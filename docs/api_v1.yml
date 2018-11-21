@@ -1,0 +1,264 @@
+openapi: 3.0.0
+info:
+  title: TAO Simple Roaster API
+  description: '' # TODO
+  version: 1.0.0
+
+servers:
+- url: https://example.com/api/v1 # TODO
+
+paths:
+  /auth/login:
+    post:
+      summary: Login the user
+      tags:
+      - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        204:
+          description: The user logged in successfully
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        403:
+          $ref: '#/components/responses/InvalidCredentialsResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Logout the user
+      tags:
+      - Authentication
+      responses:
+        204:
+          description: The user logged out successfully
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /assignments:
+    get:
+      summary: Returns the assignments for the current user
+      description: Returns all the assignments which belongs to the currently logged in user.
+      tags:
+      - Assignments
+      parameters:
+      - name: page
+        in: query
+        description: Number of page
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Number of assignments to return per page
+        schema:
+          type: integer
+          default: 25 #TODO
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                    - true
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Assignment'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    post:
+      summary: Creates a new assignment for the current user
+      tags:
+      - Assignments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lineItemId:
+                  type: string
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                    - true
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+
+  /assignments/{id}/lti-link:
+    get:
+      summary: Returns the LTI link for the given assignment
+      description: lorem ipsum dolor
+      tags:
+      - Assignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the assignment
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                    - true
+                  ltiLink:
+                    type: string
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        404:
+          $ref: '#/components/responses/AssignmentNotFoundResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+components:
+  schemas:
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The assignment ID
+        username:
+          type: string
+          description: The username of the user who belongs to the assignment
+        lineItem:
+          $ref: '#/components/schemas/LineItem'
+    LineItem:
+      type: object
+      properties:
+        uri:
+          type: string
+        login:
+          type: string
+        name:
+          type: string
+        startDateTime:
+          type: string
+        endDateTime:
+          type: string
+        infrastructure:
+          type: integer
+          description: The infrastructure ID
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum:
+                - false
+              error:
+                type: string
+                enum:
+                - "Bad request"
+                - "{errorMessage}"
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum:
+                - false
+              error:
+                type: string
+                enum:
+                - "Unauthorized"
+    InvalidCredentialsResponse:
+      description: Invalid credentials
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum:
+                - false
+              error:
+                type: string
+                enum:
+                - "Invalid credentials"
+    AssignmentNotFoundResponse:
+      description: Assignment not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum:
+                - false
+              error:
+                type: string
+                enum:
+                - "Assignment not found"
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum:
+                - false
+              error:
+                type: string
+                enum:
+                - "Internal server error"
+                - "{errorMessage}"
