@@ -266,12 +266,6 @@ components:
             $ref: '#/components/schemas/Error'
     UnauthorizedResponse:
       description: Unauthorized
-      headers:
-        WWW-Authenticate:
-          schema:
-            type: string
-            description: Authentication method that should be used to gain access to a resource.
-            example: Bearer
       content:
         application/problem+json:
           schema:
