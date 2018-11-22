@@ -38,6 +38,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         403:
           $ref: '#/components/responses/InvalidCredentialsResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -51,6 +53,8 @@ paths:
           description: The user logged out successfully
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -76,6 +80,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
     post:
@@ -107,6 +113,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -138,6 +146,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         404:
           $ref: '#/components/responses/AssignmentNotFoundResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -164,6 +174,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -234,6 +246,7 @@ components:
           - 401
           - 403
           - 404
+          - 405
           - 500
           example: 403
         detail:
@@ -248,7 +261,7 @@ components:
     BadRequestResponse:
       description: Bad request
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
     UnauthorizedResponse:
@@ -260,24 +273,30 @@ components:
             description: Authentication method that should be used to gain access to a resource.
             example: Bearer
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
     InvalidCredentialsResponse:
       description: Invalid credentials
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
     AssignmentNotFoundResponse:
       description: Assignment not found
       content:
-        application/json:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    MethodNotAllowedResponse:
+      description: Method not allowed
+      content:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
     InternalServerErrorResponse:
       description: Internal server error
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
