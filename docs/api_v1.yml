@@ -1,0 +1,296 @@
+openapi: 3.0.0
+info:
+  title: TAO Simple Roaster API
+  description: '' # TODO
+  version: 1.0.0
+
+servers:
+- url: https://example.com/api/v1 # TODO
+
+paths:
+  /auth/login:
+    post:
+      summary: Login the user
+      tags:
+      - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      security: []
+      responses:
+        204:
+          description: The user logged in successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                description: Session cookie
+                example: SESSIONID=abcde12345; Path=/;
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        403:
+          $ref: '#/components/responses/InvalidCredentialsResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Logout the user
+      tags:
+      - Authentication
+      responses:
+        204:
+          description: The user logged out successfully
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /assignments:
+    get:
+      summary: Returns the assignments for the current user
+      description: Returns all the assignments which belongs to the currently logged in user.
+      tags:
+      - Assignments
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Assignment'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    post:
+      summary: Creates a new assignment for the current user
+      tags:
+      - Assignments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lineItemId:
+                  type: string
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The ID of the created Assignment
+                    example: 13
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /assignments/{id}/lti-link:
+    get:
+      summary: Returns the LTI link for the given assignment
+      tags:
+      - Assignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the assignment
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ltiLink:
+                    type: string
+                    description: The url for the LTI resource
+                    example: https://lti.example.com/something # TODO
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        404:
+          $ref: '#/components/responses/AssignmentNotFoundResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /lti/outcome:
+    post:
+      summary: LTI Basic Outcomes Service
+      tags:
+      - LTI
+      security: []
+      parameters:
+      - name: Authorization
+        description: OAuth authorization header, including OAuth parameters
+        in: header
+        schema:
+          type: string
+          example: Oauth realm="", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
+      requestBody:
+        content:
+          application/xml: {}
+      responses:
+        204:
+          description: Success
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+security:
+- cookieAuth: []
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
+  schemas:
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The assignment ID
+          example: 13
+        username:
+          type: string
+          description: The username of the user who belongs to the assignment
+          example: johndoe
+        lineItem:
+          $ref: '#/components/schemas/LineItem'
+    LineItem:
+      type: object
+      properties:
+        uri:
+          type: string
+          example: my-tao-instance.com/tao.rdf#123456789 # TODO
+        login:
+          type: string
+          example: johndoe
+        name:
+          type: string
+          example: Delivery#12
+        startDateTime:
+          type: integer
+          description: The start DateTime in UNIX timestamp
+          example: 1542880258
+        endDateTime:
+          type: integer
+          description: The end DateTime in UNIX timestamp
+          example: 1542880258
+        infrastructure:
+          type: integer
+          description: The infrastructure ID
+          example: 2
+    Error:
+      type: object
+      description: Problem details object (RFC7807)
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          example: https://example.com/api/probs/out-of-credit
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type.
+          example: You do not have enough credit.
+        status:
+          type: integer
+          description: The HTTP status code, generated by the origin server for this occurrence of the problem.
+          enum:
+          - 400
+          - 401
+          - 403
+          - 404
+          - 405
+          - 500
+          example: 403
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+          example: Your current balance is 30, but that costs 50.
+        instance:
+          type: string
+          description: A URI reference that identifies the speciic occurrence of the problem.
+          example: /account/12345/msgs/abc
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidCredentialsResponse:
+      description: Invalid credentials
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    AssignmentNotFoundResponse:
+      description: Assignment not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    MethodNotAllowedResponse:
+      description: Method not allowed
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
