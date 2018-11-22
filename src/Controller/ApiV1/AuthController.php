@@ -18,14 +18,6 @@ class AuthController
     }
 
     /**
-     * @Route("/token", name="api_v1_auth_token", methods={"POST"})
-     */
-    public function token()
-    {
-        //TODO
-    }
-
-    /**
      * @Route("/logout", name="api_v1_auth_logout", methods={"POST"})
      */
     public function logout()

@@ -24,21 +24,16 @@ paths:
                   type: string
                 password:
                   type: string
+      security: []
       responses:
-        200:
+        204:
           description: The user logged in successfully
-          content:
-            application/json:
+          headers:
+            Set-Cookie:
               schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                    description: JWT access token
-                  refreshToken:
-                    type: string
-                    description: JWT refresh token
-
+                type: string
+                description: Session cookie
+                example: SESSIONID=abcde12345; Path=/;
         400:
           $ref: '#/components/responses/BadRequestResponse'
         403:
@@ -46,53 +41,11 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /auth/token:
-    post:
-      summary: Request new token
-      tags:
-      - Authentication
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                refreshToken:
-                  type: string
-                  description: JWT refresh token
-      responses:
-        200:
-          description: New token requested successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                    description: New JWT access token
-                  refreshToken:
-                    type: string
-                    description: New JWT refresh token
-        400:
-          $ref: '#/components/responses/BadRequestResponse'
-        401:
-          $ref: '#/components/responses/UnauthorizedResponse'
-        500:
-          $ref: '#/components/responses/InternalServerErrorResponse'
   /auth/logout:
     post:
       summary: Logout the user
       tags:
       - Authentication
-      parameters:
-      - name: accessToken
-        in: query
-        description: JWT access token
-        required: true
-        schema:
-          type: string
       responses:
         204:
           description: The user logged out successfully
@@ -107,25 +60,6 @@ paths:
       description: Returns all the assignments which belongs to the currently logged in user.
       tags:
       - Assignments
-      parameters:
-      - name: accessToken
-        in: query
-        description: JWT access token
-        required: true
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Number of page
-        schema:
-          type: integer
-          default: 1
-      - name: limit
-        in: query
-        description: Number of assignments to return per page
-        schema:
-          type: integer
-          default: 25 #TODO
       responses:
         200:
           description: Success
@@ -134,52 +68,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  _links:
-                    type: object
-                    properties:
-                      self:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            example: /api/v1/assignments?page=2
-                      first:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            example: /api/v1/assignments?page=1
-                      prev:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            example: /api/v1/assignments?page=1
-                      next:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            example: /api/v1/assignments?page=3
-                      last:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            example: /api/v1/assignments?page=12
-                  count:
-                    type: integer
-                    example: 3
-                  total:
-                    type: integer
-                    example: 36
-                  _embedded:
-                    type: object
-                    properties:
-                      assignments:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Assignment'
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Assignment'
         400:
           $ref: '#/components/responses/BadRequestResponse'
         401:
@@ -190,13 +82,6 @@ paths:
       summary: Creates a new assignment for the current user
       tags:
       - Assignments
-      parameters:
-      - name: accessToken
-        in: query
-        description: JWT access token
-        required: true
-        schema:
-          type: string
       requestBody:
         required: true
         content:
@@ -225,7 +110,6 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-
   /assignments/{id}/lti-link:
     get:
       summary: Returns the LTI link for the given assignment
@@ -233,12 +117,6 @@ paths:
       tags:
       - Assignments
       parameters:
-      - name: accessToken
-        in: query
-        description: JWT access token
-        required: true
-        schema:
-          type: string
       - name: id
         in: path
         description: The ID of the assignment
@@ -264,7 +142,15 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
+security:
+- cookieAuth: []
+
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
   schemas:
     Assignment:
       type: object
