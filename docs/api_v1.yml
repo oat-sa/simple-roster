@@ -204,14 +204,6 @@ components:
           type: string
           description: Possible state of assignment [ready, started, completed, cancelled]
           example: started
-        label:
-          type: string
-          description: Label for assigment to show on user-login-portal
-          example: Delievery of Test 1
-        description:
-          type: string
-          description: Detailes of assigment to show on user-login-portal
-          example: Started at 28/11/2018 09:09:03
         lineItem:
           $ref: '#/components/schemas/LineItem'
     LineItem:
@@ -226,6 +218,14 @@ components:
         name:
           type: string
           example: Delivery#12
+        label:
+          type: string
+          description: Label for assigment to show on user-login-portal
+          example: Delievery of Test 1
+        description:
+          type: string
+          description: Detailes of assigment to show on user-login-portal
+          example: Started at 28/11/2018 09:09:03
         startDateTime:
           type: integer
           description: The start DateTime in UNIX timestamp
