@@ -9,6 +9,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
+        "aws/aws-sdk-php": "^3.81",
         "phing/phing": "^2.16",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",
