@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Ingesting;
 
 use App\Entity\Entity;
 use App\Entity\Infrastructure;
@@ -14,9 +14,15 @@ class IngestInfrastructures extends AbstractIngestCommand
     {
         $this
             ->setName('ingest-infrastructures')
-            ->setDescription('TBD')
-            ->setHelp('TBD');
-
+            ->setDescription('Import a list of infrastructures')
+            ->setHelp($this->getHelpHeader('infrastructures') . <<<'HELP'
+CSV fields: 
+<info>id</info> string, required <comment>must be unique</comment>
+<info>lti_director_link</info> string, required
+<info>key</info> string, required
+<info>secret</info> string, required
+HELP
+            );
         parent::configure();
     }
 

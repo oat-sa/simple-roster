@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Ingesting;
 
 use App\Entity\Entity;
 use App\Entity\User;
@@ -14,8 +14,16 @@ class IngestUsersCommand extends AbstractIngestCommand
     {
         $this
             ->setName('ingest-users')
-            ->setDescription('TBD')
-            ->setHelp('TBD');
+            ->setDescription('Import a list of users')
+            ->setHelp($this->getHelpHeader('users') . <<<'HELP'
+CSV fields: 
+<info>user login</info> string <comment>must be unique</comment>
+<info>user password</info> string <comment>plain</comment>
+
+Example:
+"Bob";"qwerty"
+HELP
+            );
 
         parent::configure();
     }
