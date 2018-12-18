@@ -28,7 +28,7 @@ abstract class Entity
     {
         foreach ($this->requiredProperties as $requiredProperty) {
             if (!array_key_exists($requiredProperty, $this->data) || $this->data[$requiredProperty] === null || $this->data[$requiredProperty] === '') {
-                throw new \Exception(sprintf('Required field "%s" isn\'t provided'));
+                throw new \Exception(sprintf('Required field "%s" isn\'t provided', $requiredProperty));
             }
         }
     }
