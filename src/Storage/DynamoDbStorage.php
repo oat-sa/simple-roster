@@ -42,7 +42,7 @@ class DynamoDbStorage implements Storage
         $this->marshaler = new Marshaler();
     }
 
-    public function read(string $tableName, array $keys): array
+    public function read(string $tableName, array $keys): ?array
     {
         $item = $this->client->getItem([
             self::TABLE_NAME_KEY => $tableName,
@@ -53,7 +53,10 @@ class DynamoDbStorage implements Storage
             return null;
         }
         $item = $item->get(self::TABLE_ITEM_KEY);
-        return $this->marshaler->unmarshalItem($item);
+        if ($item !== null) {
+            $item = $this->marshaler->unmarshalItem($item);
+        }
+        return $item;
     }
 
     public function insert(string $tableName, array $keys, array $data): void

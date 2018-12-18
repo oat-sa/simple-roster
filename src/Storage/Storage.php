@@ -4,7 +4,7 @@ namespace App\Storage;
 
 interface Storage
 {
-    public function read(string $storageName, array $key): array;
+    public function read(string $storageName, array $key): ?array;
 
     public function insert(string $storageName, array $keys, array $data): void;
 
