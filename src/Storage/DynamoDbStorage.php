@@ -42,6 +42,9 @@ class DynamoDbStorage implements Storage
         $this->marshaler = new Marshaler();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function read(string $tableName, array $keys): ?array
     {
         $item = $this->client->getItem([
@@ -59,6 +62,9 @@ class DynamoDbStorage implements Storage
         return $item;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function insert(string $tableName, array $keys, array $data): void
     {
         $this->client->putItem([
@@ -67,6 +73,9 @@ class DynamoDbStorage implements Storage
         ]);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update(string $storageName, array $keys, array $data): void
     {
         // we are using PUT so we just replace the original item, if the key
@@ -74,6 +83,9 @@ class DynamoDbStorage implements Storage
         $this->insert($storageName, $keys, $data);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function delete(string $storageName, array $keys): void
     {
         $this->client->deleteItem([

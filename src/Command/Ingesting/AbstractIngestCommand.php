@@ -27,6 +27,9 @@ abstract class AbstractIngestCommand extends Command
         $this->storage = $storage;
     }
 
+    /**
+     * Sets command name, input and metadata
+     */
     protected function configure(): void
     {
         $this
@@ -34,9 +37,20 @@ abstract class AbstractIngestCommand extends Command
             ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
     }
 
+    /**
+     * List of accepted fields
+     *
+     * @return array
+     */
     abstract protected function getFields(): array;
 
-    abstract protected function buildEntity(array $fields): Entity;
+    /**
+     * Creates entity by fields values
+     *
+     * @param array $fieldsValues
+     * @return Entity
+     */
+    abstract protected function buildEntity(array $fieldsValues): Entity;
 
     /**
      * @todo retrieving the file from Amazon S3
@@ -58,6 +72,12 @@ abstract class AbstractIngestCommand extends Command
         }
     }
 
+    /**
+     * Maps CSV line values to the command fields (getFields())
+     *
+     * @param array $line
+     * @return array
+     */
     protected function mapFileLineByFieldNames(array $line): array
     {
         $fieldNames = $this->getFields();
@@ -122,7 +142,6 @@ abstract class AbstractIngestCommand extends Command
                 return;
             }
 
-            // check if the record with same id already exists
             if ($this->checkIfExists($entity)) {
                 $alreadyExistingRowsCount++;
                 continue;
@@ -136,6 +155,12 @@ abstract class AbstractIngestCommand extends Command
         $this->io->success(sprintf('Data has been ingested successfully. %d records created, %d records updated', $rowsAdded, $alreadyExistingRowsCount));
     }
 
+    /**
+     * Gets generic help common to all ingesting commands
+     *
+     * @param string $entityName
+     * @return string
+     */
     public function getHelpHeader(string $entityName): string
     {
         return <<<HELP

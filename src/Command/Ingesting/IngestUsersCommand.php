@@ -39,8 +39,8 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function buildEntity(array $fields): Entity
+    protected function buildEntity(array $fieldsValues): Entity
     {
-        return new User($fields);
+        return new User($fieldsValues);
     }
 }

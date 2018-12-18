@@ -38,9 +38,9 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function buildEntity(array $fields): Entity
+    protected function buildEntity(array $fieldsValues): Entity
     {
-        return new LineItem($fields);
+        return new LineItem($fieldsValues);
     }
 
     /**
