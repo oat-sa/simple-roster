@@ -21,6 +21,13 @@ abstract class AbstractIngestCommand extends Command
      */
     protected $storage;
 
+    /**
+     * Whether to skip those records already existing or update with new values
+     *
+     * @var bool
+     */
+    protected $updateMode = false;
+
     public function __construct(Storage $storage)
     {
         parent::__construct();
@@ -121,6 +128,8 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
+     * Entry point to the command
+     *
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return void
@@ -144,15 +153,18 @@ abstract class AbstractIngestCommand extends Command
 
             if ($this->checkIfExists($entity)) {
                 $alreadyExistingRowsCount++;
-                continue;
+                if (!$this->updateMode) {
+                    continue;
+                }
             }
 
             $entityData = $entity->getData();
-            $this->storage->insert($entity->getTable(), $entityData, [$entity->getKey() => $entityData[$entity->getKey()]]);
+            $this->storage->insert($entity->getTable(), [$entity->getKey() => $entityData[$entity->getKey()]], $entityData);
             $rowsAdded++;
         }
 
-        $this->io->success(sprintf('Data has been ingested successfully. %d records created, %d records updated', $rowsAdded, $alreadyExistingRowsCount));
+        $messageOnUpdated = $this->updateMode ? 'updated' : 'were skipped as they already existed';
+        $this->io->success(sprintf('Data has been ingested successfully. %d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
     }
 
     /**

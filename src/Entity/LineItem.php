@@ -15,9 +15,4 @@ class LineItem extends Entity
     {
         return 'tao_uri';
     }
-
-    public function validate()
-    {
-        // @todo
-    }
 }

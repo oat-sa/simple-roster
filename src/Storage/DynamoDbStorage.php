@@ -47,6 +47,7 @@ class DynamoDbStorage implements Storage
      */
     public function read(string $tableName, array $keys): ?array
     {
+        return null;
         $item = $this->client->getItem([
             self::TABLE_NAME_KEY => $tableName,
             self::CONSISTENT_READ_KEY => true,
@@ -71,16 +72,6 @@ class DynamoDbStorage implements Storage
             self::TABLE_NAME_KEY => $tableName,
             self::TABLE_ITEM_KEY => $this->marshaler->marshalItem($keys) + $this->marshaler->marshalItem($data),
         ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function update(string $storageName, array $keys, array $data): void
-    {
-        // we are using PUT so we just replace the original item, if the key
-        // does not exist, it will be created.
-        $this->insert($storageName, $keys, $data);
     }
 
     /**

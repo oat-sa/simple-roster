@@ -22,22 +22,13 @@ interface Storage
     public function read(string $tableName, array $key): ?array;
 
     /**
-     * Creates a record with primary key
+     * Puts a record with primary key
      *
      * @param string $tableName
      * @param array $keys
      * @param array $data
      */
     public function insert(string $tableName, array $keys, array $data): void;
-
-    /**
-     * Updates/Puts a record (depending on implementation)
-     *
-     * @param string $tableName
-     * @param array $keys
-     * @param array $data
-     */
-    public function update(string $tableName, array $keys, array $data): void;
 
     /**
      * Deletes one record by primary key
