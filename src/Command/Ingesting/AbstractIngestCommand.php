@@ -3,7 +3,10 @@
 namespace App\Command\Ingesting;
 
 use App\Command\Ingesting\Exception\FileNotFoundException;
+use App\Command\Ingesting\Exception\InputOptionException;
+use App\Command\Ingesting\Exception\S3AccessException;
 use App\Entity\Entity;
+use App\S3\S3ClientFactory;
 use App\Storage\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,16 +25,23 @@ abstract class AbstractIngestCommand extends Command
     protected $storage;
 
     /**
+     * @var S3ClientFactory
+     */
+    protected $s3ClientFactory;
+
+    /**
      * Whether to skip those records already existing or update with new values
      *
      * @var bool
      */
     protected $updateMode = false;
 
-    public function __construct(Storage $storage)
+    public function __construct(Storage $storage, S3ClientFactory $s3ClientFactory)
     {
         parent::__construct();
+
         $this->storage = $storage;
+        $this->s3ClientFactory = $s3ClientFactory;
     }
 
     /**
@@ -41,7 +51,12 @@ abstract class AbstractIngestCommand extends Command
     {
         $this
             ->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
-            ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
+            ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',')
+            ->addOption('s3_bucket', null, InputOption::VALUE_OPTIONAL, 'Name of a S3 bucket')
+            ->addOption('s3_object', null, InputOption::VALUE_OPTIONAL, 'Key of a S3 object')
+            ->addOption('s3_region', null, InputOption::VALUE_OPTIONAL, 'Region specified for S3 bucket')
+            ->addOption('s3_access_key', null, InputOption::VALUE_OPTIONAL, 'AWS access key')
+            ->addOption('s3_secret', null, InputOption::VALUE_OPTIONAL, 'AWS secret key');
     }
 
     /**
@@ -60,22 +75,68 @@ abstract class AbstractIngestCommand extends Command
     abstract protected function buildEntity(array $fieldsValues): Entity;
 
     /**
-     * @todo retrieving the file from Amazon S3
-     *
+     * @param InputInterface $input
+     * @param string $optionName
+     * @throws InputOptionException
+     */
+    private function checkAwsOption(InputInterface $input, string $optionName): void
+    {
+        if (!$input->getOption($optionName)) {
+            throw new InputOptionException(sprintf('Option %s is not provided', $optionName));
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @throws InputOptionException
+     */
+    private function checkAwsOptions(InputInterface $input): void
+    {
+        if (!$input->getOption('s3_bucket') && !$input->getOption('s3_object') && !$input->getOption('s3_region')
+            && !$input->getOption('s3_access_key') && !$input->getOption('s3_secret')) {
+            throw new InputOptionException('Neither local filename nor AWS object provided');
+        }
+
+        $this->checkAwsOption($input, 's3_bucket');
+        $this->checkAwsOption($input, 's3_object');
+        $this->checkAwsOption($input, 's3_region');
+        $this->checkAwsOption($input, 's3_access_key');
+        $this->checkAwsOption($input, 's3_secret');
+    }
+
+    /**
      * @param InputInterface $input
      * @return \Generator
      * @throws FileNotFoundException
+     * @throws InputOptionException
+     * @throws S3AccessException
      */
-    protected function getData(InputInterface $input): \Generator
+    private function iterateInputFileLines(InputInterface $input): \Generator
     {
         $filename = $input->getOption('filename');
 
-        $fileHandle = fopen($filename, 'r');
-        if (false === $fileHandle) {
-            throw new FileNotFoundException($filename);
-        }
-        while (($line = fgetcsv($fileHandle, null, $input->getOption('delimiter'))) !== false) {
-            yield $line;
+        if ($filename !== null) {
+            $fileHandle = fopen($filename, 'r');
+            if (false === $fileHandle) {
+                throw new FileNotFoundException($filename);
+            }
+            while (($line = fgetcsv($fileHandle, null, $input->getOption('delimiter'))) !== false) {
+                yield $line;
+            }
+        } else {
+            $this->checkAwsOptions($input);
+
+            $s3Client = $this->s3ClientFactory->createClient($input->getOption('s3_region'),
+                $input->getOption('s3_access_key'), $input->getOption('s3_secret'));
+
+            try {
+                $s3Response = $s3Client->getObject($input->getOption('s3_bucket'), $input->getOption('s3_object'));
+            } catch (\Exception $e) {
+                throw new S3AccessException();
+            }
+            foreach (explode(PHP_EOL, $s3Response) as $line) {
+                yield str_getcsv($line, $input->getOption('delimiter'));
+            }
         }
     }
 
@@ -140,7 +201,7 @@ abstract class AbstractIngestCommand extends Command
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
         $lineNumber = 0;
-        foreach ($this->getData($input) as $line) {
+        foreach ($this->iterateInputFileLines($input) as $line) {
             $lineNumber++;
             $entity = $this->buildEntity($this->mapFileLineByFieldNames($line));
             try {

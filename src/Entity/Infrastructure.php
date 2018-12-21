@@ -15,9 +15,4 @@ class Infrastructure extends Entity
     {
         return 'id';
     }
-
-    public function validate()
-    {
-        // @todo
-    }
 }

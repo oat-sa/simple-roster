@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Validation\ValidationException;
+
 abstract class Entity
 {
     protected $data = [];
@@ -14,21 +16,16 @@ abstract class Entity
 
     abstract public function getTable(): string;
 
-    /**
-     * @todo multiple fields in key
-     */
     abstract public function getKey();
 
     /**
-     * @todo ValidatorException
-     *
      * @throws \Exception
      */
     public function validate()
     {
         foreach ($this->requiredProperties as $requiredProperty) {
             if (!array_key_exists($requiredProperty, $this->data) || $this->data[$requiredProperty] === null || $this->data[$requiredProperty] === '') {
-                throw new \Exception(sprintf('Required field "%s" isn\'t provided', $requiredProperty));
+                throw new ValidationException(sprintf('Required field "%s" isn\'t provided', $requiredProperty));
             }
         }
     }
