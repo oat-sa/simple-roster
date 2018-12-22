@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Tests\Command\Ingesting;
+
+use App\Command\Ingesting\Exception\InputOptionException;
+use App\S3\InMemoryS3Client;
+use App\S3\S3ClientFactory;
+use App\Storage\InMemoryStorage;
+use App\Tests\Command\CommandTestCase;
+use org\bovigo\vfs\vfsStream;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class AbstractIngestCommandTest extends CommandTestCase
+{
+    protected $fieldNames = ['name', 'mandatory_prop_1', 'mandatory_prop_2', 'optional_prop_1'];
+
+    public function setUp()
+    {
+        vfsStream::setup('home');
+    }
+
+    public function testNotProvidedOptionsCauseException()
+    {
+        $command = new ConcretedAbstractIngestCommand(new InMemoryStorage(), new S3ClientFactory(InMemoryS3Client::class));
+
+        $this->expectException(InputOptionException::class);
+
+        $command->run($this->getInputMock(), $this->getOutputMock());
+    }
+
+    public function testNotAllS3OptionsSpecified()
+    {
+        $command = new ConcretedAbstractIngestCommand(new InMemoryStorage(), new S3ClientFactory(InMemoryS3Client::class));
+
+        $this->expectException(InputOptionException::class);
+
+        $command->run($this->getInputMock(['s3_bucket' => 'bucket_name', 's3_region' => 'eu']), $this->getOutputMock());
+    }
+
+    public function testSimpleImportWithS3()
+    {
+        $bucketName = 'bucket_name';
+        $objectName = 'object_name';
+
+        $importedData = [
+            ['name value', 'mandatory_prop_1 value', 'mandatory_prop_2 value', 'optional_prop_1 value',]
+        ];
+
+        $importedDataCsv = $this->convertArrayToCSV($importedData);
+
+        $s3Client = new InMemoryS3Client();
+
+        $s3Client->putObject($bucketName, $objectName, $importedDataCsv);
+
+        $storage = new InMemoryStorage();
+
+        $command = new ConcretedAbstractIngestCommand($storage, $this->getS3Factory($s3Client));
+
+        $command->run($this->getInputMock([
+            's3_region' => 'eu',
+            's3_bucket' => $bucketName,
+            's3_object' => $objectName,
+            's3_access_key' => 'does not matter',
+            's3_secret' => 'does not matter',
+        ]), $this->getOutputMock());
+
+        $savedEntity = $storage->read('example_table', ['name' => 'name value']);
+        $this->assertSavedData($savedEntity, $importedData[0]);
+    }
+
+    public function testCsvStringsHavingDifferentAmountOfCells()
+    {
+        $importedData = [
+            ['name value', 'mandatory_prop_1 value', 'mandatory_prop_2 value', 'optional_prop_1 value'],
+            ['name value 2', 'mandatory_prop_1 value', 'mandatory_prop_2 value',],
+        ];
+
+        $importedDataCsv = $this->convertArrayToCSV($importedData);
+
+        $filename = vfsStream::url('home/test.txt');
+        file_put_contents($filename, $importedDataCsv);
+
+        $storage = new InMemoryStorage();
+
+        $command = new ConcretedAbstractIngestCommand($storage, $this->getS3Factory());
+
+        $command->run($this->getInputMock([
+            'filename' => $filename,
+            'delimiter' => ','
+        ]), $this->getOutputMock());
+
+        $savedEntity = $storage->read('example_table', ['name' => 'name value']);
+        $this->assertSavedData($savedEntity, $importedData[0]);
+
+        $savedEntity = $storage->read('example_table', ['name' => 'name value 2']);
+        $this->assertSavedData($savedEntity, $importedData[1]);
+    }
+
+    protected function assertSavedData(array $savedEntity, array $importedData)
+    {
+        $i = 0;
+        foreach ($this->fieldNames as $fieldName) {
+            $this->assertEquals($importedData[$i] ?? null, $savedEntity[$fieldName]);
+            $i++;
+        }
+    }
+
+    private function getS3Factory($s3Client = null)
+    {
+        $s3Factory = $this->getMockBuilder(S3ClientFactory::class)->disableOriginalConstructor()->getMock();
+        $s3Factory->expects($this->any())
+            ->method('createClient')
+            ->willReturn($s3Client);
+        return $s3Factory;
+    }
+
+    private function convertArrayToCSV($data, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
+    {
+        $f = fopen('php://memory', 'r+');
+        foreach ($data as $item) {
+            fputcsv($f, $item, $delimiter, $enclosure, $escape_char);
+        }
+        rewind($f);
+        return stream_get_contents($f);
+    }
+}

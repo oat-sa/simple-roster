@@ -19,6 +19,7 @@
         "symfony/yaml": "4.1.*"
     },
     "require-dev": {
+        "mikey179/vfsStream": "^1.6",
         "symfony/debug-bundle": "^3.3|^4.0",
         "symfony/dotenv": "4.1.*",
         "symfony/maker-bundle": "^1.9",

@@ -47,7 +47,6 @@ class DynamoDbStorage implements Storage
      */
     public function read(string $tableName, array $keys): ?array
     {
-        return null;
         $item = $this->client->getItem([
             self::TABLE_NAME_KEY => $tableName,
             self::CONSISTENT_READ_KEY => true,
