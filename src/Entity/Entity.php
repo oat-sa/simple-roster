@@ -19,7 +19,7 @@ abstract class Entity
     abstract public function getKey();
 
     /**
-     * @throws \Exception
+     * @throws ValidationException
      */
     public function validate()
     {

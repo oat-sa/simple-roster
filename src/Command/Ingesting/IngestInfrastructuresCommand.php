@@ -5,7 +5,7 @@ namespace App\Command\Ingesting;
 use App\Entity\Entity;
 use App\Entity\Infrastructure;
 
-class IngestInfrastructures extends AbstractIngestCommand
+class IngestInfrastructuresCommand extends AbstractIngestCommand
 {
     /**
      * {@inheritdoc}
@@ -13,7 +13,7 @@ class IngestInfrastructures extends AbstractIngestCommand
     protected function configure(): void
     {
         $this
-            ->setName('ingest-infrastructures')
+            ->setName('tao:ingest:infrastructures')
             ->setDescription('Import a list of infrastructures')
             ->setHelp($this->getHelpHeader('infrastructures') . <<<'HELP'
 CSV fields: 

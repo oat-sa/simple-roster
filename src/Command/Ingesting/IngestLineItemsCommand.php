@@ -13,7 +13,7 @@ class IngestLineItemsCommand extends AbstractIngestCommand
     protected function configure(): void
     {
         $this
-            ->setName('ingest-line-items')
+            ->setName('tao:ingest:line-items')
             ->setDescription('Import a list of line items')
             ->setHelp($this->getHelpHeader('line items') . <<<'HELP'
 CSV fields: 

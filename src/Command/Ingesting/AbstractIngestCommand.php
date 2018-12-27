@@ -3,9 +3,11 @@
 namespace App\Command\Ingesting;
 
 use App\Command\Ingesting\Exception\FileNotFoundException;
+use App\Command\Ingesting\Exception\IngestingException;
 use App\Command\Ingesting\Exception\InputOptionException;
 use App\Command\Ingesting\Exception\S3AccessException;
 use App\Entity\Entity;
+use App\Entity\Validation\ValidationException;
 use App\S3\S3ClientFactory;
 use App\Storage\Storage;
 use Symfony\Component\Console\Command\Command;
@@ -170,7 +172,7 @@ abstract class AbstractIngestCommand extends Command
 
     /**
      * @param Entity $entity
-     * @throws \Exception
+     * @throws ValidationException
      */
     protected function validateEntity(Entity $entity): void
     {
@@ -206,8 +208,8 @@ abstract class AbstractIngestCommand extends Command
             $entity = $this->buildEntity($this->mapFileLineByFieldNames($line));
             try {
                 $this->validateEntity($entity);
-            } catch (\Exception $e) {
-                $this->io->warning(sprintf('The process has been terminated because of an error on line %d of file:', $lineNumber));
+            } catch (ValidationException $e) {
+                $this->io->warning(sprintf('The process has been terminated because the line %d of the file is invalid:', $lineNumber));
                 $this->io->error(sprintf('%s', $e->getMessage()));
                 return;
             }

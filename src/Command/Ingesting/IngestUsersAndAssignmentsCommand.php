@@ -23,7 +23,7 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
     protected function configure(): void
     {
         $this
-            ->setName('ingest-users-and-assignments')
+            ->setName('tao:ingest:users-and-assignments')
             ->setDescription('Import a list of users and their assignments')
             ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . <<<'HELP'
 <options=bold>If there is a need to ingest assignments for an existing user, please follow the common pattern. 
