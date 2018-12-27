@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-class User extends Entity
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class User extends Entity implements UserInterface
 {
     protected $requiredProperties = ['login', 'password'];
 
@@ -32,5 +34,31 @@ class User extends Entity
                 ];
             }
         }
+    }
+
+    public function getRoles()
+    {
+        return [];
+    }
+
+    public function getPassword()
+    {
+        $this->getData()['password'];
+    }
+
+    public function getSalt()
+    {
+        return $this->getData()['salt'];
+    }
+
+    public function getUsername()
+    {
+        return $this->getData()['login'];
+    }
+
+    public function eraseCredentials()
+    {
+        $this->data['password'] = '***';
+        $this->data['salt'] = '***';
     }
 }

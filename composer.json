@@ -16,6 +16,7 @@
         "symfony/console": "4.1.*",
         "symfony/flex": "^1.1",
         "symfony/framework-bundle": "4.1.*",
+        "symfony/security-bundle": "4.1.*",
         "symfony/yaml": "4.1.*"
     },
     "require-dev": {
