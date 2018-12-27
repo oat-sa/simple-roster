@@ -59,4 +59,12 @@ HELP
             throw new \Exception(sprintf('Infrastructure with id "%s" not found', $infrastructureId));
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEntityClass()
+    {
+        return LineItem::class;
+    }
 }

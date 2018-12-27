@@ -8,6 +8,9 @@ use App\Command\Ingesting\Exception\InputOptionException;
 use App\Command\Ingesting\Exception\S3AccessException;
 use App\Entity\Entity;
 use App\Entity\Validation\ValidationException;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\Source\Source;
+use App\Ingesting\Source\SourceFactory;
 use App\S3\S3ClientFactory;
 use App\Storage\Storage;
 use Symfony\Component\Console\Command\Command;
@@ -32,18 +35,30 @@ abstract class AbstractIngestCommand extends Command
     protected $s3ClientFactory;
 
     /**
+     * @var SourceFactory
+     */
+    protected $sourceFactory;
+
+    /**
+     * @var RowToModelMapper
+     */
+    protected $rowToModelMapper;
+
+    /**
      * Whether to skip those records already existing or update with new values
      *
      * @var bool
      */
     protected $updateMode = false;
 
-    public function __construct(Storage $storage, S3ClientFactory $s3ClientFactory)
+    public function __construct(Storage $storage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
     {
         parent::__construct();
 
         $this->storage = $storage;
         $this->s3ClientFactory = $s3ClientFactory;
+        $this->sourceFactory = $sourceFactory;
+        $this->rowToModelMapper = $rowToModelMapper;
     }
 
     /**
@@ -69,97 +84,22 @@ abstract class AbstractIngestCommand extends Command
     abstract protected function getFields(): array;
 
     /**
-     * Creates entity by fields values
-     *
-     * @param array $fieldsValues
-     * @return Entity
-     */
-    abstract protected function buildEntity(array $fieldsValues): Entity;
-
-    /**
      * @param InputInterface $input
-     * @param string $optionName
+     * @return Source
      * @throws InputOptionException
      */
-    private function checkAwsOption(InputInterface $input, string $optionName): void
+    private function detectSource(InputInterface $input): Source
     {
-        if (!$input->getOption($optionName)) {
-            throw new InputOptionException(sprintf('Option %s is not provided', $optionName));
+        $accessParameters = [];
+        foreach ($this->sourceFactory->getSupportedAccessParameters() as $parameterName) {
+            $accessParameters[$parameterName] = $input->hasOption($parameterName) ? $input->getOption($parameterName) : null;
         }
-    }
-
-    /**
-     * @param InputInterface $input
-     * @throws InputOptionException
-     */
-    private function checkAwsOptions(InputInterface $input): void
-    {
-        if (!$input->getOption('s3_bucket') && !$input->getOption('s3_object') && !$input->getOption('s3_region')
-            && !$input->getOption('s3_access_key') && !$input->getOption('s3_secret')) {
-            throw new InputOptionException('Neither local filename nor AWS object provided');
+        $accessParameters['s3_client_factory'] = $this->s3ClientFactory;
+        try {
+            return $this->sourceFactory->createSource($accessParameters);
+        } catch (\Exception $e) {
+            throw new InputOptionException($e->getMessage());
         }
-
-        $this->checkAwsOption($input, 's3_bucket');
-        $this->checkAwsOption($input, 's3_object');
-        $this->checkAwsOption($input, 's3_region');
-        $this->checkAwsOption($input, 's3_access_key');
-        $this->checkAwsOption($input, 's3_secret');
-    }
-
-    /**
-     * @param InputInterface $input
-     * @return \Generator
-     * @throws FileNotFoundException
-     * @throws InputOptionException
-     * @throws S3AccessException
-     */
-    private function iterateInputFileLines(InputInterface $input): \Generator
-    {
-        $filename = $input->getOption('filename');
-
-        if ($filename !== null) {
-            $fileHandle = fopen($filename, 'r');
-            if (false === $fileHandle) {
-                throw new FileNotFoundException($filename);
-            }
-            while (($line = fgetcsv($fileHandle, null, $input->getOption('delimiter'))) !== false) {
-                yield $line;
-            }
-        } else {
-            $this->checkAwsOptions($input);
-
-            $s3Client = $this->s3ClientFactory->createClient($input->getOption('s3_region'),
-                $input->getOption('s3_access_key'), $input->getOption('s3_secret'));
-
-            try {
-                $s3Response = $s3Client->getObject($input->getOption('s3_bucket'), $input->getOption('s3_object'));
-            } catch (\Exception $e) {
-                throw new S3AccessException();
-            }
-            foreach (explode(PHP_EOL, $s3Response) as $line) {
-                yield str_getcsv($line, $input->getOption('delimiter'));
-            }
-        }
-    }
-
-    /**
-     * Maps CSV line values to the command fields (getFields())
-     *
-     * @param array $line
-     * @return array
-     */
-    protected function mapFileLineByFieldNames(array $line): array
-    {
-        $fieldNames = $this->getFields();
-        $fieldValues = [];
-
-        $numberOfLineElement = 0;
-        foreach ($fieldNames as $fieldName) {
-            $fieldValues[$fieldName] = array_key_exists($numberOfLineElement, $line) ? $line[$numberOfLineElement] : null;
-            $numberOfLineElement++;
-        }
-
-        return $fieldValues;
     }
 
     /**
@@ -179,6 +119,8 @@ abstract class AbstractIngestCommand extends Command
         $entity->validate();
     }
 
+    abstract protected function getEntityClass();
+
     /**
      * Checks if the record with same primary key already exists
      *
@@ -187,7 +129,7 @@ abstract class AbstractIngestCommand extends Command
      */
     protected function checkIfExists(Entity $entity): bool
     {
-        return $this->storage->read($entity->getTable(), [$entity->getKey()]) !== null;
+        return $this->storage->read($entity->getTable(), [$entity->getKey() => $entity->getData()[$entity->getKey()]]) !== null;
     }
 
     /**
@@ -203,9 +145,9 @@ abstract class AbstractIngestCommand extends Command
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
         $lineNumber = 0;
-        foreach ($this->iterateInputFileLines($input) as $line) {
+        foreach ($this->detectSource($input)->iterateThroughLines() as $line) {
             $lineNumber++;
-            $entity = $this->buildEntity($this->mapFileLineByFieldNames($line));
+            $entity = $this->rowToModelMapper->map($line, $this->getFields(), $this->getEntityClass());
             try {
                 $this->validateEntity($entity);
             } catch (ValidationException $e) {

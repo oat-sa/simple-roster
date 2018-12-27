@@ -13,11 +13,6 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
     protected $updateMode = true;
 
     /**
-     * @var string
-     */
-    protected $lastExistingUserLogin;
-
-    /**
      * {@inheritdoc}
      */
     protected function configure(): void
@@ -58,52 +53,8 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function mapFileLineByFieldNames(array $line): array
+    protected function getEntityClass()
     {
-        $fieldValues = parent::mapFileLineByFieldNames($line);
-
-        // collect the remaining elements of line to the single 'assignment' field
-        $fieldCount = count($this->getFields());
-        $fieldValues['assignments'] = [];
-        for ($i = $fieldCount; $i < count($line); $i++) {
-            $fieldValues['assignments'][] = $line[$i];
-        }
-
-        return $fieldValues;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        $assignments = $fieldsValues['assignments'];
-        unset($fieldsValues['assignments']);
-        $user = new User($fieldsValues);
-        if (array_key_exists('login', $fieldsValues)) {
-            $existingUser = $this->storage->read('users', ['login' => $fieldsValues['login']]);
-            if ($existingUser) {
-                $user = new User($existingUser);
-                $this->lastExistingUserLogin = $user->getData()['login'];
-            }
-        }
-        $user->addAssignments($assignments);
-
-        return $user;
-    }
-
-    /**
-     * Since we have already checked existence inside buildEntity,
-     * let's prevent double query execution and just use the cache (lastExistingUserLogin).
-     *
-     * {@inheritdoc}
-     */
-    protected function checkIfExists(Entity $entity): bool
-    {
-        if ($this->lastExistingUserLogin === $entity->getData()['login']) {
-            return true;
-        }
-
-        return parent::checkIfExists($entity);
+        return User::class;
     }
 }

@@ -41,4 +41,12 @@ HELP
     {
         return new Infrastructure($fieldsValues);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEntityClass()
+    {
+        return Infrastructure::class;
+    }
 }
