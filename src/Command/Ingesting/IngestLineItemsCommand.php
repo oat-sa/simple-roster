@@ -47,9 +47,12 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'];
+        return $this->rowToModelMapper->map($row,
+            ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'],
+            LineItem::class
+        );
     }
 
     /**
@@ -67,13 +70,5 @@ HELP
         if ($existingInfrastructure === null) {
             throw new \Exception(sprintf('Infrastructure with id "%s" not found', $infrastructureId));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getModelClass()
-    {
-        return LineItem::class;
     }
 }

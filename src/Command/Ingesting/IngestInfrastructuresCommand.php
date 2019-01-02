@@ -5,6 +5,7 @@ namespace App\Command\Ingesting;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
 use App\Model\Infrastructure;
+use App\Model\Model;
 use App\Model\Storage\InfrastructureStorage;
 use App\S3\S3ClientFactory;
 
@@ -37,16 +38,11 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['id', 'lti_director_link', 'key', 'secret'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getModelClass()
-    {
-        return Infrastructure::class;
+        return $this->rowToModelMapper->map($row,
+            ['id', 'lti_director_link', 'key', 'secret'],
+            Infrastructure::class
+        );
     }
 }

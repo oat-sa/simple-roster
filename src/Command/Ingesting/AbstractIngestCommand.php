@@ -75,13 +75,10 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
-     * List of accepted fields
-     *
-     * @return array
+     * @param String[] $row
+     * @return Model
      */
-    abstract protected function getFields(): array;
-
-    abstract protected function getModelClass();
+    abstract protected function convertRowToModel(array $row): Model;
 
     /**
      * @param InputInterface $input
@@ -143,7 +140,7 @@ abstract class AbstractIngestCommand extends Command
         $lineNumber = 0;
         foreach ($this->detectSource($input)->iterateThroughLines() as $line) {
             $lineNumber++;
-            $entity = $this->rowToModelMapper->map($line, $this->getFields(), $this->getModelClass());
+            $entity = $this->convertRowToModel($line);
             try {
                 $this->validateEntity($entity);
             } catch (ValidationException $e) {
@@ -190,7 +187,7 @@ abstract class AbstractIngestCommand extends Command
             $this->io->error(sprintf('Unknown error: %s', $e->getMessage()));
         }
 
-        $alreadyExistingRowsCount = $result['rowsAdded'] ?? 0;
+        $alreadyExistingRowsCount = $result['alreadyExistingRowsCount'] ?? 0;
         $rowsAdded = $result['rowsAdded'] ?? 0;
 
         $messageOnUpdated = $this->updateMode ? 'updated' : 'were skipped as they already existed';

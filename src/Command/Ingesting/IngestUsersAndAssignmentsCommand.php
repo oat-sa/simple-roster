@@ -3,7 +3,9 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
+use App\Model\Model;
 use App\Model\Storage\UserStorage;
 use App\Model\User;
 use App\S3\S3ClientFactory;
@@ -15,7 +17,7 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
      */
     protected $updateMode = true;
 
-    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, UserRowToModelMapper $rowToModelMapper)
     {
         parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
     }
@@ -53,16 +55,8 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['login', 'password'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getModelClass()
-    {
-        return User::class;
+        return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
     }
 }
