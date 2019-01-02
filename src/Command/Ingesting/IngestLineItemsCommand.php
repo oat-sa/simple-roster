@@ -2,11 +2,28 @@
 
 namespace App\Command\Ingesting;
 
-use App\Entity\Entity;
-use App\Entity\LineItem;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\Source\SourceFactory;
+use App\Model\Model;
+use App\Model\LineItem;
+use App\Model\Storage\InfrastructureStorage;
+use App\Model\Storage\LineItemStorage;
+use App\S3\S3ClientFactory;
 
 class IngestLineItemsCommand extends AbstractIngestCommand
 {
+    /**
+     * @var InfrastructureStorage
+     */
+    private $infrastructureStorage;
+
+    public function __construct(LineItemStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
+    {
+        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+
+        $this->infrastructureStorage = $infrastructureStorage;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,24 +53,16 @@ HELP
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        return new LineItem($fieldsValues);
-    }
-
-    /**
-     * @param Entity $entity
+     * @param LineItem $entity
      * @throws \Exception
      */
-    protected function validateEntity(Entity $entity): void
+    protected function validateEntity(Model $entity): void
     {
         parent::validateEntity($entity);
 
-        $infrastructureId = $entity->getData()['infrastructure_id'];
+        $infrastructureId = $entity->getInfrastructureId();
 
-        $existingInfrastructure = $this->storage->read('infrastructures', ['id' => $infrastructureId]);
+        $existingInfrastructure = $this->infrastructureStorage->read($infrastructureId);
 
         if ($existingInfrastructure === null) {
             throw new \Exception(sprintf('Infrastructure with id "%s" not found', $infrastructureId));
@@ -63,7 +72,7 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getEntityClass()
+    protected function getModelClass()
     {
         return LineItem::class;
     }

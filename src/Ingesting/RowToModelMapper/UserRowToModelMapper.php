@@ -2,6 +2,8 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
+use App\Model\User;
+
 class UserRowToModelMapper extends RowToModelMapper
 {
     public function map(array $row, array $fieldNames, string $modelClass)
@@ -15,7 +17,8 @@ class UserRowToModelMapper extends RowToModelMapper
             $fieldValues['assignments'][] = $row[$i];
         }
 
-        $user = new \App\Entity\User($row);
+        /** @var User $user */
+        $user = User::createFromArray($fieldValues);
 
         $assignments = $fieldValues['assignments'];
         unset($fieldValues['assignments']);

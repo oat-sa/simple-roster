@@ -20,6 +20,6 @@ class RowToModelMapper
     public function map(array $row, array $fieldNames, string $modelClass)
     {
         $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
-        return new $modelClass($fieldValues);
+        return $modelClass::createFromArray($fieldValues);
     }
 }

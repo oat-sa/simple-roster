@@ -2,11 +2,19 @@
 
 namespace App\Command\Ingesting;
 
-use App\Entity\Entity;
-use App\Entity\Infrastructure;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\Source\SourceFactory;
+use App\Model\Infrastructure;
+use App\Model\Storage\InfrastructureStorage;
+use App\S3\S3ClientFactory;
 
 class IngestInfrastructuresCommand extends AbstractIngestCommand
 {
+    public function __construct(InfrastructureStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    {
+        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -37,15 +45,7 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        return new Infrastructure($fieldsValues);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getEntityClass()
+    protected function getModelClass()
     {
         return Infrastructure::class;
     }

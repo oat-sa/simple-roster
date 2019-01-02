@@ -25,6 +25,18 @@ abstract class CommandTestCase extends TestCase
                 $valueMap
             );
 
+        $valueMap = [];
+        foreach ($optionValues as $optionName => $optionValue) {
+            $valueMap[] = [$optionName, true];
+        }
+
+        $input->expects($this->any())
+            ->method('hasOption')
+            ->willReturnMap(
+                $valueMap
+            );
+
+
         return $input;
     }
 

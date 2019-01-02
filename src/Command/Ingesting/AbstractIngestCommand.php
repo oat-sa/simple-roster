@@ -2,17 +2,14 @@
 
 namespace App\Command\Ingesting;
 
-use App\Command\Ingesting\Exception\FileNotFoundException;
-use App\Command\Ingesting\Exception\IngestingException;
 use App\Command\Ingesting\Exception\InputOptionException;
-use App\Command\Ingesting\Exception\S3AccessException;
-use App\Entity\Entity;
-use App\Entity\Validation\ValidationException;
+use App\Model\Model;
+use App\Model\Storage\ModelStorage;
+use App\Model\Validation\ValidationException;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\Source;
 use App\Ingesting\Source\SourceFactory;
 use App\S3\S3ClientFactory;
-use App\Storage\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,9 +22,9 @@ abstract class AbstractIngestCommand extends Command
     protected $io;
 
     /**
-     * @var Storage
+     * @var ModelStorage
      */
-    protected $storage;
+    protected $modelStorage;
 
     /**
      * @var S3ClientFactory
@@ -51,11 +48,11 @@ abstract class AbstractIngestCommand extends Command
      */
     protected $updateMode = false;
 
-    public function __construct(Storage $storage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(ModelStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
     {
         parent::__construct();
 
-        $this->storage = $storage;
+        $this->modelStorage = $modelStorage;
         $this->s3ClientFactory = $s3ClientFactory;
         $this->sourceFactory = $sourceFactory;
         $this->rowToModelMapper = $rowToModelMapper;
@@ -82,6 +79,8 @@ abstract class AbstractIngestCommand extends Command
      * @return array
      */
     abstract protected function getFields(): array;
+
+    abstract protected function getModelClass();
 
     /**
      * @param InputInterface $input
@@ -111,25 +110,23 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
-     * @param Entity $entity
+     * @param Model $entity
      * @throws ValidationException
      */
-    protected function validateEntity(Entity $entity): void
+    protected function validateEntity(Model $entity): void
     {
         $entity->validate();
     }
 
-    abstract protected function getEntityClass();
-
     /**
      * Checks if the record with same primary key already exists
      *
-     * @param Entity $entity
+     * @param Model $entity
      * @return bool
      */
-    protected function checkIfExists(Entity $entity): bool
+    protected function checkIfExists(Model $entity): bool
     {
-        return $this->storage->read($entity->getTable(), [$entity->getKey() => $entity->getData()[$entity->getKey()]]) !== null;
+        return $this->modelStorage->read($this->modelStorage->getKey($entity)) !== null;
     }
 
     /**
@@ -147,7 +144,7 @@ abstract class AbstractIngestCommand extends Command
         $lineNumber = 0;
         foreach ($this->detectSource($input)->iterateThroughLines() as $line) {
             $lineNumber++;
-            $entity = $this->rowToModelMapper->map($line, $this->getFields(), $this->getEntityClass());
+            $entity = $this->rowToModelMapper->map($line, $this->getFields(), $this->getModelClass());
             try {
                 $this->validateEntity($entity);
             } catch (ValidationException $e) {
@@ -163,8 +160,7 @@ abstract class AbstractIngestCommand extends Command
                 }
             }
 
-            $entityData = $entity->getData();
-            $this->storage->insert($entity->getTable(), [$entity->getKey() => $entityData[$entity->getKey()]], $entityData);
+            $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
             $rowsAdded++;
         }
 

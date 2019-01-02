@@ -28,7 +28,7 @@ class S3Source extends Source
             throw new S3AccessException();
         }
         foreach (explode(PHP_EOL, $s3Response) as $line) {
-            yield str_getcsv($line, $this->accessParameters['s3_delimiter']);
+            yield str_getcsv($line, $this->accessParameters['delimiter']);
         }
     }
 }

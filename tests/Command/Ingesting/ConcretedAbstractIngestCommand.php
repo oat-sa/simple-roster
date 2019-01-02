@@ -3,7 +3,6 @@
 namespace App\Tests\Command\Ingesting;
 
 use App\Command\Ingesting\AbstractIngestCommand;
-use App\Entity\Entity;
 
 class ConcretedAbstractIngestCommand extends AbstractIngestCommand
 {
@@ -18,8 +17,8 @@ class ConcretedAbstractIngestCommand extends AbstractIngestCommand
     /**
      * {@inheritdoc}
      */
-    protected function buildEntity(array $fieldsValues): Entity
+    protected function getModelClass()
     {
-        return new ExampleEntity($fieldsValues);
+        return ExampleModel::class;
     }
 }

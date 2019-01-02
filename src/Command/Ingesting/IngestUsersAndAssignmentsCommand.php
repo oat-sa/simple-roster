@@ -2,8 +2,11 @@
 
 namespace App\Command\Ingesting;
 
-use App\Entity\Entity;
-use App\Entity\User;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\Source\SourceFactory;
+use App\Model\Storage\UserStorage;
+use App\Model\User;
+use App\S3\S3ClientFactory;
 
 class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
@@ -11,6 +14,11 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
      * {@inheritdoc}
      */
     protected $updateMode = true;
+
+    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    {
+        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+    }
 
     /**
      * {@inheritdoc}
@@ -53,7 +61,7 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getEntityClass()
+    protected function getModelClass()
     {
         return User::class;
     }
