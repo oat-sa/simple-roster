@@ -2,7 +2,7 @@
 
 namespace App\Ingesting\Source;
 
-use App\Command\Ingesting\Exception\InputOptionException;
+use App\Ingesting\Exception\InputOptionException;
 
 class SourceFactory
 {

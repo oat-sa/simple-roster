@@ -2,7 +2,7 @@
 
 namespace App\Tests\Command\Ingesting;
 
-use App\Command\Ingesting\Exception\InputOptionException;
+use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
 use App\S3\InMemoryS3Client;
@@ -26,7 +26,11 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $this->expectException(InputOptionException::class);
 
-        $command->run($this->getInputMock(), $this->getOutputMock());
+        $input = $this->getInputMock();
+        $output = $this->getOutputMock();
+
+        $command->initialize($input, $output);
+        $command->executeUnformatted($input);
     }
 
     public function testNotAllS3OptionsSpecified()
@@ -35,7 +39,11 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $this->expectException(InputOptionException::class);
 
-        $command->run($this->getInputMock(['s3_bucket' => 'bucket_name', 's3_region' => 'eu']), $this->getOutputMock());
+        $input = $this->getInputMock(['s3_bucket' => 'bucket_name', 's3_region' => 'eu']);
+        $output = $this->getOutputMock();
+
+        $command->initialize($input, $output);
+        $command->executeUnformatted($input);
     }
 
     public function testSimpleImportWithS3()
@@ -57,13 +65,17 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $command = new ConcretedAbstractIngestCommand(new ExampleStorage($storage), $this->getS3Factory($s3Client), new SourceFactory(), new RowToModelMapper());
 
-        $command->run($this->getInputMock([
+        $input = $this->getInputMock([
             's3_region' => 'eu',
             's3_bucket' => $bucketName,
             's3_object' => $objectName,
             's3_access_key' => 'does not matter',
             's3_secret' => 'does not matter',
-        ]), $this->getOutputMock());
+        ]);
+        $output = $this->getOutputMock();
+
+        $command->initialize($input, $output);
+        $command->executeUnformatted($input);
 
         $savedEntity = $storage->read('example_table', ['name' => 'name value']);
         $this->assertSavedData($savedEntity, $importedData[0]);
@@ -85,10 +97,14 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $command = new ConcretedAbstractIngestCommand(new ExampleStorage($storage), $this->getS3Factory(), new SourceFactory(), new RowToModelMapper());
 
-        $command->run($this->getInputMock([
+        $input = $this->getInputMock([
             'filename' => $filename,
             'delimiter' => ','
-        ]), $this->getOutputMock());
+        ]);
+        $output = $this->getOutputMock();
+
+        $command->initialize($input, $output);
+        $command->executeUnformatted($input);
 
         $savedEntity = $storage->read('example_table', ['name' => 'name value']);
         $this->assertSavedData($savedEntity, $importedData[0]);

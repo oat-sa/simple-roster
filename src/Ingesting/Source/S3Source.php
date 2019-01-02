@@ -2,7 +2,7 @@
 
 namespace App\Ingesting\Source;
 
-use App\Command\Ingesting\Exception\S3AccessException;
+use App\Ingesting\Exception\S3AccessException;
 use App\S3\S3ClientFactory;
 
 class S3Source extends Source

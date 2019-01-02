@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\Ingesting\Exception;
+namespace App\Ingesting\Exception;
 
 class InputOptionException extends IngestingException
 {

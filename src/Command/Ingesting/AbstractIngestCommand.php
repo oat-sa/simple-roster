@@ -2,7 +2,8 @@
 
 namespace App\Command\Ingesting;
 
-use App\Command\Ingesting\Exception\InputOptionException;
+use App\Ingesting\Exception\IngestingException;
+use App\Ingesting\Exception\InputOptionException;
 use App\Model\Model;
 use App\Model\Storage\ModelStorage;
 use App\Model\Validation\ValidationException;
@@ -104,7 +105,7 @@ abstract class AbstractIngestCommand extends Command
     /**
      * @inheritdoc
      */
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    public function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
     }
@@ -130,14 +131,12 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
-     * Entry point to the command
-     *
      * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
-     * @throws \Exception
+     * @return array
+     * @throws IngestingException
+     * @throws InputOptionException
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    public function executeUnformatted(InputInterface $input): array
     {
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
@@ -150,7 +149,7 @@ abstract class AbstractIngestCommand extends Command
             } catch (ValidationException $e) {
                 $this->io->warning(sprintf('The process has been terminated because the line %d of the file is invalid:', $lineNumber));
                 $this->io->error(sprintf('%s', $e->getMessage()));
-                return;
+                return [];
             }
 
             if ($this->checkIfExists($entity)) {
@@ -164,8 +163,38 @@ abstract class AbstractIngestCommand extends Command
             $rowsAdded++;
         }
 
+        return [
+            'rowsAdded' => $rowsAdded,
+            'alreadyExistingRowsCount' => $alreadyExistingRowsCount,
+        ];
+    }
+
+    /**
+     * Entry point to the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    public function execute(InputInterface $input, OutputInterface $output): void
+    {
+        try {
+            $result = $this->executeUnformatted($input);
+
+            $this->io->success(sprintf('Data has been ingested successfully.'));
+        } catch (InputOptionException $e) {
+            $this->io->error(sprintf('Bad input parameters: %s', $e->getMessage()));
+        } catch (IngestingException $e) {
+            $this->io->error(sprintf('Error: %s', $e->getMessage()));
+        } catch (\Exception $e) {
+            $this->io->error(sprintf('Unknown error: %s', $e->getMessage()));
+        }
+
+        $alreadyExistingRowsCount = $result['rowsAdded'] ?? 0;
+        $rowsAdded = $result['rowsAdded'] ?? 0;
+
         $messageOnUpdated = $this->updateMode ? 'updated' : 'were skipped as they already existed';
-        $this->io->success(sprintf('Data has been ingested successfully. %d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
+        $this->io->write(sprintf('%d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
     }
 
     /**

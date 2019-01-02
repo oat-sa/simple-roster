@@ -2,7 +2,7 @@
 
 namespace App\Ingesting\Source;
 
-use App\Command\Ingesting\Exception\FileNotFoundException;
+use App\Ingesting\Exception\FileNotFoundException;
 
 class LocalFileSource extends Source
 {
