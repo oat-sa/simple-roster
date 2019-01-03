@@ -2,7 +2,10 @@
 
 namespace App\Model;
 
-class User extends Model
+use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class User extends Model implements UserInterface, EncoderAwareInterface
 {
     /**
      * @var string
@@ -15,7 +18,12 @@ class User extends Model
     private $password;
 
     /**
-     * @var array
+     * @var string
+     */
+    private $salt;
+
+    /**
+     * @var Assignment[]
      */
     private $assignments = [];
 
@@ -67,6 +75,12 @@ class User extends Model
         return $this->password;
     }
 
+    public function setPasswordAndSalt(string $password, string $salt): void
+    {
+        $this->password = $password;
+        $this->salt = $salt;
+    }
+
     /**
      * @inheritdoc
      */
@@ -78,5 +92,31 @@ class User extends Model
         if (!$this->password) {
             $this->throwExceptionRequiredFieldEmpty('password');
         }
+    }
+
+    public function getRoles()
+    {
+        return [];
+    }
+
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    public function getUsername()
+    {
+        return $this->login;
+    }
+
+    public function eraseCredentials()
+    {
+        $this->password = '***';
+        $this->salt = '***';
+    }
+
+    public function getEncoderName()
+    {
+        return 'harsh';
     }
 }

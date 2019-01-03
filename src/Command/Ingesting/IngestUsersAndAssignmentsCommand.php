@@ -9,6 +9,7 @@ use App\Model\Model;
 use App\Model\Storage\UserStorage;
 use App\Model\User;
 use App\S3\S3ClientFactory;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
@@ -17,9 +18,16 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
      */
     protected $updateMode = true;
 
-    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, UserRowToModelMapper $rowToModelMapper)
+    /**
+     * @var EncoderFactoryInterface
+     */
+    protected $encoderFactory;
+
+    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, UserRowToModelMapper $rowToModelMapper, EncoderFactoryInterface $encoderFactory)
     {
         parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+
+        $this->encoderFactory = $encoderFactory;
     }
 
     /**
@@ -57,6 +65,15 @@ HELP
      */
     protected function convertRowToModel(array $row): Model
     {
-        return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
+        /** @var User $user */
+        $user = $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
+
+        // encrypt user password
+        $encoder = $this->encoderFactory->getEncoder($user);
+        $salt = base64_encode(random_bytes(30));
+        $encodedPassword = $encoder->encodePassword($user->getPassword(), $salt);
+        $user->setPasswordAndSalt($encodedPassword, $salt);
+
+        return $user;
     }
 }
