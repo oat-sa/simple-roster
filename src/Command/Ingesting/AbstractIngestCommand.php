@@ -154,10 +154,13 @@ abstract class AbstractIngestCommand extends Command
                 if (!$this->updateMode) {
                     continue;
                 }
+            } else {
+                if (!$this->updateMode) {
+                    $rowsAdded++;
+                }
             }
 
             $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
-            $rowsAdded++;
         }
 
         return [

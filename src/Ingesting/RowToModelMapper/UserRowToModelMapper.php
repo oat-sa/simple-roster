@@ -17,11 +17,12 @@ class UserRowToModelMapper extends RowToModelMapper
             $fieldValues['assignments'][] = $row[$i];
         }
 
+        $assignments = $fieldValues['assignments'];
+        unset($fieldValues['assignments']);
+
         /** @var User $user */
         $user = User::createFromArray($fieldValues);
 
-        $assignments = $fieldValues['assignments'];
-        unset($fieldValues['assignments']);
         $user->addAssignments($assignments);
 
         return $user;
