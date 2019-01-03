@@ -2,6 +2,8 @@
 
 namespace App\Controller\ApiV1;
 
+use App\Model\Assignment;
+use App\Model\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,10 +21,12 @@ class AssignmentController extends AbstractController
     public function getAssignments(): Response
     {
         $assignmentsToOutput = [];
-        $assignments = $this->getUser()->getData()['assignments'];
-        foreach ($assignments as $assignment) {
-            if (!array_key_exists('state', $assignment) || $assignment['state'] !== 'cancelled') {
-                $assignmentsToOutput[] = $assignment['line_item_tao_uri'];
+
+        /** @var User $user */
+        $user = $this->getUser();
+        foreach ($user->getAssignments() as $assignment) {
+            if ($assignment->getState() === Assignment::STATE_CANCELLED) {
+                $assignmentsToOutput[] = $assignment->getLineItemTaoUri();
             }
         }
 
