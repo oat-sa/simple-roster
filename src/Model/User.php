@@ -15,7 +15,7 @@ class User extends Model
     private $password;
 
     /**
-     * @var array
+     * @var Assignment[]
      */
     private $assignments = [];
 
@@ -27,7 +27,13 @@ class User extends Model
         $model = new self();
         $model->login = $data['login'] ?? null;
         $model->password = $data['password'] ?? null;
-        $model->assignments = $data['assignments'] ?? [];
+
+        if (!empty($data['assignments'])) {
+            foreach ($data['assignments'] as $assignmentArray) {
+                $model->assignments[] = Assignment::createFromArray($assignmentArray);
+            }
+        }
+
         return $model;
     }
 
@@ -36,25 +42,43 @@ class User extends Model
      */
     public function toArray(): array
     {
+        $assignmentArrays = [];
+        foreach ($this->assignments as $assignment) {
+            $assignmentArrays[] = $assignment->toArray();
+        }
+
         return [
             'login' => $this->login,
             'password' => $this->password,
-            'assignments' => $this->assignments,
+            'assignments' => $assignmentArrays,
         ];
     }
 
     /**
-     * @param String[] $uris
+     * @param array $uris
+     * @return int amount of actually added assignments
      */
-    public function addAssignments(array $uris): void
+    public function addAssignments(array $uris): int
     {
+        $addedCount = 0;
+
         foreach ($uris as $uri) {
-            if (!array_key_exists($uri, $this->assignments)) {
-                $this->assignments[] = [
-                    'line_item_tao_uri' => $uri,
-                ];
+            $alreadyExists = false;
+            foreach ($this->assignments as $assignment) {
+                if ($assignment->getLineItemTaoUri() === $uri && $assignment->getState() === Assignment::STATE_READY) {
+                    $alreadyExists = true;
+                }
+            }
+
+            if (!$alreadyExists) {
+                $newAssignment = new Assignment();
+                $newAssignment->setLineItemTaoUri($uri);
+                $this->assignments[] = $newAssignment;
+                $addedCount++;
             }
         }
+
+        return $addedCount;
     }
 
     public function getLogin(): string
@@ -77,6 +101,9 @@ class User extends Model
         }
         if (!$this->password) {
             $this->throwExceptionRequiredFieldEmpty('password');
+        }
+        foreach ($this->assignments as $assignment) {
+            $assignment->validate();
         }
     }
 }
