@@ -2,8 +2,13 @@
 
 namespace App\Command\Ingesting;
 
-use App\Entity\Entity;
-use App\Entity\User;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
+use App\Ingesting\Source\SourceFactory;
+use App\Model\Model;
+use App\Model\Storage\UserStorage;
+use App\Model\User;
+use App\S3\S3ClientFactory;
 
 class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
@@ -12,10 +17,10 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
      */
     protected $updateMode = true;
 
-    /**
-     * @var string
-     */
-    protected $lastExistingUserLogin;
+    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, UserRowToModelMapper $rowToModelMapper)
+    {
+        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+    }
 
     /**
      * {@inheritdoc}
@@ -23,7 +28,7 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
     protected function configure(): void
     {
         $this
-            ->setName('ingest-users-and-assignments')
+            ->setName('tao:ingest:users-and-assignments')
             ->setDescription('Import a list of users and their assignments')
             ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . <<<'HELP'
 <options=bold>If there is a need to ingest assignments for an existing user, please follow the common pattern. 
@@ -50,60 +55,8 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['login', 'password'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function mapFileLineByFieldNames(array $line): array
-    {
-        $fieldValues = parent::mapFileLineByFieldNames($line);
-
-        // collect the remaining elements of line to the single 'assignment' field
-        $fieldCount = count($this->getFields());
-        $fieldValues['assignments'] = [];
-        for ($i = $fieldCount; $i < count($line); $i++) {
-            $fieldValues['assignments'][] = $line[$i];
-        }
-
-        return $fieldValues;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        $assignments = $fieldsValues['assignments'];
-        unset($fieldsValues['assignments']);
-        $user = new User($fieldsValues);
-        if (array_key_exists('login', $fieldsValues)) {
-            $existingUser = $this->storage->read('users', ['login' => $fieldsValues['login']]);
-            if ($existingUser) {
-                $user = new User($existingUser);
-                $this->lastExistingUserLogin = $user->getData()['login'];
-            }
-        }
-        $user->addAssignments($assignments);
-
-        return $user;
-    }
-
-    /**
-     * Since we have already checked existence inside buildEntity,
-     * let's prevent double query execution and just use the cache (lastExistingUserLogin).
-     *
-     * {@inheritdoc}
-     */
-    protected function checkIfExists(Entity $entity): bool
-    {
-        if ($this->lastExistingUserLogin === $entity->getData()['login']) {
-            return true;
-        }
-
-        return parent::checkIfExists($entity);
+        return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
     }
 }

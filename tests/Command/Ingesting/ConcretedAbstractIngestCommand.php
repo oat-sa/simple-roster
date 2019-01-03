@@ -3,23 +3,18 @@
 namespace App\Tests\Command\Ingesting;
 
 use App\Command\Ingesting\AbstractIngestCommand;
-use App\Entity\Entity;
+use App\Model\Model;
 
 class ConcretedAbstractIngestCommand extends AbstractIngestCommand
 {
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['name', 'mandatory_prop_1', 'mandatory_prop_2', 'optional_prop_1'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        return new ExampleEntity($fieldsValues);
+        return $this->rowToModelMapper->map($row,
+            ['name', 'mandatory_prop_1', 'mandatory_prop_2', 'optional_prop_1'],
+            ExampleModel::class
+        );
     }
 }

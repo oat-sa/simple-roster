@@ -6,6 +6,12 @@ class InMemoryS3Client implements S3Client
 {
     private $objects = [];
 
+    /**
+     * @param string $bucket
+     * @param string $object
+     * @return mixed
+     * @throws \Exception
+     */
     public function getObject(string $bucket, string $object)
     {
         $hash = $bucket . $object;

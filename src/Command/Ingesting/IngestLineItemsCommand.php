@@ -2,18 +2,35 @@
 
 namespace App\Command\Ingesting;
 
-use App\Entity\Entity;
-use App\Entity\LineItem;
+use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\Source\SourceFactory;
+use App\Model\Model;
+use App\Model\LineItem;
+use App\Model\Storage\InfrastructureStorage;
+use App\Model\Storage\LineItemStorage;
+use App\S3\S3ClientFactory;
 
 class IngestLineItemsCommand extends AbstractIngestCommand
 {
+    /**
+     * @var InfrastructureStorage
+     */
+    private $infrastructureStorage;
+
+    public function __construct(LineItemStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
+    {
+        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+
+        $this->infrastructureStorage = $infrastructureStorage;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure(): void
     {
         $this
-            ->setName('ingest-line-items')
+            ->setName('tao:ingest:line-items')
             ->setDescription('Import a list of line items')
             ->setHelp($this->getHelpHeader('line items') . <<<'HELP'
 CSV fields: 
@@ -30,30 +47,25 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function getFields(): array
+    protected function convertRowToModel(array $row): Model
     {
-        return ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'];
+        return $this->rowToModelMapper->map($row,
+            ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'],
+            LineItem::class
+        );
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function buildEntity(array $fieldsValues): Entity
-    {
-        return new LineItem($fieldsValues);
-    }
-
-    /**
-     * @param Entity $entity
+     * @param LineItem $entity
      * @throws \Exception
      */
-    protected function validateEntity(Entity $entity): void
+    protected function validateEntity(Model $entity): void
     {
         parent::validateEntity($entity);
 
-        $infrastructureId = $entity->getData()['infrastructure_id'];
+        $infrastructureId = $entity->getInfrastructureId();
 
-        $existingInfrastructure = $this->storage->read('infrastructures', ['id' => $infrastructureId]);
+        $existingInfrastructure = $this->infrastructureStorage->read($infrastructureId);
 
         if ($existingInfrastructure === null) {
             throw new \Exception(sprintf('Infrastructure with id "%s" not found', $infrastructureId));
