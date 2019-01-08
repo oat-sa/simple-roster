@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class Infrastructure extends Model
+class Infrastructure extends AbstractModel
 {
     /**
      * @var string
@@ -27,7 +27,7 @@ class Infrastructure extends Model
     /**
      * @inheritdoc
      */
-    static public function createFromArray(array $data): Model
+    static public function createFromArray(array $data): AbstractModel
     {
         $model = new self();
         $model->id = $data['id'] ?? null;

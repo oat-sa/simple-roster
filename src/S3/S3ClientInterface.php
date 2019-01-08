@@ -2,7 +2,7 @@
 
 namespace App\S3;
 
-interface S3Client
+interface S3ClientInterface
 {
     public function getObject(string $bucket, string $object);
 

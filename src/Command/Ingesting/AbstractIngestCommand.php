@@ -4,11 +4,11 @@ namespace App\Command\Ingesting;
 
 use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
-use App\Model\Model;
-use App\Model\Storage\ModelStorage;
+use App\Model\AbstractModel;
+use App\Model\Storage\AbstractModelStorage;
 use App\Model\Validation\ValidationException;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
-use App\Ingesting\Source\Source;
+use App\Ingesting\Source\AbstractSource;
 use App\Ingesting\Source\SourceFactory;
 use App\S3\S3ClientFactory;
 use Symfony\Component\Console\Command\Command;
@@ -23,7 +23,7 @@ abstract class AbstractIngestCommand extends Command
     protected $io;
 
     /**
-     * @var ModelStorage
+     * @var AbstractModelStorage
      */
     protected $modelStorage;
 
@@ -49,7 +49,7 @@ abstract class AbstractIngestCommand extends Command
      */
     protected $updateMode = false;
 
-    public function __construct(ModelStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(AbstractModelStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
     {
         parent::__construct();
 
@@ -76,16 +76,16 @@ abstract class AbstractIngestCommand extends Command
 
     /**
      * @param String[] $row
-     * @return Model
+     * @return AbstractModel
      */
-    abstract protected function convertRowToModel(array $row): Model;
+    abstract protected function convertRowToModel(array $row): AbstractModel;
 
     /**
      * @param InputInterface $input
-     * @return Source
+     * @return AbstractSource
      * @throws InputOptionException
      */
-    private function detectSource(InputInterface $input): Source
+    private function detectSource(InputInterface $input): AbstractSource
     {
         $accessParameters = [];
         foreach ($this->sourceFactory->getSupportedAccessParameters() as $parameterName) {
@@ -108,10 +108,10 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
-     * @param Model $entity
+     * @param AbstractModel $entity
      * @throws ValidationException
      */
-    protected function validateEntity(Model $entity): void
+    protected function validateEntity(AbstractModel $entity): void
     {
         $entity->validate();
     }
@@ -119,10 +119,10 @@ abstract class AbstractIngestCommand extends Command
     /**
      * Checks if the record with same primary key already exists
      *
-     * @param Model $entity
+     * @param AbstractModel $entity
      * @return bool
      */
-    protected function checkIfExists(Model $entity): bool
+    protected function checkIfExists(AbstractModel $entity): bool
     {
         return $this->modelStorage->read($this->modelStorage->getKey($entity)) !== null;
     }

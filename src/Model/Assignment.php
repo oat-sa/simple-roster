@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class Assignment extends Model
+class Assignment extends AbstractModel
 {
     /**
      * @var string
@@ -37,7 +37,7 @@ class Assignment extends Model
     /**
      * @inheritdoc
      */
-    public static function createFromArray(array $data): Model
+    public static function createFromArray(array $data): AbstractModel
     {
         $model = new self();
         $model->lineItemTaoUri = $data['line_item_tao_uri'] ?? null;

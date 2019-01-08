@@ -4,7 +4,7 @@ namespace App\Command\Ingesting;
 
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
-use App\Model\Model;
+use App\Model\AbstractModel;
 use App\Model\LineItem;
 use App\Model\Storage\InfrastructureStorage;
 use App\Model\Storage\LineItemStorage;
@@ -48,7 +48,7 @@ HELP;
     /**
      * {@inheritdoc}
      */
-    protected function convertRowToModel(array $row): Model
+    protected function convertRowToModel(array $row): AbstractModel
     {
         return $this->rowToModelMapper->map($row,
             ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'],
@@ -60,7 +60,7 @@ HELP;
      * @param LineItem $entity
      * @throws \Exception
      */
-    protected function validateEntity(Model $entity): void
+    protected function validateEntity(AbstractModel $entity): void
     {
         parent::validateEntity($entity);
 

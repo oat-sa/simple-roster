@@ -2,7 +2,7 @@
 
 namespace App\S3;
 
-class AmazonS3Client implements S3Client
+class AmazonS3ClientInterface implements S3ClientInterface
 {
     /**
      * @var \Aws\S3\S3Client

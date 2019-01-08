@@ -2,10 +2,10 @@
 
 namespace App\Model\Storage;
 
-use App\Model\Model;
+use App\Model\AbstractModel;
 use App\Model\User;
 
-class UserStorage extends ModelStorage
+class UserStorage extends AbstractModelStorage
 {
     protected function getTable(): string
     {
@@ -18,11 +18,11 @@ class UserStorage extends ModelStorage
     }
 
     /**
-     * @param Model $model
+     * @param AbstractModel $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(Model $model): string
+    public function getKey(AbstractModel $model): string
     {
         /** @var User $model */
         $this->assertModelClass($model);

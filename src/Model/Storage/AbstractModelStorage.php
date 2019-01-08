@@ -2,35 +2,60 @@
 
 namespace App\Model\Storage;
 
-use App\Model\Model;
-use App\Storage\Storage;
+use App\Model\AbstractModel;
+use App\Storage\StorageInterface;
 
-abstract class ModelStorage
+abstract class AbstractModelStorage
 {
     /**
-     * @var Storage
+     * @var StorageInterface
      */
     protected $storage;
 
+    /**
+     * Get table name used for a storage
+     *
+     * @return string
+     */
     abstract protected function getTable(): string;
 
-    abstract public function getKey(Model $model): string;
+    /**
+     * Returns primary key value of a model
+     *
+     * @param AbstractModel $model
+     * @return string
+     */
+    abstract public function getKey(AbstractModel $model): string;
 
+    /**
+     * Returns primary key value of a model
+     *
+     * @return string
+     */
     abstract protected function getKeyFieldName(): string;
 
+    /**
+     * @return string php class name
+     */
     abstract protected function getModelClass(): string;
 
-    public function __construct(Storage $storage)
+    public function __construct(StorageInterface $storage)
     {
         $this->storage = $storage;
     }
 
+    /**
+     * Returns data as array
+     *
+     * @param string $key
+     * @return array|null
+     */
     protected function readRawData(string $key): ?array
     {
         return $this->storage->read($this->getTable(), [$this->getKeyFieldName() => $key]);
     }
 
-    public function read(string $key): ?Model
+    public function read(string $key): ?AbstractModel
     {
         $rowData = $this->readRawData($key);
         if ($rowData) {
@@ -42,10 +67,10 @@ abstract class ModelStorage
     }
 
     /**
-     * @param Model $model
+     * @param AbstractModel $model
      * @throws \Exception
      */
-    protected function assertModelClass(Model $model): void
+    protected function assertModelClass(AbstractModel $model): void
     {
         $modelClass = $this->getModelClass();
         if (!$model instanceof $modelClass) {
@@ -55,10 +80,10 @@ abstract class ModelStorage
 
     /**
      * @param string $key
-     * @param Model $model
+     * @param AbstractModel $model
      * @throws \Exception
      */
-    public function insert(string $key, Model $model): void
+    public function insert(string $key, AbstractModel $model): void
     {
         $this->assertModelClass($model);
         $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $key], $model->toArray());

@@ -5,7 +5,7 @@ namespace App\Command\Ingesting;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
 use App\Model\Infrastructure;
-use App\Model\Model;
+use App\Model\AbstractModel;
 use App\Model\Storage\InfrastructureStorage;
 use App\S3\S3ClientFactory;
 
@@ -39,7 +39,7 @@ HELP;
     /**
      * {@inheritdoc}
      */
-    protected function convertRowToModel(array $row): Model
+    protected function convertRowToModel(array $row): AbstractModel
     {
         return $this->rowToModelMapper->map($row,
             ['id', 'lti_director_link', 'key', 'secret'],

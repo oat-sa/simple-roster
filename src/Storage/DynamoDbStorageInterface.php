@@ -4,7 +4,7 @@ namespace App\Storage;
 
 use Aws\DynamoDb\Marshaler;
 
-class DynamoDbStorage implements Storage
+class DynamoDbStorageInterface implements StorageInterface
 {
     /**
      * The key that DynamoDb uses to indicate the name of the table.

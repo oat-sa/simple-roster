@@ -25,15 +25,15 @@ class SourceFactory
 
     /**
      * @param array $accessParameters
-     * @return Source
+     * @return AbstractSource
      * @throws InputOptionException
      */
-    public function createSource(array $accessParameters): Source
+    public function createSource(array $accessParameters): AbstractSource
     {
         $source = null;
 
         if ($accessParameters['filename'] !== null && $accessParameters['filename'] !== '') {
-            $source = new LocalFileSource();
+            $source = new LocalFileAbstractSource();
         } else {
             $useS3 = false;
             foreach ($accessParameters as $parameterName => $parameter) {
@@ -50,7 +50,7 @@ class SourceFactory
                     }
                 }
 
-                $source = new S3Source();
+                $source = new S3AbstractSource();
             }
         }
 

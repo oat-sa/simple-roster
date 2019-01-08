@@ -4,7 +4,7 @@ namespace App\Ingesting\Source;
 
 use App\Ingesting\Exception\FileNotFoundException;
 
-class LocalFileSource extends Source
+class LocalFileAbstractSource extends AbstractSource
 {
     protected $accessParameters = ['filename' => null, 'delimiter' => null];
 

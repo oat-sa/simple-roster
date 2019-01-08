@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class User extends Model
+class User extends AbstractModel
 {
     /**
      * @var string
@@ -22,7 +22,7 @@ class User extends Model
     /**
      * @inheritdoc
      */
-    public static function createFromArray(array $data): Model
+    public static function createFromArray(array $data): AbstractModel
     {
         $model = new self();
         $model->login = $data['login'] ?? null;

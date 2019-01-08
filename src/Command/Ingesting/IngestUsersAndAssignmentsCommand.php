@@ -2,10 +2,9 @@
 
 namespace App\Command\Ingesting;
 
-use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
-use App\Model\Model;
+use App\Model\AbstractModel;
 use App\Model\Storage\UserStorage;
 use App\Model\User;
 use App\S3\S3ClientFactory;
@@ -56,7 +55,7 @@ HELP;
     /**
      * {@inheritdoc}
      */
-    protected function convertRowToModel(array $row): Model
+    protected function convertRowToModel(array $row): AbstractModel
     {
         return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
     }

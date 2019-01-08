@@ -2,11 +2,11 @@
 
 namespace App\Tests\Command\Ingesting;
 
-use App\Model\Model;
-use App\Model\Storage\ModelStorage;
+use App\Model\AbstractModel;
+use App\Model\Storage\AbstractModelStorage;
 use App\Model\User;
 
-class ExampleStorage extends ModelStorage
+class ExampleStorageAbstract extends AbstractModelStorage
 {
     protected function getTable(): string
     {
@@ -19,13 +19,13 @@ class ExampleStorage extends ModelStorage
     }
 
     /**
-     * @param Model $model
+     * @param AbstractModel $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(Model $model): string
+    public function getKey(AbstractModel $model): string
     {
-        /** @var ExampleModel $model */
+        /** @var ExampleAbstractModel $model */
         $this->assertModelClass($model);
 
         return $model->getName();
@@ -33,6 +33,6 @@ class ExampleStorage extends ModelStorage
 
     protected function getModelClass(): string
     {
-        return ExampleModel::class;
+        return ExampleAbstractModel::class;
     }
 }

@@ -4,7 +4,7 @@ namespace App\Model;
 
 use App\Model\Validation\ValidationException;
 
-abstract class Model
+abstract class AbstractModel
 {
     /**
      * @param array $data

@@ -20,13 +20,13 @@ class S3ClientFactory
         $this->apiVersion = $apiVersion;
     }
 
-    public function createClient(?string $region = null, ?string $accessKey = null, ?string $secret = null): S3Client
+    public function createClient(?string $region = null, ?string $accessKey = null, ?string $secret = null): S3ClientInterface
     {
-        if ($this->clientClass === AmazonS3Client::class) {
+        if ($this->clientClass === AmazonS3ClientInterface::class) {
             return new $this->clientClass($region, $this->apiVersion, $accessKey, $secret);
         }
 
-        if ($this->clientClass === InMemoryS3Client::class) {
+        if ($this->clientClass === InMemoryS3ClientInterface::class) {
             return new $this->clientClass();
         }
 

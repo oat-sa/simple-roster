@@ -9,7 +9,7 @@ namespace App\Storage;
  * Interface Storage
  * @package App\Storage
  */
-interface Storage
+interface StorageInterface
 {
     /**
      * Reads one record by primary key

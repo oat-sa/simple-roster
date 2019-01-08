@@ -4,7 +4,7 @@ namespace App\Ingesting\Source;
 
 use App\Ingesting\Exception\IngestingException;
 
-abstract class Source
+abstract class AbstractSource
 {
     protected $accessParameters = [];
 
