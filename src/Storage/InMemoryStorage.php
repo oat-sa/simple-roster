@@ -2,7 +2,7 @@
 
 namespace App\Storage;
 
-class InMemoryStorageInterface implements StorageInterface
+class InMemoryStorage implements StorageInterface
 {
     private $items = [];
 
