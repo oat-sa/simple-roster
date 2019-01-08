@@ -11,20 +11,20 @@ class InMemoryStorage implements Storage
      * Maps its primary key to a string
      *
      * @param string $tableName
-     * @param array $keys
+     * @param array $key
      * @return string
      */
-    private function hash(string $tableName, array $keys): string
+    private function hash(string $tableName, array $key): string
     {
-        return $tableName . md5(serialize($keys));
+        return $tableName . md5(serialize($key));
     }
 
     /**
      * @inheritdoc
      */
-    public function read(string $tableName, array $keys): ?array
+    public function read(string $tableName, array $key): ?array
     {
-        $hash = $this->hash($tableName, $keys);
+        $hash = $this->hash($tableName, $key);
         if (!array_key_exists($hash, $this->items)) {
             return null;
         }
@@ -35,18 +35,18 @@ class InMemoryStorage implements Storage
     /**
      * @inheritdoc
      */
-    public function insert(string $tableName, array $keys, array $data): void
+    public function insert(string $tableName, array $key, array $data): void
     {
-        $hash = $this->hash($tableName, $keys);
+        $hash = $this->hash($tableName, $key);
         $this->items[$hash] = $data;
     }
 
     /**
      * @inheritdoc
      */
-    public function delete(string $tableName, array $keys): void
+    public function delete(string $tableName, array $key): void
     {
-        $hash = $this->hash($tableName, $keys);
+        $hash = $this->hash($tableName, $key);
         if (!array_key_exists($hash, $this->items)) {
             throw new \OutOfBoundsException('No such item saved');
         }

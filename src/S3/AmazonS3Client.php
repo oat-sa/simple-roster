@@ -7,11 +7,11 @@ class AmazonS3Client implements S3Client
     /**
      * @var \Aws\S3\S3Client
      */
-    private $realAmazonClient;
+    private $client;
 
     public function __construct(string $region, string $version, string $accessKey, string $secret)
     {
-        $this->realAmazonClient = new \Aws\S3\S3Client([
+        $this->client = new \Aws\S3\S3Client([
             'region' => $region,
             'version' => $version,
             'credentials' => new \Aws\Credentials\Credentials($accessKey, $secret),
@@ -25,7 +25,7 @@ class AmazonS3Client implements S3Client
             'Key' => $object,
         ];
 
-        return $this->realAmazonClient->getObject($args)['Body']->getContents();
+        return $this->client->getObject($args)['Body']->getContents();
     }
 
     public function putObject(string $bucket, string $name, string $content)

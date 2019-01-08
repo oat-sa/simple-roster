@@ -21,17 +21,18 @@ class IngestInfrastructuresCommand extends AbstractIngestCommand
      */
     protected function configure(): void
     {
-        $this
-            ->setName('tao:ingest:infrastructures')
-            ->setDescription('Import a list of infrastructures')
-            ->setHelp($this->getHelpHeader('infrastructures') . <<<'HELP'
+        $help = <<<'HELP'
 CSV fields: 
 <info>id</info> string, required <comment>must be unique</comment>
 <info>lti_director_link</info> string, required
 <info>key</info> string, required
 <info>secret</info> string, required
-HELP
-            );
+HELP;
+
+        $this
+            ->setName('tao:ingest:infrastructures')
+            ->setDescription('Import a list of infrastructures')
+            ->setHelp($this->getHelpHeader('infrastructures') . $help);
         parent::configure();
     }
 
