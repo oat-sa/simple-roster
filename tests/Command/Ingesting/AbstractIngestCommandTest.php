@@ -5,7 +5,7 @@ namespace App\Tests\Command\Ingesting;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
 use App\Ingesting\Source\SourceFactory;
-use App\S3\InMemoryS3ClientInterface;
+use App\S3\InMemoryS3Client;
 use App\S3\S3ClientFactory;
 use App\Storage\InMemoryStorageInterface;
 use App\Tests\Command\CommandTestCase;
@@ -22,7 +22,7 @@ class AbstractIngestCommandTest extends CommandTestCase
 
     public function testNotProvidedOptionsCauseException()
     {
-        $command = new ConcretedAbstractIngestCommand(new ExampleStorageAbstract(new InMemoryStorageInterface()), new S3ClientFactory(InMemoryS3ClientInterface::class), new SourceFactory(), new RowToModelMapper());
+        $command = new ConcretedIngestCommand(new ExampleStorage(new InMemoryStorageInterface()), new S3ClientFactory(InMemoryS3Client::class), new SourceFactory(), new RowToModelMapper());
 
         $this->expectException(InputOptionException::class);
 
@@ -35,7 +35,7 @@ class AbstractIngestCommandTest extends CommandTestCase
 
     public function testNotAllS3OptionsSpecified()
     {
-        $command = new ConcretedAbstractIngestCommand(new ExampleStorageAbstract(new InMemoryStorageInterface()), new S3ClientFactory(InMemoryS3ClientInterface::class), new SourceFactory(), new RowToModelMapper());
+        $command = new ConcretedIngestCommand(new ExampleStorage(new InMemoryStorageInterface()), new S3ClientFactory(InMemoryS3Client::class), new SourceFactory(), new RowToModelMapper());
 
         $this->expectException(InputOptionException::class);
 
@@ -57,13 +57,13 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $importedDataCsv = $this->convertArrayToCSV($importedData);
 
-        $s3Client = new InMemoryS3ClientInterface();
+        $s3Client = new InMemoryS3Client();
 
         $s3Client->putObject($bucketName, $objectName, $importedDataCsv);
 
         $storage = new InMemoryStorageInterface();
 
-        $command = new ConcretedAbstractIngestCommand(new ExampleStorageAbstract($storage), $this->getS3Factory($s3Client), new SourceFactory(), new RowToModelMapper());
+        $command = new ConcretedIngestCommand(new ExampleStorage($storage), $this->getS3Factory($s3Client), new SourceFactory(), new RowToModelMapper());
 
         $input = $this->getInputMock([
             's3_region' => 'eu',
@@ -95,7 +95,7 @@ class AbstractIngestCommandTest extends CommandTestCase
 
         $storage = new InMemoryStorageInterface();
 
-        $command = new ConcretedAbstractIngestCommand(new ExampleStorageAbstract($storage), $this->getS3Factory(), new SourceFactory(), new RowToModelMapper());
+        $command = new ConcretedIngestCommand(new ExampleStorage($storage), $this->getS3Factory(), new SourceFactory(), new RowToModelMapper());
 
         $input = $this->getInputMock([
             'filename' => $filename,

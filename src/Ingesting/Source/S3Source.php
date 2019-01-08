@@ -5,7 +5,7 @@ namespace App\Ingesting\Source;
 use App\Ingesting\Exception\S3AccessException;
 use App\S3\S3ClientFactory;
 
-class S3AbstractSource extends AbstractSource
+class S3Source extends AbstractSource
 {
     protected $accessParameters = ['s3_bucket' => null, 's3_object' => null, 's3_region' => null,
         's3_access_key' => null, 's3_secret' => null, 's3_client_factory' => null, 'delimiter' => null];

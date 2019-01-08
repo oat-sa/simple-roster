@@ -2,7 +2,7 @@
 
 namespace App\S3;
 
-class InMemoryS3ClientInterface implements S3ClientInterface
+class InMemoryS3Client implements S3ClientInterface
 {
     private $objects = [];
 

@@ -33,7 +33,7 @@ class SourceFactory
         $source = null;
 
         if ($accessParameters['filename'] !== null && $accessParameters['filename'] !== '') {
-            $source = new LocalFileAbstractSource();
+            $source = new LocalFileSource();
         } else {
             $useS3 = false;
             foreach ($accessParameters as $parameterName => $parameter) {
@@ -50,7 +50,7 @@ class SourceFactory
                     }
                 }
 
-                $source = new S3AbstractSource();
+                $source = new S3Source();
             }
         }
 

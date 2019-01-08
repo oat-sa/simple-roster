@@ -22,11 +22,11 @@ class S3ClientFactory
 
     public function createClient(?string $region = null, ?string $accessKey = null, ?string $secret = null): S3ClientInterface
     {
-        if ($this->clientClass === AmazonS3ClientInterface::class) {
+        if ($this->clientClass === AmazonS3Client::class) {
             return new $this->clientClass($region, $this->apiVersion, $accessKey, $secret);
         }
 
-        if ($this->clientClass === InMemoryS3ClientInterface::class) {
+        if ($this->clientClass === InMemoryS3Client::class) {
             return new $this->clientClass();
         }
 

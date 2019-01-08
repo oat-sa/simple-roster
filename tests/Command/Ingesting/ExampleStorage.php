@@ -6,7 +6,7 @@ use App\Model\AbstractModel;
 use App\Model\Storage\AbstractModelStorage;
 use App\Model\User;
 
-class ExampleStorageAbstract extends AbstractModelStorage
+class ExampleStorage extends AbstractModelStorage
 {
     protected function getTable(): string
     {
@@ -25,7 +25,7 @@ class ExampleStorageAbstract extends AbstractModelStorage
      */
     public function getKey(AbstractModel $model): string
     {
-        /** @var ExampleAbstractModel $model */
+        /** @var ExampleModel $model */
         $this->assertModelClass($model);
 
         return $model->getName();
@@ -33,6 +33,6 @@ class ExampleStorageAbstract extends AbstractModelStorage
 
     protected function getModelClass(): string
     {
-        return ExampleAbstractModel::class;
+        return ExampleModel::class;
     }
 }

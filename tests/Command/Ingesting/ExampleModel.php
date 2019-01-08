@@ -4,7 +4,7 @@ namespace App\Tests\Command\Ingesting;
 
 use App\Model\AbstractModel;
 
-class ExampleAbstractModel extends AbstractModel
+class ExampleModel extends AbstractModel
 {
     /**
      * @var string

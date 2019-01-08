@@ -5,7 +5,7 @@ namespace App\Tests\Command\Ingesting;
 use App\Command\Ingesting\AbstractIngestCommand;
 use App\Model\AbstractModel;
 
-class ConcretedAbstractIngestCommand extends AbstractIngestCommand
+class ConcretedIngestCommand extends AbstractIngestCommand
 {
     /**
      * {@inheritdoc}
@@ -14,7 +14,7 @@ class ConcretedAbstractIngestCommand extends AbstractIngestCommand
     {
         return $this->rowToModelMapper->map($row,
             ['name', 'mandatory_prop_1', 'mandatory_prop_2', 'optional_prop_1'],
-            ExampleAbstractModel::class
+            ExampleModel::class
         );
     }
 }
