@@ -32,6 +32,8 @@ abstract class Model
     }
 
     /**
+     * Should throw an exception if the model data isn't valid
+     *
      * @throws ValidationException
      */
     abstract public function validate(): void;

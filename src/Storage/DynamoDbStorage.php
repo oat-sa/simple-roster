@@ -45,12 +45,12 @@ class DynamoDbStorage implements Storage
     /**
      * @inheritdoc
      */
-    public function read(string $tableName, array $keys): ?array
+    public function read(string $tableName, array $key): ?array
     {
         $item = $this->client->getItem([
             self::TABLE_NAME_KEY => $tableName,
             self::CONSISTENT_READ_KEY => true,
-            self::TABLE_KEY => $this->marshaler->marshalItem($keys),
+            self::TABLE_KEY => $this->marshaler->marshalItem($key),
         ]);
         if (!$item) {
             return null;
@@ -65,22 +65,22 @@ class DynamoDbStorage implements Storage
     /**
      * @inheritdoc
      */
-    public function insert(string $tableName, array $keys, array $data): void
+    public function insert(string $tableName, array $key, array $data): void
     {
         $this->client->putItem([
             self::TABLE_NAME_KEY => $tableName,
-            self::TABLE_ITEM_KEY => $this->marshaler->marshalItem($keys) + $this->marshaler->marshalItem($data),
+            self::TABLE_ITEM_KEY => $this->marshaler->marshalItem($key) + $this->marshaler->marshalItem($data),
         ]);
     }
 
     /**
      * @inheritdoc
      */
-    public function delete(string $storageName, array $keys): void
+    public function delete(string $storageName, array $key): void
     {
         $this->client->deleteItem([
             self::TABLE_NAME_KEY => $storageName,
-            self::TABLE_KEY => $this->marshaler->marshalItem($keys),
+            self::TABLE_KEY => $this->marshaler->marshalItem($key),
         ]);
     }
 }

@@ -25,16 +25,16 @@ interface Storage
      * Puts a record with primary key
      *
      * @param string $tableName
-     * @param array $keys
+     * @param array $key
      * @param array $data
      */
-    public function insert(string $tableName, array $keys, array $data): void;
+    public function insert(string $tableName, array $key, array $data): void;
 
     /**
      * Deletes one record by primary key
      *
      * @param string $tableName
-     * @param array $keys primary key
+     * @param array $key primary key
      */
-    public function delete(string $tableName, array $keys): void;
+    public function delete(string $tableName, array $key): void;
 }

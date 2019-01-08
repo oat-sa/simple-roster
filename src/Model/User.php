@@ -123,6 +123,14 @@ class User extends Model implements UserInterface, EncoderAwareInterface
         }
     }
 
+    /**
+     * @return Assignment[]
+     */
+    public function getAssignments(): array
+    {
+        return $this->assignments;
+    }
+
     public function getRoles()
     {
         return [];

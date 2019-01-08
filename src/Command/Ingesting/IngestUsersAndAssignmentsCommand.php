@@ -35,10 +35,7 @@ class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
      */
     protected function configure(): void
     {
-        $this
-            ->setName('tao:ingest:users-and-assignments')
-            ->setDescription('Import a list of users and their assignments')
-            ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . <<<'HELP'
+        $help = <<<'HELP'
 <options=bold>If there is a need to ingest assignments for an existing user, please follow the common pattern. 
 User will NOT be recreated, the command will just add the new assignments to the user list. 
 In this case you can even omit the password (just leave empty cell).</>
@@ -54,8 +51,12 @@ CSV fields:
 
 Example:
 "Bob";"qwerty"
-HELP
-            );
+HELP;
+
+        $this
+            ->setName('tao:ingest:users-and-assignments')
+            ->setDescription('Import a list of users and their assignments')
+            ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . $help);
 
         parent::configure();
     }

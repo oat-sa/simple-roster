@@ -13,7 +13,7 @@ class DeploySchemaCommand extends Command
     /**
      * @var \Aws\Sdk
      */
-    private $awsSkd;
+    private $awsSdk;
 
     /** @var SymfonyStyle */
     protected $io;
@@ -30,7 +30,7 @@ class DeploySchemaCommand extends Command
     {
         parent::__construct();
 
-        $this->awsSkd = $awsSdk;
+        $this->awsSdk = $awsSdk;
     }
 
     /**
@@ -46,7 +46,7 @@ class DeploySchemaCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $dynamodb = $this->awsSkd->createDynamoDb();
+        $dynamodb = $this->awsSdk->createDynamoDb();
 
         try {
             $params = [
