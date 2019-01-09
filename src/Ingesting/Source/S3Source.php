@@ -32,17 +32,15 @@ class S3Source implements SourceInterface
      */
     public function iterateThroughLines(): \Generator
     {
-        $ClientFactory = $this->clientFactory;
-
-        $Client = $ClientFactory->createClient($this->region,
+        $client = $this->clientFactory->createClient($this->region,
             $this->accessKey, $this->secret);
 
         try {
-            $Response = $Client->getObject($this->bucket, $this->object);
+            $response = $client->getObject($this->bucket, $this->object);
         } catch (\Exception $e) {
             throw new S3AccessException();
         }
-        foreach (explode(PHP_EOL, $Response) as $line) {
+        foreach (explode(PHP_EOL, $response) as $line) {
             yield str_getcsv($line, $this->delimiter);
         }
     }

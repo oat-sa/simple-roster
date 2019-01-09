@@ -18,7 +18,7 @@ abstract class AbstractIngestCommand extends Command
     /**
      * @var SymfonyStyle
      */
-    protected $io;
+    private $io;
 
     /**
      * @var AbstractIngester
@@ -28,7 +28,7 @@ abstract class AbstractIngestCommand extends Command
     /**
      * @var S3ClientFactory
      */
-    protected $s3ClientFactory;
+    private $s3ClientFactory;
 
     public function __construct(AbstractIngester $ingester, S3ClientFactory $s3ClientFactory)
     {

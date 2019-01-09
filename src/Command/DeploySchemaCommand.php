@@ -16,7 +16,7 @@ class DeploySchemaCommand extends Command
     private $awsSdk;
 
     /** @var SymfonyStyle */
-    protected $io;
+    private $io;
 
     /**
      * @inheritdoc
