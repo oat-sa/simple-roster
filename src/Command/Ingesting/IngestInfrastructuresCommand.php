@@ -2,18 +2,13 @@
 
 namespace App\Command\Ingesting;
 
-use App\Ingesting\RowToModelMapper\RowToModelMapper;
-use App\Ingesting\Source\SourceFactory;
-use App\Model\Infrastructure;
-use App\Model\AbstractModel;
-use App\Model\Storage\InfrastructureStorage;
-use App\S3\S3ClientFactory;
+use App\Ingesting\Ingester\InfrastructuresIngester;
 
 class IngestInfrastructuresCommand extends AbstractIngestCommand
 {
-    public function __construct(InfrastructureStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(InfrastructuresIngester $ingester)
     {
-        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+        parent::__construct($ingester);
     }
 
     /**
@@ -34,16 +29,5 @@ HELP;
             ->setDescription('Import a list of infrastructures')
             ->setHelp($this->getHelpHeader('infrastructures') . $help);
         parent::configure();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function convertRowToModel(array $row): AbstractModel
-    {
-        return $this->rowToModelMapper->map($row,
-            ['id', 'lti_director_link', 'key', 'secret'],
-            Infrastructure::class
-        );
     }
 }

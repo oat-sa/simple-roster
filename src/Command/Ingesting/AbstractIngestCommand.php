@@ -2,15 +2,10 @@
 
 namespace App\Command\Ingesting;
 
+use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
-use App\Model\AbstractModel;
-use App\Model\Storage\AbstractModelStorage;
-use App\Model\Validation\ValidationException;
-use App\Ingesting\RowToModelMapper\RowToModelMapper;
-use App\Ingesting\Source\AbstractSource;
-use App\Ingesting\Source\SourceFactory;
-use App\S3\S3ClientFactory;
+use App\Ingesting\Ingester\AbstractIngester;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,44 +14,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractIngestCommand extends Command
 {
-    /** @var SymfonyStyle */
+    /**
+     * @var SymfonyStyle
+     */
     protected $io;
 
     /**
-     * @var AbstractModelStorage
+     * @var AbstractIngester
      */
-    protected $modelStorage;
+    private $ingester;
 
-    /**
-     * @var S3ClientFactory
-     */
-    protected $s3ClientFactory;
-
-    /**
-     * @var SourceFactory
-     */
-    protected $sourceFactory;
-
-    /**
-     * @var RowToModelMapper
-     */
-    protected $rowToModelMapper;
-
-    /**
-     * Whether to skip those records already existing or update with new values
-     *
-     * @var bool
-     */
-    protected $updateMode = false;
-
-    public function __construct(AbstractModelStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(AbstractIngester $ingester)
     {
-        parent::__construct();
+        $this->ingester = $ingester;
 
-        $this->modelStorage = $modelStorage;
-        $this->s3ClientFactory = $s3ClientFactory;
-        $this->sourceFactory = $sourceFactory;
-        $this->rowToModelMapper = $rowToModelMapper;
+        parent::__construct();
     }
 
     /**
@@ -75,98 +47,11 @@ abstract class AbstractIngestCommand extends Command
     }
 
     /**
-     * @param String[] $row
-     * @return AbstractModel
-     */
-    abstract protected function convertRowToModel(array $row): AbstractModel;
-
-    /**
-     * @param InputInterface $input
-     * @return AbstractSource
-     * @throws InputOptionException
-     */
-    private function detectSource(InputInterface $input): AbstractSource
-    {
-        $accessParameters = [];
-        foreach ($this->sourceFactory->getSupportedAccessParameters() as $parameterName) {
-            $accessParameters[$parameterName] = $input->hasOption($parameterName) ? $input->getOption($parameterName) : null;
-        }
-        $accessParameters['s3_client_factory'] = $this->s3ClientFactory;
-        try {
-            return $this->sourceFactory->createSource($accessParameters);
-        } catch (\Exception $e) {
-            throw new InputOptionException($e->getMessage());
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
-    }
-
-    /**
-     * @param AbstractModel $entity
-     * @throws ValidationException
-     */
-    protected function validateEntity(AbstractModel $entity): void
-    {
-        $entity->validate();
-    }
-
-    /**
-     * Checks if the record with same primary key already exists
-     *
-     * @param AbstractModel $entity
-     * @return bool
-     */
-    protected function checkIfExists(AbstractModel $entity): bool
-    {
-        return $this->modelStorage->read($this->modelStorage->getKey($entity)) !== null;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @return array
-     * @throws IngestingException
-     * @throws InputOptionException
-     */
-    public function executeUnformatted(InputInterface $input): array
-    {
-        $alreadyExistingRowsCount = $rowsAdded = 0;
-
-        $lineNumber = 0;
-        foreach ($this->detectSource($input)->iterateThroughLines() as $line) {
-            $lineNumber++;
-            $entity = $this->convertRowToModel($line);
-            try {
-                $this->validateEntity($entity);
-            } catch (ValidationException $e) {
-                $this->io->warning(sprintf('The process has been terminated because the line %d of the file is invalid:', $lineNumber));
-                $this->io->error(sprintf('%s', $e->getMessage()));
-                return [];
-            }
-
-            if ($this->checkIfExists($entity)) {
-                $alreadyExistingRowsCount++;
-                if (!$this->updateMode) {
-                    continue;
-                }
-            } else {
-                if (!$this->updateMode) {
-                    $rowsAdded++;
-                }
-            }
-
-            $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
-        }
-
-        return [
-            'rowsAdded' => $rowsAdded,
-            'alreadyExistingRowsCount' => $alreadyExistingRowsCount,
-        ];
     }
 
     /**
@@ -179,11 +64,14 @@ abstract class AbstractIngestCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): void
     {
         try {
-            $result = $this->executeUnformatted($input);
+            $result = $this->ingester->ingest($input->getOptions());
 
             $this->io->success(sprintf('Data has been ingested successfully.'));
         } catch (InputOptionException $e) {
             $this->io->error(sprintf('Bad input parameters: %s', $e->getMessage()));
+        } catch (FileLineIsInvalidException $e) {
+            $this->io->warning(sprintf('The process has been terminated because the line %d of the file is invalid:', $e->getLineNumber()));
+            $this->io->error(sprintf('%s', $e->getMessage()));
         } catch (IngestingException $e) {
             $this->io->error(sprintf('Error: %s', $e->getMessage()));
         } catch (\Exception $e) {
@@ -193,7 +81,7 @@ abstract class AbstractIngestCommand extends Command
         $alreadyExistingRowsCount = $result['alreadyExistingRowsCount'] ?? 0;
         $rowsAdded = $result['rowsAdded'] ?? 0;
 
-        $messageOnUpdated = $this->updateMode ? 'updated' : 'were skipped as they already existed';
+        $messageOnUpdated = $this->ingester->isUpdateMode() ? 'updated' : 'were skipped as they already existed';
         $this->io->write(sprintf('%d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
     }
 

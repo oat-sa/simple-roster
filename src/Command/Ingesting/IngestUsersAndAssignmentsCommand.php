@@ -2,23 +2,13 @@
 
 namespace App\Command\Ingesting;
 
-use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
-use App\Ingesting\Source\SourceFactory;
-use App\Model\AbstractModel;
-use App\Model\Storage\UserStorage;
-use App\Model\User;
-use App\S3\S3ClientFactory;
+use App\Ingesting\Ingester\UserAndAssignmentsIngester;
 
 class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $updateMode = true;
-
-    public function __construct(UserStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, UserRowToModelMapper $rowToModelMapper)
+    public function __construct(UserAndAssignmentsIngester $ingester)
     {
-        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+        parent::__construct($ingester);
     }
 
     /**
@@ -50,13 +40,5 @@ HELP;
             ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . $help);
 
         parent::configure();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function convertRowToModel(array $row): AbstractModel
-    {
-        return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
     }
 }
