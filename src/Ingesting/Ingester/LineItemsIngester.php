@@ -3,7 +3,6 @@
 namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
-use App\Ingesting\Source\SourceFactory;
 use App\Model\AbstractModel;
 use App\Model\LineItem;
 use App\Model\Storage\InfrastructureStorage;
@@ -17,9 +16,9 @@ class LineItemsIngester extends AbstractIngester
      */
     private $infrastructureStorage;
 
-    public function __construct(LineItemStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
+    public function __construct(LineItemStorage $modelStorage, RowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
     {
-        parent::__construct($modelStorage, $s3ClientFactory, $sourceFactory, $rowToModelMapper);
+        parent::__construct($modelStorage, $rowToModelMapper);
 
         $this->infrastructureStorage = $infrastructureStorage;
     }

@@ -6,9 +6,10 @@ use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Ingester\AbstractIngester;
+use App\Ingesting\Source\SourceInterface;
+use App\S3\S3ClientFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -24,27 +25,35 @@ abstract class AbstractIngestCommand extends Command
      */
     private $ingester;
 
-    public function __construct(AbstractIngester $ingester)
+    /**
+     * @var S3ClientFactory
+     */
+    protected $s3ClientFactory;
+
+    public function __construct(AbstractIngester $ingester, S3ClientFactory $s3ClientFactory)
     {
         $this->ingester = $ingester;
+        $this->s3ClientFactory = $s3ClientFactory;
 
         parent::__construct();
     }
+
+    /**
+     * Configure source specific options
+     *
+     * @return void
+     */
+    abstract protected function addSourceOptions(): void;
 
     /**
      * Sets command name, input and metadata
      */
     protected function configure(): void
     {
-        $this
-            ->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
-            ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',')
-            ->addOption('s3_bucket', null, InputOption::VALUE_OPTIONAL, 'Name of a S3 bucket')
-            ->addOption('s3_object', null, InputOption::VALUE_OPTIONAL, 'Key of a S3 object')
-            ->addOption('s3_region', null, InputOption::VALUE_OPTIONAL, 'Region specified for S3 bucket')
-            ->addOption('s3_access_key', null, InputOption::VALUE_OPTIONAL, 'AWS access key')
-            ->addOption('s3_secret', null, InputOption::VALUE_OPTIONAL, 'AWS secret key');
+        $this->addSourceOptions();
     }
+
+    abstract protected function getSource(array $inputOptions): SourceInterface;
 
     /**
      * @inheritdoc
@@ -64,7 +73,8 @@ abstract class AbstractIngestCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): void
     {
         try {
-            $result = $this->ingester->ingest($input->getOptions());
+            $source = $this->getSource($input->getOptions());
+            $result = $this->ingester->ingest($source);
 
             $this->io->success(sprintf('Data has been ingested successfully.'));
         } catch (InputOptionException $e) {

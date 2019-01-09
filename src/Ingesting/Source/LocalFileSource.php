@@ -4,9 +4,16 @@ namespace App\Ingesting\Source;
 
 use App\Ingesting\Exception\FileNotFoundException;
 
-class LocalFileSource extends AbstractSource
+class LocalFileSource implements SourceInterface
 {
-    protected $accessParameters = ['filename' => null, 'delimiter' => null];
+    private $filename;
+    private $delimiter;
+
+    public function __construct(string $filename, string $delimiter)
+    {
+        $this->filename = $filename;
+        $this->delimiter = $delimiter;
+    }
 
     /**
      * @return \Generator
@@ -14,15 +21,14 @@ class LocalFileSource extends AbstractSource
      */
     public function iterateThroughLines(): \Generator
     {
-        $fileName = $this->accessParameters['filename'];
-        if (!file_exists($fileName)) {
-            throw new FileNotFoundException($fileName);
+        if (!file_exists($this->filename)) {
+            throw new FileNotFoundException($this->filename);
         }
-        $fileHandle = fopen($fileName, 'r');
+        $fileHandle = fopen($this->filename, 'r');
         if (false === $fileHandle) {
-            throw new FileNotFoundException($fileName);
+            throw new FileNotFoundException($this->filename);
         }
-        while (($line = fgetcsv($fileHandle, null, $this->accessParameters['delimiter'])) !== false) {
+        while (($line = fgetcsv($fileHandle, null, $this->delimiter)) !== false) {
             yield $line;
         }
     }

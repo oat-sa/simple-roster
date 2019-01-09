@@ -5,10 +5,26 @@ namespace App\Ingesting\Source;
 use App\Ingesting\Exception\S3AccessException;
 use App\S3\S3ClientFactory;
 
-class S3Source extends AbstractSource
+class S3Source implements SourceInterface
 {
-    protected $accessParameters = ['s3_bucket' => null, 's3_object' => null, 's3_region' => null,
-        's3_access_key' => null, 's3_secret' => null, 's3_client_factory' => null, 'delimiter' => null];
+    private $clientFactory;
+    private $bucket;
+    private $object;
+    private $region;
+    private $accessKey;
+    private $secret;
+    private $delimiter;
+
+    public function __construct(S3ClientFactory $clientFactory, string $bucket, string $object, string $region, string $accessKey, string $secret, string $delimiter)
+    {
+        $this->clientFactory = $clientFactory;
+        $this->bucket = $bucket;
+        $this->object = $object;
+        $this->region = $region;
+        $this->accessKey = $accessKey;
+        $this->secret = $secret;
+        $this->delimiter = $delimiter;
+    }
 
     /**
      * @return \Generator
@@ -16,19 +32,18 @@ class S3Source extends AbstractSource
      */
     public function iterateThroughLines(): \Generator
     {
-        /** @var S3ClientFactory $s3ClientFactory */
-        $s3ClientFactory = $this->accessParameters['s3_client_factory'];
+        $ClientFactory = $this->clientFactory;
 
-        $s3Client = $s3ClientFactory->createClient($this->accessParameters['s3_region'],
-            $this->accessParameters['s3_access_key'], $this->accessParameters['s3_secret']);
+        $Client = $ClientFactory->createClient($this->region,
+            $this->accessKey, $this->secret);
 
         try {
-            $s3Response = $s3Client->getObject($this->accessParameters['s3_bucket'], $this->accessParameters['s3_object']);
+            $Response = $Client->getObject($this->bucket, $this->object);
         } catch (\Exception $e) {
             throw new S3AccessException();
         }
-        foreach (explode(PHP_EOL, $s3Response) as $line) {
-            yield str_getcsv($line, $this->accessParameters['delimiter']);
+        foreach (explode(PHP_EOL, $Response) as $line) {
+            yield str_getcsv($line, $this->delimiter);
         }
     }
 }

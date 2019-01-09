@@ -3,12 +3,13 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\Ingester\UserAndAssignmentsIngester;
+use App\S3\S3ClientFactory;
 
-class IngestUsersAndAssignmentsCommand extends AbstractIngestCommand
+abstract class AbstractIngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
-    public function __construct(UserAndAssignmentsIngester $ingester)
+    public function __construct(UserAndAssignmentsIngester $ingester, S3ClientFactory $s3ClientFactory)
     {
-        parent::__construct($ingester);
+        parent::__construct($ingester, $s3ClientFactory);
     }
 
     /**
@@ -35,7 +36,6 @@ Example:
 HELP;
 
         $this
-            ->setName('tao:ingest:users-and-assignments')
             ->setDescription('Import a list of users and their assignments')
             ->setHelp($this->getHelpHeader('users and their assignments (TAO deliveries\' URIs)') . $help);
 

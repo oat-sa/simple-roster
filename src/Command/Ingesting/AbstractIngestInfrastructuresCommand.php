@@ -3,12 +3,13 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\Ingester\InfrastructuresIngester;
+use App\S3\S3ClientFactory;
 
-class IngestInfrastructuresCommand extends AbstractIngestCommand
+abstract class AbstractIngestInfrastructuresCommand extends AbstractIngestCommand
 {
-    public function __construct(InfrastructuresIngester $ingester)
+    public function __construct(InfrastructuresIngester $ingester, S3ClientFactory $s3ClientFactory)
     {
-        parent::__construct($ingester);
+        parent::__construct($ingester, $s3ClientFactory);
     }
 
     /**
@@ -25,7 +26,6 @@ CSV fields:
 HELP;
 
         $this
-            ->setName('tao:ingest:infrastructures')
             ->setDescription('Import a list of infrastructures')
             ->setHelp($this->getHelpHeader('infrastructures') . $help);
         parent::configure();

@@ -5,13 +5,10 @@ namespace App\Ingesting\Ingester;
 use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\RowToModelMapper;
-use App\Ingesting\Source\AbstractSource;
-use App\Ingesting\Source\SourceFactory;
+use App\Ingesting\Source\SourceInterface;
 use App\Model\AbstractModel;
 use App\Model\Storage\AbstractModelStorage;
 use App\Model\Validation\ValidationException;
-use App\S3\S3ClientFactory;
-use Symfony\Component\Console\Input\InputInterface;
 
 abstract class AbstractIngester
 {
@@ -19,16 +16,6 @@ abstract class AbstractIngester
      * @var AbstractModelStorage
      */
     protected $modelStorage;
-
-    /**
-     * @var S3ClientFactory
-     */
-    protected $s3ClientFactory;
-
-    /**
-     * @var SourceFactory
-     */
-    protected $sourceFactory;
 
     /**
      * @var RowToModelMapper
@@ -42,11 +29,9 @@ abstract class AbstractIngester
      */
     protected $updateMode = false;
 
-    public function __construct(AbstractModelStorage $modelStorage, S3ClientFactory $s3ClientFactory, SourceFactory $sourceFactory, RowToModelMapper $rowToModelMapper)
+    public function __construct(AbstractModelStorage $modelStorage, RowToModelMapper $rowToModelMapper)
     {
         $this->modelStorage = $modelStorage;
-        $this->s3ClientFactory = $s3ClientFactory;
-        $this->sourceFactory = $sourceFactory;
         $this->rowToModelMapper = $rowToModelMapper;
     }
 
@@ -55,25 +40,6 @@ abstract class AbstractIngester
      * @return AbstractModel
      */
     abstract protected function convertRowToModel(array $row): AbstractModel;
-
-    /**
-     * @param InputInterface $input
-     * @return AbstractSource
-     * @throws InputOptionException
-     */
-    private function detectSource(array $options): AbstractSource
-    {
-        $accessParameters = [];
-        foreach ($this->sourceFactory->getSupportedAccessParameters() as $parameterName) {
-            $accessParameters[$parameterName] = array_key_exists($parameterName, $options) ? $options[$parameterName] : null;
-        }
-        $accessParameters['s3_client_factory'] = $this->s3ClientFactory;
-        try {
-            return $this->sourceFactory->createSource($accessParameters);
-        } catch (\Exception $e) {
-            throw new InputOptionException($e->getMessage());
-        }
-    }
 
     /**
      * @param AbstractModel $entity
@@ -96,19 +62,19 @@ abstract class AbstractIngester
     }
 
     /**
-     * @param array $options
+     * @param SourceInterface $source
      * @return array
      * @throws InputOptionException
      * @throws \App\Ingesting\Exception\IngestingException
      * @throws FileLineIsInvalidException
      * @throws \Exception
      */
-    public function ingest(array $options): array
+    public function ingest(SourceInterface $source): array
     {
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
         $lineNumber = 0;
-        foreach ($this->detectSource($options)->iterateThroughLines() as $line) {
+        foreach ($source->iterateThroughLines() as $line) {
             $lineNumber++;
             $entity = $this->convertRowToModel($line);
             try {

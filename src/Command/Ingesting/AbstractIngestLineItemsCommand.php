@@ -3,12 +3,13 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\Ingester\LineItemsIngester;
+use App\S3\S3ClientFactory;
 
-class IngestLineItemsCommand extends AbstractIngestCommand
+abstract class AbstractIngestLineItemsCommand extends AbstractIngestCommand
 {
-    public function __construct(LineItemsIngester $ingester)
+    public function __construct(LineItemsIngester $ingester, S3ClientFactory $s3ClientFactory)
     {
-        parent::__construct($ingester);
+        parent::__construct($ingester, $s3ClientFactory);
     }
 
     /**
@@ -26,7 +27,6 @@ CSV fields:
 HELP;
 
         $this
-            ->setName('tao:ingest:line-items')
             ->setDescription('Import a list of line items')
             ->setHelp($this->getHelpHeader('line items') . $help);
         parent::configure();
