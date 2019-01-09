@@ -30,7 +30,7 @@ services:
     # please note that last definitions always *replace* previous ones
 
     Aws\Sdk:
-      class: '\Aws\Sdk'
+      class: Aws\Sdk
       arguments:
           - endpoint: '%env(DYNAMODB_ENDPOINT)%'
             region: '%env(DYNAMODB_REGION)%'
@@ -40,7 +40,7 @@ services:
                 secret: '%env(DYNAMODB_SECRET)%'
 
     App\S3\S3ClientFactory:
-      class: '\App\S3\S3ClientFactory'
+      class: App\S3\S3ClientFactory
       arguments:
           $clientClass: 'App\S3\AmazonS3Client'
           $apiVersion: '%env(S3_VERSION)%'
