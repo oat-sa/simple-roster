@@ -5,7 +5,7 @@ namespace App\Model\Storage;
 use App\Model\AbstractModel;
 use App\Storage\StorageInterface;
 
-abstract class AbstractModelStorage
+abstract class AbstractModelStorage implements ModelStorageInterface
 {
     /**
      * @var StorageInterface
@@ -20,10 +20,7 @@ abstract class AbstractModelStorage
     abstract protected function getTable(): string;
 
     /**
-     * Returns primary key value of a model
-     *
-     * @param AbstractModel $model
-     * @return string
+     * @inheritdoc
      */
     abstract public function getKey(AbstractModel $model): string;
 
@@ -55,6 +52,9 @@ abstract class AbstractModelStorage
         return $this->storage->read($this->getTable(), [$this->getKeyFieldName() => $key]);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function read(string $key): ?AbstractModel
     {
         $rowData = $this->readRawData($key);
@@ -79,9 +79,7 @@ abstract class AbstractModelStorage
     }
 
     /**
-     * @param string $key
-     * @param AbstractModel $model
-     * @throws \Exception
+     * @inheritdoc
      */
     public function insert(string $key, AbstractModel $model): void
     {
@@ -89,6 +87,9 @@ abstract class AbstractModelStorage
         $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $key], $model->toArray());
     }
 
+    /**
+     * @inheritdoc
+     */
     public function delete(string $key): void
     {
         $this->storage->delete($this->getTable(), [$this->getKeyFieldName() => $key]);
