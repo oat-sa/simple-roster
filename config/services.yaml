@@ -39,10 +39,9 @@ services:
                 key: '%env(DYNAMODB_KEY)%'
                 secret: '%env(DYNAMODB_SECRET)%'
 
-    App\S3\S3ClientFactory:
-      class: App\S3\S3ClientFactory
+    App\S3\S3ClientInterface:
+      class: App\S3\AmazonS3Client
       arguments:
-          $clientClass: 'App\S3\AmazonS3Client'
           $apiVersion: '%env(S3_VERSION)%'
 
     App\Storage\StorageInterface: '@App\Storage\DynamoDbStorage'

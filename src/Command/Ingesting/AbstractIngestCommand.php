@@ -7,7 +7,7 @@ use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Ingester\AbstractIngester;
 use App\Ingesting\Source\SourceInterface;
-use App\S3\S3ClientFactory;
+use App\S3\S3ClientInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,14 +26,14 @@ abstract class AbstractIngestCommand extends Command
     private $ingester;
 
     /**
-     * @var S3ClientFactory
+     * @var S3ClientInterface
      */
-    private $s3ClientFactory;
+    private $s3Client;
 
-    public function __construct(AbstractIngester $ingester, S3ClientFactory $s3ClientFactory)
+    public function __construct(AbstractIngester $ingester, S3ClientInterface $s3Client)
     {
         $this->ingester = $ingester;
-        $this->s3ClientFactory = $s3ClientFactory;
+        $this->s3Client = $s3Client;
 
         parent::__construct();
     }
@@ -109,5 +109,15 @@ As an input a simple CSV file can be used or a file hosted on S3.
 
 
 HELP;
+    }
+
+    /**
+     * For S3SourceSpecificTrait
+     *
+     * @return S3ClientInterface
+     */
+    protected function getS3Client(): S3ClientInterface
+    {
+        return $this->s3Client;
     }
 }

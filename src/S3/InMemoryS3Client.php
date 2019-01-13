@@ -6,6 +6,11 @@ class InMemoryS3Client implements S3ClientInterface
 {
     private $objects = [];
 
+    public function connect(string $region, string $version, string $accessKey): void
+    {
+        $this->objects = [];
+    }
+
     /**
      * @param string $bucket
      * @param string $object
@@ -22,10 +27,6 @@ class InMemoryS3Client implements S3ClientInterface
         return $this->objects[$hash];
     }
 
-    /**
-     * @param array $args
-     * @throws \Exception
-     */
     public function putObject(string $bucket, string $name, string $content)
     {
         $hash = $bucket . $name;

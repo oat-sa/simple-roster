@@ -5,11 +5,14 @@ namespace App\Command\Ingesting\SourceSpecific;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Source\S3CsvSource;
 use App\Ingesting\Source\SourceInterface;
+use App\S3\S3ClientInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 trait S3SourceSpecificTrait
 {
     use SourceSpecificTrait;
+
+    abstract protected function getS3Client(): S3ClientInterface;
 
     protected function addSourceOptions(): void
     {
@@ -23,21 +26,22 @@ trait S3SourceSpecificTrait
     }
 
     /**
-     * @param array $options
+     * @param array $inputOptions
      * @return SourceInterface
      * @throws InputOptionException
      */
-    protected function getSource(array $options): SourceInterface
+    protected function getSource(array $inputOptions): SourceInterface
     {
         $requiredOptions = ['delimiter', 's3_bucket', 's3_object', 's3_region', 's3_access_key', 's3_secret'];
 
         foreach ($requiredOptions as $requiredOption) {
-            if (!array_key_exists($requiredOption, $options) || $options[$requiredOption] === null) {
+            if (!array_key_exists($requiredOption, $inputOptions) || $inputOptions[$requiredOption] === null) {
                 throw new InputOptionException(sprintf('Option "%s" is not provided', $requiredOption));
             }
         }
 
-        return new S3CsvSource($this->s3ClientFactory, $options['s3_bucket'], $options['s3_object'],
-            $options['s3_region'], $options['s3_access_key'], $options['s3_secret'], $options['delimiter']);
+        $this->getS3Client()->connect($inputOptions['s3_region'], $inputOptions['s3_access_key'], $inputOptions['s3_secret']);
+
+        return new S3CsvSource($this->getS3Client(), $inputOptions['s3_bucket'], $inputOptions['s3_object'], $inputOptions['delimiter']);
     }
 }

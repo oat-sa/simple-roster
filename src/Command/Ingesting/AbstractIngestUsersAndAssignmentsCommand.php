@@ -3,13 +3,13 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\Ingester\UserAndAssignmentsIngester;
-use App\S3\S3ClientFactory;
+use App\S3\S3ClientInterface;
 
 abstract class AbstractIngestUsersAndAssignmentsCommand extends AbstractIngestCommand
 {
-    public function __construct(UserAndAssignmentsIngester $ingester, S3ClientFactory $s3ClientFactory)
+    public function __construct(UserAndAssignmentsIngester $ingester, S3ClientInterface $s3Client)
     {
-        parent::__construct($ingester, $s3ClientFactory);
+        parent::__construct($ingester, $s3Client);
     }
 
     /**

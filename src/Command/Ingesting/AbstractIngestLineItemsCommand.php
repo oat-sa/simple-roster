@@ -3,13 +3,13 @@
 namespace App\Command\Ingesting;
 
 use App\Ingesting\Ingester\LineItemsIngester;
-use App\S3\S3ClientFactory;
+use App\S3\S3ClientInterface;
 
 abstract class AbstractIngestLineItemsCommand extends AbstractIngestCommand
 {
-    public function __construct(LineItemsIngester $ingester, S3ClientFactory $s3ClientFactory)
+    public function __construct(LineItemsIngester $ingester, S3ClientInterface $s3Client)
     {
-        parent::__construct($ingester, $s3ClientFactory);
+        parent::__construct($ingester, $s3Client);
     }
 
     /**
