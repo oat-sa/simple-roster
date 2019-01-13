@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85a601c6465479f8c70bccbbd2dba267",
+    "content-hash": "386713600b5a439de4be15e7ddacb926",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -967,6 +967,27 @@
                 "jsonpath"
             ],
             "time": "2016-12-03T22:08:25+00:00"
+        },
+        {
+            "name": "oat-sa/phing-tasks",
+            "version": "v0.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:oat-sa/phing-tasks.git",
+                "reference": "f1c28134a8de8f39e05088c233761f97dd860051"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/phing-tasks/zipball/f1c28134a8de8f39e05088c233761f97dd860051",
+                "reference": "f1c28134a8de8f39e05088c233761f97dd860051",
+                "shasum": ""
+            },
+            "type": "library",
+            "support": {
+                "source": "https://github.com/oat-sa/phing-tasks/tree/v0.1",
+                "issues": "https://github.com/oat-sa/phing-tasks/issues"
+            },
+            "time": "2017-10-23T17:36:49+00:00"
         },
         {
             "name": "phing/phing",
