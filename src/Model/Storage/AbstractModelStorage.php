@@ -4,6 +4,8 @@ namespace App\Model\Storage;
 
 use App\Model\AbstractModel;
 use App\Storage\StorageInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 abstract class AbstractModelStorage implements ModelStorageInterface
 {
@@ -11,6 +13,16 @@ abstract class AbstractModelStorage implements ModelStorageInterface
      * @var StorageInterface
      */
     protected $storage;
+
+    /**
+     * @var NormalizerInterface
+     */
+    protected $normalizer;
+
+    /**
+     * @var DenormalizerInterface
+     */
+    protected $denormalizer;
 
     /**
      * Get table name used for a storage
@@ -36,9 +48,11 @@ abstract class AbstractModelStorage implements ModelStorageInterface
      */
     abstract protected function getModelClass(): string;
 
-    public function __construct(StorageInterface $storage)
+    public function __construct(StorageInterface $storage, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
     {
         $this->storage = $storage;
+        $this->normalizer = $normalizer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
@@ -58,9 +72,11 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     public function read(string $key): ?AbstractModel
     {
         $rowData = $this->readRawData($key);
-        if ($rowData) {
-            $modelClass = $this->getModelClass();
-            return new $modelClass($rowData);
+
+        if ($rowData !== null) {
+            /** @var AbstractModel $model */
+            $model = $this->denormalizer->denormalize($rowData, $this->getModelClass());
+            return $model;
         }
 
         return null;
@@ -84,7 +100,9 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     public function insert(string $key, AbstractModel $model): void
     {
         $this->assertModelClass($model);
-        $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $key], $model->toArray());
+        $normalizedModel = $this->normalizer->normalize($model);
+
+        $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $key], $normalizedModel);
     }
 
     /**

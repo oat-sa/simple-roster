@@ -34,26 +34,10 @@ class Assignment extends AbstractModel
      */
     private $state = self::STATE_READY;
 
-    /**
-     * @inheritdoc
-     */
-    public static function createFromArray(array $data): AbstractModel
+    public function __construct(string $lineItemTaoUri, string $state = self::STATE_READY)
     {
-        $model = new self();
-        $model->lineItemTaoUri = $data['line_item_tao_uri'] ?? null;
-        $model->state = $data['state'] ?? null;
-        return $model;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toArray(): array
-    {
-        return [
-            'state' => $this->state,
-            'line_item_tao_uri' => $this->lineItemTaoUri,
-        ];
+        $this->lineItemTaoUri = $lineItemTaoUri;
+        $this->state = $state;
     }
 
     public function validate(): void

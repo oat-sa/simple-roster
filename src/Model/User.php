@@ -20,60 +20,35 @@ class User extends AbstractModel
     private $assignments = [];
 
     /**
-     * @inheritdoc
+     * @param $login
+     * @param $password
+     * @param Assignment[] $assignments
      */
-    public static function createFromArray(array $data): AbstractModel
+    public function __construct(string $login, string $password, array $assignments = [])
     {
-        $model = new self();
-        $model->login = $data['login'] ?? null;
-        $model->password = $data['password'] ?? null;
-
-        if (!empty($data['assignments'])) {
-            foreach ($data['assignments'] as $assignmentArray) {
-                $model->assignments[] = Assignment::createFromArray($assignmentArray);
-            }
-        }
-
-        return $model;
+        $this->login = $login;
+        $this->password = $password;
+        $this->assignments = $assignments;
     }
 
     /**
-     * @inheritdoc
-     */
-    public function toArray(): array
-    {
-        $assignmentArrays = [];
-        foreach ($this->assignments as $assignment) {
-            $assignmentArrays[] = $assignment->toArray();
-        }
-
-        return [
-            'login' => $this->login,
-            'password' => $this->password,
-            'assignments' => $assignmentArrays,
-        ];
-    }
-
-    /**
-     * @param array $uris
+     * @param Assignment[] $assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(array $uris): int
+    public function addAssignments(array $assignments): int
     {
         $addedCount = 0;
 
-        foreach ($uris as $uri) {
+        foreach ($assignments as $assignmentToAdd) {
             $alreadyExists = false;
             foreach ($this->assignments as $assignment) {
-                if ($assignment->getLineItemTaoUri() === $uri && $assignment->getState() === Assignment::STATE_READY) {
+                if ($assignment->getLineItemTaoUri() === $assignmentToAdd->getLineItemTaoUri() && $assignment->getState() === Assignment::STATE_READY) {
                     $alreadyExists = true;
                 }
             }
 
             if (!$alreadyExists) {
-                $newAssignment = new Assignment();
-                $newAssignment->setLineItemTaoUri($uri);
-                $this->assignments[] = $newAssignment;
+                $this->assignments[] = $assignmentToAdd;
                 $addedCount++;
             }
         }

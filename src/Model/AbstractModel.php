@@ -7,17 +7,6 @@ use App\Model\Validation\ValidationException;
 abstract class AbstractModel
 {
     /**
-     * @param array $data
-     * @return mixed
-     */
-    abstract static public function createFromArray(array $data): self;
-
-    /**
-     * @return array than can be saved and then passed to self::createFromArray to reproduce an entity
-     */
-    abstract public function toArray();
-
-    /**
      * Throws prepared exception
      *
      * Why cannot it also do universal checks instead of checking a field existence outside?

@@ -2,11 +2,13 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
+use App\Model\AbstractModel;
+use App\Model\Assignment;
 use App\Model\User;
 
-class UserRowToModelMapper extends RowToModelMapper
+class UserRowToModelMapper extends AbstractRowToModelMapper
 {
-    public function map(array $row, array $fieldNames, string $modelClass)
+    public function map(array $row, array $fieldNames): AbstractModel
     {
         $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
 
@@ -17,11 +19,15 @@ class UserRowToModelMapper extends RowToModelMapper
             $fieldValues['assignments'][] = $row[$i];
         }
 
-        $assignments = $fieldValues['assignments'];
+        $assignmentUris = $fieldValues['assignments'];
+        $assignments = [];
+        foreach ($assignmentUris as $assignmentUri) {
+            $assignments[] = new Assignment($assignmentUri);
+        }
         unset($fieldValues['assignments']);
 
         /** @var User $user */
-        $user = User::createFromArray($fieldValues);
+        $user = new User($fieldValues['login'], $fieldValues['password']);
 
         $user->addAssignments($assignments);
 

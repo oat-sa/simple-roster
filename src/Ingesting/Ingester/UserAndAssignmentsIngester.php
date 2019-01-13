@@ -24,6 +24,6 @@ class UserAndAssignmentsIngester extends AbstractIngester
      */
     protected function convertRowToModel(array $row): AbstractModel
     {
-        return $this->rowToModelMapper->map($row, ['login', 'password'], User::class);
+        return $this->rowToModelMapper->map($row, ['login', 'password']);
     }
 }

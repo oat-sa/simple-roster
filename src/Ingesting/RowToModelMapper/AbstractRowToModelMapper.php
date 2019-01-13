@@ -2,7 +2,9 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
-class RowToModelMapper
+use App\Model\AbstractModel;
+
+abstract class AbstractRowToModelMapper
 {
     protected function mapFileLineByFieldNames(array $row, array $fieldNames): array
     {
@@ -17,9 +19,5 @@ class RowToModelMapper
         return $fieldValues;
     }
 
-    public function map(array $row, array $fieldNames, string $modelClass)
-    {
-        $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
-        return $modelClass::createFromArray($fieldValues);
-    }
+    abstract public function map(array $row, array $fieldNames): AbstractModel;
 }

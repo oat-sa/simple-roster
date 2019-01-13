@@ -4,7 +4,7 @@ namespace App\Ingesting\Ingester;
 
 use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\InputOptionException;
-use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\AbstractModel;
 use App\Model\Storage\AbstractModelStorage;
@@ -18,7 +18,7 @@ abstract class AbstractIngester
     protected $modelStorage;
 
     /**
-     * @var RowToModelMapper
+     * @var AbstractRowToModelMapper
      */
     protected $rowToModelMapper;
 
@@ -29,7 +29,7 @@ abstract class AbstractIngester
      */
     protected $updateMode = false;
 
-    public function __construct(AbstractModelStorage $modelStorage, RowToModelMapper $rowToModelMapper)
+    public function __construct(AbstractModelStorage $modelStorage, AbstractRowToModelMapper $rowToModelMapper)
     {
         $this->modelStorage = $modelStorage;
         $this->rowToModelMapper = $rowToModelMapper;

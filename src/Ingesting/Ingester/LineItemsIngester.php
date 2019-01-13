@@ -2,12 +2,11 @@
 
 namespace App\Ingesting\Ingester;
 
-use App\Ingesting\RowToModelMapper\RowToModelMapper;
+use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
 use App\Model\AbstractModel;
 use App\Model\LineItem;
 use App\Model\Storage\InfrastructureStorage;
 use App\Model\Storage\LineItemStorage;
-use App\S3\S3ClientFactory;
 
 class LineItemsIngester extends AbstractIngester
 {
@@ -16,7 +15,7 @@ class LineItemsIngester extends AbstractIngester
      */
     private $infrastructureStorage;
 
-    public function __construct(LineItemStorage $modelStorage, RowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
+    public function __construct(LineItemStorage $modelStorage, LineItemRowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
     {
         parent::__construct($modelStorage, $rowToModelMapper);
 
@@ -29,8 +28,7 @@ class LineItemsIngester extends AbstractIngester
     protected function convertRowToModel(array $row): AbstractModel
     {
         return $this->rowToModelMapper->map($row,
-            ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time'],
-            LineItem::class
+            ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time']
         );
     }
 

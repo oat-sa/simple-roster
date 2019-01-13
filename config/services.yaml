@@ -46,3 +46,20 @@ services:
           $apiVersion: '%env(S3_VERSION)%'
 
     App\Storage\StorageInterface: '@App\Storage\DynamoDbStorage'
+
+    Symfony\Component\Serializer\Normalizer\NormalizerInterface:
+      class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+      calls:
+      - method: setSerializer
+        arguments:
+          - '@Symfony\Component\Serializer\SerializerInterface'
+
+    Symfony\Component\Serializer\Normalizer\DenormalizerInterface:
+      class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+
+    Symfony\Component\Serializer\SerializerInterface:
+      class: Symfony\Component\Serializer\Serializer
+      arguments:
+        $normalizers:
+          - '@Symfony\Component\Serializer\Normalizer\NormalizerInterface'
+          - '@Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
