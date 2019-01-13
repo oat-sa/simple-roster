@@ -4,7 +4,7 @@ namespace App\Ingesting\Source;
 
 use App\Ingesting\Exception\FileNotFoundException;
 
-class LocalFileSource implements SourceInterface
+class LocalCsvFileSource implements SourceInterface
 {
     private $filename;
     private $delimiter;

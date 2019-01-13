@@ -3,7 +3,7 @@
 namespace App\Command\Ingesting\SourceSpecific;
 
 use App\Ingesting\Exception\InputOptionException;
-use App\Ingesting\Source\S3Source;
+use App\Ingesting\Source\S3CsvSource;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -37,7 +37,7 @@ trait S3SourceSpecificTrait
             }
         }
 
-        return new S3Source($this->s3ClientFactory, $options['s3_bucket'], $options['s3_object'],
+        return new S3CsvSource($this->s3ClientFactory, $options['s3_bucket'], $options['s3_object'],
             $options['s3_region'], $options['s3_access_key'], $options['s3_secret'], $options['delimiter']);
     }
 }

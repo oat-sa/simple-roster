@@ -5,7 +5,7 @@ namespace App\Ingesting\Source;
 use App\Ingesting\Exception\S3AccessException;
 use App\S3\S3ClientFactory;
 
-class S3Source implements SourceInterface
+class S3CsvSource implements SourceInterface
 {
     private $clientFactory;
     private $bucket;

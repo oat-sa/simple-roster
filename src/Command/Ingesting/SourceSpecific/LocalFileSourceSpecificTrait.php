@@ -3,7 +3,7 @@
 namespace App\Command\Ingesting\SourceSpecific;
 
 use App\Ingesting\Exception\InputOptionException;
-use App\Ingesting\Source\LocalFileSource;
+use App\Ingesting\Source\LocalCsvFileSource;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -33,6 +33,6 @@ trait LocalFileSourceSpecificTrait
             }
         }
 
-        return new LocalFileSource($options['filename'], $options['delimiter']);
+        return new LocalCsvFileSource($options['filename'], $options['delimiter']);
     }
 }
