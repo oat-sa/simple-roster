@@ -3,49 +3,24 @@
 namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
-use App\Model\AbstractModel;
-use App\Model\LineItem;
-use App\Model\Storage\InfrastructureStorage;
+use App\Model\ModelInterface;
 use App\Model\Storage\LineItemStorage;
+use App\Model\Validation\LineItemValidator;
 
 class LineItemsIngester extends AbstractIngester
 {
-    /**
-     * @var InfrastructureStorage
-     */
-    private $infrastructureStorage;
-
-    public function __construct(LineItemStorage $modelStorage, LineItemRowToModelMapper $rowToModelMapper, InfrastructureStorage $infrastructureStorage)
+    public function __construct(LineItemStorage $modelStorage, LineItemRowToModelMapper $rowToModelMapper, LineItemValidator $lineItemValidator)
     {
-        parent::__construct($modelStorage, $rowToModelMapper);
-
-        $this->infrastructureStorage = $infrastructureStorage;
+        parent::__construct($modelStorage, $rowToModelMapper, $lineItemValidator);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function convertRowToModel(array $row): AbstractModel
+    protected function convertRowToModel(array $row): ModelInterface
     {
         return $this->rowToModelMapper->map($row,
             ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time']
         );
-    }
-
-    /**
-     * @param LineItem $entity
-     * @throws \Exception
-     */
-    protected function validateEntity(AbstractModel $entity): void
-    {
-        parent::validateEntity($entity);
-
-        $infrastructureId = $entity->getInfrastructureId();
-
-        $existingInfrastructure = $this->infrastructureStorage->read($infrastructureId);
-
-        if ($existingInfrastructure === null) {
-            throw new \Exception(sprintf('Infrastructure with id "%s" not found', $infrastructureId));
-        }
     }
 }

@@ -3,9 +3,10 @@
 namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Model\Storage\UserStorage;
 use App\Model\User;
+use App\Model\Validation\UserValidator;
 
 class UserAndAssignmentsIngester extends AbstractIngester
 {
@@ -14,15 +15,15 @@ class UserAndAssignmentsIngester extends AbstractIngester
      */
     protected $updateMode = true;
 
-    public function __construct(UserStorage $modelStorage, UserRowToModelMapper $rowToModelMapper)
+    public function __construct(UserStorage $modelStorage, UserRowToModelMapper $rowToModelMapper, UserValidator $validator)
     {
-        parent::__construct($modelStorage, $rowToModelMapper);
+        parent::__construct($modelStorage, $rowToModelMapper, $validator);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function convertRowToModel(array $row): AbstractModel
+    protected function convertRowToModel(array $row): ModelInterface
     {
         return $this->rowToModelMapper->map($row, ['login', 'password']);
     }

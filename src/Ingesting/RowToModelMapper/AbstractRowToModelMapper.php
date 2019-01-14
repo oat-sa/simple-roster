@@ -2,7 +2,7 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 
 abstract class AbstractRowToModelMapper
 {
@@ -19,5 +19,5 @@ abstract class AbstractRowToModelMapper
         return $fieldValues;
     }
 
-    abstract public function map(array $row, array $fieldNames): AbstractModel;
+    abstract public function map(array $row, array $fieldNames): ModelInterface;
 }

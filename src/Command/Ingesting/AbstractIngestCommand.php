@@ -75,6 +75,8 @@ abstract class AbstractIngestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): void
     {
+
+
         $inputOptions = $input->getOptions();
         $dryRun = $input->getOption('dry-run') !== false;
 

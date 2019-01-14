@@ -2,26 +2,26 @@
 
 namespace App\Model\Storage;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 
 interface ModelStorageInterface
 {
     /**
      * Returns primary key value of a model
      *
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @return string
      */
-    public function getKey(AbstractModel $model): string;
+    public function getKey(ModelInterface $model): string;
 
-    public function read(string $key): ?AbstractModel;
+    public function read(string $key): ?ModelInterface;
 
     /**
      * @param string $key
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @throws \Exception
      */
-    public function insert(string $key, AbstractModel $model): void;
+    public function insert(string $key, ModelInterface $model): void;
 
     public function delete(string $key): void;
 }

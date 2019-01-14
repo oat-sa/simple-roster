@@ -2,7 +2,7 @@
 
 namespace App\Model\Storage;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Storage\StorageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -34,7 +34,7 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    abstract public function getKey(AbstractModel $model): string;
+    abstract public function getKey(ModelInterface $model): string;
 
     /**
      * Returns primary key value of a model
@@ -69,12 +69,12 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function read(string $key): ?AbstractModel
+    public function read(string $key): ?ModelInterface
     {
         $rowData = $this->readRawData($key);
 
         if ($rowData !== null) {
-            /** @var AbstractModel $model */
+            /** @var ModelInterface $model */
             $model = $this->denormalizer->denormalize($rowData, $this->getModelClass());
             return $model;
         }
@@ -83,10 +83,10 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     }
 
     /**
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @throws \Exception
      */
-    protected function assertModelClass(AbstractModel $model): void
+    protected function assertModelClass(ModelInterface $model): void
     {
         $modelClass = $this->getModelClass();
         if (!$model instanceof $modelClass) {
@@ -97,7 +97,7 @@ abstract class AbstractModelStorage implements ModelStorageInterface
     /**
      * @inheritdoc
      */
-    public function insert(string $key, AbstractModel $model): void
+    public function insert(string $key, ModelInterface $model): void
     {
         $this->assertModelClass($model);
         $normalizedModel = $this->normalizer->normalize($model);

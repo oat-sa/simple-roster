@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class Assignment extends AbstractModel
+class Assignment implements ModelInterface
 {
     /**
      * @var string
@@ -40,11 +40,6 @@ class Assignment extends AbstractModel
         $this->state = $state;
     }
 
-    public function validate(): void
-    {
-
-    }
-
     public function getLineItemTaoUri(): string
     {
         return $this->lineItemTaoUri;
@@ -55,8 +50,10 @@ class Assignment extends AbstractModel
         return $this->state;
     }
 
-    public function setLineItemTaoUri(string $lineItemTaoUri): void
+    public function setLineItemTaoUri(string $lineItemTaoUri): self
     {
         $this->lineItemTaoUri = $lineItemTaoUri;
+
+        return $this;
     }
 }

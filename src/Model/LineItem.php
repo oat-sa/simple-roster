@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class LineItem extends AbstractModel
+class LineItem implements ModelInterface
 {
     /**
      * @var string
@@ -64,21 +64,5 @@ class LineItem extends AbstractModel
     public function getEndDateTime(): ?string
     {
         return $this->endDateTime;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validate(): void
-    {
-        if (!$this->taoUri) {
-            $this->throwExceptionRequiredFieldEmpty('tao_uri');
-        }
-        if (!$this->title) {
-            $this->throwExceptionRequiredFieldEmpty('title');
-        }
-        if (!$this->infrastructureId) {
-            $this->throwExceptionRequiredFieldEmpty('infrastructure_id');
-        }
     }
 }

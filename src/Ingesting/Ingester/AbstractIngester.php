@@ -6,8 +6,9 @@ use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Model\Storage\AbstractModelStorage;
+use App\Model\Validation\AbstractModelValidator;
 use App\Model\Validation\ValidationException;
 
 abstract class AbstractIngester
@@ -23,40 +24,37 @@ abstract class AbstractIngester
     protected $rowToModelMapper;
 
     /**
+     * @var AbstractModelValidator
+     */
+    protected $validator;
+
+    /**
      * Whether to skip those records already existing or update with new values
      *
      * @var bool
      */
     protected $updateMode = false;
 
-    public function __construct(AbstractModelStorage $modelStorage, AbstractRowToModelMapper $rowToModelMapper)
+    public function __construct(AbstractModelStorage $modelStorage, AbstractRowToModelMapper $rowToModelMapper, AbstractModelValidator $validator)
     {
         $this->modelStorage = $modelStorage;
         $this->rowToModelMapper = $rowToModelMapper;
+        $this->validator = $validator;
     }
 
     /**
      * @param String[] $row
-     * @return AbstractModel
+     * @return ModelInterface
      */
-    abstract protected function convertRowToModel(array $row): AbstractModel;
-
-    /**
-     * @param AbstractModel $entity
-     * @throws ValidationException
-     */
-    protected function validateEntity(AbstractModel $entity): void
-    {
-        $entity->validate();
-    }
+    abstract protected function convertRowToModel(array $row): ModelInterface;
 
     /**
      * Checks if the record with same primary key already exists
      *
-     * @param AbstractModel $entity
+     * @param ModelInterface $entity
      * @return bool
      */
-    protected function checkIfExists(AbstractModel $entity): bool
+    protected function checkIfExists(ModelInterface $entity): bool
     {
         return $this->modelStorage->read($this->modelStorage->getKey($entity)) !== null;
     }
@@ -77,14 +75,14 @@ abstract class AbstractIngester
         $lineNumber = 0;
         foreach ($source->iterateThroughLines() as $line) {
             $lineNumber++;
-            $entity = $this->convertRowToModel($line);
+            $model = $this->convertRowToModel($line);
             try {
-                $this->validateEntity($entity);
+                $this->validator->validate($model);
             } catch (ValidationException $e) {
                 throw new FileLineIsInvalidException($lineNumber, $e->getMessage());
             }
 
-            if ($this->checkIfExists($entity)) {
+            if ($this->checkIfExists($model)) {
                 $alreadyExistingRowsCount++;
                 if (!$this->updateMode) {
                     continue;
@@ -96,7 +94,7 @@ abstract class AbstractIngester
             }
 
             if (!$dryRun) {
-                $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
+                $this->modelStorage->insert($this->modelStorage->getKey($model), $model);
             }
         }
 

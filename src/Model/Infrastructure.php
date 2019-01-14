@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class Infrastructure extends AbstractModel
+class Infrastructure implements ModelInterface
 {
     /**
      * @var string
@@ -37,22 +37,18 @@ class Infrastructure extends AbstractModel
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function validate(): void
+    public function getLtiDirectorLink(): string
     {
-        if (!$this->id) {
-            $this->throwExceptionRequiredFieldEmpty('id');
-        }
-        if (!$this->ltiDirectorLink) {
-            $this->throwExceptionRequiredFieldEmpty('lti_director_link');
-        }
-        if (!$this->key) {
-            $this->throwExceptionRequiredFieldEmpty('key');
-        }
-        if (!$this->secret) {
-            $this->throwExceptionRequiredFieldEmpty('secret');
-        }
+        return $this->ltiDirectorLink;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    public function getSecret(): string
+    {
+        return $this->secret;
     }
 }

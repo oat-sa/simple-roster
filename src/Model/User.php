@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class User extends AbstractModel
+class User implements ModelInterface
 {
     /**
      * @var string
@@ -64,21 +64,5 @@ class User extends AbstractModel
     public function getPassword(): string
     {
         return $this->password;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validate(): void
-    {
-        if (!$this->login) {
-            $this->throwExceptionRequiredFieldEmpty('login');
-        }
-        if (!$this->password) {
-            $this->throwExceptionRequiredFieldEmpty('password');
-        }
-        foreach ($this->assignments as $assignment) {
-            $assignment->validate();
-        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Model\Storage;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Model\Infrastructure;
 
 class InfrastructureStorage extends AbstractModelStorage
@@ -18,11 +18,11 @@ class InfrastructureStorage extends AbstractModelStorage
     }
 
     /**
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(AbstractModel $model): string
+    public function getKey(ModelInterface $model): string
     {
         /** @var Infrastructure $model */
         $this->assertModelClass($model);

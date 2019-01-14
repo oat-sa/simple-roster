@@ -2,13 +2,13 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
-    public function map(array $row, array $fieldNames): AbstractModel
+    public function map(array $row, array $fieldNames): ModelInterface
     {
         $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
 

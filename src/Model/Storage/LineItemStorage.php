@@ -3,7 +3,7 @@
 namespace App\Model\Storage;
 
 use App\Model\LineItem;
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 
 class LineItemStorage extends AbstractModelStorage
 {
@@ -18,11 +18,11 @@ class LineItemStorage extends AbstractModelStorage
     }
 
     /**
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(AbstractModel $model): string
+    public function getKey(ModelInterface $model): string
     {
         /** @var LineItem $model */
         $this->assertModelClass($model);

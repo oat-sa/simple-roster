@@ -2,7 +2,7 @@
 
 namespace App\Model\Storage;
 
-use App\Model\AbstractModel;
+use App\Model\ModelInterface;
 use App\Model\Denormalizer\UserDenormalizer;
 use App\Model\User;
 use App\Storage\StorageInterface;
@@ -30,11 +30,11 @@ class UserStorage extends AbstractModelStorage
     }
 
     /**
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(AbstractModel $model): string
+    public function getKey(ModelInterface $model): string
     {
         /** @var User $model */
         $this->assertModelClass($model);
