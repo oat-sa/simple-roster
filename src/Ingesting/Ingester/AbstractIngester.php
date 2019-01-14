@@ -63,13 +63,14 @@ abstract class AbstractIngester
 
     /**
      * @param SourceInterface $source
+     * @param bool $dryRun
      * @return array
      * @throws InputOptionException
      * @throws \App\Ingesting\Exception\IngestingException
      * @throws FileLineIsInvalidException
      * @throws \Exception
      */
-    public function ingest(SourceInterface $source): array
+    public function ingest(SourceInterface $source, bool $dryRun): array
     {
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
@@ -94,7 +95,9 @@ abstract class AbstractIngester
                 }
             }
 
-            $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
+            if (!$dryRun) {
+                $this->modelStorage->insert($this->modelStorage->getKey($entity), $entity);
+            }
         }
 
         return [

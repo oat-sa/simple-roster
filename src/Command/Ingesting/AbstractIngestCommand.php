@@ -10,6 +10,7 @@ use App\Ingesting\Source\SourceInterface;
 use App\S3\S3ClientInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -50,6 +51,8 @@ abstract class AbstractIngestCommand extends Command
      */
     protected function configure(): void
     {
+        $this->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Do not write any data', false);
+
         $this->addSourceOptions();
     }
 
@@ -72,11 +75,18 @@ abstract class AbstractIngestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): void
     {
-        try {
-            $source = $this->getSource($input->getOptions());
-            $result = $this->ingester->ingest($source);
+        $inputOptions = $input->getOptions();
+        $dryRun = $input->getOption('dry-run') !== false;
 
-            $this->io->success(sprintf('Data has been ingested successfully.'));
+        try {
+            $source = $this->getSource($inputOptions);
+            $result = $this->ingester->ingest($source, $dryRun);
+
+            if ($dryRun) {
+                $this->io->success(sprintf('DRY RUN! Data ingestion imitated successfully.'));
+            } else {
+                $this->io->success(sprintf('Data has been ingested successfully.'));
+            }
         } catch (InputOptionException $e) {
             $this->io->error(sprintf('Bad input parameters: %s', $e->getMessage()));
         } catch (FileLineIsInvalidException $e) {
