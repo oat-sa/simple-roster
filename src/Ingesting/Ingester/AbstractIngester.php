@@ -7,7 +7,7 @@ use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
-use App\Model\Storage\AbstractModelManager;
+use App\ModelManager\AbstractModelManager;
 use App\Model\Validation\ModelValidator;
 use App\Model\Validation\ValidationException;
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Model\Storage;
+namespace App\ModelManager;
 
 use App\Model\ModelInterface;
 use App\Model\Denormalizer\UserDenormalizer;

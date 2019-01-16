@@ -4,7 +4,7 @@ namespace App\Model\Validation;
 
 use App\Model\ModelInterface;
 use App\Model\LineItem;
-use App\Model\Storage\InfrastructureManager;
+use App\ModelManager\InfrastructureManager;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

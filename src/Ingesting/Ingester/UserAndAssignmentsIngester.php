@@ -4,7 +4,7 @@ namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
 use App\Model\ModelInterface;
-use App\Model\Storage\UserManager;
+use App\ModelManager\UserManager;
 use App\Model\Validation\ModelValidator;
 
 class UserAndAssignmentsIngester extends AbstractIngester

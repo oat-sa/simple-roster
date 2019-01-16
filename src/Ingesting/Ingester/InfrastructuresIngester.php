@@ -4,7 +4,7 @@ namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper;
 use App\Model\ModelInterface;
-use App\Model\Storage\InfrastructureManager;
+use App\ModelManager\InfrastructureManager;
 use App\Model\Validation\ModelValidator;
 
 class InfrastructuresIngester extends AbstractIngester

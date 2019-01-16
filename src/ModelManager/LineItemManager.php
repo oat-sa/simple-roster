@@ -1,20 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace App\Model\Storage;
+namespace App\ModelManager;
 
+use App\Model\LineItem;
 use App\Model\ModelInterface;
-use App\Model\Infrastructure;
 
-class InfrastructureManager extends AbstractModelManager
+class LineItemManager extends AbstractModelManager
 {
     protected function getTable(): string
     {
-        return 'infrastructures';
+        return 'line_items';
     }
 
     protected function getKeyFieldName(): string
     {
-        return 'id';
+        return 'taoUri';
     }
 
     /**
@@ -24,14 +24,14 @@ class InfrastructureManager extends AbstractModelManager
      */
     public function getKey(ModelInterface $model): string
     {
-        /** @var Infrastructure $model */
+        /** @var LineItem $model */
         $this->assertModelClass($model);
 
-        return $model->getId();
+        return $model->getTaoUri();
     }
 
     protected function getModelClass(): string
     {
-        return Infrastructure::class;
+        return LineItem::class;
     }
 }
