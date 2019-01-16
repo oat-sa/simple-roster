@@ -46,7 +46,14 @@ services:
         arguments:
             $apiVersion: '%env(S3_VERSION)%'
 
-    App\Storage\StorageInterface: '@App\Storage\DynamoDbStorage'
+    Aws\DynamoDb\Marshaler:
+        class: Aws\DynamoDb\Marshaler
+
+    App\Storage\StorageInterface:
+        class: App\Storage\DynamoDbStorage
+        arguments:
+            $awsSdk: '@Aws\Sdk'
+            $marshaler: '@Aws\DynamoDb\Marshaler'
 
     Symfony\Component\Serializer\Normalizer\NormalizerInterface:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
