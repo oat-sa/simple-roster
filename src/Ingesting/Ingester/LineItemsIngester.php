@@ -5,7 +5,7 @@ namespace App\Ingesting\Ingester;
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
 use App\Model\ModelInterface;
 use App\ModelManager\LineItemManager;
-use App\Model\Validation\ModelValidator;
+use App\Validation\ModelValidator;
 
 class LineItemsIngester extends AbstractIngester
 {

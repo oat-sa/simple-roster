@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Model\Denormalizer;
+namespace App\Denormalizer;
 
 use App\Model\Assignment;
 use App\Model\User;

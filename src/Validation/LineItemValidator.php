@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Model\Validation;
+namespace App\Validation;
 
 use App\Model\ModelInterface;
 use App\Model\LineItem;

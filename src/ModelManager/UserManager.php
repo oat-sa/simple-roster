@@ -3,7 +3,7 @@
 namespace App\ModelManager;
 
 use App\Model\ModelInterface;
-use App\Model\Denormalizer\UserDenormalizer;
+use App\Denormalizer\UserDenormalizer;
 use App\Model\User;
 use App\Storage\StorageInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

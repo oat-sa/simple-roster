@@ -8,8 +8,8 @@ use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
 use App\ModelManager\AbstractModelManager;
-use App\Model\Validation\ModelValidator;
-use App\Model\Validation\ValidationException;
+use App\Validation\ModelValidator;
+use App\Validation\ValidationException;
 
 abstract class AbstractIngester
 {
