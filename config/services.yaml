@@ -58,9 +58,14 @@ services:
     Symfony\Component\Serializer\Normalizer\DenormalizerInterface:
       class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
 
-    Symfony\Component\Serializer\SerializerInterface:
-      class: Symfony\Component\Serializer\Serializer
-      arguments:
-        $normalizers:
-          - '@Symfony\Component\Serializer\Normalizer\NormalizerInterface'
-          - '@Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
+    'App\Ingesting\Ingester\InfrastructuresIngester':
+        class: App\Ingesting\Ingester\InfrastructuresIngester
+        public: true
+
+    'App\Ingesting\Ingester\LineItemsIngester':
+        class: App\Ingesting\Ingester\LineItemsIngester
+        public: true
+
+    'App\Ingesting\Ingester\UserAndAssignmentsIngester':
+        class: App\Ingesting\Ingester\UserAndAssignmentsIngester
+        public: true

@@ -1,21 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace App\Command\Ingesting\SourceSpecific;
+namespace App\Command\Ingesting;
 
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Source\LocalCsvFileSource;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Component\Console\Input\InputOption;
 
-trait LocalFileSourceSpecificTrait
+class IngestLocalCommand extends AbstractIngestCommand
 {
-    use SourceSpecificTrait;
-
-    protected function addSourceOptions(): void
+    protected function configure(): void
     {
-        $this
+        $this->setName('tao:local-ingest')
             ->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
             ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
+
+        parent::configure();
     }
 
     /**
