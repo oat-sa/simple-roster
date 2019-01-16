@@ -6,11 +6,15 @@ class User implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $login;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $password;
 

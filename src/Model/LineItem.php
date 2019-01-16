@@ -6,26 +6,33 @@ class LineItem implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     * @Assert\Url
      */
     private $taoUri;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $title;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $startDateTime;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $endDateTime;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $infrastructureId;
 

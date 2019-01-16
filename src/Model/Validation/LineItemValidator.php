@@ -8,7 +8,7 @@ use App\Model\Storage\InfrastructureManager;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class LineItemValidator extends AbstractModelValidator
+class LineItemValidator extends ModelValidator
 {
     /**
      * @var InfrastructureManager
@@ -28,23 +28,11 @@ class LineItemValidator extends AbstractModelValidator
      */
     public function validate(ModelInterface $lineItem): void
     {
+        parent::validate($lineItem);
+
         if (!$lineItem instanceof LineItem) {
             return;
         }
-        $violations = $this->validator->startContext()
-            ->atPath('tao_uri')->validate($lineItem->getTaoUri(), [
-                new Constraints\NotBlank(),
-                new Constraints\Url(),
-            ])
-            ->atPath('title')->validate($lineItem->getTitle(), [
-                new Constraints\NotBlank(),
-            ])
-            ->atPath('infrastructure_id')->validate($lineItem->getInfrastructureId(), [
-                new Constraints\NotBlank(),
-            ])
-            ->getViolations();
-
-        $this->throwIfConstraintViolationsNotEmpty($violations);
 
         $infrastructureId = $lineItem->getInfrastructureId();
 

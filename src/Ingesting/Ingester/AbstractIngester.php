@@ -8,7 +8,7 @@ use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
 use App\Model\Storage\AbstractModelManager;
-use App\Model\Validation\AbstractModelValidator;
+use App\Model\Validation\ModelValidator;
 use App\Model\Validation\ValidationException;
 
 abstract class AbstractIngester
@@ -24,7 +24,7 @@ abstract class AbstractIngester
     protected $rowToModelMapper;
 
     /**
-     * @var AbstractModelValidator
+     * @var ModelValidator
      */
     protected $validator;
 
@@ -35,7 +35,7 @@ abstract class AbstractIngester
      */
     protected $updateMode = false;
 
-    public function __construct(AbstractModelManager $modelStorage, AbstractRowToModelMapper $rowToModelMapper, AbstractModelValidator $validator)
+    public function __construct(AbstractModelManager $modelStorage, AbstractRowToModelMapper $rowToModelMapper, ModelValidator $validator)
     {
         $this->modelStorage = $modelStorage;
         $this->rowToModelMapper = $rowToModelMapper;

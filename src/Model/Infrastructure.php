@@ -2,25 +2,35 @@
 
 namespace App\Model;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class Infrastructure implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $ltiDirectorLink;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $key;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $secret;
 

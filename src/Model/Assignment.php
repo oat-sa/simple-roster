@@ -6,6 +6,10 @@ class Assignment implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     *
+     * @Assert\Url
      */
     private $lineItemTaoUri;
 
