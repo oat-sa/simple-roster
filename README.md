@@ -48,6 +48,8 @@ TBD
 
 [Ingesting Command](src/Command/Ingesting/AbstractIngestCommand.php) is a CLI entry point for ingesting data. It just manages CLI input and output.
 
+Full documentation on how to ingest data can be found here: [docs/ingest.md](docs/ingest.md)
+
 Testing
 -------
  ```bash
