@@ -30,16 +30,6 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    Aws\Sdk:
-        class: Aws\Sdk
-        arguments:
-            -   endpoint: '%env(DYNAMODB_ENDPOINT)%'
-                region: '%env(DYNAMODB_REGION)%'
-                version: '%env(DYNAMODB_VERSION)%'
-                credentials:
-                    key: '%env(DYNAMODB_KEY)%'
-                    secret: '%env(DYNAMODB_SECRET)%'
-
     App\S3\S3ClientInterface:
         class: App\S3\AmazonS3Client
         shared: false
@@ -52,7 +42,7 @@ services:
     App\Storage\StorageInterface:
         class: App\Storage\DynamoDbStorage
         arguments:
-            $awsSdk: '@Aws\Sdk'
+            $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
             $marshaler: '@Aws\DynamoDb\Marshaler'
 
     Symfony\Component\Serializer\Normalizer\NormalizerInterface:

@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,9 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DeploySchemaCommand extends Command
 {
     /**
-     * @var \Aws\Sdk
+     * @var DynamoDbClient
      */
-    private $awsSdk;
+    private $dynamoDbClient;
 
     /** @var SymfonyStyle */
     private $io;
@@ -26,11 +27,11 @@ class DeploySchemaCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
     }
 
-    public function __construct(\Aws\Sdk $awsSdk)
+    public function __construct(DynamoDbClient $dynamoDbClient)
     {
         parent::__construct();
 
-        $this->awsSdk = $awsSdk;
+        $this->dynamoDbClient = $dynamoDbClient;
     }
 
     /**
@@ -46,8 +47,6 @@ class DeploySchemaCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $dynamodb = $this->awsSdk->createDynamoDb();
-
         try {
             $params = [
                 'TableName' => 'infrastructures',
@@ -68,7 +67,7 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
 
             $params = [
                 'TableName' => 'line_items',
@@ -89,7 +88,7 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
 
             $params = [
                 'TableName' => 'users',
@@ -110,7 +109,7 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
         } catch (DynamoDbException $e) {
             $this->io->error(sprintf('Unable to deploy schema: %s', $e->getMessage()));
         }

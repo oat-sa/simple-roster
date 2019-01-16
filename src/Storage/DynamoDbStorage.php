@@ -36,9 +36,9 @@ class DynamoDbStorage implements StorageInterface
      */
     private $marshaler;
 
-    public function __construct(\Aws\Sdk $awsSdk, Marshaler $marshaler)
+    public function __construct(\Aws\DynamoDb\DynamoDbClient $dynamoDbClient, Marshaler $marshaler)
     {
-        $this->client = $awsSdk->createDynamoDb();
+        $this->client = $dynamoDbClient;
         $this->marshaler = $marshaler;
     }
 
