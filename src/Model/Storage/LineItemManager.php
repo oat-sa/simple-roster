@@ -14,7 +14,7 @@ class LineItemManager extends AbstractModelManager
 
     protected function getKeyFieldName(): string
     {
-        return 'tao_uri';
+        return 'taoUri';
     }
 
     /**

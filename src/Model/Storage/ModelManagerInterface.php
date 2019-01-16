@@ -17,11 +17,10 @@ interface ModelManagerInterface
     public function read(string $key): ?ModelInterface;
 
     /**
-     * @param string $key
      * @param ModelInterface $model
      * @throws \Exception
      */
-    public function insert(string $key, ModelInterface $model): void;
+    public function insert(ModelInterface $model): void;
 
     public function delete(string $key): void;
 }

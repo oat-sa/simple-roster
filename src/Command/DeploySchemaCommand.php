@@ -73,13 +73,13 @@ class DeploySchemaCommand extends Command
                 'TableName' => 'line_items',
                 'KeySchema' => [
                     [
-                        'AttributeName' => 'tao_uri',
+                        'AttributeName' => 'taoUri',
                         'KeyType' => 'HASH'
                     ]
                 ],
                 'AttributeDefinitions' => [
                     [
-                        'AttributeName' => 'tao_uri',
+                        'AttributeName' => 'taoUri',
                         'AttributeType' => 'S'
                     ]
                 ],

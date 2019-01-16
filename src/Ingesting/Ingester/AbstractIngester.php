@@ -75,11 +75,13 @@ abstract class AbstractIngester
         $lineNumber = 0;
         foreach ($source->iterateThroughLines() as $line) {
             $lineNumber++;
-            $model = $this->convertRowToModel($line);
             try {
+                $model = $this->convertRowToModel($line);
                 $this->validator->validate($model);
             } catch (ValidationException $e) {
                 throw new FileLineIsInvalidException($lineNumber, $e->getMessage());
+            } catch (\Throwable $e) {
+                throw new FileLineIsInvalidException($lineNumber, 'Can not construct model. Please fill out all the fields.');
             }
 
             if ($this->checkIfExists($model)) {
@@ -94,7 +96,7 @@ abstract class AbstractIngester
             }
 
             if (!$dryRun) {
-                $this->modelStorage->insert($this->modelStorage->getKey($model), $model);
+                $this->modelStorage->insert($model);
             }
         }
 

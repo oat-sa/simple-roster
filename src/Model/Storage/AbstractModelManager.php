@@ -48,7 +48,7 @@ abstract class AbstractModelManager implements ModelManagerInterface
      */
     abstract protected function getModelClass(): string;
 
-    public function __construct(StorageInterface $storage, DenormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    public function __construct(StorageInterface $storage, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
     {
         $this->storage = $storage;
         $this->normalizer = $normalizer;
@@ -97,12 +97,12 @@ abstract class AbstractModelManager implements ModelManagerInterface
     /**
      * @inheritdoc
      */
-    public function insert(string $key, ModelInterface $model): void
+    public function insert(ModelInterface $model): void
     {
         $this->assertModelClass($model);
         $normalizedModel = $this->normalizer->normalize($model);
 
-        $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $key], $normalizedModel);
+        $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $this->getKey($model)], $normalizedModel);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class Assignment implements ModelInterface
 {
     /**
