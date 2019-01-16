@@ -4,12 +4,12 @@ namespace App\Ingesting\Ingester;
 
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
 use App\Model\ModelInterface;
-use App\Model\Storage\LineItemStorage;
+use App\Model\Storage\LineItemManager;
 use App\Model\Validation\LineItemValidator;
 
 class LineItemsIngester extends AbstractIngester
 {
-    public function __construct(LineItemStorage $modelStorage, LineItemRowToModelMapper $rowToModelMapper, LineItemValidator $lineItemValidator)
+    public function __construct(LineItemManager $modelStorage, LineItemRowToModelMapper $rowToModelMapper, LineItemValidator $lineItemValidator)
     {
         parent::__construct($modelStorage, $rowToModelMapper, $lineItemValidator);
     }

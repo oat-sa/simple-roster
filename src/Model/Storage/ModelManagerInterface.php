@@ -4,7 +4,7 @@ namespace App\Model\Storage;
 
 use App\Model\ModelInterface;
 
-interface ModelStorageInterface
+interface ModelManagerInterface
 {
     /**
      * Returns primary key value of a model

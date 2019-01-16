@@ -49,14 +49,10 @@ services:
     App\Storage\StorageInterface: '@App\Storage\DynamoDbStorage'
 
     Symfony\Component\Serializer\Normalizer\NormalizerInterface:
-      class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-      calls:
-      - method: setSerializer
-        arguments:
-          - '@Symfony\Component\Serializer\SerializerInterface'
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
 
     Symfony\Component\Serializer\Normalizer\DenormalizerInterface:
-      class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
 
     'App\Ingesting\Ingester\InfrastructuresIngester':
         class: App\Ingesting\Ingester\InfrastructuresIngester

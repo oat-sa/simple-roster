@@ -7,7 +7,7 @@ use App\Storage\StorageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-abstract class AbstractModelStorage implements ModelStorageInterface
+abstract class AbstractModelManager implements ModelManagerInterface
 {
     /**
      * @var StorageInterface
@@ -48,7 +48,7 @@ abstract class AbstractModelStorage implements ModelStorageInterface
      */
     abstract protected function getModelClass(): string;
 
-    public function __construct(StorageInterface $storage, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    public function __construct(StorageInterface $storage, DenormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
     {
         $this->storage = $storage;
         $this->normalizer = $normalizer;

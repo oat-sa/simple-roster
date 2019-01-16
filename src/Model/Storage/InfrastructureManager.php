@@ -2,19 +2,19 @@
 
 namespace App\Model\Storage;
 
-use App\Model\LineItem;
 use App\Model\ModelInterface;
+use App\Model\Infrastructure;
 
-class LineItemStorage extends AbstractModelStorage
+class InfrastructureManager extends AbstractModelManager
 {
     protected function getTable(): string
     {
-        return 'line_items';
+        return 'infrastructures';
     }
 
     protected function getKeyFieldName(): string
     {
-        return 'tao_uri';
+        return 'id';
     }
 
     /**
@@ -24,14 +24,14 @@ class LineItemStorage extends AbstractModelStorage
      */
     public function getKey(ModelInterface $model): string
     {
-        /** @var LineItem $model */
+        /** @var Infrastructure $model */
         $this->assertModelClass($model);
 
-        return $model->getTaoUri();
+        return $model->getId();
     }
 
     protected function getModelClass(): string
     {
-        return LineItem::class;
+        return Infrastructure::class;
     }
 }

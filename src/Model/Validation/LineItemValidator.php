@@ -4,18 +4,18 @@ namespace App\Model\Validation;
 
 use App\Model\ModelInterface;
 use App\Model\LineItem;
-use App\Model\Storage\InfrastructureStorage;
+use App\Model\Storage\InfrastructureManager;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class LineItemValidator extends AbstractModelValidator
 {
     /**
-     * @var InfrastructureStorage
+     * @var InfrastructureManager
      */
     private $infrastructureStorage;
 
-    public function __construct(InfrastructureStorage $infrastructureStorage, ValidatorInterface $validator)
+    public function __construct(InfrastructureManager $infrastructureStorage, ValidatorInterface $validator)
     {
         parent::__construct($validator);
 

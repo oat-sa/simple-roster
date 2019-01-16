@@ -8,7 +8,7 @@ use App\Model\User;
 use App\Storage\StorageInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserStorage extends AbstractModelStorage
+class UserManager extends AbstractModelManager
 {
     public function __construct(StorageInterface $storage, NormalizerInterface $normalizer, UserDenormalizer $denormalizer)
     {
