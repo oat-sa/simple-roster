@@ -5,6 +5,7 @@ namespace App\Controller\ApiV1;
 use App\Model\Assignment;
 use App\Model\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -25,12 +26,12 @@ class AssignmentController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->getState() === Assignment::STATE_CANCELLED) {
+            if ($assignment->getState() !== Assignment::STATE_CANCELLED) {
                 $assignmentsToOutput[] = $assignment->getLineItemTaoUri();
             }
         }
 
-        return $this->json($assignmentsToOutput);
+        return new JsonResponse($assignmentsToOutput);
     }
 
     /**

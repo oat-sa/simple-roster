@@ -2,11 +2,12 @@
 
 namespace App\Security;
 
-use App\Entity\User;
-use App\Storage\Storage;
+use App\Model\User;
+use App\ModelManager\UserManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -16,13 +17,19 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
     /**
-     * @var Storage
+     * @var UserManager
      */
-    private $storage;
+    private $userManager;
 
-    public function __construct(Storage $storage)
+    /**
+     * @var SessionInterface
+     */
+    private $session;
+
+    public function __construct(SessionInterface $session, UserManager $userManager)
     {
-        $this->storage = $storage;
+        $this->session = $session;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -34,7 +41,9 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function supports(Request $request)
     {
-        return $request->headers->has('X-AUTH-TOKEN');
+        $session = $request->getSession();
+
+        return $request->getSession()->isStarted() && $session->has('login') && $session->has('password');
     }
 
     /**
@@ -45,8 +54,11 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getCredentials(Request $request)
     {
+        $session = $request->getSession();
+
         return array(
-            'token' => $request->headers->get('X-AUTH-TOKEN'),
+            'login' => $session->get('login'),
+            'password' => $session->get('password'),
         );
     }
 
@@ -55,25 +67,20 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider): ?User
     {
-        $apiToken = $credentials['token'];
+        $login = $credentials['login'];
+        $password = $credentials['password'];
 
-        if (null === $apiToken) {
+        if (null === $login || null === $password) {
             return null;
         }
 
-        $tokenData = $this->storage->read('api_access_tokens', [
-            'token' => $apiToken,
-        ]);
-
-        if ($tokenData === null) {
-            return null;
+        /** @var User $user */
+        $user = $this->userManager->read($login);
+        if ($user && $user->getPassword() === $credentials['password']) {
+            return $user;
         }
 
-        $userData = $this->storage->read('users', [
-            'login' => $tokenData['user_login'],
-        ]);
-
-        return new User($userData);
+        return null;
     }
 
     /**

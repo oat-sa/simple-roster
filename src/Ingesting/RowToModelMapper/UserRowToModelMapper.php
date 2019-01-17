@@ -5,9 +5,17 @@ namespace App\Ingesting\RowToModelMapper;
 use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
+    private $encoderFactory;
+
+    public function __construct(EncoderFactoryInterface $encoderFactory)
+    {
+        $this->encoderFactory = $encoderFactory;
+    }
+
     public function map(array $row, array $fieldNames): ModelInterface
     {
         $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
@@ -30,6 +38,12 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         $user = new User($fieldValues['login'], $fieldValues['password']);
 
         $user->addAssignments($assignments);
+
+        // encrypt user password
+        $encoder = $this->encoderFactory->getEncoder($user);
+        $salt = base64_encode(random_bytes(30));
+        $encodedPassword = $encoder->encodePassword($user->getPassword(), $salt);
+        $user->setPasswordAndSalt($encodedPassword, $salt);
 
         return $user;
     }
