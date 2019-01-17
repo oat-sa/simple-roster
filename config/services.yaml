@@ -45,12 +45,6 @@ services:
             $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
             $marshaler: '@Aws\DynamoDb\Marshaler'
 
-    Symfony\Component\Serializer\Normalizer\NormalizerInterface:
-        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-
-    Symfony\Component\Serializer\Normalizer\DenormalizerInterface:
-        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-
     'App\Ingesting\Ingester\InfrastructuresIngester':
         class: App\Ingesting\Ingester\InfrastructuresIngester
         public: true
@@ -62,3 +56,19 @@ services:
     'App\Ingesting\Ingester\UserAndAssignmentsIngester':
         class: App\Ingesting\Ingester\UserAndAssignmentsIngester
         public: true
+
+    Symfony\Component\Serializer\SerializerInterface:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            $normalizers:
+                - !service
+                    class: App\Denormalizer\UserDenormalizer
+                    calls:
+                        -   method: setSerializer
+                            arguments:
+                                - '@Symfony\Component\Serializer\SerializerInterface'
+                - !service
+                    class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+            $encoders:
+                - !service
+                    class: App\Denormalizer\Encoder

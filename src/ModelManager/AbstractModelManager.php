@@ -4,8 +4,7 @@ namespace App\ModelManager;
 
 use App\Model\ModelInterface;
 use App\Storage\StorageInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractModelManager implements ModelManagerInterface
 {
@@ -15,14 +14,9 @@ abstract class AbstractModelManager implements ModelManagerInterface
     protected $storage;
 
     /**
-     * @var NormalizerInterface
+     * @var SerializerInterface
      */
-    protected $normalizer;
-
-    /**
-     * @var DenormalizerInterface
-     */
-    protected $denormalizer;
+    protected $serializer;
 
     /**
      * Get table name used for a storage
@@ -48,11 +42,10 @@ abstract class AbstractModelManager implements ModelManagerInterface
      */
     abstract protected function getModelClass(): string;
 
-    public function __construct(StorageInterface $storage, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    public function __construct(StorageInterface $storage, SerializerInterface $serializer)
     {
         $this->storage = $storage;
-        $this->normalizer = $normalizer;
-        $this->denormalizer = $denormalizer;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -75,7 +68,7 @@ abstract class AbstractModelManager implements ModelManagerInterface
 
         if ($rowData !== null) {
             /** @var ModelInterface $model */
-            $model = $this->denormalizer->denormalize($rowData, $this->getModelClass());
+            $model = $this->serializer->deserialize($rowData, $this->getModelClass(), 'plain');
             return $model;
         }
 
@@ -100,8 +93,8 @@ abstract class AbstractModelManager implements ModelManagerInterface
     public function insert(ModelInterface $model): void
     {
         $this->assertModelClass($model);
-        $normalizedModel = $this->normalizer->normalize($model);
-
+        /** @var array $normalizedModel */
+        $normalizedModel = $this->serializer->serialize($model, 'plain');
         $this->storage->insert($this->getTable(), [$this->getKeyFieldName() => $this->getKey($model)], $normalizedModel);
     }
 

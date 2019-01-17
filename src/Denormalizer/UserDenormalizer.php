@@ -5,22 +5,22 @@ namespace App\Denormalizer;
 use App\Model\Assignment;
 use App\Model\User;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 class UserDenormalizer implements DenormalizerInterface
 {
-    /**
-     * @var DenormalizerInterface
-     */
-    private $denormalizer;
-
-    public function __construct(DenormalizerInterface $denormalizer)
-    {
-        $this->denormalizer = $denormalizer;
-    }
+    use SerializerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type !== User::class;
+        if ($type !== User::class) {
+            return false;
+        }
+        if (empty($data['assignments'])) {
+            return true;
+        }
+
+        return !current($data['assignments']) instanceof Assignment;
     }
 
     public function denormalize($data, $class, $format = null, array $context = array())
@@ -28,15 +28,11 @@ class UserDenormalizer implements DenormalizerInterface
         $assignmentsDenormalized = [];
         if (!empty($data['assignments'])) {
             foreach ($data['assignments'] as $assignmentNormalized) {
-                $assignmentsDenormalized[] = $this->denormalizer->denormalize(
-                    $assignmentNormalized,
-                    Assignment::class,
-                    $format,
-                    $context
-                );
+                $assignmentsDenormalized[] = $this->serializer->deserialize($assignmentNormalized, Assignment::class,
+                    $format, $context);
             }
+            $data['assignments'] = $assignmentsDenormalized;
         }
-
-        return new User($data['login'], $data['password'], $assignmentsDenormalized);
+        return $this->serializer->deserialize($data, $class, $format, $context);
     }
 }
