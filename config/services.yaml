@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    locale: 'en'
 
 services:
     # default configuration for services in *this* file
@@ -11,14 +12,14 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         public: false       # Allows optimizing the container by removing unused services; this also means
-                            # fetching services directly from the container via $container->get() won't work.
-                            # The best practice is to be explicit about your dependencies anyway.
+          # fetching services directly from the container via $container->get() won't work.
+          # The best practice is to be explicit about your dependencies anyway.
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Ingesting/Source,Ingesting/Exception,Model,Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -29,20 +30,45 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    Aws\Sdk:
-      class: '\Aws\Sdk'
-      arguments:
-          - endpoint: '%env(DYNAMODB_ENDPOINT)%'
-            region: '%env(DYNAMODB_REGION)%'
-            version: '%env(DYNAMODB_VERSION)%'
-            credentials:
-                key: '%env(DYNAMODB_KEY)%'
-                secret: '%env(DYNAMODB_SECRET)%'
+    App\S3\S3ClientInterface:
+        class: App\S3\AmazonS3Client
+        shared: false
+        arguments:
+            $apiVersion: '%env(S3_VERSION)%'
 
-    App\S3\S3ClientFactory:
-      class: '\App\S3\S3ClientFactory'
-      arguments:
-          $clientClass: 'App\S3\AmazonS3Client'
-          $apiVersion: '%env(S3_VERSION)%'
+    Aws\DynamoDb\Marshaler:
+        class: Aws\DynamoDb\Marshaler
 
-    App\Storage\Storage: '@App\Storage\DynamoDbStorage'
+    App\Storage\StorageInterface:
+        class: App\Storage\DynamoDbStorage
+        arguments:
+            $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
+            $marshaler: '@Aws\DynamoDb\Marshaler'
+
+    'App\Ingesting\Ingester\InfrastructuresIngester':
+        class: App\Ingesting\Ingester\InfrastructuresIngester
+        public: true
+
+    'App\Ingesting\Ingester\LineItemsIngester':
+        class: App\Ingesting\Ingester\LineItemsIngester
+        public: true
+
+    'App\Ingesting\Ingester\UserAndAssignmentsIngester':
+        class: App\Ingesting\Ingester\UserAndAssignmentsIngester
+        public: true
+
+    Symfony\Component\Serializer\SerializerInterface:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            $normalizers:
+                - !service
+                    class: App\Denormalizer\UserDenormalizer
+                    calls:
+                        -   method: setSerializer
+                            arguments:
+                                - '@Symfony\Component\Serializer\SerializerInterface'
+                - !service
+                    class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+            $encoders:
+                - !service
+                    class: App\Denormalizer\Encoder

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Model\Storage;
+namespace App\ModelManager;
 
-use App\Model\Model;
+use App\Model\ModelInterface;
 use App\Model\User;
 
-class UserStorage extends ModelStorage
+class UserManager extends AbstractModelManager
 {
     protected function getTable(): string
     {
@@ -18,11 +18,11 @@ class UserStorage extends ModelStorage
     }
 
     /**
-     * @param Model $model
+     * @param ModelInterface $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(Model $model): string
+    public function getKey(ModelInterface $model): string
     {
         /** @var User $model */
         $this->assertModelClass($model);

@@ -2,9 +2,9 @@
 
 namespace App\Tests\Command\Ingesting;
 
-use App\Model\Model;
+use App\Model\AbstractModel;
 
-class ExampleModel extends Model
+class ExampleModel extends AbstractModel
 {
     /**
      * @var string
@@ -27,7 +27,7 @@ class ExampleModel extends Model
     /**
      * @inheritdoc
      */
-    public static function createFromArray(array $data): Model
+    public static function createFromArray(array $data): AbstractModel
     {
         $model = new self();
         $model->name = $data['name'] ?? null;

@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Storage;
 
-class InMemoryStorage implements Storage
+class InMemoryStorage implements StorageInterface
 {
     private $items = [];
 

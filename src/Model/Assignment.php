@@ -1,11 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Model;
 
-class Assignment extends Model
+use Symfony\Component\Validator\Constraints as Assert;
+
+class Assignment implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     *
+     * @Assert\Url
      */
     private $lineItemTaoUri;
 
@@ -34,31 +40,10 @@ class Assignment extends Model
      */
     private $state = self::STATE_READY;
 
-    /**
-     * @inheritdoc
-     */
-    public static function createFromArray(array $data): Model
+    public function __construct(string $lineItemTaoUri, string $state = self::STATE_READY)
     {
-        $model = new self();
-        $model->lineItemTaoUri = $data['line_item_tao_uri'] ?? null;
-        $model->state = $data['state'] ?? null;
-        return $model;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toArray(): array
-    {
-        return [
-            'state' => $this->state,
-            'line_item_tao_uri' => $this->lineItemTaoUri,
-        ];
-    }
-
-    public function validate(): void
-    {
-
+        $this->lineItemTaoUri = $lineItemTaoUri;
+        $this->state = $state;
     }
 
     public function getLineItemTaoUri(): string
@@ -71,8 +56,10 @@ class Assignment extends Model
         return $this->state;
     }
 
-    public function setLineItemTaoUri(string $lineItemTaoUri): void
+    public function setLineItemTaoUri(string $lineItemTaoUri): self
     {
         $this->lineItemTaoUri = $lineItemTaoUri;
+
+        return $this;
     }
 }

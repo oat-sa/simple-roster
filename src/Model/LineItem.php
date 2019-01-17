@@ -1,60 +1,50 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Model;
 
-class LineItem extends Model
+use Symfony\Component\Validator\Constraints as Assert;
+
+class LineItem implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     * @Assert\Url
      */
     private $taoUri;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $title;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $startDateTime;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $endDateTime;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $infrastructureId;
 
-    /**
-     * @inheritdoc
-     */
-    public static function createFromArray(array $data): Model
+    public function __construct(string $taoUri, string $title, string $infrastructureId, string $startDateTime, string $endDateTime)
     {
-        $model = new self();
-        $model->taoUri = $data['tao_uri'] ?? null;
-        $model->title = $data['title'] ?? null;
-        $model->infrastructureId = $data['infrastructure_id'] ?? null;
-        $model->startDateTime = $data['start_date_time'] ?? null;
-        $model->endDateTime = $data['end_date_time'] ?? null;
-        return $model;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toArray(): array
-    {
-        return [
-            'tao_uri' => $this->taoUri,
-            'title' => $this->title,
-            'infrastructure_id' => $this->infrastructureId,
-            'start_date_time' => $this->startDateTime,
-            'end_date_time' => $this->endDateTime,
-        ];
+        $this->taoUri = $taoUri;
+        $this->title = $title;
+        $this->infrastructureId = $infrastructureId;
+        $this->startDateTime = $startDateTime;
+        $this->endDateTime = $endDateTime;
     }
 
     /**
@@ -83,21 +73,5 @@ class LineItem extends Model
     public function getEndDateTime(): ?string
     {
         return $this->endDateTime;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validate(): void
-    {
-        if (!$this->taoUri) {
-            $this->throwExceptionRequiredFieldEmpty('tao_uri');
-        }
-        if (!$this->title) {
-            $this->throwExceptionRequiredFieldEmpty('title');
-        }
-        if (!$this->infrastructureId) {
-            $this->throwExceptionRequiredFieldEmpty('infrastructure_id');
-        }
     }
 }

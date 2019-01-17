@@ -1,53 +1,45 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Model;
 
-class Infrastructure extends Model
+use Symfony\Component\Validator\Constraints as Assert;
+
+class Infrastructure implements ModelInterface
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $ltiDirectorLink;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $key;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
      */
     private $secret;
 
-    /**
-     * @inheritdoc
-     */
-    static public function createFromArray(array $data): Model
+    public function __construct(string $id, string $ltiDirectorLink, string $key, string $secret)
     {
-        $model = new self();
-        $model->id = $data['id'] ?? null;
-        $model->ltiDirectorLink = $data['lti_director_link'] ?? null;
-        $model->key = $data['key'] ?? null;
-        $model->secret = $data['secret'] ?? null;
-        return $model;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'lti_director_link' => $this->ltiDirectorLink,
-            'key' => $this->key,
-            'secret' => $this->secret,
-        ];
+        $this->id = $id;
+        $this->ltiDirectorLink = $ltiDirectorLink;
+        $this->key = $key;
+        $this->secret = $secret;
     }
 
     public function getId(): string
@@ -55,22 +47,18 @@ class Infrastructure extends Model
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function validate(): void
+    public function getLtiDirectorLink(): string
     {
-        if (!$this->id) {
-            $this->throwExceptionRequiredFieldEmpty('id');
-        }
-        if (!$this->ltiDirectorLink) {
-            $this->throwExceptionRequiredFieldEmpty('lti_director_link');
-        }
-        if (!$this->key) {
-            $this->throwExceptionRequiredFieldEmpty('key');
-        }
-        if (!$this->secret) {
-            $this->throwExceptionRequiredFieldEmpty('secret');
-        }
+        return $this->ltiDirectorLink;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    public function getSecret(): string
+    {
+        return $this->secret;
     }
 }

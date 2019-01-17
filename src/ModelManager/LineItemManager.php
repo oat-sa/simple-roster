@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Model\Storage;
+namespace App\ModelManager;
 
 use App\Model\LineItem;
-use App\Model\Model;
+use App\Model\ModelInterface;
 
-class LineItemStorage extends ModelStorage
+class LineItemManager extends AbstractModelManager
 {
     protected function getTable(): string
     {
@@ -14,15 +14,15 @@ class LineItemStorage extends ModelStorage
 
     protected function getKeyFieldName(): string
     {
-        return 'tao_uri';
+        return 'taoUri';
     }
 
     /**
-     * @param Model $model
+     * @param ModelInterface $model
      * @return string
      * @throws \Exception
      */
-    public function getKey(Model $model): string
+    public function getKey(ModelInterface $model): string
     {
         /** @var LineItem $model */
         $this->assertModelClass($model);

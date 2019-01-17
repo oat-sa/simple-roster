@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Command;
 
+use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,12 +12,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DeploySchemaCommand extends Command
 {
     /**
-     * @var \Aws\Sdk
+     * @var DynamoDbClient
      */
-    private $awsSdk;
+    private $dynamoDbClient;
 
     /** @var SymfonyStyle */
-    protected $io;
+    private $io;
 
     /**
      * @inheritdoc
@@ -26,11 +27,11 @@ class DeploySchemaCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
     }
 
-    public function __construct(\Aws\Sdk $awsSdk)
+    public function __construct(DynamoDbClient $dynamoDbClient)
     {
         parent::__construct();
 
-        $this->awsSdk = $awsSdk;
+        $this->dynamoDbClient = $dynamoDbClient;
     }
 
     /**
@@ -46,8 +47,6 @@ class DeploySchemaCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $dynamodb = $this->awsSdk->createDynamoDb();
-
         try {
             $params = [
                 'TableName' => 'infrastructures',
@@ -68,19 +67,19 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
 
             $params = [
                 'TableName' => 'line_items',
                 'KeySchema' => [
                     [
-                        'AttributeName' => 'tao_uri',
+                        'AttributeName' => 'taoUri',
                         'KeyType' => 'HASH'
                     ]
                 ],
                 'AttributeDefinitions' => [
                     [
-                        'AttributeName' => 'tao_uri',
+                        'AttributeName' => 'taoUri',
                         'AttributeType' => 'S'
                     ]
                 ],
@@ -89,7 +88,7 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
 
             $params = [
                 'TableName' => 'users',
@@ -110,7 +109,7 @@ class DeploySchemaCommand extends Command
                     'WriteCapacityUnits' => 10
                 ]
             ];
-            $dynamodb->createTable($params);
+            $this->dynamoDbClient->createTable($params);
         } catch (DynamoDbException $e) {
             $this->io->error(sprintf('Unable to deploy schema: %s', $e->getMessage()));
         }

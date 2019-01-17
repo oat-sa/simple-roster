@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Storage;
 
 use Aws\DynamoDb\Marshaler;
 
-class DynamoDbStorage implements Storage
+class DynamoDbStorage implements StorageInterface
 {
     /**
      * The key that DynamoDb uses to indicate the name of the table.
@@ -36,10 +36,10 @@ class DynamoDbStorage implements Storage
      */
     private $marshaler;
 
-    public function __construct(\Aws\Sdk $awsSdk)
+    public function __construct(\Aws\DynamoDb\DynamoDbClient $dynamoDbClient, Marshaler $marshaler)
     {
-        $this->client = $awsSdk->createDynamoDb();
-        $this->marshaler = new Marshaler();
+        $this->client = $dynamoDbClient;
+        $this->marshaler = $marshaler;
     }
 
     /**

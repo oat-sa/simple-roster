@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Storage;
 
@@ -9,7 +9,7 @@ namespace App\Storage;
  * Interface Storage
  * @package App\Storage
  */
-interface Storage
+interface StorageInterface
 {
     /**
      * Reads one record by primary key
