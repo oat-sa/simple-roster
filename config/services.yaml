@@ -72,3 +72,9 @@ services:
             $encoders:
                 - !service
                     class: App\Denormalizer\Encoder
+
+    App\Security\LoginManagerInterface:
+        class: App\Security\LoginManager
+
+    Symfony\Component\Security\Guard\GuardAuthenticatorHandler:
+        class: Symfony\Component\Security\Guard\GuardAuthenticatorHandler

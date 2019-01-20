@@ -4,14 +4,14 @@ namespace App\Controller\ApiV1;
 
 use App\Model\User;
 use App\ModelManager\UserManager;
+use App\Security\LoginManagerInterface;
+use App\Security\TokenAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 /**
  * @Route("/auth")
@@ -23,12 +23,10 @@ class AuthController extends AbstractController
      *
      * @param Request $request
      * @param UserManager $userManager
-     * @param EncoderFactoryInterface $encoderFactory
-     * @param SessionInterface $session
-     * @return Response JSON containing token
-     * @throws \Exception
+     * @param LoginManagerInterface $loginManager
+     * @return Response
      */
-    public function login(Request $request, UserManager $userManager, SessionInterface $session, EncoderFactoryInterface $encoderFactory): Response
+    public function login(Request $request, UserManager $userManager, LoginManagerInterface $loginManager): Response
     {
         if ($this->getUser()) {
             throw new BadRequestHttpException('Already authorized');
@@ -45,13 +43,8 @@ class AuthController extends AbstractController
         /** @var User $user */
         $user = $userManager->read($login);
         if ($user) {
-            $encodedRequestPassword = $encoderFactory->getEncoder($user)->encodePassword($request->request->get('password'), $user->getSalt());
-            if ($user->getPassword() === $encodedRequestPassword) {
-                $session->start();
-                $session->set('login', $user->getLogin());
-                $session->set('password', $user->getPassword());
-                $session->save();
-
+            $result = $loginManager->logInUser($request, 'main', $user);
+            if ($result) {
                 return new Response('OK');
             }
         }
@@ -63,14 +56,13 @@ class AuthController extends AbstractController
      *
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      *
-     * @param SessionInterface $session
+     * @param Request $request
+     * @param LoginManagerInterface $loginManager
      * @return Response
      */
-    public function logout(SessionInterface $session): Response
+    public function logout(Request $request, LoginManagerInterface $loginManager): Response
     {
-        $session->clear();
-        $session->save();
-
+        $loginManager->logOutUser($request);
         return new Response();
     }
 }
