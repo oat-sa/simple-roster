@@ -3,7 +3,9 @@
 namespace App\Controller\ApiV1;
 
 use App\Model\Assignment;
+use App\Model\LineItem;
 use App\Model\User;
+use App\ModelManager\LineItemManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,19 +21,35 @@ class AssignmentController extends AbstractController
     /**
      * @Route("/", name="api_v1_get_assignments", methods={"GET"})
      */
-    public function getAssignments(): Response
+    public function getAssignments(LineItemManager $lineItemManager): Response
     {
         $assignmentsToOutput = [];
 
         /** @var User $user */
         $user = $this->getUser();
+        $assignmentId = 0;
         foreach ($user->getAssignments() as $assignment) {
+            $assignmentId++;
             if ($assignment->getState() !== Assignment::STATE_CANCELLED) {
-                $assignmentsToOutput[] = $assignment->getLineItemTaoUri();
+                /** @var LineItem $lineItem */
+                $lineItem = $lineItemManager->read($assignment->getLineItemTaoUri());
+
+                $assignmentsToOutput[] = [
+                    'id' => $assignmentId,
+                    'username' => $user->getUsername(),
+                    'lineItem' => [
+                        'uri' => $lineItem->getTaoUri(),
+                        'login' => $user->getUsername(),
+                        'name' => $lineItem->getTitle(),
+                        'startDateTime' => $lineItem->getStartDateTime(),
+                        'endDateTime' => $lineItem->getEndDateTime(),
+                        'infrastructure' => $lineItem->getInfrastructureId(),
+                    ]
+                ];
             }
         }
 
-        return new JsonResponse($assignmentsToOutput);
+        return new JsonResponse(['assignments' => $assignmentsToOutput]);
     }
 
     /**

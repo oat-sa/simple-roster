@@ -5,7 +5,6 @@ namespace App\Controller\ApiV1;
 use App\Model\User;
 use App\ModelManager\UserManager;
 use App\Security\LoginManagerInterface;
-use App\Security\TokenAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
