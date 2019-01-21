@@ -7,16 +7,16 @@ use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
-use App\ModelManager\AbstractModelManager;
+use App\ModelManager\ModelManagerInterface;
 use App\Validation\ModelValidator;
 use App\Validation\ValidationException;
 
 abstract class AbstractIngester
 {
     /**
-     * @var AbstractModelManager
+     * @var ModelManagerInterface
      */
-    protected $modelStorage;
+    protected $modelManager;
 
     /**
      * @var AbstractRowToModelMapper
@@ -35,9 +35,9 @@ abstract class AbstractIngester
      */
     protected $updateMode = false;
 
-    public function __construct(AbstractModelManager $modelStorage, AbstractRowToModelMapper $rowToModelMapper, ModelValidator $validator)
+    public function __construct(ModelManagerInterface $modelManager, AbstractRowToModelMapper $rowToModelMapper, ModelValidator $validator)
     {
-        $this->modelStorage = $modelStorage;
+        $this->modelManager = $modelManager;
         $this->rowToModelMapper = $rowToModelMapper;
         $this->validator = $validator;
     }
@@ -56,7 +56,7 @@ abstract class AbstractIngester
      */
     protected function checkIfExists(ModelInterface $entity): bool
     {
-        return $this->modelStorage->read($this->modelStorage->getKey($entity)) !== null;
+        return $this->modelManager->read($this->modelManager->getKey($entity)) !== null;
     }
 
     /**
@@ -96,7 +96,7 @@ abstract class AbstractIngester
             }
 
             if (!$dryRun) {
-                $this->modelStorage->insert($model);
+                $this->modelManager->insert($model);
             }
         }
 
