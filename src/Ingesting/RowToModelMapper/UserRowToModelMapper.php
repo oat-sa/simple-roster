@@ -22,7 +22,8 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         $assignmentUris = $fieldValues['assignments'];
         $assignments = [];
         foreach ($assignmentUris as $assignmentUri) {
-            $assignments[] = new Assignment($assignmentUri);
+            $assignment = new Assignment(uniqid(), $assignmentUri);
+            $assignments[] = $assignment;
         }
         unset($fieldValues['assignments']);
 
