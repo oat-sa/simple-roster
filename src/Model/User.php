@@ -90,7 +90,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
 
     public function getRoles()
     {
-        return [];
+        return ['ROLE_USER'];
     }
 
     public function getSalt()
