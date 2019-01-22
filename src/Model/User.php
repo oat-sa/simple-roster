@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,9 +23,9 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
     private $password;
 
     /**
-     * @var ArrayCollection
+     * @var Assignment[]
      */
-    private $assignments;
+    private $assignments = [];
 
     /**
      * @var string
@@ -42,8 +41,8 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
     {
         $this->login = $login;
         $this->password = $password;
+        $this->assignments = $assignments;
         $this->salt = $salt;
-        $this->assignments = new ArrayCollection($assignments);
     }
 
     /**
@@ -56,16 +55,14 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
 
         foreach ($assignments as $assignmentToAdd) {
             $alreadyExists = false;
-
             foreach ($this->assignments as $assignment) {
-                /** @var Assignment $assignment */
                 if ($assignment->getLineItemTaoUri() === $assignmentToAdd->getLineItemTaoUri() && $assignment->getState() === Assignment::STATE_READY) {
                     $alreadyExists = true;
                 }
             }
 
             if (!$alreadyExists) {
-                $this->assignments->add($assignmentToAdd);
+                $this->assignments[] = $assignmentToAdd;
                 $addedCount++;
             }
         }
@@ -83,9 +80,12 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         return $this->password;
     }
 
+    /**
+     * @return Assignment[]
+     */
     public function getAssignments(): array
     {
-        return $this->assignments->toArray();
+        return $this->assignments;
     }
 
     public function getRoles()
