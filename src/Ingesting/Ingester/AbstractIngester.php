@@ -73,6 +73,8 @@ abstract class AbstractIngester
         $alreadyExistingRowsCount = $rowsAdded = 0;
 
         $lineNumber = 0;
+        $modelsToInsert = [];
+
         foreach ($source->iterateThroughLines() as $line) {
             $lineNumber++;
             try {
@@ -95,8 +97,12 @@ abstract class AbstractIngester
                 }
             }
 
-            if (!$dryRun) {
-                $this->modelManager->insert($model);
+            $modelsToInsert[] = $model;
+        }
+
+        if (!$dryRun) {
+            foreach ($modelsToInsert as $modelToInsert) {
+                $this->modelManager->insert($modelToInsert);
             }
         }
 
