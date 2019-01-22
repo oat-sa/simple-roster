@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class User implements ModelInterface
@@ -22,20 +21,20 @@ class User implements ModelInterface
     private $password;
 
     /**
-     * @var ArrayCollection
+     * @var Assignment[]
      */
-    private $assignments;
+    private $assignments = [];
 
     /**
      * @param $login
      * @param $password
      * @param Assignment[] $assignments
      */
-    public function __construct(string $login, string $password, ?array $assignments = [])
+    public function __construct(string $login, string $password, array $assignments = [])
     {
         $this->login = $login;
         $this->password = $password;
-        $this->assignments = new ArrayCollection($assignments);
+        $this->assignments = $assignments;
     }
 
     /**
@@ -48,16 +47,14 @@ class User implements ModelInterface
 
         foreach ($assignments as $assignmentToAdd) {
             $alreadyExists = false;
-
             foreach ($this->assignments as $assignment) {
-                /** @var Assignment $assignment */
                 if ($assignment->getLineItemTaoUri() === $assignmentToAdd->getLineItemTaoUri() && $assignment->getState() === Assignment::STATE_READY) {
                     $alreadyExists = true;
                 }
             }
 
             if (!$alreadyExists) {
-                $this->assignments->add($assignmentToAdd);
+                $this->assignments[] = $assignmentToAdd;
                 $addedCount++;
             }
         }
@@ -75,8 +72,11 @@ class User implements ModelInterface
         return $this->password;
     }
 
+    /**
+     * @return Assignment[]
+     */
     public function getAssignments(): array
     {
-        return $this->assignments->toArray();
+        return $this->assignments;
     }
 }
