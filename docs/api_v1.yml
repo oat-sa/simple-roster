@@ -200,6 +200,15 @@ components:
           type: string
           description: The username of the user who belongs to the assignment
           example: johndoe
+        state:
+          type: string
+          description: State of assignment
+          enum:
+            - ready
+            - started
+            - completed
+            - cancelled
+          example: started
         lineItem:
           $ref: '#/components/schemas/LineItem'
     LineItem:
@@ -214,6 +223,10 @@ components:
         name:
           type: string
           example: Delivery#12
+        label:
+          type: string
+          description: Label for assigment
+          example: Delivery of Test 1
         startDateTime:
           type: integer
           description: The start DateTime in UNIX timestamp
