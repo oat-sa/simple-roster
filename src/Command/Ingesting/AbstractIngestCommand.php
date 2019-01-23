@@ -8,6 +8,7 @@ use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Ingester\AbstractIngester;
 use App\Ingesting\Ingester\InfrastructuresIngester;
 use App\Ingesting\Ingester\LineItemsIngester;
+use App\Ingesting\Ingester\RepeatedAssignmentIngester;
 use App\Ingesting\Ingester\UserAndAssignmentsIngester;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -113,6 +114,9 @@ HELP
                 break;
             case 'line-items':
                 $ingesterClass = LineItemsIngester::class;
+                break;
+            case 'repeat-assignments':
+                $ingesterClass = RepeatedAssignmentIngester::class;
                 break;
             default:
                 throw new InputOptionException('Unacceptable data type');
