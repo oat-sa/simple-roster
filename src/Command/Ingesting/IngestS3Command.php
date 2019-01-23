@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class IngestS3Command extends AbstractIngestCommand
 {
+    protected static $defaultName = 'roster:s3-ingest';
+
     /**
      * @var S3ClientInterface
      */
@@ -24,7 +26,7 @@ class IngestS3Command extends AbstractIngestCommand
 
     protected function configure(): void
     {
-        $this->setName('tao:s3-ingest')
+        $this->setName('roster:s3-ingest')
             ->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Do not write any data', false)
             ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',')
             ->addOption('s3_bucket', null, InputOption::VALUE_OPTIONAL, 'Name of a S3 bucket')

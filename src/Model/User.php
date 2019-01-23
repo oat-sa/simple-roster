@@ -38,10 +38,10 @@ class User implements ModelInterface
     }
 
     /**
-     * @param Assignment[] $assignments
+     * @param Assignment ...$assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(array $assignments): int
+    public function addAssignments(Assignment ...$assignments): int
     {
         $addedCount = 0;
 

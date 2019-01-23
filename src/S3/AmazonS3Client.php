@@ -5,25 +5,15 @@ namespace App\S3;
 class AmazonS3Client implements S3ClientInterface
 {
     /**
-     * @var string
-     */
-    private $apiVersion;
-
-    /**
      * @var \Aws\S3\S3Client
      */
     private $client;
-
-    public function __construct(string $apiVersion)
-    {
-        $this->apiVersion = $apiVersion;
-    }
 
     public function connect(string $region, string $accessKey, string $secret): void
     {
         $this->client = new \Aws\S3\S3Client([
             'region' => $region,
-            'version' => $this->apiVersion,
+            'version' => 'latest',
             'credentials' => new \Aws\Credentials\Credentials($accessKey, $secret),
         ]);
     }

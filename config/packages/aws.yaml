@@ -1,11 +1,8 @@
 aws:
-    region: '%env(DYNAMODB_REGION)%'
-    version: '%env(DYNAMODB_VERSION)%'
+    region: '%env(AWS_REGION)%'
+    version: '%env(AWS_VERSION)%'
     credentials:
-        key: '%env(DYNAMODB_KEY)%'
-        secret: '%env(DYNAMODB_SECRET)%'
+        key: '%env(AWS_KEY)%'
+        secret: '%env(AWS_SECRET)%'
     DynamoDb:
         endpoint: '%env(DYNAMODB_ENDPOINT)%'
-    S3:
-framework:
-    secret: "Rosebud was the name of his sled."

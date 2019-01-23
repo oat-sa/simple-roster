@@ -9,10 +9,11 @@ use Symfony\Component\Console\Input\InputOption;
 
 class IngestLocalCommand extends AbstractIngestCommand
 {
+    protected static $defaultName = 'roster:local-ingest';
+
     protected function configure(): void
     {
-        $this->setName('tao:local-ingest')
-            ->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
+        $this->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
             ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
 
         parent::configure();
