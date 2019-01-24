@@ -11,6 +11,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DeploySchemaCommand extends Command
 {
+    protected static $defaultName = 'roster:deploy:schema';
+
     /**
      * @var DynamoDbClient
      */
@@ -40,7 +42,6 @@ class DeploySchemaCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('tao:deploy:schema')
             ->setDescription('Deploys DynamoDB schema');
         parent::configure();
     }
@@ -110,10 +111,10 @@ class DeploySchemaCommand extends Command
                 ]
             ];
             $this->dynamoDbClient->createTable($params);
+
+            $this->io->success(sprintf('Schema has been deployed successfully'));
         } catch (DynamoDbException $e) {
             $this->io->error(sprintf('Unable to deploy schema: %s', $e->getMessage()));
         }
-
-        $this->io->success(sprintf('Schema has been deployed successfully'));
     }
 }
