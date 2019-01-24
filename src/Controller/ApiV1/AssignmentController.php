@@ -34,6 +34,10 @@ class AssignmentController extends AbstractController
                 /** @var LineItem $lineItem */
                 $lineItem = $lineItemManager->read($assignment->getLineItemTaoUri());
 
+                if ($lineItem === null) {
+                    throw new \Exception('Line item has disappeared.');
+                }
+
                 $assignmentsToOutput[] = [
                     'id' => $assignmentId,
                     'username' => $user->getUsername(),

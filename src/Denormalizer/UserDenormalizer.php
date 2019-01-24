@@ -16,8 +16,8 @@ class UserDenormalizer implements DenormalizerInterface
         if ($type !== User::class) {
             return false;
         }
-        if (empty($data['assignments'])) {
-            return true;
+        if (empty($data['assignments']) || count($data['assignments']) === 0) {
+            return false;
         }
 
         return !current($data['assignments']) instanceof Assignment;
@@ -33,6 +33,7 @@ class UserDenormalizer implements DenormalizerInterface
             }
             $data['assignments'] = $assignmentsDenormalized;
         }
+
         return $this->serializer->deserialize($data, $class, $format, $context);
     }
 }

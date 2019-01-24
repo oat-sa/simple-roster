@@ -76,3 +76,7 @@ services:
 
     Symfony\Component\Security\Guard\GuardAuthenticatorHandler:
         class: Symfony\Component\Security\Guard\GuardAuthenticatorHandler
+
+    user_provider:
+        class: App\Security\UserProvider
+        public: true

@@ -104,6 +104,9 @@
             "ref": "c82bead70f9a4f656354a193df7bf0ca2114efa0"
         }
     },
+    "symfony/browser-kit": {
+        "version": "v4.1.10"
+    },
     "symfony/cache": {
         "version": "v4.1.7"
     },
@@ -136,6 +139,9 @@
     },
     "symfony/dependency-injection": {
         "version": "v4.1.7"
+    },
+    "symfony/dom-crawler": {
+        "version": "v4.1.10"
     },
     "symfony/dotenv": {
         "version": "v4.1.7"
@@ -236,6 +242,9 @@
     "symfony/stopwatch": {
         "version": "v4.1.7"
     },
+    "symfony/templating": {
+        "version": "v4.1.10"
+    },
     "symfony/translation": {
         "version": "3.3",
         "recipe": {
@@ -292,5 +301,11 @@
     },
     "twig/twig": {
         "version": "v2.5.0"
+    },
+    "willdurand/jsonp-callback-validator": {
+        "version": "v1.1.0"
+    },
+    "willdurand/negotiation": {
+        "version": "v2.3.1"
     }
 }
