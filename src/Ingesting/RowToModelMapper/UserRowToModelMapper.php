@@ -27,7 +27,7 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         unset($fieldValues['assignments']);
 
         /** @var User $user */
-        $user = new User($fieldValues['login'], $fieldValues['password']);
+        $user = new User($fieldValues['username'], $fieldValues['password']);
 
         $user->addAssignments(...$assignments);
 

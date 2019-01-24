@@ -14,7 +14,7 @@ class UserManager extends AbstractModelManager
 
     protected function getKeyFieldName(): string
     {
-        return 'login';
+        return 'username';
     }
 
     /**
@@ -27,7 +27,7 @@ class UserManager extends AbstractModelManager
         /** @var User $model */
         $this->assertModelClass($model);
 
-        return $model->getLogin();
+        return $model->getUsername();
     }
 
     protected function getModelClass(): string

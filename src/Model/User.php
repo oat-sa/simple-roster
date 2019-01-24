@@ -11,7 +11,7 @@ class User implements ModelInterface
      *
      * @Assert\NotBlank
      */
-    private $login;
+    private $username;
 
     /**
      * @var string
@@ -26,15 +26,18 @@ class User implements ModelInterface
     private $assignments = [];
 
     /**
-     * @param $login
-     * @param $password
+     * @param string $username
+     * @param string $password
      * @param Assignment[] $assignments
      */
-    public function __construct(string $login, string $password, array $assignments = [])
+    public function __construct(string $username, string $password, array $assignments = [])
     {
-        $this->login = $login;
+        $this->username = $username;
         $this->password = $password;
-        $this->assignments = $assignments;
+
+        if (!empty($assignments)) {
+            $this->addAssignments(...$assignments);
+        }
     }
 
     /**
@@ -62,9 +65,9 @@ class User implements ModelInterface
         return $addedCount;
     }
 
-    public function getLogin(): string
+    public function getUsername(): string
     {
-        return $this->login;
+        return $this->username;
     }
 
     public function getPassword(): string

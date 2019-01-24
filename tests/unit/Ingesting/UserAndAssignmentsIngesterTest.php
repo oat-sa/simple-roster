@@ -33,8 +33,8 @@ class UserAndAssignmentsIngesterTest extends AbstractIngesterTest
     {
         return [[
             [
-                ['login', 'password', 'assignment_1'],
-                ['login_2', 'password', 'assignment_1', 'assignment_2'],
+                ['username', 'password', 'assignment_1'],
+                ['username_2', 'password', 'assignment_1', 'assignment_2'],
             ]
         ]];
     }

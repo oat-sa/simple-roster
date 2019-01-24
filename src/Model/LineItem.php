@@ -38,7 +38,7 @@ class LineItem implements ModelInterface
      */
     private $infrastructureId;
 
-    public function __construct(string $taoUri, string $title, string $infrastructureId, string $startDateTime, string $endDateTime)
+    public function __construct(string $taoUri, string $title, string $infrastructureId, ?string $startDateTime, ?string $endDateTime)
     {
         $this->taoUri = $taoUri;
         $this->title = $title;

@@ -19,7 +19,7 @@ To mock Dynamo DB for local development, use [DynamoDB (Downloadable Version)](h
 To deploy DynamoDB schema:
 
 ```bash
- $ bin/console tao:deploy:schema
+ $ bin/console roster:deploy:schema
 ```
 
 To run the application using PHP's built-in web server (or [Configure your Web Server](https://symfony.com/doc/current/setup/web_server_configuration.html)):

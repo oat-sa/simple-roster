@@ -5,6 +5,8 @@ namespace App\Command\Ingesting;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Source\LocalCsvFileSource;
 use App\Ingesting\Source\SourceInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 class IngestLocalCommand extends AbstractIngestCommand
@@ -13,27 +15,13 @@ class IngestLocalCommand extends AbstractIngestCommand
 
     protected function configure(): void
     {
-        $this->addOption('filename', null, InputOption::VALUE_OPTIONAL, 'The filename with CSV data')
-            ->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
+        $this->addArgument('filename', InputArgument::REQUIRED, 'The path of CSV file to be imported');
 
         parent::configure();
     }
 
-    /**
-     * @param array $options
-     * @return SourceInterface
-     * @throws InputOptionException
-     */
-    protected function getSource(array $options): SourceInterface
+    protected function getSource(InputInterface $input): SourceInterface
     {
-        $requiredOptions = ['delimiter', 'filename'];
-
-        foreach ($requiredOptions as $requiredOption) {
-            if (!array_key_exists($requiredOption, $options) || $options[$requiredOption] === null) {
-                throw new InputOptionException(sprintf('Option "%s" is not provided', $requiredOption));
-            }
-        }
-
-        return new LocalCsvFileSource($options['filename'], $options['delimiter']);
+        return new LocalCsvFileSource($input->getArgument('filename'), $input->getOption('delimiter'));
     }
 }
