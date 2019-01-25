@@ -54,14 +54,15 @@ class AssignmentControllerTest extends WebTestCase
             'title' => 'title',
             'taoUri' => 'http://line_item_1_tao.uri',
             'infrastructureId' => 'infra_id',
-            'startDateTime' => '',
-            'endDateTime' => '',
+            'startDateTime' => '2019-01-26 18:30:00',
+            'endDateTime' => '2019-01-27 18:30:00',
         ]);
         $this->client->getContainer()->set(StorageInterface::class, $storage);
 
         $user = new User('login', 'encoded_password', 'salt', [
-            new Assignment('http://line_item_1_tao.uri'),
-            new Assignment('http://line_item_1_tao.uri'),
+            new Assignment(123, 'http://line_item_1_tao.uri', Assignment::STATE_STARTED),
+            new Assignment(1234567, 'http://line_item_1_tao.uri', Assignment::STATE_STARTED),
+            new Assignment(999999, 'http://line_item_1_tao.uri', Assignment::STATE_CANCELLED),
         ]);
 
         $this->logIn($this->client, $user);
@@ -77,29 +78,29 @@ class AssignmentControllerTest extends WebTestCase
                 array (
                     0 =>
                         array (
-                            'id' => 1,
+                            'id' => 123,
                             'username' => 'login',
                             'lineItem' =>
                                 array (
                                     'uri' => 'http://line_item_1_tao.uri',
                                     'login' => 'login',
                                     'name' => 'http://line_item_1_tao.uri',
-                                    'startDateTime' => '',
-                                    'endDateTime' => '',
+                                    'startDateTime' => 1548527400,
+                                    'endDateTime' => 1548613800,
                                     'infrastructure' => 'infra_id',
                                 ),
                         ),
                     1 =>
                         array (
-                            'id' => 2,
+                            'id' => 1234567,
                             'username' => 'login',
                             'lineItem' =>
                                 array (
                                     'uri' => 'http://line_item_1_tao.uri',
                                     'login' => 'login',
                                     'name' => 'http://line_item_1_tao.uri',
-                                    'startDateTime' => '',
-                                    'endDateTime' => '',
+                                    'startDateTime' => 1548527400,
+                                    'endDateTime' => 1548613800,
                                     'infrastructure' => 'infra_id',
                                 ),
                         ),

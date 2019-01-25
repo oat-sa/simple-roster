@@ -33,8 +33,8 @@ class AuthControllerTest extends WebTestCase
         $salt = base64_encode(random_bytes(30));
         $encodedPassword = $encoder->encodePassword($this->plainPassword, $salt);
 
-        $storage->insert('users', ['login' => 'user_1'], [
-            'login' => 'user_1',
+        $storage->insert('users', ['username' => 'user_1'], [
+            'username' => 'user_1',
             'password' => $encodedPassword,
             'salt' => $salt,
             'assignments' => [],

@@ -38,9 +38,9 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
      * @param string $salt
      * @param Assignment[] $assignments
      */
-    public function __construct(string $login, string $password, ?string $salt = null, array $assignments = [])
+    public function __construct(string $username, string $password, ?string $salt = null, array $assignments = [])
     {
-        $this->login = $login;
+        $this->username = $username;
         $this->password = $password;
 
         if (!empty($assignments)) {
