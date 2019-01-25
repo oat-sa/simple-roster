@@ -6,7 +6,6 @@ use App\Ingesting\Ingester\LineItemsIngester;
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
 use App\ModelManager\LineItemManager;
 use App\Validation\LineItemValidator;
-use App\Validation\ModelValidator;
 
 class LineItemsIngesterTest extends AbstractIngesterTest
 {

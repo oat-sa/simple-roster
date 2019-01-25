@@ -2,17 +2,10 @@
 
 namespace App\Tests\Unit\Ingesting;
 
-use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Ingester\InfrastructuresIngester;
-use App\Ingesting\Ingester\LineItemsIngester;
 use App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper;
-use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
-use App\Ingesting\Source\SourceInterface;
-use App\Model\ModelInterface;
 use App\ModelManager\InfrastructureManager;
-use App\ModelManager\LineItemManager;
 use App\Validation\ModelValidator;
-use PHPUnit\Framework\TestCase;
 
 class InfrastructuresIngesterTest extends AbstractIngesterTest
 {
