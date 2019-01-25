@@ -18,6 +18,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractIngestCommand extends ContainerAwareCommand
 {
+    private const TYPE_USER_AND_ASSIGNMENT = 'users-assignments';
+    private const TYPE_INFRASTRUCTURE = 'infrastructures';
+    private const TYPE_LINE_ITEM = 'line-items';
+
     /**
      * @var SymfonyStyle
      */
@@ -33,8 +37,9 @@ abstract class AbstractIngestCommand extends ContainerAwareCommand
      */
     protected function configure(): void
     {
-        $this->addOption('data-type', null, InputOption::VALUE_REQUIRED, 'Type of entity needed to be ingested');
-        $this->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Do not write any data', false);
+        $this->addOption('data-type', 't', InputOption::VALUE_REQUIRED, 'Type of entity needed to be ingested');
+        $this->addOption('wet-run', 'w', InputOption::VALUE_NONE, 'Data will be saved in storage');
+        $this->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
 
         $this->setHelp(<<<HELP
 The <info>%command.name%</info> command imports entities from the provided file to the database:
@@ -43,7 +48,7 @@ HELP
         );
     }
 
-    abstract protected function getSource(array $inputOptions): SourceInterface;
+    abstract protected function getSource(InputInterface $inputOptions): SourceInterface;
 
     /**
      * @inheritdoc
@@ -62,13 +67,17 @@ HELP
      */
     public function execute(InputInterface $input, OutputInterface $output): void
     {
-        $inputOptions = $input->getOptions();
-        $dryRun = $input->getOption('dry-run') !== false;
+        $dryRun = $input->getOption('wet-run') === false;
 
         try {
+            if (!in_array($input->getOption('data-type'), [self::TYPE_LINE_ITEM, self::TYPE_USER_AND_ASSIGNMENT, self::TYPE_INFRASTRUCTURE], true)) {
+                $this->io->error('Data type not provided or wrong. Set one of the followings: '. implode(', ', [self::TYPE_LINE_ITEM, self::TYPE_USER_AND_ASSIGNMENT, self::TYPE_INFRASTRUCTURE]));
+                exit(1);
+            }
+
             $this->setUpIngester($input->getOption('data-type'));
 
-            $source = $this->getSource($inputOptions);
+            $source = $this->getSource($input);
             $result = $this->ingester->ingest($source, $dryRun);
 
             if ($dryRun) {
@@ -76,6 +85,12 @@ HELP
             } else {
                 $this->io->success(sprintf('Data has been ingested successfully.'));
             }
+
+            $alreadyExistingRowsCount = $result['alreadyExistingRowsCount'] ?? 0;
+            $rowsAdded = $result['rowsAdded'] ?? 0;
+
+            $messageOnUpdated = $this->ingester->isUpdateMode() ? 'updated' : 'were skipped as they already existed';
+            $this->io->success(sprintf('%d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
         } catch (InputOptionException $e) {
             $this->io->error(sprintf('Bad input parameters: %s', $e->getMessage()));
             return;
@@ -90,12 +105,6 @@ HELP
             $this->io->error(sprintf('Unknown error: %s', $e->getMessage()));
             return;
         }
-
-        $alreadyExistingRowsCount = $result['alreadyExistingRowsCount'] ?? 0;
-        $rowsAdded = $result['rowsAdded'] ?? 0;
-
-        $messageOnUpdated = $this->ingester->isUpdateMode() ? 'updated' : 'were skipped as they already existed';
-        $this->io->write(sprintf('%d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
     }
 
     /**
@@ -105,13 +114,13 @@ HELP
     public function setUpIngester(string $dataType): void
     {
         switch ($dataType) {
-            case 'users-and-assignments':
+            case self::TYPE_USER_AND_ASSIGNMENT:
                 $ingesterClass = UserAndAssignmentsIngester::class;
                 break;
-            case 'infrastructures':
+            case self::TYPE_INFRASTRUCTURE:
                 $ingesterClass = InfrastructuresIngester::class;
                 break;
-            case 'line-items':
+            case self::TYPE_LINE_ITEM:
                 $ingesterClass = LineItemsIngester::class;
                 break;
             default:

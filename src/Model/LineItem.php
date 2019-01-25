@@ -38,7 +38,7 @@ class LineItem implements ModelInterface
      */
     private $infrastructureId;
 
-    public function __construct(string $taoUri, string $title, string $infrastructureId, string $startDateTime, string $endDateTime)
+    public function __construct(string $taoUri, string $title, string $infrastructureId, ?\DateTimeImmutable $startDateTime = null, ?\DateTimeImmutable $endDateTime = null)
     {
         $this->taoUri = $taoUri;
         $this->title = $title;
@@ -65,12 +65,12 @@ class LineItem implements ModelInterface
         return $this->taoUri;
     }
 
-    public function getStartDateTime(): ?string
+    public function getStartDateTime(): ?\DateTimeImmutable
     {
         return $this->startDateTime;
     }
 
-    public function getEndDateTime(): ?string
+    public function getEndDateTime(): ?\DateTimeImmutable
     {
         return $this->endDateTime;
     }
