@@ -2,9 +2,10 @@
 
 namespace App\Model;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class User implements ModelInterface
+class User implements UserInterface, ModelInterface
 {
     /**
      * @var string
@@ -78,5 +79,40 @@ class User implements ModelInterface
     public function getAssignments(): array
     {
         return $this->assignments;
+    }
+
+    /**
+     * Returns the roles granted to the user.
+     *
+     * @return (Role|string)[] The user roles
+     */
+    public function getRoles()
+    {
+        return ['ROLE_USER'];
+    }
+
+    /**
+     * Returns the salt that was originally used to encode the password.
+     *
+     * @return string|null The salt
+     */
+    public function getSalt()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the username used to authenticate the user.
+     *
+     * @return string The username
+     */
+    public function getUsername()
+    {
+        return $this->login;
+    }
+
+    public function eraseCredentials()
+    {
+        // do nothing
     }
 }

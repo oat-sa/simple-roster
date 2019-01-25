@@ -2,18 +2,20 @@
 
 namespace App\Controller\ApiV1;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/lti")
  */
-class LtiController
+class LtiController implements OAuthSignatureValidatedController
 {
     /**
-     * @Route("/outcome", name="api_v1_lti_outcome", methods={"POST"})
+     * @Route("/outcome", name="api_v1_lti_outcome", methods={"POST", "GET"})
      */
     public function outcome()
     {
-
+        // TODO
+        return new Response();
     }
 }
