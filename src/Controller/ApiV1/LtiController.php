@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class LtiController implements OAuthSignatureValidatedController
 {
     /**
-     * @Route("/outcome", name="api_v1_lti_outcome", methods={"POST", "GET"})
+     * @Route("/outcome", name="api_v1_lti_outcome", methods={"POST"})
      */
     public function outcome()
     {
