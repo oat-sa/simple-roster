@@ -72,6 +72,8 @@ services:
                                 - '@Symfony\Component\Serializer\SerializerInterface'
                 - !service
                     class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+                - !service
+                    class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
             $encoders:
                 - !service
                     class: App\Denormalizer\Encoder

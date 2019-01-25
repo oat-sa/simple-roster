@@ -2,12 +2,23 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
+use App\AssignmentIdGenerator;
 use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
+    /**
+     * @var AssignmentIdGenerator
+     */
+    private $assignmentIdGenerator;
+
+    public function __construct(AssignmentIdGenerator $assignmentIdGenerator)
+    {
+        $this->assignmentIdGenerator = $assignmentIdGenerator;
+    }
+
     public function map(array $row, array $fieldNames): ModelInterface
     {
         $fieldValues = $this->mapFileLineByFieldNames($row, $fieldNames);
@@ -22,7 +33,9 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         $assignmentUris = $fieldValues['assignments'];
         $assignments = [];
         foreach ($assignmentUris as $assignmentUri) {
-            $assignments[] = new Assignment($assignmentUri);
+            $assignmentId = $this->assignmentIdGenerator->generate($assignments);
+            $newAssignment = new Assignment($assignmentId, $assignmentUri);
+            $assignments[] = $newAssignment;
         }
         unset($fieldValues['assignments']);
 

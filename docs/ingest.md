@@ -71,8 +71,8 @@ CSV fields for line items are:
 1. `tao_uri` string, **required** `must be unique`
 2. `title` string, **required**
 3. `infrastructure_id` string, **required** `infrastructure must be already ingested`
-4. `start_date_time` string, _optional_
-5. `end_date_time` string, _optional_
+4. `start_date_time` string, _optional_ format: 2019-01-26 18:30:00
+5. `end_date_time` string, _optional_ format: 2019-01-26 18:30:00
 
 Example:
 ```csv
@@ -100,3 +100,4 @@ N. `assignment N line item tao URI` string `optional`
 This structure can work with any amount of CSV fields >2. All fields starting from third are assignments list. 
 In case a user with the same `username` already exists, those assignments not existing in the storage and specified in CSV will be inserted. 
 In this case the password will not be updated and can even be omitted in CSV if the goal is updating the assignment list.
+Each assignment must have existing line item. Otherwise, the error will occur.

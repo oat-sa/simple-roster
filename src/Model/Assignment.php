@@ -10,6 +10,13 @@ class Assignment implements ModelInterface
      * @var string
      *
      * @Assert\NotBlank
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @Assert\NotBlank
      * @Assert\Url
      */
     private $lineItemTaoUri;
@@ -39,10 +46,16 @@ class Assignment implements ModelInterface
      */
     private $state;
 
-    public function __construct(string $lineItemTaoUri, string $state = self::STATE_READY)
+    public function __construct(int $id, string $lineItemTaoUri, string $state = self::STATE_READY)
     {
+        $this->id = $id;
         $this->lineItemTaoUri = $lineItemTaoUri;
         $this->state = $state;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getLineItemTaoUri(): string
@@ -53,12 +66,5 @@ class Assignment implements ModelInterface
     public function getState(): string
     {
         return $this->state;
-    }
-
-    public function setLineItemTaoUri(string $lineItemTaoUri): self
-    {
-        $this->lineItemTaoUri = $lineItemTaoUri;
-
-        return $this;
     }
 }

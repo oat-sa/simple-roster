@@ -5,7 +5,7 @@ namespace App\Ingesting\Ingester;
 use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
 use App\Model\ModelInterface;
 use App\ModelManager\UserManager;
-use App\Validation\ModelValidator;
+use App\Validation\UserValidator;
 
 class UserAndAssignmentsIngester extends AbstractIngester
 {
@@ -14,7 +14,7 @@ class UserAndAssignmentsIngester extends AbstractIngester
      */
     protected $updateMode = true;
 
-    public function __construct(UserManager $modelStorage, UserRowToModelMapper $rowToModelMapper, ModelValidator $validator)
+    public function __construct(UserManager $modelStorage, UserRowToModelMapper $rowToModelMapper, UserValidator $validator)
     {
         parent::__construct($modelStorage, $rowToModelMapper, $validator);
     }
