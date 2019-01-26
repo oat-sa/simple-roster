@@ -41,9 +41,6 @@ class AmazonS3Client implements S3ClientInterface
      */
     public function getObject(string $bucket, string $object): string
     {
-        if (!$this->client) {
-            throw new \RuntimeException();
-        }
         $args = [
             'Bucket' => $bucket,
             'Key' => $object,

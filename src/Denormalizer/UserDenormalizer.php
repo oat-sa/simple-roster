@@ -6,10 +6,16 @@ use App\Model\Assignment;
 use App\Model\User;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class UserDenormalizer implements DenormalizerInterface
 {
     use SerializerAwareTrait;
+
+    /**
+     * @var SerializerInterface|DenormalizerInterface
+     */
+    protected $serializer;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -25,20 +31,10 @@ class UserDenormalizer implements DenormalizerInterface
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $assignmentsDenormalized = [];
-
         if (!empty($data['assignments'])) {
-            foreach ($data['assignments'] as $assignmentNormalized) {
-                $assignmentsDenormalized[] = $this->serializer->deserialize(
-                    $assignmentNormalized,
-                    Assignment::class,
-                    $format,
-                    $context
-                );
-            }
-            $data['assignments'] = $assignmentsDenormalized;
+            $data['assignments'] = $this->serializer->denormalize($data['assignments'], Assignment::class .'[]');
         }
 
-        return $this->serializer->deserialize($data, $class, $format, $context);
+        return $this->serializer->denormalize($data, $class);
     }
 }

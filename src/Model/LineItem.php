@@ -2,8 +2,13 @@
 
 namespace App\Model;
 
+use App\ODM\Annotations\Item;
+use App\ODM\Validator\Constraints as ODMAssert;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Item(table="line_items", primaryKey="taoUri")
+ */
 class LineItem implements ModelInterface
 {
     /**
@@ -22,12 +27,12 @@ class LineItem implements ModelInterface
     private $title;
 
     /**
-     * @var string
+     * @var \DateTimeImmutable
      */
     private $startDateTime;
 
     /**
-     * @var string
+     * @var \DateTimeImmutable
      */
     private $endDateTime;
 
@@ -35,6 +40,7 @@ class LineItem implements ModelInterface
      * @var string
      *
      * @Assert\NotBlank
+     * @ODMAssert\ExistingItem(itemClass="App\Model\Infrastructure")
      */
     private $infrastructureId;
 

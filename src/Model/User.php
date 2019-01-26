@@ -2,8 +2,12 @@
 
 namespace App\Model;
 
+use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Item(table="users", primaryKey="username")
+ */
 class User implements ModelInterface
 {
     /**
@@ -22,6 +26,8 @@ class User implements ModelInterface
 
     /**
      * @var Assignment[]
+     *
+     * @Assert\Valid
      */
     private $assignments = [];
 
@@ -36,7 +42,7 @@ class User implements ModelInterface
         $this->password = $password;
 
         if (!empty($assignments)) {
-            $this->addAssignments(...$assignments);
+            $this->addAssignment(...$assignments);
         }
     }
 
@@ -44,7 +50,7 @@ class User implements ModelInterface
      * @param Assignment ...$assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(Assignment ...$assignments): int
+    public function addAssignment(Assignment ...$assignments): int
     {
         $addedCount = 0;
 
