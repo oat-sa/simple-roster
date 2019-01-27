@@ -14,6 +14,9 @@ services:
         public: false       # Allows optimizing the container by removing unused services; this also means
           # fetching services directly from the container via $container->get() won't work.
           # The best practice is to be explicit about your dependencies anyway.
+        bind:
+            $awsVersion: '%env(AWS_VERSION)%'
+            $awsRegion: '%env(AWS_REGION)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -34,7 +37,7 @@ services:
         class: App\S3\AmazonS3Client
         shared: false
         arguments:
-            $apiVersion: '%env(S3_VERSION)%'
+            $client: '@aws.s3'
 
     Aws\DynamoDb\Marshaler:
         class: Aws\DynamoDb\Marshaler
@@ -45,15 +48,15 @@ services:
             $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
             $marshaler: '@Aws\DynamoDb\Marshaler'
 
-    'App\Ingesting\Ingester\InfrastructuresIngester':
+    App\Ingesting\Ingester\InfrastructuresIngester:
         class: App\Ingesting\Ingester\InfrastructuresIngester
         public: true
 
-    'App\Ingesting\Ingester\LineItemsIngester':
+    App\Ingesting\Ingester\LineItemsIngester:
         class: App\Ingesting\Ingester\LineItemsIngester
         public: true
 
-    'App\Ingesting\Ingester\UserAndAssignmentsIngester':
+    App\Ingesting\Ingester\UserAndAssignmentsIngester:
         class: App\Ingesting\Ingester\UserAndAssignmentsIngester
         public: true
 
@@ -69,6 +72,8 @@ services:
                                 - '@Symfony\Component\Serializer\SerializerInterface'
                 - !service
                     class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+                - !service
+                    class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
             $encoders:
                 - !service
                     class: App\Denormalizer\Encoder
@@ -78,3 +83,7 @@ services:
 
     Symfony\Component\Security\Guard\GuardAuthenticatorHandler:
         class: Symfony\Component\Security\Guard\GuardAuthenticatorHandler
+
+    user_provider:
+        class: App\Security\UserProvider
+        public: true

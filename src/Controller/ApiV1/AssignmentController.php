@@ -30,22 +30,25 @@ class AssignmentController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $assignmentId = 0;
+
         foreach ($user->getAssignments() as $assignment) {
-            $assignmentId++;
             if ($assignment->getState() !== Assignment::STATE_CANCELLED) {
                 /** @var LineItem $lineItem */
                 $lineItem = $lineItemManager->read($assignment->getLineItemTaoUri());
 
+                if ($lineItem === null) {
+                    throw new \Exception('Line item has disappeared.');
+                }
+
                 $assignmentsToOutput[] = [
-                    'id' => $assignmentId,
+                    'id' => $assignment->getId(),
                     'username' => $user->getUsername(),
                     'lineItem' => [
                         'uri' => $lineItem->getTaoUri(),
                         'login' => $user->getUsername(),
                         'name' => $lineItem->getTitle(),
-                        'startDateTime' => $lineItem->getStartDateTime(),
-                        'endDateTime' => $lineItem->getEndDateTime(),
+                        'startDateTime' => $lineItem->getStartDateTime()->getTimestamp(),
+                        'endDateTime' => $lineItem->getEndDateTime()->getTimestamp(),
                         'infrastructure' => $lineItem->getInfrastructureId(),
                     ]
                 ];

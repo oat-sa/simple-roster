@@ -13,7 +13,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
      *
      * @Assert\NotBlank
      */
-    private $login;
+    private $username;
 
     /**
      * @var string
@@ -33,23 +33,27 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
     private $salt;
 
     /**
-     * @param $login
-     * @param $password
+     * @param string $username
+     * @param string $password
+     * @param string $salt
      * @param Assignment[] $assignments
      */
-    public function __construct(string $login, string $password, ?string $salt = null, ?array $assignments = [])
+    public function __construct(string $username, string $password, ?string $salt = null, array $assignments = [])
     {
-        $this->login = $login;
+        $this->username = $username;
         $this->password = $password;
-        $this->assignments = $assignments;
+
+        if (!empty($assignments)) {
+            $this->addAssignments(...$assignments);
+        }
         $this->salt = $salt;
     }
 
     /**
-     * @param Assignment[] $assignments
+     * @param Assignment ...$assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(array $assignments): int
+    public function addAssignments(Assignment ...$assignments): int
     {
         $addedCount = 0;
 
@@ -70,9 +74,9 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         return $addedCount;
     }
 
-    public function getLogin(): string
+    public function getUsername(): string
     {
-        return $this->login;
+        return $this->username;
     }
 
     public function getPassword(): string
@@ -96,11 +100,6 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
     public function getSalt()
     {
         return $this->salt;
-    }
-
-    public function getUsername()
-    {
-        return $this->login;
     }
 
     public function eraseCredentials()

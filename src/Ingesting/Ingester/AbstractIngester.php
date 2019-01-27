@@ -92,9 +92,7 @@ abstract class AbstractIngester
                     continue;
                 }
             } else {
-                if (!$this->updateMode) {
-                    $rowsAdded++;
-                }
+                $rowsAdded++;
             }
 
             $modelsToInsert[] = $model;

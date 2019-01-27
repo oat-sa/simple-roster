@@ -1,0 +1,6 @@
+services:
+    _defaults:
+        public: true
+
+    App\Storage\StorageInterface:
+        class: App\Storage\InMemoryStorage

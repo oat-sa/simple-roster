@@ -28,13 +28,13 @@ class AuthController extends AbstractController
     public function login(Request $request, UserManager $userManager, LoginManagerInterface $loginManager): Response
     {
         if ($this->getUser()) {
-            throw new BadRequestHttpException('Already authorized');
+            return new Response('Already authorized', Response::HTTP_BAD_REQUEST);
         }
         if (!$request->request->has('login')) {
-            throw new BadRequestHttpException('Mandatory parameter "login" is missing');
+            return new Response('Mandatory parameter "login" is missing', Response::HTTP_BAD_REQUEST);
         }
         if (!$request->request->has('password')) {
-            throw new BadRequestHttpException('Mandatory parameter "password" is missing');
+            return new Response('Mandatory parameter "password" is missing', Response::HTTP_BAD_REQUEST);
         }
 
         $login = $request->request->get('login');

@@ -19,7 +19,7 @@ To mock Dynamo DB for local development, use [DynamoDB (Downloadable Version)](h
 To deploy DynamoDB schema:
 
 ```bash
- $ bin/console tao:deploy:schema
+ $ bin/console roster:deploy:schema
 ```
 
 To run the application using PHP's built-in web server (or [Configure your Web Server](https://symfony.com/doc/current/setup/web_server_configuration.html)):
@@ -28,17 +28,13 @@ To run the application using PHP's built-in web server (or [Configure your Web S
  $ bin/console server:start
 ```
 
-Setup with Docker
--------
-TBD
-
 ## Vocabulary
 ### General
 [StorageInterface](src/Storage/StorageInterface.php) communicates with NoSQL storage in terms of raw data rows. For now it can only use simple keys (you cannot use DynamoDB complex primary key). Always puts a new value without checking for existence. The checks should be done outside if necessary.
 
 [Model](src/Model/ModelInterface.php) just represents some business data. It does not know of anything.
 
-[Validator](src/Model/AbstractModelValidator.php) validates models.
+[ModelValidator](src/Validation/ModelValidator.php) validates models. It'sSetup with Docker based on Symfony/Validator.
 
 [ModelStorage](src/Model/Storage/ModelStorageInterface.php) is aware of models and talks to StorageInterface. Uses Symfony/Serializer component (Normalizer interface) to turn Models into arrays before handing over them to the [StorageInterface](src/Storage/StorageInterface.php).
 

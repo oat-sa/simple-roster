@@ -2,13 +2,15 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         user_provider:
-            id: App\Security\UserProvider
+            id: 'user_provider'
 
     firewalls:
         main:
             anonymous: ~
             logout: ~
             provider: user_provider
+            access_denied_handler: App\Security\AccessDeniedHandler
+            entry_point: App\Security\AuthenticationEntryPoint
             # activate different ways to authenticate
 
             # http_basic: true
