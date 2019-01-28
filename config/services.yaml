@@ -64,19 +64,15 @@ services:
             $rowToModelMapper: '@App\Ingesting\RowToModelMapper\UserRowToModelMapper'
         tags: ['app.ingester']
 
-    app.denormalizer.user:
-        class: App\Denormalizer\UserDenormalizer
-        calls:
-            -   method: setSerializer
-                arguments:
-                    - '@app.serializer.odm'
+    app.prop_normalizer.with_extractor:
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        arguments:
+            $propertyTypeExtractor: '@property_info.reflection_extractor'
 
     app.serializer.odm:
         class: Symfony\Component\Serializer\Serializer
         arguments:
             $normalizers:
-                - '@app.denormalizer.user'
                 - '@serializer.normalizer.datetime'
                 - '@serializer.denormalizer.array'
-                - !service
-                    class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+                - '@app.prop_normalizer.with_extractor'

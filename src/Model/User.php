@@ -71,6 +71,23 @@ class User implements ModelInterface
         return $addedCount;
     }
 
+    /**
+     * Setter method is required for the serializer to be able to denormalize
+     * the nested raw data from DynamoDB.
+     *
+     * Only setter denormalization works for nested data at the moment:
+     * @see https://github.com/symfony/symfony/issues/28081
+     *
+     * @param Assignment[] $assignments
+     * @return User
+     */
+    public function setAssignments(array $assignments): self
+    {
+        $this->addAssignment(...$assignments);
+
+        return $this;
+    }
+
     public function getUsername(): string
     {
         return $this->username;
