@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Ingesting;
 
 use App\Ingesting\Ingester\LineItemsIngester;
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
-use App\Validation\LineItemValidator;
 
 class LineItemsIngesterTest extends AbstractIngesterTest
 {

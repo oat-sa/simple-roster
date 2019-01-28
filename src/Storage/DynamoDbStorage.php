@@ -2,6 +2,7 @@
 
 namespace App\Storage;
 
+use App\ODM\StorageInterface;
 use Aws\DynamoDb\Marshaler;
 
 class DynamoDbStorage implements StorageInterface

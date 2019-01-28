@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Ingesting;
 
 use App\Ingesting\Ingester\InfrastructuresIngester;
 use App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper;
-use App\Validation\ModelValidator;
 
 class InfrastructuresIngesterTest extends AbstractIngesterTest
 {

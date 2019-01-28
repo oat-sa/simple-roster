@@ -4,10 +4,10 @@ namespace App\ODM;
 
 use App\ODM\Annotations\Item;
 use App\ODM\Exceptions\NotAnnotatedException;
-use App\Storage\StorageInterface;
 use App\ODM\Exceptions\ValidationException;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -25,13 +25,18 @@ class ItemManager implements ItemManagerInterface
      */
     private $odmSerializer;
 
-    public function __construct(StorageInterface $storage, Reader $annotationReader, SerializerInterface $odmSerializer, ValidatorInterface $validator)
+    public function __construct(
+        StorageInterface $storage,
+        Reader $annotationReader,
+        SerializerInterface $odmSerializer,
+        ValidatorInterface $validator,
+        ?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->storage = $storage;
         $this->annotationReader = $annotationReader;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->odmSerializer = $odmSerializer;
         $this->validator = $validator;
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
     public function load(string $itemClass, string $key): ?object
@@ -72,11 +77,7 @@ class ItemManager implements ItemManagerInterface
 
     public function save(object $item): void
     {
-        $violations = $this->validator->validate($item);
-
-        if ($violations->count() > 0) {
-            throw new ValidationException(sprintf('Validation failure on %s', (string) $violations));
-        }
+        $this->validate($item);
 
         $itemDefinition = $this->getItemDefinition(get_class($item));
 
@@ -94,6 +95,15 @@ class ItemManager implements ItemManagerInterface
         $itemDefinition = $this->getItemDefinition($itemClass);
 
         $this->storage->delete($itemDefinition->table, [$itemDefinition->primaryKey => $key]);
+    }
+
+    private function validate(object $item): void
+    {
+        $violations = $this->validator->validate($item);
+
+        if ($violations->count() > 0) {
+            throw new ValidationException(sprintf('Validation failure on %s', (string) $violations));
+        }
     }
 
     private function getItemDefinition(string $itemClass): Item

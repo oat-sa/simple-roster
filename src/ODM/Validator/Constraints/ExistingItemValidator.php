@@ -3,7 +3,6 @@
 namespace App\ODM\Validator\Constraints;
 
 use App\ODM\ItemManagerInterface;
-use Doctrine\Instantiator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -30,7 +29,7 @@ class ExistingItemValidator extends ConstraintValidator
         }
 
         if (!is_string($value)) {
-            throw new UnexpectedValueException($value, 'string');
+            throw new UnexpectedTypeException($value, 'string');
         }
 
         if (!$this->itemManager->isExistById($constraint->itemClass, $value)) {

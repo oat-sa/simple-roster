@@ -43,7 +43,7 @@ services:
 
     Aws\DynamoDb\Marshaler: ~
 
-    App\Storage\StorageInterface:
+    App\ODM\StorageInterface:
         class: App\Storage\DynamoDbStorage
         arguments:
             $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'

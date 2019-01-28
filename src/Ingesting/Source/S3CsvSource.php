@@ -24,7 +24,7 @@ class S3CsvSource implements SourceInterface
      * @return \Generator
      * @throws S3AccessException
      */
-    public function iterateThroughLines(): \Generator
+    public function iterateThroughLines(): iterable
     {
         try {
             $response = $this->s3Client->getObject($this->bucket, $this->object);

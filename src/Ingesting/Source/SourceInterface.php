@@ -10,5 +10,5 @@ interface SourceInterface
      * @throws IngestingException
      * @return \Generator
      */
-    public function iterateThroughLines(): \Generator;
+    public function iterateThroughLines(): iterable;
 }

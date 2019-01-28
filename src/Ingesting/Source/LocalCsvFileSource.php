@@ -19,17 +19,21 @@ class LocalCsvFileSource implements SourceInterface
      * @return \Generator
      * @throws \Exception
      */
-    public function iterateThroughLines(): \Generator
+    public function iterateThroughLines(): iterable
     {
         if (!file_exists($this->filename)) {
             throw new FileNotFoundException($this->filename);
         }
+
         $fileHandle = fopen($this->filename, 'r');
         if (false === $fileHandle) {
             throw new FileNotFoundException($this->filename);
         }
+
         while (($line = fgetcsv($fileHandle, null, $this->delimiter)) !== false) {
             yield $line;
         }
+
+        fclose($fileHandle);
     }
 }

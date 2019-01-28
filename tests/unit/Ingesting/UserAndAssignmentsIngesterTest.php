@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Ingesting;
 
 use App\Ingesting\Ingester\UserAndAssignmentsIngester;
 use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
-use App\Validation\UserValidator;
 
 class UserAndAssignmentsIngesterTest extends AbstractIngesterTest
 {
