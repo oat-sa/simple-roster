@@ -17,6 +17,8 @@ services:
         bind:
             $awsVersion: '%env(AWS_VERSION)%'
             $awsRegion: '%env(AWS_REGION)%'
+            $odmSerializer: '@app.serializer.odm'
+            $ingesters: !tagged app.ingester
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -39,44 +41,41 @@ services:
         arguments:
             $client: '@aws.s3'
 
-    Aws\DynamoDb\Marshaler:
-        class: Aws\DynamoDb\Marshaler
+    Aws\DynamoDb\Marshaler: ~
 
-    App\Storage\StorageInterface:
+    App\ODM\StorageInterface:
         class: App\Storage\DynamoDbStorage
         arguments:
             $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
             $marshaler: '@Aws\DynamoDb\Marshaler'
 
     App\Ingesting\Ingester\InfrastructuresIngester:
-        class: App\Ingesting\Ingester\InfrastructuresIngester
-        public: true
+        arguments:
+            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper'
+        tags: ['app.ingester']
 
     App\Ingesting\Ingester\LineItemsIngester:
-        class: App\Ingesting\Ingester\LineItemsIngester
-        public: true
+        arguments:
+            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\LineItemRowToModelMapper'
+        tags: ['app.ingester']
 
     App\Ingesting\Ingester\UserAndAssignmentsIngester:
-        class: App\Ingesting\Ingester\UserAndAssignmentsIngester
-        public: true
+        arguments:
+            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\UserRowToModelMapper'
+        tags: ['app.ingester']
 
-    Symfony\Component\Serializer\SerializerInterface:
+    app.prop_normalizer.with_extractor:
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        arguments:
+            $propertyTypeExtractor: '@property_info.reflection_extractor'
+
+    app.serializer.odm:
         class: Symfony\Component\Serializer\Serializer
         arguments:
             $normalizers:
-                - !service
-                    class: App\Denormalizer\UserDenormalizer
-                    calls:
-                        -   method: setSerializer
-                            arguments:
-                                - '@Symfony\Component\Serializer\SerializerInterface'
-                - !service
-                    class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-                - !service
-                    class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
-            $encoders:
-                - !service
-                    class: App\Denormalizer\Encoder
+                - '@serializer.normalizer.datetime'
+                - '@serializer.denormalizer.array'
+                - '@app.prop_normalizer.with_extractor'
 
     App\Security\LoginManagerInterface:
         class: App\Security\LoginManager

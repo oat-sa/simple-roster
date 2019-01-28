@@ -21,10 +21,7 @@ abstract class AbstractRowToModelMapper
 
         $numberOfLineElement = 0;
         foreach ($fieldNames as $fieldName) {
-            // set null instead of empty string because DynamoDB does not allow empty strings at any level of a document
-            $fieldValues[$fieldName] = array_key_exists($numberOfLineElement, $row) && $row[$numberOfLineElement] !== ''
-                ? $row[$numberOfLineElement]
-                : null;
+            $fieldValues[$fieldName] = $row[$numberOfLineElement] ?? null;
             $numberOfLineElement++;
         }
 

@@ -2,16 +2,13 @@
 
 namespace App\Ingesting\Ingester;
 
-use App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper;
 use App\Model\ModelInterface;
-use App\ModelManager\InfrastructureManager;
-use App\Validation\ModelValidator;
 
 class InfrastructuresIngester extends AbstractIngester
 {
-    public function __construct(InfrastructureManager $modelStorage, InfrastructureRowToModelMapper $rowToModelMapper, ModelValidator $validator)
+    public function getType(): string
     {
-        parent::__construct($modelStorage, $rowToModelMapper, $validator);
+        return self::TYPE_INFRASTRUCTURE;
     }
 
     /**

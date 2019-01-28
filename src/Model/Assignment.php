@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\ODM\Validator\Constraints as ODMAssert;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Assignment implements ModelInterface
@@ -18,6 +19,7 @@ class Assignment implements ModelInterface
      *
      * @Assert\NotBlank
      * @Assert\Url
+     * @ODMAssert\ExistingItem(itemClass="App\Model\LineItem")
      */
     private $lineItemTaoUri;
 
@@ -46,14 +48,14 @@ class Assignment implements ModelInterface
      */
     private $state;
 
-    public function __construct(int $id, string $lineItemTaoUri, string $state = self::STATE_READY)
+    public function __construct(string $id, string $lineItemTaoUri, string $state = self::STATE_READY)
     {
         $this->id = $id;
         $this->lineItemTaoUri = $lineItemTaoUri;
         $this->state = $state;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

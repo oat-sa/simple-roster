@@ -24,12 +24,16 @@ class LocalCsvFileSource implements SourceInterface
         if (!file_exists($this->filename)) {
             throw new FileNotFoundException($this->filename);
         }
+
         $fileHandle = fopen($this->filename, 'r');
         if (false === $fileHandle) {
             throw new FileNotFoundException($this->filename);
         }
+
         while (($line = fgetcsv($fileHandle, null, $this->delimiter)) !== false) {
             yield $line;
         }
+
+        fclose($fileHandle);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Storage;
 
+use App\ODM\StorageInterface;
+
 class InMemoryStorage implements StorageInterface
 {
     private $items = [];
