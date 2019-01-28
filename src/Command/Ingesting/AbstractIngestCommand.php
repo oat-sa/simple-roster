@@ -43,7 +43,12 @@ abstract class AbstractIngestCommand extends Command
      */
     protected function configure(): void
     {
-        $this->addOption('data-type', 't', InputOption::VALUE_REQUIRED, 'Type of entity needed to be ingested');
+        $this->addOption(
+            'data-type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'Type of the items needed to be ingested. Possible values: '. implode(', ', AbstractIngester::getTypes())
+        );
         $this->addOption('wet-run', 'w', InputOption::VALUE_NONE, 'Data will be saved in storage');
         $this->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
 
@@ -76,8 +81,8 @@ HELP
         $wetRun = $input->getOption('wet-run') !== false;
 
         try {
-            if (!in_array($input->getOption('data-type'), [IngesterInterface::TYPE_LINE_ITEM, IngesterInterface::TYPE_USER_AND_ASSIGNMENT, IngesterInterface::TYPE_INFRASTRUCTURE], true)) {
-                $this->io->error('Data type not provided or wrong. Set one of the followings: '. implode(', ', [IngesterInterface::TYPE_LINE_ITEM, IngesterInterface::TYPE_USER_AND_ASSIGNMENT, IngesterInterface::TYPE_INFRASTRUCTURE]));
+            if (!in_array($input->getOption('data-type'), AbstractIngester::getTypes(), true)) {
+                $this->io->error('Data type not provided or wrong. Set one of the followings: '. implode(', ', AbstractIngester::getTypes()));
                 exit(1);
             }
 

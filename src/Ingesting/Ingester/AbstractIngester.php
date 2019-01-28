@@ -7,7 +7,6 @@ use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
-use App\ODM\Exceptions\ValidationException;
 use App\ODM\ItemManagerInterface;
 
 abstract class AbstractIngester implements IngesterInterface
@@ -78,5 +77,17 @@ abstract class AbstractIngester implements IngesterInterface
     public function isUpdateMode(): bool
     {
         return $this->updateMode;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getTypes(): array
+    {
+        return [
+            self::TYPE_USER_AND_ASSIGNMENT,
+            self::TYPE_LINE_ITEM,
+            self::TYPE_INFRASTRUCTURE,
+        ];
     }
 }
