@@ -2,14 +2,16 @@
 
 namespace App\Tests\Ingesting\Ingester;
 
-
 use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Ingester\InfrastructuresIngester;
 use App\Ingesting\Source\SourceInterface;
+use App\Tests\GeneratorHelperTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class InfrastructuresIngesterTest extends KernelTestCase
 {
+    use GeneratorHelperTrait;
+
     public function invalidItemsProvider()
     {
         return [
@@ -32,7 +34,7 @@ class InfrastructuresIngesterTest extends KernelTestCase
         $ingester = $testContainer->get(InfrastructuresIngester::class);
 
         $source = $this->createMock(SourceInterface::class);
-        $source->method('iterateThroughLines')->willReturn($row);
+        $source->method('iterateThroughLines')->willReturn($this->arrayAsGenerator($row));
 
         $this->expectException(FileLineIsInvalidException::class);
 

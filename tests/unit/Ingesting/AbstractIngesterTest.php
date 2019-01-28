@@ -7,11 +7,14 @@ use App\Ingesting\Ingester\AbstractIngester;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\ODM\ItemManagerInterface;
+use App\Tests\GeneratorHelperTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 abstract class AbstractIngesterTest extends TestCase
 {
+    use GeneratorHelperTrait;
+
     /**
      * @var ItemManagerInterface|MockObject
      */
@@ -36,13 +39,6 @@ abstract class AbstractIngesterTest extends TestCase
     {
         $this->itemManager = $this->createMock(ItemManagerInterface::class);
         $this->source = $this->createMock(SourceInterface::class);
-    }
-
-    protected function arrayAsGenerator(array $array): \Generator
-    {
-        foreach ($array as $item) {
-            yield $item;
-        }
     }
 
     /**

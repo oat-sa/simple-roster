@@ -19,7 +19,7 @@ class LocalCsvFileSource implements SourceInterface
      * @return \Generator
      * @throws \Exception
      */
-    public function iterateThroughLines(): iterable
+    public function iterateThroughLines(): \Generator
     {
         if (!file_exists($this->filename)) {
             throw new FileNotFoundException($this->filename);
