@@ -2,21 +2,18 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
-use App\AssignmentIdGenerator;
 use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
+use App\ODM\Id\IdGeneratorInterface;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
-    /**
-     * @var AssignmentIdGenerator
-     */
-    private $assignmentIdGenerator;
+    private $idGenerator;
 
-    public function __construct(AssignmentIdGenerator $assignmentIdGenerator)
+    public function __construct(IdGeneratorInterface $idGenerator)
     {
-        $this->assignmentIdGenerator = $assignmentIdGenerator;
+        $this->idGenerator = $idGenerator;
     }
 
     public function map(array $row, array $fieldNames): ModelInterface
@@ -33,8 +30,8 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         $assignmentUris = $fieldValues['assignments'];
         $assignments = [];
         foreach ($assignmentUris as $assignmentUri) {
-            $assignmentId = $this->assignmentIdGenerator->generate($assignments);
-            $newAssignment = new Assignment($assignmentId, $assignmentUri);
+            $id = $this->idGenerator->generate($fieldValues['username']);
+            $newAssignment = new Assignment($id, $assignmentUri);
             $assignments[] = $newAssignment;
         }
         unset($fieldValues['assignments']);
@@ -42,7 +39,7 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         /** @var User $user */
         $user = new User($fieldValues['username'], $fieldValues['password']);
 
-        $user->addAssignments(...$assignments);
+        $user->addAssignment(...$assignments);
 
         return $user;
     }

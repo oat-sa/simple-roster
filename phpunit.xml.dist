@@ -10,7 +10,9 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <env name="APP_ENV" value="test" />
+        <env name="APP_SECRET" value="efb4bec60a6d5ae851607d777be120a6"/>
         <env name="SHELL_VERBOSITY" value="-1" />
+        <env name="KERNEL_CLASS" value="App\Kernel" />
     </php>
 
     <testsuites>

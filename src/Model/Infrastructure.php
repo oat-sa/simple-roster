@@ -2,8 +2,12 @@
 
 namespace App\Model;
 
+use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Item(table="infrastructures", primaryKey="id")
+ */
 class Infrastructure implements ModelInterface
 {
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Storage;
 
+use App\ODM\StorageInterface;
 use Aws\DynamoDb\Marshaler;
 
 class DynamoDbStorage implements StorageInterface
@@ -67,6 +68,13 @@ class DynamoDbStorage implements StorageInterface
      */
     public function insert(string $tableName, array $key, array $data): void
     {
+        // set null instead of empty string because DynamoDB does not allow empty strings at any level of a document
+        array_walk_recursive($data, function(& $item) {
+            if ('' === $item) {
+                $item = null;
+            }
+        });
+
         $this->client->putItem([
             self::TABLE_NAME_KEY => $tableName,
             self::TABLE_ITEM_KEY => $this->marshaler->marshalItem($key) + $this->marshaler->marshalItem($data),

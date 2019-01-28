@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Storage;
+namespace App\ODM;
 
 /**
  * Simple interface for noSQL database. Currently allows only use primary keys entirely,

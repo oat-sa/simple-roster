@@ -6,38 +6,49 @@ use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Ingester\AbstractIngester;
-use App\Ingesting\Ingester\InfrastructuresIngester;
-use App\Ingesting\Ingester\LineItemsIngester;
-use App\Ingesting\Ingester\UserAndAssignmentsIngester;
+use App\Ingesting\Ingester\IngesterInterface;
 use App\Ingesting\Source\SourceInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-abstract class AbstractIngestCommand extends ContainerAwareCommand
+abstract class AbstractIngestCommand extends Command
 {
-    private const TYPE_USER_AND_ASSIGNMENT = 'users-assignments';
-    private const TYPE_INFRASTRUCTURE = 'infrastructures';
-    private const TYPE_LINE_ITEM = 'line-items';
-
     /**
      * @var SymfonyStyle
      */
     private $io;
 
     /**
+     * @var AbstractIngester[]
+     */
+    private $ingesters;
+
+    /**
      * @var AbstractIngester
      */
-    private $ingester;
+    private $currentIngester;
+
+    public function __construct(iterable $ingesters)
+    {
+        parent::__construct();
+
+        $this->ingesters = $ingesters;
+    }
 
     /**
      * Sets command name, input and metadata
      */
     protected function configure(): void
     {
-        $this->addOption('data-type', 't', InputOption::VALUE_REQUIRED, 'Type of entity needed to be ingested');
+        $this->addOption(
+            'data-type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'Type of the items needed to be ingested. Possible values: '. implode(', ', AbstractIngester::getTypes())
+        );
         $this->addOption('wet-run', 'w', InputOption::VALUE_NONE, 'Data will be saved in storage');
         $this->addOption('delimiter', null, InputOption::VALUE_OPTIONAL, 'CSV delimiter used in file ("," or "; normally)', ',');
 
@@ -67,36 +78,35 @@ HELP
      */
     public function execute(InputInterface $input, OutputInterface $output): void
     {
-        $dryRun = $input->getOption('wet-run') === false;
+        $wetRun = $input->getOption('wet-run') !== false;
 
         try {
-            if (!in_array($input->getOption('data-type'), [self::TYPE_LINE_ITEM, self::TYPE_USER_AND_ASSIGNMENT, self::TYPE_INFRASTRUCTURE], true)) {
-                $this->io->error('Data type not provided or wrong. Set one of the followings: '. implode(', ', [self::TYPE_LINE_ITEM, self::TYPE_USER_AND_ASSIGNMENT, self::TYPE_INFRASTRUCTURE]));
+            if (!in_array($input->getOption('data-type'), AbstractIngester::getTypes(), true)) {
+                $this->io->error('Data type not provided or wrong. Set one of the followings: '. implode(', ', AbstractIngester::getTypes()));
                 exit(1);
             }
 
             $this->setUpIngester($input->getOption('data-type'));
 
             $source = $this->getSource($input);
-            $result = $this->ingester->ingest($source, $dryRun);
+            $result = $this->currentIngester->ingest($source, $wetRun);
 
-            if ($dryRun) {
-                $this->io->success(sprintf('DRY RUN! Data ingestion imitated successfully.'));
-            } else {
+            if ($wetRun) {
                 $this->io->success(sprintf('Data has been ingested successfully.'));
+            } else {
+                $this->io->success(sprintf('DRY RUN! Data ingestion imitated successfully.'));
             }
 
             $alreadyExistingRowsCount = $result['alreadyExistingRowsCount'] ?? 0;
             $rowsAdded = $result['rowsAdded'] ?? 0;
 
-            $messageOnUpdated = $this->ingester->isUpdateMode() ? 'updated' : 'were skipped as they already existed';
+            $messageOnUpdated = $this->currentIngester->isUpdateMode() ? 'updated' : 'were skipped as they already existed';
             $this->io->success(sprintf('%d records created, %d records %s.', $rowsAdded, $alreadyExistingRowsCount, $messageOnUpdated));
         } catch (InputOptionException $e) {
             $this->io->error(sprintf('Bad input parameters: %s', $e->getMessage()));
             return;
         } catch (FileLineIsInvalidException $e) {
-            $this->io->warning(sprintf('The process has been terminated because the line %d of the file is invalid:', $e->getLineNumber()));
-            $this->io->error(sprintf('%s', $e->getMessage()));
+            $this->io->error(sprintf('Ingestion terminated: the line %d is invalid: "%s"', $e->getLineNumber(), $e->getMessage()));
             return;
         } catch (IngestingException $e) {
             $this->io->error(sprintf('Error: %s', $e->getMessage()));
@@ -113,20 +123,15 @@ HELP
      */
     public function setUpIngester(string $dataType): void
     {
-        switch ($dataType) {
-            case self::TYPE_USER_AND_ASSIGNMENT:
-                $ingesterClass = UserAndAssignmentsIngester::class;
+        foreach ($this->ingesters as $ingester) {
+            if ($ingester->getType() === $dataType) {
+                $this->currentIngester = $ingester;
                 break;
-            case self::TYPE_INFRASTRUCTURE:
-                $ingesterClass = InfrastructuresIngester::class;
-                break;
-            case self::TYPE_LINE_ITEM:
-                $ingesterClass = LineItemsIngester::class;
-                break;
-            default:
-                throw new InputOptionException('Unacceptable data type');
+            }
         }
 
-        $this->ingester = $this->getContainer()->get($ingesterClass);
+        if ($this->currentIngester === null) {
+            throw new InputOptionException('Unacceptable data type');
+        }
     }
 }
