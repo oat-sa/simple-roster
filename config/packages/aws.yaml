@@ -1,0 +1,5 @@
+aws:
+    region: '%env(AWS_REGION)%'
+    version: '%env(AWS_VERSION)%'
+    DynamoDb:
+        endpoint: '%env(DYNAMODB_ENDPOINT)%'

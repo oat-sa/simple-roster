@@ -243,9 +243,6 @@ components:
         uri:
           type: string
           example: my-tao-instance.com/tao.rdf#123456789 # TODO
-        login:
-          type: string
-          example: johndoe
         name:
           type: string
           example: Delivery#12
