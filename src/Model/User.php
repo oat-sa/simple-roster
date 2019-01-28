@@ -83,6 +83,8 @@ class User implements ModelInterface
      */
     public function setAssignments(array $assignments): self
     {
+        $this->assignments = [];
+
         $this->addAssignment(...$assignments);
 
         return $this;
