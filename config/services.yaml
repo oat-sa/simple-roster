@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: en
+    locale: 'en'
 
 services:
     # default configuration for services in *this* file
@@ -65,14 +65,14 @@ services:
         tags: ['app.ingester']
 
     app.prop_normalizer.with_extractor:
-      class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-      arguments:
-        $propertyTypeExtractor: '@property_info.reflection_extractor'
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        arguments:
+            $propertyTypeExtractor: '@property_info.reflection_extractor'
 
     app.serializer.odm:
-      class: Symfony\Component\Serializer\Serializer
-      arguments:
-        $normalizers:
-          - '@serializer.normalizer.datetime'
-          - '@serializer.denormalizer.array'
-          - '@app.prop_normalizer.with_extractor'
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            $normalizers:
+                - '@serializer.normalizer.datetime'
+                - '@serializer.denormalizer.array'
+                - '@app.prop_normalizer.with_extractor'
