@@ -2,6 +2,7 @@
 
 namespace App\Controller\ApiV1;
 
+use App\Lti\LaunchRequestBuilder;
 use App\Model\Assignment;
 use App\Model\Infrastructure;
 use App\Model\LineItem;
@@ -67,23 +68,19 @@ class AssignmentController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/lti-link", name="api_v1_get_assignment_lti_link", methods={"GET"})
+     * @Route("/{id}/lti-link", name="api_v1_get_assignment_lti_link", methods={"GET"}, requirements={"id"="\d+"})
      */
-    public function getAssignmentLtiLink(?string $id, InfrastructureManager $infrastructureManager, LineItemManager $lineItemManager)
+    public function getAssignmentLtiLink(int $id, InfrastructureManager $infrastructureManager, LineItemManager $lineItemManager, LaunchRequestBuilder $launchRequestBuilder)
     {
         if ($id === null) {
             throw new BadRequestHttpException('Mandatory parameter "id" is missing');
         }
 
-        if (!is_numeric($id)) {
-            throw new BadRequestHttpException('"id" should be numeric');
-        }
-
         /** @var User $user */
         $user = $this->getUser();
         $foundAssignment = null;
-        foreach ($user->getAssignments() as $assignmentId => $assignment) {
-            if ($assignmentId === $id - 1) {
+        foreach ($user->getAssignments() as $assignment) {
+            if ($assignment->getId() === $id) {
                 $foundAssignment = $assignment;
                 continue;
             }
@@ -96,34 +93,23 @@ class AssignmentController extends AbstractController
         /** @var LineItem $lineItem */
         $lineItem = $lineItemManager->read($foundAssignment->getLineItemTaoUri());
 
+        if ($lineItem === null) {
+            throw new \Exception(sprintf('Line item "%s" has disappeared.', $lineItem->getTaoUri()));
+        }
+
         /** @var Infrastructure $infrastructure */
         $infrastructure = $infrastructureManager->read($lineItem->getInfrastructureId());
+        if ($infrastructure === null) {
+            throw new \Exception(sprintf('Infrastructure "%s" has disappeared.', $infrastructure->getId()));
+        }
 
-        $roles = [];
+        $request = $launchRequestBuilder->build($user, $lineItem, $infrastructure);
 
-        // @todo make a signature
+        $requestParameters = $request->getAllParameters();
 
-        return new JsonResponse(
-            [
-                'ltiLink' => $infrastructure->getLtiDirectorLink() . base64_encode($lineItem->getTaoUri()),
-                'lti_message_type' => 'basic-lti-launch-request',
-                'lti_version' => 'LTI-1p0',
+        $response = $requestParameters;
+        $response['ltiLink'] = $request->getUrl();
 
-                'resource_link_id' => rand(0, 9999999),
-                'resource_link_title' => 'Launch Title',
-                'resource_link_label' => 'Launch label',
-
-                'context_id' => 'Service call ID',
-                'context_title' => 'Launch Title',
-                'context_label' => 'Launch label',
-
-                'user_id' => $user->getLogin(),
-                'roles' => implode(',', $roles),
-                'lis_person_name_full' => $user->getLogin(),
-
-                'tool_consumer_info_product_family_code' => 'Roster',
-                'tool_consumer_info_version' => '1.0.0',
-            ]
-        );
+        return new JsonResponse($response);
     }
 }
