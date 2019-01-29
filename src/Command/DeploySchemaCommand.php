@@ -95,13 +95,13 @@ class DeploySchemaCommand extends Command
                 'TableName' => 'users',
                 'KeySchema' => [
                     [
-                        'AttributeName' => 'login',
+                        'AttributeName' => 'username',
                         'KeyType' => 'HASH'
                     ]
                 ],
                 'AttributeDefinitions' => [
                     [
-                        'AttributeName' => 'login',
+                        'AttributeName' => 'username',
                         'AttributeType' => 'S'
                     ]
                 ],

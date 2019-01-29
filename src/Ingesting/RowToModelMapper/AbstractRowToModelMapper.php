@@ -6,13 +6,22 @@ use App\Model\ModelInterface;
 
 abstract class AbstractRowToModelMapper
 {
+    protected function convertStringToDateTime(string $dateTimeString)
+    {
+         $result = \DateTime::createFromFormat('Y-m-d H:i:s', $dateTimeString);
+         if ($result === false) {
+             return null;
+         }
+         return $result;
+    }
+
     protected function mapFileLineByFieldNames(array $row, array $fieldNames): array
     {
         $fieldValues = [];
 
         $numberOfLineElement = 0;
         foreach ($fieldNames as $fieldName) {
-            $fieldValues[$fieldName] = array_key_exists($numberOfLineElement, $row) ? $row[$numberOfLineElement] : null;
+            $fieldValues[$fieldName] = $row[$numberOfLineElement] ?? null;
             $numberOfLineElement++;
         }
 

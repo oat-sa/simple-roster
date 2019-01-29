@@ -2,10 +2,7 @@
 
 namespace App\Ingesting\Ingester;
 
-use App\Ingesting\RowToModelMapper\UserRowToModelMapper;
 use App\Model\ModelInterface;
-use App\ModelManager\UserManager;
-use App\Validation\ModelValidator;
 
 class UserAndAssignmentsIngester extends AbstractIngester
 {
@@ -14,9 +11,9 @@ class UserAndAssignmentsIngester extends AbstractIngester
      */
     protected $updateMode = true;
 
-    public function __construct(UserManager $modelStorage, UserRowToModelMapper $rowToModelMapper, ModelValidator $validator)
+    public function getType(): string
     {
-        parent::__construct($modelStorage, $rowToModelMapper, $validator);
+        return self::TYPE_USER_AND_ASSIGNMENT;
     }
 
     /**
@@ -24,6 +21,6 @@ class UserAndAssignmentsIngester extends AbstractIngester
      */
     protected function convertRowToModel(array $row): ModelInterface
     {
-        return $this->rowToModelMapper->map($row, ['login', 'password']);
+        return $this->rowToModelMapper->map($row, ['username', 'password']);
     }
 }

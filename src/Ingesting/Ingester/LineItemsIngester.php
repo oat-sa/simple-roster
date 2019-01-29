@@ -2,16 +2,13 @@
 
 namespace App\Ingesting\Ingester;
 
-use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
 use App\Model\ModelInterface;
-use App\ModelManager\LineItemManager;
-use App\Validation\ModelValidator;
 
 class LineItemsIngester extends AbstractIngester
 {
-    public function __construct(LineItemManager $modelStorage, LineItemRowToModelMapper $rowToModelMapper, ModelValidator $lineItemValidator)
+    public function getType(): string
     {
-        parent::__construct($modelStorage, $rowToModelMapper, $lineItemValidator);
+        return self::TYPE_LINE_ITEM;
     }
 
     /**
@@ -19,7 +16,8 @@ class LineItemsIngester extends AbstractIngester
      */
     protected function convertRowToModel(array $row): ModelInterface
     {
-        return $this->rowToModelMapper->map($row,
+        return $this->rowToModelMapper->map(
+            $row,
             ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time']
         );
     }

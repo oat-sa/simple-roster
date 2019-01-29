@@ -2,8 +2,12 @@
 
 namespace App\Model;
 
+use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Item(table="users", primaryKey="username")
+ */
 class User implements ModelInterface
 {
     /**
@@ -11,7 +15,7 @@ class User implements ModelInterface
      *
      * @Assert\NotBlank
      */
-    private $login;
+    private $username;
 
     /**
      * @var string
@@ -22,26 +26,31 @@ class User implements ModelInterface
 
     /**
      * @var Assignment[]
+     *
+     * @Assert\Valid
      */
     private $assignments = [];
 
     /**
-     * @param $login
-     * @param $password
+     * @param string $username
+     * @param string $password
      * @param Assignment[] $assignments
      */
-    public function __construct(string $login, string $password, array $assignments = [])
+    public function __construct(string $username, string $password, array $assignments = [])
     {
-        $this->login = $login;
+        $this->username = $username;
         $this->password = $password;
-        $this->assignments = $assignments;
+
+        if (!empty($assignments)) {
+            $this->addAssignment(...$assignments);
+        }
     }
 
     /**
      * @param Assignment ...$assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(Assignment ...$assignments): int
+    public function addAssignment(Assignment ...$assignments): int
     {
         $addedCount = 0;
 
@@ -62,9 +71,28 @@ class User implements ModelInterface
         return $addedCount;
     }
 
-    public function getLogin(): string
+    /**
+     * Setter method is required for the serializer to be able to denormalize
+     * the nested raw data from DynamoDB.
+     *
+     * Only setter denormalization works for nested data at the moment:
+     * @see https://github.com/symfony/symfony/issues/28081
+     *
+     * @param Assignment[] $assignments
+     * @return User
+     */
+    public function setAssignments(array $assignments): self
     {
-        return $this->login;
+        $this->assignments = [];
+
+        $this->addAssignment(...$assignments);
+
+        return $this;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
     }
 
     public function getPassword(): string

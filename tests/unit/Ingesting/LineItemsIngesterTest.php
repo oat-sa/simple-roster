@@ -4,19 +4,15 @@ namespace App\Tests\Unit\Ingesting;
 
 use App\Ingesting\Ingester\LineItemsIngester;
 use App\Ingesting\RowToModelMapper\LineItemRowToModelMapper;
-use App\ModelManager\LineItemManager;
-use App\Validation\ModelValidator;
 
 class LineItemsIngesterTest extends AbstractIngesterTest
 {
     public function setUp()
     {
-        $this->modelManager = $this->createMock(LineItemManager::class);
-        $this->rowToModelMapper = $this->createMock(LineItemRowToModelMapper::class);
-        $this->modelValidator = $this->createMock(ModelValidator::class);
-        $this->ingester = new LineItemsIngester($this->modelManager, $this->rowToModelMapper, $this->modelValidator);
-
         parent::setUp();
+
+        $this->rowToModelMapper = $this->createMock(LineItemRowToModelMapper::class);
+        $this->ingester = new LineItemsIngester($this->itemManager, $this->rowToModelMapper);
     }
 
     public function itemsProvider()
