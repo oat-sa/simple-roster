@@ -69,15 +69,15 @@ $ bin/console roster:local-ingest /path/to/line-items.csv --data-type=line-items
 
 CSV fields for line items are: 
 1. `tao_uri` string, **required** `must be unique`
-2. `title` string, **required**
+2. `label` string, **required**
 3. `infrastructure_id` string, **required** `infrastructure must be already ingested`
 4. `start_date_time` string, _optional_ format: 2019-01-26 18:30:00
 5. `end_date_time` string, _optional_ format: 2019-01-26 18:30:00
 
 Example:
 ```csv
-"http://tao.installation/delivery_1.rdf", "some title", "some infrastructure 2",,
-"http://tao.installation/delivery_2.rdf", "some title", "some infrastructure 1", "start", "end",
+"http://tao.installation/delivery_1.rdf", "some label", "some infrastructure 1",,
+"http://tao.installation/delivery_2.rdf", "some label2", "some infrastructure 2", "2019-01-26 10:00:00", "2019-02-20 18:00:00",
 ```
 
 In case a line-item with the same `tao_uri` already exists, this line of CSV will be skipped (not updated!).

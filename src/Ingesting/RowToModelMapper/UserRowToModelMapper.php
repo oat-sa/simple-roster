@@ -5,17 +5,18 @@ namespace App\Ingesting\RowToModelMapper;
 use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use App\ODM\Id\IdGeneratorInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
     private $idGenerator;
+    private $passwordEncoder;
 
-    public function __construct(IdGeneratorInterface $idGenerator, EncoderFactoryInterface $encoderFactory)
+    public function __construct(IdGeneratorInterface $idGenerator, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->idGenerator = $idGenerator;
-        $this->encoderFactory = $encoderFactory;
+        $this->passwordEncoder = $passwordEncoder;
     }
 
     public function map(array $row, array $fieldNames): ModelInterface
@@ -39,15 +40,12 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         unset($fieldValues['assignments']);
 
         /** @var User $user */
-        $user = new User($fieldValues['username'], $fieldValues['password']);
-
-        $user->addAssignment(...$assignments);
+        $user = new User($fieldValues['username'], $assignments);
 
         // encrypt user password
-        $encoder = $this->encoderFactory->getEncoder($user);
-        $salt = base64_encode(random_bytes(30));
-        $encodedPassword = $encoder->encodePassword($user->getPassword(), $salt);
-        $user->setPasswordAndSalt($encodedPassword, $salt);
+        $encodedPassword = $this->passwordEncoder->encodePassword($user, $fieldValues['password']);
+
+        $user->setPassword($encodedPassword);
 
         return $user;
     }

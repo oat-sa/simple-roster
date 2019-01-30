@@ -4,13 +4,12 @@ namespace App\Model;
 
 use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Item(table="users", primaryKey="username")
  */
-class User implements ModelInterface, UserInterface, EncoderAwareInterface
+class User implements ModelInterface, UserInterface, \Serializable
 {
     /**
      * @var string
@@ -20,7 +19,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
     private $username;
 
     /**
-     * @var string
+     * @var string The hashed password
      *
      * @Assert\NotBlank
      */
@@ -33,10 +32,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
      */
     private $assignments = [];
 
-    /**
-     * @var string
-     */
-    private $salt;
+    private $roles = [];
 
     /**
      * @param string $username
@@ -44,15 +40,13 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
      * @param string $salt
      * @param Assignment[] $assignments
      */
-    public function __construct(string $username, string $password, ?string $salt = null, array $assignments = [])
+    public function __construct(string $username, array $assignments = [])
     {
         $this->username = $username;
-        $this->password = $password;
 
         if (!empty($assignments)) {
             $this->addAssignment(...$assignments);
         }
-        $this->salt = $salt;
     }
 
     /**
@@ -99,14 +93,31 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         return $this;
     }
 
+    /**
+     * @see UserInterface
+     */
     public function getUsername(): string
     {
         return $this->username;
     }
 
+    /**
+     * @see UserInterface
+     */
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    /**
+     * @param string $password
+     * @return User
+     */
+    public function setPassword(string $password): User
+    {
+        $this->password = $password;
+
+        return $this;
     }
 
     /**
@@ -117,30 +128,56 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         return $this->assignments;
     }
 
-    public function getRoles()
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = $this->roles;
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
     public function getSalt()
     {
-        return $this->salt;
+        // not needed when using the "argon2i" algorithm in security.yaml
     }
 
+    /**
+     * @see UserInterface
+     */
     public function eraseCredentials()
     {
-        $this->password = '***';
-        $this->salt = '***';
+        // If you store any temporary, sensitive data on the user, clear it here like
+        // $this->plainPassword = null;
     }
 
-    public function getEncoderName()
+    public function serialize(): string
     {
-        return 'harsh';
+        return serialize([
+            $this->username,
+            $this->password
+        ]);
     }
 
-    public function setPasswordAndSalt(string $password, string $salt): void
+    public function unserialize($serialized): void
     {
-        $this->password = $password;
-        $this->salt = $salt;
+        list (
+            $this->username,
+            $this->password,
+            ) = unserialize($serialized);
     }
 }

@@ -15,6 +15,7 @@ services:
           # fetching services directly from the container via $container->get() won't work.
           # The best practice is to be explicit about your dependencies anyway.
         bind:
+            $debug: '%kernel.debug%'
             $awsVersion: '%env(AWS_VERSION)%'
             $awsRegion: '%env(AWS_REGION)%'
             $odmSerializer: '@app.serializer.odm'
@@ -77,12 +78,5 @@ services:
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
 
-    App\Security\LoginManagerInterface:
-        class: App\Security\LoginManager
-
-    Symfony\Component\Security\Guard\GuardAuthenticatorHandler:
-        class: Symfony\Component\Security\Guard\GuardAuthenticatorHandler
-
-    user_provider:
-        class: App\Security\UserProvider
-        public: true
+    app.api.failure_handler:
+        class: App\Security\ApiAuthenticationFailureHandler

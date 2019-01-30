@@ -2,5 +2,5 @@ services:
     _defaults:
         public: true
 
-    App\Storage\StorageInterface:
+    App\ODM\StorageInterface:
         class: App\Storage\InMemoryStorage

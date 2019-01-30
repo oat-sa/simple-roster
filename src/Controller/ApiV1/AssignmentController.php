@@ -5,7 +5,8 @@ namespace App\Controller\ApiV1;
 use App\Model\Assignment;
 use App\Model\LineItem;
 use App\Model\User;
-use App\ModelManager\LineItemManager;
+use App\ODM\ItemManagerInterface;
+use App\Service\AssignmentProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,38 +22,9 @@ class AssignmentController extends AbstractController
     /**
      * @Route("/", name="api_v1_get_assignments", methods={"GET"})
      */
-    public function getAssignments(LineItemManager $lineItemManager): Response
+    public function getAssignments(AssignmentProvider $assignmentProvider): Response
     {
-        $assignmentsToOutput = [];
-
-        /** @var User $user */
-        $user = $this->getUser();
-
-        foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->getState() !== Assignment::STATE_CANCELLED) {
-                /** @var LineItem $lineItem */
-                $lineItem = $lineItemManager->read($assignment->getLineItemTaoUri());
-
-                if ($lineItem === null) {
-                    throw new \Exception('Line item has disappeared.');
-                }
-
-                $assignmentsToOutput[] = [
-                    'id' => $assignment->getId(),
-                    'username' => $user->getUsername(),
-                    'lineItem' => [
-                        'uri' => $lineItem->getTaoUri(),
-                        'login' => $user->getUsername(),
-                        'name' => $lineItem->getTitle(),
-                        'startDateTime' => $lineItem->getStartDateTime()->getTimestamp(),
-                        'endDateTime' => $lineItem->getEndDateTime()->getTimestamp(),
-                        'infrastructure' => $lineItem->getInfrastructureId(),
-                    ]
-                ];
-            }
-        }
-
-        return new JsonResponse(['assignments' => $assignmentsToOutput]);
+        return $this->json(['assignments' => $assignmentProvider->getAssignmentsSerializedForListing()]);
     }
 
     /**

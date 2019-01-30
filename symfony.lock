@@ -1,0 +1,20 @@
+{
+    "symfony/browser-kit": {
+        "version": "v4.1.10"
+    },
+    "symfony/dom-crawler": {
+        "version": "v4.1.10"
+    },
+    "symfony/security": {
+        "version": "v4.1.10"
+    },
+    "symfony/security-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "f8a63faa0d9521526499c0a8f403c9964ecb0527"
+        }
+    }
+}
