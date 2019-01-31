@@ -2,24 +2,19 @@
 
 namespace App\Controller\ApiV1;
 
-use App\Service\AssignmentProvider;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/assignments")
- * @IsGranted("IS_AUTHENTICATED_FULLY")
  */
-class AssignmentController extends AbstractController
+class AssignmentController
 {
     /**
      * @Route("/", name="api_v1_get_assignments", methods={"GET"})
      */
-    public function getAssignments(AssignmentProvider $assignmentProvider): Response
+    public function getAssignments()
     {
-        return $this->json(['assignments' => $assignmentProvider->getAssignmentsSerializedForListing()]);
+        //TODO
     }
 
     /**

@@ -6,17 +6,14 @@ use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
 use App\ODM\Id\IdGeneratorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
     private $idGenerator;
-    private $passwordEncoder;
 
-    public function __construct(IdGeneratorInterface $idGenerator, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(IdGeneratorInterface $idGenerator)
     {
         $this->idGenerator = $idGenerator;
-        $this->passwordEncoder = $passwordEncoder;
     }
 
     public function map(array $row, array $fieldNames): ModelInterface
@@ -40,12 +37,9 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         unset($fieldValues['assignments']);
 
         /** @var User $user */
-        $user = new User($fieldValues['username'], $assignments);
+        $user = new User($fieldValues['username'], $fieldValues['password']);
 
-        // encrypt user password
-        $encodedPassword = $this->passwordEncoder->encodePassword($user, $fieldValues['password']);
-
-        $user->setPassword($encodedPassword);
+        $user->addAssignment(...$assignments);
 
         return $user;
     }

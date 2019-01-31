@@ -243,6 +243,9 @@ components:
         uri:
           type: string
           example: my-tao-instance.com/tao.rdf#123456789 # TODO
+        name:
+          type: string
+          example: Delivery#12
         label:
           type: string
           description: Label for assignment
@@ -286,6 +289,10 @@ components:
           type: string
           description: A human-readable explanation specific to this occurrence of the problem.
           example: Your current balance is 30, but that costs 50.
+        instance:
+          type: string
+          description: A URI reference that identifies the speciic occurrence of the problem.
+          example: /account/12345/msgs/abc
   responses:
     BadRequestResponse:
       description: Bad request

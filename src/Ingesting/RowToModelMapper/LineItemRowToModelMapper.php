@@ -44,6 +44,6 @@ class LineItemRowToModelMapper extends AbstractRowToModelMapper
             }
         }
 
-        return new LineItem($fieldValues['tao_uri'], $fieldValues['label'], $fieldValues['infrastructure_id'], $startDt, $endDt);
+        return new LineItem($fieldValues['tao_uri'], $fieldValues['title'], $fieldValues['infrastructure_id'], $startDt, $endDt);
     }
 }

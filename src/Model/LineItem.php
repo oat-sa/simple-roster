@@ -24,7 +24,7 @@ class LineItem implements ModelInterface
      *
      * @Assert\NotBlank
      */
-    private $label;
+    private $title;
 
     /**
      * @var \DateTimeImmutable
@@ -44,10 +44,10 @@ class LineItem implements ModelInterface
      */
     private $infrastructureId;
 
-    public function __construct(string $taoUri, string $label, string $infrastructureId, ?\DateTimeImmutable $startDateTime = null, ?\DateTimeImmutable $endDateTime = null)
+    public function __construct(string $taoUri, string $title, string $infrastructureId, ?\DateTimeImmutable $startDateTime = null, ?\DateTimeImmutable $endDateTime = null)
     {
         $this->taoUri = $taoUri;
-        $this->label = $label;
+        $this->title = $title;
         $this->infrastructureId = $infrastructureId;
         $this->startDateTime = $startDateTime;
         $this->endDateTime = $endDateTime;
@@ -66,9 +66,9 @@ class LineItem implements ModelInterface
         return $this->infrastructureId;
     }
 
-    public function getLabel(): string
+    public function getTitle(): string
     {
-        return $this->label;
+        return $this->taoUri;
     }
 
     public function getStartDateTime(): ?\DateTimeImmutable
