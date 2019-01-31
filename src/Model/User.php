@@ -4,11 +4,12 @@ namespace App\Model;
 
 use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Item(table="users", primaryKey="username")
  */
-class User implements ModelInterface
+class User implements ModelInterface, UserInterface, \Serializable
 {
     /**
      * @var string
@@ -18,7 +19,7 @@ class User implements ModelInterface
     private $username;
 
     /**
-     * @var string
+     * @var string The hashed password
      *
      * @Assert\NotBlank
      */
@@ -31,15 +32,17 @@ class User implements ModelInterface
      */
     private $assignments = [];
 
+    private $roles = [];
+
     /**
      * @param string $username
      * @param string $password
+     * @param string $salt
      * @param Assignment[] $assignments
      */
-    public function __construct(string $username, string $password, array $assignments = [])
+    public function __construct(string $username, array $assignments = [])
     {
         $this->username = $username;
-        $this->password = $password;
 
         if (!empty($assignments)) {
             $this->addAssignment(...$assignments);
@@ -90,14 +93,31 @@ class User implements ModelInterface
         return $this;
     }
 
+    /**
+     * @see UserInterface
+     */
     public function getUsername(): string
     {
         return $this->username;
     }
 
+    /**
+     * @see UserInterface
+     */
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    /**
+     * @param string $password
+     * @return User
+     */
+    public function setPassword(string $password): User
+    {
+        $this->password = $password;
+
+        return $this;
     }
 
     /**
@@ -106,5 +126,58 @@ class User implements ModelInterface
     public function getAssignments(): array
     {
         return $this->assignments;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        // not needed when using the "argon2i" algorithm in security.yaml
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here like
+        // $this->plainPassword = null;
+    }
+
+    public function serialize(): string
+    {
+        return serialize([
+            $this->username,
+            $this->password
+        ]);
+    }
+
+    public function unserialize($serialized): void
+    {
+        list (
+            $this->username,
+            $this->password,
+            ) = unserialize($serialized);
     }
 }
