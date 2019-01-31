@@ -38,6 +38,14 @@ services:
         volumes:
           - simple_roster_redis_data:/data
 
+    simple_roster_dynamodb:
+        container_name: simple_roster_dynamodb
+        image: amazon/dynamodb-local
+        networks:
+          - simple_roster_network
+        ports:
+          - "8000:8000"
+
     simple_roster_blackfire:
         container_name: simple_roster_blackfire
         image: blackfire/blackfire
