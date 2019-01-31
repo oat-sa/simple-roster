@@ -77,6 +77,3 @@ services:
                 - '@serializer.normalizer.datetime'
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
-
-    app.api.failure_handler:
-        class: App\Security\ApiAuthenticationFailureHandler

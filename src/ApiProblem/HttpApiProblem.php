@@ -14,6 +14,9 @@ class HttpApiProblem implements ApiProblemInterface
     private $title;
     private $detail = '';
 
+    /**
+     * Note: add new titles here, for example for validation
+     */
     private static $titles = [];
 
     public function __construct($statusCode, $type = null)

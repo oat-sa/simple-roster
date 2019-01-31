@@ -23,7 +23,7 @@ security:
             json_login:
                 check_path: api_v1_auth_login
                 remember_me: false
-                failure_handler: app.api.failure_handler
+                failure_handler: App\Security\ApiAuthenticationFailureHandler
 
             # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
 

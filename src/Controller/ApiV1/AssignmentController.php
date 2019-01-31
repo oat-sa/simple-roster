@@ -2,13 +2,8 @@
 
 namespace App\Controller\ApiV1;
 
-use App\Model\Assignment;
-use App\Model\LineItem;
-use App\Model\User;
-use App\ODM\ItemManagerInterface;
 use App\Service\AssignmentProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
