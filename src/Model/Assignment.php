@@ -69,4 +69,9 @@ class Assignment implements ModelInterface
     {
         return $this->state;
     }
+
+    public function isCancelled(): bool
+    {
+        return $this->state === self::STATE_CANCELLED;
+    }
 }

@@ -18,7 +18,7 @@ class LineItemsIngester extends AbstractIngester
     {
         return $this->rowToModelMapper->map(
             $row,
-            ['tao_uri', 'title', 'infrastructure_id', 'start_date_time', 'end_date_time']
+            ['tao_uri', 'label', 'infrastructure_id', 'start_date_time', 'end_date_time']
         );
     }
 }
