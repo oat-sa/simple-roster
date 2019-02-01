@@ -1,6 +1,6 @@
 App\Entity\Infrastructure:
     type: entity
-    table: infrastructure
+    table: infrastructures
     repositoryClass: App\Repository\InfrastructureRepository
     id:
         id:
