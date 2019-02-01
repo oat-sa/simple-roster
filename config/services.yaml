@@ -25,7 +25,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Ingesting/Source,Ingesting/Exception,Model,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -50,21 +50,6 @@ services:
             $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
             $marshaler: '@Aws\DynamoDb\Marshaler'
 
-    App\Ingesting\Ingester\InfrastructuresIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper'
-        tags: ['app.ingester']
-
-    App\Ingesting\Ingester\LineItemsIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\LineItemRowToModelMapper'
-        tags: ['app.ingester']
-
-    App\Ingesting\Ingester\UserAndAssignmentsIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\UserRowToModelMapper'
-        tags: ['app.ingester']
-
     app.prop_normalizer.with_extractor:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
         arguments:
@@ -77,3 +62,12 @@ services:
                 - '@serializer.normalizer.datetime'
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
+
+    App\Ingester\Ingester\UserIngester:
+        tags: ['app.ingester']
+
+    App\Ingester\Ingester\InfrastructureIngester:
+        tags: ['app.ingester']
+
+    App\Ingester\Ingester\LineItemIngester:
+        tags: ['app.ingester']

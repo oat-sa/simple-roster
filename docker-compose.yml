@@ -40,7 +40,7 @@ services:
 
     simple_roster_postgres:
         container_name: simple_roster_postgres
-        image: postgres:latest
+        image: postgres:9.5.15
         networks:
           - simple_roster_network
         ports:

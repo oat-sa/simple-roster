@@ -6,7 +6,7 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class LineItem
+class LineItem implements EntityInterface
 {
     /** @var int */
     private $id;

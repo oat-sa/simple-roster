@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-class Infrastructure
+class Infrastructure implements EntityInterface
 {
     /** @var int */
     private $id;

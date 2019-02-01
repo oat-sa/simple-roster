@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-class Assignment
+class Assignment implements EntityInterface
 {
     /** @var int */
     private $id;
