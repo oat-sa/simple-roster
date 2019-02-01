@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -30,6 +30,7 @@ class UserRepository extends ServiceEntityRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
+            ->useResultCache(true)
             ->getOneOrNullResult();
     }
 }

@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Generator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -97,6 +98,21 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Generator|Assignment[]
+     */
+    public function getAvailableAssignments(): Generator
+    {
+        foreach ($this->getAssignments() as $assignment) {
+            // cancelled assignment cannot be listed
+            if ($assignment->isCancelled()) {
+                continue;
+            }
+
+            yield $assignment;
+        }
     }
 
     /**
