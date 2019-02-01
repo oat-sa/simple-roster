@@ -1,6 +1,6 @@
 App\Entity\Assignment:
     type: entity
-    table: assignment
+    table: assignments
     repositoryClass: App\Repository\AssignmentRepository
     id:
         id:

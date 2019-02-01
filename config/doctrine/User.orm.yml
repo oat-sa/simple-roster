@@ -1,6 +1,6 @@
 App\Entity\User:
     type: entity
-    table: user
+    table: users
     repositoryClass: App\Repository\UserRepository
     id:
         id:
@@ -29,7 +29,7 @@ App\Entity\User:
             nullable: false
             precision: 0
         roles:
-            type: array
+            type: json_array
             scale: 0
             length: null
             unique: false

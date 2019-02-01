@@ -24,6 +24,9 @@ class User implements UserInterface
     /** @var string[] */
     private $roles = [];
 
+    /** @var string */
+    private $plainPassword;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
@@ -54,6 +57,13 @@ class User implements UserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }
@@ -89,7 +99,6 @@ class User implements UserInterface
         return $this;
     }
 
-
     /**
      * @see UserInterface
      */
@@ -102,8 +111,6 @@ class User implements UserInterface
 
         return array_unique($roles);
     }
-
-
 
     /**
      * @see UserInterface
@@ -118,7 +125,6 @@ class User implements UserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here like
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 }

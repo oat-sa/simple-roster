@@ -1,6 +1,6 @@
 App\Entity\LineItem:
     type: entity
-    table: line_item
+    table: line_items
     repositoryClass: App\Repository\LineItemRepository
     id:
         id:

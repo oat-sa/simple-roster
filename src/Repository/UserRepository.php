@@ -18,4 +18,18 @@ class UserRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, User::class);
     }
+
+    public function getByUsernameWithAssignments(string $username): ?User
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->select('u, a, l, i')
+            ->leftJoin('u.assignments', 'a')
+            ->leftJoin('a.lineItem', 'l')
+            ->leftJoin('l.infrastructure', 'i')
+            ->where('u.username = :username')
+            ->setParameter('username', $username)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
