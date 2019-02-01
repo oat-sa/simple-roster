@@ -27,6 +27,7 @@ To run the application using PHP's built-in web server (or [Configure your Web S
 This project provides a ready to use docker stack with:
 - php fpm 7.2
 - nginx
+- postgres (container persistent storage)
 - redis (container persistent storage)
 - blackfire
 
@@ -50,26 +51,6 @@ If you need to use blackfire, you can simply edit the `.env` file settings with 
 ```yaml
 BLACKFIRE_SERVER_ID=<your_backfire_id>
 BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
-```
-
-### DynamoDB settings
-
-- First download the local version of DynamoDB: [DynamoDB (Downloadable Version)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
-- Configure the AWS variables and any other env variables: copy `.env` into `.env.local`
-
-```dotenv
-    AWS_REGION=eu-west-1
-    AWS_VERSION=latest
-    AWS_KEY=
-    AWS_SECRET=
-    
-    DYNAMODB_ENDPOINT=http://localhost:8000
-```
-
-- Deploy DynamoDB schema:
-
-```bash
- $ bin/console roster:deploy:schema
 ```
 
 ## Vocabulary
