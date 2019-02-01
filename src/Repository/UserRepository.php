@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Generator\UserCacheIdGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -14,9 +15,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    /** @var UserCacheIdGenerator */
+    private $userCacheIdGenerator;
+
+    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator)
     {
         parent::__construct($registry, User::class);
+
+        $this->userCacheIdGenerator = $userCacheIdGenerator;
     }
 
     public function getByUsernameWithAssignments(string $username): ?User
@@ -30,7 +36,7 @@ class UserRepository extends ServiceEntityRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
-            ->useResultCache(true)
+            ->useResultCache(true, null, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
     }
 }
