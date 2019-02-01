@@ -18,7 +18,7 @@ App\Entity\User:
             type: string
             scale: 0
             length: 255
-            unique: false
+            unique: true
             nullable: false
             precision: 0
         password:
