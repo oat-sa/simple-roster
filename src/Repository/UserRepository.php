@@ -23,8 +23,10 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('u')
-            ->select('u, a')
+            ->select('u, a, l, i')
             ->leftJoin('u.assignments', 'a')
+            ->leftJoin('a.lineItem', 'l')
+            ->leftJoin('l.infrastructure', 'i')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
