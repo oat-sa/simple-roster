@@ -38,13 +38,19 @@ services:
         volumes:
           - simple_roster_redis_data:/data
 
-    simple_roster_dynamodb:
-        container_name: simple_roster_dynamodb
-        image: amazon/dynamodb-local
+    simple_roster_postgres:
+        container_name: simple_roster_postgres
+        image: postgres:latest
         networks:
           - simple_roster_network
         ports:
-          - "8000:8000"
+          - "5432:5432"
+        environment:
+          - DB_USER=simple-roster
+          - DB_PASS=simple-roster
+          - DB_NAME=simple-roster
+        volumes:
+          - simple_roster_postgres_data:/var/lib/postgresql
 
     simple_roster_blackfire:
         container_name: simple_roster_blackfire
@@ -59,6 +65,8 @@ services:
 
 volumes:
     simple_roster_redis_data:
+       driver: local
+    simple_roster_postgres_data:
        driver: local
 
 networks:
