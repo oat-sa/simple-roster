@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -13,6 +14,9 @@ class LineItem
 
     /** @var string */
     private $label;
+
+    /** @var string */
+    private $slug;
 
     /** @var DateTime */
     private $startAt;
@@ -48,24 +52,36 @@ class LineItem
         return $this;
     }
 
-    public function getStartAt(): ?\DateTimeInterface
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getStartAt(): ?DateTimeInterface
     {
         return $this->startAt;
     }
 
-    public function setStartAt(\DateTimeInterface $startAt): self
+    public function setStartAt(DateTimeInterface $startAt): self
     {
         $this->startAt = $startAt;
 
         return $this;
     }
 
-    public function getEndAt(): ?\DateTimeInterface
+    public function getEndAt(): ?DateTimeInterface
     {
         return $this->endAt;
     }
 
-    public function setEndAt(\DateTimeInterface $endAt): self
+    public function setEndAt(DateTimeInterface $endAt): self
     {
         $this->endAt = $endAt;
 
@@ -77,7 +93,7 @@ class LineItem
         return $this->infrastructure;
     }
 
-    public function setInfrastructure(?Infrastructure $infrastructure): self
+    public function setInfrastructure(Infrastructure $infrastructure): self
     {
         $this->infrastructure = $infrastructure;
 

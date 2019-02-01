@@ -38,7 +38,7 @@ class Assignment
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -50,7 +50,7 @@ class Assignment
         return $this->lineItem;
     }
 
-    public function setLineItem(?LineItem $lineItem): self
+    public function setLineItem(LineItem $lineItem): self
     {
         $this->lineItem = $lineItem;
 
