@@ -1,6 +1,6 @@
 security:
     encoders:
-        App\Model\User:
+        App\Entity\User:
             algorithm: argon2i
             # maximum memory (in KiB) that may be used to compute the Argon2 hash
             memory_cost: 4096
