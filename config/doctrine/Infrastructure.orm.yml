@@ -1,0 +1,48 @@
+App\Entity\Infrastructure:
+    type: entity
+    table: infrastructure
+    repositoryClass: App\Repository\InfrastructureRepository
+    id:
+        id:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            id: true
+            generator:
+                strategy: SEQUENCE
+    fields:
+        label:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+        ltiDirectorLink:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+            column: lti_director_link
+        ltiKey:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+            column: lti_key
+        ltiSecret:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+            column: lti_secret
+    lifecycleCallbacks: {  }
