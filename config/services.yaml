@@ -19,7 +19,6 @@ services:
             $awsVersion: '%env(AWS_VERSION)%'
             $awsRegion: '%env(AWS_REGION)%'
             $odmSerializer: '@app.serializer.odm'
-            $ingesters: !tagged app.ingester
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -71,3 +70,9 @@ services:
 
     App\Ingester\Ingester\LineItemIngester:
         tags: ['app.ingester']
+
+    App\Ingester\Source\LocalCsvIngesterSource:
+        tags: ['app.ingester_source']
+
+    App\Ingester\Source\S3CsvIngesterSource:
+        tags: ['app.ingester_sourcee']

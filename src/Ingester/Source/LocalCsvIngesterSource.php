@@ -5,24 +5,11 @@ namespace App\Ingester\Source;
 use Generator;
 use Exception;
 
-class LocalCsvIngesterSource implements IngesterSourceInterface
+class LocalCsvIngesterSource extends AbstractIngesterSource
 {
-    const NAME = 'local';
-
-    /** @var string */
-    private $filename;
-
-    private $delimiter;
-
-    public function __construct(string $filename, $delimiter)
-    {
-        $this->filename = $filename;
-        $this->delimiter = $delimiter;
-    }
-
     public function getName(): string
     {
-        return static::NAME;
+        return 'local';
     }
 
     /**
@@ -30,13 +17,13 @@ class LocalCsvIngesterSource implements IngesterSourceInterface
      */
     public function read(): Generator
     {
-        if (!file_exists($this->filename)) {
-            throw new Exception('Invalid file ' . $this->filename);
+        if (!file_exists($this->path)) {
+            throw new Exception('Invalid file path ' . $this->path);
         }
 
-        $fileHandle = fopen($this->filename, 'r');
+        $fileHandle = fopen($this->path, 'r');
         if (false === $fileHandle) {
-            throw new Exception('Cannor read' . $this->filename);
+            throw new Exception('Cannot read file path' . $this->path);
         }
 
         while (($line = fgetcsv($fileHandle, null, $this->delimiter)) !== false) {
