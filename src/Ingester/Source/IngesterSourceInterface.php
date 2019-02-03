@@ -2,15 +2,14 @@
 
 namespace App\Ingester\Source;
 
-use Generator;
+use App\Ingester\Registry\RegistryItemInterface;
+use Iterator;
 
-interface IngesterSourceInterface
+interface IngesterSourceInterface extends RegistryItemInterface
 {
     const DEFAULT_CSV_DELIMITER = ',';
 
-    public function getName(): string;
-
-    public function read(): Generator;
+    public function read(): Iterator;
 
     public function setPath(string $path): self;
 

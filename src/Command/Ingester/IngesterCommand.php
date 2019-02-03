@@ -41,19 +41,44 @@ class IngesterCommand extends Command
 
     protected function configure()
     {
-        $this->addArgument('type', InputArgument::REQUIRED, sprintf(
-            'Type of the items needed to be ingested. Possible values: ["%s"]',
-            implode('", "', array_keys($this->ingesterRegistry->all()))
-        ));
+        $this->addArgument(
+            'type',
+            InputArgument::REQUIRED,
+            sprintf(
+                'Type of data to be ingested, possible values: ["%s"]',
+                implode('", "', array_keys($this->ingesterRegistry->all()))
+            )
+        );
 
-        $this->addArgument('source', InputArgument::REQUIRED, sprintf(
-            'Source to ingest from. Possible values: ["%s"]',
-            implode('", "', array_keys($this->sourceRegistry->all()))
-        ));
+        $this->addArgument(
+            'source',
+            InputArgument::REQUIRED,
+            sprintf(
+                'Source type to ingest from, possible values: ["%s"]',
+                implode('", "', array_keys($this->sourceRegistry->all()))
+            )
+        );
 
-        $this->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to import');
+        $this->addArgument(
+            'path',
+            InputArgument::REQUIRED,
+            'Source path to ingest from'
+        );
 
-        $this->addOption('delimiter', 'd', InputOption::VALUE_REQUIRED, 'CSV delimiter', IngesterSourceInterface::DEFAULT_CSV_DELIMITER);
+        $this->addOption(
+            'delimiter',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'CSV delimiter',
+            IngesterSourceInterface::DEFAULT_CSV_DELIMITER
+        );
+
+        $this->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Causes data ingestion to be applied into storage'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -62,16 +87,15 @@ class IngesterCommand extends Command
 
         try {
             $ingester = $this->ingesterRegistry->get($input->getArgument('type'));
-            $source = $this->sourceRegistry->get($input->getArgument('source'));
-
-            $source
-                ->setPath($input->getOption('path'))
+            $source = $this->sourceRegistry
+                ->get($input->getArgument('source'))
+                ->setPath($input->getArgument('path'))
                 ->setDelimiter($input->getOption('delimiter'));
 
-            $result = $ingester->ingest($source);
+            $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
-            $this->logger->info($result->getFeedback());
-            $style->success($result->getFeedback());
+            $this->logger->info($result);
+            $style->success($result);
 
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());

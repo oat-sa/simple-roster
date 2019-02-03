@@ -3,7 +3,7 @@
 namespace App\Ingester\Source;
 
 use App\S3\S3ClientInterface;
-use Generator;
+use Iterator;
 
 class S3CsvIngesterSource extends AbstractIngesterSource
 {
@@ -19,12 +19,12 @@ class S3CsvIngesterSource extends AbstractIngesterSource
         $this->bucket = $bucket;
     }
 
-    public function getName(): string
+    public function getRegistryItemName(): string
     {
         return 's3';
     }
 
-    public function read(): Generator
+    public function read(): Iterator
     {
         $response = $this->client->getObject($this->bucket, $this->path);
 

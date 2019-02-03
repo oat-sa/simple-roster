@@ -7,7 +7,7 @@ use App\Entity\Infrastructure;
 
 class InfrastructureIngester extends AbstractIngester
 {
-    public function getName(): string
+    public function getRegistryItemName(): string
     {
         return 'infrastructure';
     }

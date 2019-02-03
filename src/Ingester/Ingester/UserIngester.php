@@ -7,7 +7,7 @@ use App\Entity\User;
 
 class UserIngester extends AbstractIngester
 {
-    public function getName(): string
+    public function getRegistryItemName(): string
     {
         return 'user';
     }

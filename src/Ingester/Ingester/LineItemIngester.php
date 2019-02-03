@@ -7,9 +7,9 @@ use App\Entity\LineItem;
 
 class LineItemIngester extends AbstractIngester
 {
-    public function getName(): string
+    public function getRegistryItemName(): string
     {
-        return 'lineItem';
+        return 'line-item';
     }
 
     protected function createEntity(array $data): EntityInterface

@@ -2,12 +2,12 @@
 
 namespace App\Ingester\Source;
 
-use Generator;
+use Iterator;
 use Exception;
 
 class LocalCsvIngesterSource extends AbstractIngesterSource
 {
-    public function getName(): string
+    public function getRegistryItemName(): string
     {
         return 'local';
     }
@@ -15,7 +15,7 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
     /**
      * @throws Exception
      */
-    public function read(): Generator
+    public function read(): Iterator
     {
         if (!file_exists($this->path)) {
             throw new Exception('Invalid file path ' . $this->path);

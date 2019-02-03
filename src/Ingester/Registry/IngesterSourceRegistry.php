@@ -10,9 +10,16 @@ class IngesterSourceRegistry
     /** @var IngesterSourceInterface[] */
     private $sources = [];
 
+    public function __construct(iterable $sources = [])
+    {
+        foreach ($sources as $source) {
+            $this->add($source);
+        }
+    }
+
     public function add(IngesterSourceInterface $source): self
     {
-        $this->sources[$source->getName()] = $source;
+        $this->sources[$source->getRegistryItemName()] = $source;
 
         return $this;
     }

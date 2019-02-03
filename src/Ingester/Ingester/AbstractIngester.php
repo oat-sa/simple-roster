@@ -17,18 +17,23 @@ abstract class AbstractIngester implements IngesterInterface
         $this->entityManager = $entityManager;
     }
 
-    public function ingest(IngesterSourceInterface $source): IngesterResult
+    public function ingest(IngesterSourceInterface $source, bool $dryRun = true): IngesterResult
     {
         $ingestCount = 0;
 
         foreach ($source->read() as $data) {
-            $this->entityManager->persist($this->createEntity($data));
+            if (!$dryRun) {
+                $this->entityManager->persist($this->createEntity($data));
+            }
+
             $ingestCount++;
         }
 
-        $this->entityManager->flush();
+        if (!$dryRun) {
+            $this->entityManager->flush();
+        }
 
-        return new IngesterResult($this->getName(), $ingestCount);
+        return new IngesterResult($this->getRegistryItemName(), $ingestCount, $dryRun);
     }
 
     abstract protected function createEntity(array $data): EntityInterface;

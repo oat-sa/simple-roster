@@ -62,6 +62,12 @@ services:
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
 
+    App\Ingester\Registry\IngesterRegistry:
+        arguments: [!tagged 'app.ingester']
+
+    App\Ingester\Registry\IngesterSourceRegistry:
+        arguments: [!tagged 'app.ingester_source']
+
     App\Ingester\Ingester\UserIngester:
         tags: ['app.ingester']
 

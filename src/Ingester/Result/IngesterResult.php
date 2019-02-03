@@ -10,10 +10,14 @@ class IngesterResult
     /** @var int */
     private $rowCount;
 
-    public function __construct(string $type, int $rowCount)
+    /** @var bool */
+    private $dryRun = true;
+
+    public function __construct(string $type, int $rowCount, bool $dryRun = true)
     {
         $this->type = $type;
         $this->rowCount = $rowCount;
+        $this->dryRun = $dryRun;
     }
 
     public function getType(): string
@@ -26,10 +30,16 @@ class IngesterResult
         return $this->rowCount;
     }
 
-    public function getFeedback(): string
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
+    }
+
+    public function __toString(): string
     {
         return sprintf(
-            '%s elements of type %s have been ingested.',
+            '%s%s elements of type %s have been ingested.',
+            $this->dryRun ? '[DRY_RUN] ' : '',
             $this->rowCount,
             $this->type
         );

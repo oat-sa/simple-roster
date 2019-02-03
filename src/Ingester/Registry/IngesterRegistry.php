@@ -10,9 +10,16 @@ class IngesterRegistry
     /** @var IngesterInterface[] */
     private $ingesters = [];
 
+    public function __construct(iterable $ingesters = [])
+    {
+        foreach ($ingesters as $ingester) {
+            $this->add($ingester);
+        }
+    }
+
     public function add(IngesterInterface $ingester): self
     {
-        $this->ingesters[$ingester->getName()] = $ingester;
+        $this->ingesters[$ingester->getRegistryItemName()] = $ingester;
 
         return $this;
     }
