@@ -4,7 +4,7 @@ namespace App\Lti;
 
 use Symfony\Component\Serializer\SerializerInterface;
 
-class Request
+class LtiRequest
 {
     /**
      * @var string

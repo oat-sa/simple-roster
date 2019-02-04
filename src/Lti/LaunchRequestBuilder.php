@@ -29,13 +29,13 @@ class LaunchRequestBuilder
         $this->requestParametersSerializer = $requestParametersSerializer;
     }
 
-    public function build(User $user, LineItem $lineItem, Infrastructure $infrastructure): Request
+    public function build(User $user, LineItem $lineItem, Infrastructure $infrastructure): LtiRequest
     {
         $launchUrl = $infrastructure->getLtiDirectorLink() . base64_encode($lineItem->getTaoUri());
 
         $parameterBag = new LtiLaunchParametersBagV1($user->getUsername(), rand(1, 100000000));
 
-        $request = new Request($launchUrl, $parameterBag, $this->requestParametersSerializer);
+        $request = new LtiRequest($launchUrl, $parameterBag, $this->requestParametersSerializer);
 
         $this->oauthSigner->sign($request, $infrastructure->getKey(), $infrastructure->getSecret());
 

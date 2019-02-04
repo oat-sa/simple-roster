@@ -4,7 +4,7 @@ namespace App\Lti;
 
 class OauthSigner
 {
-    public function sign(Request $request, string $consumerKey, string $consumerSecret): void
+    public function sign(LtiRequest $request, string $consumerKey, string $consumerSecret): void
     {
         $nonce = uniqid('', true);
         $timestamp = (new \DateTime('now'))->getTimestamp();
