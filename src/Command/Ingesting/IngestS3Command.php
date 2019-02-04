@@ -19,11 +19,11 @@ class IngestS3Command extends AbstractIngestCommand
      */
     protected $s3Client;
 
-    public function __construct(S3ClientInterface $s3Client)
+    public function __construct(iterable $ingesters, S3ClientInterface $s3Client)
     {
         $this->s3Client = $s3Client;
 
-        parent::__construct();
+        parent::__construct($ingesters);
     }
 
     protected function configure(): void

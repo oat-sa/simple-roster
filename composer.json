@@ -16,6 +16,7 @@
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.81",
         "aws/aws-sdk-php-symfony": "^2.0",
+        "doctrine/annotations": "^1.6",
         "oat-sa/phing-tasks": "^0.1",
         "phing/phing": "^2.16",
         "sensio/framework-extra-bundle": "^5.2",
@@ -26,11 +27,14 @@
         "symfony/framework-bundle": "4.1.*",
         "symfony/security-bundle": "4.1.*",
         "symfony/monolog-bundle": "^3.3",
+        "symfony/property-access": "4.1.*",
+        "symfony/property-info": "4.1.*",
         "symfony/serializer": "4.1.*",
         "symfony/validator": "4.1.*",
         "symfony/yaml": "4.1.*"
     },
     "require-dev": {
+        "ext-intl": "*",
         "mikey179/vfsStream": "^1.6",
         "symfony/debug-bundle": "^3.3|^4.0",
         "symfony/dotenv": "4.1.*",

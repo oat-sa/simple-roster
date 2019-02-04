@@ -2,27 +2,19 @@
 
 namespace App\Ingesting\RowToModelMapper;
 
-use App\AssignmentIdGenerator;
 use App\Model\ModelInterface;
 use App\Model\Assignment;
 use App\Model\User;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use App\ODM\Id\IdGeneratorInterface;
 
 class UserRowToModelMapper extends AbstractRowToModelMapper
 {
-    /**
-     * @var AssignmentIdGenerator
-     */
-    private $assignmentIdGenerator;
+    private $idGenerator;
 
-    /**
-     * @var EncoderFactoryInterface
-     */
-    private $encoderFactory;
-
-    public function __construct(AssignmentIdGenerator $assignmentIdGenerator, EncoderFactoryInterface $encoderFactory)
+    public function __construct(IdGeneratorInterface $idGenerator, EncoderFactoryInterface $encoderFactory)
     {
-        $this->assignmentIdGenerator = $assignmentIdGenerator;
+        $this->idGenerator = $idGenerator;
         $this->encoderFactory = $encoderFactory;
     }
 
@@ -40,8 +32,8 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         $assignmentUris = $fieldValues['assignments'];
         $assignments = [];
         foreach ($assignmentUris as $assignmentUri) {
-            $assignmentId = $this->assignmentIdGenerator->generate($assignments);
-            $newAssignment = new Assignment($assignmentId, $assignmentUri);
+            $id = $this->idGenerator->generate($fieldValues['username']);
+            $newAssignment = new Assignment($id, $assignmentUri);
             $assignments[] = $newAssignment;
         }
         unset($fieldValues['assignments']);
@@ -49,7 +41,7 @@ class UserRowToModelMapper extends AbstractRowToModelMapper
         /** @var User $user */
         $user = new User($fieldValues['username'], $fieldValues['password']);
 
-        $user->addAssignments(...$assignments);
+        $user->addAssignment(...$assignments);
 
         // encrypt user password
         $encoder = $this->encoderFactory->getEncoder($user);

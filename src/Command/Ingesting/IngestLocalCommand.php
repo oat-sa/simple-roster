@@ -2,12 +2,10 @@
 
 namespace App\Command\Ingesting;
 
-use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Source\LocalCsvFileSource;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 
 class IngestLocalCommand extends AbstractIngestCommand
 {

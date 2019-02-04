@@ -3,30 +3,17 @@
 namespace App\Ingesting\Ingester;
 
 use App\Ingesting\Exception\FileLineIsInvalidException;
-use App\Ingesting\Exception\InputOptionException;
+use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\RowToModelMapper\AbstractRowToModelMapper;
 use App\Ingesting\Source\SourceInterface;
 use App\Model\ModelInterface;
-use App\ModelManager\ModelManagerInterface;
-use App\Validation\ModelValidator;
-use App\Validation\ValidationException;
+use App\ODM\ItemManagerInterface;
 
-abstract class AbstractIngester
+abstract class AbstractIngester implements IngesterInterface
 {
-    /**
-     * @var ModelManagerInterface
-     */
-    protected $modelManager;
-
-    /**
-     * @var AbstractRowToModelMapper
-     */
     protected $rowToModelMapper;
-
-    /**
-     * @var ModelValidator
-     */
     protected $validator;
+    private $itemManager;
 
     /**
      * Whether to skip those records already existing or update with new values
@@ -35,11 +22,11 @@ abstract class AbstractIngester
      */
     protected $updateMode = false;
 
-    public function __construct(ModelManagerInterface $modelManager, AbstractRowToModelMapper $rowToModelMapper, ModelValidator $validator)
+
+    public function __construct(ItemManagerInterface $itemManager, AbstractRowToModelMapper $rowToModelMapper)
     {
-        $this->modelManager = $modelManager;
         $this->rowToModelMapper = $rowToModelMapper;
-        $this->validator = $validator;
+        $this->itemManager = $itemManager;
     }
 
     /**
@@ -49,58 +36,35 @@ abstract class AbstractIngester
     abstract protected function convertRowToModel(array $row): ModelInterface;
 
     /**
-     * Checks if the record with same primary key already exists
-     *
-     * @param ModelInterface $entity
-     * @return bool
-     */
-    protected function checkIfExists(ModelInterface $entity): bool
-    {
-        return $this->modelManager->read($this->modelManager->getKey($entity)) !== null;
-    }
-
-    /**
      * @param SourceInterface $source
-     * @param bool $dryRun
+     * @param bool            $wetRun
      * @return array
-     * @throws InputOptionException
-     * @throws \App\Ingesting\Exception\IngestingException
      * @throws FileLineIsInvalidException
-     * @throws \Exception
+     * @throws IngestingException
      */
-    public function ingest(SourceInterface $source, bool $dryRun): array
+    public function ingest(SourceInterface $source, bool $wetRun): array
     {
-        $alreadyExistingRowsCount = $rowsAdded = 0;
-
-        $lineNumber = 0;
-        $modelsToInsert = [];
+        $alreadyExistingRowsCount = $rowsAdded = $lineNumber = 0;
 
         foreach ($source->iterateThroughLines() as $line) {
             $lineNumber++;
             try {
                 $model = $this->convertRowToModel($line);
-                $this->validator->validate($model);
-            } catch (ValidationException $e) {
-                throw new FileLineIsInvalidException($lineNumber, $e->getMessage());
-            } catch (\Throwable $e) {
-                throw new FileLineIsInvalidException($lineNumber, 'Can not construct model. Please fill out all the fields.');
-            }
 
-            if ($this->checkIfExists($model)) {
-                $alreadyExistingRowsCount++;
-                if (!$this->updateMode) {
-                    continue;
+                if ($this->itemManager->isExist($model)) {
+                    $alreadyExistingRowsCount++;
+                    if (!$this->updateMode) {
+                        continue;
+                    }
+                } else {
+                    $rowsAdded++;
                 }
-            } else {
-                $rowsAdded++;
-            }
 
-            $modelsToInsert[] = $model;
-        }
-
-        if (!$dryRun) {
-            foreach ($modelsToInsert as $modelToInsert) {
-                $this->modelManager->insert($modelToInsert);
+                if ($wetRun) {
+                    $this->itemManager->save($model);
+                }
+            } catch (\Throwable $e) {
+                throw new FileLineIsInvalidException($lineNumber, $e->getMessage());
             }
         }
 
@@ -113,5 +77,17 @@ abstract class AbstractIngester
     public function isUpdateMode(): bool
     {
         return $this->updateMode;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getTypes(): array
+    {
+        return [
+            self::TYPE_USER_AND_ASSIGNMENT,
+            self::TYPE_LINE_ITEM,
+            self::TYPE_INFRASTRUCTURE,
+        ];
     }
 }

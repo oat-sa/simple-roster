@@ -8,19 +8,33 @@ _Useful links_
 - [Using Vagrant/Homestead](https://symfony.com/doc/current/setup/homestead.html)
 - [Setting up or Fixing File Permissions](https://symfony.com/doc/current/setup/file_permissions.html)
 
-#### DEV environment
+## DEV environment
 
 ```bash
  $ composer install
 ```
 
-To mock Dynamo DB for local development, use [DynamoDB (Downloadable Version)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
+### DynamoDB settings
 
-To deploy DynamoDB schema:
+- First download the local version of DynamoDB: [DynamoDB (Downloadable Version)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
+- Configure the AWS variables and any other env variables: copy `.env` into `.env.local`
+
+```dotenv
+    AWS_REGION=eu-west-1
+    AWS_VERSION=latest
+    AWS_KEY=
+    AWS_SECRET=
+    
+    DYNAMODB_ENDPOINT=http://localhost:8000
+```
+
+- Deploy DynamoDB schema:
 
 ```bash
  $ bin/console roster:deploy:schema
 ```
+
+### Server settings
 
 To run the application using PHP's built-in web server (or [Configure your Web Server](https://symfony.com/doc/current/setup/web_server_configuration.html)):
 
@@ -36,7 +50,7 @@ To run the application using PHP's built-in web server (or [Configure your Web S
 
 [ModelValidator](src/Validation/ModelValidator.php) validates models. It'sSetup with Docker based on Symfony/Validator.
 
-[ModelStorage](src/Model/Storage/ModelStorageInterface.php) is aware of models and talks to StorageInterface. Uses Symfony/Serializer component (Normalizer interface) to turn Models into arrays before handing over them to the [StorageInterface](src/Storage/StorageInterface.php).
+[ItemManager](src/ODM/ItemManager.php) is aware of models and talks to StorageInterface. Uses Symfony/Serializer component (Normalizer interface) to turn Models into arrays before handing over them to the [StorageInterface](src/Storage/StorageInterface.php).
 
 ### Ingesting
 

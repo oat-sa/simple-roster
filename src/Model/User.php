@@ -2,10 +2,14 @@
 
 namespace App\Model;
 
+use App\ODM\Annotations\Item;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @Item(table="users", primaryKey="username")
+ */
 class User implements ModelInterface, UserInterface, EncoderAwareInterface
 {
     /**
@@ -24,6 +28,8 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
 
     /**
      * @var Assignment[]
+     *
+     * @Assert\Valid
      */
     private $assignments = [];
 
@@ -44,7 +50,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         $this->password = $password;
 
         if (!empty($assignments)) {
-            $this->addAssignments(...$assignments);
+            $this->addAssignment(...$assignments);
         }
         $this->salt = $salt;
     }
@@ -53,7 +59,7 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
      * @param Assignment ...$assignments
      * @return int amount of actually added assignments
      */
-    public function addAssignments(Assignment ...$assignments): int
+    public function addAssignment(Assignment ...$assignments): int
     {
         $addedCount = 0;
 
@@ -72,6 +78,25 @@ class User implements ModelInterface, UserInterface, EncoderAwareInterface
         }
 
         return $addedCount;
+    }
+
+    /**
+     * Setter method is required for the serializer to be able to denormalize
+     * the nested raw data from DynamoDB.
+     *
+     * Only setter denormalization works for nested data at the moment:
+     * @see https://github.com/symfony/symfony/issues/28081
+     *
+     * @param Assignment[] $assignments
+     * @return User
+     */
+    public function setAssignments(array $assignments): self
+    {
+        $this->assignments = [];
+
+        $this->addAssignment(...$assignments);
+
+        return $this;
     }
 
     public function getUsername(): string
