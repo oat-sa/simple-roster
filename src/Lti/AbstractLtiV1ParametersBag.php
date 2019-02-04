@@ -2,7 +2,7 @@
 
 namespace App\Lti;
 
-abstract class AbstractLtiParametersBag implements ParameterBagInterface
+abstract class AbstractLtiV1ParametersBag implements ParameterBagInterface
 {
     /**
      * @var string

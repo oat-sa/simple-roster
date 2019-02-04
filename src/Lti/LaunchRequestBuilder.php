@@ -29,16 +29,19 @@ class LaunchRequestBuilder
         $this->requestParametersSerializer = $requestParametersSerializer;
     }
 
-    public function build(User $user, LineItem $lineItem, Infrastructure $infrastructure): LtiRequest
+    public function build(User $user, LineItem $lineItem, Infrastructure $infrastructure): array
     {
         $launchUrl = $infrastructure->getLtiDirectorLink() . base64_encode($lineItem->getTaoUri());
 
         $parameterBag = new LtiLaunchParametersBagV1($user->getUsername(), rand(1, 100000000));
 
-        $request = new LtiRequest($launchUrl, $parameterBag, $this->requestParametersSerializer);
+        $ltiRequest = new LtiRequest($launchUrl, $parameterBag, $this->requestParametersSerializer);
 
-        $this->oauthSigner->sign($request, $infrastructure->getKey(), $infrastructure->getSecret());
+        $this->oauthSigner->sign($ltiRequest, $infrastructure->getKey(), $infrastructure->getSecret());
 
-        return $request;
+        $ltiRequestParameters = $ltiRequest->getAllParameters();
+        $ltiRequestParameters['ltiLink'] = $ltiRequest->getUrl();
+
+        return $ltiRequestParameters;
     }
 }

@@ -72,21 +72,17 @@ class AssignmentController extends AbstractController
      */
     public function getAssignmentLtiLink(int $id, InfrastructureManager $infrastructureManager, LineItemManager $lineItemManager, LaunchRequestBuilder $launchRequestBuilder)
     {
-        if ($id === null) {
-            throw new BadRequestHttpException('Mandatory parameter "id" is missing');
-        }
-
         /** @var User $user */
         $user = $this->getUser();
         $foundAssignment = null;
         foreach ($user->getAssignments() as $assignment) {
             if ($assignment->getId() === $id) {
                 $foundAssignment = $assignment;
-                continue;
+                break;
             }
         }
 
-        if (!$foundAssignment) {
+        if ($foundAssignment === null) {
             throw $this->createNotFoundException(sprintf('Assignment with ID %d has not been found', $id));
         }
 
@@ -103,13 +99,7 @@ class AssignmentController extends AbstractController
             throw new \Exception(sprintf('Infrastructure "%s" has disappeared.', $infrastructure->getId()));
         }
 
-        $request = $launchRequestBuilder->build($user, $lineItem, $infrastructure);
-
-        $requestParameters = $request->getAllParameters();
-
-        $response = $requestParameters;
-        $response['ltiLink'] = $request->getUrl();
-
-        return new JsonResponse($response);
+        $ltiRequestParameters = $launchRequestBuilder->build($user, $lineItem, $infrastructure);
+        return new JsonResponse($ltiRequestParameters);
     }
 }

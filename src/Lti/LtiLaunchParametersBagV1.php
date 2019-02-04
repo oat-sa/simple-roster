@@ -2,7 +2,7 @@
 
 namespace App\Lti;
 
-class LtiLaunchParametersBagV1 extends AbstractLtiParametersBag
+class LtiLaunchParametersBagV1 extends AbstractLtiV1ParametersBag
 {
     /**
      * @var string
