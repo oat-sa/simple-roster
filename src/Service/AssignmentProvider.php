@@ -22,17 +22,6 @@ class AssignmentProvider
         $this->itemManager = $itemManager;
     }
 
-    public function getAssignmentById(string $id): Assignment
-    {
-        foreach ($this->getUser()->getAssignments() as $assignment) {
-            if ($assignment->getId() === $id) {
-                return $assignment;
-            }
-        }
-
-        throw new NotFoundHttpException('Assignment with id "'. $id .'" not found');
-    }
-
     public function getTakeableAssignments(): \Generator
     {
         foreach ($this->getUser()->getAssignments() as $assignment) {

@@ -27,8 +27,8 @@ class OauthSigner
         $ltiRequest->setOauthParameterBag($oauthBag);
 
         $ltiRequestParameters = array_merge(
-            $this->requestParametersSerializer->serialize($ltiRequest->getLtiParameterBag(), 'plain'),
-            $this->requestParametersSerializer->serialize($ltiRequest->getOauthParameterBag(), 'plain')
+            $this->requestParametersSerializer->normalize($ltiRequest->getLtiParameterBag()),
+            $this->requestParametersSerializer->normalize($ltiRequest->getOauthParameterBag())
         );;
 
         $requestParametersKeys = array_keys($ltiRequestParameters);

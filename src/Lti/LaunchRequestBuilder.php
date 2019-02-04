@@ -40,8 +40,8 @@ class LaunchRequestBuilder
         $this->oauthSigner->sign($ltiRequest, $infrastructure->getKey(), $infrastructure->getSecret());
 
         $ltiRequestParameters = array_merge(
-            $this->requestParametersSerializer->serialize($ltiRequest->getLtiParameterBag(), 'plain'),
-            $this->requestParametersSerializer->serialize($ltiRequest->getOauthParameterBag(), 'plain')
+            $this->requestParametersSerializer->normalize($ltiRequest->getLtiParameterBag()),
+            $this->requestParametersSerializer->normalize($ltiRequest->getOauthParameterBag())
         );;
         $ltiRequestParameters['ltiLink'] = $ltiRequest->getUrl();
 
