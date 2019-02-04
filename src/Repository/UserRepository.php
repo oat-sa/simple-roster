@@ -18,11 +18,15 @@ class UserRepository extends ServiceEntityRepository
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
 
-    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator)
+    /** @var int */
+    private $userCacheTtl;
+
+    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator, int $userCacheTtl)
     {
         parent::__construct($registry, User::class);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
+        $this->userCacheTtl = $userCacheTtl;
     }
 
     public function getByUsernameWithAssignments(string $username): ?User
@@ -36,7 +40,7 @@ class UserRepository extends ServiceEntityRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
-            ->useResultCache(true, null, $this->userCacheIdGenerator->generate($username))
+            ->useResultCache(true, $this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
     }
 }
