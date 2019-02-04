@@ -77,3 +77,25 @@ services:
                 - '@serializer.normalizer.datetime'
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
+
+    serializer.lti_request:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            $normalizers:
+                - !service
+                    class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+                    arguments:
+                        $classMetadataFactory: null
+                        $nameConverter:
+                          !service
+                            class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
+            $encoders:
+                - !service
+                    class: App\Denormalizer\Encoder
+
+    App\Lti\LaunchRequestBuilder:
+        class: App\Lti\LaunchRequestBuilder
+        calls:
+            -   method: setSerializer
+                arguments:
+                    - '@serializer.lti_request'
