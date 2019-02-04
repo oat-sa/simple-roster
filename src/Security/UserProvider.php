@@ -1,56 +1,76 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Security;
 
 use App\Model\User;
-use App\ModelManager\UserManager;
+use App\ODM\ItemManagerInterface;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    /**
-     * @var UserManager
-     */
-    private $userManager;
+    private $itemManager;
 
-    public function __construct(UserManager $userManager)
+    public function __construct(ItemManagerInterface $itemManager)
     {
-        $this->userManager = $userManager;
+        $this->itemManager = $itemManager;
     }
 
     /**
-     * {@inheritdoc}
+     * Symfony calls this method if you use features like switch_user
+     * or remember_me.
+     *
+     * @return UserInterface
+     * @throws UsernameNotFoundException if the user is not found
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
-        $user = $this->userManager->read($username);
+        /** @var User $user */
+        $user = $this->itemManager->load(User::class, $username);
+
         if (!$user) {
             throw new UsernameNotFoundException(sprintf('Username "%s" does not exist', $username));
         }
+
         return $user;
     }
 
     /**
-     * {@inheritdoc}
+     * Refreshes the user after being reloaded from the session.
+     *
+     * When a user is logged in, at the beginning of each request, the
+     * User object is loaded from the session and then this method is
+     * called. Your job is to make sure the user's data is still fresh by,
+     * for example, re-querying for fresh User data.
+     *
+     * If your firewall is "stateless: true" (for a pure API), this
+     * method is not called.
+     *
+     * @return UserInterface
      */
-    public function refreshUser(SecurityUserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
-        $reloadedUser = $this->userManager->read($user->getUsername());
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+        }
+
+        /** @var User $reloadedUser */
+        $reloadedUser = $this->itemManager->load(User::class, $user->getUsername());
 
         if (null === $reloadedUser) {
-            throw new UsernameNotFoundException(sprintf('User with ID "%s" could not be reloaded', $user->getUsername()));
+            throw new UsernameNotFoundException(sprintf('User "%s" could not be reloaded', $user->getUsername()));
         }
 
         return $reloadedUser;
     }
 
     /**
-     * {@inheritdoc}
+     * Tells Symfony to use this provider for this User class.
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        return User::class === $class || is_subclass_of($class, User::class);
+        return User::class === $class;
     }
 }
