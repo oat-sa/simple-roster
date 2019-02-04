@@ -52,12 +52,4 @@ class LtiRequest
     {
         $this->oauthBag = $oauthBag;
     }
-
-    public function getAllParameters(): array
-    {
-        return array_merge(
-            $this->requestParametersSerializer->serialize($this->getLtiParameterBag(), 'plain'),
-            $this->requestParametersSerializer->serialize($this->getOauthParameterBag(), 'plain')
-        );
-    }
 }
