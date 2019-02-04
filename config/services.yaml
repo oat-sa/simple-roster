@@ -87,7 +87,7 @@ services:
                     arguments:
                         $classMetadataFactory: null
                         $nameConverter:
-                          !service
+                            !service
                             class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
             $encoders:
                 - !service
