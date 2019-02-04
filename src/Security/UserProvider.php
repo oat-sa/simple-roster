@@ -2,8 +2,8 @@
 
 namespace App\Security;
 
-use App\Model\User;
-use App\ODM\ItemManagerInterface;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,11 +11,12 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    private $itemManager;
+    /** @var UserRepository */
+    private $userRepository;
 
-    public function __construct(ItemManagerInterface $itemManager)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->itemManager = $itemManager;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -28,7 +29,7 @@ class UserProvider implements UserProviderInterface
     public function loadUserByUsername($username): UserInterface
     {
         /** @var User $user */
-        $user = $this->itemManager->load(User::class, $username);
+        $user = $this->userRepository->getByUsernameWithAssignments($username);
 
         if (!$user) {
             throw new UsernameNotFoundException(sprintf('Username "%s" does not exist', $username));
@@ -57,7 +58,7 @@ class UserProvider implements UserProviderInterface
         }
 
         /** @var User $reloadedUser */
-        $reloadedUser = $this->itemManager->load(User::class, $user->getUsername());
+        $reloadedUser = $this->userRepository->getByUsernameWithAssignments($user->getUsername());
 
         if (null === $reloadedUser) {
             throw new UsernameNotFoundException(sprintf('User "%s" could not be reloaded', $user->getUsername()));
