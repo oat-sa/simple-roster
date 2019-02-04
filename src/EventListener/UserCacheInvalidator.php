@@ -37,7 +37,7 @@ class UserCacheInvalidator
         }
     }
 
-    protected function clearUserCache(User $user, EntityManager $entityManager): void
+    private function clearUserCache(User $user, EntityManager $entityManager): void
     {
         $cacheId = $this->userCacheIdGenerator->generate($user->getUsername());
 
