@@ -11,7 +11,7 @@ App\Entity\User:
             precision: 0
             id: true
             generator:
-                strategy: SEQUENCE
+                strategy: AUTO
     fields:
         username:
             type: string
