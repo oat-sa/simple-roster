@@ -4,9 +4,7 @@ namespace App\Controller\ApiV1;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\CreateUsersAssignmentsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -23,20 +21,6 @@ class AssignmentController extends AbstractController
     public function getAssignments(): Response
     {
         return $this->json(['assignments' => $this->getUser()->getAvailableAssignments()]);
-    }
-
-    /**
-     * @Route("/", name="api_v1_add_assignments", methods={"POST"})
-     */
-    public function addAssignments(Request $request, CreateUsersAssignmentsService $createUsersAssignmentsService): Response
-    {
-        $usernames = json_decode($request->getContent(), true);
-        $users = [];
-        foreach ($usernames as $username) {
-            $users[] = $this->getUserRepository()->getByUsernameWithAssignments($username);
-        }
-
-        return $this->json(['assignments' => $createUsersAssignmentsService->create(...$users)], 201);
     }
 
     /**
