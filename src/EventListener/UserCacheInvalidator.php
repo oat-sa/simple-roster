@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\EntityManager;
@@ -32,6 +33,8 @@ class UserCacheInvalidator
             foreach ($entities as $entity) {
                 if ($entity instanceof User) {
                     $this->clearUserCache($entity, $entityManager);
+                } elseif ($entity instanceof Assignment) {
+                    $this->clearUserCache($entity->getUser(), $entityManager);
                 }
             }
         }
