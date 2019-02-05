@@ -19,6 +19,6 @@ class DummyFunctionalTest extends WebTestCase
             ->getRepository(User::class)
             ->findAll();
 
-        $this->assertCount(10, $users);
+        $this->assertCount(1, $users);
     }
 }

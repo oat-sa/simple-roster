@@ -1,5 +1,5 @@
 App\Entity\User:
-  user{1..10}:
-    username: '<username()>'
-    password: '<password()>'
-    plainPassword: '<password()>'
+  user1:
+    username: 'user1'
+    password: 'password'
+    plainPassword: 'password'
