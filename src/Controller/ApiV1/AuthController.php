@@ -38,7 +38,7 @@ class AuthController extends AbstractController
             $request->getSession()->invalidate();
         }
 
-        $this->container->get('security.token_storage')->setToken(null);
+        $this->container->get('security.token_storage')->setToken();
 
         return $this->json([], 204);
     }

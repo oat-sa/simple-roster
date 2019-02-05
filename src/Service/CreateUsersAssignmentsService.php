@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Assignment;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

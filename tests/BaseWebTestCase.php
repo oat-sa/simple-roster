@@ -2,7 +2,6 @@
 
 namespace App\Tests;
 
-use App\Model\Assignment;
 use App\Model\User;
 use App\ODM\StorageInterface;
 use Symfony\Bundle\FrameworkBundle\Client;

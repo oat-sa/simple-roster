@@ -6,7 +6,6 @@ use App\Ingesting\Exception\FileLineIsInvalidException;
 use App\Ingesting\Exception\IngestingException;
 use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Ingester\AbstractIngester;
-use App\Ingesting\Ingester\IngesterInterface;
 use App\Ingesting\Source\SourceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

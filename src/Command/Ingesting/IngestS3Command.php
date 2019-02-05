@@ -2,7 +2,6 @@
 
 namespace App\Command\Ingesting;
 
-use App\Ingesting\Exception\InputOptionException;
 use App\Ingesting\Source\S3CsvSource;
 use App\Ingesting\Source\SourceInterface;
 use App\S3\S3ClientInterface;
