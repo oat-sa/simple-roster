@@ -21,7 +21,7 @@ class UserIngesterTest extends KernelTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabaseAndFixture();
+        $this->setUpDatabase();
 
         $this->subject = new UserIngester($this->getEntityManager());
     }

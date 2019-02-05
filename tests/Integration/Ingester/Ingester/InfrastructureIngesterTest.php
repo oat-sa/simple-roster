@@ -22,7 +22,7 @@ class InfrastructureIngesterTest extends KernelTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabaseAndFixture();
+        $this->setUpDatabase();
 
         $this->subject = new InfrastructureIngester($this->getEntityManager());
     }
