@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 trait DatabaseTrait
 {
@@ -16,11 +17,11 @@ trait DatabaseTrait
         $this->setUpDatabase();
     }
 
-    protected function setUpDatabase()
+    protected function setUpDatabase(): KernelInterface
     {
         static::ensureKernelTestCase();
 
-        parent::bootKernel();
+        $kernel = parent::bootKernel();
 
         $entityManager = $this->getEntityManager();
 
@@ -28,6 +29,8 @@ trait DatabaseTrait
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         $schemaTool->updateSchema($metadata);
+
+        return $kernel;
     }
 
     protected function getEntityManager(): EntityManager

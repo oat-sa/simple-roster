@@ -7,12 +7,12 @@ use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserIngesterTest extends KernelTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTrait;
 
     /** @var UserIngester */
     private $subject;
@@ -28,7 +28,7 @@ class UserIngesterTest extends KernelTestCase
 
     public function testDryRunIngest()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/valid_users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
         $output = $this->subject->ingest($source);
 
@@ -43,7 +43,7 @@ class UserIngesterTest extends KernelTestCase
 
     public function testIngestWithValidSource()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/valid_users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
         $output = $this->subject->ingest($source, false);
 
@@ -67,7 +67,7 @@ class UserIngesterTest extends KernelTestCase
 
     public function testIngestWithInvalidSource()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/invalid_users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/users.csv');
 
         $output = $this->subject->ingest($source, false);
 

@@ -66,7 +66,7 @@ class S3CsvIngesterSourceTest extends TestCase
                 'Key' => 'path'
             ]])
             ->willReturn([
-                'Body' => file_get_contents(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv')
+                'Body' => file_get_contents(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv')
             ]);
     }
 }

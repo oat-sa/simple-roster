@@ -16,8 +16,6 @@ services:
           # The best practice is to be explicit about your dependencies anyway.
         bind:
             $debug: '%kernel.debug%'
-            $awsVersion: '%env(AWS_VERSION)%'
-            $awsRegion: '%env(AWS_REGION)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:

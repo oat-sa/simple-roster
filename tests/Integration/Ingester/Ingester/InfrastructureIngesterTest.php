@@ -3,17 +3,16 @@
 namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\Infrastructure;
-use App\Entity\User;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class InfrastructureIngesterTest extends KernelTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTrait;
 
     /** @var InfrastructureIngester */
     private $subject;
@@ -29,7 +28,7 @@ class InfrastructureIngesterTest extends KernelTestCase
 
     public function testDryRunIngest()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $output = $this->subject->ingest($source);
 
@@ -44,7 +43,7 @@ class InfrastructureIngesterTest extends KernelTestCase
 
     public function testIngest()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $output = $this->subject->ingest($source, false);
 

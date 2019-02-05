@@ -11,7 +11,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     public function testGetContentWithDefaultDelimiter()
     {
         $subject = new LocalCsvIngesterSource();
-        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv');
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $output = $subject->getContent();
 
@@ -30,7 +30,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     {
         $subject = new LocalCsvIngesterSource();
         $subject
-            ->setPath(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv')
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv')
             ->setDelimiter('|');
 
         $output = $subject->getContent();
