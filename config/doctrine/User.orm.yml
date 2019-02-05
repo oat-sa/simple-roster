@@ -38,7 +38,7 @@ App\Entity\User:
     oneToMany:
         assignments:
             targetEntity: App\Entity\Assignment
-            cascade: {  }
+            cascade: ["persist"]
             fetch: LAZY
             mappedBy: user
             inversedBy: null

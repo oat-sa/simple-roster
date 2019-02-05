@@ -86,6 +86,11 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getLastAssignment(): ?Assignment
+    {
+        return $this->assignments->last() ?: null;
+    }
+
     public function removeAssignment(Assignment $assignment): self
     {
         if ($this->assignments->contains($assignment)) {

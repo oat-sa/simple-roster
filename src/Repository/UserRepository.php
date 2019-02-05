@@ -32,4 +32,9 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function persist(User $user): void
+    {
+        $this->_em->persist($user);
+    }
 }

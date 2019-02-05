@@ -130,4 +130,15 @@ class LineItem
 
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'uri' => $this->getUri(),
+            'label' => $this->getLabel(),
+            'startDateTime' => $this->getStartAt() ? $this->getStartAt()->getTimestamp() : '',
+            'endDateTime' => $this->getEndAt() ? $this->getEndAt()->getTimestamp() : '',
+            'infrastructureId' => $this->getInfrastructure()->getId(),
+        ];
+    }
 }
