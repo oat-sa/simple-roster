@@ -2,10 +2,10 @@
 
 namespace App\Tests\Traits;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
-use Symfony\Component\HttpKernel\Kernel;
 
 trait DatabaseFixturesTrait
 {
@@ -13,12 +13,16 @@ trait DatabaseFixturesTrait
 
     protected function setUp()
     {
+        $this->setUpDatabaseAndFixture();
+    }
+
+    protected function setUpDatabaseAndFixture()
+    {
         static::ensureKernelTestCase();
 
-        /** @var Kernel $kernel */
-        $kernel = parent::bootKernel();
+        parent::bootKernel();
 
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getEntityManager();
 
         $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($entityManager);
@@ -26,14 +30,16 @@ trait DatabaseFixturesTrait
         $schemaTool->updateSchema($metadata);
 
         static::populateDatabase();
+    }
 
-        return $kernel;
+    protected function getEntityManager(): EntityManager
+    {
+        return self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     protected function getRepository(string $class): EntityRepository
     {
-        $entityManager = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
-
-        return $entityManager->getRepository($class);
+        return $this->getEntityManager()->getRepository($class);
     }
+
 }
