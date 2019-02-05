@@ -3,13 +3,13 @@
 namespace App\Tests\Functional;
 
 use App\Entity\User;
+use App\Tests\Traits\DatabaseFixturesTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DummyFunctionalTest extends WebTestCase
 {
-    use ReloadDatabaseTrait;
+    use DatabaseFixturesTrait;
 
     public function test()
     {
