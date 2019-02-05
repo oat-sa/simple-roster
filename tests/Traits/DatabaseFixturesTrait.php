@@ -2,6 +2,7 @@
 
 namespace App\Tests\Traits;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 use Symfony\Component\HttpKernel\Kernel;
@@ -27,5 +28,12 @@ trait DatabaseFixturesTrait
         static::populateDatabase();
 
         return $kernel;
+    }
+
+    protected function getRepository(string $class): EntityRepository
+    {
+        $entityManager = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
+
+        return $entityManager->getRepository($class);
     }
 }
