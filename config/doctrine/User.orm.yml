@@ -12,13 +12,13 @@ App\Entity\User:
             precision: 0
             id: true
             generator:
-                strategy: SEQUENCE
+                strategy: AUTO
     fields:
         username:
             type: string
             scale: 0
             length: 255
-            unique: false
+            unique: true
             nullable: false
             precision: 0
         password:

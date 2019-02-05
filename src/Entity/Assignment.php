@@ -60,7 +60,7 @@ class Assignment implements JsonSerializable
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -72,7 +72,7 @@ class Assignment implements JsonSerializable
         return $this->lineItem;
     }
 
-    public function setLineItem(?LineItem $lineItem): self
+    public function setLineItem(LineItem $lineItem): self
     {
         $this->lineItem = $lineItem;
 
