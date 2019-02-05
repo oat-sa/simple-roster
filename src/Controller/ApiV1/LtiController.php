@@ -37,6 +37,6 @@ class LtiController implements OAuthSignatureValidatedController
             throw new BadRequestHttpException($exception->getMessage());
         }
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 }
