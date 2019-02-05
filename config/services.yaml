@@ -18,7 +18,6 @@ services:
             $debug: '%kernel.debug%'
             $awsVersion: '%env(AWS_VERSION)%'
             $awsRegion: '%env(AWS_REGION)%'
-            $odmSerializer: '@app.serializer.odm'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
@@ -51,30 +50,3 @@ services:
         arguments:
             $client: '@aws.s3'
             $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
-
-    App\S3\S3ClientInterface:
-        class: App\S3\AmazonS3Client
-        shared: false
-        arguments:
-            $client: '@aws.s3'
-
-    Aws\DynamoDb\Marshaler: ~
-
-    App\ODM\StorageInterface:
-        class: App\Storage\DynamoDbStorage
-        arguments:
-            $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
-            $marshaler: '@Aws\DynamoDb\Marshaler'
-
-    app.prop_normalizer.with_extractor:
-        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
-        arguments:
-            $propertyTypeExtractor: '@property_info.reflection_extractor'
-
-    app.serializer.odm:
-        class: Symfony\Component\Serializer\Serializer
-        arguments:
-            $normalizers:
-                - '@serializer.normalizer.datetime'
-                - '@serializer.denormalizer.array'
-                - '@app.prop_normalizer.with_extractor'

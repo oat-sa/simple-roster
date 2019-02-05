@@ -8,7 +8,7 @@ use Traversable;
 
 class LocalCsvIngesterSourceTest extends TestCase
 {
-    public function testgetContentWithDefaultDelimiter()
+    public function testGetContentWithDefaultDelimiter()
     {
         $subject = new LocalCsvIngesterSource();
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv');
