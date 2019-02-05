@@ -20,6 +20,12 @@ services:
             $awsRegion: '%env(AWS_REGION)%'
             $odmSerializer: '@app.serializer.odm'
 
+    _instanceof:
+        App\Ingester\Ingester\IngesterInterface:
+            tags: ['app.ingester']
+        App\Ingester\Source\IngesterSourceInterface:
+            tags: ['app.ingester_source']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -34,6 +40,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Ingester\Registry\IngesterRegistry:
+        arguments: [!tagged 'app.ingester']
+
+    App\Ingester\Registry\IngesterSourceRegistry:
+        arguments: [!tagged 'app.ingester_source']
+
+    App\Ingester\Source\S3CsvIngesterSource:
+        arguments:
+            $client: '@aws.s3'
+            $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
 
     App\S3\S3ClientInterface:
         class: App\S3\AmazonS3Client
@@ -61,24 +78,3 @@ services:
                 - '@serializer.normalizer.datetime'
                 - '@serializer.denormalizer.array'
                 - '@app.prop_normalizer.with_extractor'
-
-    App\Ingester\Registry\IngesterRegistry:
-        arguments: [!tagged 'app.ingester']
-
-    App\Ingester\Registry\IngesterSourceRegistry:
-        arguments: [!tagged 'app.ingester_source']
-
-    App\Ingester\Ingester\UserIngester:
-        tags: ['app.ingester']
-
-    App\Ingester\Ingester\InfrastructureIngester:
-        tags: ['app.ingester']
-
-    App\Ingester\Ingester\LineItemIngester:
-        tags: ['app.ingester']
-
-    App\Ingester\Source\LocalCsvIngesterSource:
-        tags: ['app.ingester_source']
-
-    App\Ingester\Source\S3CsvIngesterSource:
-        tags: ['app.ingester_sourcee']

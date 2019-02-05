@@ -1,0 +1,6 @@
+"http://taoplatform.loc/delivery_6.rdf", "some label 5", "infra_1", "2019-01-05 10:00:00", "2019-01-26 18:30:00"
+"http://taoplatform.loc/delivery_5.rdf", "some label 4", "infra_4", "2019-01-05 10:00:00", "2019-01-26 18:30:00"
+"http://taoplatform.loc/delivery_1.rdf", "some label", "infra_1",,
+"http://taoplatform.loc/delivery_2.rdf", "some label", "infra_2", "2019-01-05 10:00:00", "2019-01-26 18:30:00"
+"http://taoplatform.loc/delivery_3.rdf", "some label", "infra_2", "2019-01-05 10:00:00", "2019-01-26 18:30:00"
+"http://taoplatform.loc/delivery_4.rdf", "some label 4", "infra_3", "2019-01-05 10:00:00", "2019-01-26 18:30:00"

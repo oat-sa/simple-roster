@@ -6,6 +6,7 @@ use App\Entity\EntityInterface;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface
 {
@@ -19,21 +20,26 @@ abstract class AbstractIngester implements IngesterInterface
 
     public function ingest(IngesterSourceInterface $source, bool $dryRun = true): IngesterResult
     {
-        $ingestCount = 0;
+        $result = new IngesterResult(
+            $this->getRegistryItemName(),
+            $source->getRegistryItemName(),
+            $dryRun
+        );
 
-        foreach ($source->read() as $data) {
-            if (!$dryRun) {
-                $this->entityManager->persist($this->createEntity($data));
+        foreach ($source->getContent() as $data) {
+            try {
+                if (!$dryRun) {
+                    $this->entityManager->persist($this->createEntity($data));
+                    $this->entityManager->flush();
+                }
+
+                $result->addSuccess($data);
+            } catch (Throwable $exception) {
+                $result->addFailure($data);
             }
-
-            $ingestCount++;
         }
 
-        if (!$dryRun) {
-            $this->entityManager->flush();
-        }
-
-        return new IngesterResult($this->getRegistryItemName(), $ingestCount, $dryRun);
+        return $result;
     }
 
     abstract protected function createEntity(array $data): EntityInterface;

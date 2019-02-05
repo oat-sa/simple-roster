@@ -11,7 +11,7 @@ use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use ArrayIterator;
-use Iterator;
+use Traversable;
 
 class AbstractIngesterTest extends TestCase
 {
@@ -38,10 +38,12 @@ class AbstractIngesterTest extends TestCase
         $output = $this->createIngesterInstance()->ingest($this->createSourceInstance());
 
         $this->assertInstanceOf(IngesterResult::class, $output);
-        $this->assertEquals(1, $output->getRowCount());
-        $this->assertEquals('anonymousIngester', $output->getType());
+        $this->assertCount(1, $output->getSuccesses());
+        $this->assertCount(0, $output->getFailures());
+        $this->assertEquals('anonymousIngester', $output->getIngesterType());
+        $this->assertEquals('anonymousSource', $output->getSourceType());
         $this->assertEquals(
-            '[DRY_RUN] 1 elements of type anonymousIngester have been ingested.',
+            "[DRY_RUN] Ingestion (type='anonymousIngester', source='anonymousSource'): 1 successes, 0 failures.",
             $output->__toString()
         );
     }
@@ -60,10 +62,12 @@ class AbstractIngesterTest extends TestCase
         $output = $this->createIngesterInstance()->ingest($this->createSourceInstance(), false);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
-        $this->assertEquals(1, $output->getRowCount());
-        $this->assertEquals('anonymousIngester', $output->getType());
+        $this->assertCount(1, $output->getSuccesses());
+        $this->assertCount(0, $output->getFailures());
+        $this->assertEquals('anonymousIngester', $output->getIngesterType());
+        $this->assertEquals('anonymousSource', $output->getSourceType());
         $this->assertEquals(
-            '1 elements of type anonymousIngester have been ingested.',
+            "Ingestion (type='anonymousIngester', source='anonymousSource'): 1 successes, 0 failures.",
             $output->__toString()
         );
     }
@@ -99,9 +103,9 @@ class AbstractIngesterTest extends TestCase
                 return 'anonymousSource';
             }
 
-            public function read(): Iterator
+            public function getContent(): Traversable
             {
-                return new ArrayIterator([[]]);
+                return new ArrayIterator([[1]]);
             }
         };
     }

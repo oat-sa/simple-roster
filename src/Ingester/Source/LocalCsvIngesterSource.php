@@ -2,8 +2,8 @@
 
 namespace App\Ingester\Source;
 
-use Iterator;
-use Exception;
+use League\Csv\Reader;
+use Traversable;
 
 class LocalCsvIngesterSource extends AbstractIngesterSource
 {
@@ -12,24 +12,11 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
         return 'local';
     }
 
-    /**
-     * @throws Exception
-     */
-    public function read(): Iterator
+    public function getContent(): Traversable
     {
-        if (!file_exists($this->path)) {
-            throw new Exception('Invalid file path ' . $this->path);
-        }
+        $reader = Reader::createFromPath($this->path, 'r');
+        $reader->setDelimiter($this->delimiter);
 
-        $fileHandle = fopen($this->path, 'r');
-        if (false === $fileHandle) {
-            throw new Exception('Cannot read file path' . $this->path);
-        }
-
-        while (($line = fgetcsv($fileHandle, null, $this->delimiter)) !== false) {
-            yield $line;
-        }
-
-        fclose($fileHandle);
+        return $reader;
     }
 }

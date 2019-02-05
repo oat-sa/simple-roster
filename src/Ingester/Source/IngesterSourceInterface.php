@@ -3,13 +3,13 @@
 namespace App\Ingester\Source;
 
 use App\Ingester\Registry\RegistryItemInterface;
-use Iterator;
+use Traversable;
 
 interface IngesterSourceInterface extends RegistryItemInterface
 {
     const DEFAULT_CSV_DELIMITER = ',';
 
-    public function read(): Iterator;
+    public function getContent(): Traversable;
 
     public function setPath(string $path): self;
 

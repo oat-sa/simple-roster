@@ -2,18 +2,19 @@
 
 namespace App\Ingester\Source;
 
-use App\S3\S3ClientInterface;
-use Iterator;
+use Aws\S3\S3Client;
+use League\Csv\Reader;
+use Traversable;
 
 class S3CsvIngesterSource extends AbstractIngesterSource
 {
-    /** @var S3ClientInterface  */
+    /** @var S3Client */
     private $client;
 
     /** @var string  */
     private $bucket;
 
-    public function __construct(S3ClientInterface $client, string $bucket)
+    public function __construct(S3Client $client, string $bucket)
     {
         $this->client = $client;
         $this->bucket = $bucket;
@@ -24,12 +25,16 @@ class S3CsvIngesterSource extends AbstractIngesterSource
         return 's3';
     }
 
-    public function read(): Iterator
+    public function getContent(): Traversable
     {
-        $response = $this->client->getObject($this->bucket, $this->path);
+        $result = $this->client->getObject([
+            'Bucket' => $this->bucket,
+            'Key'    => $this->path
+        ]);
 
-        foreach (explode(PHP_EOL, $response) as $line) {
-            yield str_getcsv($line, $this->delimiter);
-        }
+        $reader = Reader::createFromString((string)$result['Body'] ?? '');
+        $reader->setDelimiter($this->delimiter);
+
+        return $reader;
     }
 }

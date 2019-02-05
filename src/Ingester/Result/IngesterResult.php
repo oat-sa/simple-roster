@@ -5,29 +5,59 @@ namespace App\Ingester\Result;
 class IngesterResult
 {
     /** @var string */
-    private $type;
+    private $ingesterType;
 
-    /** @var int */
-    private $rowCount;
+    /** @var string */
+    private $sourceType;
+
+    /** @var array */
+    private $successes = [];
+
+    /** @var array */
+    private $failures = [];
 
     /** @var bool */
     private $dryRun = true;
 
-    public function __construct(string $type, int $rowCount, bool $dryRun = true)
+    public function __construct(string $ingesterType, string $sourceType, bool $dryRun = true)
     {
-        $this->type = $type;
-        $this->rowCount = $rowCount;
+        $this->ingesterType = $ingesterType;
+        $this->sourceType = $sourceType;
         $this->dryRun = $dryRun;
     }
 
-    public function getType(): string
+    public function addSuccess(array $row): self
     {
-        return $this->type;
+        $this->successes[] = $row;
+
+        return $this;
     }
 
-    public function getRowCount(): int
+    public function addFailure(array $row): self
     {
-        return $this->rowCount;
+        $this->failures[] = $row;
+
+        return $this;
+    }
+
+    public function getIngesterType(): string
+    {
+        return $this->ingesterType;
+    }
+
+    public function getSourceType(): string
+    {
+        return $this->sourceType;
+    }
+
+    public function getSuccesses(): array
+    {
+        return $this->successes;
+    }
+
+    public function getFailures(): array
+    {
+        return $this->failures;
     }
 
     public function isDryRun(): bool
@@ -38,10 +68,12 @@ class IngesterResult
     public function __toString(): string
     {
         return sprintf(
-            '%s%s elements of type %s have been ingested.',
+            "%sIngestion (type='%s', source='%s'): %s successes, %s failures.",
             $this->dryRun ? '[DRY_RUN] ' : '',
-            $this->rowCount,
-            $this->type
+            $this->ingesterType,
+            $this->sourceType,
+            sizeof($this->successes),
+            sizeof($this->failures)
         );
     }
 }

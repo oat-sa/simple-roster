@@ -89,6 +89,9 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
+    "league/csv": {
+        "version": "8.2.3"
+    },
     "mikey179/vfsstream": {
         "version": "v1.6.5"
     },

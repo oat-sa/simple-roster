@@ -9,27 +9,42 @@ class IngesterResultTest extends TestCase
 {
     public function testGettersPostConstruction()
     {
-        $subject = new IngesterResult('type', 10, false);
+        $subject = new IngesterResult('ingester', 'source');
 
-        $this->assertEquals('type', $subject->getType());
-        $this->assertEquals(10, $subject->getRowCount());
-        $this->assertFalse($subject->isDryRun());
+        $this->assertEquals('ingester', $subject->getIngesterType());
+        $this->assertEquals('source', $subject->getSourceType());
+        $this->assertEmpty($subject->getSuccesses());
+        $this->assertEmpty($subject->getFailures());
+        $this->assertTrue($subject->isDryRun());
     }
 
-    public function testStringRepresentation()
+    public function testPostDryRunStringRepresentation()
     {
-        $subject1 = new IngesterResult('type1', 10);
+        $subject = new IngesterResult('ingester', 'source');
+
+        $subject
+            ->addSuccess([])
+            ->addSuccess([])
+            ->addFailure([]);
 
         $this->assertEquals(
-            '[DRY_RUN] 10 elements of type type1 have been ingested.',
-            $subject1->__toString()
+            "[DRY_RUN] Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
+            $subject->__toString()
         );
+    }
 
-        $subject2 = new IngesterResult('type2', 20, false);
+    public function testPostRunStringRepresentation()
+    {
+        $subject = new IngesterResult('ingester', 'source', false);
+
+        $subject
+            ->addSuccess([])
+            ->addSuccess([])
+            ->addFailure([]);
 
         $this->assertEquals(
-            '20 elements of type type2 have been ingested.',
-            $subject2->__toString()
+            "Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
+            $subject->__toString()
         );
     }
 }
