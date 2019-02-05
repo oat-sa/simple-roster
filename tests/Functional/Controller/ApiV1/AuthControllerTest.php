@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller;
+namespace App\Tests\Functional\Controller\ApiV1;
 
 use App\Tests\BaseWebTestCase;
 

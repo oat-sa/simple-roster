@@ -33,24 +33,21 @@ class UserCacheInvalidatorTest extends TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $this->unitOfWork = $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
-        $this->userCacheIdGenerator = $this->getMockBuilder(UserCacheIdGenerator::class)->getMock();
-        $this->resultCacheImplementation = $this->getMockBuilder(Cache::class)->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->unitOfWork = $this->createMock(UnitOfWork::class);
+        $this->userCacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
+        $this->resultCacheImplementation = $this->createMock(Cache::class);
 
-        $doctrineConfiguration = $this->getMockBuilder(Configuration::class)->getMock();
+        $doctrineConfiguration = $this->createMock(Configuration::class);
         $doctrineConfiguration
-            ->expects($this->any())
             ->method('getResultCacheImpl')
             ->willReturn($this->resultCacheImplementation);
 
         $this->entityManager
-            ->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
 
         $this->entityManager
-            ->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 

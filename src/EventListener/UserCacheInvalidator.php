@@ -19,19 +19,19 @@ class UserCacheInvalidator
 
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
-        $em = $eventArgs->getEntityManager();
-        $uow = $em->getUnitOfWork();
+        $entityManager = $eventArgs->getEntityManager();
+        $unitOfWork = $entityManager->getUnitOfWork();
 
         $scheduledEntityChanges = array(
-            'insert' => $uow->getScheduledEntityInsertions(),
-            'update' => $uow->getScheduledEntityUpdates(),
-            'delete' => $uow->getScheduledEntityDeletions()
+            'insert' => $unitOfWork->getScheduledEntityInsertions(),
+            'update' => $unitOfWork->getScheduledEntityUpdates(),
+            'delete' => $unitOfWork->getScheduledEntityDeletions()
         );
 
-        foreach ($scheduledEntityChanges as $change => $entities) {
+        foreach ($scheduledEntityChanges as $entities) {
             foreach ($entities as $entity) {
                 if ($entity instanceof User) {
-                    $this->clearUserCache($entity, $em);
+                    $this->clearUserCache($entity, $entityManager);
                 }
             }
         }

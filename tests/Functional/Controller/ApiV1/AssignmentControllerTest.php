@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller\ApiV1;
+namespace App\Tests\Functional\Controller\ApiV1\ApiV1;
 
 use App\Model\LineItem;
 use App\ODM\StorageInterface;

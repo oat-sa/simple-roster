@@ -28,7 +28,7 @@ class AssignmentController extends AbstractController
     /**
      * @Route("/", name="api_v1_add_assignments", methods={"POST"})
      */
-    public function addAssignments(Request $request, CreateUsersAssignmentsService $createUsersAssignmentsService)
+    public function addAssignments(Request $request, CreateUsersAssignmentsService $createUsersAssignmentsService): Response
     {
         $usernames = json_decode($request->getContent(), true);
         $users = [];
