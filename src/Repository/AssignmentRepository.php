@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\ORMException;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,8 +14,11 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AssignmentRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    /**
+     * @throws ORMException
+     */
+    public function persist(Assignment $assignment): void
     {
-        parent::__construct($registry, Assignment::class);
+        $this->_em->persist($assignment);
     }
 }

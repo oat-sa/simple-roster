@@ -4,18 +4,18 @@ namespace App\Service;
 
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Repository\AssignmentRepository;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\ORMException;
 
 class CreateUserAssignmentService
 {
-    /** @var UserRepository */
-    private $userRepository;
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(AssignmentRepository $assignmentRepository)
     {
-        $this->userRepository = $userRepository;
+        $this->assignmentRepository = $assignmentRepository;
     }
 
     /**
@@ -42,7 +42,7 @@ class CreateUserAssignmentService
 
         $user->addAssignment($newAssignment);
 
-        $this->userRepository->persist($user);
+        $this->assignmentRepository->persist($newAssignment);
 
         return $newAssignment;
     }

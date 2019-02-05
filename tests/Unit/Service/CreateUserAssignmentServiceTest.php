@@ -5,8 +5,9 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Assignment;
 use App\Entity\LineItem;
 use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Repository\AssignmentRepository;
 use App\Service\CreateUserAssignmentService;
+use Doctrine\ORM\EntityNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class CreateUserAssignmentServiceTest extends TestCase
@@ -14,23 +15,22 @@ class CreateUserAssignmentServiceTest extends TestCase
     /** @var CreateUserAssignmentService */
     private $subject;
 
-    /** @var UserRepository */
-    private $userRepository;
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->userRepository = $this->createMock(UserRepository::class);
-        $this->subject = new CreateUserAssignmentService($this->userRepository);
+        $this->assignmentRepository = $this->createMock(AssignmentRepository::class);
+        $this->subject = new CreateUserAssignmentService($this->assignmentRepository);
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\EntityNotFoundException
-     * @expectedExceptionMessage Assignment cannot be created for user 'testUser'. No previous assignments were found in database.
-     */
     public function testItThrowsExceptionIfNoPreviousAssignmentWasFound(): void
     {
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage("Assignment cannot be created for user 'testUser'. No previous assignments were found in database.");
+
         $this->subject->create((new User())->setUsername('testUser'));
     }
 
@@ -40,15 +40,15 @@ class CreateUserAssignmentServiceTest extends TestCase
         $lastAssignment = (new Assignment())->setLineItem($expectedLineItem);
         $user = (new User())->addAssignment($lastAssignment);
 
-        $this->userRepository
+        $this->assignmentRepository
             ->expects($this->once())
             ->method('persist')
-            ->with($user);
+            ->willReturnCallback(function (Assignment $assignment) use ($expectedLineItem) {
+                return $assignment->getState() === Assignment::STATE_READY
+                    && $assignment->getLineItem() === $expectedLineItem;
+            });
 
-        $createdAssignment = $this->subject->create($user);
-
-        $this->assertEquals(Assignment::STATE_READY, $createdAssignment->getState());
-        $this->assertEquals($expectedLineItem, $createdAssignment->getLineItem());
+        $this->subject->create($user);
     }
 
     public function testItCancelsAllPreviousAssignmentsBeforeCreatingNewOne(): void

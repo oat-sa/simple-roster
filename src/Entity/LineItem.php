@@ -137,7 +137,7 @@ class LineItem implements JsonSerializable
             'label' => $this->getLabel(),
             'startDateTime' => $this->getStartAt() ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() ? $this->getEndAt()->getTimestamp() : '',
-            'infrastructureId' => $this->getInfrastructure()->getId(),
+            'infrastructure' => $this->getInfrastructure()->getId(),
         ];
     }
 }
