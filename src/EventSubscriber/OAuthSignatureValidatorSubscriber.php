@@ -53,7 +53,7 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
             $infrastructure = $this->infrastructureRepository->getByLtiKey((string)$request->query->get('oauth_consumer_key'));
 
             if (!$infrastructure) {
-                throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer ey invalid"');
+                throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer key invalid"');
             }
 
             $signature = new Signature(

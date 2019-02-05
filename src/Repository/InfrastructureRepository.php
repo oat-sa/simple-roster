@@ -28,4 +28,14 @@ class InfrastructureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function persist(Infrastructure $infrastructure): void
+    {
+        $this->_em->persist($infrastructure);
+    }
+
+    public function flush(): void
+    {
+        $this->_em->flush();
+    }
 }
