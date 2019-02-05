@@ -12,7 +12,7 @@ App\Entity\Infrastructure:
             precision: 0
             id: true
             generator:
-                strategy: SEQUENCE
+                strategy: AUTO
     fields:
         label:
             type: string
