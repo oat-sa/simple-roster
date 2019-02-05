@@ -10,7 +10,7 @@
         <replaceResultRequest>
             <resultRecord>
                 <sourcedGUID>
-                    <sourcedId>1</sourcedId>
+                    <sourcedId>1000000000</sourcedId>
                 </sourcedGUID>
                 <result>
                     <resultScore>
