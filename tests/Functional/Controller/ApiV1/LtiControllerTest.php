@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Controller\ApiV1;
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
 use App\Model\OAuth\Signature;
+use App\Repository\AssignmentRepository;
 use App\Repository\InfrastructureRepository;
 use App\Security\OAuth\SignatureGenerator;
 use App\Tests\Traits\DatabaseFixturesTrait;
@@ -19,6 +20,35 @@ class LtiControllerTest extends WebTestCase
         $client = static::createClient();
 
         $client->request('POST', '/api/v1/lti/outcome');
+
+        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+    }
+
+    public function testItReturns401IfWrongAuthentication()
+    {
+        $client = static::createClient();
+
+        $infrastructure = $this->getInfrastructure();
+
+        $queryParameters = http_build_query([
+            'oauth_body_hash' => 'bodyHash',
+            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_nonce' => 'nonce',
+            'oauth_signature' => 'signature',
+            'oauth_signature_method' => 'HMAC-SHA1',
+            'oauth_timestamp' => time(),
+            'oauth_version' => '1.0',
+        ]);
+
+        $client->request(
+            'POST',
+            '/api/v1/lti/outcome? '. $queryParameters,
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+            ]
+        );
 
         $this->assertEquals(401, $client->getResponse()->getStatusCode());
     }
@@ -59,7 +89,7 @@ class LtiControllerTest extends WebTestCase
 
         $this->assertEquals(
             Assignment::STATE_COMPLETED,
-            $this->getRepository(Assignment::class)->find(1)->getState()
+            $this->getAssignment()->getState()
         );
     }
 
@@ -99,7 +129,7 @@ class LtiControllerTest extends WebTestCase
 
         $this->assertEquals(
             Assignment::STATE_READY,
-            $this->getRepository(Assignment::class)->find(1)->getState()
+            $this->getAssignment()->getState()
         );
     }
 
@@ -123,6 +153,14 @@ class LtiControllerTest extends WebTestCase
     {
         /** @var InfrastructureRepository $repository */
         $repository = $this->getRepository(Infrastructure::class);
+
+        return $repository->find(1);
+    }
+
+    private function getAssignment(): Assignment
+    {
+        /** @var AssignmentRepository $repository */
+        $repository = $this->getRepository(Assignment::class);
 
         return $repository->find(1);
     }
