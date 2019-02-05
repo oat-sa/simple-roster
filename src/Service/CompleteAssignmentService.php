@@ -21,7 +21,7 @@ class CompleteAssignmentService
         $assignment = $this->assignmentRepository->find($assignmentId);
 
         if (!$assignment) {
-            new AssignmentNotFoundException(sprintf('Assignment with id `%s` not found.', $assignmentId));
+            throw new AssignmentNotFoundException(sprintf('Assignment with id `%s` not found.', $assignmentId));
         }
 
         $assignment->setState(Assignment::STATE_COMPLETED);

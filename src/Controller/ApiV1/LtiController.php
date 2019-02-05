@@ -27,9 +27,9 @@ class LtiController implements OAuthSignatureValidatedController
         CompleteAssignmentService $completeAssignmentService
     ): Response
     {
-        $assignmentId = $replaceResultSourceIdExtractor->extractSourceId($request->getContent());
-
         try {
+            $assignmentId = $replaceResultSourceIdExtractor->extractSourceId($request->getContent());
+
             $completeAssignmentService->markAssignmentAsCompleted($assignmentId);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
