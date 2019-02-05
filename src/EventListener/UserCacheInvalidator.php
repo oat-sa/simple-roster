@@ -42,10 +42,10 @@ class UserCacheInvalidator
 
     private function clearUserCache(User $user, EntityManager $entityManager): void
     {
-        $cacheId = $this->userCacheIdGenerator->generate($user->getUsername());
+        $resultCache = $entityManager
+            ->getConfiguration()
+            ->getResultCacheImpl();
 
-        $resultCache = $entityManager->getConfiguration()->getResultCacheImpl();
-
-        $resultCache->delete($cacheId);
+        $resultCache->delete($this->userCacheIdGenerator->generate($user->getUsername()));
     }
 }
