@@ -5,7 +5,6 @@ namespace App\Controller\ApiV1;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\CreateUsersAssignmentsService;
-use App\Service\AssignmentProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,9 +20,9 @@ class AssignmentController extends AbstractController
     /**
      * @Route("/", name="api_v1_get_assignments", methods={"GET"})
      */
-    public function getAssignments(AssignmentProvider $assignmentProvider): Response
+    public function getAssignments(): Response
     {
-        return $this->json(['assignments' => $assignmentProvider->getAssignmentsSerializedForListing()]);
+        return $this->json(['assignments' => $this->getUser()->getAvailableAssignments()]);
     }
 
     /**
