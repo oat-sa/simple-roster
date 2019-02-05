@@ -18,4 +18,14 @@ class AssignmentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Assignment::class);
     }
+
+    public function persist(Assignment $assignment): void
+    {
+        $this->_em->persist($assignment);
+    }
+
+    public function flush(): void
+    {
+        $this->_em->flush();
+    }
 }
