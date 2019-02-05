@@ -40,9 +40,6 @@ class SignatureGenerator
         }
     }
 
-    /**
-     * @return string
-     */
     private function getBaseString(): string
     {
         return implode('&', [
@@ -52,9 +49,6 @@ class SignatureGenerator
         ]);
     }
 
-    /**
-     * @return string
-     */
     private function getParameters(): string
     {
         $encodedParameters = [];
@@ -75,11 +69,7 @@ class SignatureGenerator
         return implode('&', $encodedParameters);
     }
 
-    /**
-     * @param $value
-     * @return string
-     */
-    private function encode($value): string
+    private function encode(string $value): string
     {
         return urlencode(utf8_encode($value));
     }
