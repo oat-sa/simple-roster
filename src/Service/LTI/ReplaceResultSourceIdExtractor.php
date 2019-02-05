@@ -2,8 +2,8 @@
 
 namespace App\Service\LTI;
 
+use App\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ReplaceResultSourceIdExtractor
 {
@@ -18,7 +18,7 @@ class ReplaceResultSourceIdExtractor
         );
 
         if (count($sourceIdNodes) !== 1 || !$sourceIdNodes[0] instanceof SimpleXMLElement) {
-            throw new BadRequestHttpException();
+            throw new InvalidLtiReplaceResultBodyException();
         }
 
         return (int)$sourceIdNodes[0];

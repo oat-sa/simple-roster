@@ -2,11 +2,15 @@
 
 namespace App\Controller\ApiV1;
 
+use App\Exception\AssignmentNotFoundException;
+use App\Exception\InvalidLtiReplaceResultBodyException;
 use App\Service\CompleteAssignmentService;
 use App\Service\LTI\ReplaceResultSourceIdExtractor;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -25,7 +29,13 @@ class LtiController implements OAuthSignatureValidatedController
     {
         $assignmentId = $replaceResultSourceIdExtractor->extractSourceId($request->getContent());
 
-        $completeAssignmentService->markAssignmentAsCompleted($assignmentId);
+        try {
+            $completeAssignmentService->markAssignmentAsCompleted($assignmentId);
+        } catch (AssignmentNotFoundException $exception) {
+            throw new NotFoundHttpException($exception->getMessage());
+        } catch (InvalidLtiReplaceResultBodyException $exception) {
+            throw new BadRequestHttpException($exception->getMessage());
+        }
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }

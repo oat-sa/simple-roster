@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
+use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CompleteAssignmentService
 {
@@ -21,7 +21,7 @@ class CompleteAssignmentService
         $assignment = $this->assignmentRepository->find($assignmentId);
 
         if (!$assignment) {
-            new NotFoundHttpException(sprintf('Assignment with id `%s` not found.', $assignmentId));
+            new AssignmentNotFoundException(sprintf('Assignment with id `%s` not found.', $assignmentId));
         }
 
         $assignment->setState(Assignment::STATE_COMPLETED);
