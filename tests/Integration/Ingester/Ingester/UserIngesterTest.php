@@ -8,7 +8,6 @@ use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseFixturesTrait;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserIngesterTest extends KernelTestCase
@@ -29,11 +28,12 @@ class UserIngesterTest extends KernelTestCase
 
     public function testDryRunIngest()
     {
-        $source = $this->createLocalIngesterSource(__DIR__ . '/../../../Resources/Ingester/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/valid_users.csv');
 
         $output = $this->subject->ingest($source);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
+        $this->assertEquals('user', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertCount(3, $output->getSuccesses());
         $this->assertCount(0, $output->getFailures());
@@ -41,13 +41,14 @@ class UserIngesterTest extends KernelTestCase
         $this->assertEmpty($this->getRepository(User::class)->findAll());
     }
 
-    public function testIngest()
+    public function testIngestWithValidSource()
     {
-        $source = $this->createLocalIngesterSource(__DIR__ . '/../../../Resources/Ingester/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/valid_users.csv');
 
         $output = $this->subject->ingest($source, false);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
+        $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertCount(3, $output->getSuccesses());
         $this->assertCount(0, $output->getFailures());
@@ -64,7 +65,25 @@ class UserIngesterTest extends KernelTestCase
         $this->assertEquals('user_3', $user3->getUsername());
     }
 
-    private function createLocalIngesterSource(string $path): IngesterSourceInterface
+    public function testIngestWithInvalidSource()
+    {
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/invalid_users.csv');
+
+        $output = $this->subject->ingest($source, false);
+
+        $this->assertInstanceOf(IngesterResult::class, $output);
+        $this->assertEquals('user', $output->getIngesterType());
+        $this->assertFalse($output->isDryRun());
+        $this->assertCount(1, $output->getSuccesses());
+        $this->assertCount(1, $output->getFailures());
+
+        $this->assertCount(1, $this->getRepository(User::class)->findAll());
+
+        $user1 = $this->getRepository(User::class)->find(1);
+        $this->assertEquals('user_1', $user1->getUsername());
+    }
+
+    private function createIngesterSource(string $path): IngesterSourceInterface
     {
         return (new LocalCsvIngesterSource())->setPath($path);
     }

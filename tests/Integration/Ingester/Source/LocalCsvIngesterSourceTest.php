@@ -1,0 +1,44 @@
+<?php declare(strict_types=1);
+
+namespace App\Tests\Integration\Ingester\Ingester;
+
+use App\Ingester\Source\LocalCsvIngesterSource;
+use PHPUnit\Framework\TestCase;
+use Traversable;
+
+class LocalCsvIngesterSourceTest extends TestCase
+{
+    public function testgetContentWithDefaultDelimiter()
+    {
+        $subject = new LocalCsvIngesterSource();
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv');
+
+        $output = $subject->getContent();
+
+        $this->assertInstanceOf(Traversable::class, $output);
+
+        foreach ($output as $row) {
+            $this->assertCount(4, $row);
+            $this->assertContains('infra', $row[0]);
+            $this->assertContains('http://infra', $row[1]);
+            $this->assertContains('key', $row[2]);
+            $this->assertContains('secret', $row[3]);
+        }
+    }
+
+    public function testGetContentWithOtherDelimiter()
+    {
+        $subject = new LocalCsvIngesterSource();
+        $subject
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/infrastructures.csv')
+            ->setDelimiter('|');
+
+        $output = $subject->getContent();
+
+        $this->assertInstanceOf(Traversable::class, $output);
+
+        foreach ($output as $row) {
+            $this->assertCount(1, $row);
+        }
+    }
+}
