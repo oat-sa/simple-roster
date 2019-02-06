@@ -12,11 +12,14 @@ class InfrastructureIngester extends AbstractIngester
         return 'infrastructure';
     }
 
+    protected function prepare(): void
+    {
+        return;
+    }
+
     protected function createEntity(array $data): EntityInterface
     {
-        $infrastructure = new Infrastructure();
-
-        return $infrastructure
+        return (new Infrastructure())
             ->setLabel($data[0])
             ->setLtiDirectorLink($data[1])
             ->setLtiKey($data[2])

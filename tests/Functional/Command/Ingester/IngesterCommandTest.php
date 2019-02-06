@@ -90,4 +90,36 @@ class IngesterCommandTest extends KernelTestCase
         $user1 = $this->getRepository(Infrastructure::class)->find(1);
         $this->assertEquals('infra_1', $user1->getLabel());
     }
+
+    public function testInvalidIngesterFailure()
+    {
+        $output = $this->commandTester->execute([
+            'type' => 'invalid',
+            'source' => 'invalid',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            '--force' => true
+        ]);
+
+        $this->assertEquals(1, $output);
+        $this->assertContains(
+            "[ERROR] Ingester named 'invalid' cannot be found.",
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testInvalidSourceFailure()
+    {
+        $output = $this->commandTester->execute([
+            'type' => 'infrastructure',
+            'source' => 'invalid',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            '--force' => true
+        ]);
+
+        $this->assertEquals(1, $output);
+        $this->assertContains(
+            "[ERROR] Ingester source named 'invalid' cannot be found.",
+            $this->commandTester->getDisplay()
+        );
+    }
 }

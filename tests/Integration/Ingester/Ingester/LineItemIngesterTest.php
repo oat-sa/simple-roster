@@ -2,21 +2,20 @@
 
 namespace App\Tests\Integration\Ingester\Ingester;
 
-use App\Entity\User;
+use App\Entity\LineItem;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class UserIngesterTest extends KernelTestCase
+class LineItemIngesterTest extends KernelTestCase
 {
     use DatabaseTrait;
 
-    /** @var UserIngester */
+    /** @var LineItemIngester */
     private $subject;
 
     protected function setUp()
@@ -25,31 +24,31 @@ class UserIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserIngester($this->getManagerRegistry());
+        $this->subject = new LineItemIngester($this->getManagerRegistry());
     }
 
     public function testDryRunIngest()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv');
 
         $output = $this->subject->ingest($source);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
-        $this->assertEquals('user', $output->getIngesterType());
+        $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
-        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertEquals(6, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
-        $this->assertEmpty($this->getRepository(User::class)->findAll());
+        $this->assertEmpty($this->getRepository(LineItem::class)->findAll());
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Cannot ingest 'user' since line-item table is empty.
+     * @expectedExceptionMessage Cannot ingest 'line-item' since infrastructure table is empty.
      */
-    public function testIngestWithEmptyLineItems()
+    public function testIngestWithEmptyInfrastructures()
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv.csv');
 
         $this->subject->ingest($source, false);
     }
@@ -58,52 +57,59 @@ class UserIngesterTest extends KernelTestCase
     {
         $this->prepareIngestionContext();
 
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/line-items.csv');
 
         $output = $this->subject->ingest($source, false);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
-        $this->assertEquals('user', $output->getIngesterType());
+        $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
         $this->assertCount(1, $output->getFailures());
 
-        $this->assertCount(1, $this->getRepository(User::class)->findAll());
+        $this->assertCount(1, $this->getRepository(LineItem::class)->findAll());
 
-        $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $lineItem1 = $this->getRepository(LineItem::class)->find(1);
+        $this->assertEquals('gra13_ita_1', $lineItem1->getSlug());
 
         $failure = current($output->getFailures());
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
-            ['user_1', 'password1', 'gra13_ita_1'],
+            [
+                'http://taoplatform.loc/delivery_2.rdf',
+                'label2',
+                'gra13_ita_1',
+                'infra_2',
+                '2019-01-05 10:00:00',
+                '2019-01-26 18:30:00'
+            ],
             $failure->getData()
         );
-        $this->assertContains('UNIQUE constraint failed: users.username', $failure->getReason());
+        $this->assertContains('UNIQUE constraint failed: line_items.slug', $failure->getReason());
     }
 
     public function testIngestWithValidSource()
     {
         $this->prepareIngestionContext();
 
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv');
 
         $output = $this->subject->ingest($source, false);
 
         $this->assertInstanceOf(IngesterResult::class, $output);
-        $this->assertEquals('user', $output->getIngesterType());
+        $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
-        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertEquals(6, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        $this->assertCount(6, $this->getRepository(LineItem::class)->findAll());
 
-        $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $lineItem1 = $this->getRepository(LineItem::class)->find(1);
+        $this->assertEquals('gra13_ita_1', $lineItem1->getSlug());
 
-        $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        $lineItem6 = $this->getRepository(LineItem::class)->find(6);
+        $this->assertEquals('gra13_ita_6', $lineItem6->getSlug());
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface
@@ -115,11 +121,6 @@ class UserIngesterTest extends KernelTestCase
     {
         static::$container->get(InfrastructureIngester::class)->ingest(
             $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv'),
-            false
-        );
-
-        static::$container->get(LineItemIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv'),
             false
         );
     }

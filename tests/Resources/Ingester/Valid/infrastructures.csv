@@ -1,3 +1,3 @@
-"infra_1", "http://infra_1.com", "key1", "secret1"
-"infra_2", "http://infra_2.com", "key2", "secret2"
-"infra_3", "http://infra_3.com", "key3", "secret3"
+infra_1,http://infra_1.com,key,secret
+infra_2,http://infra_2.com,key,secret
+infra_3,http://infra_3.com,key,secret

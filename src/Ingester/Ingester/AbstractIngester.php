@@ -27,6 +27,10 @@ abstract class AbstractIngester implements IngesterInterface
             $dryRun
         );
 
+        if (!$dryRun) {
+            $this->prepare();
+        }
+
         $lineNumber = 1;
         foreach ($source->getContent() as $data) {
             try {
@@ -52,6 +56,8 @@ abstract class AbstractIngester implements IngesterInterface
 
         return $result;
     }
+
+    abstract protected function prepare(): void;
 
     abstract protected function createEntity(array $data): EntityInterface;
 }

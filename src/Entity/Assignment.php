@@ -1,9 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
-class Assignment implements EntityInterface
+use JsonSerializable;
+
+class Assignment implements JsonSerializable, EntityInterface
 {
+    /**
+     * Assignment can be taken if other constraints allows it (dates)
+     */
+    public const STATE_READY = 'ready';
+
+    /**
+     * The LTI link for this assignment has been queried, and the state changed as “started” at the same time
+     */
+    public const STATE_STARTED = 'started';
+
+    /**
+     * The test has been completed. We know that it has because simple-roster received the LTI-outcome request from the TAO delivery
+     */
+    public const STATE_COMPLETED = 'completed';
+
+    /**
+     * The assignment cannot be taken anymore
+     */
+    public const STATE_CANCELLED = 'cancelled';
+
     /** @var int */
     private $id;
 
@@ -55,5 +77,20 @@ class Assignment implements EntityInterface
         $this->lineItem = $lineItem;
 
         return $this;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->state === self::STATE_CANCELLED;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->getUser()->getUsername(),
+            'state' => $this->getState(),
+            'lineItem' => $this->lineItem,
+        ];
     }
 }
