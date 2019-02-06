@@ -7,7 +7,6 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Result\IngesterResultFailure;
 use App\Ingester\Source\IngesterSourceInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
