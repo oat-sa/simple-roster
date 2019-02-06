@@ -1,14 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\EventSubscriber;
 
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Events;
 
-class UserCacheInvalidator
+class UserCacheInvalidator implements EventSubscriber
 {
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
@@ -16,6 +18,13 @@ class UserCacheInvalidator
     public function __construct(UserCacheIdGenerator $userCacheIdGenerator)
     {
         $this->userCacheIdGenerator = $userCacheIdGenerator;
+    }
+
+    public function getSubscribedEvents()
+    {
+        return [
+            Events::onFlush,
+        ];
     }
 
     public function onFlush(OnFlushEventArgs $eventArgs): void

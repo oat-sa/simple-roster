@@ -69,10 +69,6 @@ services:
         public: false
         tags: [serializer.normalizer]
 
-    App\EventListener\UserCacheInvalidator:
-        tags:
-            - { name: doctrine.event_listener, event: onFlush }
-
     App\Repository\UserRepository:
         arguments:
             $userCacheTtl: '%env(USER_CACHE_TTL)%'

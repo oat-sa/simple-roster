@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\EventListener;
+namespace App\Tests\Unit\EventSubscriber;
 
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\EventListener\UserCacheInvalidator;
+use App\EventSubscriber\UserCacheInvalidator;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;

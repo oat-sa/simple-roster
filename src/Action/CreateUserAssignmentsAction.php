@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use App\Responder\SerializerResponder;
 use App\Service\CreateUsersAssignmentsService;
 use Doctrine\ORM\EntityNotFoundException;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -35,6 +36,7 @@ class CreateUserAssignmentsAction
     /**
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
+     * @throws Exception
      */
     public function __invoke(Request $request)
     {
@@ -42,7 +44,7 @@ class CreateUserAssignmentsAction
         if (json_last_error()) {
             throw new BadRequestHttpException(
                 sprintf(
-                    'An error occurred while decoding request body: %s',
+                    'Invalid JSON request body received. Error: %s',
                     json_last_error_msg()
                 )
             );
@@ -61,8 +63,13 @@ class CreateUserAssignmentsAction
             throw new NotFoundHttpException($exception->getMessage());
         }
 
+        $assignments = [];
+        foreach ($this->createUsersAssignmentsService->create(...$users) as $assignment) {
+            $assignments[] = $assignment;
+        }
+
         return $this->responder->createJsonResponse(
-            ['assignments' => $this->createUsersAssignmentsService->create(...$users)],
+            ['assignments' => $assignments],
             Response::HTTP_CREATED
         );
     }

@@ -50,7 +50,7 @@ class UserRepository extends ServiceEntityRepository
         if (null === $user) {
             throw new EntityNotFoundException(
                 sprintf(
-                    "User with usnername = '%s' cannot be found.",
+                    "User with username = '%s' cannot be found.",
                     $username
                 )
             );
