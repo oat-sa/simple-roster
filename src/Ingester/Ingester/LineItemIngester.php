@@ -26,8 +26,7 @@ class LineItemIngester extends AbstractIngester
         /** @var Infrastructure[] $infrastructures */
         $infrastructures = $this->managerRegistry->getRepository(Infrastructure::class)->findAll();
 
-        if (empty($infrastructures))
-        {
+        if (empty($infrastructures)) {
             throw new Exception(
                 sprintf("Cannot ingest '%s' since infrastructure table is empty.", $this->getRegistryItemName())
             );

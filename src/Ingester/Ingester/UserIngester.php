@@ -26,8 +26,7 @@ class UserIngester extends AbstractIngester
         /** @var LineItem[] $lineItems */
         $lineItems = $this->managerRegistry->getRepository(LineItem::class)->findAll();
 
-        if (empty($lineItems))
-        {
+        if (empty($lineItems)) {
             throw new Exception(
                 sprintf("Cannot ingest '%s' since line-item table is empty.", $this->getRegistryItemName())
             );
