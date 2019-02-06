@@ -16,15 +16,18 @@ services:
           # The best practice is to be explicit about your dependencies anyway.
         bind:
             $debug: '%kernel.debug%'
-            $awsVersion: '%env(AWS_VERSION)%'
-            $awsRegion: '%env(AWS_REGION)%'
-            $ingesters: !tagged app.ingester
+
+    _instanceof:
+        App\Ingester\Ingester\IngesterInterface:
+            tags: ['app.ingester']
+        App\Ingester\Source\IngesterSourceInterface:
+            tags: ['app.ingester_source']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Ingesting/Source,Ingesting/Exception,Model,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -32,43 +35,20 @@ services:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-
-    App\S3\S3ClientInterface:
-        class: App\S3\AmazonS3Client
-        shared: false
-        arguments:
-            $client: '@aws.s3'
-
-    Aws\DynamoDb\Marshaler: ~
-
-    App\ODM\StorageInterface:
-        class: App\Storage\DynamoDbStorage
-        arguments:
-            $dynamoDbClient: '@Aws\DynamoDb\DynamoDbClient'
-            $marshaler: '@Aws\DynamoDb\Marshaler'
-
-    App\Ingesting\Ingester\InfrastructuresIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\InfrastructureRowToModelMapper'
-        tags: ['app.ingester']
-
-    App\Ingesting\Ingester\LineItemsIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\LineItemRowToModelMapper'
-        tags: ['app.ingester']
-
-    App\Ingesting\Ingester\UserAndAssignmentsIngester:
-        arguments:
-            $rowToModelMapper: '@App\Ingesting\RowToModelMapper\UserRowToModelMapper'
-        tags: ['app.ingester']
-
-    json_serializer_normalizer:
-        class: Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer
-        public: false
-        tags: [serializer.normalizer]
-
     App\Repository\UserRepository:
         arguments:
             $userCacheTtl: '%env(USER_CACHE_TTL)%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    App\Ingester\Registry\IngesterRegistry:
+        arguments: [!tagged 'app.ingester']
+
+    App\Ingester\Registry\IngesterSourceRegistry:
+        arguments: [!tagged 'app.ingester_source']
+
+    App\Ingester\Source\S3CsvIngesterSource:
+        arguments:
+            $client: '@aws.s3'
+            $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
