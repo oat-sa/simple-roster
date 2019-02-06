@@ -7,7 +7,7 @@ use Traversable;
 
 interface IngesterSourceInterface extends RegistryItemInterface
 {
-    const DEFAULT_CSV_DELIMITER = ',';
+    public const DEFAULT_CSV_DELIMITER = ',';
 
     public function getContent(): Traversable;
 
