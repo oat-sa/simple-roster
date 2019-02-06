@@ -21,11 +21,11 @@ App\Entity\LineItem:
             unique: false
             nullable: false
             precision: 0
-        slug:
+        uri:
             type: string
             scale: 0
             length: 255
-            unique: true
+            unique: false
             nullable: false
             precision: 0
         startAt:
