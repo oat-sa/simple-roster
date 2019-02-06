@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -6,8 +6,9 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use JsonSerializable;
 
-class LineItem
+class LineItem implements JsonSerializable
 {
     /** @var int */
     private $id;
@@ -16,7 +17,7 @@ class LineItem
     private $label;
 
     /** @var string */
-    private $slug;
+    private $uri;
 
     /** @var DateTime */
     private $startAt;
@@ -52,19 +53,19 @@ class LineItem
         return $this;
     }
 
-    public function getSlug(): ?string
+    public function getUri(): string
     {
-        return $this->slug;
+        return $this->uri;
     }
 
-    public function setSlug(string $slug): self
+    public function setUri(string $uri): self
     {
-        $this->slug = $slug;
+        $this->uri = $uri;
 
         return $this;
     }
 
-    public function getStartAt(): ?DateTimeInterface
+    public function getStartAt(): ?\DateTimeInterface
     {
         return $this->startAt;
     }
@@ -129,5 +130,16 @@ class LineItem
         }
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'uri' => $this->getUri(),
+            'label' => $this->getLabel(),
+            'startDateTime' => $this->getStartAt() ? $this->getStartAt()->getTimestamp() : '',
+            'endDateTime' => $this->getEndAt() ? $this->getEndAt()->getTimestamp() : '',
+            'infrastructure' => $this->getInfrastructure()->getId(),
+        ];
     }
 }
