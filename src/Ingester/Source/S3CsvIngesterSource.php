@@ -32,7 +32,7 @@ class S3CsvIngesterSource extends AbstractIngesterSource
             'Key'    => $this->path
         ]);
 
-        $reader = Reader::createFromString((string)$result['Body'] ?? '');
+        $reader = Reader::createFromString((string)($result['Body'] ?? ''));
         $reader->setDelimiter($this->delimiter);
 
         foreach ($reader as $row) {
