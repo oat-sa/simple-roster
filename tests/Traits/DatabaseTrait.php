@@ -39,5 +39,4 @@ trait DatabaseTrait
     {
         return $this->getEntityManager()->getRepository($class);
     }
-
 }

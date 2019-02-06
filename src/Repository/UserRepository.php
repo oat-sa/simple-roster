@@ -35,7 +35,7 @@ class UserRepository extends ServiceEntityRepository
      */
     public function getByUsernameWithAssignments(string $username): ?User
     {
-        $users = $this
+        $user = $this
             ->createQueryBuilder('u')
             ->select('u, a, l, i')
             ->leftJoin('u.assignments', 'a')
@@ -47,7 +47,7 @@ class UserRepository extends ServiceEntityRepository
             ->useResultCache(true, $this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
 
-        if (null === $users) {
+        if (null === $user) {
             throw new EntityNotFoundException(
                 sprintf(
                     "User with usnername = '%s' cannot be found.",
@@ -56,7 +56,7 @@ class UserRepository extends ServiceEntityRepository
             );
         }
 
-        return $users;
+        return $user;
     }
 
     public function persist(User $user): void
