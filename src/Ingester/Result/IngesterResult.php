@@ -81,7 +81,7 @@ class IngesterResult
             $this->ingesterType,
             $this->sourceType,
             $this->successCount,
-            sizeof($this->failures)
+            count($this->failures)
         );
     }
 }
