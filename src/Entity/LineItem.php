@@ -58,9 +58,11 @@ class LineItem implements JsonSerializable
         return $this->uri;
     }
 
-    public function setUri(string $uri): void
+    public function setUri(string $uri): self
     {
         $this->uri = $uri;
+
+        return $this;
     }
 
     public function getStartAt(): ?\DateTimeInterface
