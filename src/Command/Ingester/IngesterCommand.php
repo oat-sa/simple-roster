@@ -17,7 +17,7 @@ use Throwable;
 
 class IngesterCommand extends Command
 {
-    const NAME = 'roster:ingest';
+    public const NAME = 'roster:ingest';
 
     /** @var IngesterRegistry */
     private $ingesterRegistry;

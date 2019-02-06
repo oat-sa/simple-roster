@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Command\Ingester;
 
+use App\Command\Ingester\IngesterCommand;
 use App\Entity\Infrastructure;
 use App\Tests\Traits\DatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -22,7 +23,7 @@ class IngesterCommandTest extends KernelTestCase
         $kernel = $this->setUpDatabase();
         $application = new Application($kernel);
 
-        $this->commandTester = new CommandTester($application->find('roster:ingest'));
+        $this->commandTester = new CommandTester($application->find(IngesterCommand::NAME));
     }
 
 
