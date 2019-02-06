@@ -15,18 +15,6 @@ doctrine:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
-        metadata_cache_driver:
-            type: redis
-            host: simple_roster_redis
-            port: 6379
-        query_cache_driver:
-            type: redis
-            host: simple_roster_redis
-            port: 6379
-        result_cache_driver:
-            type: redis
-            host: simple_roster_redis
-            port: 6379
         mappings:
             App:
                 is_bundle: false
