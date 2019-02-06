@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Generator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class User implements UserInterface
+class User implements UserInterface, EntityInterface
 {
     /** @var int */
     private $id;
@@ -84,6 +84,11 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    public function getLastAssignment(): ?Assignment
+    {
+        return $this->assignments->last() ?: null;
     }
 
     public function removeAssignment(Assignment $assignment): self
