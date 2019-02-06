@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use JsonSerializable;
 
-class LineItem implements JsonSerializable
+class LineItem implements JsonSerializable, EntityInterface
 {
     /** @var int */
     private $id;
@@ -18,6 +18,9 @@ class LineItem implements JsonSerializable
 
     /** @var string */
     private $uri;
+
+    /** @var string */
+    private $slug;
 
     /** @var DateTime */
     private $startAt;
@@ -61,6 +64,18 @@ class LineItem implements JsonSerializable
     public function setUri(string $uri): self
     {
         $this->uri = $uri;
+
+        return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

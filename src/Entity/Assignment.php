@@ -4,25 +4,25 @@ namespace App\Entity;
 
 use JsonSerializable;
 
-class Assignment implements JsonSerializable
+class Assignment implements JsonSerializable, EntityInterface
 {
     /**
-     * assignment can be taken if other constraints allows it (dates)
+     * Assignment can be taken if other constraints allows it (dates)
      */
     public const STATE_READY = 'ready';
 
     /**
-     * the LTI link for this assignment has been queried, and the state changed as “started” at the same time
+     * The LTI link for this assignment has been queried, and the state changed as “started” at the same time
      */
     public const STATE_STARTED = 'started';
 
     /**
-     * the test has been completed. We know that it has because simple-roster received the LTI-outcome request from the TAO delivery
+     * The test has been completed. We know that it has because simple-roster received the LTI-outcome request from the TAO delivery
      */
     public const STATE_COMPLETED = 'completed';
 
     /**
-     * the assignment cannot be taken anymore
+     * The assignment cannot be taken anymore
      */
     public const STATE_CANCELLED = 'cancelled';
 
