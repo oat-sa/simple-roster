@@ -23,7 +23,7 @@ class UserIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserIngester($this->getEntityManager());
+        $this->subject = new UserIngester($this->getManagerRegistry());
     }
 
     public function testDryRunIngest()
@@ -35,8 +35,8 @@ class UserIngesterTest extends KernelTestCase
         $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
-        $this->assertCount(3, $output->getSuccesses());
-        $this->assertCount(0, $output->getFailures());
+        $this->assertEquals(3, $output->getSuccessCount());
+        $this->assertFalse($output->hasFailures());
 
         $this->assertEmpty($this->getRepository(User::class)->findAll());
     }
@@ -50,8 +50,8 @@ class UserIngesterTest extends KernelTestCase
         $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
-        $this->assertCount(3, $output->getSuccesses());
-        $this->assertCount(0, $output->getFailures());
+        $this->assertEquals(3, $output->getSuccessCount());
+        $this->assertFalse($output->hasFailures());
 
         $this->assertCount(3, $this->getRepository(User::class)->findAll());
 
@@ -74,13 +74,22 @@ class UserIngesterTest extends KernelTestCase
         $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
-        $this->assertCount(1, $output->getSuccesses());
+        $this->assertEquals(1, $output->getSuccessCount());
+        $this->assertTrue($output->hasFailures());
         $this->assertCount(1, $output->getFailures());
 
         $this->assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
         $this->assertEquals('user_1', $user1->getUsername());
+
+        $failure = current($output->getFailures());
+        $this->assertEquals(2, $failure->getLineNumber());
+        $this->assertEquals(
+            ['user_1', 'password', 'http://taoplatform.loc/delivery_2.rdf'],
+            $failure->getData()
+        );
+        $this->assertContains('UNIQUE constraint failed: users.username', $failure->getReason());
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface

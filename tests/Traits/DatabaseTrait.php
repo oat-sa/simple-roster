@@ -2,11 +2,13 @@
 
 namespace App\Tests\Traits;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 trait DatabaseTrait
 {
@@ -33,9 +35,17 @@ trait DatabaseTrait
         return $kernel;
     }
 
-    protected function getEntityManager(): EntityManager
+    protected function getManagerRegistry(): ManagerRegistry
     {
-        return self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
+        return self::$kernel->getContainer()->get('doctrine');
+    }
+
+    /**
+     * @return ObjectManager|EntityManager
+     */
+    protected function getEntityManager(): ObjectManager
+    {
+        return $this->getManagerRegistry()->getManager();
     }
 
     protected function getRepository(string $class): EntityRepository

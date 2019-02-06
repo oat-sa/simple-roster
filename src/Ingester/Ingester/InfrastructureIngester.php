@@ -17,9 +17,9 @@ class InfrastructureIngester extends AbstractIngester
         $infrastructure = new Infrastructure();
 
         return $infrastructure
-            ->setLabel($data[0] ?? '')
-            ->setLtiDirectorLink($data[1] ?? '')
-            ->setLtiKey($data[2] ?? '')
-            ->setLtiSecret($data[3] ?? '');
+            ->setLabel($data[0])
+            ->setLtiDirectorLink($data[1])
+            ->setLtiKey($data[2])
+            ->setLtiSecret($data[3]);
     }
 }

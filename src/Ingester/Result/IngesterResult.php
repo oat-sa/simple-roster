@@ -10,8 +10,8 @@ class IngesterResult
     /** @var string */
     private $sourceType;
 
-    /** @var array */
-    private $successes = [];
+    /** @var int */
+    private $successCount = 0;
 
     /** @var array */
     private $failures = [];
@@ -26,16 +26,16 @@ class IngesterResult
         $this->dryRun = $dryRun;
     }
 
-    public function addSuccess(array $row): self
+    public function addSuccess(): self
     {
-        $this->successes[] = $row;
+        $this->successCount++;
 
         return $this;
     }
 
-    public function addFailure(array $row): self
+    public function addFailure(IngesterResultFailure $failure): self
     {
-        $this->failures[] = $row;
+        $this->failures[$failure->getLineNumber()] = $failure;
 
         return $this;
     }
@@ -50,14 +50,22 @@ class IngesterResult
         return $this->sourceType;
     }
 
-    public function getSuccesses(): array
+    public function getSuccessCount(): int
     {
-        return $this->successes;
+        return $this->successCount;
     }
 
+    /**
+     * @return IngesterResultFailure[]
+     */
     public function getFailures(): array
     {
         return $this->failures;
+    }
+
+    public function hasFailures(): bool
+    {
+        return !empty($this->failures);
     }
 
     public function isDryRun(): bool
@@ -72,7 +80,7 @@ class IngesterResult
             $this->dryRun ? '[DRY_RUN] ' : '',
             $this->ingesterType,
             $this->sourceType,
-            sizeof($this->successes),
+            $this->successCount,
             sizeof($this->failures)
         );
     }

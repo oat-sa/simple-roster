@@ -3,14 +3,14 @@
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\InfrastructureIngester;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class InfrastructureIngesterTest extends TestCase
 {
     public function testRegistryItemName()
     {
-        $subject = new InfrastructureIngester($this->createMock(EntityManagerInterface::class));
+        $subject = new InfrastructureIngester($this->createMock(ManagerRegistry::class));
 
         $this->assertEquals('infrastructure', $subject->getRegistryItemName());
     }

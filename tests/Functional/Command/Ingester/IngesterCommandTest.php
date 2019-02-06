@@ -41,7 +41,7 @@ class IngesterCommandTest extends KernelTestCase
         );
     }
 
-    public function testLocalIngestion()
+    public function testLocalIngestionSuccess()
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -66,5 +66,28 @@ class IngesterCommandTest extends KernelTestCase
 
         $user3 = $this->getRepository(Infrastructure::class)->find(3);
         $this->assertEquals('infra_3', $user3->getLabel());
+    }
+
+    public function testLocalIngestionFailure()
+    {
+        $output = $this->commandTester->execute([
+            'type' => 'infrastructure',
+            'source' => 'local',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            '--force' => true
+        ]);
+
+        $this->assertEquals(0, $output);
+        $this->assertContains(
+            "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
+            $this->commandTester->getDisplay()
+        );
+
+        $this->assertContains("Undefined offset: 3", $this->commandTester->getDisplay());
+
+        $this->assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
+
+        $user1 = $this->getRepository(Infrastructure::class)->find(1);
+        $this->assertEquals('infra_1', $user1->getLabel());
     }
 }

@@ -4,6 +4,8 @@ namespace App\Command\Ingester;
 
 use App\Ingester\Registry\IngesterRegistry;
 use App\Ingester\Registry\IngesterSourceRegistry;
+use App\Ingester\Result\IngesterResult;
+use App\Ingester\Result\IngesterResultFailure;
 use App\Ingester\Source\IngesterSourceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -94,16 +96,35 @@ class IngesterCommand extends Command
 
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
+            $this->displayIngestionResult($result, $style);
             $this->logger->info($result);
-            $style->success($result);
 
         } catch (Throwable $exception) {
-            $this->logger->error($exception->getMessage());
             $style->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
             return 1;
         }
 
         return 0;
+    }
+
+    private function displayIngestionResult(IngesterResult $result, SymfonyStyle $style): void
+    {
+        if ($result->hasFailures()) {
+            $style->warning($result);
+            $style->table(
+                ['Line', 'Data', 'Reason'],
+                array_map(function (IngesterResultFailure $failure): array {
+                    return [
+                        $failure->getLineNumber(),
+                        implode(', ', $failure->getData()),
+                        $failure->getReason()
+                    ];
+                }, $result->getFailures())
+            );
+        } else {
+            $style->success($result);
+        }
     }
 }

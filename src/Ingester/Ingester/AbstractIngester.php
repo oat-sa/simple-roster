@@ -4,18 +4,19 @@ namespace App\Ingester\Ingester;
 
 use App\Entity\EntityInterface;
 use App\Ingester\Result\IngesterResult;
+use App\Ingester\Result\IngesterResultFailure;
 use App\Ingester\Source\IngesterSourceInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface
 {
-    /** @var EntityManagerInterface */
-    protected $entityManager;
+    /** @var ManagerRegistry */
+    protected $managerRegistry;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        $this->entityManager = $entityManager;
+        $this->managerRegistry = $managerRegistry;
     }
 
     public function ingest(IngesterSourceInterface $source, bool $dryRun = true): IngesterResult
@@ -26,17 +27,27 @@ abstract class AbstractIngester implements IngesterInterface
             $dryRun
         );
 
+        $lineNumber = 1;
         foreach ($source->getContent() as $data) {
             try {
                 if (!$dryRun) {
-                    $this->entityManager->persist($this->createEntity($data));
-                    $this->entityManager->flush();
+                    $this->managerRegistry->getManager()->persist($this->createEntity($data));
+                    $this->managerRegistry->getManager()->flush();
                 }
 
-                $result->addSuccess($data);
+                $result->addSuccess();
+
             } catch (Throwable $exception) {
-                $result->addFailure($data);
+                if (!$dryRun) {
+                    $this->managerRegistry->resetManager();
+                }
+
+                $result->addFailure(
+                    new IngesterResultFailure($lineNumber, $data, $exception->getMessage())
+                );
             }
+
+            $lineNumber++;
         }
 
         return $result;
