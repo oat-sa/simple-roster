@@ -26,17 +26,10 @@ class IngesterCommand extends Command
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    public function __construct(
-        IngesterRegistry $ingesterRegistry,
-        IngesterSourceRegistry $sourceRegistry,
-        LoggerInterface $logger
-    ) {
+    public function __construct(IngesterRegistry $ingesterRegistry, IngesterSourceRegistry $sourceRegistry)
+    {
         $this->ingesterRegistry = $ingesterRegistry;
         $this->sourceRegistry = $sourceRegistry;
-        $this->logger = $logger;
 
         parent::__construct(static::NAME);
     }
@@ -97,11 +90,9 @@ class IngesterCommand extends Command
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
             $this->displayIngestionResult($result, $style);
-            $this->logger->info($result);
 
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
-            $this->logger->error($exception->getMessage());
 
             return 1;
         }
