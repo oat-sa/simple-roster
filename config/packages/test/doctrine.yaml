@@ -2,3 +2,10 @@ doctrine:
     dbal:
         driver: 'pdo_sqlite'
         url: 'sqlite:///%kernel.project_dir%/var/test.db3'
+    orm:
+        metadata_cache_driver:
+            type: array
+        query_cache_driver:
+            type: array
+        result_cache_driver:
+            type: array

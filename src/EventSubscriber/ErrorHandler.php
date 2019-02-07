@@ -12,7 +12,7 @@ class ErrorHandler implements EventSubscriberInterface
     /** @var SerializerResponder */
     private $responder;
 
-    /** @var */
+    /** @var bool */
     private $debug;
 
     public function __construct(SerializerResponder $responder, bool $debug)
@@ -35,7 +35,7 @@ class ErrorHandler implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->debug) {
+        if ($this->debug) {
             $errorJsonResponse = $this->responder->createErrorJsonResponse($event->getException());
 
             $event->setResponse($errorJsonResponse);

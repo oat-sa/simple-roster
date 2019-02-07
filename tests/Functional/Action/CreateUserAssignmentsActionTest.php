@@ -32,7 +32,7 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         $this->setUpDatabase();
         $this->setUpFixtures();
 
-        $this->client = self::createClient(['debug' => false]);
+        $this->client = self::createClient();
         $this->userRepository = $this->getRepository(User::class);
     }
 

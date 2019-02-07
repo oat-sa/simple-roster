@@ -4,10 +4,11 @@ parameters:
     # environment variables are not available yet.
     # You should not need to change this value.
     env(DATABASE_URL): ''
+    "redis_cache_url": '%env(REDIS_CACHE_URL)%' #TODO Find better solution to bypass env variable usage
 
 doctrine:
     dbal:
-        # configure these for your database server
+        # configure these for your database serv
         driver: 'pdo_pgsql'
         charset: utf8
         url: '%env(resolve:DATABASE_URL)%'
@@ -17,15 +18,15 @@ doctrine:
         auto_mapping: true
         metadata_cache_driver:
             type: redis
-            host: simple_roster_redis
+            host: '%env(REDIS_CACHE_URL)%'
             port: 6379
         query_cache_driver:
             type: redis
-            host: simple_roster_redis
+            host: '%env(REDIS_CACHE_URL)%'
             port: 6379
         result_cache_driver:
             type: redis
-            host: simple_roster_redis
+            host: '%env(REDIS_CACHE_URL)%'
             port: 6379
         mappings:
             App:

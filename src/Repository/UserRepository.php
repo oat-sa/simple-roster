@@ -33,7 +33,7 @@ class UserRepository extends ServiceEntityRepository
     /**
      * @throws EntityNotFoundException
      */
-    public function getByUsernameWithAssignments(string $username): ?User
+    public function getByUsernameWithAssignments(string $username): User
     {
         $user = $this
             ->createQueryBuilder('u')
@@ -48,12 +48,7 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
 
         if (null === $user) {
-            throw new EntityNotFoundException(
-                sprintf(
-                    "User with username = '%s' cannot be found.",
-                    $username
-                )
-            );
+            throw new EntityNotFoundException(sprintf("User with username = '%s' cannot be found.", $username));
         }
 
         return $user;
