@@ -4,12 +4,17 @@ namespace App\Service\LTI;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;
+use Throwable;
 
 class ReplaceResultSourceIdExtractor
 {
     public function extractSourceId(string $xmlContent): int
     {
-        $xml = new SimpleXMLElement($xmlContent);
+        try {
+            $xml = new SimpleXMLElement($xmlContent);
+        } catch (Throwable $exception) {
+            throw new InvalidLtiReplaceResultBodyException();
+        }
 
         $xml->registerXPathNamespace('x', 'http://www.imsglobal.org/lis/oms1p0/pox');
 

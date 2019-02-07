@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Controller\ApiV1\OAuthSignatureValidatedController;
+use App\Action\OAuthSignatureValidatedAction;
 use App\Model\OAuth\Signature;
 use App\Repository\InfrastructureRepository;
 use App\Security\OAuth\SignatureGenerator;
@@ -36,18 +36,9 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
      */
     public function onKernelController(FilterControllerEvent $event): void
     {
-        $controller = $event->getController();
+        $action = $event->getController();
 
-        /*
-        * $controller passed can be either a class or a Closure.
-        * This is not usual in Symfony but it may happen.
-        * If it is a class, it comes in array format
-        */
-        if (!is_array($controller)) {
-            return;
-        }
-
-        if ($controller[0] instanceof OAuthSignatureValidatedController) {
+        if ($action instanceof OAuthSignatureValidatedAction) {
             $request = $event->getRequest();
 
             $infrastructure = $this->infrastructureRepository->getByLtiKey((string)$request->query->get('oauth_consumer_key'));

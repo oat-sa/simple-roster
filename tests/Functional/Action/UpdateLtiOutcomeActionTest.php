@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Controller\ApiV1;
+namespace App\Tests\Functional\Action;
 
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
@@ -11,7 +11,7 @@ use App\Security\OAuth\SignatureGenerator;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class LtiControllerTest extends WebTestCase
+class UpdateLtiOutcomeActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
 
@@ -62,7 +62,7 @@ class LtiControllerTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($infrastructure, $time);
 
-        $xmlBody = file_get_contents(__DIR__ . '/samples/valid_replace_result_body.xml');
+        $xmlBody = file_get_contents(__DIR__ . '/../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
@@ -102,7 +102,7 @@ class LtiControllerTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($infrastructure, $time);
 
-        $xmlBody = file_get_contents(__DIR__ . '/samples/invalid_replace_result_body_wrong_assignment.xml');
+        $xmlBody = file_get_contents(__DIR__ . '/../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',

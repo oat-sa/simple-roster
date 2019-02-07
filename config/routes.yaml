@@ -2,3 +2,8 @@ createUserAssignments:
   path: /api/v1/assignments
   methods: POST
   defaults: { _controller: App\Action\CreateUserAssignmentsAction }
+
+updateLtiOutcome:
+  path: /api/v1/lti/outcome
+  methods: POST
+  defaults: { _controller: App\Action\UpdateLtiOutcomeAction }
