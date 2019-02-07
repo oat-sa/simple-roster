@@ -3,7 +3,13 @@ createUserAssignments:
   methods: POST
   defaults: { _controller: App\Action\CreateUserAssignmentsAction }
 
+updateLtiOutcome:
+  path: /api/v1/lti/outcome
+  methods: POST
+  defaults: { _controller: App\Action\UpdateLtiOutcomeAction }
+
 getUserAssignments:
   path: /api/v1/assignments
   methods: GET
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
+

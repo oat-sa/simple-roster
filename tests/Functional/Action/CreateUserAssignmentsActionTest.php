@@ -44,7 +44,7 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => 'A Token was not found in the TokenStorage.',
+                    'message' => 'Full authentication is required to access this resource.',
                 ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)

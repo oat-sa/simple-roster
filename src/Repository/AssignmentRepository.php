@@ -27,4 +27,9 @@ class AssignmentRepository extends ServiceEntityRepository
     {
         $this->_em->persist($assignment);
     }
+
+    public function flush(): void
+    {
+        $this->_em->flush();
+    }
 }

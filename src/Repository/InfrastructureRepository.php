@@ -18,4 +18,24 @@ class InfrastructureRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Infrastructure::class);
     }
+
+    public function getByLtiKey(string $ltiKey): ?Infrastructure
+    {
+        return $this
+            ->createQueryBuilder('i')
+            ->where('i.ltiKey = :ltiKey')
+            ->setParameter('ltiKey', $ltiKey)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function persist(Infrastructure $infrastructure): void
+    {
+        $this->_em->persist($infrastructure);
+    }
+
+    public function flush(): void
+    {
+        $this->_em->flush();
+    }
 }
