@@ -1,5 +1,4 @@
 App\Entity\Assignment:
   assignment1:
     lineItem: '@lineItem1'
-    user: '@user1'
     state: 'ready'

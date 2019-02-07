@@ -4,5 +4,4 @@ namespace App\Action;
 
 interface OAuthSignatureValidatedAction
 {
-
 }
