@@ -13,3 +13,10 @@ getUserAssignments:
   methods: GET
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
 
+login:
+  path: /api/v1/auth/login
+  methods: POST
+  defaults: { _controller: App\Action\LoginAction }
+
+logout:
+  path: /api/v1/auth/logout
