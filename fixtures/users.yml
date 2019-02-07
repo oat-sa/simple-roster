@@ -3,3 +3,4 @@ App\Entity\User:
     username: 'user1'
     password: '\$argon2i\$v=19\$m=4096,t=3,p=2\$bGUxZ3lKZGdCMWNGOXJUWQ\$ThtL30mrYhEntJfilajQUvXEsbopCm3QgAiUYY7jQx4' # "password" hashed with argon2
     plainPassword: 'password'
+    assignments: ['@assignment1']
