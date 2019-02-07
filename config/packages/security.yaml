@@ -20,8 +20,11 @@ security:
 
         api:
             anonymous: ~
+            logout:
+                path: logout
+                success_handler: App\Security\LogoutSuccessHandler
             json_login:
-                check_path: api_v1_auth_login
+                check_path: login
                 remember_me: false
 
             # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
