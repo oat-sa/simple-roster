@@ -6,6 +6,7 @@ use App\Responder\SerializerResponder;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
@@ -29,7 +30,7 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createJsonResponse($data);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(json_encode($data), $response->getContent());
     }
 
@@ -37,10 +38,14 @@ class SerializerResponderTest extends KernelTestCase
     {
         $data = ['some' => 'data'];
 
-        $response = $this->createResponderInstance()->createJsonResponse($data, 201, ['some' => 'header']);
+        $response = $this->createResponderInstance()->createJsonResponse(
+            $data,
+            Response::HTTP_CREATED,
+            ['some' => 'header']
+        );
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
         $this->assertEquals(json_encode($data), $response->getContent());
     }
@@ -52,7 +57,7 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertArraySubset(
             [
                 'error' => [
@@ -72,7 +77,7 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertArraySubset(
             [
                 'error' => [
@@ -91,10 +96,14 @@ class SerializerResponderTest extends KernelTestCase
     {
         $exception = new Exception('error message');
 
-        $response = $this->createResponderInstance()->createErrorJsonResponse($exception, 501, ['some' => 'header']);
+        $response = $this->createResponderInstance()->createErrorJsonResponse(
+            $exception,
+            Response::HTTP_NOT_IMPLEMENTED,
+            ['some' => 'header']
+        );
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(501, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
         $this->assertArraySubset(
             [
@@ -113,7 +122,7 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(418, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(
             [
@@ -139,7 +148,7 @@ class SerializerResponderTest extends KernelTestCase
         {
             public function getStatusCode()
             {
-                return 418; //teapot
+                return Response::HTTP_I_AM_A_TEAPOT; //teapot
             }
 
             public function getHeaders()
