@@ -27,7 +27,7 @@ class IngesterCommandTest extends KernelTestCase
     }
 
 
-    public function testDryRunLocalIngestion()
+    public function testDryRunLocalIngestion(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -40,9 +40,11 @@ class IngesterCommandTest extends KernelTestCase
             "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
+
+        $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
     }
 
-    public function testLocalIngestionSuccess()
+    public function testLocalIngestionSuccess(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -69,7 +71,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals('infra_3', $user3->getLabel());
     }
 
-    public function testLocalIngestionFailure()
+    public function testLocalIngestionFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -92,7 +94,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals('infra_1', $user1->getLabel());
     }
 
-    public function testInvalidIngesterFailure()
+    public function testInvalidIngesterFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'invalid',
@@ -108,7 +110,7 @@ class IngesterCommandTest extends KernelTestCase
         );
     }
 
-    public function testInvalidSourceFailure()
+    public function testInvalidSourceFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
