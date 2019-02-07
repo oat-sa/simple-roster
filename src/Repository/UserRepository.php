@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Generator\UserCacheIdGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -14,14 +16,26 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    /** @var UserCacheIdGenerator */
+    private $userCacheIdGenerator;
+
+    /** @var int */
+    private $userCacheTtl;
+
+    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator, int $userCacheTtl)
     {
         parent::__construct($registry, User::class);
+
+        $this->userCacheIdGenerator = $userCacheIdGenerator;
+        $this->userCacheTtl = $userCacheTtl;
     }
 
-    public function getByUsernameWithAssignments(string $username): ?User
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function getByUsernameWithAssignments(string $username): User
     {
-        return $this
+        $user = $this
             ->createQueryBuilder('u')
             ->select('u, a, l, i')
             ->leftJoin('u.assignments', 'a')
@@ -30,6 +44,18 @@ class UserRepository extends ServiceEntityRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
+            ->useResultCache(true, $this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
+
+        if (null === $user) {
+            throw new EntityNotFoundException(sprintf("User with username = '%s' cannot be found.", $username));
+        }
+
+        return $user;
+    }
+
+    public function persist(User $user): void
+    {
+        $this->_em->persist($user);
     }
 }
