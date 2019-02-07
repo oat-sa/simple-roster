@@ -148,7 +148,7 @@ class User implements UserInterface, EntityInterface
         $this->plainPassword = null;
     }
 
-    public function getPlainPassword(): string
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
