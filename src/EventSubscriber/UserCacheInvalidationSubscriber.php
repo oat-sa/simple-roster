@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 
-class UserCacheInvalidator implements EventSubscriber
+class UserCacheInvalidationSubscriber implements EventSubscriber
 {
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
@@ -32,11 +32,11 @@ class UserCacheInvalidator implements EventSubscriber
         $entityManager = $eventArgs->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
-        $scheduledEntityChanges = array(
+        $scheduledEntityChanges = [
             'insert' => $unitOfWork->getScheduledEntityInsertions(),
             'update' => $unitOfWork->getScheduledEntityUpdates(),
             'delete' => $unitOfWork->getScheduledEntityDeletions()
-        );
+        ];
 
         foreach ($scheduledEntityChanges as $entities) {
             foreach ($entities as $entity) {
