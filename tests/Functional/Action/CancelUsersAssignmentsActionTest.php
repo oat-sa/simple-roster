@@ -23,11 +23,10 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         $client->request(Request::METHOD_DELETE, self::CANCEL_USERS_ASSIGNMENTS_URI);
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'message' => 'A Token was not found in the TokenStorage.',
+                    'message' => 'Full authentication is required to access this resource.',
                 ],
             ],
             json_decode($client->getResponse()->getContent(), true)
@@ -53,10 +52,9 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_BAD_REQUEST,
                     'message' => 'Invalid JSON request body received. Error: Syntax error',
                 ],
             ],
@@ -83,10 +81,9 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_BAD_REQUEST,
                     'message' => 'Empty request body received.',
                 ],
             ],
@@ -113,10 +110,9 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
                     'message' => "User with username = 'nonExistingUsername' cannot be found.",
                 ]
             ],
