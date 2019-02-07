@@ -20,11 +20,19 @@ class LoginActionTest extends WebTestCase
             '/api/v1/auth/login',
             [],
             [],
-            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
             json_encode(['username' => 'invalid', 'password' => 'invalid'])
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => 'Authentication request could not be processed due to a system problem.',
+            ],
+            json_decode($client->getResponse()->getContent(), true)
+        );
     }
 
     public function testItLogsInProperlyTheUser()
