@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entity;
 
-class Infrastructure
+class Infrastructure implements EntityInterface
 {
     /** @var int */
     private $id;
