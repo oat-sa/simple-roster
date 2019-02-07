@@ -148,7 +148,7 @@ class SerializerResponderTest extends KernelTestCase
         {
             public function getStatusCode()
             {
-                return Response::HTTP_I_AM_A_TEAPOT; //teapot
+                return Response::HTTP_I_AM_A_TEAPOT;
             }
 
             public function getHeaders()
