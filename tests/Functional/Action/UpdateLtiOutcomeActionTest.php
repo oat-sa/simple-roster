@@ -176,7 +176,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     private function generateSignature(Infrastructure $infrastructure, $time): string
     {
-        $signature = new OAuthContext(
+        $context = new OAuthContext(
             'bodyHash',
             $infrastructure->getLtiKey(),
             'nonce',
@@ -185,9 +185,14 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             '1.0'
         );
 
-        $signatureGenerator = new OAuthSigner($signature, 'http://localhost/api/v1/lti/outcome', 'POST');
+        $oauthSigner = new OAuthSigner();
 
-        return $signatureGenerator->getSignature($infrastructure->getLtiSecret());
+        return $oauthSigner->sign(
+            $context,
+            'http://localhost/api/v1/lti/outcome',
+            'POST',
+            $infrastructure->getLtiSecret()
+        );
     }
 
     private function getInfrastructure(): Infrastructure
