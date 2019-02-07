@@ -94,6 +94,46 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
     }
 
+    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid()
+    {
+        $client = static::createClient();
+
+        $infrastructure = $this->getInfrastructure();
+
+        $time = time();
+        $signature = $this->generateSignature($infrastructure, $time);
+
+        $xmlBody = 'test';
+
+        $queryParameters = http_build_query([
+            'oauth_body_hash' => 'bodyHash',
+            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_nonce' => 'nonce',
+            'oauth_signature' => $signature,
+            'oauth_signature_method' => 'HMAC-SHA1',
+            'oauth_timestamp' => $time,
+            'oauth_version' => '1.0',
+        ]);
+
+        $client->request(
+            'POST',
+            '/api/v1/lti/outcome? '. $queryParameters,
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+            ],
+            $xmlBody
+        );
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
+
+        $this->assertEquals(
+            Assignment::STATE_READY,
+            $this->getAssignment()->getState()
+        );
+    }
+
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist()
     {
         $client = static::createClient();
