@@ -12,10 +12,14 @@ class SerializerResponder
 {
     /** @var SerializerInterface */
     private $serializer;
+    
+    /** @var bool */
+    private $debug;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, bool $debug = false)
     {
         $this->serializer = $serializer;
+        $this->debug = $debug;
     }
 
     public function createJsonResponse($data, int $statusCode = Response::HTTP_OK, array $headers = []): JsonResponse
@@ -27,26 +31,20 @@ class SerializerResponder
         );
     }
 
-    public function createErrorJsonResponse(
-        Throwable $exception,
-        int $statusCode = 500,
-        array $headers = []
-    ): JsonResponse {
-
-        $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode;
-        $headers = $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : $headers;
-
-        $responseBody = [
-            'error' => [
-                'code' => $statusCode,
-                'message' => $exception->getMessage(),
-            ]
+    public function createErrorJsonResponse(Throwable $exception, int $statusCode = 500, array $headers = []): JsonResponse
+    {
+        $content = [
+            'message' => $exception->getMessage()
         ];
 
+        if ($this->debug) {
+            $content['trace'] = $exception->getTraceAsString();
+        }
+
         return JsonResponse::fromJsonString(
-            $this->serializer->serialize($responseBody, 'json'),
-            $statusCode,
-            $headers
+            $this->serializer->serialize(['error' => $content], 'json'),
+            $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode,
+            $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : $headers
         );
     }
 }

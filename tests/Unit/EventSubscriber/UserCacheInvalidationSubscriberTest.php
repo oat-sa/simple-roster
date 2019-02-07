@@ -4,7 +4,7 @@ namespace App\Tests\Unit\EventSubscriber;
 
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\EventSubscriber\UserCacheInvalidator;
+use App\EventSubscriber\UserCacheInvalidationSubscriber;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
@@ -13,9 +13,9 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
-class UserCacheInvalidatorTest extends TestCase
+class UserCacheInvalidationSubscriberTest extends TestCase
 {
-    /** @var UserCacheInvalidator */
+    /** @var UserCacheInvalidationSubscriber */
     private $subject;
 
     /** @var EntityManager */
@@ -52,7 +52,7 @@ class UserCacheInvalidatorTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
-        $this->subject = new UserCacheInvalidator($this->userCacheIdGenerator);
+        $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator);
     }
 
     public function testItInvalidatesSingleUserCacheUponEntityInsertion(): void

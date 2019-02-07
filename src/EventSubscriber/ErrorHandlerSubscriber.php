@@ -7,18 +7,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ErrorHandler implements EventSubscriberInterface
+class ErrorHandlerSubscriber implements EventSubscriberInterface
 {
     /** @var SerializerResponder */
     private $responder;
 
-    /** @var bool */
-    private $debug;
-
-    public function __construct(SerializerResponder $responder, bool $debug)
+    public function __construct(SerializerResponder $responder)
     {
         $this->responder = $responder;
-        $this->debug = $debug;
     }
 
     public static function getSubscribedEvents()
@@ -30,15 +26,12 @@ class ErrorHandler implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event): void
     {
-        // only apply in master requests
         if (!$event->isMasterRequest()) {
             return;
         }
 
-        if ($this->debug) {
-            $errorJsonResponse = $this->responder->createErrorJsonResponse($event->getException());
-
-            $event->setResponse($errorJsonResponse);
-        }
+        $event->setResponse(
+            $this->responder->createErrorJsonResponse($event->getException())
+        );
     }
 }
