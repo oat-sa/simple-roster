@@ -38,33 +38,35 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
     {
         $action = $event->getController();
 
-        if ($action instanceof OAuthSignatureValidatedAction) {
-            $request = $event->getRequest();
+        if (!$action instanceof OAuthSignatureValidatedAction) {
+            return;
+        }
 
-            $infrastructure = $this->infrastructureRepository->getByLtiKey((string)$request->query->get('oauth_consumer_key'));
+        $request = $event->getRequest();
 
-            if (!$infrastructure) {
-                throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer key invalid"');
-            }
+        $infrastructure = $this->infrastructureRepository->getByLtiKey((string)$request->query->get('oauth_consumer_key'));
 
-            $signature = new Signature(
-                (string)$request->query->get('oauth_body_hash'),
-                (string)$request->query->get('oauth_consumer_key'),
-                (string)$request->query->get('oauth_nonce'),
-                (string)$request->query->get('oauth_signature_method'),
-                (string)$request->query->get('oauth_timestamp'),
-                (string)$request->query->get('oauth_version')
-            );
+        if (!$infrastructure) {
+            throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer key invalid"');
+        }
 
-            $signatureGenerator = new SignatureGenerator(
-                $signature,
-                $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
-                $request->getMethod()
-            );
+        $signature = new Signature(
+            (string)$request->query->get('oauth_body_hash'),
+            (string)$request->query->get('oauth_consumer_key'),
+            (string)$request->query->get('oauth_nonce'),
+            (string)$request->query->get('oauth_signature_method'),
+            (string)$request->query->get('oauth_timestamp'),
+            (string)$request->query->get('oauth_version')
+        );
 
-            if ($signatureGenerator->getSignature($infrastructure->getLtiSecret()) !== $request->query->get('oauth_signature')) {
-                throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="access token invalid"');
-            }
+        $signatureGenerator = new SignatureGenerator(
+            $signature,
+            $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
+            $request->getMethod()
+        );
+
+        if ($signatureGenerator->getSignature($infrastructure->getLtiSecret()) !== $request->query->get('oauth_signature')) {
+            throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="access token invalid"');
         }
     }
 }

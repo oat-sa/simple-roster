@@ -27,8 +27,7 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedAction
         ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor,
         CompleteAssignmentService $completeAssignmentService,
         SerializerResponder $serializerResponder
-    )
-    {
+    ) {
         $this->replaceResultSourceIdExtractor = $replaceResultSourceIdExtractor;
         $this->completeAssignmentService = $completeAssignmentService;
         $this->serializerResponder = $serializerResponder;
