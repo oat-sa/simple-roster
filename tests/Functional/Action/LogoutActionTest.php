@@ -28,13 +28,7 @@ class LogoutActionTest extends WebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/v1/auth/logout',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'])
+            '/api/v1/auth/logout'
         );
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
