@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\LTI;
+namespace App\Service\Lti;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;

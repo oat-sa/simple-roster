@@ -4,6 +4,7 @@ namespace App\Action;
 
 use App\Entity\User;
 use App\Responder\SerializerResponder;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ListUserAssignmentsAction
@@ -19,7 +20,7 @@ class ListUserAssignmentsAction
     /**
      * @param UserInterface|User $user
      */
-    public function __invoke(UserInterface $user)
+    public function __invoke(UserInterface $user): Response
     {
         return $this->responder->createJsonResponse(['assignments' => $user->getAvailableAssignments()]);
     }

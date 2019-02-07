@@ -38,7 +38,7 @@ class CreateUserAssignmentsAction
      * @throws NotFoundHttpException
      * @throws Exception
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): Response
     {
         $usernames = json_decode($request->getContent(), true);
         if (json_last_error()) {
