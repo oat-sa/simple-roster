@@ -46,9 +46,6 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedAction
             throw new BadRequestHttpException($exception->getMessage());
         }
 
-        return $this->serializerResponder->createJsonResponse(
-            null,
-            Response::HTTP_OK
-        );
+        return $this->serializerResponder->createJsonResponse(null);
     }
 }
