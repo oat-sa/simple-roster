@@ -1,0 +1,16 @@
+{
+  "source": {
+    "directories": [
+      "src"
+    ]
+  },
+  "timeout": 10,
+  "logs": {
+    "text": "var/log/infection/infection.log",
+    "summary": "var/log/infection/summary.log",
+    "perMutator": "var/log/infection/per-mutator.md"
+  },
+  "tmpDir": "var/cache/infection",
+  "testFramework": "phpunit",
+  "testFrameworkOptions": "-vvv"
+}
