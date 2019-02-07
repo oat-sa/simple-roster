@@ -37,3 +37,9 @@ services:
         arguments:
             $client: '@aws.s3'
             $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
+
+    App\EventSubscriber\UserPasswordEncoderSubscriber:
+        tags: ['doctrine.event_subscriber']
+
+    App\EventSubscriber\UserCacheInvalidationSubscriber:
+        tags: ['doctrine.event_subscriber']
