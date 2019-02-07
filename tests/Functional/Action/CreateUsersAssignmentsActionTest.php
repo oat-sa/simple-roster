@@ -41,11 +41,10 @@ class CreateUsersAssignmentsActionTest extends WebTestCase
         $this->client->request(Request::METHOD_POST, self::CREATE_USER_ASSIGNMENTS_URI);
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'message' => 'A Token was not found in the TokenStorage.',
+                    'message' => 'Full authentication is required to access this resource.',
                 ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
@@ -67,10 +66,9 @@ class CreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_BAD_REQUEST,
                     'message' => 'Invalid JSON request body received. Error: Syntax error',
                 ],
             ],
@@ -93,10 +91,9 @@ class CreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_BAD_REQUEST,
                     'message' => 'Empty request body received.',
                 ],
             ],
@@ -119,10 +116,9 @@ class CreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_NOT_FOUND,
                     'message' => "User with username = 'nonExistingUsername' cannot be found.",
                 ]
             ],

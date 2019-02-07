@@ -17,4 +17,14 @@ class InfrastructureRepository extends AbstractRepository
     {
         parent::__construct($registry, Infrastructure::class);
     }
+
+    public function getByLtiKey(string $ltiKey): ?Infrastructure
+    {
+        return $this
+            ->createQueryBuilder('i')
+            ->where('i.ltiKey = :ltiKey')
+            ->setParameter('ltiKey', $ltiKey)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

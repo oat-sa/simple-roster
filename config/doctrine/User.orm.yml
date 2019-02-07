@@ -44,3 +44,5 @@ App\Entity\User:
             orphanRemoval: false
             orderBy: null
     lifecycleCallbacks: {  }
+    entityListeners:
+        App\EventListener\Doctrine\UserPasswordEncoderListener:

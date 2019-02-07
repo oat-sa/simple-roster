@@ -24,11 +24,10 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $client->request(Request::METHOD_GET, self::LIST_USER_ASSIGNMENTS_URI);
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'error' => [
-                    'code' => Response::HTTP_UNAUTHORIZED,
-                    'message' => 'A Token was not found in the TokenStorage.',
+                    'message' => 'Full authentication is required to access this resource.',
                 ],
             ],
             json_decode($client->getResponse()->getContent(), true)

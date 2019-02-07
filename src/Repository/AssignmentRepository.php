@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
-use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
