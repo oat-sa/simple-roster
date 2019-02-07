@@ -10,6 +10,7 @@ use App\Repository\InfrastructureRepository;
 use App\Security\OAuth\SignatureGenerator;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLtiOutcomeActionTest extends WebTestCase
 {
@@ -21,7 +22,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $client->request('POST', '/api/v1/lti/outcome');
 
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongAuthentication()
@@ -50,7 +51,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             ]
         );
 
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists()
@@ -85,7 +86,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_COMPLETED,
@@ -125,7 +126,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_READY,

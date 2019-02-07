@@ -28,7 +28,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
             [
                 'error' => [
                     'code' => Response::HTTP_UNAUTHORIZED,
-                    'message' => 'A Token was not found in the TokenStorage.',
+                    'message' => 'Full authentication is required to access this resource.',
                 ],
             ],
             json_decode($client->getResponse()->getContent(), true)
