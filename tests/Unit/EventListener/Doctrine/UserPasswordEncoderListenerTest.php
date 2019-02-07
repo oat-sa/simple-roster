@@ -4,7 +4,6 @@ namespace App\Tests\Unit\EventListener\Doctrine;
 
 use App\Entity\User;
 use App\EventListener\Doctrine\UserPasswordEncoderListener;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -28,8 +27,6 @@ class UserPasswordEncoderListenerTest extends TestCase
     {
         $entity = $this->createMock(User::class);
 
-        $event = $this->createMock(LifecycleEventArgs::class);
-
         $this
             ->userPasswordEncoderMock
             ->expects($this->never())
@@ -39,15 +36,13 @@ class UserPasswordEncoderListenerTest extends TestCase
             ->expects($this->never())
             ->method('setPassword');
 
-        $this->subject->prePersist($entity, $event);
+        $this->subject->prePersist($entity);
     }
 
     public function testItCorrectlyUpdatesTheEncodedPassword()
     {
         $entity = new User();
         $entity->setPlainPassword('password');
-
-        $event = $this->createMock(LifecycleEventArgs::class);
 
         $this
             ->userPasswordEncoderMock
@@ -56,7 +51,7 @@ class UserPasswordEncoderListenerTest extends TestCase
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
-        $this->subject->prePersist($entity, $event);
+        $this->subject->prePersist($entity);
 
         $this->assertEquals(
             'encodedPassword',
