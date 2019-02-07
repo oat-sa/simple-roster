@@ -45,7 +45,7 @@ class GetUserAssignmentLtiLinkService
         $signature = $this->signer->sign(
             $context,
             $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
-            Request::METHOD_POST,
+            Request::METHOD_GET,
             $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
             $ltiParameters
         );
