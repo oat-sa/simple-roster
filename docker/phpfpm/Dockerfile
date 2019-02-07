@@ -1,7 +1,7 @@
 FROM php:7.2-fpm
 
 RUN apt-get update && \
-    apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev && \
+    apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev zlib1g-dev libicu-dev g++ && \
     rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
@@ -13,6 +13,7 @@ RUN yes | pecl install igbinary redis apcu
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install intl && \
     docker-php-ext-install mysqli && \
     docker-php-ext-install pgsql && \
     docker-php-ext-install pdo_pgsql && \
@@ -38,6 +39,8 @@ RUN { \
     echo 'opcache.enable_cli=1'; \
     echo 'opcache.load_comments=1'; \
 } >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \

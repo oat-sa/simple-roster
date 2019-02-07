@@ -8,11 +8,8 @@ services:
 
 before_install:
   - docker-compose up -d
-  - composer install
+  - docker exec -it simple_roster_phpfpm composer install
   - docker exec -it simple_roster_phpfpm bin/console do:sc:up --force
-
-before_script:
-  - composer install
 
 script:
   - docker exec -it simple_roster_phpfpm vendor/bin/phpunit
