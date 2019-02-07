@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\EventListener;
+namespace App\Tests\Unit\EventSubscriber;
 
+use App\Entity\Assignment;
 use App\Entity\User;
-use App\EventListener\UserCacheInvalidator;
+use App\EventSubscriber\UserCacheInvalidator;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
@@ -33,24 +34,21 @@ class UserCacheInvalidatorTest extends TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $this->unitOfWork = $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
-        $this->userCacheIdGenerator = $this->getMockBuilder(UserCacheIdGenerator::class)->getMock();
-        $this->resultCacheImplementation = $this->getMockBuilder(Cache::class)->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->unitOfWork = $this->createMock(UnitOfWork::class);
+        $this->userCacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
+        $this->resultCacheImplementation = $this->createMock(Cache::class);
 
-        $doctrineConfiguration = $this->getMockBuilder(Configuration::class)->getMock();
+        $doctrineConfiguration = $this->createMock(Configuration::class);
         $doctrineConfiguration
-            ->expects($this->any())
             ->method('getResultCacheImpl')
             ->willReturn($this->resultCacheImplementation);
 
         $this->entityManager
-            ->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
 
         $this->entityManager
-            ->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
@@ -59,8 +57,7 @@ class UserCacheInvalidatorTest extends TestCase
 
     public function testItInvalidatesSingleUserCacheUponEntityInsertion(): void
     {
-        $user = new User();
-        $user->setUsername('expectedUsername');
+        $user = (new User())->setUsername('expectedUsername');
 
         $this->setUnitOfWorkExpectations([$user]);
 
@@ -69,8 +66,7 @@ class UserCacheInvalidatorTest extends TestCase
 
     public function testItInvalidatesSingleUserCacheUponEntityUpdate(): void
     {
-        $user = new User();
-        $user->setUsername('expectedUsername');
+        $user = (new User())->setUsername('expectedUsername');
 
         $this->setUnitOfWorkExpectations([], [$user]);
 
@@ -79,8 +75,7 @@ class UserCacheInvalidatorTest extends TestCase
 
     public function testItInvalidatesSingleUserCacheUponEntityDeletion(): void
     {
-        $user = new User();
-        $user->setUsername('expectedUsername');
+        $user = (new User())->setUsername('expectedUsername');
 
         $this->setUnitOfWorkExpectations([], [], [$user]);
 
@@ -89,15 +84,24 @@ class UserCacheInvalidatorTest extends TestCase
 
     public function testItInvalidatesMultipleUsersCacheUponEntityInsertion(): void
     {
-        $user1 = new User();
-        $user1->setUsername('expectedUsername1');
-
-        $user2 = new User();
-        $user2->setUsername('expectedUsername2');
+        $user1 = (new User())->setUsername('expectedUsername1');
+        $user2 = (new User())->setUsername('expectedUsername2');
 
         $this->setUnitOfWorkExpectations([], [], [$user1, $user2]);
 
         $this->assertCacheDeletion([$user1->getUsername(), $user2->getUsername()]);
+    }
+
+    public function testItInvalidatesMultipleAssignmentsCacheUponEntityUpdate(): void
+    {
+        $user = (new User())->setUsername('expectedUsername');
+        $assignment1 = (new Assignment())->setUser($user);
+        $assignment2 = (new Assignment())->setUser($user);
+
+        $this->setUnitOfWorkExpectations([], [$assignment1, $assignment2]);
+
+        // TODO: Cache gets cleared for each updated entity, this could be improved
+        $this->assertCacheDeletion([$user->getUsername(), $user->getUsername()]);
     }
 
     private function assertCacheDeletion(array $expectedUsernames): void
@@ -129,8 +133,8 @@ class UserCacheInvalidatorTest extends TestCase
             ->method('delete')
             ->withConsecutive(
                 ...array_map(
-                    function ($exectedCacheId) {
-                        return [$exectedCacheId];
+                    function ($expectedCacheId) {
+                        return [$expectedCacheId];
                     },
                     $expectedCacheIds
                 )
@@ -143,7 +147,7 @@ class UserCacheInvalidatorTest extends TestCase
         array $insertedEntities = [],
         array $updatedEntities = [],
         array $deletedEntities = []
-    ) {
+    ): void {
         $this->unitOfWork
             ->expects($this->once())
             ->method('getScheduledEntityInsertions')

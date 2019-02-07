@@ -22,14 +22,6 @@ class AssignmentController extends AbstractController
     }
 
     /**
-     * @Route("/", name="api_v1_add_assignment", methods={"POST"})
-     */
-    public function addAssignment()
-    {
-        //TODO
-    }
-
-    /**
      * @Route("/{id}/lti-link", name="api_v1_get_assignment_lti_link", methods={"GET"})
      */
     public function getAssignmentLtiLink()

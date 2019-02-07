@@ -40,7 +40,6 @@ abstract class AbstractIngester implements IngesterInterface
                 }
 
                 $result->addSuccess();
-
             } catch (Throwable $exception) {
                 if (!$dryRun) {
                     $this->managerRegistry->resetManager();
