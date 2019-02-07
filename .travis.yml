@@ -12,6 +12,7 @@ before_install:
   - docker-compose up -d --build
   - docker exec -it simple_roster_phpfpm composer install
   - docker exec -it simple_roster_phpfpm bin/console do:sc:up --force
+  - docker ps
 
 script:
   - docker exec -it simple_roster_phpfpm vendor/bin/phpunit
