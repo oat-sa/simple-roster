@@ -6,16 +6,23 @@ use InvalidArgumentException;
 
 class OAuthSigner
 {
-    public function sign(OAuthContext $context, string $url, string $method, string $secret): string
-    {
+    public const METHOD_MAC_SHA1 = 'HMAC-SHA1';
+
+    public function sign(
+        OAuthContext $context,
+        string $url,
+        string $method,
+        string $secret,
+        array $additionalParameters = []
+    ): string {
         switch ($context->getSignatureMethod()) {
-            case 'HMAC-SHA1':
+            case static::METHOD_MAC_SHA1:
 
                 $secret .= '&';
                 $baseString = implode('&', [
                     urlencode($method),
                     urlencode($url),
-                    urlencode($this->getParameters($context)),
+                    urlencode($this->getParameters($context, $additionalParameters)),
                 ]);
 
                 return base64_encode(
@@ -35,17 +42,20 @@ class OAuthSigner
         }
     }
 
-    private function getParameters(OAuthContext $context): string
+    private function getParameters(OAuthContext $context, array $additionalParameters = []): string
     {
         $encodedParameters = [];
-        $parameters = [
-            'oauth_body_hash' => $context->getBodyHash(),
-            'oauth_consumer_key' => $context->getConsumerKey(),
-            'oauth_nonce' => $context->getNonce(),
-            'oauth_signature_method' => $context->getSignatureMethod(),
-            'oauth_timestamp' => $context->getTimestamp(),
-            'oauth_version' => $context->getVersion(),
-        ];
+        $parameters = array_merge(
+            [
+                'oauth_body_hash' => $context->getBodyHash(),
+                'oauth_consumer_key' => $context->getConsumerKey(),
+                'oauth_nonce' => $context->getNonce(),
+                'oauth_signature_method' => $context->getSignatureMethod(),
+                'oauth_timestamp' => $context->getTimestamp(),
+                'oauth_version' => $context->getVersion(),
+            ],
+            $additionalParameters
+        );
 
         ksort($parameters, SORT_STRING);
 
@@ -55,8 +65,8 @@ class OAuthSigner
         return implode('&', $encodedParameters);
     }
 
-    private function encode(string $value): string
+    private function encode($value): string
     {
-        return urlencode(utf8_encode($value));
+        return urlencode(utf8_encode((string)$value));
     }
 }

@@ -63,7 +63,6 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
             (string)$request->query->get('oauth_version')
         );
 
-
         $signature = $this->signer->sign(
             $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
