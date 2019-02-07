@@ -22,6 +22,6 @@ getUserAssignments:
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
 
 getUserAssignmentLtiLink:
-  path: /api/v1/assignments/{$assignmentId}/lti-link
+  path: /api/v1/assignments/{assignmentId}/lti-link
   methods: GET
   defaults: { _controller: App\Action\GetUserAssignmentLtiLinkAction }

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Model\OAuth;
+namespace App\Security\OAuth;
 
-class Signature
+class OAuthContext
 {
     /** @var string */
     private $bodyHash;
@@ -22,8 +22,14 @@ class Signature
     /** @var string */
     private $version;
 
-    public function __construct(string $bodyHash, string $consumerKey, string $nonce, string $signatureMethod, string $timestamp, string $version)
-    {
+    public function __construct(
+        string $bodyHash,
+        string $consumerKey,
+        string $nonce,
+        string $signatureMethod,
+        string $timestamp,
+        string $version
+    ) {
         $this->bodyHash = $bodyHash;
         $this->consumerKey = $consumerKey;
         $this->nonce = $nonce;

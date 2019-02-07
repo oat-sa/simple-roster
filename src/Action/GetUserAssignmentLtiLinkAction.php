@@ -3,6 +3,7 @@
 namespace App\Action;
 
 use App\Entity\User;
+use App\Exception\AssignmentNotFoundException;
 use App\Responder\SerializerResponder;
 use App\Service\GetUserAssignmentLtiLinkService;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,13 +17,17 @@ class GetUserAssignmentLtiLinkAction
     /** @var GetUserAssignmentLtiLinkService */
     private $getUserAssignmentLtiLinkService;
 
-    public function __construct(SerializerResponder $responder, GetUserAssignmentLtiLinkService $getUserAssignmentLtiLinkService)
-    {
+    public function __construct(
+        SerializerResponder $responder,
+        GetUserAssignmentLtiLinkService $getUserAssignmentLtiLinkService
+    ) {
         $this->responder = $responder;
+        $this->getUserAssignmentLtiLinkService = $getUserAssignmentLtiLinkService;
     }
 
     /**
      * @param UserInterface|User $user
+     * @throws AssignmentNotFoundException
      */
     public function __invoke(UserInterface $user, int $assignmentId): Response
     {
@@ -30,6 +35,6 @@ class GetUserAssignmentLtiLinkAction
             $user->getAvailableAssignmentById($assignmentId)
         );
 
-        return $this->responder->createJsonResponse([]);
+        return $this->responder->createJsonResponse(['link' => $link]);
     }
 }

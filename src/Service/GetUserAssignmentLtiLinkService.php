@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
-use Exception;
 
 class GetUserAssignmentLtiLinkService
 {

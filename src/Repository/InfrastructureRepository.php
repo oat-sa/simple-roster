@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Infrastructure;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -12,13 +12,16 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Infrastructure[]    findAll()
  * @method Infrastructure[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class InfrastructureRepository extends ServiceEntityRepository
+class InfrastructureRepository extends AbstractRepository
 {
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Infrastructure::class);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function getByLtiKey(string $ltiKey): ?Infrastructure
     {
         return $this
@@ -27,15 +30,5 @@ class InfrastructureRepository extends ServiceEntityRepository
             ->setParameter('ltiKey', $ltiKey)
             ->getQuery()
             ->getOneOrNullResult();
-    }
-
-    public function persist(Infrastructure $infrastructure): void
-    {
-        $this->_em->persist($infrastructure);
-    }
-
-    public function flush(): void
-    {
-        $this->_em->flush();
     }
 }

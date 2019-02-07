@@ -2,10 +2,10 @@
 
 namespace App\EventSubscriber;
 
-use App\Action\OAuthSignatureValidatedAction;
-use App\Model\OAuth\Signature;
+use App\Security\OAuth\OAuthContext;
 use App\Repository\InfrastructureRepository;
-use App\Security\OAuth\SignatureGenerator;
+use App\Security\OAuth\OAuthSignatureValidatedAction;
+use App\Security\OAuth\OAuthSigner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -16,9 +16,13 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
     /** @var InfrastructureRepository */
     private $infrastructureRepository;
 
-    public function __construct(InfrastructureRepository $infrastructureRepository)
+    /** @var OAuthSigner */
+    private $signer;
+
+    public function __construct(InfrastructureRepository $infrastructureRepository, OAuthSigner $signer)
     {
         $this->infrastructureRepository = $infrastructureRepository;
+        $this->signer = $signer;
     }
 
     /**
@@ -50,7 +54,7 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
             throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer key invalid"');
         }
 
-        $signature = new Signature(
+        $context = new OAuthContext(
             (string)$request->query->get('oauth_body_hash'),
             (string)$request->query->get('oauth_consumer_key'),
             (string)$request->query->get('oauth_nonce'),
@@ -59,13 +63,15 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
             (string)$request->query->get('oauth_version')
         );
 
-        $signatureGenerator = new SignatureGenerator(
-            $signature,
+
+        $signature = $this->signer->sign(
+            $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
-            $request->getMethod()
+            $request->getMethod(),
+            $infrastructure->getLtiSecret()
         );
 
-        if ($signatureGenerator->getSignature($infrastructure->getLtiSecret()) !== $request->query->get('oauth_signature')) {
+        if ($signature !== $request->query->get('oauth_signature')) {
             throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="access token invalid"');
         }
     }

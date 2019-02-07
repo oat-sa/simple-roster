@@ -4,8 +4,8 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends AbstractRepository
 {
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
@@ -32,6 +32,7 @@ class UserRepository extends ServiceEntityRepository
 
     /**
      * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
      */
     public function getByUsernameWithAssignments(string $username): User
     {
@@ -52,10 +53,5 @@ class UserRepository extends ServiceEntityRepository
         }
 
         return $user;
-    }
-
-    public function persist(User $user): void
-    {
-        $this->_em->persist($user);
     }
 }
