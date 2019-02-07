@@ -14,6 +14,8 @@ services:
             tags: ['app.ingester']
         App\Ingester\Source\IngesterSourceInterface:
             tags: ['app.ingester_source']
+        App\EventListener\Doctrine\EntityListenerInterface:
+            tags: ['doctrine.orm.entity_listener']
 
     App\:
         resource: '../src/*'
@@ -37,3 +39,7 @@ services:
         arguments:
             $client: '@aws.s3'
             $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
+
+
+    App\EventSubscriber\UserCacheInvalidationSubscriber:
+        tags: ['doctrine.event_subscriber']
