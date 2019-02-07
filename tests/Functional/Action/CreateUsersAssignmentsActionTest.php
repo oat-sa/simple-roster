@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CreateUserAssignmentsActionTest extends WebTestCase
+class CreateUsersAssignmentsActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
     use UserAuthenticatorTrait;

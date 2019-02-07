@@ -89,7 +89,6 @@ class IngesterCommand extends Command
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
             $this->displayIngestionResult($result, $style);
-
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 

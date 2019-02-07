@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Service\CreateUserAssignmentService;
 use App\Service\CreateUsersAssignmentsService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 class CreateUsersAssignmentsServiceTest extends TestCase
@@ -55,15 +56,14 @@ class CreateUsersAssignmentsServiceTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Ooops...
-     */
     public function testItRollsBackTransactionUponException(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Ooops...');
+
         $this->createUserAssignmentService
             ->method('create')
-            ->willThrowException(new \Exception('Ooops...'));
+            ->willThrowException(new Exception('Ooops...'));
 
         $this->entityManager
             ->expects($this->once())

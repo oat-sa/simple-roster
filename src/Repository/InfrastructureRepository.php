@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Infrastructure;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -12,7 +11,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Infrastructure[]    findAll()
  * @method Infrastructure[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class InfrastructureRepository extends ServiceEntityRepository
+class InfrastructureRepository extends AbstractRepository
 {
     public function __construct(RegistryInterface $registry)
     {

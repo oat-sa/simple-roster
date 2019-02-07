@@ -7,12 +7,13 @@ use App\Responder\SerializerResponder;
 use App\Service\CreateUsersAssignmentsService;
 use Doctrine\ORM\EntityNotFoundException;
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CreateUserAssignmentsAction
+class CreateUsersAssignmentsAction
 {
     /** @var CreateUsersAssignmentsService */
     private $createUsersAssignmentsService;
@@ -38,7 +39,7 @@ class CreateUserAssignmentsAction
      * @throws NotFoundHttpException
      * @throws Exception
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $usernames = json_decode($request->getContent(), true);
         if (json_last_error()) {

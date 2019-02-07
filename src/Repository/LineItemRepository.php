@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\LineItem;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -12,7 +11,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method LineItem[]    findAll()
  * @method LineItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class LineItemRepository extends ServiceEntityRepository
+class LineItemRepository extends AbstractRepository
 {
     public function __construct(RegistryInterface $registry)
     {

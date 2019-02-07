@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -13,18 +12,10 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Assignment[]    findAll()
  * @method Assignment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AssignmentRepository extends ServiceEntityRepository
+class AssignmentRepository extends AbstractRepository
 {
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Assignment::class);
-    }
-
-    /**
-     * @throws ORMException
-     */
-    public function persist(Assignment $assignment): void
-    {
-        $this->_em->persist($assignment);
     }
 }
