@@ -1,8 +1,0 @@
-controllers:
-    resource: ../../src/Controller/
-    type: annotation
-
-api_v1_controllers:
-    resource: ../../src/Controller/ApiV1/
-    type: annotation
-    prefix: /api/v1

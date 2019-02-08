@@ -128,9 +128,6 @@
     "league/csv": {
         "version": "8.2.3"
     },
-    "mikey179/vfsstream": {
-        "version": "v1.6.5"
-    },
     "monolog/monolog": {
         "version": "1.24.0"
     },

@@ -5,8 +5,9 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
+use Doctrine\ORM\ORMException;
 
-class CompleteAssignmentService
+class CompleteUserAssignmentService
 {
     /** @var AssignmentRepository */
     private $assignmentRepository;
@@ -16,6 +17,9 @@ class CompleteAssignmentService
         $this->assignmentRepository = $assignmentRepository;
     }
 
+    /**
+     * @throws AssignmentNotFoundException
+     */
     public function markAssignmentAsCompleted(int $assignmentId): void
     {
         $assignment = $this->assignmentRepository->find($assignmentId);

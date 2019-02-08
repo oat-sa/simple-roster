@@ -14,12 +14,14 @@
         <env name="SHELL_VERBOSITY" value="-1" />
         <env name="KERNEL_CLASS" value="App\Kernel" />
         <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/test.db3"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
     </php>
 
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
         </testsuite>
         <testsuite name="Functional">
             <directory>tests/Functional</directory>

@@ -23,7 +23,7 @@ class UserPasswordEncoderListenerTest extends TestCase
         $this->subject = new UserPasswordEncoderListener($this->userPasswordEncoderMock);
     }
 
-    public function testItDoesNothingIfTheUserPlainPasswordIsEmpty()
+    public function testItDoesNothingIfTheUserPlainPasswordIsEmpty(): void
     {
         $entity = $this->createMock(User::class);
 
@@ -39,7 +39,7 @@ class UserPasswordEncoderListenerTest extends TestCase
         $this->subject->prePersist($entity);
     }
 
-    public function testItCorrectlyUpdatesTheEncodedPassword()
+    public function testItCorrectlyUpdatesTheEncodedPasswordUponPrePersist(): void
     {
         $entity = new User();
         $entity->setPlainPassword('password');
@@ -52,6 +52,26 @@ class UserPasswordEncoderListenerTest extends TestCase
             ->willReturn('encodedPassword');
 
         $this->subject->prePersist($entity);
+
+        $this->assertEquals(
+            'encodedPassword',
+            $entity->getPassword()
+        );
+    }
+
+    public function testItCorrectlyUpdatesTheEncodedPasswordUponPreUpdate(): void
+    {
+        $entity = new User();
+        $entity->setPlainPassword('password');
+
+        $this
+            ->userPasswordEncoderMock
+            ->expects($this->once())
+            ->method('encodePassword')
+            ->with($entity, 'password')
+            ->willReturn('encodedPassword');
+
+        $this->subject->preUpdate($entity);
 
         $this->assertEquals(
             'encodedPassword',

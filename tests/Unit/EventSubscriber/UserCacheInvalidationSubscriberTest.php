@@ -10,6 +10,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
@@ -53,6 +54,11 @@ class UserCacheInvalidationSubscriberTest extends TestCase
             ->willReturn($doctrineConfiguration);
 
         $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator);
+    }
+
+    public function testSubscribedEvents(): void
+    {
+        $this->assertEquals([Events::onFlush], $this->subject->getSubscribedEvents());
     }
 
     public function testItInvalidatesSingleUserCacheUponEntityInsertion(): void
