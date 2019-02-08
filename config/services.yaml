@@ -1,6 +1,7 @@
 parameters:
     locale: 'en'
 
+
 services:
     _defaults:
         autowire: true
@@ -8,6 +9,7 @@ services:
         public: false
         bind:
             $debug: '%kernel.debug%'
+            $ltiLaunchPresentationReturnUrl: '%env(LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:

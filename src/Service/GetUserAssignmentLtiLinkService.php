@@ -23,11 +23,19 @@ class GetUserAssignmentLtiLinkService
     /** @var RouterInterface */
     private $router;
 
-    public function __construct(OAuthSigner $signer, NonceGenerator $generator, RouterInterface $router)
-    {
+    /** @var string */
+    private $ltiLaunchPresentationReturnUrl;
+
+    public function __construct(
+        OAuthSigner $signer,
+        NonceGenerator $generator,
+        RouterInterface $router,
+        string $ltiLaunchPresentationReturnUrl
+    ) {
         $this->signer = $signer;
         $this->generator = $generator;
         $this->router = $router;
+        $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
     }
 
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
@@ -83,8 +91,8 @@ class GetUserAssignmentLtiLinkService
             'user_id' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'lis_result_sourcedid' => $assignment->getId(),,
-            'launch_presentation_return_url' => 'http://localhost:8000/index.html',//todo
+            'lis_result_sourcedid' => $assignment->getId(),
+            'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl
         ];
     }
 }
