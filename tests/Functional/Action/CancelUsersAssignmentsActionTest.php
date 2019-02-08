@@ -34,7 +34,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testitThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void
+    public function testItThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
