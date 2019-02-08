@@ -40,14 +40,12 @@ class GetUserAssignmentLtiLinkService
 
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
-        $time = Carbon::now()->getTimestamp();
-
         $context = new OAuthContext(
             '',
             $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
             $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
-            (string)$time,
+            (string)Carbon::now()->getTimestamp(),
             OAuthContext::VERSION_1_0
         );
 
