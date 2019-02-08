@@ -49,7 +49,7 @@ class OAuthSignerTest extends TestCase
 
     private function generateOAuthContext(string $signatureMethod): OAuthContext
     {
-        return  new OAuthContext(
+        return new OAuthContext(
             'bodyHash',
             'consumerKey',
             'nonce',
