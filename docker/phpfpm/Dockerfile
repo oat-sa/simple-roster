@@ -42,8 +42,6 @@ RUN { \
     echo 'opcache.load_comments=1'; \
 } >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
     && mkdir -p /tmp/blackfire \
