@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
-use Doctrine\ORM\ORMException;
 
 class CompleteUserAssignmentService
 {

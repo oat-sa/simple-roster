@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 
 class CancelUsersAssignmentsService
 {
@@ -17,23 +16,20 @@ class CancelUsersAssignmentsService
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function cancel(User ...$users): void
+    public function cancel(User ...$users): array
     {
-        try {
-            $this->entityManager->beginTransaction();
-            foreach ($users as $user) {
-                foreach ($user->getAvailableAssignments() as $assignment) {
-                    $assignment->setState(Assignment::STATE_CANCELLED);
-                }
+        $result = [];
+        $this->entityManager->beginTransaction();
+        foreach ($users as $user) {
+            foreach ($user->getAvailableAssignments() as $assignment) {
+                $assignment->setState(Assignment::STATE_CANCELLED);
             }
-            $this->entityManager->flush();
-            $this->entityManager->commit();
-        } catch (Exception $e) {
-            $this->entityManager->rollback();
-            throw $e;
+            $result[$user->getUsername()] = true;
         }
+
+        $this->entityManager->flush();
+        $this->entityManager->commit();
+
+        return $result;
     }
 }

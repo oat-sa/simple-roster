@@ -31,10 +31,10 @@ class CreateUsersAssignmentsService
         foreach ($users as $user) {
             try {
                 $this->createUserAssignmentService->create($user);
-                $result[$user->getUsername()] = 'success';
+                $result[$user->getUsername()] = true;
             } catch (Exception $exception) {
                 $isSuccessfulTransaction = false;
-                $result[$user->getUsername()] = 'failure';
+                $result[$user->getUsername()] = false;
                 continue;
             }
         }

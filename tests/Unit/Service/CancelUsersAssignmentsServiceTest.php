@@ -6,10 +6,9 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Service\CancelUsersAssignmentsService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use PHPUnit\Framework\TestCase;
 
-class CancelUserAssignmentsServiceTest extends TestCase
+class CancelUsersAssignmentsServiceTest extends TestCase
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -25,18 +24,20 @@ class CancelUserAssignmentsServiceTest extends TestCase
         $this->subject = new CancelUsersAssignmentsService($this->entityManager);
     }
 
-    public function testItCancelUsersAssignmentsInTransaction(): void
+    public function testItCancelsAllAssignmentsAndReturnsWithActualResultForAllUsers(): void
     {
         $readyAssignment = (new Assignment())->setState(Assignment::STATE_READY);
         $completedAssignment = (new Assignment())->setState(Assignment::STATE_COMPLETED);
         $startedAssignment = (new Assignment())->setState(Assignment::STATE_STARTED);
 
         $user1 = (new User())
+            ->setUsername('user1')
             ->addAssignment($readyAssignment)
             ->addAssignment($completedAssignment)
             ->addAssignment($startedAssignment);
 
         $user2 = (new User())
+            ->setUsername('user2')
             ->addAssignment($readyAssignment)
             ->addAssignment($completedAssignment)
             ->addAssignment($startedAssignment);
@@ -53,7 +54,10 @@ class CancelUserAssignmentsServiceTest extends TestCase
             ->expects($this->once())
             ->method('commit');
 
-        $this->subject->cancel($user1, $user2);
+        $this->assertEquals([
+            'user1' => true,
+            'user2' => true
+        ], $this->subject->cancel($user1, $user2));
 
         foreach ($user1->getAssignments() as $assignment) {
             $this->assertEquals(Assignment::STATE_CANCELLED, $assignment->getState());
@@ -62,21 +66,5 @@ class CancelUserAssignmentsServiceTest extends TestCase
         foreach ($user2->getAssignments() as $assignment) {
             $this->assertEquals(Assignment::STATE_CANCELLED, $assignment->getState());
         }
-    }
-
-    public function testItRollsBackTransactionUponException(): void
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Ooops...');
-
-        $this->entityManager
-            ->method('beginTransaction')
-            ->willThrowException(new Exception('Ooops...'));
-
-        $this->entityManager
-            ->expects($this->once())
-            ->method('rollback');
-
-        $this->subject->cancel(new User());
     }
 }

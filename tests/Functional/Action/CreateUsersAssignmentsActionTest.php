@@ -147,9 +147,9 @@ class CreateUsersAssignmentsActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $this->assertEquals([
-            $user->getUsername() => 'success',
-            'nonExistingUser1' => 'failure',
-            'nonExistingUser2' => 'failure',
+            $user->getUsername() => true,
+            'nonExistingUser1' => false,
+            'nonExistingUser2' => false,
         ], json_decode($this->client->getResponse()->getContent(), true));
     }
 }

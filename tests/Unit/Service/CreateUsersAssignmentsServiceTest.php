@@ -48,10 +48,10 @@ class CreateUsersAssignmentsServiceTest extends TestCase
             });
 
         $this->assertEquals([
-            'user1' => 'failure',
-            'user2' => 'failure',
-            'user3' => 'success',
-            'user4' => 'success',
+            'user1' => false,
+            'user2' => false,
+            'user3' => true,
+            'user4' => true,
         ], $this->subject->create($user1, $user2, $user3, $user4));
     }
 

@@ -86,7 +86,7 @@ class IngesterCommandTest extends KernelTestCase
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertContains("Undefined offset: 3", $this->commandTester->getDisplay());
+        $this->assertContains('Undefined offset: 3', $this->commandTester->getDisplay());
 
         $this->assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
 

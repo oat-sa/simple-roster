@@ -2,7 +2,7 @@
 
 namespace App\Action;
 
-use App\Http\RequestEntityTooLargeHttpException;
+use App\Http\Exception\RequestEntityTooLargeHttpException;
 use App\Repository\UserRepository;
 use App\Responder\SerializerResponder;
 use App\Service\CreateUsersAssignmentsService;
@@ -48,7 +48,7 @@ class CreateUsersAssignmentsAction
             try {
                 $users[] = $this->userRepository->getByUsernameWithAssignments($username);
             } catch (EntityNotFoundException $exception) {
-                $resultOfNonExistingUsers[$username] = 'failure';
+                $resultOfNonExistingUsers[$username] = false;
                 continue;
             }
         }

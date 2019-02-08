@@ -17,8 +17,6 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
         $reader = Reader::createFromPath($this->path, 'r');
         $reader->setDelimiter($this->delimiter);
 
-        foreach ($reader as $row) {
-            yield $row;
-        }
+        yield from $reader;
     }
 }

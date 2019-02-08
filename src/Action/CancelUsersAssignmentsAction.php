@@ -2,18 +2,19 @@
 
 namespace App\Action;
 
+use App\Http\Exception\RequestEntityTooLargeHttpException;
 use App\Repository\UserRepository;
 use App\Responder\SerializerResponder;
 use App\Service\CancelUsersAssignmentsService;
 use Doctrine\ORM\EntityNotFoundException;
-use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CancelUsersAssignmentsAction
 {
+    public const LIMIT = 1000;
+
     /** @var CancelUsersAssignmentsService */
     private $cancelUsersAssignmentsService;
 
@@ -34,14 +35,38 @@ class CancelUsersAssignmentsAction
     }
 
     /**
-     * @param Request $request
-     *
-     * @return JsonResponse
      * @throws BadRequestHttpException
-     * @throws NotFoundHttpException
-     * @throws Exception
+     * @throws RequestEntityTooLargeHttpException
      */
     public function __invoke(Request $request): JsonResponse
+    {
+        $users = [];
+        $resultOfNonExistingUsers = [];
+        $usernames = $this->getUsernamesFromRequest($request);
+        foreach ($usernames as $username) {
+            try {
+                $users[] = $this->userRepository->getByUsernameWithAssignments($username);
+            } catch (EntityNotFoundException $exception) {
+                $resultOfNonExistingUsers[$username] = false;
+                continue;
+            }
+        }
+
+        $result = array_merge($resultOfNonExistingUsers, $this->cancelUsersAssignmentsService->cancel(...$users));
+
+        return $this->responder->createJsonResponse(
+            array_replace(
+                array_flip($usernames),
+                $result
+            )
+        );
+    }
+
+    /**
+     * @throws BadRequestHttpException
+     * @throws RequestEntityTooLargeHttpException
+     */
+    private function getUsernamesFromRequest(Request $request): array
     {
         $usernames = json_decode($request->getContent(), true);
         if (json_last_error()) {
@@ -57,17 +82,15 @@ class CancelUsersAssignmentsAction
             throw new BadRequestHttpException('Empty request body received.');
         }
 
-        $users = [];
-        try {
-            foreach ($usernames as $username) {
-                $users[] = $this->userRepository->getByUsernameWithAssignments($username);
-            }
-
-            $this->cancelUsersAssignmentsService->cancel(...$users);
-        } catch (EntityNotFoundException $exception) {
-            throw new NotFoundHttpException($exception->getMessage());
+        if (count($usernames) > self::LIMIT) {
+            throw new RequestEntityTooLargeHttpException(
+                sprintf(
+                    'User limit has been exceeded. Maximum of `%s` users are allowed per request.',
+                    self::LIMIT
+                )
+            );
         }
 
-        return $this->responder->createJsonResponse(null);
+        return $usernames;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Action;
 
+use App\Action\CancelUsersAssignmentsAction;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
@@ -17,7 +18,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
 
     private const CANCEL_USERS_ASSIGNMENTS_URI = '/api/v1/assignments';
 
-    public function testWithNonAuthenticatedUser(): void
+    public function testItThrowsUnauthorizedHttpExceptionIfUserIsNotAuthenticated(): void
     {
         $client = self::createClient();
         $client->request(Request::METHOD_DELETE, self::CANCEL_USERS_ASSIGNMENTS_URI);
@@ -33,7 +34,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithInvalidRequestBodyContent(): void
+    public function testitThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -62,7 +63,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithEmptyUsernameListInRequestBody(): void
+    public function testItThrowsBadRequestHttpExceptionIfEmptyRequestBodyReceived(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -91,7 +92,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithNonExistingUser(): void
+    public function testItThrowsRequestEntityTooLargeHttpExceptionIfRequestPayloadIsTooLarge(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -100,27 +101,32 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
 
         $this->logInAs($user, $client);
 
+        $requestPayload = [];
+        for ($i = 0; $i <= CancelUsersAssignmentsAction::LIMIT + 1; $i++) {
+            $requestPayload[] = 'user_' . $i;
+        }
+
         $client->request(
             Request::METHOD_DELETE,
             self::CANCEL_USERS_ASSIGNMENTS_URI,
             [],
             [],
             [],
-            json_encode([$user->getUsername(), 'nonExistingUsername'])
+            json_encode($requestPayload)
         );
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $client->getResponse()->getStatusCode());
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => "User with username = 'nonExistingUsername' cannot be found.",
-                ]
+                    'message' => 'User limit has been exceeded. Maximum of `1000` users are allowed per request.',
+                ],
             ],
             json_decode($client->getResponse()->getContent(), true)
         );
     }
 
-    public function testIfAssignmentsCanBeCancelled(): void
+    public function testSuccessfulResponse(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -135,10 +141,16 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode([$user->getUsername()])
+            json_encode([$user->getUsername(), 'nonExistingUser1', 'nonExistingUser2'])
         );
 
         $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals([
+            $user->getUsername() => true,
+            'nonExistingUser1' => false,
+            'nonExistingUser2' => false,
+        ], json_decode($client->getResponse()->getContent(), true));
+
         // Refresh repository
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
