@@ -83,7 +83,8 @@ class GetUserAssignmentLtiLinkService
             'user_id' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'lis_result_sourcedid' => $assignment->getId(),
+            'lis_result_sourcedid' => $assignment->getId(),,
+            'launch_presentation_return_url' => 'http://localhost:8000/index.html',//todo
         ];
     }
 }
