@@ -15,7 +15,7 @@ class LtiRequest implements JsonSerializable
     private $link;
 
     /** @var array  */
-    private $parameters = [];
+    private $parameters;
 
     public function __construct(string $link, array $parameters)
     {
