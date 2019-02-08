@@ -84,7 +84,6 @@ class GetUserAssignmentLtiLinkService
             'resource_link_id' => 1234,
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'lis_result_sourcedid' => $assignment->getId(),
-
         ];
     }
 }
