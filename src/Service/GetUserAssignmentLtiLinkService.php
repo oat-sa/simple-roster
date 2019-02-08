@@ -89,7 +89,6 @@ class GetUserAssignmentLtiLinkService
                 $assignment->getUser()->getUsername(),
                 $assignment->getId()
             )
-
         ];
     }
 }
