@@ -20,6 +20,7 @@
         "doctrine/annotations": "^1.6",
         "league/csv": "^8.0",
         "nesbot/carbon": "^2.11",
+        "nelmio/cors-bundle": "^1.5",
         "oat-sa/phing-tasks": "^0.1",
         "phing/phing": "^2.16",
         "sensio/framework-extra-bundle": "^5.2",

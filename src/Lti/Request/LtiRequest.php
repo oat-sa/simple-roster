@@ -7,7 +7,7 @@ use JsonSerializable;
 class LtiRequest implements JsonSerializable
 {
     public const LTI_MESSAGE_TYPE = 'basic-lti-launch-request';
-    public const LTI_VERSION = 'basic-lti-launch-request';
+    public const LTI_VERSION = 'LTI-1p0';
     public const LTI_CONTEXT_TYPE = 'CourseSection';
     public const LTI_ROLE = 'Learner';
 
