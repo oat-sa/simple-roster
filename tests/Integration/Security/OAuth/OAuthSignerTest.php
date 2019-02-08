@@ -4,6 +4,7 @@ namespace App\Tests\Integration\Security\OAuth;
 
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class OAuthSignerTest extends TestCase
@@ -34,12 +35,11 @@ class OAuthSignerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Signature method 'invalid' is not supported
-     */
     public function testSignWithInvalidMethod(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Signature method 'invalid' is not supported");
+
         $subject = new OAuthSigner();
 
         $context = $this->generateOAuthContext('invalid');
