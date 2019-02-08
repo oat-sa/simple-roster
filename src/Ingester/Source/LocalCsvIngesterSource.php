@@ -15,8 +15,7 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
     public function getContent(): Traversable
     {
         $reader = Reader::createFromPath($this->path, 'r');
-        $reader->setDelimiter($this->delimiter);
 
-        yield from $reader;
+        return $reader->setDelimiter($this->delimiter);
     }
 }

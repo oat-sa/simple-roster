@@ -33,8 +33,7 @@ class S3CsvIngesterSource extends AbstractIngesterSource
         ]);
 
         $reader = Reader::createFromString((string)($result['Body'] ?? ''));
-        $reader->setDelimiter($this->delimiter);
 
-        yield from $reader;
+        return $reader->setDelimiter($this->delimiter);
     }
 }
