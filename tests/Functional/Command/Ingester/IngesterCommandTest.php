@@ -27,7 +27,7 @@ class IngesterCommandTest extends KernelTestCase
     }
 
 
-    public function testDryRunLocalIngestion()
+    public function testDryRunLocalIngestion(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -38,11 +38,13 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertContains(
             "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
+
+        $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
     }
 
-    public function testLocalIngestionSuccess()
+    public function testLocalIngestionSuccess(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -54,7 +56,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertContains(
             "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
         $this->assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
@@ -69,7 +71,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals('infra_3', $user3->getLabel());
     }
 
-    public function testLocalIngestionFailure()
+    public function testLocalIngestionFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -81,10 +83,10 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertContains(
             "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertContains("Undefined offset: 3", $this->commandTester->getDisplay());
+        $this->assertContains('Undefined offset: 3', $this->commandTester->getDisplay());
 
         $this->assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
 
@@ -92,7 +94,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals('infra_1', $user1->getLabel());
     }
 
-    public function testInvalidIngesterFailure()
+    public function testInvalidIngesterFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'invalid',
@@ -108,7 +110,7 @@ class IngesterCommandTest extends KernelTestCase
         );
     }
 
-    public function testInvalidSourceFailure()
+    public function testInvalidSourceFailure(): void
     {
         $output = $this->commandTester->execute([
             'type' => 'infrastructure',
@@ -122,5 +124,14 @@ class IngesterCommandTest extends KernelTestCase
             "[ERROR] Ingester source named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );
+    }
+
+    /**
+     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
+     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
+     */
+    private function normalizeDisplay(string $commandDisplay): string
+    {
+        return trim(preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }

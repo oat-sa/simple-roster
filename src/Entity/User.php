@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Exception\AssignmentNotFoundException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Generator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface
@@ -106,18 +105,21 @@ class User implements UserInterface, EntityInterface
     }
 
     /**
-     * @return Generator|Assignment[]
+     * @return Assignment[]
      */
-    public function getAvailableAssignments(): Generator
+    public function getAvailableAssignments(): array
     {
+        $availableAssignments = [];
         foreach ($this->getAssignments() as $assignment) {
             // cancelled assignment cannot be listed
             if ($assignment->isCancelled()) {
                 continue;
             }
 
-            yield $assignment;
+            $availableAssignments[] = $assignment;
         }
+
+        return $availableAssignments;
     }
 
     /**

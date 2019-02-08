@@ -6,10 +6,10 @@ login:
 logout:
   path: /api/v1/auth/logout
 
-createUserAssignments:
+createUsersAssignments:
   path: /api/v1/assignments
   methods: POST
-  defaults: { _controller: App\Action\CreateUserAssignmentsAction }
+  defaults: { _controller: App\Action\CreateUsersAssignmentsAction }
 
 updateLtiOutcome:
   path: /api/v1/lti/outcome
@@ -21,7 +21,13 @@ getUserAssignments:
   methods: GET
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
 
+cancelUsersAssignments:
+  path: /api/v1/assignments
+  methods: DELETE
+  defaults: { _controller: App\Action\CancelUsersAssignmentsAction }
+
 getUserAssignmentLtiLink:
   path: /api/v1/assignments/{assignmentId}/lti-link
   methods: GET
   defaults: { _controller: App\Action\GetUserAssignmentLtiLinkAction }
+

@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Generator;
 
 class CreateUsersAssignmentsService
 {
@@ -15,27 +14,38 @@ class CreateUsersAssignmentsService
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    public function __construct(CreateUserAssignmentService $createUserAssignmentService, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        CreateUserAssignmentService $createUserAssignmentService,
+        EntityManagerInterface $entityManager
+    ) {
         $this->createUserAssignmentService = $createUserAssignmentService;
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function create(User ...$users): Generator
+    public function create(User ...$users): array
     {
-        try {
-            $this->entityManager->beginTransaction();
-            foreach ($users as $user) {
-                yield $this->createUserAssignmentService->create($user);
+        $result = [];
+        $isSuccessfulTransaction = true;
+
+        $this->entityManager->beginTransaction();
+        foreach ($users as $user) {
+            try {
+                $this->createUserAssignmentService->create($user);
+                $result[$user->getUsername()] = true;
+            } catch (Exception $exception) {
+                $isSuccessfulTransaction = false;
+                $result[$user->getUsername()] = false;
+                continue;
             }
+        }
+
+        if ($isSuccessfulTransaction) {
             $this->entityManager->flush();
             $this->entityManager->commit();
-        } catch (Exception $e) {
+        } else {
             $this->entityManager->rollback();
-            throw $e;
         }
+
+        return $result;
     }
 }

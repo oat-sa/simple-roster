@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 trait UserAuthenticatorTrait
 {
-    protected function logInAs(User $user, Client $client, $role = 'ROLE_USER'): void
+    protected function logInAs(User $user, Client $client): void
     {
         /** @var Session $session */
         $session = $client->getContainer()->get('session');
@@ -18,7 +18,7 @@ trait UserAuthenticatorTrait
         // the firewall context defaults to the firewall name
         $firewallContext = 'api';
 
-        $token = new UsernamePasswordToken($user, null, $firewallContext, [$role]);
+        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
         $session->set('_security_' . $firewallContext, serialize($token));
         $session->save();
 

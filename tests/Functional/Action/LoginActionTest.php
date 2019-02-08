@@ -11,7 +11,7 @@ class LoginActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
 
-    public function testItFailsWithWrongCredentials()
+    public function testItFailsWithWrongCredentials(): void
     {
         $client = self::createClient();
 
@@ -35,7 +35,7 @@ class LoginActionTest extends WebTestCase
         );
     }
 
-    public function testItLogsInProperlyTheUser()
+    public function testItLogsInProperlyTheUser(): void
     {
         $client = self::createClient();
 
