@@ -67,7 +67,33 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $client->request('GET', '/api/v1/assignments/1/lti-link');
 
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+
         var_dump(json_decode($client->getResponse()->getContent(), true));
+        $this->assertEquals(
+            [
+                'ltiLink' => 'http://lti-director.com',
+                'ltiParams' => [
+                    'oauth_body_hash' => '',
+                    'oauth_consumer_key' => 'key1',
+                    'oauth_nonce' => '5c5d419fa7a30',
+                    'oauth_signature' => 'qGkYbqOYHG8ybSMH28De6BA7+n0=',
+                    'oauth_signature_method' => 'HMAC-SHA1',
+                    'oauth_timestamp' => '1549615519',
+                    'oauth_version' => '1.0',
+                    'lti_message_type' => 'basic-lti-launch-request',
+                    'lti_version' => 'basic-lti-launch-request',
+                    'context_id' => 1,
+                    'context_label' => 'gra13_ita_1',
+                    'context_title' => 'label1',
+                    'context_type' => 'CourseSection',
+                    'roles' => 'Learner',
+                    'user_id' => 1,
+                    'resource_link_id' => 1234
+                ]
+            ],
+            json_decode($client->getResponse()->getContent(), true)
+        );
     }
 
 }
