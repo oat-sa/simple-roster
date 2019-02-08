@@ -2,6 +2,6 @@
 
 namespace App\Security\OAuth;
 
-interface OAuthSignatureValidatedAction
+interface OAuthSignatureValidatedActionInterface
 {
 }

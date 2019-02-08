@@ -6,17 +6,10 @@ use InvalidArgumentException;
 
 class OAuthSigner
 {
-    public const METHOD_MAC_SHA1 = 'HMAC-SHA1';
-
-    public function sign(
-        OAuthContext $context,
-        string $url,
-        string $method,
-        string $secret,
-        array $additionalParameters = []
-    ): string {
+    public function sign(OAuthContext $context, string $url, string $method, string $secret, array $additionalParameters = []): string
+    {
         switch ($context->getSignatureMethod()) {
-            case static::METHOD_MAC_SHA1:
+            case OAuthContext::METHOD_MAC_SHA1:
 
                 $secret .= '&';
                 $baseString = implode('&', [
@@ -25,20 +18,12 @@ class OAuthSigner
                     urlencode($this->getParameters($context, $additionalParameters)),
                 ]);
 
-                return base64_encode(
-                    hash_hmac(
-                        'sha1',
-                        $baseString,
-                        $secret,
-                        true
-                    )
-                );
+                return base64_encode(hash_hmac('sha1', $baseString, $secret, true));
 
             default:
-                throw new InvalidArgumentException(sprintf(
-                    'Signature method is not supported: %s',
-                    $context->getSignatureMethod()
-                ));
+                throw new InvalidArgumentException(
+                    sprintf("Signature method '%s' is not supported", $context->getSignatureMethod())
+                );
         }
     }
 
@@ -62,6 +47,7 @@ class OAuthSigner
         foreach ($parameters as $name => $value) {
             $encodedParameters[] = $this->encode($name) . '=' . $this->encode($value);
         }
+
         return implode('&', $encodedParameters);
     }
 

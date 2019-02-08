@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
+use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
+use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Request;
 
 class GetUserAssignmentLtiLinkService
@@ -17,52 +19,58 @@ class GetUserAssignmentLtiLinkService
         $this->signer = $signer;
     }
 
-    public function getAssignmentLtiLink(Assignment $assignment): string
+    public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
-        $time = time();
+        $time = Carbon::now()->getTimestamp();
 
         $context = new OAuthContext(
             '',
             $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
             uniqid(),
-            OAuthSigner::METHOD_MAC_SHA1,
+            OAuthContext::METHOD_MAC_SHA1,
             (string)$time,
-            '1.0'
+            OAuthContext::VERSION_1_0
         );
 
-        $ltiParameters = [
-            'lti_message_type' => 'basic-lti-launch-request',
-            'lti_version' => 'LTI-1p0',
-            'context_id' => $assignment->getId(),
-            'context_label' => $assignment->getLineItem()->getSlug(),
-            'context_title' => $assignment->getLineItem()->getLabel(),
-            'context_type' => 'CourseSection',
-            'roles' => 'Learner',
-            'user_id' => $assignment->getUser()->getId(),
-            'resource_link_id' => 1234,
-        ];
+        $ltiParameters = $this->getAssignmentLtiParameters($assignment);
 
         $signature = $this->signer->sign(
             $context,
             $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
-            Request::METHOD_GET,
+            Request::METHOD_POST,
             $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
             $ltiParameters
         );
 
-        $url = http_build_query(array_merge(
-            [
-                'oauth_body_hash' => $context->getBodyHash(),
-                'oauth_consumer_key' => $context->getConsumerKey(),
-                'oauth_nonce' => $context->getNonce(),
-                'oauth_signature' => $signature,
-                'oauth_signature_method' => $context->getSignatureMethod(),
-                'oauth_timestamp' => $context->getTimestamp(),
-                'oauth_version' => $context->getVersion(),
-            ],
-            $ltiParameters
-        ));
+        return new LtiRequest(
+            $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
+            array_merge(
+                [
+                    'oauth_body_hash' => $context->getBodyHash(),
+                    'oauth_consumer_key' => $context->getConsumerKey(),
+                    'oauth_nonce' => $context->getNonce(),
+                    'oauth_signature' => $signature,
+                    'oauth_signature_method' => $context->getSignatureMethod(),
+                    'oauth_timestamp' => $context->getTimestamp(),
+                    'oauth_version' => $context->getVersion(),
+                ],
+                $ltiParameters
+            )
+        );
+    }
 
-        return $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink() . '?' . $url;
+    private function getAssignmentLtiParameters(Assignment $assignment): array
+    {
+        return [
+            'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+            'lti_version' => LtiRequest::LTI_VERSION,
+            'context_id' => $assignment->getId(),
+            'context_label' => $assignment->getLineItem()->getSlug(),
+            'context_title' => $assignment->getLineItem()->getLabel(),
+            'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
+            'roles' => LtiRequest::LTI_ROLE,
+            'user_id' => $assignment->getUser()->getId(),
+            'resource_link_id' => 1234,
+        ];
     }
 }

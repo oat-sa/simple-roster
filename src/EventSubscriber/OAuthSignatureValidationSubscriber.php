@@ -4,24 +4,27 @@ namespace App\EventSubscriber;
 
 use App\Security\OAuth\OAuthContext;
 use App\Repository\InfrastructureRepository;
-use App\Security\OAuth\OAuthSignatureValidatedAction;
+use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use App\Security\OAuth\OAuthSigner;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
+class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 {
+    public const AUTH_REALM = 'SimpleRoster';
+
     /** @var InfrastructureRepository */
-    private $infrastructureRepository;
+    private $repository;
 
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(InfrastructureRepository $infrastructureRepository, OAuthSigner $signer)
+    public function __construct(InfrastructureRepository $repository, OAuthSigner $signer)
     {
-        $this->infrastructureRepository = $infrastructureRepository;
+        $this->repository = $repository;
         $this->signer = $signer;
     }
 
@@ -36,22 +39,26 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param FilterControllerEvent $event
+     * @throws NonUniqueResultException
      */
     public function onKernelController(FilterControllerEvent $event): void
     {
         $action = $event->getController();
 
-        if (!$action instanceof OAuthSignatureValidatedAction) {
+        if (!$action instanceof OAuthSignatureValidatedActionInterface) {
             return;
         }
 
         $request = $event->getRequest();
 
-        $infrastructure = $this->infrastructureRepository->getByLtiKey((string)$request->query->get('oauth_consumer_key'));
+        $infrastructure = $this->repository->getByLtiKey(
+            (string)$request->query->get('oauth_consumer_key')
+        );
 
         if (!$infrastructure) {
-            throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="consumer key invalid"');
+            throw new UnauthorizedHttpException(
+                sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
+            );
         }
 
         $context = new OAuthContext(
@@ -71,7 +78,9 @@ class OAuthSignatureValidatorSubscriber implements EventSubscriberInterface
         );
 
         if ($signature !== $request->query->get('oauth_signature')) {
-            throw new UnauthorizedHttpException('realm="SimpleRoster", oauth_error="access token invalid"');
+            throw new UnauthorizedHttpException(
+                sprintf('realm="%s", oauth_error="access token invalid"', static::AUTH_REALM)
+            );
         }
     }
 }

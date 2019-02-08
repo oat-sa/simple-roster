@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Lti;
+namespace App\Lti\Extractor;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;
@@ -8,6 +8,9 @@ use Throwable;
 
 class ReplaceResultSourceIdExtractor
 {
+    /**
+     * @throws InvalidLtiReplaceResultBodyException
+     */
     public function extractSourceId(string $xmlContent): int
     {
         try {

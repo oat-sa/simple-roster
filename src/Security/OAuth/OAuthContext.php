@@ -4,6 +4,9 @@ namespace App\Security\OAuth;
 
 class OAuthContext
 {
+    public const VERSION_1_0 = '1.0';
+    public const METHOD_MAC_SHA1 = 'HMAC-SHA1';
+
     /** @var string */
     private $bodyHash;
 
