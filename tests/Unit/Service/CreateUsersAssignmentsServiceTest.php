@@ -30,18 +30,41 @@ class CreateUsersAssignmentsServiceTest extends TestCase
         $this->subject = new CreateUsersAssignmentsService($this->createUserAssignmentService, $this->entityManager);
     }
 
-    public function testItWrapsGenerationInTransaction(): void
+    public function testItReturnsWithActualResultForAllUsers(): void
     {
-        $expectedAssignment = (new Assignment())->setState(Assignment::STATE_READY);
+        $user1 = (new User())->setUsername('user1');
+        $user2 = (new User())->setUsername('user2');
+        $user3 = (new User())->setUsername('user3');
+        $user4 = (new User())->setUsername('user4');
 
         $this->createUserAssignmentService
-            ->expects($this->exactly(2))
             ->method('create')
-            ->willReturn($expectedAssignment);
+            ->willReturnCallback(function (User $user) {
+                if (in_array($user->getUsername(), ['user1', 'user2'])) {
+                    throw new Exception('Not ok');
+                }
 
-        $this->entityManager
-            ->expects($this->once())
-            ->method('beginTransaction');
+                return new Assignment();
+            });
+
+        $this->assertEquals([
+            'user1' => 'failure',
+            'user2' => 'failure',
+            'user3' => 'success',
+            'user4' => 'success',
+        ], $this->subject->create($user1, $user2, $user3, $user4));
+    }
+
+    public function testItCommitsTransactionIfThereIsNoError(): void
+    {
+        $user1 = (new User())->setUsername('user1');
+        $user2 = (new User())->setUsername('user2');
+        $user3 = (new User())->setUsername('user3');
+        $user4 = (new User())->setUsername('user4');
+
+        $this->createUserAssignmentService
+            ->method('create')
+            ->willReturn(new Assignment());
 
         $this->entityManager
             ->expects($this->once())
@@ -51,30 +74,42 @@ class CreateUsersAssignmentsServiceTest extends TestCase
             ->expects($this->once())
             ->method('commit');
 
-        foreach ($this->subject->create(new User(), new User()) as $createdAssignment) {
-            $this->assertEquals($expectedAssignment, $createdAssignment);
-        }
+        $this->entityManager
+            ->expects($this->never())
+            ->method('rollback');
+
+        $this->subject->create($user1, $user2, $user3, $user4);
     }
 
-    public function testItRollsBackTransactionUponException(): void
+    public function testItRollsBackWholeTransactionIfAnyErrorOccurs(): void
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Ooops...');
+        $user1 = (new User())->setUsername('user1');
+        $user2 = (new User())->setUsername('user2');
+        $user3 = (new User())->setUsername('user3');
+        $user4 = (new User())->setUsername('user4');
 
         $this->createUserAssignmentService
             ->method('create')
-            ->willThrowException(new Exception('Ooops...'));
+            ->willReturnCallback(function (User $user) {
+                if ($user->getUsername() === 'user3') {
+                    throw new Exception('Not ok');
+                }
+
+                return new Assignment();
+            });
+
+        $this->entityManager
+            ->expects($this->never())
+            ->method('flush');
+
+        $this->entityManager
+            ->expects($this->never())
+            ->method('commit');
 
         $this->entityManager
             ->expects($this->once())
             ->method('rollback');
 
-        /** @noinspection LoopWhichDoesNotLoopInspection */
-        /** @noinspection MissingOrEmptyGroupStatementInspection */
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        foreach ($this->subject->create(new User()) as $createdAssignment) {
-            // Looping over generator
-        }
+        $this->subject->create($user1, $user2, $user3, $user4);
     }
 }

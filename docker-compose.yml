@@ -43,7 +43,7 @@ services:
         networks:
           - simple_roster_network
         ports:
-          - "5433:5432"
+          - "5432:5432"
         environment:
           - POSTGRES_USER=simple-roster
           - POSTGRES_PASSWORD=simple-roster
