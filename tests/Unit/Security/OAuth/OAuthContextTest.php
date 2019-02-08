@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class OAuthContextTest extends TestCase
 {
-    public function testGettersPostConstruction()
+    public function testGettersPostConstruction(): void
     {
         $subject = new OAuthContext(
             'bodyHash',

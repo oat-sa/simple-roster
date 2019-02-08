@@ -10,7 +10,7 @@ class OAuthSignerTest extends TestCase
 {
     private const TIMESTAMP = '1549615519';
 
-    public function testSignWithMacSha1Method()
+    public function testSignWithMacSha1Method(): void
     {
         $subject = new OAuthSigner();
 
@@ -22,7 +22,7 @@ class OAuthSignerTest extends TestCase
         );
     }
 
-    public function testSignWithMacSha1MethodAndAdditionalParameters()
+    public function testSignWithMacSha1MethodAndAdditionalParameters(): void
     {
         $subject = new OAuthSigner();
 
@@ -38,7 +38,7 @@ class OAuthSignerTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Signature method 'invalid' is not supported
      */
-    public function testSignWithInvalidMethod()
+    public function testSignWithInvalidMethod(): void
     {
         $subject = new OAuthSigner();
 

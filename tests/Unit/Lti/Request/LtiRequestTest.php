@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class LtiRequestTest extends TestCase
 {
-    public function testGettersPostConstruction()
+    public function testGettersPostConstruction(): void
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 
@@ -15,7 +15,7 @@ class LtiRequestTest extends TestCase
         $this->assertEquals(['param1', 'param2'], $subject->getParameters());
     }
 
-    public function testJsonSerialization()
+    public function testJsonSerialization(): void
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 

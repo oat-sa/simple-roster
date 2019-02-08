@@ -24,7 +24,7 @@ class S3CsvIngesterSourceTest extends TestCase
         $this->subject->setPath('path');
     }
 
-    public function testGetContentWithDefaultDelimiter()
+    public function testGetContentWithDefaultDelimiter(): void
     {
         $this->prepareS3Client();
 
@@ -41,7 +41,7 @@ class S3CsvIngesterSourceTest extends TestCase
         }
     }
 
-    public function testGetContentWithOtherDelimiter()
+    public function testGetContentWithOtherDelimiter(): void
     {
         $this->prepareS3Client();
 
