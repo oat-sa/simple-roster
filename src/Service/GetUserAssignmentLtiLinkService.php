@@ -83,12 +83,7 @@ class GetUserAssignmentLtiLinkService
             'user_id' => $assignment->getUser()->getUsername(),
             'resource_link_id' => 1234,
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'lis_result_sourcedid' => sprintf(
-                'xxx:::%s:::%s:::%s',
-                $assignment->getId(),
-                $assignment->getUser()->getUsername(),
-                $assignment->getId()
-            )
+            'lis_result_sourcedid' => $assignment->getId(),
 
         ];
     }
