@@ -3,20 +3,31 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
+use App\Generator\NonceGenerator;
 use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class GetUserAssignmentLtiLinkService
 {
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(OAuthSigner $signer)
+    /** @var NonceGenerator */
+    private $generator;
+
+    /** @var RouterInterface */
+    private $router;
+
+    public function __construct(OAuthSigner $signer, NonceGenerator $generator, RouterInterface $router)
     {
         $this->signer = $signer;
+        $this->generator = $generator;
+        $this->router = $router;
     }
 
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
@@ -26,7 +37,7 @@ class GetUserAssignmentLtiLinkService
         $context = new OAuthContext(
             '',
             $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
-            uniqid(),
+            $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
             (string)$time,
             OAuthContext::VERSION_1_0
@@ -69,8 +80,16 @@ class GetUserAssignmentLtiLinkService
             'context_title' => $assignment->getLineItem()->getLabel(),
             'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
             'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getId(),
+            'user_id' => $assignment->getUser()->getUsername(),
             'resource_link_id' => 1234,
+            'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'lis_result_sourcedid' => sprintf(
+                'xxx:::%s:::%s:::%s',
+                $assignment->getId(),
+                $assignment->getUser()->getUsername(),
+                $assignment->getId()
+            )
+
         ];
     }
 }
