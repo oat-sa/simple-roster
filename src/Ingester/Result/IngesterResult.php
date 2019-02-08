@@ -17,7 +17,7 @@ class IngesterResult
     private $failures = [];
 
     /** @var bool */
-    private $dryRun = true;
+    private $dryRun;
 
     public function __construct(string $ingesterType, string $sourceType, bool $dryRun = true)
     {

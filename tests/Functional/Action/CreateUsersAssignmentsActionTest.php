@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Action;
 
-use App\Entity\Assignment;
+use App\Action\CreateUsersAssignmentsAction;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CreateUserAssignmentsActionTest extends WebTestCase
+class CreateUsersAssignmentsActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
     use UserAuthenticatorTrait;
@@ -36,7 +36,7 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         $this->userRepository = $this->getRepository(User::class);
     }
 
-    public function testWithNonAuthenticatedUser(): void
+    public function testItThrowsUnauthorizedHttpExceptionIfUserIsNotAuthenticated(): void
     {
         $this->client->request(Request::METHOD_POST, self::CREATE_USER_ASSIGNMENTS_URI);
 
@@ -51,7 +51,7 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithInvalidRequestBodyContent(): void
+    public function testItThrowsBadRequestHttpExceptionIfRequestBodyIsInvalid(): void
     {
         $user = $this->userRepository->getByUsernameWithAssignments('user1');
         $this->logInAs($user, $this->client);
@@ -76,7 +76,37 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithEmptyUsernameListInRequestBody(): void
+    public function testItThrowsRequestEntityTooLargeHttpExceptionIfRequestPayloadIsTooLarge(): void
+    {
+        $user = $this->userRepository->getByUsernameWithAssignments('user1');
+        $this->logInAs($user, $this->client);
+
+        $requestPayload = [];
+        for ($i = 0; $i <= CreateUsersAssignmentsAction::LIMIT + 1; $i++) {
+            $requestPayload[] = 'user_' . $i;
+        }
+
+        $this->client->request(
+            Request::METHOD_POST,
+            self::CREATE_USER_ASSIGNMENTS_URI,
+            [],
+            [],
+            [],
+            json_encode($requestPayload)
+        );
+
+        $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->client->getResponse()->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => 'User limit has been exceeded. Maximum of `1000` users are allowed per request.',
+                ],
+            ],
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
+    }
+
+    public function testItThrowsBadRequestHttpExceptionIfRequestPayloadIsValidButEmpty(): void
     {
         $user = $this->userRepository->getByUsernameWithAssignments('user1');
         $this->logInAs($user, $this->client);
@@ -101,7 +131,7 @@ class CreateUserAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testWithNonExistingUser(): void
+    public function testSuccessfulResponse(): void
     {
         $user = $this->userRepository->getByUsernameWithAssignments('user1');
         $this->logInAs($user, $this->client);
@@ -112,54 +142,14 @@ class CreateUserAssignmentsActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode([$user->getUsername(), 'nonExistingUsername'])
-        );
-
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => "User with username = 'nonExistingUsername' cannot be found.",
-                ]
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
-    }
-
-    public function testIfNewAssignmentCanBeCreated(): void
-    {
-        $user = $this->userRepository->getByUsernameWithAssignments('user1');
-
-        $expectedLineItem = $user->getLastAssignment()->getLineItem();
-        $lastAssignmentId = $user->getLastAssignment()->getId();
-
-        $this->logInAs($user, $this->client);
-
-        $this->client->request(
-            Request::METHOD_POST,
-            self::CREATE_USER_ASSIGNMENTS_URI,
-            [],
-            [],
-            [],
-            json_encode([$user->getUsername()])
+            json_encode([$user->getUsername(), 'nonExistingUser1', 'nonExistingUser2'])
         );
 
         $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $this->assertEquals([
-            'assignments' => [
-                [
-                    'id' => $lastAssignmentId + 1,
-                    'username' => $user->getUsername(),
-                    'state' => Assignment::STATE_READY,
-                    'lineItem' => [
-                        'uri' => $expectedLineItem->getUri(),
-                        'label' => $expectedLineItem->getLabel(),
-                        'startDateTime' => $expectedLineItem->getStartAt()->getTimestamp(),
-                        'endDateTime' => $expectedLineItem->getEndAt()->getTimestamp(),
-                        'infrastructure' => $expectedLineItem->getInfrastructure()->getId(),
-                    ],
-                ],
-            ],
+            $user->getUsername() => true,
+            'nonExistingUser1' => false,
+            'nonExistingUser2' => false,
         ], json_decode($this->client->getResponse()->getContent(), true));
     }
 }

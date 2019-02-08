@@ -1,7 +1,7 @@
-createUserAssignments:
+createUsersAssignments:
   path: /api/v1/assignments
   methods: POST
-  defaults: { _controller: App\Action\CreateUserAssignmentsAction }
+  defaults: { _controller: App\Action\CreateUsersAssignmentsAction }
 
 updateLtiOutcome:
   path: /api/v1/lti/outcome
@@ -12,6 +12,11 @@ getUserAssignments:
   path: /api/v1/assignments
   methods: GET
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
+
+cancelUsersAssigntments:
+  path: /api/v1/assignments
+  methods: DELETE
+  defaults: { _controller: App\Action\CancelUsersAssignmentsAction }
 
 login:
   path: /api/v1/auth/login

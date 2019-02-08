@@ -5,7 +5,7 @@ namespace App\Action;
 use App\Exception\AssignmentNotFoundException;
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use App\Responder\SerializerResponder;
-use App\Service\CompleteAssignmentService;
+use App\Service\CompleteUserAssignmentService;
 use App\Service\LTI\ReplaceResultSourceIdExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,19 +17,19 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedAction
     /** @var ReplaceResultSourceIdExtractor */
     private $replaceResultSourceIdExtractor;
 
-    /** @var CompleteAssignmentService */
-    private $completeAssignmentService;
+    /** @var CompleteUserAssignmentService */
+    private $completeUserAssignmentService;
 
     /** @var SerializerResponder */
     private $serializerResponder;
 
     public function __construct(
         ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor,
-        CompleteAssignmentService $completeAssignmentService,
+        CompleteUserAssignmentService $completeUserAssignmentService,
         SerializerResponder $serializerResponder
     ) {
         $this->replaceResultSourceIdExtractor = $replaceResultSourceIdExtractor;
-        $this->completeAssignmentService = $completeAssignmentService;
+        $this->completeUserAssignmentService = $completeUserAssignmentService;
         $this->serializerResponder = $serializerResponder;
     }
 
@@ -38,7 +38,7 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedAction
         try {
             $assignmentId = $this->replaceResultSourceIdExtractor->extractSourceId($request->getContent());
 
-            $this->completeAssignmentService->markAssignmentAsCompleted($assignmentId);
+            $this->completeUserAssignmentService->markAssignmentAsCompleted($assignmentId);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         } catch (InvalidLtiReplaceResultBodyException $exception) {

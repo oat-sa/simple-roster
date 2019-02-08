@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class S3CsvIngesterSourceTest extends TestCase
 {
-    public function testRegistryItemName()
+    public function testRegistryItemName(): void
     {
         $subject = new S3CsvIngesterSource(
             $this->createMock(S3Client::class),
