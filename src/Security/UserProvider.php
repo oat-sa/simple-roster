@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,6 +23,7 @@ class UserProvider implements UserProviderInterface
 
     /**
      * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
      */
     public function loadUserByUsername($username): UserInterface
     {
@@ -37,6 +39,7 @@ class UserProvider implements UserProviderInterface
 
     /**
      * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
      */
     public function refreshUser(UserInterface $user): UserInterface
     {
