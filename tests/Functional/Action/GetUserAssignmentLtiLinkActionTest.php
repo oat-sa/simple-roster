@@ -2,9 +2,10 @@
 
 namespace App\Tests\Functional\Action;
 
+use App\Entity\Assignment;
 use App\Entity\User;
+use App\Generator\NonceGenerator;
 use App\Lti\Request\LtiRequest;
-use App\Repository\UserRepository;
 use App\Security\OAuth\OAuthContext;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
@@ -37,9 +38,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
 
         $client = static::createClient();
 
@@ -58,13 +57,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnsLtiLink(): void
+    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
 
         $client = static::createClient();
 
@@ -80,10 +77,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
-                    'oauth_nonce' => 'e100bf304503b2ae0c1a8708c53a5405e19e51b7dc405153cb02935fd37c1909',
+                    'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => '0/KDfULBIsTSBR2jvsD8t+J2tMk=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
-                    'oauth_timestamp' => '1546297200',
+                    'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
@@ -101,6 +98,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             ],
             json_decode($client->getResponse()->getContent(), true)
         );
-    }
 
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+    }
 }

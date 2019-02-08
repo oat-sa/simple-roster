@@ -43,7 +43,6 @@ class GetUserAssignmentLtiLinkAction
             $ltiRequest = $this->getUserAssignmentLtiLinkService->getAssignmentLtiRequest($assignment);
 
             $assignment->setState(Assignment::STATE_STARTED);
-
             $this->entityManager->flush();
 
             return $this->responder->createJsonResponse($ltiRequest);
