@@ -2,6 +2,7 @@
 
 namespace App\Http\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RequestEntityTooLargeHttpException extends HttpException
@@ -14,6 +15,6 @@ class RequestEntityTooLargeHttpException extends HttpException
      */
     public function __construct(string $message = null, \Exception $previous = null, int $code = 0, array $headers = [])
     {
-        parent::__construct(413, $message, $previous, $headers, $code);
+        parent::__construct(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $message, $previous, $headers, $code);
     }
 }
