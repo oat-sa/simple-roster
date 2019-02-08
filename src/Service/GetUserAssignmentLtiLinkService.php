@@ -75,13 +75,13 @@ class GetUserAssignmentLtiLinkService
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
             'lti_version' => LtiRequest::LTI_VERSION,
-            'context_id' => $assignment->getId(),
+            'context_id' => $assignment->getLineItem()->getId(),
             'context_label' => $assignment->getLineItem()->getSlug(),
             'context_title' => $assignment->getLineItem()->getLabel(),
             'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => 1234,
+            'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'lis_result_sourcedid' => $assignment->getId(),
         ];
