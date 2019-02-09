@@ -1,4 +1,4 @@
-label,ltiDirectoryLink,ltiKey,ltiSecret
+label,ltiDirectorLink,ltiKey,ltiSecret
 infra_1,http://infra_1.com,key1,secret
 infra_2,http://infra_2.com,key2,secret
 infra_3,http://infra_3.com,key3,secret
