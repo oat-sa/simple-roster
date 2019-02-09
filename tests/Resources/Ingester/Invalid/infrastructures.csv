@@ -1,2 +1,3 @@
-"infra_1", "http://infra_1.com", "key1", "secret1"
-"infra_2", "http://infra_2.com", "key2"
+label,ltiDirectoryLink,ltiKey,ltiSecret
+infra_1,http://infra_1.com,key1,secret1
+infra_2,http://infra_2.com,key2

@@ -5,7 +5,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 use App\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
 class S3CsvIngesterSourceTest extends TestCase
 {
@@ -30,8 +29,6 @@ class S3CsvIngesterSourceTest extends TestCase
 
         $output = $this->subject->getContent();
 
-        $this->assertInstanceOf(Traversable::class, $output);
-
         foreach ($output as $row) {
             $this->assertCount(4, $row);
             $this->assertContains('infra', $row[0]);
@@ -48,8 +45,6 @@ class S3CsvIngesterSourceTest extends TestCase
         $this->subject->setDelimiter('|');
 
         $output = $this->subject->getContent();
-
-        $this->assertInstanceOf(Traversable::class, $output);
 
         foreach ($output as $row) {
             $this->assertCount(1, $row);

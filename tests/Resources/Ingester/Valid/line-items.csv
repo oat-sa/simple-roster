@@ -1,3 +1,4 @@
+uri,label,slug,infrastructure,startedAt,endedAt
 http://taoplatform.loc/delivery_1.rdf,label1,gra13_ita_1,infra_1,2019-01-05 10:00:00,2019-01-26 18:30:00
 http://taoplatform.loc/delivery_2.rdf,label2,gra13_ita_2,infra_2,2019-01-05 10:00:00,2019-01-26 18:30:00
 http://taoplatform.loc/delivery_3.rdf,label2,gra13_ita_3,infra_3,2019-01-05 10:00:00,2019-01-26 18:30:00
