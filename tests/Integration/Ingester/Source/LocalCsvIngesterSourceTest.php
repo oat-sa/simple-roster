@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class LocalCsvIngesterSourceTest extends TestCase
 {
-    public function testGetContentWithDefaultDelimiter()
+    public function testGetContentWithDefaultDelimiter(): void
     {
         $subject = new LocalCsvIngesterSource();
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
@@ -23,7 +23,7 @@ class LocalCsvIngesterSourceTest extends TestCase
         }
     }
 
-    public function testGetContentWithOtherDelimiter()
+    public function testGetContentWithOtherDelimiter(): void
     {
         $subject = new LocalCsvIngesterSource();
         $subject

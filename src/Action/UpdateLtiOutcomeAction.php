@@ -5,14 +5,15 @@ namespace App\Action;
 use App\Exception\AssignmentNotFoundException;
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use App\Responder\SerializerResponder;
+use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
+use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
 use App\Service\CompleteUserAssignmentService;
-use App\Service\LTI\ReplaceResultSourceIdExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UpdateLtiOutcomeAction implements OAuthSignatureValidatedAction
+class UpdateLtiOutcomeAction implements OAuthSignatureValidatedActionInterface
 {
     /** @var ReplaceResultSourceIdExtractor */
     private $replaceResultSourceIdExtractor;

@@ -26,7 +26,7 @@ class InfrastructureIngesterTest extends KernelTestCase
         $this->subject = new InfrastructureIngester($this->getManagerRegistry());
     }
 
-    public function testDryRunIngest()
+    public function testDryRunIngest(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
@@ -41,7 +41,7 @@ class InfrastructureIngesterTest extends KernelTestCase
         $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
     }
 
-    public function testIngestWithValidSource()
+    public function testIngestWithValidSource(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
@@ -65,7 +65,7 @@ class InfrastructureIngesterTest extends KernelTestCase
         $this->assertEquals('infra_3', $user3->getLabel());
     }
 
-    public function testIngestWithInvalidSource()
+    public function testIngestWithInvalidSource(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv');
 

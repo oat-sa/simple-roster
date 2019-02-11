@@ -1,3 +1,11 @@
+login:
+  path: /api/v1/auth/login
+  methods: POST
+  defaults: { _controller: App\Action\LoginAction }
+
+logout:
+  path: /api/v1/auth/logout
+
 createUsersAssignments:
   path: /api/v1/assignments
   methods: POST
@@ -13,15 +21,13 @@ getUserAssignments:
   methods: GET
   defaults: { _controller: App\Action\ListUserAssignmentsAction }
 
-cancelUsersAssigntments:
+cancelUsersAssignments:
   path: /api/v1/assignments
   methods: DELETE
   defaults: { _controller: App\Action\CancelUsersAssignmentsAction }
 
-login:
-  path: /api/v1/auth/login
-  methods: POST
-  defaults: { _controller: App\Action\LoginAction }
+getUserAssignmentLtiLink:
+  path: /api/v1/assignments/{assignmentId}/lti-link
+  methods: GET
+  defaults: { _controller: App\Action\GetUserAssignmentLtiLinkAction }
 
-logout:
-  path: /api/v1/auth/logout

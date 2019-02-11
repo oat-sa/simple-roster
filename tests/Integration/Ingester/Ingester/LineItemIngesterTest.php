@@ -27,7 +27,7 @@ class LineItemIngesterTest extends KernelTestCase
         $this->subject = new LineItemIngester($this->getManagerRegistry());
     }
 
-    public function testDryRunIngest()
+    public function testDryRunIngest(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv');
 
@@ -46,14 +46,14 @@ class LineItemIngesterTest extends KernelTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Cannot ingest 'line-item' since infrastructure table is empty.
      */
-    public function testIngestWithEmptyInfrastructures()
+    public function testIngestWithEmptyInfrastructures(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv.csv');
 
         $this->subject->ingest($source, false);
     }
 
-    public function testIngestWithInvalidSource()
+    public function testIngestWithInvalidSource(): void
     {
         $this->prepareIngestionContext();
 
@@ -89,7 +89,7 @@ class LineItemIngesterTest extends KernelTestCase
         $this->assertContains('UNIQUE constraint failed: line_items.slug', $failure->getReason());
     }
 
-    public function testIngestWithValidSource()
+    public function testIngestWithValidSource(): void
     {
         $this->prepareIngestionContext();
 

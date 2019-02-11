@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -31,6 +32,7 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
      */
     public function getByUsernameWithAssignments(string $username): User
     {

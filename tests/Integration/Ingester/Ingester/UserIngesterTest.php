@@ -28,7 +28,7 @@ class UserIngesterTest extends KernelTestCase
         $this->subject = new UserIngester($this->getManagerRegistry());
     }
 
-    public function testDryRunIngest()
+    public function testDryRunIngest(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
@@ -47,14 +47,14 @@ class UserIngesterTest extends KernelTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Cannot ingest 'user' since line-item table is empty.
      */
-    public function testIngestWithEmptyLineItems()
+    public function testIngestWithEmptyLineItems(): void
     {
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
         $this->subject->ingest($source, false);
     }
 
-    public function testIngestWithInvalidSource()
+    public function testIngestWithInvalidSource(): void
     {
         $this->prepareIngestionContext();
 
@@ -83,7 +83,7 @@ class UserIngesterTest extends KernelTestCase
         $this->assertContains('UNIQUE constraint failed: users.username', $failure->getReason());
     }
 
-    public function testIngestWithValidSource()
+    public function testIngestWithValidSource(): void
     {
         $this->prepareIngestionContext();
 
