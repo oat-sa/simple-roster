@@ -43,7 +43,7 @@ class CreateUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function(Assignment $assignment) use ($expectedLineItem) {
+            ->with($this->callback(function (Assignment $assignment) use ($expectedLineItem) {
                 return $assignment->getState() === Assignment::STATE_READY
                     && $assignment->getLineItem() === $expectedLineItem;
             }));

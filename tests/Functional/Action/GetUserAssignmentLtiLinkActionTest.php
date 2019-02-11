@@ -6,6 +6,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Generator\NonceGenerator;
 use App\Lti\Request\LtiRequest;
+use App\Repository\UserRepository;
 use App\Security\OAuth\OAuthContext;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
@@ -39,7 +40,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $client = static::createClient();
 
@@ -62,7 +65,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $client = static::createClient();
 
