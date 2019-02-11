@@ -4,6 +4,7 @@ namespace App\Action;
 
 use App\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoginAction
 {
@@ -15,7 +16,7 @@ class LoginAction
         $this->serializerResponder = $serializerResponder;
     }
 
-    public function __invoke(): JsonResponse
+    public function __invoke(): Response
     {
         return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }

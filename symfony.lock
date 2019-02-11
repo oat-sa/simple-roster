@@ -146,6 +146,18 @@
             "ref": "0b9900ece737bec7752e4155c0164639dd9b0cb0"
         }
     },
+    "nelmio/cors-bundle": {
+        "version": "1.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.5",
+            "ref": "f0436fc35fca88eada758311f8de43bfb61f1980"
+        }
+    },
+    "nesbot/carbon": {
+        "version": "2.11.0"
+    },
     "nikic/php-parser": {
         "version": "v4.2.0"
     },
@@ -382,6 +394,15 @@
     },
     "symfony/stopwatch": {
         "version": "v4.1.10"
+    },
+    "symfony/translation": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "1fb02a6e1c8f3d4232cce485c9afa868d63b115a"
+        }
     },
     "symfony/twig-bridge": {
         "version": "v4.1.10"

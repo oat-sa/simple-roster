@@ -8,6 +8,7 @@ services:
         public: false
         bind:
             $debug: '%kernel.debug%'
+            $ltiLaunchPresentationReturnUrl: '%env(LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
@@ -39,7 +40,6 @@ services:
         arguments:
             $client: '@aws.s3'
             $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
-
 
     App\EventSubscriber\UserCacheInvalidationSubscriber:
         tags: ['doctrine.event_subscriber']

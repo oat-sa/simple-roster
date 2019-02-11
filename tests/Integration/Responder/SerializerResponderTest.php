@@ -23,7 +23,7 @@ class SerializerResponderTest extends KernelTestCase
         static::bootKernel();
     }
 
-    public function testCreateDefaultJsonResponse()
+    public function testCreateDefaultJsonResponse(): void
     {
         $data = ['some' => 'data'];
 
@@ -34,7 +34,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(json_encode($data), $response->getContent());
     }
 
-    public function testCreateCustomJsonResponse()
+    public function testCreateCustomJsonResponse(): void
     {
         $data = ['some' => 'data'];
 
@@ -50,7 +50,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(json_encode($data), $response->getContent());
     }
 
-    public function testCreateDefaultErrorJsonResponse()
+    public function testCreateDefaultErrorJsonResponse(): void
     {
         $exception = new Exception('error message');
 
@@ -68,7 +68,7 @@ class SerializerResponderTest extends KernelTestCase
         );
     }
 
-    public function testCreateDefaultErrorJsonResponseWithDebug()
+    public function testCreateDefaultErrorJsonResponseWithDebug(): void
     {
         $this->debug = true;
 
@@ -92,7 +92,7 @@ class SerializerResponderTest extends KernelTestCase
         );
     }
 
-    public function testCreateCustomErrorJsonResponse()
+    public function testCreateCustomErrorJsonResponse(): void
     {
         $exception = new Exception('error message');
 
@@ -115,7 +115,7 @@ class SerializerResponderTest extends KernelTestCase
         );
     }
 
-    public function testCreateHttpErrorJsonResponse()
+    public function testCreateHttpErrorJsonResponse(): void
     {
         $exception = $this->createHttpException('error message');
 

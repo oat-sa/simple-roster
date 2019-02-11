@@ -4,10 +4,10 @@ namespace App\Tests\Functional\Action;
 
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
-use App\Model\OAuth\Signature;
+use App\Security\OAuth\OAuthContext;
 use App\Repository\AssignmentRepository;
 use App\Repository\InfrastructureRepository;
-use App\Security\OAuth\SignatureGenerator;
+use App\Security\OAuth\OAuthSigner;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -176,7 +176,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     private function generateSignature(Infrastructure $infrastructure, $time): string
     {
-        $signature = new Signature(
+        $context = new OAuthContext(
             'bodyHash',
             $infrastructure->getLtiKey(),
             'nonce',
@@ -185,9 +185,14 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             '1.0'
         );
 
-        $signatureGenerator = new SignatureGenerator($signature, 'http://localhost/api/v1/lti/outcome', 'POST');
+        $oauthSigner = new OAuthSigner();
 
-        return $signatureGenerator->getSignature($infrastructure->getLtiSecret());
+        return $oauthSigner->sign(
+            $context,
+            'http://localhost/api/v1/lti/outcome',
+            'POST',
+            $infrastructure->getLtiSecret()
+        );
     }
 
     private function getInfrastructure(): Infrastructure

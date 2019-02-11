@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Exception\AssignmentNotFoundException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -119,6 +120,22 @@ class User implements UserInterface, EntityInterface
         }
 
         return $availableAssignments;
+    }
+
+    /**
+     * @throws AssignmentNotFoundException
+     */
+    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    {
+        foreach ($this->getAvailableAssignments() as $assignment) {
+            if ($assignment->getId() === $assignmentId) {
+                return $assignment;
+            }
+        }
+
+        throw new AssignmentNotFoundException(
+            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+        );
     }
 
     /**

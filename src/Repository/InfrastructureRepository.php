@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Infrastructure;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -18,6 +19,9 @@ class InfrastructureRepository extends AbstractRepository
         parent::__construct($registry, Infrastructure::class);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function getByLtiKey(string $ltiKey): ?Infrastructure
     {
         return $this
