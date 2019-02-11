@@ -47,7 +47,15 @@ class LineItemIngester extends AbstractIngester
             ->setLabel($data[1])
             ->setSlug($data[2])
             ->setInfrastructure($this->infrastructureCollection[$data[3]])
-            ->setStartAt(new DateTime($data[4]))
-            ->setEndAt(new DateTime($data[5]));
+            ->setStartAt($this->createDateTime($data[4]))
+            ->setEndAt($this->createDateTime($data[5]));
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function createDateTime(string $value): DateTime
+    {
+        return (new DateTime())->setTimestamp((int)$value);
     }
 }

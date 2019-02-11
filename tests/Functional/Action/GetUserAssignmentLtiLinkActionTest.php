@@ -10,6 +10,7 @@ use App\Security\OAuth\OAuthContext;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
+use DateTimeZone;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -59,7 +60,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
 
@@ -78,7 +79,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => '0/KDfULBIsTSBR2jvsD8t+J2tMk=',
+                    'oauth_signature' => 'W5GIWvNO1qOB/FCN8J9zFQTfpdQ=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,

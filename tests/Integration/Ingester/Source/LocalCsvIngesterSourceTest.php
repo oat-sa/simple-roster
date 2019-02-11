@@ -4,7 +4,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Ingester\Source\LocalCsvIngesterSource;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
 class LocalCsvIngesterSourceTest extends TestCase
 {
@@ -14,8 +13,6 @@ class LocalCsvIngesterSourceTest extends TestCase
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $output = $subject->getContent();
-
-        $this->assertInstanceOf(Traversable::class, $output);
 
         foreach ($output as $row) {
             $this->assertCount(4, $row);
@@ -34,8 +31,6 @@ class LocalCsvIngesterSourceTest extends TestCase
             ->setDelimiter('|');
 
         $output = $subject->getContent();
-
-        $this->assertInstanceOf(Traversable::class, $output);
 
         foreach ($output as $row) {
             $this->assertCount(1, $row);

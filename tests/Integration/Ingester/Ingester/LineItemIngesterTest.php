@@ -81,8 +81,8 @@ class LineItemIngesterTest extends KernelTestCase
                 'label2',
                 'gra13_ita_1',
                 'infra_2',
-                '2019-01-05 10:00:00',
-                '2019-01-26 18:30:00'
+                '1546682400',
+                '1546713000'
             ],
             $failure->getData()
         );
