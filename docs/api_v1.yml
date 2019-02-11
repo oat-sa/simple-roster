@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: TAO Simple Roaster API
+  title: TAO Simple Roster API
   description: '' # TODO
   version: 1.0.0
 
