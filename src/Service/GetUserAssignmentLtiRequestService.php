@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class GetUserAssignmentLtiLinkService
+class GetUserAssignmentLtiRequestService
 {
     /** @var OAuthSigner */
     private $signer;

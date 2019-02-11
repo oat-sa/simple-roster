@@ -6,7 +6,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
 use App\Responder\SerializerResponder;
-use App\Service\GetUserAssignmentLtiLinkService;
+use App\Service\GetUserAssignmentLtiRequestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,19 +17,19 @@ class GetUserAssignmentLtiLinkAction
     /** @var SerializerResponder */
     private $responder;
 
-    /** @var GetUserAssignmentLtiLinkService */
-    private $getUserAssignmentLtiLinkService;
+    /** @var GetUserAssignmentLtiRequestService */
+    private $getUserAssignmentLtiRequestService;
 
     /** @var EntityManagerInterface */
     private $entityManager;
 
     public function __construct(
         SerializerResponder $responder,
-        GetUserAssignmentLtiLinkService $getUserAssignmentLtiLinkService,
+        GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
         EntityManagerInterface $entityManager
     ) {
         $this->responder = $responder;
-        $this->getUserAssignmentLtiLinkService = $getUserAssignmentLtiLinkService;
+        $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
         $this->entityManager = $entityManager;
     }
 
@@ -40,7 +40,7 @@ class GetUserAssignmentLtiLinkAction
     {
         try {
             $assignment = $user->getAvailableAssignmentById($assignmentId);
-            $ltiRequest = $this->getUserAssignmentLtiLinkService->getAssignmentLtiRequest($assignment);
+            $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 
             $assignment->setState(Assignment::STATE_STARTED);
             $this->entityManager->flush();

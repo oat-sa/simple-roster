@@ -43,9 +43,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
      */
     public function onKernelController(FilterControllerEvent $event): void
     {
-        $action = $event->getController();
-
-        if (!$action instanceof OAuthSignatureValidatedActionInterface) {
+        if (!$event->getController() instanceof OAuthSignatureValidatedActionInterface) {
             return;
         }
 
