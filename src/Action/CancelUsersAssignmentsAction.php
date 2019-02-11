@@ -7,8 +7,8 @@ use App\Repository\UserRepository;
 use App\Responder\SerializerResponder;
 use App\Service\CancelUsersAssignmentsService;
 use Doctrine\ORM\EntityNotFoundException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CancelUsersAssignmentsAction
@@ -54,12 +54,7 @@ class CancelUsersAssignmentsAction
 
         $result = array_merge($resultOfNonExistingUsers, $this->cancelUsersAssignmentsService->cancel(...$users));
 
-        return $this->responder->createJsonResponse(
-            array_replace(
-                array_flip($usernames),
-                $result
-            )
-        );
+        return $this->responder->createJsonResponse(['data' => array_replace(array_flip($usernames), $result)]);
     }
 
     /**

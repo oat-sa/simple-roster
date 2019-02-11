@@ -131,7 +131,7 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
-        $client  = self::createClient();
+        $client = self::createClient();
 
         $this->logInAs($user, $client);
 
@@ -146,9 +146,11 @@ class CancelUsersAssignmentsActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         $this->assertEquals([
-            $user->getUsername() => true,
-            'nonExistingUser1' => false,
-            'nonExistingUser2' => false,
+            'data' => [
+                $user->getUsername() => true,
+                'nonExistingUser1' => false,
+                'nonExistingUser2' => false,
+            ],
         ], json_decode($client->getResponse()->getContent(), true));
 
         // Refresh repository
