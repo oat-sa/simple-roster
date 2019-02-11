@@ -29,7 +29,7 @@ class LoginActionTest extends WebTestCase
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
         $this->assertArraySubset(
             [
-                'error' => 'Authentication request could not be processed due to a system problem.',
+                'error' => 'Invalid credentials.',
             ],
             json_decode($client->getResponse()->getContent(), true)
         );

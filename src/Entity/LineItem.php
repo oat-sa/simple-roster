@@ -31,14 +31,6 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var Infrastructure */
     private $infrastructure;
 
-    /** @var ArrayCollection|Assignment[] */
-    private $assignments;
-
-    public function __construct()
-    {
-        $this->assignments = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -112,37 +104,6 @@ class LineItem implements JsonSerializable, EntityInterface
     public function setInfrastructure(Infrastructure $infrastructure): self
     {
         $this->infrastructure = $infrastructure;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Assignment[]
-     */
-    public function getAssignments(): Collection
-    {
-        return $this->assignments;
-    }
-
-    public function addAssignment(Assignment $assignment): self
-    {
-        if (!$this->assignments->contains($assignment)) {
-            $this->assignments[] = $assignment;
-            $assignment->setLineItem($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAssignment(Assignment $assignment): self
-    {
-        if ($this->assignments->contains($assignment)) {
-            $this->assignments->removeElement($assignment);
-            // set the owning side to null (unless already changed)
-            if ($assignment->getLineItem() === $this) {
-                $assignment->setLineItem(null);
-            }
-        }
 
         return $this;
     }

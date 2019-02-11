@@ -62,13 +62,4 @@ App\Entity\LineItem:
                 infrastructure_id:
                     referencedColumnName: id
             orphanRemoval: false
-    oneToMany:
-        assignments:
-            targetEntity: App\Entity\Assignment
-            cascade: {  }
-            fetch: LAZY
-            mappedBy: lineItem
-            inversedBy: null
-            orphanRemoval: false
-            orderBy: null
     lifecycleCallbacks: {  }

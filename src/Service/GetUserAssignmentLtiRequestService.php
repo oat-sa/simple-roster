@@ -86,8 +86,9 @@ class GetUserAssignmentLtiRequestService
             'context_title' => $assignment->getLineItem()->getLabel(),
             'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
             'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => $assignment->getId(),
+            'user_id' => $assignment->getUser()->getId(),
+            'lis_person_name_full' => $assignment->getUser()->getUsername(),
+            'resource_link_id' => $assignment->getLineItem()->getId(),
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'lis_result_sourcedid' => $assignment->getId(),
             'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl
