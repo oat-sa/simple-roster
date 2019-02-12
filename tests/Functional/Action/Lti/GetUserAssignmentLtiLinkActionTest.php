@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
 use App\Entity\User;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
@@ -63,7 +63,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($infrastructure, $time);
 
-        $xmlBody = file_get_contents(__DIR__ . '/../../Resources/LtiOutcome/valid_replace_result_body.xml');
+        $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
@@ -143,7 +143,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($infrastructure, $time);
 
-        $xmlBody = file_get_contents(__DIR__ . '/../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml');
+        $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',

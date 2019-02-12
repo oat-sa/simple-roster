@@ -26,7 +26,6 @@ class IngesterCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(IngesterCommand::NAME));
     }
 
-
     public function testDryRunLocalIngestion(): void
     {
         $output = $this->commandTester->execute([

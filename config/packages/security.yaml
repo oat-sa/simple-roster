@@ -30,5 +30,6 @@ security:
             # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
 
     access_control:
+      - { path: ^/api/v1/bulk/assignments, roles: IS_AUTHENTICATED_ANONYMOUSLY }
       - { path: ^/api/v1/lti/outcome, roles: IS_AUTHENTICATED_ANONYMOUSLY }
       - { path: ^/api, roles: ROLE_USER }

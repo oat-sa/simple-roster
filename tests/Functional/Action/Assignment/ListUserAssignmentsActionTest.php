@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Assignment;
 
 use App\Entity\Assignment;
 use App\Entity\User;
