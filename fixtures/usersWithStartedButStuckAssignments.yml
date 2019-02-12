@@ -1,0 +1,27 @@
+App\Entity\Infrastructure:
+  infrastructure:
+    label: 'The first infrastructure'
+    ltiDirectorLink: 'http://lti-director.com'
+    ltiKey: 'myKey'
+    ltiSecret: 'mySecret'
+
+App\Entity\LineItem:
+  lineItem:
+    infrastructure: '@infrastructure'
+    label: 'The first line item'
+    uri: 'http://lineitemuri.com'
+    slug: 'lineItemSlug'
+    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+
+App\Entity\Assignment:
+  startedButStuckAssignment_{1..10}:
+    lineItem: '@lineItem'
+    state: 'started'
+    # Updated at will be set through Carbon mock
+
+App\Entity\User:
+  userWithStartedButStuckAssignment_{1..10}:
+    username: 'userWithStartedButStuckAssignment_<current()>'
+    plainPassword: 'password'
+    assignments: ['@startedButStuckAssignment_<current()>']

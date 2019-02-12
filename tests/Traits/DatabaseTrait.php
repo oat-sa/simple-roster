@@ -19,11 +19,13 @@ trait DatabaseTrait
         $this->setUpDatabase();
     }
 
-    protected function setUpDatabase(): KernelInterface
+    protected function setUpDatabase(KernelInterface $kernel = null): KernelInterface
     {
         static::ensureKernelTestCase();
 
-        $kernel = parent::bootKernel();
+        if (null === $kernel) {
+            $kernel = parent::bootKernel();
+        }
 
         $entityManager = $this->getEntityManager();
 

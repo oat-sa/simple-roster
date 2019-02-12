@@ -35,6 +35,8 @@ class IngesterCommand extends Command
 
     protected function configure()
     {
+        $this->setDescription('TODO');
+
         $this->addArgument(
             'type',
             InputArgument::REQUIRED,

@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
+use DateTime;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -13,8 +15,31 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AssignmentRepository extends AbstractRepository
 {
+    private const LIMIT = 1000;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Assignment::class);
+    }
+
+    public function findAllByStateAndUpdatedAtPaged(
+        string $state,
+        DateTime $updatedAt,
+        int $offset = null,
+        int $limit = null
+    ): Paginator {
+        $query = $this
+            ->createQueryBuilder('a')
+            ->select('a')
+            ->where('a.state = :state')
+            ->andWhere('a.updatedAt <= :updatedAt')
+            ->setParameter('state', $state)
+            ->setParameter('updatedAt', $updatedAt)
+            ->setFirstResult($offset)
+            ->setMaxResults($limit ?? self::LIMIT)
+            ->getQuery()
+            ->useResultCache(false);
+
+        return new Paginator($query, false);
     }
 }

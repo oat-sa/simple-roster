@@ -35,6 +35,13 @@ class Kernel extends BaseKernel
         }
     }
 
+    protected function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+//        $container->addCompilerPass();
+    }
+
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
         $container->addResource(new FileResource($this->getProjectDir().'/config/bundles.php'));
