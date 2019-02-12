@@ -7,6 +7,7 @@ use App\Repository\AssignmentRepository;
 use Carbon\Carbon;
 use DateInterval;
 use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -76,7 +77,7 @@ class AssignmentGarbageCollectorCommand extends Command
         try {
             $batchSize = (int)($input->getOption('batch-size') ?? self::BATCH_SIZE);
             if ($batchSize < 1) {
-                throw new \InvalidArgumentException('Invalid `batch-size` argument received.');
+                throw new InvalidArgumentException('Invalid `batch-size` argument received.');
             }
 
             $isDryRun = !(bool)$input->getOption('force');

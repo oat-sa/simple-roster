@@ -46,4 +46,4 @@ services:
 
     App\Command\AssignmentGarbageCollectorCommand:
         arguments:
-            $cleanUpInterval: '%env(ASSIGNMENT_STATE_CLEAN_UP_INTERVAL)%'
+            $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
