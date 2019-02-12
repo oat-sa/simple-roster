@@ -75,7 +75,7 @@ Full documentation on how to ingest data can be found here: [docs/ingest.md](doc
 ### Garbage collection
 
 [AssignmentGarbageCollectorCommand](src/Command/AssignmentGarbageCollectorCommand.php) is responsible for transitioning all stuck assignments from `started` state to `completed` state.
-For further details plese check [docs/assignment-garbage-collector.md](docs/assignment-garbage-collector.md)
+For further details please check [docs/assignment-garbage-collector.md](docs/assignment-garbage-collector.md)
 
 Testing
 -------
