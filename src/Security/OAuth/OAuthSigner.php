@@ -10,7 +10,6 @@ class OAuthSigner
     {
         switch ($context->getSignatureMethod()) {
             case OAuthContext::METHOD_MAC_SHA1:
-
                 $secret .= '&';
                 $baseString = implode('&', [
                     urlencode($method),
