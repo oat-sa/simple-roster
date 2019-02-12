@@ -35,7 +35,7 @@ class IngesterCommand extends Command
 
     protected function configure()
     {
-        $this->setDescription('TODO');
+        $this->setDescription('Responsible for data ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
             'type',

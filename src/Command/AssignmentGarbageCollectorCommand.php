@@ -74,7 +74,11 @@ class AssignmentGarbageCollectorCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
         try {
-            $batchSize = $input->getOption('batch-size') ?? self::BATCH_SIZE;
+            $batchSize = (int)($input->getOption('batch-size') ?? self::BATCH_SIZE);
+            if ($batchSize < 1) {
+                throw new \InvalidArgumentException('Invalid `batch-size` argument received.');
+            }
+
             $isDryRun = !(bool)$input->getOption('force');
             $numberOfCollectedAssignments = $this->collectStuckAssignments($batchSize, $isDryRun);
 
@@ -109,7 +113,6 @@ class AssignmentGarbageCollectorCommand extends Command
                 0,
                 $batchSize
             );
-
 
             /** @var Assignment $assignment */
             $assignmentCount = $stuckAssignments->getIterator()->count();

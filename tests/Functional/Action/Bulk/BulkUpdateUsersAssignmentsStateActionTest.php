@@ -2,13 +2,10 @@
 
 namespace App\Tests\Functional\Action\Assignment;
 
-use App\Action\CancelUsersAssignmentsAction;
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
-use App\Tests\Traits\UserAuthenticatorTrait;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

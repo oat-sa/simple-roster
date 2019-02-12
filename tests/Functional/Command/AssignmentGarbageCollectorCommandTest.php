@@ -86,6 +86,15 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $this->assertEmpty($assignmentRepository->findBy(['state' => Assignment::STATE_STARTED]));
     }
 
+    public function testOutputInCaseOfException(): void
+    {
+        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => -1]));
+        $this->assertContains(
+            '[ERROR] Invalid `batch-size` argument received.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
     private function loadTestFixtures(): void
     {
         $now = Carbon::now();
