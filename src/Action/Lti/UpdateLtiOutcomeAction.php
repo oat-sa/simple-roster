@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Action;
+namespace App\Action\Lti;
 
 use App\Exception\AssignmentNotFoundException;
 use App\Exception\InvalidLtiReplaceResultBodyException;

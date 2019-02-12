@@ -1,16 +1,16 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
-  title: TAO Simple Roster API
-  description: '' # TODO
-  version: 1.0.0
+  title: Simple Roster API
+  description: 'TAO Simple Roster API'
+  version: v1
 
 servers:
-- url: https://example.com/api/v1 # TODO
+- url: https://localhost/api/v1
 
 paths:
   /auth/login:
     post:
-      summary: Login the user
+      summary: User login
       tags:
       - Authentication
       requestBody:
@@ -27,7 +27,7 @@ paths:
       security: []
       responses:
         204:
-          description: The user logged in successfully
+          description: Authentication success
           headers:
             Set-Cookie:
               schema:
@@ -45,7 +45,7 @@ paths:
 
   /auth/logout:
     post:
-      summary: Logout the user
+      summary: User logout
       tags:
       - Authentication
       responses:
@@ -60,8 +60,8 @@ paths:
 
   /assignments:
     get:
-      summary: Returns the assignments for the current user
-      description: Returns all the assignments which belongs to the currently logged in user.
+      summary: List user assignments
+      description: List current authenticated user assignments
       tags:
       - Assignments
       responses:
@@ -85,18 +85,19 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
     post:
-      summary: Creates a new assignment for the current user
+      summary: Create user assignments
+      description: Create user assignments
       tags:
-      - Assignments
+        - Assignments
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                lineItemId:
-                  type: string
+              type: array
+              items:
+                type: string
+              example: ['username1', 'username2']
       responses:
         201:
           description: Success
@@ -105,26 +106,70 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    description: The ID of the created Assignment
-                    example: 13
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+                    example:
+                      username1: true
+                      username2: false
         400:
           $ref: '#/components/responses/BadRequestResponse'
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
+        413:
+          $ref: '#/components/responses/RequestEntityTooLarge'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      summary: Cancel user assignments
+      description: Cancel user assignments
+      tags:
+        - Assignments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+              example: ['username1', 'username2']
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+                    example:
+                      username1: true
+                      username2: false
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        413:
+          $ref: '#/components/responses/RequestEntityTooLarge'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /assignments/{id}/lti-link:
+  /assignments/{assignmentId}/lti-link:
     get:
       summary: Returns the LTI link for the given assignment
       tags:
-      - Assignments
+        - Assignments
       parameters:
-      - name: id
+      - name: assignmentId
         in: path
         description: The ID of the assignment
         required: true
@@ -261,65 +306,58 @@ components:
           example: 2
     Error:
       type: object
-      description: Problem details object (RFC7807)
       properties:
-        type:
-          type: string
-          description: A URI reference that identifies the problem type.
-          example: https://example.com/api/probs/out-of-credit
-        title:
-          type: string
-          description: A short, human-readable summary of the problem type.
-          example: You do not have enough credit.
-        status:
-          type: integer
-          description: The HTTP status code, generated by the origin server for this occurrence of the problem.
-          enum:
-          - 400
-          - 401
-          - 403
-          - 404
-          - 405
-          - 500
-          example: 403
-        detail:
-          type: string
-          description: A human-readable explanation specific to this occurrence of the problem.
-          example: Your current balance is 30, but that costs 50.
+        error:
+          type: object
+          properties:
+            message:
+              description: Error message.
+              example: 'error message'
+              type: string
+            trace:
+              description: Error trace.
+              example: 'error trace (if debug activated)'
+              type: string
   responses:
     BadRequestResponse:
       description: Bad request
       content:
-        application/problem+json:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'
     UnauthorizedResponse:
       description: Unauthorized
       content:
-        application/problem+json:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'
     InvalidCredentialsResponse:
       description: Invalid credentials
       content:
-        application/problem+json:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'
     AssignmentNotFoundResponse:
       description: Assignment not found
       content:
-        application/problem+json:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'
     MethodNotAllowedResponse:
       description: Method not allowed
       content:
-        application/problem+json:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RequestEntityTooLarge:
+      description: Request Entity Too Large
+      content:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'
     InternalServerErrorResponse:
       description: Internal server error
       content:
-        application/problem+json:
+        application/json:
           schema:
             $ref: '#/components/schemas/Error'

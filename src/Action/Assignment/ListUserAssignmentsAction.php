@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Action;
+namespace App\Action\Assignment;
 
 use App\Entity\User;
 use App\Responder\SerializerResponder;

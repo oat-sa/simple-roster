@@ -36,7 +36,7 @@ App\Entity\Assignment:
             cascade: {  }
             fetch: LAZY
             mappedBy: null
-            inversedBy: assignments
+            inversedBy: null
             joinColumns:
                 line_item_id:
                     referencedColumnName: id

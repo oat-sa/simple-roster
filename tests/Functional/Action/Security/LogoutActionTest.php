@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Security;
 
 use App\Entity\User;
 use App\Tests\Traits\DatabaseFixturesTrait;
@@ -26,10 +26,7 @@ class LogoutActionTest extends WebTestCase
 
         $this->assertNotEmpty($session->all());
 
-        $client->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/logout'
-        );
+        $client->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
 

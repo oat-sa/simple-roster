@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Security;
 
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,7 +29,7 @@ class LoginActionTest extends WebTestCase
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
         $this->assertArraySubset(
             [
-                'error' => 'Authentication request could not be processed due to a system problem.',
+                'error' => 'Invalid credentials.',
             ],
             json_decode($client->getResponse()->getContent(), true)
         );

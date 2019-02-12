@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Action;
+namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
 use App\Entity\User;
@@ -84,7 +84,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'W5GIWvNO1qOB/FCN8J9zFQTfpdQ=',
+                    'oauth_signature' => 'fO38nTEEFJJkGWWwZoLWXsUnvOI=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -95,7 +95,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'context_title' => 'The first line item',
                     'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
                     'roles' => LtiRequest::LTI_ROLE,
-                    'user_id' => 'user1',
+                    'user_id' => 1,
+                    'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
                     'lis_result_sourcedid' => 1,

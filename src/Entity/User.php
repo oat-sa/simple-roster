@@ -95,10 +95,6 @@ class User implements UserInterface, EntityInterface
     {
         if ($this->assignments->contains($assignment)) {
             $this->assignments->removeElement($assignment);
-            // set the owning side to null (unless already changed)
-            if ($assignment->getUser() === $this) {
-                $assignment->setUser(null);
-            }
         }
 
         return $this;
