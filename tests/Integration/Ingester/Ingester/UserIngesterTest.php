@@ -23,7 +23,6 @@ class UserIngesterTest extends KernelTestCase
     {
         parent::setUp();
 
-        self::bootKernel();
         $this->setUpDatabase();
 
         $this->subject = new UserIngester($this->getManagerRegistry());

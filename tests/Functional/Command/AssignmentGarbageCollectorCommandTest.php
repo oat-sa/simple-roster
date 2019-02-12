@@ -22,8 +22,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = static::bootKernel();
-        $this->setUpDatabase($kernel);
+        $kernel = $this->setUpDatabase();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));

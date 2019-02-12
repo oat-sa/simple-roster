@@ -21,7 +21,6 @@ class InfrastructureIngesterTest extends KernelTestCase
     {
         parent::setUp();
 
-        self::bootKernel();
         $this->setUpDatabase();
 
         $this->subject = new InfrastructureIngester($this->getManagerRegistry());

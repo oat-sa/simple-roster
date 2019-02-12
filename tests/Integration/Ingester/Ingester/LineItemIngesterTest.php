@@ -22,7 +22,6 @@ class LineItemIngesterTest extends KernelTestCase
     {
         parent::setUp();
 
-        self::bootKernel();
         $this->setUpDatabase();
 
         $this->subject = new LineItemIngester($this->getManagerRegistry());
