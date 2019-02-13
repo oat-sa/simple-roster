@@ -50,7 +50,7 @@ paths:
       - Authentication
       responses:
         204:
-          description: The user logged out successfully
+          description: Logout success
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
         405:
@@ -84,11 +84,13 @@ paths:
           $ref: '#/components/responses/MethodNotAllowedResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /bulk/assignments:
     post:
-      summary: Create user assignments
-      description: Create user assignments
+      summary: Bulk create users assignments
+      description: Bulk create users assignments
       tags:
         - Assignments
+        - Bulk
       requestBody:
         required: true
         content:
@@ -96,23 +98,14 @@ paths:
             schema:
               type: array
               items:
-                type: string
-              example: ['username1', 'username2']
+                $ref: '#/components/schemas/BulkCreateOperation'
       responses:
         201:
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    additionalProperties:
-                      type: boolean
-                    example:
-                      username1: true
-                      username2: false
+                $ref: '#/components/schemas/BulkResult'
         400:
           $ref: '#/components/responses/BadRequestResponse'
         401:
@@ -123,11 +116,12 @@ paths:
           $ref: '#/components/responses/RequestEntityTooLarge'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
-    delete:
-      summary: Cancel user assignments
-      description: Cancel user assignments
+    patch:
+      summary: Bulk upate users assignments
+      description: Bulk create users assignments
       tags:
         - Assignments
+        - Bulk
       requestBody:
         required: true
         content:
@@ -135,23 +129,14 @@ paths:
             schema:
               type: array
               items:
-                type: string
-              example: ['username1', 'username2']
+                $ref: '#/components/schemas/BulkUpdateOperation'
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    additionalProperties:
-                      type: boolean
-                    example:
-                      username1: true
-                      username2: false
+                $ref: '#/components/schemas/BulkResult'
         400:
           $ref: '#/components/responses/BadRequestResponse'
         401:
@@ -165,9 +150,9 @@ paths:
 
   /assignments/{assignmentId}/lti-link:
     get:
-      summary: Returns the LTI link for the given assignment
+      summary: Gets LTI link for the given assignment
       tags:
-        - Assignments
+        - LTI
       parameters:
       - name: assignmentId
         in: path
@@ -210,8 +195,6 @@ paths:
                         type: string
                         description: This is an opaque unique identifier that the TC guarantees will be unique within the TC for every placement of the link (required)
                         example: '88391-e1919-bb3456'
-
-
 
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
@@ -303,7 +286,68 @@ components:
         infrastructure:
           type: integer
           description: The infrastructure ID
-          example: 2
+          example: 2v
+    BulkCreateOperation:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Operation identifier
+          example: "user1"
+    BulkUpdateOperation:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Operation identifier
+          example: "user1"
+        attributes:
+          type: array
+          items: {}
+          description: Operation attributes
+          example: ["state": "cancelled"]
+    BulkResult:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            applied:
+              type: boolean
+              description: If the bulk has been correctly applied, or rollbacked.
+              example: true
+            results:
+              type: array
+              items: {}
+              example: ["user1": true]
+    LtiRequest:
+      type: object
+      properties:
+        ltiLink:
+          type: string
+          example: "http://infra_1.com"
+        ltiParams:
+          type: object
+          properties:
+            oauth_body_hash:
+              type: string
+            oauth_consumer_key:
+              type: string
+            oauth_nonce:
+              type: string
+            oauth_signature:
+              type: string
+            oauth_signature_method:
+              type: string
+            oauth_timestamp:
+              type: string
+            oauth_version:
+              type: string
+            lti_message_type:
+              type: string
+            lti_version:
+              type: string
+
     Error:
       type: object
       properties:
