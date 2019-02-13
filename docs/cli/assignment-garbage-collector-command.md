@@ -16,6 +16,7 @@ $ bin/console roster:garbage-collector:assignment [--force]
 | -f, --force      |  To involve actual database modifications or not [default: `false`] |
 
 #### Other options
+
 For the full list of options please refer to the helper option:
 ```bash
 $ bin/console roster:garbage-collector:assignment -h
