@@ -5,7 +5,7 @@
 The interval threshold is coming from the `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` environment variable. Default value is [P1D] (= 1 day).
 
 ## Default usage:
-```php
+```bash
 $ bin/console roster:garbage-collector:assignment [--force]
 ```
 ### Main options:
@@ -17,6 +17,6 @@ $ bin/console roster:garbage-collector:assignment [--force]
 
 ### Other options
 For the full list of options please refer to the helper option:
-```php
+```bash
 $ bin/console roster:garbage-collector:assignment -h
 ```

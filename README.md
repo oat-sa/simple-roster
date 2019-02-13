@@ -61,7 +61,6 @@ BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 ```
 
 ## Tests
--------
 
 You can run tests with:
 
