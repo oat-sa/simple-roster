@@ -91,12 +91,19 @@ class DoctrineResultCacheWarmerCommand extends Command
 
                 $offset += $batchSize;
             } while ($users->getIterator()->count() === $batchSize);
-            $this->stopwatch->start(self::NAME);
 
             $style->success(
                 sprintf(
                     '%s result cache entries have been successfully warmed up.',
                     $numberOfWarmedUpCacheEntries
+                )
+            );
+            $event = $this->stopwatch->stop(self::NAME);
+            $style->note(
+                sprintf(
+                    '%.2F MiB - %d ms',
+                    $event->getMemory() / 1024 / 1024,
+                    $event->getDuration()
                 )
             );
 
