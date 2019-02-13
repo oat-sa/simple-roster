@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Command;
+namespace App\Tests\Functional\Command\GarbageCollector;
 
-use App\Command\AssignmentGarbageCollectorCommand;
+use App\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use App\Entity\Assignment;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Carbon\Carbon;
@@ -98,7 +98,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     private function loadTestFixtures(): void
     {
         $this->loadFixtures([
-            __DIR__ . '/../../../fixtures/usersWithStartedButStuckAssignments.yml',
+            __DIR__ . '/../../../../fixtures/usersWithStartedButStuckAssignments.yml',
         ]);
     }
 }

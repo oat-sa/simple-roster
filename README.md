@@ -1,18 +1,25 @@
 # Simple-Roster
-REST back-end service that handles authentication and eligibilities
 
-Installation
-------------
+REST back-end service that handles authentication and eligibilities.
 
-_Useful links_
-- [Using Vagrant/Homestead](https://symfony.com/doc/current/setup/homestead.html)
-- [Setting up or Fixing File Permissions](https://symfony.com/doc/current/setup/file_permissions.html)
-
-## DEV environment
+## Installation
 
 ```bash
  $ composer install
 ```
+
+## Documentation
+
+### Api documentation
+
+You can find an openapi v3 documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file.
+
+### CLI documentation
+
+- **Data ingestion** : see [docs//cli/ingester-command.md](docs/cli/ingester-command.md)
+- **Garbage collection** (assignments) : see [docs//cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
+
+## Development
 
 ### Build in server usage
 
@@ -53,33 +60,11 @@ BLACKFIRE_SERVER_ID=<your_backfire_id>
 BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 ```
 
-## Vocabulary
-
-### General
-[StorageInterface](src/Storage/StorageInterface.php) communicates with NoSQL storage in terms of raw data rows. For now it can only use simple keys (you cannot use DynamoDB complex primary key). Always puts a new value without checking for existence. The checks should be done outside if necessary.
-
-[Model](src/Model/ModelInterface.php) just represents some business data. It does not know of anything.
-
-[ModelValidator](src/Validation/ModelValidator.php) validates models. It'sSetup with Docker based on Symfony/Validator.
-
-[ItemManager](src/ODM/ItemManager.php) is aware of models and talks to StorageInterface. Uses Symfony/Serializer component (Normalizer interface) to turn Models into arrays before handing over them to the [StorageInterface](src/Storage/StorageInterface.php).
-
-### Ingesting
-
-[AbstractIngester](src/Ingesting/Ingester/AbstractIngester.php) manages the entire ingesting business scenario. It ties together a specific ModelStorage, a RowToModelMapper and a Validator.
-
-[Ingesting Command](src/Command/Ingesting/AbstractIngestCommand.php) is a CLI entry point for ingesting data. It just manages CLI input and output.
-
-Full documentation on how to ingest data can be found here: [docs/ingest.md](docs/ingest.md)
-
-### Garbage collection
-
-[AssignmentGarbageCollectorCommand](src/Command/AssignmentGarbageCollectorCommand.php) is responsible for transitioning all stuck assignments from `started` state to `completed` state.
-For further details please check [docs/assignment-garbage-collector.md](docs/assignment-garbage-collector.md)
-
-Testing
+## Tests
 -------
 
+You can run tests with:
+
  ```bash
- $ bin/phpunit
+ $ bin/phpunit [--coverage-html=coverage]
  ```
