@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
+use DateTime;
 use JsonSerializable;
 
 class Assignment implements JsonSerializable, EntityInterface
@@ -37,6 +39,9 @@ class Assignment implements JsonSerializable, EntityInterface
 
     /** @var LineItem */
     private $lineItem;
+
+    /** @var DateTime */
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -75,6 +80,25 @@ class Assignment implements JsonSerializable, EntityInterface
     public function setLineItem(LineItem $lineItem): self
     {
         $this->lineItem = $lineItem;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function refreshUpdatedAt(): self
+    {
+        $this->updatedAt = Carbon::now()->toDateTime();
 
         return $this;
     }
