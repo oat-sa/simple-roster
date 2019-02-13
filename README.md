@@ -62,6 +62,7 @@ Start up the docker stack, from the root folder:
 
 Resources:
 - application is exposed on port **80**
+- postgres is exposed on port **5432**
 - redis is exposed on port **6379**
 - blackfire is exposed on port **8707**
 
