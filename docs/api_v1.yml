@@ -166,36 +166,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ltiLink:
-                    type: string
-                    description: LTI Consumer link
-                    example: https://lti.example.com/something # TODO
-                  ltiParams:
-                    type: object
-                    description: |
-                      Parameters for the LTI request.
-
-                      It could contain additional optional parameters. For the full list, see the **Basic Launch Data** section in [the official LTI implementation guide](https://www.imsglobal.org/specs/ltiv1p1/implementation-guide).
-                    required:
-                    - lti_message_type
-                    - lti_version
-                    - resource_link_id
-                    properties:
-                      lti_message_type:
-                        type: string
-                        description: Indicates that this is a basic launch message (required)
-                        example: 'basic-lti-launch-request'
-                      lti_version:
-                        type: string
-                        description: Indicates which version of the specification is being used for this particular message (required)
-                        example: 'LTI-1p0'
-                      resource_link_id:
-                        type: string
-                        description: This is an opaque unique identifier that the TC guarantees will be unique within the TC for every placement of the link (required)
-                        example: '88391-e1919-bb3456'
-
+                $ref: '#/components/schemas/LtiRequest'
         401:
           $ref: '#/components/responses/UnauthorizedResponse'
         404:
@@ -217,7 +188,7 @@ paths:
         in: header
         schema:
           type: string
-          example: Oauth realm="", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
+          example: Oauth realm="SimpleRoster", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
       requestBody:
         content:
           application/xml: {}
@@ -270,7 +241,7 @@ components:
       properties:
         uri:
           type: string
-          example: my-tao-instance.com/tao.rdf#123456789 # TODO
+          example: my-tao-instance.com/tao.rdf#123456789
         label:
           type: string
           description: Label for assignment
@@ -286,7 +257,7 @@ components:
         infrastructure:
           type: integer
           description: The infrastructure ID
-          example: 2v
+          example: 1
     BulkCreateOperation:
       type: object
       properties:
@@ -347,7 +318,28 @@ components:
               type: string
             lti_version:
               type: string
-
+            context_id:
+              type: int
+            context_label:
+              type: string
+            context_title:
+              type: string
+            context_type:
+              type: string
+            roles:
+              type: string
+            user_id:
+              type: int
+            lis_person_name_full:
+              type: string
+            resource_link_id:
+              type: int
+            lis_outcome_service_url:
+              type: string
+            lis_result_sourcedid:
+              type: int
+            launch_presentation_return_url:
+              type: string
     Error:
       type: object
       properties:
