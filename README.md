@@ -5,7 +5,7 @@ REST back-end service that handles authentication and eligibilities.
 ## Table of Contents
 - [Installation](#installation)
 - [Documentation](#documentation)
-    - [Api documentation](#api-documentation)
+    - [API documentation](#api-documentation)
     - [CLI documentation](#cli-documentation)
 - [Development](#development)
     - [Build in server usage](#build-in-server-usage)
@@ -21,7 +21,7 @@ REST back-end service that handles authentication and eligibilities.
 
 ## Documentation
 
-#### Api documentation
+#### API documentation
 
 You can:
 - find the **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
