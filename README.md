@@ -12,10 +12,13 @@ REST back-end service that handles authentication and eligibilities.
 
 #### Api documentation
 
-You can find an **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file.
+You can:
+- find an **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
+- use [https://editor.swagger.io/](https://editor.swagger.io/) to visualize it.
 
 #### CLI documentation
 
+Available commands:
 - **Data ingestion** : see [docs//cli/ingester-command.md](docs/cli/ingester-command.md)
 - **Garbage collection** (assignments) : see [docs//cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
 
