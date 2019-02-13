@@ -48,6 +48,6 @@ services:
         arguments:
             $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
 
-    App\Command\DoctrineResultCacheWarmerCommand:
+    App\Command\Cache\DoctrineResultCacheWarmerCommand:
         arguments:
             $doctrineConfiguration: '@doctrine.orm.default_configuration'

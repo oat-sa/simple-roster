@@ -20,8 +20,8 @@ class AssignmentRepositoryTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = static::bootKernel();
-        $this->setUpDatabase($kernel);
+        static::bootKernel();
+        $this->setUpDatabase();
 
         $this->loadFixtures([
             __DIR__ . '/../../../fixtures/usersWithStartedButStuckAssignments.yml',

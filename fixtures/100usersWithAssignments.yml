@@ -1,0 +1,26 @@
+App\Entity\Infrastructure:
+  infrastructure:
+    label: 'The first infrastructure'
+    ltiDirectorLink: 'http://lti-director.com'
+    ltiKey: 'myKey'
+    ltiSecret: 'mySecret'
+
+App\Entity\LineItem:
+  lineItem:
+    infrastructure: '@infrastructure'
+    label: 'The first line item'
+    uri: 'http://lineitemuri.com'
+    slug: 'lineItemSlug'
+    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+
+App\Entity\Assignment:
+  assignment_{1..100}:
+    lineItem: '@lineItem'
+    state: 'ready'
+
+App\Entity\User:
+  userWithStartedButStuckAssignment_{1..100}:
+    username: 'user_<current()>'
+    plainPassword: 'password'
+    assignments: ['@assignment_<current()>']
