@@ -56,7 +56,10 @@ abstract class AbstractIngester implements IngesterInterface
         return $result;
     }
 
-    abstract protected function prepare(): void;
+    protected function prepare(): void
+    {
+        return;
+    }
 
     abstract protected function createEntity(array $data): EntityInterface;
 }
