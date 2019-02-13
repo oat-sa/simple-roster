@@ -8,14 +8,14 @@ The interval threshold is coming from the `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` 
 ```bash
 $ bin/console roster:garbage-collector:assignment [--force]
 ```
-### Main options:
+#### Main options:
 
 | Option | Description |
 | ------------- |:-------------|
 | -b, --batch-size | Number of assignments to process per batch [default: `1000`] |
 | -f, --force      |  To involve actual database modifications or not [default: `false`] |
 
-### Other options
+#### Other options
 For the full list of options please refer to the helper option:
 ```bash
 $ bin/console roster:garbage-collector:assignment -h

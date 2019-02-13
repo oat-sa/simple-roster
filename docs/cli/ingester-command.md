@@ -7,7 +7,7 @@
 $ bin/console roster:ingest <type> <source> <path> [--force]
 ```
 
-### Main arguments:
+#### Main arguments:
 
 | Option | Description |
 | ------------- |:-------------|
@@ -15,14 +15,14 @@ $ bin/console roster:ingest <type> <source> <path> [--force]
 | source | Can be **local**, or **s3** |
 | path      |  Local or S3 path to ingest data from |
 
-### Main options:
+#### Main options:
 
 | Option | Description |
 | ------------- |:-------------|
 | -d, --delimiter | CSV delimiter [default: `,`] |
 | -f, --force      |  To involve actual database modifications or not [default: `false`] |
 
-### Other options
+#### Other options
 For the full list of options please refer to the helper option:
 ```bash
 $ bin/console roster:ingest -h
