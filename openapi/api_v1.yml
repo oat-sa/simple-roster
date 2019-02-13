@@ -1,0 +1,401 @@
+openapi: 3.0.1
+info:
+  title: Simple Roster API
+  description: 'TAO Simple Roster API'
+  version: v1
+
+servers:
+  - url: https://localhost/api/v1
+
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      security: []
+      responses:
+        204:
+          description: Authentication success
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                description: Session cookie
+                example: SESSIONID=abcde12345; Path=/;
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        403:
+          $ref: '#/components/responses/InvalidCredentialsResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: User logout
+      tags:
+        - Authentication
+      responses:
+        204:
+          description: Logout success
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /assignments:
+    get:
+      summary: List user assignments
+      description: List current authenticated user assignments
+      tags:
+        - Assignments
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Assignment'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /bulk/assignments:
+    post:
+      summary: Bulk create users assignments
+      description: Bulk create users assignments
+      tags:
+        - Assignments
+        - Bulk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BulkCreateOperation'
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkResult'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        413:
+          $ref: '#/components/responses/RequestEntityTooLarge'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    patch:
+      summary: Bulk upate users assignments
+      description: Bulk create users assignments
+      tags:
+        - Assignments
+        - Bulk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BulkUpdateOperation'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkResult'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        413:
+          $ref: '#/components/responses/RequestEntityTooLarge'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /assignments/{assignmentId}/lti-link:
+    get:
+      summary: Gets LTI link for the given assignment
+      tags:
+        - LTI
+      parameters:
+        - name: assignmentId
+          in: path
+          description: The ID of the assignment
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LtiRequest'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        404:
+          $ref: '#/components/responses/AssignmentNotFoundResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /lti/outcome:
+    post:
+      summary: LTI Basic Outcomes Service
+      tags:
+        - LTI
+      security: []
+      parameters:
+        - name: Authorization
+          description: OAuth authorization header, including OAuth parameters
+          in: header
+          schema:
+            type: string
+            example: Oauth realm="SimpleRoster", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
+      requestBody:
+        content:
+          application/xml: {}
+      responses:
+        204:
+          description: Success
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+security:
+  - cookieAuth: []
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: SESSIONID
+  schemas:
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The assignment ID
+          example: 13
+        username:
+          type: string
+          description: The username of the user who belongs to the assignment
+          example: johndoe
+        state:
+          type: string
+          description: State of assignment
+          enum:
+            - ready
+            - started
+            - completed
+            - cancelled
+          example: started
+        lineItem:
+          $ref: '#/components/schemas/LineItem'
+    LineItem:
+      type: object
+      properties:
+        uri:
+          type: string
+          example: my-tao-instance.com/tao.rdf#123456789
+        label:
+          type: string
+          description: Label for assignment
+          example: Delivery of Test 1
+        startDateTime:
+          type: integer
+          description: The start DateTime in UNIX timestamp
+          example: 1542880258
+        endDateTime:
+          type: integer
+          description: The end DateTime in UNIX timestamp
+          example: 1542880258
+        infrastructure:
+          type: integer
+          description: The infrastructure ID
+          example: 1
+    BulkCreateOperation:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Operation identifier
+          example: "user1"
+    BulkUpdateOperation:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Operation identifier
+          example: "user1"
+        attributes:
+          type: array
+          items: {}
+          description: Operation attributes
+          example: ["state": "cancelled"]
+    BulkResult:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            applied:
+              type: boolean
+              description: If the bulk has been correctly applied, or rollbacked.
+              example: true
+            results:
+              type: array
+              items: {}
+              example: ["user1": true]
+    LtiRequest:
+      type: object
+      properties:
+        ltiLink:
+          type: string
+          example: "http://infra_1.com"
+        ltiParams:
+          $ref: '#/components/schemas/LtiRequestParams'
+    LtiRequestParams:
+      type: object
+      properties:
+        oauth_body_hash:
+          type: string
+        oauth_consumer_key:
+          type: string
+        oauth_nonce:
+          type: string
+        oauth_signature:
+          type: string
+        oauth_signature_method:
+          type: string
+        oauth_timestamp:
+          type: string
+        oauth_version:
+          type: string
+        lti_message_type:
+          type: string
+        lti_version:
+          type: string
+        context_id:
+          type: integer
+        context_label:
+          type: string
+        context_title:
+          type: string
+        context_type:
+          type: string
+        roles:
+          type: string
+        user_id:
+          type: integer
+        lis_person_name_full:
+          type: string
+        resource_link_id:
+          type: integer
+        lis_outcome_service_url:
+          type: string
+        lis_result_sourcedid:
+          type: integer
+        launch_presentation_return_url:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              description: Error message.
+              example: 'error message'
+              type: string
+            trace:
+              description: Error trace.
+              example: 'error trace (if debug activated)'
+              type: string
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidCredentialsResponse:
+      description: Invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    AssignmentNotFoundResponse:
+      description: Assignment not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    MethodNotAllowedResponse:
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RequestEntityTooLarge:
+      description: Request Entity Too Large
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,49 @@
+App\Entity\Assignment:
+    type: entity
+    table: assignments
+    repositoryClass: App\Repository\AssignmentRepository
+    id:
+        id:
+            type: integer
+            scale: 0
+            length: null
+            nullable: false
+            precision: 0
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        state:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+        updatedAt:
+            type: datetime
+            nullable: true
+            column: updated_at
+    manyToOne:
+        user:
+            targetEntity: App\Entity\User
+            cascade: ["persist"]
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: assignments
+            joinColumns:
+                user_id:
+                    referencedColumnName: id
+            orphanRemoval: false
+        lineItem:
+            targetEntity: App\Entity\LineItem
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                line_item_id:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks:
+        preUpdate: [refreshUpdatedAt]

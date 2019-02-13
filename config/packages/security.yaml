@@ -1,0 +1,35 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: argon2i
+            # maximum memory (in KiB) that may be used to compute the Argon2 hash
+            memory_cost: 4096
+            #  number of times the Argon2 hash algorithm will be run
+            time_cost: 3
+            # number of threads to use for computing the Argon2 hash
+            threads: 2
+
+    providers:
+        app_user_provider:
+            id: App\Security\UserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api:
+            anonymous: ~
+            logout:
+                path: logout
+                success_handler: App\Security\LogoutSuccessHandler
+            json_login:
+                check_path: login
+                remember_me: false
+
+            # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
+
+    access_control:
+      - { path: ^/api/v1/bulk/assignments, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/api/v1/lti/outcome, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/api, roles: ROLE_USER }
