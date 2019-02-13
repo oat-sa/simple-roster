@@ -24,7 +24,7 @@ REST back-end service that handles authentication and eligibilities.
 #### Api documentation
 
 You can:
-- find an **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
+- find the **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
 - use [https://editor.swagger.io/](https://editor.swagger.io/) to visualize it.
 
 #### CLI documentation
