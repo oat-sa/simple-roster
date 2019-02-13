@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Command;
+namespace App\Tests\Functional\Command\GarbageCollector;
 
-use App\Command\AssignmentGarbageCollectorCommand;
+use App\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use App\Entity\Assignment;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Carbon\Carbon;
@@ -65,10 +65,11 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
 
-        $assignmentRepository = $this->getRepository(Assignment::class);
-
-        $this->assertCount(10, $assignmentRepository->findBy(['state' => Assignment::STATE_COMPLETED]));
-        $this->assertEmpty($assignmentRepository->findBy(['state' => Assignment::STATE_STARTED]));
+        /** @var Assignment $assignment */
+        foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
+            $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());
+            $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
+        }
     }
 
     public function testItCanUpdateStuckAssignmentsInMultipleBatch(): void
@@ -81,25 +82,23 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
 
-        $assignmentRepository = $this->getRepository(Assignment::class);
-
-        $this->assertCount(10, $assignmentRepository->findBy(['state' => Assignment::STATE_COMPLETED]));
-        $this->assertEmpty($assignmentRepository->findBy(['state' => Assignment::STATE_STARTED]));
+        /** @var Assignment $assignment */
+        foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
+            $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());
+            $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
+        }
     }
 
     public function testOutputInCaseOfException(): void
     {
         $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => -1]));
-        $this->assertContains(
-            '[ERROR] Invalid `batch-size` argument received.',
-            $this->commandTester->getDisplay()
-        );
+        $this->assertContains('[ERROR] Invalid `batch-size` argument received.', $this->commandTester->getDisplay());
     }
 
     private function loadTestFixtures(): void
     {
         $this->loadFixtures([
-            __DIR__ . '/../../../fixtures/usersWithStartedButStuckAssignments.yml',
+            __DIR__ . '/../../../../fixtures/usersWithStartedButStuckAssignments.yml',
         ]);
     }
 }

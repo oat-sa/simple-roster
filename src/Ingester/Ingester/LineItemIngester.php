@@ -42,13 +42,21 @@ class LineItemIngester extends AbstractIngester
      */
     protected function createEntity(array $data): EntityInterface
     {
-        return (new LineItem())
+        $lineItem = new LineItem();
+
+        $lineItem
             ->setUri($data[0])
             ->setLabel($data[1])
             ->setSlug($data[2])
-            ->setInfrastructure($this->infrastructureCollection[$data[3]])
-            ->setStartAt($this->createDateTime($data[4]))
-            ->setEndAt($this->createDateTime($data[5]));
+            ->setInfrastructure($this->infrastructureCollection[$data[3]]);
+
+        if (isset($data[4]) && $data[5]) {
+            $lineItem
+                ->setStartAt($this->createDateTime($data[4]))
+                ->setEndAt($this->createDateTime($data[5]));
+        }
+
+        return $lineItem;
     }
 
     /**
