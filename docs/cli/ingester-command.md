@@ -1,6 +1,6 @@
 # Ingesting
 
-[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `infrastrcture`, `line-item` and `user` data.
+[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `infrastructure`, `line-item` and `user` data.
 
 ## Usage:
 ```bash
