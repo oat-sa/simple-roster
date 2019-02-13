@@ -20,6 +20,10 @@ App\Entity\Assignment:
             unique: false
             nullable: false
             precision: 0
+        updatedAt:
+            type: datetime
+            nullable: true
+            column: updated_at
     manyToOne:
         user:
             targetEntity: App\Entity\User
@@ -41,4 +45,5 @@ App\Entity\Assignment:
                 line_item_id:
                     referencedColumnName: id
             orphanRemoval: false
-    lifecycleCallbacks: {  }
+    lifecycleCallbacks:
+        preUpdate: [refreshUpdatedAt]

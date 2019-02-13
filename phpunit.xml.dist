@@ -29,7 +29,7 @@
     </testsuites>
 
     <filter>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory>src</directory>
             <exclude>
                 <file>src/Kernel.php</file>
