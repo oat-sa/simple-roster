@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Command\GarbageCollector;
 
 use App\Entity\Assignment;
 use App\Repository\AssignmentRepository;
