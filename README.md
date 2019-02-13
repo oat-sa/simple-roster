@@ -19,8 +19,8 @@ You can:
 #### CLI documentation
 
 Available commands:
-- **Data ingestion** : see [docs//cli/ingester-command.md](docs/cli/ingester-command.md)
-- **Garbage collection** (assignments) : see [docs//cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
+- **Data ingestion** : see [docs/cli/ingester-command.md](docs/cli/ingester-command.md)
+- **Garbage collection** (assignments) : see [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
 
 ## Development
 
