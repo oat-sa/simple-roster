@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
 class IngesterCommand extends Command
@@ -25,10 +26,17 @@ class IngesterCommand extends Command
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
 
-    public function __construct(IngesterRegistry $ingesterRegistry, IngesterSourceRegistry $sourceRegistry)
-    {
+    /** @var Stopwatch */
+    private $stopwatch;
+
+    public function __construct(
+        IngesterRegistry $ingesterRegistry,
+        IngesterSourceRegistry $sourceRegistry,
+        Stopwatch $stopwatch
+    ) {
         $this->ingesterRegistry = $ingesterRegistry;
         $this->sourceRegistry = $sourceRegistry;
+        $this->stopwatch = $stopwatch;
 
         parent::__construct(static::NAME);
     }
@@ -79,6 +87,7 @@ class IngesterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->stopwatch->start(__CLASS__, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
 
         try {
@@ -95,6 +104,9 @@ class IngesterCommand extends Command
             $style->error($exception->getMessage());
 
             return 1;
+        } finally {
+            $event = $this->stopwatch->stop(__CLASS__);
+            $style->note(sprintf('Took: %s', $event));
         }
 
         return 0;

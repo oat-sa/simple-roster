@@ -12,10 +12,6 @@ class InfrastructureIngester extends AbstractIngester
         return 'infrastructure';
     }
 
-    protected function prepare(): void
-    {
-    }
-
     protected function createEntity(array $data): EntityInterface
     {
         return (new Infrastructure())
