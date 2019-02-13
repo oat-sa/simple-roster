@@ -2,7 +2,7 @@
 
 [IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `infrastrcture`, `line-item` and `user` data.
 
-## Default usage:
+## Usage:
 ```bash
 $ bin/console roster:ingest <type> <source> <path> [--force]
 ```

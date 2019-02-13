@@ -4,7 +4,7 @@
 
 The interval threshold is coming from the `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` environment variable. Default value is [P1D] (= 1 day).
 
-## Default usage:
+## Usage:
 ```bash
 $ bin/console roster:garbage-collector:assignment [--force]
 ```
