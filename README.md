@@ -2,6 +2,17 @@
 
 REST back-end service that handles authentication and eligibilities.
 
+## Table of Contents
+1. [Installation](#installation)
+2. [Documentation](#documentation)
+    2.1. [Api documentation](#api-documentation)
+    2.2. [CLI documentation](#cli-documentation)
+3. [Development](#development)
+    3.1. [Build in server usage](#build-in-server-usage)
+    3.2. [Docker usage](#docker-usage)
+    3.3. [Blackfire usage](#blackfire-usage)
+4. [Tests](#tests)
+
 ## Installation
 
 ```bash
