@@ -47,3 +47,7 @@ services:
     App\Command\AssignmentGarbageCollectorCommand:
         arguments:
             $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
+
+    App\Command\DoctrineResultCacheWarmerCommand:
+        arguments:
+            $doctrineConfiguration: '@doctrine.orm.default_configuration'

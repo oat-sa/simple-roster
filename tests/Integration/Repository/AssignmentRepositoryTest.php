@@ -3,8 +3,6 @@
 namespace App\Tests\Integration\Repository;
 
 use App\Entity\Assignment;
-use App\Entity\Infrastructure;
-use App\Entity\User;
 use App\Repository\AssignmentRepository;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use DateInterval;
