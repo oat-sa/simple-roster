@@ -20,7 +20,7 @@ class AssignmentGarbageCollectorCommand extends Command
 {
     public const NAME = 'roster:garbage-collector:assignment';
 
-    private const BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var AssignmentRepository */
     private $assignmentRepository;
@@ -60,7 +60,7 @@ class AssignmentGarbageCollectorCommand extends Command
             'b',
             InputOption::VALUE_REQUIRED,
             'Number of assignments to process per batch',
-            self::BATCH_SIZE
+            self::DEFAULT_BATCH_SIZE
         );
 
         $this->addOption(
@@ -75,7 +75,7 @@ class AssignmentGarbageCollectorCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
         try {
-            $batchSize = (int)($input->getOption('batch-size') ?? self::BATCH_SIZE);
+            $batchSize = (int)$input->getOption('batch-size');
             if ($batchSize < 1) {
                 throw new InvalidArgumentException('Invalid `batch-size` argument received.');
             }

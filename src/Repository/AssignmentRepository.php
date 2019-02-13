@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AssignmentRepository extends AbstractRepository
 {
-    private const LIMIT = 1000;
+    private const DEFAULT_LIMIT = 1000;
 
     public function __construct(RegistryInterface $registry)
     {
@@ -36,7 +36,7 @@ class AssignmentRepository extends AbstractRepository
             ->setParameter('state', $state)
             ->setParameter('updatedAt', $updatedAt)
             ->setFirstResult($offset)
-            ->setMaxResults($limit ?? self::LIMIT)
+            ->setMaxResults($limit ?? self::DEFAULT_LIMIT)
             ->getQuery()
             ->useResultCache(false);
 

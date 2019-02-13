@@ -22,7 +22,7 @@ App\Entity\Assignment:
             precision: 0
         updatedAt:
             type: datetime
-            nullable: false
+            nullable: true
             column: updated_at
     manyToOne:
         user:
@@ -46,5 +46,4 @@ App\Entity\Assignment:
                     referencedColumnName: id
             orphanRemoval: false
     lifecycleCallbacks:
-        prePersist: [refreshUpdatedAt]
         preUpdate: [refreshUpdatedAt]

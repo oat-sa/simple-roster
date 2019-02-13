@@ -69,7 +69,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $this->assertEmpty($assignmentRepository->findBy(['state' => Assignment::STATE_STARTED]));
     }
 
-    public function testItUpdateStuckAssignmentsInMultipleBatch(): void
+    public function testItCanUpdateStuckAssignmentsInMultipleBatch(): void
     {
         $this->loadTestFixtures();
 
@@ -96,13 +96,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     private function loadTestFixtures(): void
     {
-        $now = Carbon::now();
-        Carbon::setTestNow(Carbon::now()->subtract(new DateInterval('P3D')));
-
         $this->loadFixtures([
             __DIR__ . '/../../../fixtures/usersWithStartedButStuckAssignments.yml',
         ]);
-
-        Carbon::setTestNow($now);
     }
 }

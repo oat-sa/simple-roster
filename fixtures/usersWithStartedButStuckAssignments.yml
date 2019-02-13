@@ -18,7 +18,7 @@ App\Entity\Assignment:
   startedButStuckAssignment_{1..10}:
     lineItem: '@lineItem'
     state: 'started'
-    # Updated at will be set through Carbon mock
+    updatedAt: '<dateTimeInInterval("-5 days", "-3 days")>'
 
 App\Entity\User:
   userWithStartedButStuckAssignment_{1..10}:
