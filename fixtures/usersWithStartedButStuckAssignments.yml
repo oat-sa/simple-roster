@@ -18,7 +18,7 @@ App\Entity\Assignment:
   startedButStuckAssignment_{1..10}:
     lineItem: '@lineItem'
     state: 'started'
-    updatedAt: '<dateTimeInInterval("-5 days", "-3 days")>'
+    updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
 
 App\Entity\User:
   userWithStartedButStuckAssignment_{1..10}:

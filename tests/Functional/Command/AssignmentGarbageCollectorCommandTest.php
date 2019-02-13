@@ -6,7 +6,7 @@ use App\Command\AssignmentGarbageCollectorCommand;
 use App\Entity\Assignment;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Carbon\Carbon;
-use DateInterval;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -26,6 +26,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
+
+        Carbon::setTestNow(new DateTime());
     }
 
     public function testOutputWhenThereIsNothingToUpdate(): void
