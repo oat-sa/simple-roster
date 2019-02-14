@@ -52,6 +52,6 @@ class OAuthSigner
 
     private function encode($value): string
     {
-        return urlencode(utf8_encode((string)$value));
+        return str_replace('+', ' ', str_replace('%7E', '~', rawurlencode((string)$value)));
     }
 }

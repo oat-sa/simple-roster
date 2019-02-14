@@ -84,7 +84,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'fO38nTEEFJJkGWWwZoLWXsUnvOI=',
+                    'oauth_signature' => 'o218FKyyUML7L8jE6s9s5qrZnZY=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
