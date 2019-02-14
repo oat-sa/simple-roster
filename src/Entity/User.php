@@ -24,7 +24,7 @@ class User implements UserInterface, EntityInterface
     /** @var string[] */
     private $roles = [];
 
-    /** @var string */
+    /** @var string|null */
     private $plainPassword;
 
     public function __construct()

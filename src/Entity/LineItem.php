@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use DateTime;
 use DateTimeInterface;
 use JsonSerializable;
 
@@ -20,10 +19,10 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var string */
     private $slug;
 
-    /** @var DateTime */
+    /** @var DateTimeInterface */
     private $startAt;
 
-    /** @var DateTime */
+    /** @var DateTimeInterface */
     private $endAt;
 
     /** @var Infrastructure */

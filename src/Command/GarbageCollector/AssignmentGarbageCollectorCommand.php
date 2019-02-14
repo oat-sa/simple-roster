@@ -40,7 +40,7 @@ class AssignmentGarbageCollectorCommand extends Command
 
         $this->assignmentRepository = $assignmentRepository;
         $this->logger = $logger;
-        $this->cleanUpInterval = $cleanUpInterval;
+        $this->cleanUpInterval = new DateInterval($cleanUpInterval);
     }
 
     protected function configure()
@@ -110,7 +110,7 @@ class AssignmentGarbageCollectorCommand extends Command
         do {
             $stuckAssignments = $this->assignmentRepository->findAllByStateAndUpdatedAtPaged(
                 Assignment::STATE_STARTED,
-                Carbon::now()->subtract(new DateInterval($this->cleanUpInterval))->toDateTime(),
+                Carbon::now()->subtract($this->cleanUpInterval)->toDateTime(),
                 0,
                 $batchSize
             );
