@@ -51,16 +51,22 @@ class GetUserAssignmentLtiRequestService
 
         $ltiParameters = $this->getAssignmentLtiParameters($assignment);
 
+        $ltiLink = sprintf(
+            '%s/%s',
+            $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
+            base64_encode(json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
+        );
+
         $signature = $this->signer->sign(
             $context,
-            $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
+            $ltiLink,
             Request::METHOD_POST,
             $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
             $ltiParameters
         );
 
         return new LtiRequest(
-            $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
+            $ltiLink,
             array_merge(
                 [
                     'oauth_body_hash' => $context->getBodyHash(),

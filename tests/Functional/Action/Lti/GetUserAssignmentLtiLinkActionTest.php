@@ -79,12 +79,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertEquals(
             [
-                'ltiLink' => 'http://lti-director.com',
+                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'o218FKyyUML7L8jE6s9s5qrZnZY=',
+                    'oauth_signature' => 'hnGSz3IWyuQwwYbQNvx+3mnvSvo=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
