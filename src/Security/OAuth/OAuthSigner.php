@@ -10,6 +10,7 @@ class OAuthSigner
     {
         switch ($context->getSignatureMethod()) {
             case OAuthContext::METHOD_MAC_SHA1:
+                // @see package-tao/vendor/imsglobal/lti/src/OAuth/OAuthSignatureMethod_HMAC_SHA1.php
                 $secret .= '&';
                 $baseString = implode('&', [
                     urlencode($method),
