@@ -23,6 +23,18 @@ class OAuthSignerTest extends TestCase
         );
     }
 
+    public function testSignWithMacSha1MethodContainingSpaces(): void
+    {
+        $subject = new OAuthSigner();
+
+        $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
+
+        $this->assertEquals(
+            'Apr1WITmq9IoQ3lKJeCfFuNlA6M=',
+            $subject->sign($context, 'some url', 'method', 'secret')
+        );
+    }
+
     public function testSignWithMacSha1MethodAndAdditionalParameters(): void
     {
         $subject = new OAuthSigner();
