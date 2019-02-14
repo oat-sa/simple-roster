@@ -79,7 +79,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
             $this->stopwatch->start(self::NAME);
             do {
-                $users = $this->userRepository->findAllPaged($batchSize, $offset);
+                $users = $this->userRepository->findAllPaginated($batchSize, $offset);
                 /** @var User $user */
                 foreach ($users->getIterator() as $user) {
                     $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());

@@ -56,7 +56,7 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
-    public function findAllPaged(int $limit = null, int $offset = null): Paginator
+    public function findAllPaginated(int $limit = null, int $offset = null): Paginator
     {
         $query = $this
             ->createQueryBuilder('u')

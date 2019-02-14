@@ -108,7 +108,7 @@ class AssignmentGarbageCollectorCommand extends Command
     {
         $numberOfCollectedAssignments = 0;
         do {
-            $stuckAssignments = $this->assignmentRepository->findAllByStateAndUpdatedAtPaged(
+            $stuckAssignments = $this->assignmentRepository->findAllByStateAndUpdatedAtPaginated(
                 Assignment::STATE_STARTED,
                 Carbon::now()->subtract(new DateInterval($this->cleanUpInterval))->toDateTime(),
                 0,

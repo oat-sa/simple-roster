@@ -18,7 +18,6 @@ class UserRepositoryTest extends KernelTestCase
     {
         parent::setUp();
 
-        static::bootKernel();
         $this->setUpDatabase();
 
         $this->loadFixtures([
@@ -30,7 +29,7 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItCanFindAllUsers(): void
     {
-        $users = $this->subject->findAllPaged();
+        $users = $this->subject->findAllPaginated();
 
         $this->assertCount(100, $users);
         $this->assertCount(100, $users->getIterator());
@@ -42,9 +41,9 @@ class UserRepositoryTest extends KernelTestCase
         }
     }
 
-    public function testItCanFindAllUsersPaged(): void
+    public function testItCanFindAllUsersPaginated(): void
     {
-        $users = $this->subject->findAllPaged(10, 5);
+        $users = $this->subject->findAllPaginated(10, 5);
 
         $this->assertCount(100, $users);
         $this->assertCount(10, $users->getIterator());
