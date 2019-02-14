@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Action\Bulk;
 
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -99,8 +100,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItDoesNotCreateNewAssignmentsWithInvalidUsersProvided(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_POST,
@@ -134,8 +136,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();
 
         $this->client->request(
@@ -163,8 +166,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         $this->assertCount(2, $this->getRepository(Assignment::class)->findAll());
 
-        /** @var User $reloadedUser */
-        $reloadedUser = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
         $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());

@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Action\Bulk;
 
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -99,8 +100,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
     public function testItDoesNotUpdateAssignmentsStateWithInvalidUsersProvided(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_PATCH,
@@ -138,8 +140,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
     public function testItUpdatesAssignmentStateWithValidUserProvided(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_PATCH,
@@ -166,8 +169,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         $this->assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
-        /** @var User $reloadedUser */
-        $reloadedUser = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->assertEquals(Assignment::STATE_CANCELLED, $reloadedUser->getLastAssignment()->getState());
         $this->assertCount(0, $reloadedUser->getAvailableAssignments());

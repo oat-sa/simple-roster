@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Bulk\Result\BulkResult;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Throwable;
 
@@ -28,12 +29,11 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
-            if ($operation->getType() == BulkOperation::TYPE_CREATE) {
+            if ($operation->getType() === BulkOperation::TYPE_CREATE) {
                 try {
-                    /** @var User $user */
-                    $user = $this->entityManager
-                        ->getRepository(User::class)
-                        ->getByUsernameWithAssignments($operation->getIdentifier());
+                    /** @var UserRepository $userRepository */
+                    $userRepository = $this->entityManager->getRepository(User::class);
+                    $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
 
                     $lastAssignment = $user->getLastAssignment();
 

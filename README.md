@@ -75,7 +75,7 @@ BLACKFIRE_SERVER_ID=<your_backfire_id>
 BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 ```
 
-## Tests
+#### Tests
 
 You can run all tests suites with:
 
@@ -83,7 +83,7 @@ You can run all tests suites with:
  $ bin/phpunit [--coverage-html=coverage]
  ```
  
-## Static analysis with PHPStan
+#### Static analysis with PHPStan
 ```bash
 $ vendor/bin/phpstan analyse --level=max
 ```
