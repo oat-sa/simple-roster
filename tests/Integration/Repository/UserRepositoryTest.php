@@ -33,9 +33,9 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->assertCount(100, $users);
         $this->assertCount(100, $users->getIterator());
+
         $index = 1;
-        /** @var User $user */
-        foreach ($users->getIterator() as $user) {
+        foreach ($users as $user) {
             $this->assertEquals('user_' . $index, $user->getUsername());
             $index++;
         }
@@ -47,9 +47,9 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->assertCount(100, $users);
         $this->assertCount(10, $users->getIterator());
+
         $index = 6;
-        /** @var User $user */
-        foreach ($users->getIterator() as $user) {
+        foreach ($users as $user) {
             $this->assertEquals('user_' . $index, $user->getUsername());
             $index++;
         }

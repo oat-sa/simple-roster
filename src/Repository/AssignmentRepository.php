@@ -20,6 +20,9 @@ class AssignmentRepository extends AbstractRepository
         parent::__construct($registry, Assignment::class);
     }
 
+    /**
+     * @return Paginator|Assignment[]
+     */
     public function findAllByStateAndUpdatedAtPaginated(
         string $state,
         DateTime $updatedAt,

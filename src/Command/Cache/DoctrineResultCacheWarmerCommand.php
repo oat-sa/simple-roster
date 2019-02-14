@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
-    public const NAME = 'roster:doctrine:result-cache:warm-up';
+    public const NAME = 'roster:doctrine-result-cache:warm-up';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
@@ -79,8 +79,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->stopwatch->start(self::NAME);
         do {
             $users = $this->userRepository->findAllPaginated($batchSize, $offset);
-            /** @var User $user */
-            foreach ($users->getIterator() as $user) {
+            foreach ($users as $user) {
                 $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
                 $this->resultCacheImplementation->delete($resultCacheId);
 

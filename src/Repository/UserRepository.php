@@ -56,6 +56,9 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
+    /**
+     * @return Paginator|User[]
+     */
     public function findAllPaginated(int $limit = null, int $offset = null): Paginator
     {
         $query = $this
@@ -65,7 +68,8 @@ class UserRepository extends AbstractRepository
             ->leftJoin('a.lineItem', 'l')
             ->leftJoin('l.infrastructure', 'i')
             ->setFirstResult($offset)
-            ->setMaxResults($limit);
+            ->setMaxResults($limit)
+            ->getQuery();
 
         return new Paginator($query);
     }
