@@ -82,3 +82,8 @@ You can run all tests suites with:
  ```bash
  $ bin/phpunit [--coverage-html=coverage]
  ```
+ 
+## Static analysis with PHPStan
+```bash
+$ vendor/bin/phpstan analyse --level=max
+```
