@@ -6,6 +6,7 @@ use App\EventSubscriber\ErrorHandlerSubscriber;
 use App\Responder\SerializerResponder;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,7 +16,7 @@ class ErrorHandlerSubscriberTest extends TestCase
     /** @var ErrorHandlerSubscriber */
     private $subject;
 
-    /** @var SerializerResponder */
+    /** @var SerializerResponder|PHPUnit_Framework_MockObject_MockObject */
     private $responder;
 
     protected function setUp()

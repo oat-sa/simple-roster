@@ -13,22 +13,23 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class UserCacheInvalidationSubscriberTest extends TestCase
 {
     /** @var UserCacheInvalidationSubscriber */
     private $subject;
 
-    /** @var EntityManager */
+    /** @var EntityManager|PHPUnit_Framework_MockObject_MockObject */
     private $entityManager;
 
-    /** @var UnitOfWork */
+    /** @var UnitOfWork|PHPUnit_Framework_MockObject_MockObject */
     private $unitOfWork;
 
-    /** @var UserCacheIdGenerator */
+    /** @var UserCacheIdGenerator|PHPUnit_Framework_MockObject_MockObject */
     private $userCacheIdGenerator;
 
-    /** @var Cache */
+    /** @var Cache|PHPUnit_Framework_MockObject_MockObject */
     private $resultCacheImplementation;
 
     protected function setUp()

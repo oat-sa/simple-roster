@@ -7,13 +7,14 @@ use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
 use App\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
     /** @var CompleteUserAssignmentService */
     private $subject;
 
-    /** @var AssignmentRepository */
+    /** @var AssignmentRepository|PHPUnit_Framework_MockObject_MockObject */
     private $assignmentRepository;
 
     protected function setUp()
