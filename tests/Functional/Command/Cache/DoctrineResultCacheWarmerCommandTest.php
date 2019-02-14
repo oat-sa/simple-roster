@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -40,10 +41,9 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testOutputInCaseOfException(): void
     {
-        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => -1]));
-        $this->assertContains(
-            '[ERROR] An exception occurred: Invalid `batch-size` argument received.',
-            $this->commandTester->getDisplay()
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid `batch-size` argument received.');
+
+        $this->commandTester->execute(['--batch-size' => -1]);
     }
 }

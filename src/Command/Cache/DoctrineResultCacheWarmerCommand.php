@@ -14,7 +14,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Throwable;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
@@ -66,47 +65,42 @@ class DoctrineResultCacheWarmerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $style = new SymfonyStyle($input, $output);
-        try {
-            $batchSize = (int)$input->getOption('batch-size');
-            if ($batchSize < 1) {
-                throw new InvalidArgumentException('Invalid `batch-size` argument received.');
+
+        $batchSize = (int)$input->getOption('batch-size');
+        if ($batchSize < 1) {
+            throw new InvalidArgumentException('Invalid `batch-size` argument received.');
+        }
+
+        $offset = 0;
+        $numberOfWarmedUpCacheEntries = 0;
+
+        $style->note('Warming up doctrine result cache...');
+
+        $this->stopwatch->start(self::NAME);
+        do {
+            $users = $this->userRepository->findAllPaginated($batchSize, $offset);
+            /** @var User $user */
+            foreach ($users->getIterator() as $user) {
+                $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
+                $this->resultCacheImplementation->delete($resultCacheId);
+
+                // Refresh by query
+                $this->userRepository->getByUsernameWithAssignments($user->getUsername());
+                $numberOfWarmedUpCacheEntries++;
             }
 
-            $offset = 0;
-            $numberOfWarmedUpCacheEntries = 0;
+            $offset += $batchSize;
+        } while ($users->getIterator()->count() === $batchSize);
 
-            $style->note('Warming up doctrine result cache...');
+        $style->success(
+            sprintf(
+                '%s result cache entries have been successfully warmed up.',
+                $numberOfWarmedUpCacheEntries
+            )
+        );
+        $event = $this->stopwatch->stop(self::NAME);
+        $style->note(sprintf('%.2F MiB - %d ms', $event->getMemory() / 1024 / 1024, $event->getDuration()));
 
-            $this->stopwatch->start(self::NAME);
-            do {
-                $users = $this->userRepository->findAllPaginated($batchSize, $offset);
-                /** @var User $user */
-                foreach ($users->getIterator() as $user) {
-                    $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
-                    $this->resultCacheImplementation->delete($resultCacheId);
-
-                    // Refresh by query
-                    $this->userRepository->getByUsernameWithAssignments($user->getUsername());
-                    $numberOfWarmedUpCacheEntries++;
-                }
-
-                $offset += $batchSize;
-            } while ($users->getIterator()->count() === $batchSize);
-
-            $style->success(
-                sprintf(
-                    '%s result cache entries have been successfully warmed up.',
-                    $numberOfWarmedUpCacheEntries
-                )
-            );
-            $event = $this->stopwatch->stop(self::NAME);
-            $style->note(sprintf('%.2F MiB - %d ms', $event->getMemory() / 1024 / 1024, $event->getDuration()));
-
-            return 0;
-        } catch (Throwable $throwable) {
-            $style->error(sprintf('An exception occurred: %s', $throwable->getMessage()));
-
-            return 1;
-        }
+        return 0;
     }
 }
