@@ -64,6 +64,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->stopwatch->start(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
 
         $batchSize = (int)$input->getOption('batch-size');
@@ -75,8 +76,6 @@ class DoctrineResultCacheWarmerCommand extends Command
         $numberOfWarmedUpCacheEntries = 0;
 
         $style->note('Warming up doctrine result cache...');
-
-        $this->stopwatch->start(self::NAME);
         do {
             $users = $this->userRepository->findAllPaginated($batchSize, $offset);
             foreach ($users as $user) {
@@ -97,8 +96,7 @@ class DoctrineResultCacheWarmerCommand extends Command
                 $numberOfWarmedUpCacheEntries
             )
         );
-        $event = $this->stopwatch->stop(self::NAME);
-        $style->note(sprintf('%.2F MiB - %d ms', $event->getMemory() / 1024 / 1024, $event->getDuration()));
+        $style->note(sprintf('Took to %s:', $this->stopwatch->stop(self::NAME)));
 
         return 0;
     }
