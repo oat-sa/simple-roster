@@ -30,6 +30,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     /** @var UserRepository */
     private $userRepository;
+
     /** @var Stopwatch */
     private $stopwatch;
 
@@ -99,13 +100,7 @@ class DoctrineResultCacheWarmerCommand extends Command
                 )
             );
             $event = $this->stopwatch->stop(self::NAME);
-            $style->note(
-                sprintf(
-                    '%.2F MiB - %d ms',
-                    $event->getMemory() / 1024 / 1024,
-                    $event->getDuration()
-                )
-            );
+            $style->note(sprintf('%.2F MiB - %d ms', $event->getMemory() / 1024 / 1024, $event->getDuration()));
 
             return 0;
         } catch (Throwable $throwable) {

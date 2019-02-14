@@ -20,7 +20,7 @@ App\Entity\Assignment:
     state: 'ready'
 
 App\Entity\User:
-  userWithStartedButStuckAssignment_{1..100}:
+  user_{1..100}:
     username: 'user_<current()>'
     plainPassword: 'password'
     assignments: ['@assignment_<current()>']
