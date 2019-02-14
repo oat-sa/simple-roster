@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
-    public const NAME = 'roster:doctrine-result-cache:warm-up';
+    public const NAME = 'roster:doctrine-result-cache:warmup';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
