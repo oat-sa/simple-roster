@@ -6,6 +6,12 @@ DevOps related information for setting up / debug / maintain the application.
 
 The main configuration file is `.env`, located in root folder.
 
+## Cache configuration
+
+The redis TTL value can be set in `.env`, with `USER_CACHE_TTL` value.
+
+This value should be greater than the duration on the test campaign (so it never expires during the campaign).
+
 ## Application setup steps
 
 - Install dependencies with Composer
