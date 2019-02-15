@@ -61,6 +61,32 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
+    public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
+        $this->getEntityManager()->flush();
+
+        $client = static::createClient();
+
+        $this->logInAs($user, $client);
+
+        $client->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_CONFLICT, $client->getResponse()->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => "Assignment with id '1' does not have a suitable state.",
+                ],
+            ],
+            json_decode($client->getResponse()->getContent(), true)
+        );
+    }
+
     public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
