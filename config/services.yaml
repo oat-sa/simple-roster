@@ -18,6 +18,14 @@ services:
         App\EventListener\Doctrine\EntityListenerInterface:
             tags: ['doctrine.orm.entity_listener']
 
+    app.session_storage.connection:
+        class: Redis
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(REDIS_SESSION_CACHE_URL)%'
+                  - '%env(int:REDIS_SESSION_CACHE_PORT)%'
+
     App\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
@@ -28,7 +36,7 @@ services:
 
     App\Repository\UserRepository:
         arguments:
-            $userCacheTtl: '%env(USER_CACHE_TTL)%'
+            $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
 
     App\Ingester\Registry\IngesterRegistry:
         arguments: [!tagged 'app.ingester']
@@ -51,3 +59,7 @@ services:
     App\Command\Cache\DoctrineResultCacheWarmerCommand:
         arguments:
             $doctrineConfiguration: '@doctrine.orm.default_configuration'
+
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@app.session_storage.connection'
