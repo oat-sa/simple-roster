@@ -8,7 +8,7 @@ The main configuration file is `.env`, located in root folder.
 
 ## Cache configuration
 
-The redis TTL value can be set in `.env`, with `USER_CACHE_TTL` value.
+The redis TTL value can be set in `.env`, with `REDIS_DOCTRINE_USER_CACHE_TTL` value.
 
 This value should be greater than the duration on the test campaign (so it never expires during the campaign).
 
