@@ -83,3 +83,7 @@ You can run all tests suites with:
  ```bash
  $ bin/phpunit [--coverage-html=coverage]
  ```
+ 
+ ## Devops Cheat Sheet
+ 
+ See [docs/cli/devops-cheat-sheet.md](docs/devops/devops-cheat-sheet.md).

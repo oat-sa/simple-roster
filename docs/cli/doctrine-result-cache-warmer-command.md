@@ -6,7 +6,7 @@ Currently we use result cache for `getByUsernameWithAssignments()` method in `Us
 
 ## Usage:
 ```bash
-$ bin/console roster:doctrine-result-cache:warm-up
+$ bin/console roster:doctrine-result-cache:warmup
 ```
 #### Main options:
 
@@ -18,5 +18,5 @@ $ bin/console roster:doctrine-result-cache:warm-up
 
 For the full list of options please refer to the helper option:
 ```bash
-$ bin/console roster:doctrine-result-cache:warm-up -h
+$ bin/console roster:doctrine-result-cache:warmup -h
 ```
