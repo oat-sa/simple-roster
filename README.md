@@ -7,6 +7,7 @@ REST back-end service that handles authentication and eligibilities.
 - [Documentation](#documentation)
     - [API documentation](#api-documentation)
     - [CLI documentation](#cli-documentation)
+    - [DevOps documentation](#devops-documentation)
 - [Development](#development)
     - [Build in server usage](#build-in-server-usage)
     - [Docker usage](#docker-usage) 
@@ -33,6 +34,11 @@ Available commands:
 - **Data ingestion** : see [docs/cli/ingester-command.md](docs/cli/ingester-command.md)
 - **Garbage collection** (assignments) : see [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
 - **Doctrine result cache warming** : see [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md)
+
+#### DevOps documentation
+
+You can:
+- find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
 
 ## Development
 
@@ -84,6 +90,3 @@ You can run all tests suites with:
  $ bin/phpunit [--coverage-html=coverage]
  ```
  
- ## Devops Cheat Sheet
- 
- See [docs/cli/devops-cheat-sheet.md](docs/devops/devops-cheat-sheet.md).

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Exception\AssignmentNotFoundException;
+use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -106,9 +107,14 @@ class User implements UserInterface, EntityInterface
     public function getAvailableAssignments(): array
     {
         $availableAssignments = [];
+        $now = Carbon::now()->toDateTime();
+
         foreach ($this->getAssignments() as $assignment) {
-            // cancelled assignment cannot be listed
             if ($assignment->isCancelled()) {
+                continue;
+            }
+
+            if (!$assignment->getLineItem()->isAvailableForDate($now)) {
                 continue;
             }
 
