@@ -5,12 +5,10 @@ dist: trusty
 php:
   - 7.2
 
-services:
-  - docker
-
 before_install:
-  - docker-compose up -d
-  - docker exec -it simple_roster_phpfpm composer install
+  - composer install
 
 script:
-  - docker exec -it simple_roster_phpfpm bin/phpunit
+  - bin/phpunit
+  - vendor/bin/infection --min-msi=70 --min-covered-msi=80
+  - vendor/bin/phpstan analyse --level=4
