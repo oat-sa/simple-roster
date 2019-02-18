@@ -191,16 +191,13 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             '/api/v1/bulk/assignments',
             [],
             [],
-            ['HTTP_X-Edge-Request-Id' => '2.2.2.2'],
+            [],
             $this->generateRequestPayload([$user->getUsername()])
         );
 
-        $this->assertHasInfoLogRecord([
-            'message' => 'Successful assignment update operation (id=`1`) for user with username=`user1`.',
-            'context' => [
-                'X-Edge-Request-Id' => '2.2.2.2'
-            ]
-        ]);
+        $this->assertHasInfoLogRecordWithMessage(
+            'Successful assignment update operation (id=`1`) for user with username=`user1`.'
+        );
     }
 
     private function generateRequestPayload(array $users): string

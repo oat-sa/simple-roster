@@ -45,14 +45,11 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                     foreach ($user->getAvailableAssignments() as $assignment) {
                         $assignment->setState($operation->getAttribute('state'));
 
-                        $this->logBuffer[] = [
-                            'message' => sprintf(
-                                'Successful assignment update operation (id=`%s`) for user with username=`%s`.',
-                                $assignment->getId(),
-                                $user->getUsername()
-                            ),
-                            'context' => $operation->getContext(),
-                        ];
+                        $this->logBuffer[] = sprintf(
+                            'Successful assignment update operation (id=`%s`) for user with username=`%s`.',
+                            $assignment->getId(),
+                            $user->getUsername()
+                        );
                     }
 
                     $this->entityManager->flush();
@@ -71,7 +68,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             $this->entityManager->commit();
 
             foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info($logRecord['message'], $logRecord['context']);
+                $this->logger->info($logRecord);
             }
         } else {
             $this->entityManager->rollback();

@@ -54,12 +54,11 @@ class BulkOperationCollectionParamConverterTest extends TestCase
             [],
             [],
             [],
-            ['HTTP_X-Edge-Request-Id' => '127.0.0.1'],
+            [],
             $requestBodyContent
         );
 
         $this->subject->apply($request, $paramConverter);
-
 
         $this->assertTrue($request->attributes->has($expectedParameterName));
 
@@ -69,11 +68,5 @@ class BulkOperationCollectionParamConverterTest extends TestCase
         $this->assertInstanceOf(BulkOperationCollection::class, $bulkOperationCollection);
 
         $this->assertCount(2, $bulkOperationCollection);
-
-        foreach ($bulkOperationCollection as $bulkOperation) {
-            $this->assertEquals([
-                'X-Edge-Request-Id' => '127.0.0.1'
-            ], $bulkOperation->getContext());
-        }
     }
 }

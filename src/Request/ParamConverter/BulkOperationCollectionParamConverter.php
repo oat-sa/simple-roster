@@ -26,8 +26,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
             $bulkOperation = new BulkOperation(
                 $operation['identifier'],
                 $this->getBulkOperationTypeFromRequest($request),
-                $operation['attributes']  ?? [],
-                ['X-Edge-Request-Id' => $request->headers->get('X-Edge-Request-Id')]
+                $operation['attributes']  ?? []
             );
 
             $collection->add($bulkOperation);

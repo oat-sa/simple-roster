@@ -191,16 +191,13 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             '/api/v1/bulk/assignments',
             [],
             [],
-            ['HTTP_X-Edge-Request-Id' => '2.2.2.2'],
+            [],
             $this->generateRequestPayload([$user->getUsername()])
         );
 
-        $this->assertHasInfoLogRecord([
-            'message' => 'Successful assignment create operation (id=`2`) for user with username=`user1`.',
-            'context' => [
-                'X-Edge-Request-Id' => '2.2.2.2'
-            ]
-        ]);
+        $this->assertHasInfoLogRecordWithMessage(
+            'Successful assignment create operation (id=`2`) for user with username=`user1`.'
+        );
     }
 
     private function generateRequestPayload(array $users): string
