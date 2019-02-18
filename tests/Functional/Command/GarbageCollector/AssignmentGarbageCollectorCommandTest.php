@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Command\GarbageCollector;
 use App\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use App\Entity\Assignment;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 {
     use DatabaseManualFixturesTrait;
+    use LoggerTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -23,6 +25,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         parent::setUp();
 
         $kernel = $this->setUpDatabase();
+
+        $this->setUpTestLogHandler();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
@@ -64,6 +68,16 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             '[OK] Total of `10` stuck assignments were successfully marked as `completed`.',
             $this->commandTester->getDisplay()
         );
+
+        for ($i = 1; $i <= 10; $i++) {
+            $this->assertHasInfoLogRecordWithMessage(
+                sprintf(
+                    'Assignment with id=`%s` of user `%s` has been marked as completed by garbage collector',
+                    $i,
+                    'userWithStartedButStuckAssignment_' . $i
+                )
+            );
+        }
 
         /** @var Assignment $assignment */
         foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {

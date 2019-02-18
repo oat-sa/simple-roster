@@ -18,3 +18,7 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 infection.json
+
+###> phpunit/phpunit ###
+/phpunit.xml
+###< phpunit/phpunit ###

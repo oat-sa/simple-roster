@@ -1,3 +1,6 @@
+parameters:
+    test1: '%env(REDIS_DOCTRINE_CACHE_HOST)%' #fixme
+    test2: '%env(REDIS_DOCTRINE_CACHE_PORT)%' #fixme
 doctrine:
     dbal:
         driver: 'pdo_sqlite'

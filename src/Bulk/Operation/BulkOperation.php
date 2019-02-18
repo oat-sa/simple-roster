@@ -16,11 +16,15 @@ class BulkOperation
     /** @var string[] */
     private $attributes;
 
-    public function __construct(string $identifier, string $type, array $attributes = [])
+    /** @var array */
+    private $context;
+
+    public function __construct(string $identifier, string $type, array $attributes, array $context = [])
     {
         $this->identifier = $identifier;
         $this->type = $type;
         $this->attributes = $attributes;
+        $this->context = $context;
     }
 
     public function getIdentifier(): string
@@ -41,5 +45,10 @@ class BulkOperation
     public function getAttribute(string $attributeName): string
     {
         return $this->attributes[$attributeName];
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }
