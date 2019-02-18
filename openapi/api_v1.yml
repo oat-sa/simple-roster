@@ -10,9 +10,9 @@ servers:
 paths:
   /healthcheck:
     get:
-      summary: Heath check
+      summary: Health check
       tags:
-        - Heathcheck
+        - Healthcheck
       security: []
       responses:
         200:
