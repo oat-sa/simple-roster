@@ -18,6 +18,8 @@ trait LoggerTestingTrait
 
     protected function setUpTestLogHandler(): void
     {
+        static::ensureKernelTestCase();
+
         /** @var Logger $logger */
         $logger = static::$container->get(LoggerInterface::class);
         $this->handler = new TestHandler();

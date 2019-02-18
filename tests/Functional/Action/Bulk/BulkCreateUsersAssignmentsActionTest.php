@@ -196,7 +196,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertHasInfoLogRecord([
-            'message' => 'Successful assignment `create` operation for user with username=`user1`.',
+            'message' => 'Successful assignment create operation (id=`2`) for user with username=`user1`.',
             'context' => [
                 'X-Edge-Request-Id' => '2.2.2.2'
             ]

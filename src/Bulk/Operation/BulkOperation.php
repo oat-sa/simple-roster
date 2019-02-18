@@ -19,7 +19,7 @@ class BulkOperation
     /** @var array */
     private $context;
 
-    public function __construct(string $identifier, string $type, array $attributes, array $context = [])
+    public function __construct(string $identifier, string $type, array $attributes = [], array $context = [])
     {
         $this->identifier = $identifier;
         $this->type = $type;

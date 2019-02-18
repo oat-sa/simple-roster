@@ -8,6 +8,7 @@ use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
@@ -15,9 +16,16 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var array */
+    private $logBuffer = [];
+
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     public function process(BulkOperationCollection $operationCollection): BulkResult
@@ -27,8 +35,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
-
-            if ($operation->getType() == BulkOperation::TYPE_UPDATE) {
+            if ($operation->getType() === BulkOperation::TYPE_UPDATE) {
                 try {
                     /** @var User $user */
                     $user = $this->entityManager
@@ -37,6 +44,15 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
                     foreach ($user->getAvailableAssignments() as $assignment) {
                         $assignment->setState($operation->getAttribute('state'));
+
+                        $this->logBuffer[] = [
+                            'message' => sprintf(
+                                'Successful assignment update operation (id=`%s`) for user with username=`%s`.',
+                                $assignment->getId(),
+                                $user->getUsername()
+                            ),
+                            'context' => $operation->getContext(),
+                        ];
                     }
 
                     $this->entityManager->flush();
@@ -53,6 +69,10 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
         if (!$result->hasFailures()) {
             $this->entityManager->commit();
+
+            foreach ($this->logBuffer as $logRecord) {
+                $this->logger->info($logRecord['message'], $logRecord['context']);
+            }
         } else {
             $this->entityManager->rollback();
         }
