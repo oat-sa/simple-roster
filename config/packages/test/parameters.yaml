@@ -1,0 +1,3 @@
+parameters:
+    dummy1: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+    dummy2: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
