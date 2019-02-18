@@ -8,6 +8,24 @@ servers:
   - url: https://localhost/api/v1
 
 paths:
+  /healthcheck:
+    get:
+      summary: Heath check
+      tags:
+        - Heathcheck
+      security: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResult'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
   /auth/login:
     post:
       summary: User login
@@ -344,6 +362,15 @@ components:
           type: integer
         launch_presentation_return_url:
           type: string
+    HealthCheckResult:
+      type: object
+      properties:
+        isDoctrineConnectionAvailable:
+          type: boolean
+          description: Wether the doctrine connection is available or not
+        isDoctrineCacheAvailable:
+          type: boolean
+          description: Wether the doctrine cache is available or not
     Error:
       type: object
       properties:
