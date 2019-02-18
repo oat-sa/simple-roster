@@ -6,6 +6,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
+    use LoggerTestingTrait;
 
     /** @var Client */
     private $client;
@@ -28,6 +30,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         $this->setUpFixtures();
 
         $this->client = self::createClient();
+
+        $this->setUpTestLogHandler();
     }
 
     public function testItThrowsBadRequestHttpExceptionIfRequestBodyIsInvalid(): void
@@ -173,6 +177,30 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
         $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
         $this->assertCount(1, $reloadedUser->getAvailableAssignments());
+    }
+
+    public function testItLogsSuccessfulBulkOperations(): void
+    {
+        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+
+        /** @var User $user */
+        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v1/bulk/assignments',
+            [],
+            [],
+            ['HTTP_X-Edge-Request-Id' => '2.2.2.2'],
+            $this->generateRequestPayload([$user->getUsername()])
+        );
+
+        $this->assertHasInfoLogRecord([
+            'message' => 'Successful assignment `create` operation for user with username=`user1`.',
+            'context' => [
+                'X-Edge-Request-Id' => '2.2.2.2'
+            ]
+        ]);
     }
 
     private function generateRequestPayload(array $users): string

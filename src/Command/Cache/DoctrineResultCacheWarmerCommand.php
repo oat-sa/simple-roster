@@ -2,7 +2,6 @@
 
 namespace App\Command\Cache;
 
-use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;

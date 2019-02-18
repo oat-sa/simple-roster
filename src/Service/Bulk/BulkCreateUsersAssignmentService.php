@@ -2,13 +2,14 @@
 
 namespace App\Service\Bulk;
 
-use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
-use App\Entity\Assignment;
-use App\Entity\User;
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
+use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
+use App\Entity\Assignment;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcessorInterface
@@ -16,9 +17,16 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var array */
+    private $logBuffer = [];
+
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     public function process(BulkOperationCollection $operationCollection): BulkResult
@@ -28,7 +36,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
-            if ($operation->getType() == BulkOperation::TYPE_CREATE) {
+            if ($operation->getType() === BulkOperation::TYPE_CREATE) {
                 try {
                     /** @var User $user */
                     $user = $this->entityManager
@@ -51,6 +59,15 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
                     $this->entityManager->flush();
 
                     $result->addBulkOperationSuccess($operation);
+
+                    $this->logBuffer[$newAssignment->getId()] = [
+                        'message' => sprintf(
+                            'Successful assignment `%s` operation for user with username=`%s`.',
+                            $operation->getType(),
+                            $user->getUsername()
+                        ),
+                        'context' => $operation->getContext(),
+                    ];
                 } catch (Throwable $exception) {
                     $result->addBulkOperationFailure($operation);
                 }
@@ -61,6 +78,10 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
         if (!$result->hasFailures()) {
             $this->entityManager->commit();
+
+            foreach ($this->logBuffer as $logRecord) {
+                $this->logger->info($logRecord['message'], $logRecord['context']);
+            }
         } else {
             $this->entityManager->rollback();
         }

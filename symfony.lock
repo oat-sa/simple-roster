@@ -161,6 +161,9 @@
     "nikic/php-parser": {
         "version": "v4.2.0"
     },
+    "oat-sa/phing-tasks": {
+        "version": "v0.1"
+    },
     "ocramius/package-versions": {
         "version": "1.3.0"
     },
@@ -178,6 +181,9 @@
     },
     "phar-io/version": {
         "version": "1.0.1"
+    },
+    "phing/phing": {
+        "version": "2.16.1"
     },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
