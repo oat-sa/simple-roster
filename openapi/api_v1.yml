@@ -61,7 +61,7 @@ paths:
   /assignments:
     get:
       summary: List user assignments
-      description: List current authenticated user assignments
+      description: List current authenticated user available assignments (not cancelled, and with valid dates)
       tags:
         - Assignments
       responses:
@@ -82,6 +82,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
+        409:
+          $ref: '#/components/responses/ConflictResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /bulk/assignments:
@@ -113,7 +115,7 @@ paths:
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
         413:
-          $ref: '#/components/responses/RequestEntityTooLarge'
+          $ref: '#/components/responses/RequestEntityTooLargeResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
     patch:
@@ -144,7 +146,7 @@ paths:
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
         413:
-          $ref: '#/components/responses/RequestEntityTooLarge'
+          $ref: '#/components/responses/RequestEntityTooLargeResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -387,7 +389,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    RequestEntityTooLarge:
+    ConflictResponse:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RequestEntityTooLargeResponse:
       description: Request Entity Too Large
       content:
         application/json:

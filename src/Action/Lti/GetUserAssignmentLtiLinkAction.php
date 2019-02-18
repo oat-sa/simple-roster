@@ -5,10 +5,12 @@ namespace App\Action\Lti;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
+use App\Exception\AssignmentNotProcessableException;
 use App\Responder\SerializerResponder;
 use App\Service\GetUserAssignmentLtiRequestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -48,6 +50,8 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
+        } catch (AssignmentNotProcessableException $exception) {
+            throw new ConflictHttpException($exception->getMessage());
         }
     }
 }

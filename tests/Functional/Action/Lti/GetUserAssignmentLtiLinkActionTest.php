@@ -61,6 +61,32 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
+    public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
+        $this->getEntityManager()->flush();
+
+        $client = static::createClient();
+
+        $this->logInAs($user, $client);
+
+        $client->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_CONFLICT, $client->getResponse()->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => "Assignment with id '1' does not have a suitable state.",
+                ],
+            ],
+            json_decode($client->getResponse()->getContent(), true)
+        );
+    }
+
     public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
@@ -79,12 +105,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertEquals(
             [
-                'ltiLink' => 'http://lti-director.com',
+                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'o218FKyyUML7L8jE6s9s5qrZnZY=',
+                    'oauth_signature' => 'hnGSz3IWyuQwwYbQNvx+3mnvSvo=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
