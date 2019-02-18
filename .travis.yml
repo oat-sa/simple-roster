@@ -6,7 +6,7 @@ php:
   - 7.2
 
 before_install:
-  - pecl install apcu
+  - pecl install -f apcu
   - composer install
 
 script:
