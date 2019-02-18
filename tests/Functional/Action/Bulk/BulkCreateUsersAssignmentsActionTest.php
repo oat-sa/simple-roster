@@ -6,6 +6,8 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
+use Carbon\Carbon;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -134,6 +136,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void
     {
+        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+
         /** @var User $user */
         $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();

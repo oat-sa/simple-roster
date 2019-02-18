@@ -25,17 +25,29 @@ services:
           - .:/var/www/html:cached
         working_dir: /var/www/html
 
-    simple_roster_redis:
-        container_name: simple_roster_redis
+    simple_roster_doctrine_redis:
+        container_name: simple_roster_doctrine_redis
         image: redis
         command: ["redis-server", "--appendonly", "yes"]
-        hostname: simple_roster_redis
+        hostname: simple_roster_doctrine_redis
         networks:
           - simple_roster_network
         ports:
           - "6379:6379"
         volumes:
-          - simple_roster_redis_data:/data
+          - simple_roster_doctrine_redis_data:/data
+
+    simple_roster_session_redis:
+        container_name: simple_roster_session_redis
+        image: redis
+        command: ["redis-server", "--appendonly", "yes"]
+        hostname: simple_roster_session_redis
+        networks:
+          - simple_roster_network
+        ports:
+          - "6380:6379"
+        volumes:
+          - simple_roster_session_redis_data:/data
 
     simple_roster_postgres:
         container_name: simple_roster_postgres
@@ -63,7 +75,9 @@ services:
           - BLACKFIRE_SERVER_TOKEN
 
 volumes:
-    simple_roster_redis_data:
+    simple_roster_doctrine_redis_data:
+       driver: local
+    simple_roster_session_redis_data:
        driver: local
     simple_roster_postgres_data:
        driver: local

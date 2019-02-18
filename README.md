@@ -7,6 +7,7 @@ REST back-end service that handles authentication and eligibilities.
 - [Documentation](#documentation)
     - [API documentation](#api-documentation)
     - [CLI documentation](#cli-documentation)
+    - [DevOps documentation](#devops-documentation)
 - [Development](#development)
     - [Build in server usage](#build-in-server-usage)
     - [Docker usage](#docker-usage) 
@@ -34,6 +35,11 @@ Available commands:
 - **Garbage collection** (assignments) : see [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
 - **Doctrine result cache warming** : see [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md)
 
+#### DevOps documentation
+
+You can:
+- find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
+
 ## Development
 
 #### Build in server usage
@@ -50,7 +56,9 @@ This project provides a ready to use docker stack with:
 - php fpm 7.2
 - nginx
 - postgres (container persistent storage)
-- redis (container persistent storage)
+- redis (containers persistent storage)
+    - for doctrine data
+    - and sessions storage
 - blackfire
 
 You must have [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
@@ -64,7 +72,8 @@ Start up the docker stack, from the root folder:
 Resources:
 - application is exposed on port **80**
 - postgres is exposed on port **5432**
-- redis is exposed on port **6379**
+- redis for doctrine data is exposed on port **6379**
+- redis for session data is exposed on port **6380**
 - blackfire is exposed on port **8707**
 
 #### Blackfire usage
@@ -83,3 +92,4 @@ You can run all tests suites with:
  ```bash
  $ bin/phpunit [--coverage-html=coverage]
  ```
+ 

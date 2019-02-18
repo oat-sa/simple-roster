@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Assignment;
+use App\Exception\AssignmentNotProcessableException;
 use App\Generator\NonceGenerator;
 use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
@@ -38,8 +39,13 @@ class GetUserAssignmentLtiRequestService
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
     }
 
+    /**
+     * @throws AssignmentNotProcessableException
+     */
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
+        $this->checkIfAssignmentCanBeProcessed($assignment);
+
         $context = new OAuthContext(
             '',
             $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
@@ -82,6 +88,18 @@ class GetUserAssignmentLtiRequestService
         );
     }
 
+    /**
+     * @throws AssignmentNotProcessableException
+     */
+    private function checkIfAssignmentCanBeProcessed(Assignment $assignment): void
+    {
+        if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED])) {
+            throw new AssignmentNotProcessableException(
+                sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
+            );
+        }
+    }
+
     private function getAssignmentLtiParameters(Assignment $assignment): array
     {
         return [
@@ -94,7 +112,7 @@ class GetUserAssignmentLtiRequestService
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getId(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => $assignment->getLineItem()->getId(),
+            'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'lis_result_sourcedid' => $assignment->getId(),
             'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl

@@ -8,6 +8,24 @@ servers:
   - url: https://localhost/api/v1
 
 paths:
+  /healthcheck:
+    get:
+      summary: Health check
+      tags:
+        - Healthcheck
+      security: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResult'
+        405:
+          $ref: '#/components/responses/MethodNotAllowedResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
   /auth/login:
     post:
       summary: User login
@@ -61,7 +79,7 @@ paths:
   /assignments:
     get:
       summary: List user assignments
-      description: List current authenticated user assignments
+      description: List current authenticated user available assignments (not cancelled, and with valid dates)
       tags:
         - Assignments
       responses:
@@ -82,6 +100,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
+        409:
+          $ref: '#/components/responses/ConflictResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /bulk/assignments:
@@ -113,7 +133,7 @@ paths:
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
         413:
-          $ref: '#/components/responses/RequestEntityTooLarge'
+          $ref: '#/components/responses/RequestEntityTooLargeResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
     patch:
@@ -144,7 +164,7 @@ paths:
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
         413:
-          $ref: '#/components/responses/RequestEntityTooLarge'
+          $ref: '#/components/responses/RequestEntityTooLargeResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -342,6 +362,15 @@ components:
           type: integer
         launch_presentation_return_url:
           type: string
+    HealthCheckResult:
+      type: object
+      properties:
+        isDoctrineConnectionAvailable:
+          type: boolean
+          description: Wether the doctrine connection is available or not
+        isDoctrineCacheAvailable:
+          type: boolean
+          description: Wether the doctrine cache is available or not
     Error:
       type: object
       properties:
@@ -387,7 +416,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    RequestEntityTooLarge:
+    ConflictResponse:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RequestEntityTooLargeResponse:
       description: Request Entity Too Large
       content:
         application/json:
