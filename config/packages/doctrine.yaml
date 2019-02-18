@@ -4,7 +4,6 @@ parameters:
     # environment variables are not available yet.
     # You should not need to change this value.
     env(DATABASE_URL): ''
-    redis_cache_url: '%env(REDIS_CACHE_URL)%' #TODO Find better solution to bypass env variable usage
 
 doctrine:
     dbal:
@@ -18,16 +17,16 @@ doctrine:
         auto_mapping: true
         metadata_cache_driver:
             type: redis
-            host: '%env(REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(REDIS_DOCTRINE_CACHE_PORT)%'
+            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
         query_cache_driver:
             type: redis
-            host: '%env(REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(REDIS_DOCTRINE_CACHE_PORT)%'
+            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
         result_cache_driver:
             type: redis
-            host: '%env(REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(REDIS_DOCTRINE_CACHE_PORT)%'
+            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
         mappings:
             App:
                 is_bundle: false
