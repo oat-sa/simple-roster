@@ -23,7 +23,7 @@ services:
         calls:
             - method: connect
               arguments:
-                  - '%env(REDIS_SESSION_CACHE_URL)%'
+                  - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
                   - '%env(int:REDIS_SESSION_CACHE_PORT)%'
 
     App\:
