@@ -126,7 +126,7 @@ class AssignmentGarbageCollectorCommand extends Command
                 $numberOfCollectedAssignments++;
                 $this->logger->info(
                     sprintf(
-                        'Assignment with id=`%s` of user `%s` has been marked as completed by garbage collector',
+                        'Assignment with id=`%s` of user with username=`%s` has been marked as completed by garbage collector.',
                         $assignment->getId(),
                         $assignment->getUser()->getUsername()
                     )

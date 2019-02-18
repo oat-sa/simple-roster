@@ -72,7 +72,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         for ($i = 1; $i <= 10; $i++) {
             $this->assertHasInfoLogRecordWithMessage(
                 sprintf(
-                    'Assignment with id=`%s` of user `%s` has been marked as completed by garbage collector',
+                    'Assignment with id=`%s` of user with username=`%s` has been marked as completed by garbage collector.',
                     $i,
                     'userWithStartedButStuckAssignment_' . $i
                 )
