@@ -5,15 +5,20 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
+use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService
 {
     /** @var AssignmentRepository */
     private $assignmentRepository;
 
-    public function __construct(AssignmentRepository $assignmentRepository)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(AssignmentRepository $assignmentRepository, LoggerInterface $logger)
     {
         $this->assignmentRepository = $assignmentRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -31,5 +36,13 @@ class CompleteUserAssignmentService
 
         $this->assignmentRepository->persist($assignment);
         $this->assignmentRepository->flush();
+
+        $this->logger->info(
+            sprintf(
+                'Assignment with id=`%s` of user with username=`%s` has been marked as completed.',
+                $assignmentId,
+                $assignment->getUser()->getUsername()
+            )
+        );
     }
 }
