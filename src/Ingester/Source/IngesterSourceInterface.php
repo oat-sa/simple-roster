@@ -8,7 +8,7 @@ interface IngesterSourceInterface extends RegistryItemInterface
 {
     public const DEFAULT_CSV_DELIMITER = ',';
 
-    public function getContent(): array;
+    public function getContent();
 
     public function setPath(string $path): self;
 

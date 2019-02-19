@@ -24,7 +24,7 @@ class S3CsvIngesterSource extends AbstractIngesterSource
         return 's3';
     }
 
-    public function getContent(): array
+    public function getContent()
     {
         $result = $this->client->getObject([
             'Bucket' => $this->bucket,

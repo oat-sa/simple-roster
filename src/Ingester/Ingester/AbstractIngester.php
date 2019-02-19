@@ -11,6 +11,8 @@ use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface
 {
+    private const BATCH_SIZE = 3000;
+
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -36,7 +38,14 @@ abstract class AbstractIngester implements IngesterInterface
             try {
                 if (!$dryRun) {
                     $this->managerRegistry->getManager()->persist($this->createEntity($data));
-                    $this->managerRegistry->getManager()->flush();
+
+
+                    if (($lineNumber % self::BATCH_SIZE) === 0) {
+                        $this->managerRegistry->getManager()->flush();
+                        //$this->managerRegistry->getManager()->clear();
+                        //$this->prepare();
+                        echo 'processed : ' . $lineNumber . PHP_EOL;
+                    }
                 }
 
                 $result->addSuccess();
@@ -52,6 +61,9 @@ abstract class AbstractIngester implements IngesterInterface
 
             $lineNumber++;
         }
+
+        $this->managerRegistry->getManager()->flush();
+        $this->managerRegistry->getManager()->clear();
 
         return $result;
     }

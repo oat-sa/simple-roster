@@ -11,13 +11,16 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
         return 'local';
     }
 
-    public function getContent(): array
+    public function getContent()
     {
         $reader = Reader::createFromPath($this->path, 'r');
 
-        return $reader
+        $reader
             ->setDelimiter($this->delimiter)
-            ->setOffset(1)
-            ->fetchAll();
+            ->setOffset(1);
+
+        foreach ($reader->fetchAll() as $row) {
+            yield $row;
+        }
     }
 }
