@@ -21,6 +21,9 @@
         "league/csv": "^8.0",
         "nelmio/cors-bundle": "^1.5",
         "nesbot/carbon": "^2.11",
+        "oat-sa/phing-tasks": "^0.1",
+        "phing/phing": "^2.16",
+        "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",
         "symfony/browser-kit": "4.2.*",
@@ -36,9 +39,7 @@
         "symfony/serializer": "4.2.*",
         "symfony/stopwatch": "4.2.*",
         "symfony/validator": "4.2.*",
-        "symfony/yaml": "4.2.*",
-        "phing/phing" : "^2.16",
-        "oat-sa/phing-tasks": "^0.1"
+        "symfony/yaml": "4.2.*"
     },
     "require-dev": {
         "ext-intl": "*",

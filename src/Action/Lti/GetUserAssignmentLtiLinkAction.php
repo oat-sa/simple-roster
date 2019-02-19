@@ -9,6 +9,7 @@ use App\Exception\AssignmentNotProcessableException;
 use App\Responder\SerializerResponder;
 use App\Service\GetUserAssignmentLtiRequestService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,14 +26,19 @@ class GetUserAssignmentLtiLinkAction
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         SerializerResponder $responder,
         GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger
     ) {
         $this->responder = $responder;
         $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -46,6 +52,14 @@ class GetUserAssignmentLtiLinkAction
 
             $assignment->setState(Assignment::STATE_STARTED);
             $this->entityManager->flush();
+
+            $this->logger->info(
+                sprintf('LTI request was successfully generated for assignment with id=`%s`', $assignmentId),
+                [
+                    'ltiRequest' => $ltiRequest->jsonSerialize(),
+                    'lineItem' => $assignment->getLineItem()->jsonSerialize(),
+                ]
+            );
 
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {

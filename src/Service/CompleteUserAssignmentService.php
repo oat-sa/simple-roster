@@ -42,7 +42,8 @@ class CompleteUserAssignmentService
                 'Assignment with id=`%s` of user with username=`%s` has been marked as completed.',
                 $assignmentId,
                 $assignment->getUser()->getUsername()
-            )
+            ),
+            ['lineItem' => $assignment->getLineItem()->jsonSerialize()]
         );
     }
 }

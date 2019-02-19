@@ -3,6 +3,8 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Assignment;
+use App\Entity\Infrastructure;
+use App\Entity\LineItem;
 use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
@@ -43,8 +45,15 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
+        $lineItem = (new LineItem())
+            ->setInfrastructure(new Infrastructure())
+            ->setUri('uri')
+            ->setLabel('label')
+            ->setSlug('slug');
+
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
+            ->setLineItem($lineItem)
             ->setUser($user);
 
         $this->assignmentRepository
@@ -71,8 +80,15 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
+        $lineItem = (new LineItem())
+            ->setInfrastructure(new Infrastructure())
+            ->setUri('uri')
+            ->setLabel('label')
+            ->setSlug('slug');
+
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
+            ->setLineItem($lineItem)
             ->setUser($user);
 
         $this->assignmentRepository
@@ -84,7 +100,10 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->logger
             ->expects($this->once())
             ->method('info')
-            ->with('Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.');
+            ->with(
+                'Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.',
+                ['lineItem' => $assignment->getLineItem()->jsonSerialize()]
+            );
 
         $this->subject->markAssignmentAsCompleted(5);
     }
