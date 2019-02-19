@@ -25,9 +25,6 @@ The main configuration file is `.env`, located in root folder.
     | AWS_KEY | AWS Key |
     | AWS_SECRET | AWS Secret |
     | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
-    | AWS_REGION | AWS Region [default: `eu-west-1`] |
-    | AWS_REGION | AWS Region [default: `eu-west-1`] |
-    | AWS_REGION | AWS Region [default: `eu-west-1`] |
 - Database:
 
     | Parameter | Description |
