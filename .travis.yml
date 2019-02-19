@@ -11,5 +11,6 @@ before_install:
 
 script:
   - bin/phpunit
-  - vendor/bin/infection --min-msi=70 --min-covered-msi=80
-  - vendor/bin/phpstan analyse --level=4
+  - bin/console cache:clear --env=test
+  - vendor/bin/infection --min-msi=80 --min-covered-msi=80
+  - vendor/bin/phpstan -c phpstan.neon.travis.dist analyse --level=4

@@ -1,0 +1,22 @@
+includes:
+  - vendor/phpstan/phpstan-symfony/extension.neon
+  - vendor/phpstan/phpstan-doctrine/extension.neon
+  - vendor/phpstan/phpstan-doctrine/rules.neon
+  - vendor/phpstan/phpstan-phpunit/extension.neon
+  - vendor/phpstan/phpstan-phpunit/rules.neon
+
+parameters:
+  # Workaround for Symfony's phpunit-bridge
+  autoload_files:
+    - bin/.phpunit/phpunit-6.5/vendor/autoload.php
+  paths:
+    - src
+    - tests
+  symfony:
+    container_xml_path: '%rootDir%/../../../var/cache/test/srcApp_KernelDevDebugContainer.xml'
+  doctrine:
+    repositoryClass: App\Repository\AbstractRepository
+  # Temporary solution: https://github.com/phpstan/phpstan-symfony/issues/4
+  ignoreErrors:
+    - message: '#^Service "[^"]+" is private.$#'
+      path: %rootDir%/../../../tests
