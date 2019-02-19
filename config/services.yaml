@@ -7,7 +7,7 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $debug: '%kernel.debug%'
+            $debug: '%env(resolve:APP_DEBUG)%'
             $ltiLaunchPresentationReturnUrl: '%env(LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
 
     _instanceof:
