@@ -60,11 +60,14 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
                     $result->addBulkOperationSuccess($operation);
 
-                    $this->logBuffer[] = sprintf(
-                        'Successful assignment create operation (id=`%s`) for user with username=`%s`.',
-                        $newAssignment->getId(),
-                        $user->getUsername()
-                    );
+                    $this->logBuffer[] = [
+                        'message' => sprintf(
+                            'Successful assignment create operation (id=`%s`) for user with username=`%s`.',
+                            $newAssignment->getId(),
+                            $user->getUsername()
+                        ),
+                        'lineItem' => $newAssignment->getLineItem()->jsonSerialize(),
+                    ];
                 } catch (Throwable $exception) {
                     $result->addBulkOperationFailure($operation);
                 }
@@ -77,7 +80,10 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
             $this->entityManager->commit();
 
             foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info($logRecord);
+                $this->logger->info(
+                    $logRecord['message'],
+                    ['lineItem' => $logRecord['lineItem']]
+                );
             }
         } else {
             $this->entityManager->rollback();
