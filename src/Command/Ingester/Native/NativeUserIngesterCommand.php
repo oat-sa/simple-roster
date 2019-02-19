@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Command\Ingester\User;
+namespace App\Command\Ingester\Native;
 
 use App\Entity\Assignment;
 use App\Entity\LineItem;
@@ -9,20 +9,22 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Exception;
 use Throwable;
 
 class NativeUserIngesterCommand extends Command
 {
     public const NAME = 'roster:native-ingest:user';
+    private const BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
@@ -30,36 +32,29 @@ class NativeUserIngesterCommand extends Command
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var UserPasswordEncoderInterface */
+    private $passwordEncoder;
+
     /** @var Stopwatch */
     private $stopwatch;
-
-    /** UserPasswordEncoderInterface */
-    private $userPasswordEncoderInterface;
-
-    /** User */
-    private $user;
-
-    /** LineItem[] */
-    private $lineItemCollection = [];
 
     public function __construct(
         IngesterSourceRegistry $sourceRegistry,
         EntityManagerInterface $entityManager,
-        Stopwatch $stopwatch,
-        UserPasswordEncoderInterface $userPasswordEncoderInterface
+        UserPasswordEncoderInterface $passwordEncoder,
+        Stopwatch $stopwatch
     ) {
         $this->sourceRegistry = $sourceRegistry;
         $this->entityManager = $entityManager;
+        $this->passwordEncoder = $passwordEncoder;
         $this->stopwatch = $stopwatch;
-        $this->userPasswordEncoderInterface = $userPasswordEncoderInterface;
-        $this->user = new User();
 
         parent::__construct(static::NAME);
     }
 
     protected function configure()
     {
-        $this->setDescription('Responsible for user ingesting from various sources (Local file, S3 bucket)');
+        $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
             'source',
@@ -85,19 +80,28 @@ class NativeUserIngesterCommand extends Command
         );
 
         $this->addOption(
-            'force',
-            'f',
-            InputOption::VALUE_NONE,
-            'Causes data ingestion to be applied into storage'
+            'memory',
+            'm',
+            InputOption::VALUE_REQUIRED,
+            'PHP memory limit',
+            '1G'
         );
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface|ConsoleOutput $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', '1G');
+        ini_set('memory_limit', $input->getOption('memory'));
 
         $this->stopwatch->start(__CLASS__, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
+
+        $section = $output->section();
+        $section->writeln('Starting user ingestion...');
 
         try {
             $source = $this->sourceRegistry
@@ -105,10 +109,10 @@ class NativeUserIngesterCommand extends Command
                 ->setPath($input->getArgument('path'))
                 ->setDelimiter($input->getOption('delimiter'));
 
-            $iterator = 1;
+            $index = 1;
+            $lineItemCollection = $this->fetchLineItems();
             $resultSetMapping = new ResultSetMapping();
-            $this->fetchLineItems();
-
+            $user = new User();
             $userQueryParts = [];
             $assignmentQueryParts = [];
 
@@ -116,41 +120,34 @@ class NativeUserIngesterCommand extends Command
 
                 $userQueryParts[] = sprintf(
                     "(%s, '%s', '%s', '[]')",
-                    $iterator,
+                    $index,
                     $row[0],
-                    $this->encodePassword($row[1])
+                    $this->encodeUserPassword($user, $row[1])
                 );
 
                 $assignmentQueryParts[] = sprintf(
                     "(%s, %s, %s, '%s')",
-                    $iterator,
-                    $iterator,
-                    $this->lineItemCollection[$row[2]]->getId(),
+                    $index,
+                    $index,
+                    $lineItemCollection[$row[2]]->getId(),
                     Assignment::STATE_READY
                 );
 
-                if ($iterator % 1000 === 0) {
+                if ($index % self::BATCH_SIZE === 0) {
 
-                    $userQuery = sprintf(
-                        "INSERT INTO users (id, username, password, roles) VALUES %s",
-                        implode(', ', $userQueryParts)
-                    );
-
-                    $this->entityManager->createNativeQuery($userQuery, $resultSetMapping)->execute();
-
-                    $assignmentQuery = sprintf(
-                        "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
-                        implode(', ', $assignmentQueryParts)
-                    );
-
-                    $this->entityManager->createNativeQuery($assignmentQuery, $resultSetMapping)->execute();
+                    $this->executeNativeInsertions($resultSetMapping, $userQueryParts, $assignmentQueryParts);
 
                     $userQueryParts = [];
                     $assignmentQueryParts = [];
+
+                    $section->overwrite(sprintf('Number of users imported so far: %s', $index));
                 }
 
-                $iterator++;
+                $index++;
             }
+
+            $this->executeNativeInsertions($resultSetMapping, $userQueryParts, $assignmentQueryParts);
+            $section->overwrite(sprintf('Total of users imported: %s', $index));
 
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
@@ -164,27 +161,46 @@ class NativeUserIngesterCommand extends Command
         return 0;
     }
 
-    private function encodePassword(string $value): string
+    private function executeNativeInsertions(ResultSetMapping $mapping, array $userQueryParts, array $assignmentQueryParts): void
     {
-        return $this->userPasswordEncoderInterface->encodePassword($this->user, $value);
+        $userQuery = sprintf(
+            "INSERT INTO users (id, username, password, roles) VALUES %s",
+            implode(',', $userQueryParts)
+        );
+
+        $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
+
+        $assignmentQuery = sprintf(
+            "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
+            implode(',', $assignmentQueryParts)
+        );
+
+        $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
+    }
+
+    private function encodeUserPassword(User $user, string $value): string
+    {
+        return $this->passwordEncoder->encodePassword($user, $value);
     }
 
     /**
+     * @return LineItem[]
      * @throws Exception
      */
-    private function fetchLineItems(): void
+    private function fetchLineItems(): array
     {
         /** @var LineItem[] $lineItems */
         $lineItems = $this->entityManager->getRepository(LineItem::class)->findAll();
 
         if (empty($lineItems)) {
-            throw new Exception(
-                sprintf("Cannot native ingest 'user' since line-item table is empty.", $this->getRegistryItemName())
-            );
+            throw new Exception("Cannot native ingest 'user' since line-item table is empty.");
         }
 
+        $lineItemCollection = [];
         foreach ($lineItems as $lineItem) {
-            $this->lineItemCollection[$lineItem->getSlug()] = $lineItem;
+            $lineItemCollection[$lineItem->getSlug()] = $lineItem;
         }
+
+        return $lineItemCollection;
     }
 }
