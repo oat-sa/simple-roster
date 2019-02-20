@@ -37,13 +37,13 @@ class NativeUserIngesterCommand extends Command
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
 
-    /** @var array  */
+    /** @var array */
     private $userQueryParts = [];
 
-    /** @var array  */
+    /** @var array */
     private $assignmentQueryParts = [];
 
-    /** @var array  */
+    /** @var array */
     private $errors = [];
 
     public function __construct(
@@ -95,9 +95,7 @@ class NativeUserIngesterCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
      * @param ConsoleOutput|OutputInterface $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
