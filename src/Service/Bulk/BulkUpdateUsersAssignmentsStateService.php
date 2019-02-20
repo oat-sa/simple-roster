@@ -47,7 +47,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
                         $this->logBuffer[] = [
                             'message' => sprintf(
-                                'Successful assignment update operation (id=`%s`) for user with username=`%s`.',
+                                "Successful assignment update operation (id='%s') for user with username='%s'.",
                                 $assignment->getId(),
                                 $user->getUsername()
                             ),

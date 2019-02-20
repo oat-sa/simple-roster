@@ -202,7 +202,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            'Successful assignment update operation (id=`1`) for user with username=`user1`.',
+            "Successful assignment update operation (id='1') for user with username='user1'.",
             Logger::INFO
         );
     }

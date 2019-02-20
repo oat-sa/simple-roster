@@ -49,7 +49,7 @@ class AssignmentGarbageCollectorCommand extends Command
 
         $this->setDescription(
             sprintf(
-                'Transitions assignments stuck in `%s` state for a given amount of time to `%s` state',
+                "Transitions assignments stuck in '%s' state for a given amount of time to '%s' state",
                 Assignment::STATE_STARTED,
                 Assignment::STATE_COMPLETED
             )
@@ -77,7 +77,7 @@ class AssignmentGarbageCollectorCommand extends Command
         try {
             $batchSize = (int)$input->getOption('batch-size');
             if ($batchSize < 1) {
-                throw new InvalidArgumentException('Invalid `batch-size` argument received.');
+                throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
             }
 
             $isDryRun = !(bool)$input->getOption('force');
@@ -85,7 +85,7 @@ class AssignmentGarbageCollectorCommand extends Command
 
             $successMessage = $numberOfCollectedAssignments !== 0
                 ? sprintf(
-                    'Total of `%s` stuck assignments were successfully marked as `%s`.',
+                    "Total of '%s' stuck assignments were successfully marked as '%s'.",
                     $numberOfCollectedAssignments,
                     Assignment::STATE_COMPLETED
                 )
@@ -126,7 +126,7 @@ class AssignmentGarbageCollectorCommand extends Command
                 $numberOfCollectedAssignments++;
                 $this->logger->info(
                     sprintf(
-                        'Assignment with id=`%s` of user with username=`%s` has been marked as completed by garbage collector.',
+                        "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.",
                         $assignment->getId(),
                         $assignment->getUser()->getUsername()
                     )

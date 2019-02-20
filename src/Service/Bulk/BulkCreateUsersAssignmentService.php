@@ -62,7 +62,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
                     $this->logBuffer[] = [
                         'message' => sprintf(
-                            'Successful assignment create operation (id=`%s`) for user with username=`%s`.',
+                            "Successful assignment create operation (id='%s') for user with username='%s'.",
                             $newAssignment->getId(),
                             $user->getUsername()
                         ),

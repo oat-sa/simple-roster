@@ -202,7 +202,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            'Successful assignment create operation (id=`2`) for user with username=`user1`.',
+            "Successful assignment create operation (id='2') for user with username='user1'.",
             Logger::INFO
         );
     }

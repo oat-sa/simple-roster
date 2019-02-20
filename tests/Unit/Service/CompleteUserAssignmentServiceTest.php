@@ -37,7 +37,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
     {
         $this->expectException(AssignmentNotFoundException::class);
-        $this->expectExceptionMessage('Assignment with id `5` not found.');
+        $this->expectExceptionMessage("Assignment with id '5' not found.");
 
         $this->subject->markAssignmentAsCompleted(5);
     }
@@ -102,7 +102,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                'Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.',
+                "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",
                 ['lineItem' => $assignment->getLineItem()]
             );
 

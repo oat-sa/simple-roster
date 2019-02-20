@@ -68,7 +68,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $batchSize = (int)$input->getOption('batch-size');
         if ($batchSize < 1) {
-            throw new InvalidArgumentException('Invalid `batch-size` argument received.');
+            throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
         }
 
         $offset = 0;
