@@ -39,16 +39,15 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
-        UserRepository $userRepository,
         Configuration $doctrineConfiguration,
         EntityManagerInterface $entityManager
     ) {
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->userRepository = $userRepository;
         $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
         $this->entityManager = $entityManager;
+        $this->userRepository = $this->entityManager->getRepository(User::class);
     }
 
     protected function configure()
@@ -85,7 +84,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $style->note('Warming up doctrine result cache...');
         $section->writeln('Number of warmed up cache entries: 0');
-        $numberOfTotalUsers = $this->userRepository->getTotalNumberOfUsers();
+        $numberOfTotalUsers = $this->getTotalNumberOfUsers();
         do {
             $iterateResult = $this
                 ->getFindAllUsersQuery($offset, $batchSize)
@@ -129,6 +128,16 @@ class DoctrineResultCacheWarmerCommand extends Command
             ->setFirstResult($offset)
             ->setMaxResults($batchSize)
             ->getQuery();
+    }
+
+    private function getTotalNumberOfUsers(): int
+    {
+        return (int)$this->entityManager
+            ->createQueryBuilder()
+            ->select('COUNT(u.id)')
+            ->from(User::class, 'u')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     private function warmUpResultCacheForUser(User $user): void

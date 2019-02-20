@@ -54,12 +54,4 @@ class UserRepository extends AbstractRepository
 
         return $user;
     }
-
-    public function getTotalNumberOfUsers(): int
-    {
-        return (int)$this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
 }
