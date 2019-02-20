@@ -2,11 +2,68 @@
 
 DevOps related information for setting up / debug / maintain the application.
 
-## Configuration file
+## Configuration
+
+#### Configuration file
 
 The main configuration file is `.env`, located in root folder.
 
-## Cache configuration
+#### Configuration parameters
+- Framework:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | APP_ENV | Application environment, `dev`, `prod` or `test` [default: `prod`] |
+    | APP_DEBUG | Application debug mode, [default: `false`] |
+    | APP_SECRET | Application secret |
+- AWS:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | AWS_REGION | AWS Region [default: `eu-west-1`] |
+    | AWS_VERSION | AWS Version [default: `latest`] |
+    | AWS_KEY | AWS Key |
+    | AWS_SECRET | AWS Secret |
+    | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
+- Database:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | DATABASE_URL | Database url |
+- Cache:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | REDIS_DOCTRINE_USER_CACHE_TTL | Doctrine User entity cache storage TTL [default: `3600`] |
+    | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
+    | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
+    | REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
+    | REDIS_SESSION_CACHE_PORT | Redis host for sessions cache storage |
+- CORS:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | CORS_ALLOW_ORIGIN | Allowed CORS origin |
+- Garbage collector:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
+- Frontend LTI return link:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
+- Blackfire:
+
+    | Parameter | Description |
+    | ------------- |:-------------|
+    | BLACKFIRE_SERVER_ID | Blackfire server id |
+    | BLACKFIRE_SERVER_TOKEN | Blackfire server token |
+
+
+
+#### Cache configuration
 
 The redis TTL value can be set in `.env`, with `REDIS_DOCTRINE_USER_CACHE_TTL` value.
 

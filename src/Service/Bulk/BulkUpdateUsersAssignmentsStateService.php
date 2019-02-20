@@ -9,6 +9,7 @@ use App\Bulk\Result\BulkResult;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
@@ -16,9 +17,16 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var array */
+    private $logBuffer = [];
+
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     public function process(BulkOperationCollection $operationCollection): BulkResult
@@ -36,6 +44,15 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
                     foreach ($user->getAvailableAssignments() as $assignment) {
                         $assignment->setState($operation->getAttribute('state'));
+
+                        $this->logBuffer[] = [
+                            'message' => sprintf(
+                                'Successful assignment update operation (id=`%s`) for user with username=`%s`.',
+                                $assignment->getId(),
+                                $user->getUsername()
+                            ),
+                            'lineItem' => $assignment->getLineItem(),
+                        ];
                     }
 
                     $this->entityManager->flush();
@@ -52,6 +69,13 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
         if (!$result->hasFailures()) {
             $this->entityManager->commit();
+
+            foreach ($this->logBuffer as $logRecord) {
+                $this->logger->info(
+                    $logRecord['message'],
+                    ['lineItem' => $logRecord['lineItem']]
+                );
+            }
         } else {
             $this->entityManager->rollback();
         }

@@ -7,8 +7,10 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
+    use LoggerTestingTrait;
 
     /** @var Client */
     private $client;
@@ -29,6 +32,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         $this->setUpFixtures();
 
         $this->client = self::createClient();
+
+        $this->setUpTestLogHandler();
     }
 
     public function testItThrowsBadRequestHttpExceptionIfRequestBodyIsInvalid(): void
@@ -177,6 +182,28 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
         $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
         $this->assertCount(1, $reloadedUser->getAvailableAssignments());
+    }
+
+    public function testItLogsSuccessfulBulkOperations(): void
+    {
+        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+
+        /** @var User $user */
+        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v1/bulk/assignments',
+            [],
+            [],
+            [],
+            $this->generateRequestPayload([$user->getUsername()])
+        );
+
+        $this->assertHasLogRecordWithMessage(
+            'Successful assignment create operation (id=`2`) for user with username=`user1`.',
+            Logger::INFO
+        );
     }
 
     private function generateRequestPayload(array $users): string

@@ -38,7 +38,7 @@ App\Entity\Assignment:
         lineItem:
             targetEntity: App\Entity\LineItem
             cascade: {  }
-            fetch: LAZY
+            fetch: EAGER
             mappedBy: null
             inversedBy: null
             joinColumns:
