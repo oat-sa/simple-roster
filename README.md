@@ -32,6 +32,7 @@ You can:
 
 Available commands:
 - **Data ingestion** : see [docs/cli/ingester-command.md](docs/cli/ingester-command.md)
+- **Native user data ingestion** : see [docs/cli/native-user-ingester-command.md](docs/cli/native-user-ingester-command.md)
 - **Garbage collection** (assignments) : see [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
 - **Doctrine result cache warming** : see [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md)
 

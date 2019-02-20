@@ -1,4 +1,4 @@
-# Ingesting
+# Data ingestion
 
 [IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `infrastructure`, `line-item` and `user` data.
 
