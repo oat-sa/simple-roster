@@ -2,7 +2,9 @@
 
 namespace App\Ingester\Source;
 
+use League\Csv\Exception;
 use League\Csv\Reader;
+use Traversable;
 
 class LocalCsvIngesterSource extends AbstractIngesterSource
 {
@@ -11,13 +13,15 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
         return 'local';
     }
 
-    public function getContent(): array
+    /**
+     * @throws Exception
+     */
+    public function getContent(): Traversable
     {
         $reader = Reader::createFromPath($this->path, 'r');
 
         return $reader
             ->setDelimiter($this->delimiter)
-            ->setOffset(1)
-            ->fetchAll();
+            ->setHeaderOffset(0);
     }
 }

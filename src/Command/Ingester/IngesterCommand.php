@@ -2,6 +2,7 @@
 
 namespace App\Command\Ingester;
 
+use App\Command\CommandWatcherTrait;
 use App\Ingester\Registry\IngesterRegistry;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Result\IngesterResult;
@@ -18,6 +19,8 @@ use Throwable;
 
 class IngesterCommand extends Command
 {
+    use CommandWatcherTrait;
+
     public const NAME = 'roster:ingest';
 
     /** @var IngesterRegistry */
@@ -25,9 +28,6 @@ class IngesterCommand extends Command
 
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
-
-    /** @var Stopwatch */
-    private $stopwatch;
 
     public function __construct(
         IngesterRegistry $ingesterRegistry,
@@ -38,7 +38,7 @@ class IngesterCommand extends Command
         $this->sourceRegistry = $sourceRegistry;
         $this->stopwatch = $stopwatch;
 
-        parent::__construct(static::NAME);
+        parent::__construct(self::NAME);
     }
 
     protected function configure()
@@ -87,7 +87,7 @@ class IngesterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->stopwatch->start(__CLASS__, __FUNCTION__);
+        $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
 
         try {
@@ -105,8 +105,7 @@ class IngesterCommand extends Command
 
             return 1;
         } finally {
-            $event = $this->stopwatch->stop(__CLASS__);
-            $style->note(sprintf('Took: %s', $event));
+            $style->note(sprintf('Took: %s', $this->stopwatch(self::NAME)));
         }
 
         return 0;

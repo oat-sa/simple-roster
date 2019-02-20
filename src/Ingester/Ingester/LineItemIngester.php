@@ -45,15 +45,15 @@ class LineItemIngester extends AbstractIngester
         $lineItem = new LineItem();
 
         $lineItem
-            ->setUri($data[0])
-            ->setLabel($data[1])
-            ->setSlug($data[2])
-            ->setInfrastructure($this->infrastructureCollection[$data[3]]);
+            ->setUri($data['uri'])
+            ->setLabel($data['label'])
+            ->setSlug($data['slug'])
+            ->setInfrastructure($this->infrastructureCollection[$data['infrastructure']]);
 
-        if (isset($data[4]) && $data[5]) {
+        if (isset($data['startTimestamp']) && $data['endTimestamp']) {
             $lineItem
-                ->setStartAt($this->createDateTime($data[4]))
-                ->setEndAt($this->createDateTime($data[5]));
+                ->setStartAt($this->createDateTime($data['startTimestamp']))
+                ->setEndAt($this->createDateTime($data['endTimestamp']));
         }
 
         return $lineItem;
