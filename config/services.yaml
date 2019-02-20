@@ -66,13 +66,9 @@ services:
             - { name: 'monolog.processor', channel: 'app' }
             - { name: 'monolog.processor', channel: 'security' }
 
-    App\Request\RequestIdGenerator:
-        arguments:
-            $uuidFactory: '@Ramsey\Uuid\UuidFactory'
-
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@app.session_storage.connection'
 
-    Ramsey\Uuid\UuidFactory:
+    Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory

@@ -3,10 +3,10 @@
 namespace App\Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\RequestIdGeneratorSubscriber;
-use App\Request\RequestIdGenerator;
 use App\Request\RequestIdStorage;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -14,8 +14,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class RequestIdGeneratorSubscriberTest extends TestCase
 {
-    /** @var RequestIdGenerator|PHPUnit_Framework_MockObject_MockObject */
-    private $requestIdGenerator;
+    /** @var UuidFactoryInterface|PHPUnit_Framework_MockObject_MockObject */
+    private $uuidFactory;
 
     /** @var RequestIdStorage */
     private $requestIdStorage;
@@ -30,11 +30,11 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $this->requestIdGenerator = $this->createMock(RequestIdGenerator::class);
+        $this->uuidFactory = $this->createMock(UuidFactoryInterface::class);
         $this->requestIdStorage = new RequestIdStorage();
         $this->getResponseEvent = $this->createMock(GetResponseEvent::class);
 
-        $this->subject = new RequestIdGeneratorSubscriber($this->requestIdGenerator, $this->requestIdStorage);
+        $this->subject = new RequestIdGeneratorSubscriber($this->uuidFactory, $this->requestIdStorage);
     }
 
     public function testItIsAnEventSubscriber(): void
@@ -75,9 +75,9 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     {
         $request = Request::create('/test');
 
-        $this->requestIdGenerator
+        $this->uuidFactory
             ->expects($this->once())
-            ->method('generate')
+            ->method('uuid4')
             ->willReturn('expectedRequestId');
 
         $this->getResponseEvent
