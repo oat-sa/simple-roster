@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -95,9 +96,9 @@ class NativeUserIngesterCommand extends Command
     }
 
     /**
-     * @param ConsoleOutput|OutputInterface $output
+     * @param ConsoleOutputInterface $output
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, $output): int
     {
         $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
@@ -118,7 +119,6 @@ class NativeUserIngesterCommand extends Command
             $lineItemCollection = $this->fetchLineItems();
 
             foreach ($source->getContent() as $row) {
-
                 $this->userQueryParts[] = sprintf(
                     "(%s, '%s', '%s', '[]')",
                     $index,

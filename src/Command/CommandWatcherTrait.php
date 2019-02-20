@@ -9,7 +9,7 @@ use DateTime;
 
 trait CommandWatcherTrait
 {
-    /** @var Stopwatch */
+    /** @var Stopwatch|null */
     private $watcher;
 
     private function startWatch(string $name, string $category): Stopwatch

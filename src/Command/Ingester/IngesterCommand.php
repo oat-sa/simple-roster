@@ -14,7 +14,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
 class IngesterCommand extends Command
@@ -31,12 +30,10 @@ class IngesterCommand extends Command
 
     public function __construct(
         IngesterRegistry $ingesterRegistry,
-        IngesterSourceRegistry $sourceRegistry,
-        Stopwatch $stopwatch
+        IngesterSourceRegistry $sourceRegistry
     ) {
         $this->ingesterRegistry = $ingesterRegistry;
         $this->sourceRegistry = $sourceRegistry;
-        $this->stopwatch = $stopwatch;
 
         parent::__construct(self::NAME);
     }
