@@ -18,5 +18,4 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 infection.json
-
 phpstan.neon
