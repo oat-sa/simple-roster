@@ -60,7 +60,7 @@ services:
         arguments:
             $doctrineConfiguration: '@doctrine.orm.default_configuration'
 
-    App\Logger\ExtendedLogProcessor:
+    App\Logger\UserRequestSessionLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
             - { name: 'monolog.processor', channel: 'app' }

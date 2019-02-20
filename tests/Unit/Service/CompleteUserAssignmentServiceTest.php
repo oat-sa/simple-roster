@@ -102,7 +102,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->method('info')
             ->with(
                 'Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.',
-                ['lineItem' => $assignment->getLineItem()->jsonSerialize()]
+                ['lineItem' => $assignment->getLineItem()]
             );
 
         $this->subject->markAssignmentAsCompleted(5);

@@ -56,8 +56,8 @@ class GetUserAssignmentLtiLinkAction
             $this->logger->info(
                 sprintf('LTI request was successfully generated for assignment with id=`%s`', $assignmentId),
                 [
-                    'ltiRequest' => $ltiRequest->jsonSerialize(),
-                    'lineItem' => $assignment->getLineItem()->jsonSerialize(),
+                    'ltiRequest' => $ltiRequest,
+                    'lineItem' => $assignment->getLineItem(),
                 ]
             );
 

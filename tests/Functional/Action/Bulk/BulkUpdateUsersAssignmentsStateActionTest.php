@@ -9,6 +9,8 @@ use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
+use Monolog\Logger;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -195,8 +197,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $this->generateRequestPayload([$user->getUsername()])
         );
 
-        $this->assertHasInfoLogRecordWithMessage(
-            'Successful assignment update operation (id=`1`) for user with username=`user1`.'
+        $this->assertHasLogRecordWithMessage(
+            'Successful assignment update operation (id=`1`) for user with username=`user1`.',
+            Logger::INFO
         );
     }
 

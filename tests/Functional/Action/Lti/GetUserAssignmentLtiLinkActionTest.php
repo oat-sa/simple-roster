@@ -13,6 +13,7 @@ use App\Tests\Traits\LoggerTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
 use DateTimeZone;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,13 +160,20 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->logInAs($user, $this->client);
 
         $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+        $ltiRequestInResponse = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertHasInfoLogRecord([
-            'message' => 'LTI request was successfully generated for assignment with id=`1`',
-            'context' => [
-                'ltiRequest' => json_decode($this->client->getResponse()->getContent(), true),
-                'lineItem' => $assignment->getLineItem()->jsonSerialize()
-            ]
-        ]);
+        $this->assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+        $this->assertHasRecordThatPasses(
+            function (array $record) use ($assignment, $ltiRequestInResponse) {
+                /** @var LtiRequest $ltiRequest */
+                $ltiRequest = $record['context']['ltiRequest'];
+
+                return
+                    $record['message'] === 'LTI request was successfully generated for assignment with id=`1`'
+                    && $ltiRequest->jsonSerialize() === $ltiRequestInResponse
+                    && $record['context']['lineItem'] === $assignment->getLineItem();
+            },
+            Logger::INFO
+        );
     }
 }

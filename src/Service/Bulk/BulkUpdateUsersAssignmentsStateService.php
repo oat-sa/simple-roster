@@ -51,7 +51,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                                 $assignment->getId(),
                                 $user->getUsername()
                             ),
-                            'lineItem' => $assignment->getLineItem()->jsonSerialize(),
+                            'lineItem' => $assignment->getLineItem(),
                         ];
                     }
 

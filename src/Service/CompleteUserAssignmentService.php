@@ -43,7 +43,7 @@ class CompleteUserAssignmentService
                 $assignmentId,
                 $assignment->getUser()->getUsername()
             ),
-            ['lineItem' => $assignment->getLineItem()->jsonSerialize()]
+            ['lineItem' => $assignment->getLineItem()]
         );
     }
 }

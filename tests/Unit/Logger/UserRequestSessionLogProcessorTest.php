@@ -3,14 +3,14 @@
 namespace App\Tests\Unit\Logger;
 
 use App\Entity\User;
-use App\Logger\ExtendedLogProcessor;
+use App\Logger\UserRequestSessionLogProcessor;
 use App\Request\RequestIdStorage;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
-class ExtendedLogProcessorTest extends TestCase
+class UserRequestSessionLogProcessorTest extends TestCase
 {
     /** @var Security|PHPUnit_Framework_MockObject_MockObject */
     private $security;
@@ -21,7 +21,7 @@ class ExtendedLogProcessorTest extends TestCase
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
-    /** @var ExtendedLogProcessor */
+    /** @var UserRequestSessionLogProcessor */
     private $subject;
 
     protected function setUp()
@@ -32,7 +32,7 @@ class ExtendedLogProcessorTest extends TestCase
         $this->session = $this->createMock(SessionInterface::class);
         $this->requestIdStorage = new RequestIdStorage();
 
-        $this->subject = new ExtendedLogProcessor($this->security, $this->session, $this->requestIdStorage);
+        $this->subject = new UserRequestSessionLogProcessor($this->security, $this->session, $this->requestIdStorage);
     }
 
     public function testItExtendsLogRecordWithRequestId(): void

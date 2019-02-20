@@ -8,6 +8,7 @@ use App\Tests\Traits\DatabaseManualFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -70,12 +71,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         );
 
         for ($i = 1; $i <= 10; $i++) {
-            $this->assertHasInfoLogRecordWithMessage(
+            $this->assertHasLogRecordWithMessage(
                 sprintf(
                     'Assignment with id=`%s` of user with username=`%s` has been marked as completed by garbage collector.',
                     $i,
                     'userWithStartedButStuckAssignment_' . $i
-                )
+                ),
+                Logger::INFO
             );
         }
 

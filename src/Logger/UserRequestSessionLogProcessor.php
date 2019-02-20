@@ -6,7 +6,7 @@ use App\Request\RequestIdStorage;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
-class ExtendedLogProcessor
+class UserRequestSessionLogProcessor
 {
     /** @var Security */
     private $security;

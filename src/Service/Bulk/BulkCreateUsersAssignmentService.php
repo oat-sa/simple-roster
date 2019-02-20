@@ -66,7 +66,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
                             $newAssignment->getId(),
                             $user->getUsername()
                         ),
-                        'lineItem' => $newAssignment->getLineItem()->jsonSerialize(),
+                        'lineItem' => $newAssignment->getLineItem(),
                     ];
                 } catch (Throwable $exception) {
                     $result->addBulkOperationFailure($operation);
