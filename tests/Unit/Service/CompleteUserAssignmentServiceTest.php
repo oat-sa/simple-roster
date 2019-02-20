@@ -3,10 +3,14 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Assignment;
+use App\Entity\Infrastructure;
+use App\Entity\LineItem;
+use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
 use App\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
@@ -16,12 +20,17 @@ class CompleteUserAssignmentServiceTest extends TestCase
     /** @var AssignmentRepository */
     private $assignmentRepository;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->assignmentRepository = $this->createMock(AssignmentRepository::class);
-        $this->subject = new CompleteUserAssignmentService($this->assignmentRepository);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->subject = new CompleteUserAssignmentService($this->assignmentRepository, $this->logger);
     }
 
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
@@ -34,7 +43,18 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
     public function testItMarksAssignmentAsCompleted(): void
     {
-        $assignment = (new Assignment())->setState(Assignment::STATE_STARTED);
+        $user = (new User())->setUsername('expectedUsername');
+
+        $lineItem = (new LineItem())
+            ->setInfrastructure(new Infrastructure())
+            ->setUri('uri')
+            ->setLabel('label')
+            ->setSlug('slug');
+
+        $assignment = (new Assignment())
+            ->setState(Assignment::STATE_STARTED)
+            ->setLineItem($lineItem)
+            ->setUser($user);
 
         $this->assignmentRepository
             ->expects($this->once())
@@ -52,6 +72,38 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects($this->once())
             ->method('flush');
+
+        $this->subject->markAssignmentAsCompleted(5);
+    }
+
+    public function testItLogsSuccessfulCompletion(): void
+    {
+        $user = (new User())->setUsername('expectedUsername');
+
+        $lineItem = (new LineItem())
+            ->setInfrastructure(new Infrastructure())
+            ->setUri('uri')
+            ->setLabel('label')
+            ->setSlug('slug');
+
+        $assignment = (new Assignment())
+            ->setState(Assignment::STATE_STARTED)
+            ->setLineItem($lineItem)
+            ->setUser($user);
+
+        $this->assignmentRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with(5)
+            ->willReturn($assignment);
+
+        $this->logger
+            ->expects($this->once())
+            ->method('info')
+            ->with(
+                'Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.',
+                ['lineItem' => $assignment->getLineItem()]
+            );
 
         $this->subject->markAssignmentAsCompleted(5);
     }
