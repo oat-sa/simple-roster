@@ -26,31 +26,8 @@ class UserRepositoryTest extends KernelTestCase
         $this->subject = self::$container->get(UserRepository::class);
     }
 
-    public function testItCanFindAllUsers(): void
+    public function testItCanGiveTheTotalNumberOfUsers(): void
     {
-        $users = $this->subject->findAllPaginated();
-
-        $this->assertCount(100, $users);
-        $this->assertCount(100, $users->getIterator());
-
-        $index = 1;
-        foreach ($users as $user) {
-            $this->assertEquals('user_' . $index, $user->getUsername());
-            $index++;
-        }
-    }
-
-    public function testItCanFindAllUsersPaginated(): void
-    {
-        $users = $this->subject->findAllPaginated(10, 5);
-
-        $this->assertCount(100, $users);
-        $this->assertCount(10, $users->getIterator());
-
-        $index = 6;
-        foreach ($users as $user) {
-            $this->assertEquals('user_' . $index, $user->getUsername());
-            $index++;
-        }
+        $this->assertEquals(100, $this->subject->getTotalNumberOfUsers());
     }
 }

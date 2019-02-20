@@ -32,7 +32,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItIteratesThroughAllUsers(): void
     {
-        $this->assertEquals(0, $this->commandTester->execute(['--batch-size' => 6]));
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => 6,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
         $this->assertContains(
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
@@ -44,6 +51,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `batch-size` argument received.');
 
-        $this->commandTester->execute(['--batch-size' => -1]);
+        $this->commandTester->execute(['--batch-size' => -1], ['capture_stderr_separately' => true]);
     }
 }
