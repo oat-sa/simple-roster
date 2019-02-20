@@ -2,6 +2,7 @@
 
 namespace App\Request;
 
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 
 class RequestIdGenerator
@@ -16,6 +17,9 @@ class RequestIdGenerator
 
     public function generate(): string
     {
-        return (string)$this->uuidFactory->uuid4();
+        /** @var Uuid $uuid */
+        $uuid = $this->uuidFactory->uuid4();
+
+        return (string)$uuid;
     }
 }

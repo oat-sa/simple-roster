@@ -188,8 +188,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     {
         Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
 
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_POST,

@@ -21,7 +21,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     /** @var AssignmentRepository|PHPUnit_Framework_MockObject_MockObject */
     private $assignmentRepository;
 
-    /** @var LoggerInterface */
+    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $logger;
 
     protected function setUp()

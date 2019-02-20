@@ -188,8 +188,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
     public function testItLogsSuccessfulBulkOperations(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_PATCH,
