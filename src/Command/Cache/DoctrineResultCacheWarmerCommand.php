@@ -2,6 +2,7 @@
 
 namespace App\Command\Cache;
 
+use App\Command\CommandWatcherTrait;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
@@ -12,12 +13,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
-    public const NAME = 'roster:doctrine-result-cache:warmup';
+    use CommandWatcherTrait;
 
+    public const NAME = 'roster:doctrine-result-cache:warmup';
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var Cache|null */
@@ -29,21 +30,16 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var UserRepository */
     private $userRepository;
 
-    /** @var Stopwatch */
-    private $stopwatch;
-
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
         UserRepository $userRepository,
-        Configuration $doctrineConfiguration,
-        Stopwatch $stopwatch
+        Configuration $doctrineConfiguration
     ) {
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
         $this->userRepository = $userRepository;
         $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
-        $this->stopwatch = $stopwatch;
     }
 
     protected function configure()
@@ -63,7 +59,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->stopwatch->start(self::NAME, __FUNCTION__);
+        $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
 
         $batchSize = (int)$input->getOption('batch-size');
@@ -95,7 +91,8 @@ class DoctrineResultCacheWarmerCommand extends Command
                 $numberOfWarmedUpCacheEntries
             )
         );
-        $style->note(sprintf('Took to %s:', $this->stopwatch->stop(self::NAME)));
+
+        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }

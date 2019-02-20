@@ -15,9 +15,9 @@ class InfrastructureIngester extends AbstractIngester
     protected function createEntity(array $data): EntityInterface
     {
         return (new Infrastructure())
-            ->setLabel($data[0])
-            ->setLtiDirectorLink($data[1])
-            ->setLtiKey($data[2])
-            ->setLtiSecret($data[3]);
+            ->setLabel($data['label'])
+            ->setLtiDirectorLink($data['ltiDirectorLink'])
+            ->setLtiKey($data['ltiKey'])
+            ->setLtiSecret($data['ltiSecret']);
     }
 }

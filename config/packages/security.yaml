@@ -2,12 +2,9 @@ security:
     encoders:
         App\Entity\User:
             algorithm: argon2i
-            # maximum memory (in KiB) that may be used to compute the Argon2 hash
-            memory_cost: 4096
-            #  number of times the Argon2 hash algorithm will be run
-            time_cost: 3
-            # number of threads to use for computing the Argon2 hash
-            threads: 2
+            memory_cost: 1024
+            time_cost: 1
+            threads: 1
 
     providers:
         app_user_provider:
