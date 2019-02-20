@@ -10,6 +10,5 @@ before_install:
   - composer install
 
 script:
-  - bin/phpunit
   - vendor/bin/infection --min-msi=80 --min-covered-msi=80
   - vendor/bin/phpstan -c phpstan.neon.travis.dist analyse --level=4
