@@ -2,6 +2,7 @@
 
 namespace App\Command\Ingester\Native;
 
+use App\Command\CommandWatcherTrait;
 use App\Entity\Assignment;
 use App\Entity\LineItem;
 use App\Entity\User;
@@ -17,12 +18,13 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Exception;
 use Throwable;
 
 class NativeUserIngesterCommand extends Command
 {
+    use CommandWatcherTrait;
+
     public const NAME = 'roster:native-ingest:user';
     private const BATCH_SIZE = 1000;
 
@@ -35,21 +37,16 @@ class NativeUserIngesterCommand extends Command
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
 
-    /** @var Stopwatch */
-    private $stopwatch;
-
     public function __construct(
         IngesterSourceRegistry $sourceRegistry,
         EntityManagerInterface $entityManager,
-        UserPasswordEncoderInterface $passwordEncoder,
-        Stopwatch $stopwatch
+        UserPasswordEncoderInterface $passwordEncoder
     ) {
         $this->sourceRegistry = $sourceRegistry;
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
-        $this->stopwatch = $stopwatch;
 
-        parent::__construct(static::NAME);
+        parent::__construct(self::NAME);
     }
 
     protected function configure()
@@ -90,20 +87,20 @@ class NativeUserIngesterCommand extends Command
 
     /**
      * @param InputInterface $input
-     * @param OutputInterface|ConsoleOutput $output
+     * @param ConsoleOutput|OutputInterface $output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', $input->getOption('memory'));
-
-        $this->stopwatch->start(__CLASS__, __FUNCTION__);
+        $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
 
         $section = $output->section();
         $section->writeln('Starting user ingestion...');
 
         try {
+            ini_set('memory_limit', $input->getOption('memory'));
+
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
@@ -154,8 +151,7 @@ class NativeUserIngesterCommand extends Command
 
             return 1;
         } finally {
-            $event = $this->stopwatch->stop(__CLASS__);
-            $style->note(sprintf('Took: %s', $event));
+            $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
         }
 
         return 0;
