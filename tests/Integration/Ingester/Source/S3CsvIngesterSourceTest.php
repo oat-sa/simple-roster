@@ -32,10 +32,10 @@ class S3CsvIngesterSourceTest extends TestCase
 
         foreach ($output as $row) {
             $this->assertCount(4, $row);
-            $this->assertContains('infra', $row[0]);
-            $this->assertContains('http://infra', $row[1]);
-            $this->assertContains('key', $row[2]);
-            $this->assertContains('secret', $row[3]);
+            $this->assertContains('infra', $row['label']);
+            $this->assertContains('http://infra', $row['ltiDirectorLink']);
+            $this->assertContains('key', $row['ltiKey']);
+            $this->assertContains('secret', $row['ltiSecret']);
         }
     }
 

@@ -85,10 +85,18 @@ class InfrastructureIngesterTest extends KernelTestCase
         $failure = current($output->getFailures());
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
-            ['infra_2', 'http://infra_2.com', 'key2'],
+            [
+                'label' => 'infra_2',
+                'ltiDirectorLink' => 'http://infra_2.com',
+                'ltiKey' => 'key2',
+                'ltiSecret' => null
+            ],
             $failure->getData()
         );
-        $this->assertContains('Undefined offset: 3', $failure->getReason());
+        $this->assertContains(
+            'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given,',
+            $failure->getReason()
+        );
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface
