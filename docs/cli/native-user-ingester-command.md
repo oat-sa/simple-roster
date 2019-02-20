@@ -12,7 +12,7 @@ $ bin/console roster:native-ingest:user <source> <path> [--batch=1000]
 | Option | Description |
 | ------------- |:-------------|
 | source | Can be **local**, or **s3** |
-| path      |  Local or S3 path to ingest data from |
+| path   |  Local or S3 path to ingest data from |
 
 #### Main options:
 
