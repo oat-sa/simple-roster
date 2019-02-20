@@ -10,7 +10,6 @@ use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
 use Monolog\Logger;
-use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
