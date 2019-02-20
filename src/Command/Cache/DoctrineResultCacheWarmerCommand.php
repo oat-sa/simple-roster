@@ -87,9 +87,13 @@ class DoctrineResultCacheWarmerCommand extends Command
         $section->writeln('Number of warmed up cache entries: 0');
         $numberOfTotalUsers = $this->userRepository->getTotalNumberOfUsers();
         do {
-            foreach ($this->getFindAllUsersQuery($offset, $batchSize)->iterate() as $row) {
+            $iterateResult = $this
+                ->getFindAllUsersQuery($offset, $batchSize)
+                ->iterate([], Query::HYDRATE_SIMPLEOBJECT);
+
+            foreach ($iterateResult as $row) {
                 /** @var User $user */
-                $user = $row[0];
+                $user = current($row);
                 $this->warmUpResultCacheForUser($user, $numberOfWarmedUpCacheEntries);
 
                 $numberOfWarmedUpCacheEntries++;

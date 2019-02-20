@@ -51,6 +51,13 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `batch-size` argument received.');
 
-        $this->commandTester->execute(['--batch-size' => -1], ['capture_stderr_separately' => true]);
+        $this->commandTester->execute(
+            [
+                '--batch-size' => -1,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
     }
 }
