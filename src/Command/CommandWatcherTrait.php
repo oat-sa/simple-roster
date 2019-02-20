@@ -58,6 +58,6 @@ trait CommandWatcherTrait
         $datetime->add(new DateInterval('PT' . $seconds . 'S'));
         $di = $datetime->diff(new DateTime());
 
-        return ltrim($di->format('%Dd %Hh %im %ss ' . str_pad($ms, 2, '0', STR_PAD_LEFT) . 'ms'), '0 dhms');
+        return ltrim($di->format('%Dd %Hh %im %ss ' . str_pad((string)$ms, 2, '0', STR_PAD_LEFT) . 'ms'), '0 dhms');
     }
 }
