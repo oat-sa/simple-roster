@@ -3,7 +3,9 @@
 namespace App\Ingester\Source;
 
 use Aws\S3\S3Client;
+use League\Csv\Exception;
 use League\Csv\Reader;
+use Traversable;
 
 class S3CsvIngesterSource extends AbstractIngesterSource
 {
@@ -24,7 +26,10 @@ class S3CsvIngesterSource extends AbstractIngesterSource
         return 's3';
     }
 
-    public function getContent()
+    /**
+     * @throws Exception
+     */
+    public function getContent(): Traversable
     {
         $result = $this->client->getObject([
             'Bucket' => $this->bucket,
@@ -35,7 +40,6 @@ class S3CsvIngesterSource extends AbstractIngesterSource
 
         return $reader
             ->setDelimiter($this->delimiter)
-            ->setOffset(1)
-            ->fetchAll();
+            ->setHeaderOffset(0);
     }
 }

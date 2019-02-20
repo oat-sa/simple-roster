@@ -77,12 +77,12 @@ class LineItemIngesterTest extends KernelTestCase
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
             [
-                'http://taoplatform.loc/delivery_2.rdf',
-                'label2',
-                'gra13_ita_1',
-                'infra_2',
-                '1546682400',
-                '1546713000'
+                'uri' => 'http://taoplatform.loc/delivery_2.rdf',
+                'label' => 'label2',
+                'slug' => 'gra13_ita_1',
+                'infrastructure' => 'infra_2',
+                'startTimestamp' => '1546682400',
+                'endTimestamp' => '1546713000'
             ],
             $failure->getData()
         );

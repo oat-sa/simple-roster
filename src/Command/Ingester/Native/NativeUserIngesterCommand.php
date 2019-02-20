@@ -26,7 +26,7 @@ class NativeUserIngesterCommand extends Command
     use CommandWatcherTrait;
 
     public const NAME = 'roster:native-ingest:user';
-    private const BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
@@ -36,6 +36,15 @@ class NativeUserIngesterCommand extends Command
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
+
+    /** @var array  */
+    private $userQueryParts = [];
+
+    /** @var array  */
+    private $assignmentQueryParts = [];
+
+    /** @var array  */
+    private $errors = [];
 
     public function __construct(
         IngesterSourceRegistry $sourceRegistry,
@@ -77,11 +86,11 @@ class NativeUserIngesterCommand extends Command
         );
 
         $this->addOption(
-            'memory',
-            'm',
+            'batch',
+            'b',
             InputOption::VALUE_REQUIRED,
-            'PHP memory limit',
-            '1G'
+            'Batch size',
+            self::DEFAULT_BATCH_SIZE
         );
     }
 
@@ -94,57 +103,59 @@ class NativeUserIngesterCommand extends Command
     {
         $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
-
         $section = $output->section();
         $section->writeln('Starting user ingestion...');
+        $batchSize = $input->getOption('batch');
+
+        $resultSetMapping = new ResultSetMapping();
+        $user = new User();
 
         try {
-            ini_set('memory_limit', $input->getOption('memory'));
-
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
                 ->setDelimiter($input->getOption('delimiter'));
 
-            $index = 1;
+            $index = $this->getAvailableStartIndex();
             $lineItemCollection = $this->fetchLineItems();
-            $resultSetMapping = new ResultSetMapping();
-            $user = new User();
-            $userQueryParts = [];
-            $assignmentQueryParts = [];
 
             foreach ($source->getContent() as $row) {
 
-                $userQueryParts[] = sprintf(
+                $this->userQueryParts[] = sprintf(
                     "(%s, '%s', '%s', '[]')",
                     $index,
-                    $row[0],
-                    $this->encodeUserPassword($user, $row[1])
+                    $row['username'],
+                    $this->encodeUserPassword($user, $row['password'])
                 );
 
-                $assignmentQueryParts[] = sprintf(
+                $this->assignmentQueryParts[] = sprintf(
                     "(%s, %s, %s, '%s')",
                     $index,
                     $index,
-                    $lineItemCollection[$row[2]]->getId(),
+                    $lineItemCollection[$row['slug']]->getId(),
                     Assignment::STATE_READY
                 );
 
-                if ($index % self::BATCH_SIZE === 0) {
-
-                    $this->executeNativeInsertions($resultSetMapping, $userQueryParts, $assignmentQueryParts);
-
-                    $userQueryParts = [];
-                    $assignmentQueryParts = [];
-
-                    $section->overwrite(sprintf('Number of users imported so far: %s', $index));
+                if ($index % $batchSize === 0) {
+                    $this->executeNativeInsertions($resultSetMapping);
+                    $section->overwrite(sprintf('Success: %s, batched errors: %s', $index, count($this->errors)));
                 }
 
                 $index++;
             }
 
-            $this->executeNativeInsertions($resultSetMapping, $userQueryParts, $assignmentQueryParts);
-            $section->overwrite(sprintf('Total of users imported: %s', $index));
+            $this->executeNativeInsertions($resultSetMapping);
+            $section->overwrite(sprintf(
+                'Total of users imported: %s, batched errors: %s',
+                $this->getRealUserCount(),
+                count($this->errors)
+            ));
+
+            if (!empty($this->errors)) {
+                foreach ($this->errors as $error) {
+                    $style->error($error);
+                }
+            }
 
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
@@ -157,21 +168,54 @@ class NativeUserIngesterCommand extends Command
         return 0;
     }
 
-    private function executeNativeInsertions(ResultSetMapping $mapping, array $userQueryParts, array $assignmentQueryParts): void
+    private function getAvailableStartIndex(): int
     {
-        $userQuery = sprintf(
-            "INSERT INTO users (id, username, password, roles) VALUES %s",
-            implode(',', $userQueryParts)
-        );
+        $index = $this->entityManager
+            ->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->select('MAX(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
+        return $index + 1;
+    }
 
-        $assignmentQuery = sprintf(
-            "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
-            implode(',', $assignmentQueryParts)
-        );
+    private function getRealUserCount(): int
+    {
+        $count = $this->entityManager
+            ->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
+        return (int)$count;
+    }
+
+    private function executeNativeInsertions(ResultSetMapping $mapping): void
+    {
+        try {
+            if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts)) {
+                $userQuery = sprintf(
+                    "INSERT INTO users (id, username, password, roles) VALUES %s",
+                    implode(',', $this->userQueryParts)
+                );
+
+                $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
+
+                $assignmentQuery = sprintf(
+                    "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
+                    implode(',', $this->assignmentQueryParts)
+                );
+
+                $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
+            }
+        } catch (Throwable $exception) {
+            $this->errors[] = $exception->getMessage();
+        }
+
+        $this->userQueryParts = [];
+        $this->assignmentQueryParts = [];
     }
 
     private function encodeUserPassword(User $user, string $value): string

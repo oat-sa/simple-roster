@@ -77,7 +77,11 @@ class UserIngesterTest extends KernelTestCase
         $failure = current($output->getFailures());
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
-            ['user_1', 'password1', 'gra13_ita_1'],
+            [
+                'username' => 'user_1',
+                'password' => 'password1',
+                'slug' => 'gra13_ita_1'
+            ],
             $failure->getData()
         );
         $this->assertContains('UNIQUE constraint failed: users.username', $failure->getReason());
