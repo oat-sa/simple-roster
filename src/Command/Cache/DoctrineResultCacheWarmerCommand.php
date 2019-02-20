@@ -3,14 +3,18 @@
 namespace App\Command\Cache;
 
 use App\Command\CommandWatcherTrait;
+use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -30,16 +34,20 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var UserRepository */
     private $userRepository;
 
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
-        UserRepository $userRepository,
-        Configuration $doctrineConfiguration
+        Configuration $doctrineConfiguration,
+        EntityManagerInterface $entityManager
     ) {
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->userRepository = $userRepository;
         $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
+        $this->entityManager = $entityManager;
+        $this->userRepository = $this->entityManager->getRepository(User::class);
     }
 
     protected function configure()
@@ -57,10 +65,14 @@ class DoctrineResultCacheWarmerCommand extends Command
         );
     }
 
+    /**
+     * @param ConsoleOutputInterface|OutputInterface $output
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->startWatch(self::NAME, __FUNCTION__);
         $style = new SymfonyStyle($input, $output);
+        $section = $output->section();
 
         $batchSize = (int)$input->getOption('batch-size');
         if ($batchSize < 1) {
@@ -71,19 +83,29 @@ class DoctrineResultCacheWarmerCommand extends Command
         $numberOfWarmedUpCacheEntries = 0;
 
         $style->note('Warming up doctrine result cache...');
+        $section->writeln('Number of warmed up cache entries: 0');
+        $numberOfTotalUsers = $this->getTotalNumberOfUsers();
         do {
-            $users = $this->userRepository->findAllPaginated($batchSize, $offset);
-            foreach ($users as $user) {
-                $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
-                $this->resultCacheImplementation->delete($resultCacheId);
+            $iterateResult = $this
+                ->getFindAllUsersQuery($offset, $batchSize)
+                ->iterate([], Query::HYDRATE_SIMPLEOBJECT);
 
-                // Refresh by query
-                $this->userRepository->getByUsernameWithAssignments($user->getUsername());
+            foreach ($iterateResult as $row) {
+                /** @var User $user */
+                $user = current($row);
+                $this->warmUpResultCacheForUser($user, $numberOfWarmedUpCacheEntries);
+
                 $numberOfWarmedUpCacheEntries++;
             }
 
+            if ($numberOfWarmedUpCacheEntries % $batchSize === 0) {
+                $section->overwrite(
+                    sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
+                );
+            }
+
             $offset += $batchSize;
-        } while ($users->getIterator()->count() === $batchSize);
+        } while ($offset <= $numberOfTotalUsers + $batchSize);
 
         $style->success(
             sprintf(
@@ -95,5 +117,37 @@ class DoctrineResultCacheWarmerCommand extends Command
         $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
+    }
+
+    private function getFindAllUsersQuery(int $offset, int $batchSize): Query
+    {
+        return $this->entityManager
+            ->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->setFirstResult($offset)
+            ->setMaxResults($batchSize)
+            ->getQuery();
+    }
+
+    private function getTotalNumberOfUsers(): int
+    {
+        return (int)$this->entityManager
+            ->createQueryBuilder()
+            ->select('COUNT(u.id)')
+            ->from(User::class, 'u')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function warmUpResultCacheForUser(User $user): void
+    {
+        $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
+        $this->resultCacheImplementation->delete($resultCacheId);
+
+        // Refresh by query
+        $this->userRepository->getByUsernameWithAssignments($user->getUsername());
+
+        $this->entityManager->detach($user);
     }
 }
