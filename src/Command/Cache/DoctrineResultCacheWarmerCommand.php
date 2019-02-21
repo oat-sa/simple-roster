@@ -85,17 +85,18 @@ class DoctrineResultCacheWarmerCommand extends Command
         $style->note('Warming up doctrine result cache...');
         $section->writeln('Number of warmed up cache entries: 0');
         $numberOfTotalUsers = $this->getTotalNumberOfUsers();
+
         do {
             $iterateResult = $this
-                ->getFindAllUsersQuery($offset, $batchSize)
-                ->iterate([], Query::HYDRATE_SIMPLEOBJECT);
+                ->getFindAllUsersNameQuery($offset, $batchSize)
+                ->iterate();
 
             foreach ($iterateResult as $row) {
-                /** @var User $user */
-                $user = current($row);
-                $this->warmUpResultCacheForUser($user, $numberOfWarmedUpCacheEntries);
+                $this->warmUpResultCacheForUserName(current($row)['username']);
 
                 $numberOfWarmedUpCacheEntries++;
+
+                unset($row);
             }
 
             if ($numberOfWarmedUpCacheEntries % $batchSize === 0) {
@@ -119,15 +120,16 @@ class DoctrineResultCacheWarmerCommand extends Command
         return 0;
     }
 
-    private function getFindAllUsersQuery(int $offset, int $batchSize): Query
+    private function getFindAllUsersNameQuery(int $offset, int $batchSize): Query
     {
         return $this->entityManager
             ->createQueryBuilder()
-            ->select('u')
+            ->select('u.username')
             ->from(User::class, 'u')
             ->setFirstResult($offset)
             ->setMaxResults($batchSize)
-            ->getQuery();
+            ->getQuery()
+            ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
     }
 
     private function getTotalNumberOfUsers(): int
@@ -140,14 +142,12 @@ class DoctrineResultCacheWarmerCommand extends Command
             ->getSingleScalarResult();
     }
 
-    private function warmUpResultCacheForUser(User $user): void
+    private function warmUpResultCacheForUserName(string $username): void
     {
-        $resultCacheId = $this->userCacheIdGenerator->generate($user->getUsername());
+        $resultCacheId = $this->userCacheIdGenerator->generate($username);
         $this->resultCacheImplementation->delete($resultCacheId);
 
         // Refresh by query
-        $this->userRepository->getByUsernameWithAssignments($user->getUsername());
-
-        $this->entityManager->detach($user);
+        $this->userRepository->getByUsernameWithAssignments($username);
     }
 }
