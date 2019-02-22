@@ -107,6 +107,10 @@ class LineItem implements JsonSerializable, EntityInterface
 
     public function isAvailableForDate(DateTimeInterface $date): bool
     {
+        if (null === $this->startAt || null === $this->endAt) {
+            return true;
+        }
+
         return $this->startAt <= $date && $this->endAt >= $date;
     }
 

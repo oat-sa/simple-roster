@@ -34,8 +34,13 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
-        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER);
+        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER)
+            ?? $this->uuidFactory->uuid4();
 
         if (!$requestId) {
             /** @var Uuid $requestId */
