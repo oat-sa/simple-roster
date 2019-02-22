@@ -39,7 +39,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
     {
         $this->requestIdStorage->setRequestId('expectedRequestId');
 
-        $logRecord = call_user_func_array($this->subject, [['logRecord']]);
+        $logRecord = call_user_func($this->subject, ['logRecord']);
 
         $this->assertArraySubset(['extra' => ['requestId' => 'expectedRequestId']], $logRecord);
     }

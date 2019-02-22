@@ -193,14 +193,14 @@ class NativeUserIngesterCommand extends Command
         try {
             if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts)) {
                 $userQuery = sprintf(
-                    "INSERT INTO users (id, username, password, roles) VALUES %s",
+                    'INSERT INTO users (id, username, password, roles) VALUES %s',
                     implode(',', $this->userQueryParts)
                 );
 
                 $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
 
                 $assignmentQuery = sprintf(
-                    "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
+                    'INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s',
                     implode(',', $this->assignmentQueryParts)
                 );
 

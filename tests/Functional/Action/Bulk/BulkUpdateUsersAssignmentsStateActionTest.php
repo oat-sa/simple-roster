@@ -9,7 +9,6 @@ use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
-use DateTime;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

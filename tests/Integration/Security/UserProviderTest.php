@@ -86,7 +86,6 @@ class UserProviderTest extends KernelTestCase
 
             public function eraseCredentials()
             {
-                return;
             }
         };
     }

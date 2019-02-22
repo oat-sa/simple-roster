@@ -8,7 +8,6 @@ use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

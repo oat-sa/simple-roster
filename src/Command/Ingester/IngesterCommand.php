@@ -102,7 +102,7 @@ class IngesterCommand extends Command
 
             return 1;
         } finally {
-            $style->note(sprintf('Took: %s', $this->stopwatch(self::NAME)));
+            $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
         }
 
         return 0;

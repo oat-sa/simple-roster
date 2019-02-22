@@ -46,7 +46,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 12, batched errors: 0",
+            'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -76,7 +76,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 12, batched errors: 0",
+            'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -126,7 +126,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 1, batched errors: 1",
+            'Total of users imported: 1, batched errors: 1',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 

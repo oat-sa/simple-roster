@@ -2,8 +2,6 @@
 
 namespace App\Tests\Traits;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -16,7 +14,7 @@ trait DatabaseTrait
 {
     use BaseDatabaseTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->setUpDatabase();
     }
