@@ -8,7 +8,9 @@ services:
         public: false
         bind:
             $debug: '%env(resolve:APP_DEBUG)%'
-            $ltiLaunchPresentationReturnUrl: '%env(LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+            $ltiInstances: '%ltiInstances%'
+            $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+            $ltiInstancesLoadBalancerEnabled: '%env(bool:LTI_ENABLE_INSTANCES_LOAD_BALANCER)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
