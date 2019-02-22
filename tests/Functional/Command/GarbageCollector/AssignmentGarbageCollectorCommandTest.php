@@ -32,7 +32,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
 
-        Carbon::setTestNow(new DateTime());
+        Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }
 
     public function testOutputWhenThereIsNothingToUpdate(): void

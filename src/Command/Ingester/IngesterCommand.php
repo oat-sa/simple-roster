@@ -111,12 +111,12 @@ class IngesterCommand extends Command
     private function displayIngestionResult(IngesterResult $result, SymfonyStyle $style): void
     {
         if (!$result->hasFailures()) {
-            $style->success($result);
+            $style->success((string)$result);
 
             return;
         }
 
-        $style->warning($result);
+        $style->warning((string)$result);
         $style->table(
             ['Line', 'Data', 'Reason'],
             array_map(function (IngesterResultFailure $failure): array {

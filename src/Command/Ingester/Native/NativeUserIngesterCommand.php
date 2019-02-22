@@ -94,7 +94,7 @@ class NativeUserIngesterCommand extends Command
             self::DEFAULT_BATCH_SIZE
         );
     }
-    
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startWatch(self::NAME, __FUNCTION__);

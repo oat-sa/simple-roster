@@ -107,7 +107,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
     public function testItDoesNotUpdateAssignmentsStateWithInvalidUsersProvided(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);

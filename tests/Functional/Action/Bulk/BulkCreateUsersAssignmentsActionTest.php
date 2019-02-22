@@ -143,7 +143,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -186,7 +186,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItLogsSuccessfulBulkOperations(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);

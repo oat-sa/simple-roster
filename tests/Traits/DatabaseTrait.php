@@ -4,9 +4,11 @@ namespace App\Tests\Traits;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
+use LogicException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -40,12 +42,21 @@ trait DatabaseTrait
         return self::$kernel->getContainer()->get('doctrine');
     }
 
-    /**
-     * @return ObjectManager|EntityManager
-     */
-    protected function getEntityManager(): ObjectManager
+    protected function getEntityManager(): EntityManagerInterface
     {
-        return $this->getManagerRegistry()->getManager();
+        $manager = $this->getManagerRegistry()->getManager();
+
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new LogicException(
+                sprintf(
+                    "ManagerRegistry returned '%s', '%s' expected",
+                    get_class($manager),
+                    EntityManagerInterface::class
+                )
+            );
+        }
+
+        return $manager;
     }
 
     protected function getRepository(string $class): EntityRepository
