@@ -10,11 +10,13 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
+use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Exception;
@@ -92,15 +94,13 @@ class NativeUserIngesterCommand extends Command
             self::DEFAULT_BATCH_SIZE
         );
     }
-
-    /**
-     * @param ConsoleOutputInterface $output
-     */
-    protected function execute(InputInterface $input, $output): int
+    
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startWatch(self::NAME, __FUNCTION__);
-        $style = new SymfonyStyle($input, $output);
-        $section = $output->section();
+        $consoleOutput = $this->ensureConsoleOutput($output);
+        $style = new SymfonyStyle($input, $consoleOutput);
+        $section = $consoleOutput->section();
         $section->writeln('Starting user ingestion...');
         $batchSize = $input->getOption('batch');
 
@@ -238,5 +238,22 @@ class NativeUserIngesterCommand extends Command
         }
 
         return $lineItemCollection;
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
+    {
+        if (!$output instanceof ConsoleOutputInterface) {
+            throw new LogicException(
+                sprintf(
+                    "Output must be instance of '%s' because of section usage.",
+                    ConsoleOutputInterface::class
+                )
+            );
+        }
+
+        return $output;
     }
 }

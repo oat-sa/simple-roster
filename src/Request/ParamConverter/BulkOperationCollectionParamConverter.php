@@ -39,7 +39,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration)
     {
-        if (empty($configuration->getClass())) {
+        if (null == $configuration->getClass()) {
             return false;
         }
 

@@ -47,7 +47,7 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
             $requestId = $this->uuidFactory->uuid4();
         }
 
-        $request->attributes->set('requestId', (string)$requestId);
         $this->requestIdStorage->setRequestId((string)$requestId);
+        $request->attributes->set('requestId', $this->requestIdStorage->getRequestId());
     }
 }

@@ -317,9 +317,6 @@
     "sebastian/resource-operations": {
         "version": "1.0.0"
     },
-    "sebastian/version": {
-        "version": "2.0.1"
-    },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
         "recipe": {
