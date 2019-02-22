@@ -60,7 +60,7 @@ class GetUserAssignmentLtiRequestService
         $ltiLink = sprintf(
             '%s/%s',
             $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
-            base64_encode(json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
+            base64_encode((string)json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
         );
 
         $signature = $this->signer->sign(
@@ -113,9 +113,13 @@ class GetUserAssignmentLtiRequestService
             'user_id' => $assignment->getUser()->getId(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
-            'lis_outcome_service_url' => $this->router->generate('updateLtiOutcome', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'lis_outcome_service_url' => $this->router->generate(
+                'updateLtiOutcome',
+                [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
             'lis_result_sourcedid' => $assignment->getId(),
-            'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl
+            'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
         ];
     }
 }

@@ -23,7 +23,7 @@ class LoginActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['username' => 'invalid', 'password' => 'invalid'])
+            (string)json_encode(['username' => 'invalid', 'password' => 'invalid'])
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
@@ -47,7 +47,7 @@ class LoginActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['username' => 'user1', 'password' => 'password'])
+            (string)json_encode(['username' => 'user1', 'password' => 'password'])
         );
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());

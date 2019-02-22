@@ -88,7 +88,7 @@ class IngesterCommand extends Command
         $style = new SymfonyStyle($input, $output);
 
         try {
-            $ingester = $this->ingesterRegistry->get($input->getArgument('type'));
+            $ingester = $this->ingesterRegistry->get((string)$input->getArgument('type'));
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))

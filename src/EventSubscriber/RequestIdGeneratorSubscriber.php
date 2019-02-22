@@ -39,8 +39,7 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER)
-            ?? $this->uuidFactory->uuid4();
+        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER);
 
         if (!$requestId) {
             /** @var Uuid $requestId */

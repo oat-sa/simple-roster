@@ -43,6 +43,7 @@ class BulkOperationCollectionParamConverterTest extends TestCase
 
         $paramConverter->setName($expectedParameterName);
 
+        /** @var string $requestBodyContent */
         $requestBodyContent = json_encode([
             ['identifier' => 'user1'],
             ['identifier' => 'user2'],

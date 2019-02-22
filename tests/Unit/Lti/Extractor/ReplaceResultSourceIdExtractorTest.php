@@ -12,9 +12,10 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $subject = new ReplaceResultSourceIdExtractor();
 
-        $this->assertEquals(1, $subject->extractSourceId(
-            file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml')
-        ));
+        /** @var string $xmlContent */
+        $xmlContent = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
+
+        $this->assertEquals(1, $subject->extractSourceId($xmlContent));
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlContent(): void
@@ -32,8 +33,11 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         $subject = new ReplaceResultSourceIdExtractor();
 
-        $subject->extractSourceId(
-            file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml')
+        /** @var string $xmlContent */
+        $xmlContent = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
         );
+
+        $subject->extractSourceId($xmlContent);
     }
 }

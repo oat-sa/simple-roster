@@ -216,6 +216,6 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             ];
         }
 
-        return json_encode($payload);
+        return (string)json_encode($payload);
     }
 }
