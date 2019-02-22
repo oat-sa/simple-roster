@@ -33,8 +33,13 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
-        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER) ?? $this->requestIdGenerator->generate();
+        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER)
+            ?? $this->requestIdGenerator->generate();
 
         $request->attributes->set('requestId', $requestId);
         $this->requestIdStorage->setRequestId($requestId);
