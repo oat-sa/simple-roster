@@ -146,6 +146,56 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
     }
 
+    public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStarted(): void
+    {
+        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
+
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->client);
+
+        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $this->assertEquals(
+            [
+                'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiParams' => [
+                    'oauth_body_hash' => '',
+                    'oauth_consumer_key' => 'myKey',
+                    'oauth_nonce' => (new NonceGenerator())->generate(),
+                    'oauth_signature' => 'vAeVvGcxolp529UcrtUV5IMh+Yo=',
+                    'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
+                    'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
+                    'oauth_version' => OAuthContext::VERSION_1_0,
+                    'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+                    'lti_version' => LtiRequest::LTI_VERSION,
+                    'context_id' => 1,
+                    'context_label' => 'lineItemSlug',
+                    'context_title' => 'The first line item',
+                    'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
+                    'roles' => LtiRequest::LTI_ROLE,
+                    'user_id' => 1,
+                    'lis_person_name_full' => 'user1',
+                    'resource_link_id' => 1,
+                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
+                    'lis_result_sourcedid' => 1,
+                    'launch_presentation_return_url' => 'http://example.com/index.html'
+                ]
+            ],
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+    }
+
     public function testItLogsSuccessfulLtiRequestCreation(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));

@@ -1,0 +1,5 @@
+parameters:
+    ltiInstances:
+        - http://lb_infra_1
+        - http://lb_infra_2
+        - http://lb_infra_3
