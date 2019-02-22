@@ -65,6 +65,10 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->method('getRequest')
             ->willReturn($request);
 
+        $this->getResponseEvent
+            ->method('isMasterRequest')
+            ->willReturn(true);
+
         $this->subject->onKernelRequest($this->getResponseEvent);
 
         $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
@@ -84,9 +88,26 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->method('getRequest')
             ->willReturn($request);
 
+        $this->getResponseEvent
+            ->method('isMasterRequest')
+            ->willReturn(true);
+
         $this->subject->onKernelRequest($this->getResponseEvent);
 
         $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
         $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
+    }
+
+    public function testItWillNotSetRequestIdOnSubRequests(): void
+    {
+        $this->getResponseEvent
+            ->method('isMasterRequest')
+            ->willReturn(false);
+
+        $this->requestIdGenerator
+            ->expects($this->never())
+            ->method('generate');
+
+        $this->subject->onKernelRequest($this->getResponseEvent);
     }
 }
