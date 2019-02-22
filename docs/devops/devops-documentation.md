@@ -77,6 +77,12 @@ This value should be greater than the duration on the test campaign (so it never
 $ composer install --optimize-autoloader
 ```
 
+- Optimize composer autoloader
+
+```bash
+$ composer dump-autoload --optimize --no-dev --classmap-authoritative
+```
+
 - Create database with Doctrine
 
 ```bash
@@ -144,3 +150,7 @@ $ bin/console
 ## Application logs file
 
 Application logs are populated in `var/log/[dev|prod].log`
+
+## Performances checklist
+
+Also, for prod instances, we should follow this [checklist](https://symfony.com/doc/current/performance.html). 

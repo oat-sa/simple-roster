@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -54,23 +53,5 @@ class UserRepository extends AbstractRepository
         }
 
         return $user;
-    }
-
-    /**
-     * @return Paginator|User[]
-     */
-    public function findAllPaginated(int $limit = null, int $offset = null): Paginator
-    {
-        $query = $this
-            ->createQueryBuilder('u')
-            ->select('u, a, l, i')
-            ->leftJoin('u.assignments', 'a')
-            ->leftJoin('a.lineItem', 'l')
-            ->leftJoin('l.infrastructure', 'i')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery();
-
-        return new Paginator($query);
     }
 }
