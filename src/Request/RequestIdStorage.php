@@ -20,7 +20,7 @@ class RequestIdStorage
     public function setRequestId(string $requestId): self
     {
         if ($this->requestId) {
-            throw new LogicException('Request ID should not be set more than time per request.');
+            throw new LogicException('Request ID should not be set more than one time per request.');
         }
 
         $this->requestId = $requestId;
