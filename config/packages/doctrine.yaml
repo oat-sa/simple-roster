@@ -16,17 +16,14 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
         metadata_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
+            type: service
+            id: app.doctrine_cache.provider
         query_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
+            type: service
+            id: app.doctrine_cache.provider
         result_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
+            type: service
+            id: app.doctrine_cache.provider
         mappings:
             App:
                 is_bundle: false
