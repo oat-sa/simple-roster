@@ -26,7 +26,7 @@ class LtiInstanceLoadBalancer
     {
         $asciiSum = 0;
 
-        for ($i = 0; $i < strlen($value); $i++) {
+        for ($i = 0, $iMax = strlen($value); $i < $iMax; $i++) {
             $asciiSum += ord($value[$i]);
         }
 

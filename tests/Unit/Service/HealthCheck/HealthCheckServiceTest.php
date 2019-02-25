@@ -58,7 +58,6 @@ class HealthCheckServiceTest extends TestCase
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertInstanceOf(HealthCheckResult::class, $output);
         $this->assertTrue($output->isDoctrineConnectionAvailable());
         $this->assertTrue($output->isDoctrineCacheAvailable());
     }
@@ -94,7 +93,6 @@ class HealthCheckServiceTest extends TestCase
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertInstanceOf(HealthCheckResult::class, $output);
         $this->assertFalse($output->isDoctrineConnectionAvailable());
         $this->assertFalse($output->isDoctrineCacheAvailable());
     }

@@ -10,7 +10,8 @@
     "summary": "var/log/infection/summary.log",
     "perMutator": "var/log/infection/per-mutator.md"
   },
-  "tmpDir": "var/cache/infection",
-  "testFramework": "phpunit",
-  "testFrameworkOptions": "-vvv"
+  "phpUnit": {
+    "customPath": "bin/phpunit"
+  },
+  "tmpDir": "var/cache/infection"
 }
