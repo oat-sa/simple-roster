@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.87.16",
+            "version": "3.87.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "b6954b03e1c212b849ecf103e5f593b15b06b058"
+                "reference": "2f38294b8c0ce62278e53b060f488516eb4e9163"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b6954b03e1c212b849ecf103e5f593b15b06b058",
-                "reference": "b6954b03e1c212b849ecf103e5f593b15b06b058",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2f38294b8c0ce62278e53b060f488516eb4e9163",
+                "reference": "2f38294b8c0ce62278e53b060f488516eb4e9163",
                 "shasum": ""
             },
             "require": {
@@ -86,7 +86,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-02-21T19:16:06+00:00"
+            "time": "2019-02-22T19:34:32+00:00"
         },
         {
             "name": "aws/aws-sdk-php-symfony",
@@ -1818,28 +1818,29 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.12.0",
+            "version": "2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "35dc8834ae9ad79b77c22d1e276fd838ca8c503d"
+                "reference": "d77e6cd59e1bb7aad6ad8060a61a440251627ed0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/35dc8834ae9ad79b77c22d1e276fd838ca8c503d",
-                "reference": "35dc8834ae9ad79b77c22d1e276fd838ca8c503d",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/d77e6cd59e1bb7aad6ad8060a61a440251627ed0",
+                "reference": "d77e6cd59e1bb7aad6ad8060a61a440251627ed0",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.1.8",
+                "php": "^7.1.8 || ^8.0",
                 "symfony/translation": "^3.4 || ^4.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.14 || ^3.0",
+                "kylekatarnls/multi-tester": "^0.1",
                 "phpmd/phpmd": "^2.6",
                 "phpstan/phpstan": "^0.10.8",
-                "phpunit/phpunit": "^7.1.5",
+                "phpunit/phpunit": "^7.5 || ^8.0",
                 "squizlabs/php_codesniffer": "^3.4"
             },
             "type": "library",
@@ -1873,7 +1874,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-02-06T21:23:55+00:00"
+            "time": "2019-02-20T20:39:03+00:00"
         },
         {
             "name": "oat-sa/phing-tasks",
