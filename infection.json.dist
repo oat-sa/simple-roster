@@ -2,6 +2,9 @@
   "source": {
     "directories": [
       "src"
+    ],
+    "excludes": [
+      "Kernel.php"
     ]
   },
   "timeout": 10,
@@ -9,6 +12,10 @@
     "text": "var/log/infection/infection.log",
     "summary": "var/log/infection/summary.log",
     "perMutator": "var/log/infection/per-mutator.md"
+  },
+  "mutators": {
+    "@default": true,
+    "@removal": false
   },
   "phpUnit": {
     "customPath": "bin/phpunit"

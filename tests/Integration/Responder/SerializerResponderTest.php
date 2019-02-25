@@ -29,7 +29,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createJsonResponse($data);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals(json_encode($data), $response->getContent());
     }
@@ -44,7 +43,6 @@ class SerializerResponderTest extends KernelTestCase
             ['some' => 'header']
         );
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
         $this->assertEquals(json_encode($data), $response->getContent());
@@ -58,7 +56,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertArraySubset(
             [
@@ -78,7 +75,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertArraySubset(
             [
@@ -102,7 +98,6 @@ class SerializerResponderTest extends KernelTestCase
             ['some' => 'header']
         );
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
         $this->assertArraySubset(
@@ -123,7 +118,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertArraySubset(
             [
@@ -147,7 +141,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(
@@ -168,7 +161,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(
@@ -193,7 +185,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(
@@ -214,7 +205,6 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(

@@ -34,7 +34,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertEquals(12, $output->getSuccessCount());
@@ -62,7 +61,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
@@ -95,7 +93,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(12, $output->getSuccessCount());

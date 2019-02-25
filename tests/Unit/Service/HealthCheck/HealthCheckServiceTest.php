@@ -2,7 +2,6 @@
 
 namespace App\Tests\Unit\Service\HealthCheck;
 
-use App\HealthCheck\HealthCheckResult;
 use App\Service\HealthCheck\HealthCheckService;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
@@ -68,7 +67,7 @@ class HealthCheckServiceTest extends TestCase
         $resultCacheImplMock
             ->expects($this->once())
             ->method('getStats')
-            ->willReturn([]);
+            ->willReturn(null);
 
         $configurationMock = $this->createMock(Configuration::class);
         $configurationMock

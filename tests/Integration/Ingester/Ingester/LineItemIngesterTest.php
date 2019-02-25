@@ -33,7 +33,6 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertEquals(6, $output->getSuccessCount());
@@ -61,7 +60,6 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
@@ -97,7 +95,6 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(6, $output->getSuccessCount());

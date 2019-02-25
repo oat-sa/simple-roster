@@ -39,7 +39,7 @@ trait CommandWatcherTrait
 
     private function formatMemory(int $memory, int $precision = 2): string
     {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($memory, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));

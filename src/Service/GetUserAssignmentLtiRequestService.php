@@ -99,7 +99,7 @@ class GetUserAssignmentLtiRequestService
      */
     private function checkIfAssignmentCanBeProcessed(Assignment $assignment): void
     {
-        if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED])) {
+        if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED], true)) {
             throw new AssignmentNotProcessableException(
                 sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );

@@ -49,7 +49,7 @@ class IngesterCommandTest extends KernelTestCase
             'type' => 'infrastructure',
             'source' => 'local',
             'path' => __DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv',
-            '--force' => true
+            '--force' => 'true' // Test if it gets casted properly
         ]);
 
         $this->assertEquals(0, $output);

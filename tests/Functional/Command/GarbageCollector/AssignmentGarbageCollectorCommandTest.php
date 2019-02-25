@@ -64,7 +64,11 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadTestFixtures();
 
-        $this->assertEquals(0, $this->commandTester->execute(['--force' => true]));
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--force' => 'true', // Test if it gets casted properly
+            ]
+        ));
         $this->assertContains(
             "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
@@ -107,7 +111,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testOutputInCaseOfException(): void
     {
-        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => -1]));
+        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => 0]));
         $this->assertContains("[ERROR] Invalid 'batch-size' argument received.", $this->commandTester->getDisplay());
     }
 

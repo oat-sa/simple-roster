@@ -36,33 +36,34 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
-            if ($operation->getType() === BulkOperation::TYPE_UPDATE) {
-                try {
-                    /** @var UserRepository $userRepository */
-                    $userRepository = $this->entityManager->getRepository(User::class);
-                    $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+            if ($operation->getType() !== BulkOperation::TYPE_UPDATE) {
+                $result->addBulkOperationFailure($operation);
+                continue;
+            }
 
-                    foreach ($user->getAvailableAssignments() as $assignment) {
-                        $assignment->setState($operation->getAttribute('state'));
+            try {
+                /** @var UserRepository $userRepository */
+                $userRepository = $this->entityManager->getRepository(User::class);
+                $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
 
-                        $this->logBuffer[] = [
-                            'message' => sprintf(
-                                "Successful assignment update operation (id='%s') for user with username='%s'.",
-                                $assignment->getId(),
-                                $user->getUsername()
-                            ),
-                            'lineItem' => $assignment->getLineItem(),
-                        ];
-                    }
+                foreach ($user->getAvailableAssignments() as $assignment) {
+                    $assignment->setState($operation->getAttribute('state'));
 
-                    $this->entityManager->flush();
-
-                    $result->addBulkOperationSuccess($operation);
-
-                } catch (Throwable $exception) {
-                    $result->addBulkOperationFailure($operation);
+                    $this->logBuffer[] = [
+                        'message' => sprintf(
+                            "Successful assignment update operation (id='%s') for user with username='%s'.",
+                            $assignment->getId(),
+                            $user->getUsername()
+                        ),
+                        'lineItem' => $assignment->getLineItem(),
+                    ];
                 }
-            } else {
+
+                $this->entityManager->flush();
+
+                $result->addBulkOperationSuccess($operation);
+
+            } catch (Throwable $exception) {
                 $result->addBulkOperationFailure($operation);
             }
         }

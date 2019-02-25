@@ -65,7 +65,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             [],
             [],
             [],
-            $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT + 1))
+            $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT))
         );
 
         $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->client->getResponse()->getStatusCode());

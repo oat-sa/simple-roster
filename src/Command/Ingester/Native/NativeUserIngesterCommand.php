@@ -152,7 +152,6 @@ class NativeUserIngesterCommand extends Command
                     $style->error($error);
                 }
             }
-
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 
