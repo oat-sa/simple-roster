@@ -16,6 +16,7 @@ The main configuration file is `.env`, located in root folder.
     | APP_ENV | Application environment, `dev`, `prod` or `test` [default: `prod`] |
     | APP_DEBUG | Application debug mode, [default: `false`] |
     | APP_SECRET | Application secret |
+    | APP_API_KEY | Application API Key |
 - AWS:
 
     | Parameter | Description |
