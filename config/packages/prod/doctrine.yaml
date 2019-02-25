@@ -1,28 +1,3 @@
 doctrine:
-    dbal:
-        # configure these for your database server
-        driver: 'pdo_pgsql'
-        charset: utf8
-        url: '%env(resolve:DATABASE_URL)%'
     orm:
         auto_generate_proxy_classes: false
-        naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
-        metadata_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
-        query_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
-        result_cache_driver:
-            type: redis
-            host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-            port: '%env(resolve:REDIS_DOCTRINE_CACHE_PORT)%'
-        mappings:
-            App:
-                is_bundle: false
-                type: yml
-                dir: '%kernel.project_dir%/config/doctrine'
-                prefix: 'App\Entity'

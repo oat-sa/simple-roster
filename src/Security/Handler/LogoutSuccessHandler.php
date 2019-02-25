@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\Security;
+namespace App\Security\Handler;
 
 use App\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\JsonResponse;
