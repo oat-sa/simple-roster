@@ -28,6 +28,21 @@ services:
                   - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
                   - '%env(int:REDIS_SESSION_CACHE_PORT)%'
 
+    app.doctrine_cache.connection:
+        class: Redis
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+                  - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+
+    app.doctrine_cache.provider:
+        class: Doctrine\Common\Cache\RedisCache
+        calls:
+            - method: setRedis
+              arguments:
+                  - '@app.doctrine_cache.connection'
+
     App\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
