@@ -10,6 +10,8 @@ use Throwable;
 
 class SerializerResponder
 {
+    public const DEFAULT_ERROR_MESSAGE = 'An error occurred.';
+
     /** @var SerializerInterface */
     private $serializer;
     
@@ -33,17 +35,20 @@ class SerializerResponder
 
     public function createErrorJsonResponse(Throwable $exception, int $statusCode = 500, array $headers = []): JsonResponse
     {
+        $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode;
+
         $content = [
-            'message' => $exception->getMessage()
+            'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE
         ];
 
         if ($this->debug) {
+            $content['message'] = $exception->getMessage();
             $content['trace'] = $exception->getTraceAsString();
         }
 
         return JsonResponse::fromJsonString(
             $this->serializer->serialize(['error' => $content], 'json'),
-            $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode,
+            $statusCode,
             $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : $headers
         );
     }
