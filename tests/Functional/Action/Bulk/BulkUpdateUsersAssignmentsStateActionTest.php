@@ -30,9 +30,31 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         $this->setUpDatabase();
         $this->setUpFixtures();
 
-        $this->client = self::createClient();
+        $this->client = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . $_ENV['APP_API_KEY']]);
 
         $this->setUpTestLogHandler();
+    }
+
+    public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(): void
+    {
+        $this->client->request(
+            Request::METHOD_PATCH,
+            '/api/v1/bulk/assignments',
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer invalid'],
+            '{}'
+        );
+
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => 'API key authentication failure.',
+                ],
+            ],
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
     }
 
     public function testItThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void

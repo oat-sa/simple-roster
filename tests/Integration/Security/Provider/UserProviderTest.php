@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Integration\Security;
+namespace App\Tests\Integration\Security\Provider;
 
 use App\Entity\User;
+use App\Security\Provider\UserProvider;
 use App\Repository\UserRepository;
-use App\Security\UserProvider;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;

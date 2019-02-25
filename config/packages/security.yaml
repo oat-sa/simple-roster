@@ -8,18 +8,26 @@ security:
 
     providers:
         app_user_provider:
-            id: App\Security\UserProvider
+            id: App\Security\Provider\UserProvider
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        api_key:
+            anonymous: ~
+            pattern: ^/api/v1/bulk
+            guard:
+                authenticators:
+                    - App\Security\Authenticator\ApiKeyAuthenticator
+            stateless: true
+
         api:
             anonymous: ~
             logout:
                 path: logout
-                success_handler: App\Security\LogoutSuccessHandler
+                success_handler: App\Security\Handler\LogoutSuccessHandler
             json_login:
                 check_path: login
                 remember_me: false
@@ -28,6 +36,5 @@ security:
 
     access_control:
       - { path: ^/api/v1/healthcheck, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/api/v1/bulk/assignments, roles: IS_AUTHENTICATED_ANONYMOUSLY }
       - { path: ^/api/v1/lti/outcome, roles: IS_AUTHENTICATED_ANONYMOUSLY }
       - { path: ^/api, roles: ROLE_USER }

@@ -31,6 +31,9 @@ class GetUserAssignmentLtiRequestService
     /** @var string */
     private $ltiLaunchPresentationReturnUrl;
 
+    /** @var string */
+    private $ltiLaunchPresentationLocale;
+
     /** @var bool */
     private $ltiInstancesLoadBalancerEnabled;
 
@@ -40,6 +43,7 @@ class GetUserAssignmentLtiRequestService
         RouterInterface $router,
         LtiInstanceLoadBalancer $loadBalancer,
         string $ltiLaunchPresentationReturnUrl,
+        string $ltiLaunchPresentationLocale,
         bool $ltiInstancesLoadBalancerEnabled
     ) {
         $this->signer = $signer;
@@ -47,6 +51,7 @@ class GetUserAssignmentLtiRequestService
         $this->router = $router;
         $this->loadBalancer = $loadBalancer;
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
+        $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
         $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
     }
 
@@ -139,6 +144,7 @@ class GetUserAssignmentLtiRequestService
             ),
             'lis_result_sourcedid' => $assignment->getId(),
             'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
+            'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
         ];
     }
 }

@@ -119,7 +119,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'hnGSz3IWyuQwwYbQNvx+3mnvSvo=',
+                    'oauth_signature' => 'vSMHIT7UXq0bcD04nkw8jo5p5qw=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -135,8 +135,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
                     'lis_result_sourcedid' => 1,
-                    'launch_presentation_return_url' => 'http://example.com/index.html'
-                ]
+                    'launch_presentation_return_url' => 'http://example.com/index.html',
+                    'launch_presentation_locale' => 'en-EN',
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
@@ -149,6 +150,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
+        $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -169,7 +171,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'vAeVvGcxolp529UcrtUV5IMh+Yo=',
+                    'oauth_signature' => 'ozqOmBP1G5OdOsq7irV3jsUG9PA=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -185,8 +187,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
                     'lis_result_sourcedid' => 1,
-                    'launch_presentation_return_url' => 'http://example.com/index.html'
-                ]
+                    'launch_presentation_return_url' => 'http://example.com/index.html',
+                    'launch_presentation_locale' => 'it-IT',
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
