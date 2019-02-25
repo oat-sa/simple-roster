@@ -4,7 +4,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\Infrastructure;
 use App\Ingester\Ingester\InfrastructureIngester;
-use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;

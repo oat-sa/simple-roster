@@ -45,7 +45,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
-                '--batch-size' => '6',
+                '--batch-size' => '1',
             ],
             [
                 'capture_stderr_separately' => true,

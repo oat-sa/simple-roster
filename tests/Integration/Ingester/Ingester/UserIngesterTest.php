@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\UserIngester;
-use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;

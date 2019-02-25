@@ -62,7 +62,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 $this->entityManager->flush();
 
                 $result->addBulkOperationSuccess($operation);
-
             } catch (Throwable $exception) {
                 $result->addBulkOperationFailure($operation);
             }

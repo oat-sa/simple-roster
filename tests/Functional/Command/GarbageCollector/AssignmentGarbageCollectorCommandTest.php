@@ -66,6 +66,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $this->commandTester->execute(
             [
+                '--batch-size' => 1,
                 '--force' => 'true', // Test if it gets casted properly
             ]
         ));

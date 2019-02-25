@@ -4,7 +4,6 @@ namespace App\Tests\Integration\Responder;
 
 use App\Responder\SerializerResponder;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
