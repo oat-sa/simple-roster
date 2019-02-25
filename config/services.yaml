@@ -10,6 +10,7 @@ services:
             $debug: '%env(resolve:APP_DEBUG)%'
             $ltiInstances: '%ltiInstances%'
             $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+            $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
             $ltiInstancesLoadBalancerEnabled: '%env(bool:LTI_ENABLE_INSTANCES_LOAD_BALANCER)%'
             $appApiKey: '%env(resolve:APP_API_KEY)%'
 

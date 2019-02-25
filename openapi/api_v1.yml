@@ -362,6 +362,9 @@ components:
           type: integer
         launch_presentation_return_url:
           type: string
+        launch_presentation_locale:
+          type: string
+          example: 'it-IT'
     HealthCheckResult:
       type: object
       properties:
