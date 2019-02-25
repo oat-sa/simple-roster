@@ -11,7 +11,6 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Exception;
 
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
@@ -71,7 +70,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 
-    private function createUnauthorizedHttpException(?Exception $exception): UnauthorizedHttpException
+    private function createUnauthorizedHttpException(?AuthenticationException $exception): UnauthorizedHttpException
     {
         $message = 'API key authentication failure.';
 
