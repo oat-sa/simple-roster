@@ -8,7 +8,9 @@ services:
         public: false
         bind:
             $debug: '%env(resolve:APP_DEBUG)%'
-            $ltiLaunchPresentationReturnUrl: '%env(LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+            $ltiInstances: '%ltiInstances%'
+            $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+            $ltiInstancesLoadBalancerEnabled: '%env(bool:LTI_ENABLE_INSTANCES_LOAD_BALANCER)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
@@ -25,6 +27,21 @@ services:
               arguments:
                   - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
                   - '%env(int:REDIS_SESSION_CACHE_PORT)%'
+
+    app.doctrine_cache.connection:
+        class: Redis
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+                  - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+
+    app.doctrine_cache.provider:
+        class: Doctrine\Common\Cache\RedisCache
+        calls:
+            - method: setRedis
+              arguments:
+                  - '@app.doctrine_cache.connection'
 
     App\:
         resource: '../src/*'

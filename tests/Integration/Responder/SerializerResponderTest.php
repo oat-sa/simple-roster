@@ -3,18 +3,18 @@
 namespace App\Tests\Integration\Responder;
 
 use App\Responder\SerializerResponder;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Exception;
 use Throwable;
 
 class SerializerResponderTest extends KernelTestCase
 {
     /** @var bool  */
-    private $debug = false;
+    private $debug = true;
 
     public function setUp()
     {
@@ -52,7 +52,9 @@ class SerializerResponderTest extends KernelTestCase
 
     public function testCreateDefaultErrorJsonResponse(): void
     {
-        $exception = new Exception('error message');
+        $this->debug = false;
+
+        $exception = new Exception();
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
@@ -61,7 +63,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => 'error message',
+                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
                 ]
             ],
             json_decode($response->getContent(), true)
@@ -72,7 +74,7 @@ class SerializerResponderTest extends KernelTestCase
     {
         $this->debug = true;
 
-        $exception = new Exception('error message');
+        $exception = new Exception('custom error message');
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
@@ -81,20 +83,18 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => 'error message',
+                    'message' => 'custom error message',
                 ]
             ],
             json_decode($response->getContent(), true)
-        );
-        $this->assertArrayHasKey(
-            'trace',
-            json_decode($response->getContent(), true)['error']
         );
     }
 
     public function testCreateCustomErrorJsonResponse(): void
     {
-        $exception = new Exception('error message');
+        $this->debug = false;
+
+        $exception = new Exception();
 
         $response = $this->createResponderInstance()->createErrorJsonResponse(
             $exception,
@@ -108,16 +108,42 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => 'error message',
+                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
                 ]
             ],
             json_decode($response->getContent(), true)
         );
     }
 
-    public function testCreateHttpErrorJsonResponse(): void
+    public function testCreateCustomErrorJsonResponseWithDebug(): void
     {
-        $exception = $this->createHttpException('error message');
+        $this->debug = true;
+
+        $exception = new Exception('custom error message');
+
+        $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => 'custom error message',
+                ]
+            ],
+            json_decode($response->getContent(), true)
+        );
+        $this->assertArrayHasKey(
+            'trace',
+            json_decode($response->getContent(), true)['error']
+        );
+    }
+
+    public function testCreate4xxHttpErrorJsonResponse(): void
+    {
+        $this->debug = false;
+
+        $exception = $this->createHttpException('custom error message', Response::HTTP_I_AM_A_TEAPOT);
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
@@ -127,10 +153,81 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertArraySubset(
             [
                 'error' => [
-                    'message' => 'error message',
+                    'message' => 'custom error message',
                 ]
             ],
             json_decode($response->getContent(), true)
+        );
+    }
+
+    public function testCreate4xxHttpErrorJsonResponseWithDebug(): void
+    {
+        $this->debug = true;
+
+        $exception = $this->createHttpException('custom error message', Response::HTTP_I_AM_A_TEAPOT);
+
+        $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
+        $this->assertEquals('exceptionHeader', $response->headers->get('some'));
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => 'custom error message',
+                ]
+            ],
+            json_decode($response->getContent(), true)
+        );
+        $this->assertArrayHasKey(
+            'trace',
+            json_decode($response->getContent(), true)['error']
+        );
+    }
+
+    public function testCreate5xxHttpErrorJsonResponse(): void
+    {
+        $this->debug = false;
+
+        $exception = $this->createHttpException('custom error message', Response::HTTP_NOT_IMPLEMENTED);
+
+        $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
+        $this->assertEquals('exceptionHeader', $response->headers->get('some'));
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
+                ]
+            ],
+            json_decode($response->getContent(), true)
+        );
+    }
+
+    public function testCreate5xxHttpErrorJsonResponseWithDebug(): void
+    {
+        $this->debug = true;
+
+        $exception = $this->createHttpException('custom error message', Response::HTTP_NOT_IMPLEMENTED);
+
+        $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
+        $this->assertEquals('exceptionHeader', $response->headers->get('some'));
+        $this->assertArraySubset(
+            [
+                'error' => [
+                    'message' => 'custom error message',
+                ]
+            ],
+            json_decode($response->getContent(), true)
+        );
+        $this->assertArrayHasKey(
+            'trace',
+            json_decode($response->getContent(), true)['error']
         );
     }
 
@@ -142,13 +239,13 @@ class SerializerResponderTest extends KernelTestCase
         );
     }
 
-    private function createHttpException(string $message): Throwable
+    private function createHttpException(string $message, int $statusCode): Throwable
     {
-        return new class ($message) extends Exception implements HttpExceptionInterface
+        return new class ($message, $statusCode) extends Exception implements HttpExceptionInterface
         {
             public function getStatusCode()
             {
-                return Response::HTTP_I_AM_A_TEAPOT;
+                return $this->code;
             }
 
             public function getHeaders()

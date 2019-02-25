@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotProcessableException;
 use App\Generator\NonceGenerator;
+use App\Lti\LoadBalancer\LtiInstanceLoadBalancer;
 use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
@@ -24,19 +25,29 @@ class GetUserAssignmentLtiRequestService
     /** @var RouterInterface */
     private $router;
 
+    /** @var LtiInstanceLoadBalancer */
+    private $loadBalancer;
+
     /** @var string */
     private $ltiLaunchPresentationReturnUrl;
+
+    /** @var bool */
+    private $ltiInstancesLoadBalancerEnabled;
 
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
         RouterInterface $router,
-        string $ltiLaunchPresentationReturnUrl
+        LtiInstanceLoadBalancer $loadBalancer,
+        string $ltiLaunchPresentationReturnUrl,
+        bool $ltiInstancesLoadBalancerEnabled
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
         $this->router = $router;
+        $this->loadBalancer = $loadBalancer;
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
+        $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
     }
 
     /**
@@ -55,13 +66,8 @@ class GetUserAssignmentLtiRequestService
             OAuthContext::VERSION_1_0
         );
 
+        $ltiLink = $this->getAssignmentLtiLink($assignment);
         $ltiParameters = $this->getAssignmentLtiParameters($assignment);
-
-        $ltiLink = sprintf(
-            '%s/%s',
-            $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink(),
-            base64_encode((string)json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
-        );
 
         $signature = $this->signer->sign(
             $context,
@@ -98,6 +104,19 @@ class GetUserAssignmentLtiRequestService
                 sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );
         }
+    }
+
+    private function getAssignmentLtiLink(Assignment $assignment): string
+    {
+        $link = $this->ltiInstancesLoadBalancerEnabled
+            ? $this->loadBalancer->getLoadBalancedLtiInstanceUrl($assignment->getUser()->getUsername())
+            : $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink();
+
+        return sprintf(
+            '%s/%s',
+            $link,
+            base64_encode(json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
+        );
     }
 
     private function getAssignmentLtiParameters(Assignment $assignment): array

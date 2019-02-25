@@ -49,10 +49,11 @@ The main configuration file is `.env`, located in root folder.
     | Parameter | Description |
     | ------------- |:-------------|
     | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-- Frontend LTI return link:
+- LTI configuration:
 
     | Parameter | Description |
     | ------------- |:-------------|
+    | LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
     | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
 - Blackfire:
 
@@ -61,7 +62,11 @@ The main configuration file is `.env`, located in root folder.
     | BLACKFIRE_SERVER_ID | Blackfire server id |
     | BLACKFIRE_SERVER_TOKEN | Blackfire server token |
 
+#### LTI load balancer configuration
 
+The default map of load balancer for LTI instances is located in `config/packages/lti_instances.yaml`.
+
+It can be overridden per instance (dev, prod) by dropping this file in `config/packages/<env>/lti_instances.yaml`.
 
 #### Cache configuration
 
@@ -101,7 +106,9 @@ $ bin/console doctrine:schema:update --force
 $ bin/console doctrine:schema:drop --force
 ```
     
-## Cache management commands
+## Useful commands
+
+#### Cache management commands
 
 - Clear application cache
 
@@ -133,7 +140,7 @@ $ bin/console doctrine:cache:clear-query
 $ bin/console doctrine:cache:clear-result
 ```
 
-## Maintenance related commands
+#### Maintenance related commands
 
 - Assignment garbage collector (to collect stuck assignments)
 
@@ -141,7 +148,7 @@ $ bin/console doctrine:cache:clear-result
 $ bin/console roster:garbage-collector:assignment --force
 ```
 
-## Full list of available commands
+#### Full list of available commands
 
 ```bash
 $ bin/console
