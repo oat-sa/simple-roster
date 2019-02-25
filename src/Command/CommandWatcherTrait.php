@@ -2,10 +2,10 @@
 
 namespace App\Command;
 
-use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Stopwatch\StopwatchEvent;
 use DateInterval;
 use DateTime;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 trait CommandWatcherTrait
 {
