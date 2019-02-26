@@ -45,7 +45,7 @@ class CommandWatcherTraitTest extends TestCase
         $this->startWatch('testName', 'testCategory');
 
         $this->assertEquals(
-            'memory: 1024TB - duration: 3h 35m 59s 05ms',
+            'memory: 1024TB - duration: 3h 36m 0s 05ms',
             $this->stopWatch('testName')
         );
     }
@@ -69,7 +69,7 @@ class CommandWatcherTraitTest extends TestCase
         $this->startWatch('testName', 'testCategory');
 
         $this->assertEquals(
-            'memory: 0B - duration: 2s 615ms',
+            'memory: 0B - duration: 3s 615ms',
             $this->stopWatch('testName')
         );
     }
