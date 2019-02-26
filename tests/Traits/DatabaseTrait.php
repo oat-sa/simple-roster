@@ -4,11 +4,9 @@ namespace App\Tests\Traits;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
-use LogicException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
