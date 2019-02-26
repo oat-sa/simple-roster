@@ -32,7 +32,7 @@ class HealthCheckServiceTest extends TestCase
         $resultCacheImplMock
             ->expects($this->once())
             ->method('getStats')
-            ->willReturn(['uptime' => 999]);
+            ->willReturn(['uptime' => 1]);
 
         $configurationMock = $this->createMock(Configuration::class);
         $configurationMock
@@ -67,7 +67,7 @@ class HealthCheckServiceTest extends TestCase
         $resultCacheImplMock
             ->expects($this->once())
             ->method('getStats')
-            ->willReturn(null);
+            ->willReturn(false);
 
         $configurationMock = $this->createMock(Configuration::class);
         $configurationMock

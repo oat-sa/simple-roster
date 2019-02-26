@@ -12,7 +12,7 @@ use Throwable;
 
 class SerializerResponderTest extends KernelTestCase
 {
-    /** @var bool  */
+    /** @var bool|null  */
     private $debug = true;
 
     public function setUp()
@@ -178,13 +178,14 @@ class SerializerResponderTest extends KernelTestCase
 
     public function testCreate5xxHttpErrorJsonResponse(): void
     {
-        $this->debug = false;
+        // To test with default debug parameter value, assuming `false`
+        $this->debug = null;
 
-        $exception = $this->createHttpException('custom error message', Response::HTTP_NOT_IMPLEMENTED);
+        $exception = $this->createHttpException('custom error message', Response::HTTP_INTERNAL_SERVER_ERROR);
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
         $this->assertArraySubset(
             [
@@ -222,10 +223,9 @@ class SerializerResponderTest extends KernelTestCase
 
     private function createResponderInstance(): SerializerResponder
     {
-        return new SerializerResponder(
-            static::$container->get(SerializerInterface::class),
-            $this->debug
-        );
+        return null !== $this->debug
+            ? new SerializerResponder(static::$container->get(SerializerInterface::class), $this->debug)
+            : new SerializerResponder(static::$container->get(SerializerInterface::class));
     }
 
     private function createHttpException(string $message, int $statusCode): Throwable

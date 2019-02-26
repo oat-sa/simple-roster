@@ -63,7 +63,7 @@ class LineItemIngesterTest extends KernelTestCase
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
-        $this->assertCount(1, $output->getFailures());
+        $this->assertCount(3, $output->getFailures());
 
         $this->assertCount(1, $this->getRepository(LineItem::class)->findAll());
 

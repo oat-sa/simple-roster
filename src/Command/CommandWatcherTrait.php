@@ -14,7 +14,7 @@ trait CommandWatcherTrait
 
     private function startWatch(string $name, string $category): Stopwatch
     {
-        if (is_null($this->watcher)) {
+        if ($this->watcher === null) {
             $this->watcher = new Stopwatch();
         }
 
