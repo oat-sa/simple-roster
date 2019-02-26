@@ -11,6 +11,6 @@ before_install:
   - bin/phpunit
 
 script:
-  - ll cache/test
+  - ls var/cache/test
 #  - vendor/bin/infection --min-covered-msi=85 --show-mutations --threads=1
   - vendor/bin/phpstan analyse -c phpstan.neon.travis.dist --level=5
