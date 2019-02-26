@@ -12,7 +12,8 @@ REST back-end service that handles authentication and eligibilities.
     - [Build in server usage](#build-in-server-usage)
     - [Docker usage](#docker-usage) 
     - [Blackfire usage](#blackfire-usage)
-- [Tests](#tests)
+- [Testing](#testing)
+- [Static code analysis with PHPStan](#static-code-analysis-with-phpstan)
 
 ## Installation
 
@@ -86,7 +87,9 @@ BLACKFIRE_SERVER_ID=<your_backfire_id>
 BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 ```
 
-#### Tests
+## Testing
+
+#### Test suites
 
 You can run all tests suites with:
 
@@ -94,16 +97,15 @@ You can run all tests suites with:
  $ bin/phpunit [--coverage-html=coverage]
  ```
  
- #### Mutation tests
+ #### Mutation - Infection
  
- You can run test mutations with `Infection`:
+ You can run test mutations with:
  
  ```bash
  $ vendor/bin/infection
  ```
  
- 
-#### Static analysis with PHPStan
+## Static code analysis with PHPStan
 ```bash
 $ vendor/bin/phpstan analyse --level=max
 ```
