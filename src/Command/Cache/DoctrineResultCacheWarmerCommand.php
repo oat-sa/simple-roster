@@ -151,7 +151,9 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->resultCacheImplementation->delete($resultCacheId);
 
         // Refresh by query
-        $this->userRepository->getByUsernameWithAssignments($username);
+        $user = $this->userRepository->getByUsernameWithAssignments($username);
+        $this->entityManager->detach($user);
+        unset($user);
     }
 
     /**
