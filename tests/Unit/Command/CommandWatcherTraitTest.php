@@ -50,7 +50,7 @@ class CommandWatcherTraitTest extends TestCase
         );
     }
 
-    public function testIt(): void
+    public function testItFormatsMemoryProperly(): void
     {
         $stopWatchEvent = $this->createMock(StopwatchEvent::class);
         $stopWatchEvent
