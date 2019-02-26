@@ -10,6 +10,6 @@ before_install:
   - composer install
 
 script:
-#  - bin/phpunit
+  - bin/phpunit
 #  - vendor/bin/infection --min-covered-msi=85 --show-mutations --threads=1
   - vendor/bin/phpstan analyse -c phpstan.neon.travis.dist --level=5
