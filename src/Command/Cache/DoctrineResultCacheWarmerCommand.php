@@ -152,7 +152,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         // Refresh by query
         $user = $this->userRepository->getByUsernameWithAssignments($username);
-        $this->entityManager->detach($user);
+        $this->entityManager->clear();
         unset($user);
     }
 
