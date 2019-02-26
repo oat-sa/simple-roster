@@ -2,6 +2,8 @@
 
 namespace App\Tests\Traits;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -40,21 +42,12 @@ trait DatabaseTrait
         return self::$kernel->getContainer()->get('doctrine');
     }
 
-    protected function getEntityManager(): EntityManagerInterface
+    /**
+     * @return ObjectManager|EntityManager
+     */
+    protected function getEntityManager()
     {
-        $manager = $this->getManagerRegistry()->getManager();
-
-        if (!$manager instanceof EntityManagerInterface) {
-            throw new LogicException(
-                sprintf(
-                    "ManagerRegistry returned '%s', '%s' expected",
-                    get_class($manager),
-                    EntityManagerInterface::class
-                )
-            );
-        }
-
-        return $manager;
+        return $this->getManagerRegistry()->getManager();
     }
 
     protected function getRepository(string $class): EntityRepository

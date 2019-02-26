@@ -94,7 +94,7 @@ You can run all tests suites with:
  $ bin/phpunit [--coverage-html=coverage]
  ```
  
- ### Mutation tests
+ #### Mutation tests
  
  You can run test mutations with `Infection`:
  

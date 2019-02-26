@@ -21,6 +21,10 @@ parameters:
     - message: '#^Service "[^"]+" is private.$#'
       path: %rootDir%/../../../tests
     - message: '#Parameter \#1 \$message of method Symfony\\Component\\Console\\Style\\SymfonyStyle::success\(\) expects array\|string, App\\Ingester\\Result\\IngesterResult given\.#'
-      path: %rootDir%/../../../src
+      path: %currentWorkingDirectory%/src/Command/Ingester/IngesterCommand.php
     - message: '#Parameter \#1 \$message of method Symfony\\Component\\Console\\Style\\SymfonyStyle::warning\(\) expects array\|string, App\\Ingester\\Result\\IngesterResult given\.#'
-      path: %rootDir%/../../../src
+      path: %currentWorkingDirectory%/src/Command/Ingester/IngesterCommand.php
+    - message: '#Strict comparison using === between null and string will always evaluate to false\.#'
+      path: %currentWorkingDirectory%/src/Request/ParamConverter/BulkOperationCollectionParamConverter.php
+    - message: '#Parameter \#1 \$em of class Doctrine\\ORM\\Tools\\SchemaTool constructor expects Doctrine\\ORM\\EntityManagerInterface, Doctrine\\Common\\Persistence\\ObjectManager given\.#'
+      path: %currentWorkingDirectory%/tests
