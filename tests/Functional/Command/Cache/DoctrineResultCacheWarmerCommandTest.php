@@ -55,6 +55,11 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+
+        $this->assertContains(
+            'Number of warmed up cache entries: 100',
+            $this->commandTester->getDisplay()
+        );
     }
 
     public function testOutputInCaseOfException(): void

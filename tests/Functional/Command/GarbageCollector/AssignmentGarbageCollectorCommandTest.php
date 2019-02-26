@@ -97,7 +97,15 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadTestFixtures();
 
-        $this->assertEquals(0, $this->commandTester->execute(['--force' => true, '--batch-size' => 3]));
+        $this->assertEquals(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--force' => true,
+                    '--batch-size' => '3', // Test it gets casted properly
+                ]
+            )
+        );
         $this->assertContains(
             "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
