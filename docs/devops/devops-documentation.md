@@ -77,13 +77,6 @@ This value should be greater than the duration on the test campaign (so it never
 
 ## Application setup steps
 
-- Add `oat-sa/phing-tasks` as Composer dependency
-
-```bash
-$ composer config repositories.phing-tasks vcs git@github.com:oat-sa/phing-tasks.git
-$ composer require phing/phing oat-sa/phing-tasks
-```
-
 - Install dependencies with Composer
 
 ```bash

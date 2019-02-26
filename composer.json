@@ -3,6 +3,12 @@
     "description": "REST back-end service that handles authentication and eligibilities",
     "type": "project",
     "license": "proprietary",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:oat-sa/phing-tasks.git"
+        }
+    ],
     "require": {
         "php": "^7.2",
         "ext-ctype": "*",
@@ -15,6 +21,8 @@
         "league/csv": "^9.0",
         "nelmio/cors-bundle": "^1.5",
         "nesbot/carbon": "^2.11",
+        "oat-sa/phing-tasks": "^0.1",
+        "phing/phing": "^2.16",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",
