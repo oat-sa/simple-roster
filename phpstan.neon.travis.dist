@@ -13,7 +13,7 @@ parameters:
     - src
     - tests
   symfony:
-    container_xml_path: '%rootDir%/../../../var/cache/test/srcApp_KernelDevDebugContainer.xml'
+    container_xml_path: '%rootDir%/../../../var/cache/test/srcApp_KernelTestDebugContainer.xml'
   doctrine:
     repositoryClass: App\Repository\AbstractRepository
   # Temporary solution: https://github.com/phpstan/phpstan-symfony/issues/4
