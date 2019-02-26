@@ -19,7 +19,8 @@ class Assignment implements JsonSerializable, EntityInterface
     public const STATE_STARTED = 'started';
 
     /**
-     * The test has been completed. We know that it has because simple-roster received the LTI-outcome request from the TAO delivery
+     * The test has been completed. We know that it has because simple-roster received the LTI-outcome request from
+     * the TAO delivery
      */
     public const STATE_COMPLETED = 'completed';
 

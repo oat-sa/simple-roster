@@ -11,16 +11,17 @@ use App\Repository\AssignmentRepository;
 use App\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
     /** @var CompleteUserAssignmentService */
     private $subject;
 
-    /** @var AssignmentRepository */
+    /** @var AssignmentRepository|PHPUnit_Framework_MockObject_MockObject */
     private $assignmentRepository;
 
-    /** @var LoggerInterface */
+    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $logger;
 
     protected function setUp()
@@ -36,7 +37,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
     {
         $this->expectException(AssignmentNotFoundException::class);
-        $this->expectExceptionMessage('Assignment with id `5` not found.');
+        $this->expectExceptionMessage("Assignment with id '5' not found.");
 
         $this->subject->markAssignmentAsCompleted(5);
     }
@@ -101,7 +102,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                'Assignment with id=`5` of user with username=`expectedUsername` has been marked as completed.',
+                "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",
                 ['lineItem' => $assignment->getLineItem()]
             );
 

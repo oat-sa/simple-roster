@@ -5,7 +5,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 use App\Entity\LineItem;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
@@ -33,7 +32,6 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertEquals(6, $output->getSuccessCount());
@@ -61,12 +59,11 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
-        $this->assertCount(1, $output->getFailures());
+        $this->assertCount(3, $output->getFailures());
 
         $this->assertCount(1, $this->getRepository(LineItem::class)->findAll());
 
@@ -97,7 +94,6 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('line-item', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(6, $output->getSuccessCount());

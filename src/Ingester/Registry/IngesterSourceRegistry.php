@@ -35,7 +35,7 @@ class IngesterSourceRegistry
         return $this->sources[$sourceName];
     }
 
-    public function has(string $sourceName): bool
+    private function has(string $sourceName): bool
     {
         return isset($this->sources[$sourceName]);
     }

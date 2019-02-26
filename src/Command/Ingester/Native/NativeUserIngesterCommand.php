@@ -10,11 +10,12 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
+use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -94,14 +95,12 @@ class NativeUserIngesterCommand extends Command
         );
     }
 
-    /**
-     * @param ConsoleOutput|OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startWatch(self::NAME, __FUNCTION__);
-        $style = new SymfonyStyle($input, $output);
-        $section = $output->section();
+        $consoleOutput = $this->ensureConsoleOutput($output);
+        $style = new SymfonyStyle($input, $consoleOutput);
+        $section = $consoleOutput->section();
         $section->writeln('Starting user ingestion...');
         $batchSize = $input->getOption('batch');
 
@@ -118,7 +117,6 @@ class NativeUserIngesterCommand extends Command
             $lineItemCollection = $this->fetchLineItems();
 
             foreach ($source->getContent() as $row) {
-
                 $this->userQueryParts[] = sprintf(
                     "(%s, '%s', '%s', '[]')",
                     $index,
@@ -154,7 +152,6 @@ class NativeUserIngesterCommand extends Command
                     $style->error($error);
                 }
             }
-
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 
@@ -195,14 +192,14 @@ class NativeUserIngesterCommand extends Command
         try {
             if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts)) {
                 $userQuery = sprintf(
-                    "INSERT INTO users (id, username, password, roles) VALUES %s",
+                    'INSERT INTO users (id, username, password, roles) VALUES %s',
                     implode(',', $this->userQueryParts)
                 );
 
                 $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
 
                 $assignmentQuery = sprintf(
-                    "INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s",
+                    'INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s',
                     implode(',', $this->assignmentQueryParts)
                 );
 
@@ -240,5 +237,22 @@ class NativeUserIngesterCommand extends Command
         }
 
         return $lineItemCollection;
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
+    {
+        if (!$output instanceof ConsoleOutputInterface) {
+            throw new LogicException(
+                sprintf(
+                    "Output must be instance of '%s' because of section usage.",
+                    ConsoleOutputInterface::class
+                )
+            );
+        }
+
+        return $output;
     }
 }

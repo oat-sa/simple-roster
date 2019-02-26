@@ -4,7 +4,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\Infrastructure;
 use App\Ingester\Ingester\InfrastructureIngester;
-use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
@@ -32,7 +31,6 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('infrastructure', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertEquals(3, $output->getSuccessCount());
@@ -47,7 +45,6 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('infrastructure', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(3, $output->getSuccessCount());
@@ -71,7 +68,6 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('infrastructure', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());

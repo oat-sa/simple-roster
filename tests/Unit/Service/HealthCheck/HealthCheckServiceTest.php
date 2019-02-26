@@ -2,20 +2,20 @@
 
 namespace App\Tests\Unit\Service\HealthCheck;
 
-use App\HealthCheck\HealthCheckResult;
 use App\Service\HealthCheck\HealthCheckService;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class HealthCheckServiceTest extends TestCase
 {
     /** @var HealthCheckService */
     private $subject;
 
-    /** @var EntityManagerInterface */
+    /** @var EntityManagerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $entityManager;
 
     protected function setUp()
@@ -32,7 +32,7 @@ class HealthCheckServiceTest extends TestCase
         $resultCacheImplMock
             ->expects($this->once())
             ->method('getStats')
-            ->willReturn(['uptime' => 999]);
+            ->willReturn(['uptime' => 1]);
 
         $configurationMock = $this->createMock(Configuration::class);
         $configurationMock
@@ -57,7 +57,6 @@ class HealthCheckServiceTest extends TestCase
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertInstanceOf(HealthCheckResult::class, $output);
         $this->assertTrue($output->isDoctrineConnectionAvailable());
         $this->assertTrue($output->isDoctrineCacheAvailable());
     }
@@ -68,7 +67,7 @@ class HealthCheckServiceTest extends TestCase
         $resultCacheImplMock
             ->expects($this->once())
             ->method('getStats')
-            ->willReturn([]);
+            ->willReturn(false);
 
         $configurationMock = $this->createMock(Configuration::class);
         $configurationMock
@@ -93,7 +92,6 @@ class HealthCheckServiceTest extends TestCase
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertInstanceOf(HealthCheckResult::class, $output);
         $this->assertFalse($output->isDoctrineConnectionAvailable());
         $this->assertFalse($output->isDoctrineCacheAvailable());
     }

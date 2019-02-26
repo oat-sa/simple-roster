@@ -35,7 +35,7 @@ class IngesterRegistry
         return $this->ingesters[$ingesterName];
     }
 
-    public function has(string $ingesterName): bool
+    private function has(string $ingesterName): bool
     {
         return isset($this->ingesters[$ingesterName]);
     }

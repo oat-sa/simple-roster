@@ -12,7 +12,7 @@ class NonceGeneratorTest extends TestCase
     {
         $subject = new NonceGenerator();
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1));
+        Carbon::setTestNow(Carbon::create(2019));
         $nonce1 = $subject->generate();
 
         Carbon::setTestNow(Carbon::create(2019, 1, 2));

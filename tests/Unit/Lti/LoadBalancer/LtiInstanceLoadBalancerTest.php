@@ -50,5 +50,8 @@ class LtiInstanceLoadBalancerTest extends TestCase
         $this->assertNotEquals($output1, $output2);
         $this->assertNotEquals($output1, $output3);
         $this->assertNotEquals($output1, $output4);
+        $this->assertNotEquals($output2, $output3);
+        $this->assertNotEquals($output2, $output4);
+        $this->assertNotEquals($output3, $output4);
     }
 }

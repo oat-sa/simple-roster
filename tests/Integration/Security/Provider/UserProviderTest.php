@@ -4,6 +4,7 @@ namespace App\Tests\Integration\Security\Provider;
 
 use App\Entity\User;
 use App\Security\Provider\UserProvider;
+use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -23,7 +24,10 @@ class UserProviderTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserProvider($this->getRepository(User::class));
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+
+        $this->subject = new UserProvider($userRepository);
     }
 
     public function testItThrowsUsernameNotFoundExceptionWhenLoadingUserWithInvalidUser(): void
@@ -82,7 +86,6 @@ class UserProviderTest extends KernelTestCase
 
             public function eraseCredentials()
             {
-                return;
             }
         };
     }

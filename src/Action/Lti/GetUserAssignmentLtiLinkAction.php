@@ -42,7 +42,7 @@ class GetUserAssignmentLtiLinkAction
     }
 
     /**
-     * @param UserInterface|User $user
+     * @param User $user
      */
     public function __invoke(UserInterface $user, int $assignmentId): Response
     {
@@ -54,7 +54,7 @@ class GetUserAssignmentLtiLinkAction
             $this->entityManager->flush();
 
             $this->logger->info(
-                sprintf('LTI request was successfully generated for assignment with id=`%s`', $assignmentId),
+                sprintf("LTI request was successfully generated for assignment with id='%s'", $assignmentId),
                 [
                     'ltiRequest' => $ltiRequest,
                     'lineItem' => $assignment->getLineItem(),

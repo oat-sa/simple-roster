@@ -2,19 +2,19 @@
 
 namespace App\Command;
 
-use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Stopwatch\StopwatchEvent;
 use DateInterval;
 use DateTime;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 trait CommandWatcherTrait
 {
-    /** @var Stopwatch */
+    /** @var Stopwatch|null */
     private $watcher;
 
     private function startWatch(string $name, string $category): Stopwatch
     {
-        if (is_null($this->watcher)) {
+        if ($this->watcher === null) {
             $this->watcher = new Stopwatch();
         }
 
@@ -39,12 +39,12 @@ trait CommandWatcherTrait
 
     private function formatMemory(int $memory, int $precision = 2): string
     {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($memory, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
+        $bytes /= 1024 ** $pow;
 
         return round($bytes, $precision) . $units[$pow];
     }

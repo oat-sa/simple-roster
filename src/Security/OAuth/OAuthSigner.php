@@ -6,25 +6,28 @@ use InvalidArgumentException;
 
 class OAuthSigner
 {
-    public function sign(OAuthContext $context, string $url, string $method, string $secret, array $additionalParameters = []): string
-    {
-        switch ($context->getSignatureMethod()) {
-            case OAuthContext::METHOD_MAC_SHA1:
-                // @see package-tao/vendor/imsglobal/lti/src/OAuth/OAuthSignatureMethod_HMAC_SHA1.php
-                $secret .= '&';
-                $baseString = implode('&', [
-                    urlencode($method),
-                    urlencode($url),
-                    urlencode($this->getParameters($context, $additionalParameters)),
-                ]);
-
-                return base64_encode(hash_hmac('sha1', $baseString, $secret, true));
-
-            default:
-                throw new InvalidArgumentException(
-                    sprintf("Signature method '%s' is not supported", $context->getSignatureMethod())
-                );
+    public function sign(
+        OAuthContext $context,
+        string $url,
+        string $method,
+        string $secret,
+        array $additionalParameters = []
+    ): string {
+        if ($context->getSignatureMethod() !== OAuthContext::METHOD_MAC_SHA1) {
+            throw new InvalidArgumentException(
+                sprintf("Signature method '%s' is not supported", $context->getSignatureMethod())
+            );
         }
+
+        // @see package-tao/vendor/imsglobal/lti/src/OAuth/OAuthSignatureMethod_HMAC_SHA1.php
+        $secret .= '&';
+        $baseString = implode('&', [
+            urlencode($method),
+            urlencode($url),
+            urlencode($this->getParameters($context, $additionalParameters)),
+        ]);
+
+        return base64_encode(hash_hmac('sha1', $baseString, $secret, true));
     }
 
     private function getParameters(OAuthContext $context, array $additionalParameters = []): string
@@ -53,6 +56,6 @@ class OAuthSigner
 
     private function encode($value): string
     {
-        return str_replace('+', ' ', str_replace('%7E', '~', rawurlencode((string)$value)));
+        return str_replace(['%7E', '+'], ['~', ' '], rawurlencode((string)$value));
     }
 }
