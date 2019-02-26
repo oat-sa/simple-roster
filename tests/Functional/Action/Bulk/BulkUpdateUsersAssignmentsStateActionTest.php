@@ -87,7 +87,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             [],
             [],
             [],
-            (string)json_encode([])
+            json_encode([])
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
@@ -241,6 +241,6 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             ];
         }
 
-        return (string)json_encode($payload);
+        return json_encode($payload);
     }
 }
