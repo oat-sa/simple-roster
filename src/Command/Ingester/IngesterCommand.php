@@ -88,7 +88,7 @@ class IngesterCommand extends Command
         $style = new SymfonyStyle($input, $output);
 
         try {
-            $ingester = $this->ingesterRegistry->get((string)$input->getArgument('type'));
+            $ingester = $this->ingesterRegistry->get($input->getArgument('type'));
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
@@ -111,12 +111,12 @@ class IngesterCommand extends Command
     private function displayIngestionResult(IngesterResult $result, SymfonyStyle $style): void
     {
         if (!$result->hasFailures()) {
-            $style->success((string)$result);
+            $style->success($result);
 
             return;
         }
 
-        $style->warning((string)$result);
+        $style->warning($result);
         $style->table(
             ['Line', 'Data', 'Reason'],
             array_map(function (IngesterResultFailure $failure): array {

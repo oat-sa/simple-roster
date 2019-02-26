@@ -94,6 +94,15 @@ You can run all tests suites with:
  $ bin/phpunit [--coverage-html=coverage]
  ```
  
+ ### Mutation tests
+ 
+ You can run test mutations with `Infection`:
+ 
+ ```bash
+ $ vendor/bin/infection
+ ```
+ 
+ 
 #### Static analysis with PHPStan
 ```bash
 $ vendor/bin/phpstan analyse --level=max
