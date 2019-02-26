@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\UserIngester;
-use App\Ingester\Result\IngesterResult;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
@@ -34,7 +33,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
         $this->assertEquals(12, $output->getSuccessCount());
@@ -62,7 +60,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
@@ -95,7 +92,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertInstanceOf(IngesterResult::class, $output);
         $this->assertEquals('user', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
         $this->assertEquals(12, $output->getSuccessCount());

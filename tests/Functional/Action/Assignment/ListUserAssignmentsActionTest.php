@@ -8,7 +8,6 @@ use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +35,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateMatchesLineItemAvailability(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -70,7 +69,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
     {
-        Carbon::setTestNow(new DateTime('2022-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);

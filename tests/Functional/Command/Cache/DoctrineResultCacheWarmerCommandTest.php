@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Command\Cache;
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use InvalidArgumentException;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -30,11 +31,21 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         ]);
     }
 
+    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
+        );
+
+        $this->commandTester->execute([]);
+    }
+
     public function testItIteratesThroughAllUsers(): void
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
-                '--batch-size' => 6,
+                '--batch-size' => '1',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -44,16 +55,21 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+
+        $this->assertContains(
+            'Number of warmed up cache entries: 100',
+            $this->commandTester->getDisplay()
+        );
     }
 
     public function testOutputInCaseOfException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid `batch-size` argument received.');
+        $this->expectExceptionMessage("Invalid 'batch-size' argument received.");
 
         $this->commandTester->execute(
             [
-                '--batch-size' => -1,
+                '--batch-size' => 0,
             ],
             [
                 'capture_stderr_separately' => true,

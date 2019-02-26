@@ -18,7 +18,7 @@ class ListUserAssignmentsAction
     }
 
     /**
-     * @param UserInterface|User $user
+     * @param User $user
      */
     public function __invoke(UserInterface $user): Response
     {

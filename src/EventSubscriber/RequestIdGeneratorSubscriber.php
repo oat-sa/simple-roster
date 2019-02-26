@@ -2,8 +2,9 @@
 
 namespace App\EventSubscriber;
 
-use App\Request\RequestIdGenerator;
 use App\Request\RequestIdStorage;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -12,15 +13,15 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
 {
     public const CLOUDFRONT_REQUEST_ID_HEADER = 'x-edge-request-id';
 
-    /** @var RequestIdGenerator */
-    private $requestIdGenerator;
+    /** @var UuidFactoryInterface */
+    private $uuidFactory;
 
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
-    public function __construct(RequestIdGenerator $requestIdGenerator, RequestIdStorage $requestIdStorage)
+    public function __construct(UuidFactoryInterface $uuidFactory, RequestIdStorage $requestIdStorage)
     {
-        $this->requestIdGenerator = $requestIdGenerator;
+        $this->uuidFactory = $uuidFactory;
         $this->requestIdStorage = $requestIdStorage;
     }
 
@@ -38,10 +39,14 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER)
-            ?? $this->requestIdGenerator->generate();
+        $requestId = $request->headers->get(self::CLOUDFRONT_REQUEST_ID_HEADER);
 
-        $request->attributes->set('requestId', $requestId);
-        $this->requestIdStorage->setRequestId($requestId);
+        if (!$requestId) {
+            /** @var Uuid $requestId */
+            $requestId = $this->uuidFactory->uuid4();
+        }
+
+        $this->requestIdStorage->setRequestId((string)$requestId);
+        $request->attributes->set('requestId', $this->requestIdStorage->getRequestId());
     }
 }

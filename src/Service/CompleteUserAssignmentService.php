@@ -29,7 +29,7 @@ class CompleteUserAssignmentService
         $assignment = $this->assignmentRepository->find($assignmentId);
 
         if (!$assignment) {
-            throw new AssignmentNotFoundException(sprintf('Assignment with id `%s` not found.', $assignmentId));
+            throw new AssignmentNotFoundException(sprintf("Assignment with id '%s' not found.", $assignmentId));
         }
 
         $assignment->setState(Assignment::STATE_COMPLETED);
@@ -39,7 +39,7 @@ class CompleteUserAssignmentService
 
         $this->logger->info(
             sprintf(
-                'Assignment with id=`%s` of user with username=`%s` has been marked as completed.',
+                "Assignment with id='%s' of user with username='%s' has been marked as completed.",
                 $assignmentId,
                 $assignment->getUser()->getUsername()
             ),

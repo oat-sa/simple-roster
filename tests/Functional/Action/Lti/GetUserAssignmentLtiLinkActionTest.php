@@ -222,7 +222,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                 $ltiRequest = $record['context']['ltiRequest'];
 
                 return
-                    $record['message'] === 'LTI request was successfully generated for assignment with id=`1`'
+                    $record['message'] === "LTI request was successfully generated for assignment with id='1'"
                     && $ltiRequest->jsonSerialize() === $ltiRequestInResponse
                     && $record['context']['lineItem'] === $assignment->getLineItem();
             },

@@ -9,6 +9,7 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -30,6 +31,21 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
     }
 
+    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
+        );
+
+        $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+            ]
+        );
+    }
+
     public function testNonBatchedLocalIngestionSuccess(): void
     {
         $this->prepareIngestionContext();
@@ -37,16 +53,16 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv'
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
             ],
             [
-                'capture_stderr_separately' => true
+                'capture_stderr_separately' => true,
             ]
         );
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 12, batched errors: 0",
+            'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -67,16 +83,16 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             [
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-                '--batch' => 2
+                '--batch' => 2,
             ],
             [
-                'capture_stderr_separately' => true
+                'capture_stderr_separately' => true,
             ]
         );
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 12, batched errors: 0",
+            'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -95,10 +111,10 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             [
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-                '--batch' => 1
+                '--batch' => 1,
             ],
             [
-                'capture_stderr_separately' => true
+                'capture_stderr_separately' => true,
             ]
         );
 
@@ -117,16 +133,16 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             [
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users.csv',
-                '--batch' => 1
+                '--batch' => 1,
             ],
             [
-                'capture_stderr_separately' => true
+                'capture_stderr_separately' => true,
             ]
         );
 
         $this->assertEquals(0, $output);
         $this->assertContains(
-            "Total of users imported: 1, batched errors: 1",
+            'Total of users imported: 1, batched errors: 1',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 

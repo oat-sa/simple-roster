@@ -2,6 +2,9 @@
   "source": {
     "directories": [
       "src"
+    ],
+    "excludes": [
+      "Kernel.php"
     ]
   },
   "timeout": 10,
@@ -10,7 +13,12 @@
     "summary": "var/log/infection/summary.log",
     "perMutator": "var/log/infection/per-mutator.md"
   },
-  "tmpDir": "var/cache/infection",
-  "testFramework": "phpunit",
-  "testFrameworkOptions": "-vvv"
+  "mutators": {
+    "@default": true,
+    "@removal": false
+  },
+  "phpUnit": {
+    "customPath": "bin/phpunit"
+  },
+  "tmpDir": "var/cache/infection"
 }

@@ -11,6 +11,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
+use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,7 +48,10 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->userCacheIdGenerator = $userCacheIdGenerator;
         $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
         $this->entityManager = $entityManager;
-        $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $this->userRepository = $userRepository;
     }
 
     protected function configure()
@@ -65,18 +69,17 @@ class DoctrineResultCacheWarmerCommand extends Command
         );
     }
 
-    /**
-     * @param ConsoleOutputInterface|OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->startWatch(self::NAME, __FUNCTION__);
-        $style = new SymfonyStyle($input, $output);
-        $section = $output->section();
+        $consoleOutput = $this->ensureConsoleOutput($output);
+        $style = new SymfonyStyle($input, $consoleOutput);
+
+        $section = $consoleOutput->section();
 
         $batchSize = (int)$input->getOption('batch-size');
         if ($batchSize < 1) {
-            throw new InvalidArgumentException('Invalid `batch-size` argument received.');
+            throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
         }
 
         $offset = 0;
@@ -149,5 +152,22 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         // Refresh by query
         $this->userRepository->getByUsernameWithAssignments($username);
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
+    {
+        if (!$output instanceof ConsoleOutputInterface) {
+            throw new LogicException(
+                sprintf(
+                    "Output must be instance of '%s' because of section usage.",
+                    ConsoleOutputInterface::class
+                )
+            );
+        }
+        
+        return $output;
     }
 }

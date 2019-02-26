@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Integration\Ingester\Ingester;
+namespace App\Tests\Integration\Ingester\Source;
 
 use App\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class S3CsvIngesterSourceTest extends TestCase
 {
     /** @var S3CsvIngesterSource */
     private $subject;
 
-    /** @var S3Client */
+    /** @var S3Client|PHPUnit_Framework_MockObject_MockObject */
     private $client;
 
     protected function setUp()

@@ -8,6 +8,7 @@ use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -36,42 +37,42 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
-            if ($operation->getType() === BulkOperation::TYPE_CREATE) {
-                try {
-                    /** @var User $user */
-                    $user = $this->entityManager
-                        ->getRepository(User::class)
-                        ->getByUsernameWithAssignments($operation->getIdentifier());
+            if ($operation->getType() !== BulkOperation::TYPE_CREATE) {
+                $result->addBulkOperationFailure($operation);
+                continue;
+            }
 
-                    $lastAssignment = $user->getLastAssignment();
+            try {
+                /** @var UserRepository $userRepository */
+                $userRepository = $this->entityManager->getRepository(User::class);
+                $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
 
-                    foreach ($user->getAvailableAssignments() as $assignment) {
-                        $assignment->setState(Assignment::STATE_CANCELLED);
-                    }
+                $lastAssignment = $user->getLastAssignment();
 
-                    $newAssignment = (new Assignment())
-                        ->setState(Assignment::STATE_READY)
-                        ->setLineItem($lastAssignment->getLineItem());
-
-                    $user->addAssignment($newAssignment);
-
-                    $this->entityManager->persist($newAssignment);
-                    $this->entityManager->flush();
-
-                    $result->addBulkOperationSuccess($operation);
-
-                    $this->logBuffer[] = [
-                        'message' => sprintf(
-                            'Successful assignment create operation (id=`%s`) for user with username=`%s`.',
-                            $newAssignment->getId(),
-                            $user->getUsername()
-                        ),
-                        'lineItem' => $newAssignment->getLineItem(),
-                    ];
-                } catch (Throwable $exception) {
-                    $result->addBulkOperationFailure($operation);
+                foreach ($user->getAvailableAssignments() as $assignment) {
+                    $assignment->setState(Assignment::STATE_CANCELLED);
                 }
-            } else {
+
+                $newAssignment = (new Assignment())
+                    ->setState(Assignment::STATE_READY)
+                    ->setLineItem($lastAssignment->getLineItem());
+
+                $user->addAssignment($newAssignment);
+
+                $this->entityManager->persist($newAssignment);
+                $this->entityManager->flush();
+
+                $result->addBulkOperationSuccess($operation);
+
+                $this->logBuffer[] = [
+                    'message' => sprintf(
+                        "Successful assignment create operation (id='%s') for user with username='%s'.",
+                        $newAssignment->getId(),
+                        $user->getUsername()
+                    ),
+                    'lineItem' => $newAssignment->getLineItem(),
+                ];
+            } catch (Throwable $exception) {
                 $result->addBulkOperationFailure($operation);
             }
         }

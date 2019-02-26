@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Assignment;
+namespace App\Tests\Functional\Action\Bulk;
 
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
-use DateTime;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -87,7 +87,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             [],
             [],
             [],
-            $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT + 1))
+            $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT))
         );
 
         $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->client->getResponse()->getStatusCode());
@@ -128,8 +128,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItDoesNotCreateNewAssignmentsWithInvalidUsersProvided(): void
     {
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_POST,
@@ -163,10 +164,11 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();
 
         $this->client->request(
@@ -194,8 +196,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         $this->assertCount(2, $this->getRepository(Assignment::class)->findAll());
 
-        /** @var User $reloadedUser */
-        $reloadedUser = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
         $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
@@ -204,10 +207,11 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItLogsSuccessfulBulkOperations(): void
     {
-        Carbon::setTestNow(new DateTime('2019-01-01 00:00:00'));
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
-        /** @var User $user */
-        $user = $this->getRepository(User::class)->getByUsernameWithAssignments('user1');
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->client->request(
             Request::METHOD_POST,
@@ -219,7 +223,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            'Successful assignment create operation (id=`2`) for user with username=`user1`.',
+            "Successful assignment create operation (id='2') for user with username='user1'.",
             Logger::INFO
         );
     }

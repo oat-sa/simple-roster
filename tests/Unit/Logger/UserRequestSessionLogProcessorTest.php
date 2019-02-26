@@ -39,7 +39,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
     {
         $this->requestIdStorage->setRequestId('expectedRequestId');
 
-        $logRecord = call_user_func_array($this->subject, [['logRecord']]);
+        $logRecord = call_user_func($this->subject, ['logRecord']);
 
         $this->assertArraySubset(['extra' => ['requestId' => 'expectedRequestId']], $logRecord);
     }
@@ -51,7 +51,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
             ->method('getId')
             ->willReturn('expectedSessionId');
 
-        $logRecord = call_user_func_array($this->subject, [['logRecord']]);
+        $logRecord = call_user_func($this->subject, ['logRecord']);
 
         $this->assertArraySubset(['extra' => ['sessionId' => 'expectedSessionId']], $logRecord);
     }
@@ -62,14 +62,14 @@ class UserRequestSessionLogProcessorTest extends TestCase
             ->method('getUser')
             ->willReturn((new User())->setUsername('expectedUsername'));
 
-        $logRecord = call_user_func_array($this->subject, [['logRecord']]);
+        $logRecord = call_user_func($this->subject, ['logRecord']);
 
         $this->assertArraySubset(['extra' => ['username' => 'expectedUsername']], $logRecord);
     }
 
     public function testItExtendsLogRecordWithGuestUserIfUserCannotBeRetrieved(): void
     {
-        $logRecord = call_user_func_array($this->subject, [['logRecord']]);
+        $logRecord = call_user_func($this->subject, ['logRecord']);
 
         $this->assertArraySubset(['extra' => ['username' => 'guest']], $logRecord);
     }

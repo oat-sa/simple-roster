@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Lti;
 
@@ -16,7 +16,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 {
     use DatabaseFixturesTrait;
 
-    public function testItReturns401IfNotAuthenticated()
+    public function testItReturns401IfNotAuthenticated(): void
     {
         $client = static::createClient();
 
@@ -25,7 +25,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
 
-    public function testItReturns401IfWrongAuthentication()
+    public function testItReturns401IfWrongAuthentication(): void
     {
         $client = static::createClient();
 
@@ -54,15 +54,16 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
 
-    public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists()
+    public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
         $client = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, $time);
+        $signature = $this->generateSignature($infrastructure, (string)$time);
 
+        /** @var string $xmlBody **/
         $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
@@ -94,14 +95,14 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
     }
 
-    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid()
+    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
         $client = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, $time);
+        $signature = $this->generateSignature($infrastructure, (string)$time);
 
         $xmlBody = 'test';
 
@@ -134,16 +135,19 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
     }
 
-    public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist()
+    public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
         $client = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, $time);
+        $signature = $this->generateSignature($infrastructure, (string)$time);
 
-        $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml');
+        /** @var string $xmlBody */
+        $xmlBody = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml'
+        );
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
@@ -174,7 +178,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
     }
 
-    private function generateSignature(Infrastructure $infrastructure, $time): string
+    private function generateSignature(Infrastructure $infrastructure, string $time): string
     {
         $context = new OAuthContext(
             'bodyHash',

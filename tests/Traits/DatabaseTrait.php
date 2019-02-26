@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Tests\Traits;
 
@@ -14,7 +14,7 @@ trait DatabaseTrait
 {
     use BaseDatabaseTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->setUpDatabase();
     }
@@ -43,7 +43,7 @@ trait DatabaseTrait
     /**
      * @return ObjectManager|EntityManager
      */
-    protected function getEntityManager(): ObjectManager
+    protected function getEntityManager()
     {
         return $this->getManagerRegistry()->getManager();
     }

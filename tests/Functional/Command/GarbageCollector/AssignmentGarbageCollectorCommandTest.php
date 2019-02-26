@@ -32,7 +32,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
 
-        Carbon::setTestNow(new DateTime());
+        Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }
 
     public function testOutputWhenThereIsNothingToUpdate(): void
@@ -50,7 +50,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $this->commandTester->execute([]));
         $this->assertContains(
-            '[OK] Total of `10` stuck assignments were successfully marked as `completed`.',
+            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
 
@@ -64,16 +64,21 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadTestFixtures();
 
-        $this->assertEquals(0, $this->commandTester->execute(['--force' => true]));
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => 1,
+                '--force' => 'true', // Test if it gets casted properly
+            ]
+        ));
         $this->assertContains(
-            '[OK] Total of `10` stuck assignments were successfully marked as `completed`.',
+            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
 
         for ($i = 1; $i <= 10; $i++) {
             $this->assertHasLogRecordWithMessage(
                 sprintf(
-                    'Assignment with id=`%s` of user with username=`%s` has been marked as completed by garbage collector.',
+                    "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.",
                     $i,
                     'userWithStartedButStuckAssignment_' . $i
                 ),
@@ -92,9 +97,17 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadTestFixtures();
 
-        $this->assertEquals(0, $this->commandTester->execute(['--force' => true, '--batch-size' => 3]));
+        $this->assertEquals(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--force' => true,
+                    '--batch-size' => '3', // Test it gets casted properly
+                ]
+            )
+        );
         $this->assertContains(
-            '[OK] Total of `10` stuck assignments were successfully marked as `completed`.',
+            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
 
@@ -107,8 +120,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testOutputInCaseOfException(): void
     {
-        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => -1]));
-        $this->assertContains('[ERROR] Invalid `batch-size` argument received.', $this->commandTester->getDisplay());
+        $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => 0]));
+        $this->assertContains("[ERROR] Invalid 'batch-size' argument received.", $this->commandTester->getDisplay());
     }
 
     private function loadTestFixtures(): void
