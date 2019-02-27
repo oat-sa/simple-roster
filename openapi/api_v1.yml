@@ -54,7 +54,7 @@ paths:
                 example: SESSIONID=abcde12345; Path=/;
         400:
           $ref: '#/components/responses/BadRequestResponse'
-        403:
+        401:
           $ref: '#/components/responses/InvalidCredentialsResponse'
         405:
           $ref: '#/components/responses/MethodNotAllowedResponse'
