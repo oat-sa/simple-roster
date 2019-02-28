@@ -17,7 +17,7 @@ security:
 
         api_key:
             anonymous: ~
-            pattern: ^/api/v1/bulk
+            pattern: '^%app.route_prefix%/bulk'
             guard:
                 authenticators:
                     - App\Security\Authenticator\ApiKeyAuthenticator
@@ -25,6 +25,7 @@ security:
 
         api:
             anonymous: ~
+            pattern: '^%app.route_prefix%'
             logout:
                 path: logout
                 success_handler: App\Security\Handler\LogoutSuccessHandler
@@ -35,6 +36,6 @@ security:
             # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
 
     access_control:
-      - { path: ^/api/v1/healthcheck, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/api/v1/lti/outcome, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/api, roles: ROLE_USER }
+        - { path: '^%app.route_prefix%/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%', roles: ROLE_USER }
