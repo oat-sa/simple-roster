@@ -6,7 +6,10 @@ use App\Entity\User;
 use App\Security\Provider\UserProvider;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseFixturesTrait;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,6 +21,9 @@ class UserProviderTest extends KernelTestCase
     /** @var UserProvider */
     private $subject;
 
+    /** @var RequestStack|PHPUnit_Framework_MockObject_MockObject */
+    private $requestStack;
+
     protected function setUp()
     {
         parent::setUp();
@@ -27,7 +33,9 @@ class UserProviderTest extends KernelTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
 
-        $this->subject = new UserProvider($userRepository);
+        $this->requestStack = $this->createMock(RequestStack::class);
+
+        $this->subject = new UserProvider($userRepository, $this->requestStack);
     }
 
     public function testItThrowsUsernameNotFoundExceptionWhenLoadingUserWithInvalidUser(): void
@@ -43,6 +51,8 @@ class UserProviderTest extends KernelTestCase
         $this->expectException(UnsupportedUserException::class);
         $this->expectExceptionMessage('Invalid user class');
 
+        $this->prepareRequestStackMock(0, 'route');
+
         $this->subject->refreshUser($this->createNonSupportedUserInterfaceImplementation());
     }
 
@@ -51,7 +61,19 @@ class UserProviderTest extends KernelTestCase
         $this->expectException(UsernameNotFoundException::class);
         $this->expectExceptionMessage('User "invalid" could not be reloaded');
 
+        $this->prepareRequestStackMock(1, 'route');
+
         $this->subject->refreshUser((new User())->setUsername('invalid'));
+    }
+
+    public function testItDoesNotRefreshForLogout(): void
+    {
+        $this->prepareRequestStackMock(1, 'logout');
+
+        $toRefreshUser = (new User())->setUsername('invalid');
+        $refreshedUser = $this->subject->refreshUser($toRefreshUser);
+
+        $this->assertSame($toRefreshUser, $refreshedUser);
     }
 
     public function testItSupportsUserClassImplementations(): void
@@ -88,5 +110,13 @@ class UserProviderTest extends KernelTestCase
             {
             }
         };
+    }
+
+    private function prepareRequestStackMock(int $expectedCalls, string $expectedRoute): void
+    {
+        $this->requestStack
+            ->expects($this->exactly($expectedCalls))
+            ->method('getCurrentRequest')
+            ->willReturn(new Request([], [], ['_route' => $expectedRoute]));
     }
 }
