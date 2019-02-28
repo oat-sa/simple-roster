@@ -9,6 +9,7 @@ DevOps related information for setting up / debug / maintain the application.
 The main configuration file is `.env`, located in root folder.
 
 #### Configuration parameters
+
 - Framework:
 
     | Parameter | Description |
@@ -17,6 +18,8 @@ The main configuration file is `.env`, located in root folder.
     | APP_DEBUG | Application debug mode, [default: `false`] |
     | APP_SECRET | Application secret |
     | APP_API_KEY | Application API Key |
+    | ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
+    
 - AWS:
 
     | Parameter | Description |
@@ -26,11 +29,13 @@ The main configuration file is `.env`, located in root folder.
     | AWS_KEY | AWS Key |
     | AWS_SECRET | AWS Secret |
     | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
+    
 - Database:
 
     | Parameter | Description |
     | ------------- |:-------------|
     | DATABASE_URL | Database url |
+    
 - Cache:
 
     | Parameter | Description |
@@ -40,22 +45,27 @@ The main configuration file is `.env`, located in root folder.
     | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
     | REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
     | REDIS_SESSION_CACHE_PORT | Redis host for sessions cache storage |
+    
 - CORS:
 
     | Parameter | Description |
     | ------------- |:-------------|
     | CORS_ALLOW_ORIGIN | Allowed CORS origin |
+    
 - Garbage collector:
 
     | Parameter | Description |
     | ------------- |:-------------|
     | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
+
 - LTI configuration:
 
     | Parameter | Description |
     | ------------- |:-------------|
     | LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
     | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
+    | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
+
 - Blackfire:
 
     | Parameter | Description |
@@ -106,7 +116,23 @@ $ bin/console doctrine:schema:update --force
 ```bash
 $ bin/console doctrine:schema:drop --force
 ```
-    
+
+## Applying custom route prefix
+
+Custom route prefix can be defined via `ROUTE_PREFIX` application environment. 
+If you do so, please make sure to include the leading slash character, but *NO* trailing slash.
+
+To apply the changes, you need to clear the application cache:
+
+```bash
+$ bin/console cache:clear [--env=dev|prod]
+```
+
+To verify the changes:
+```bash
+$ bin/console debug:router [--env=dev|prod]
+```
+
 ## Useful commands
 
 #### Cache management commands

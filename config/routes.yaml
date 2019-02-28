@@ -1,38 +1,38 @@
 healthCheck:
-  path: /api/v1/healthcheck
+  path: '%app.route_prefix%/healthcheck'
   methods: GET
   defaults: { _controller: App\Action\HealthCheck\HealthCheckAction }
 
 login:
-  path: /api/v1/auth/login
+  path: '%app.route_prefix%/auth/login'
   methods: POST
   defaults: { _controller: App\Action\Security\LoginAction }
 
 logout:
-  path: /api/v1/auth/logout
+  path: '%app.route_prefix%/auth/logout'
 
 bulkCreateUsersAssignments:
-  path: /api/v1/bulk/assignments
+  path: '%app.route_prefix%/bulk/assignments'
   methods: POST
   defaults: { _controller: App\Action\Bulk\BulkCreateUsersAssignmentsAction }
 
 bulkUpdateUsersAssignmentsState:
-  path: /api/v1/bulk/assignments
+  path: '%app.route_prefix%/bulk/assignments'
   methods: PATCH
   defaults: { _controller: App\Action\Bulk\BulkUpdateUsersAssignmentsStateAction }
 
 getUserAssignments:
-  path: /api/v1/assignments
+  path: '%app.route_prefix%/assignments'
   methods: GET
   defaults: { _controller: App\Action\Assignment\ListUserAssignmentsAction }
 
 getUserAssignmentLtiLink:
-  path: /api/v1/assignments/{assignmentId}/lti-link
+  path: '%app.route_prefix%/assignments/{assignmentId}/lti-link'
   methods: GET
   defaults: { _controller: App\Action\Lti\GetUserAssignmentLtiLinkAction }
 
 updateLtiOutcome:
-  path: /api/v1/lti/outcome
+  path: '%app.route_prefix%/lti/outcome'
   methods: POST
   defaults: { _controller: App\Action\Lti\UpdateLtiOutcomeAction }
 
