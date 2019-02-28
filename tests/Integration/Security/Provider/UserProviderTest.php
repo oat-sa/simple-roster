@@ -41,7 +41,7 @@ class UserProviderTest extends KernelTestCase
     public function testItThrowsUsernameNotFoundExceptionWhenLoadingUserWithInvalidUser(): void
     {
         $this->expectException(UsernameNotFoundException::class);
-        $this->expectExceptionMessage('Username "invalid" does not exist');
+        $this->expectExceptionMessage("Username 'invalid' does not exist");
 
         $this->subject->loadUserByUsername('invalid');
     }
@@ -59,7 +59,7 @@ class UserProviderTest extends KernelTestCase
     public function testItThrowsUsernameNotFoundExceptionWhenRefreshingInvalidUser(): void
     {
         $this->expectException(UsernameNotFoundException::class);
-        $this->expectExceptionMessage('User "invalid" could not be reloaded');
+        $this->expectExceptionMessage("User 'invalid' could not be reloaded");
 
         $this->prepareRequestStackMock(1, 'route');
 
