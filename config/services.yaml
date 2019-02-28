@@ -1,5 +1,6 @@
 parameters:
     locale: 'en'
+    app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
 
 services:
     _defaults:
