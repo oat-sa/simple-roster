@@ -18,7 +18,7 @@ The main configuration file is `.env`, located in root folder.
     | APP_DEBUG | Application debug mode, [default: `false`] |
     | APP_SECRET | Application secret |
     | APP_API_KEY | Application API Key |
-    | ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
+    | APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
     
 - AWS:
 
@@ -119,7 +119,7 @@ $ bin/console doctrine:schema:drop --force
 
 ## Applying custom route prefix
 
-Custom route prefix can be defined via `ROUTE_PREFIX` application environment. 
+Custom route prefix can be defined via `APP_ROUTE_PREFIX` application environment. 
 If you do so, please make sure to include the leading slash character, but *NO* trailing slash.
 
 To apply the changes, you need to clear the application cache:
