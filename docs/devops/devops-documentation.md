@@ -129,6 +129,7 @@ $ bin/console cache:clear [--env=dev|prod]
 ```
 
 To verify the changes:
+
 ```bash
 $ bin/console debug:router [--env=dev|prod]
 ```
