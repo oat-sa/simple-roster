@@ -160,6 +160,11 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertCount(1, $this->getRepository(Assignment::class)->findAll());
+
+        $this->assertHasLogRecordWithMessage(
+            "Bulk assignments create error: User with username = 'nonExistingUser1' cannot be found.",
+            Logger::ERROR
+        );
     }
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void

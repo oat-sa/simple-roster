@@ -38,6 +38,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_CREATE) {
+                $this->logger->error('Bulk assignments create error: wrong type.', ['operation' => $operation]);
                 $result->addBulkOperationFailure($operation);
                 continue;
             }
@@ -73,6 +74,10 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
                     'lineItem' => $newAssignment->getLineItem(),
                 ];
             } catch (Throwable $exception) {
+                $this->logger->error(
+                    'Bulk assignments create error: ' . $exception->getMessage(),
+                    ['operation' => $operation]
+                );
                 $result->addBulkOperationFailure($operation);
             }
         }

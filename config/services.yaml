@@ -9,6 +9,7 @@ services:
         public: false
         bind:
             $debug: '%env(resolve:APP_DEBUG)%'
+            $kernelEnvironment: '%kernel.environment%'
             $ltiInstances: '%ltiInstances%'
             $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
             $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'

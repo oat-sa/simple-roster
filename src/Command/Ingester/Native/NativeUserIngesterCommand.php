@@ -47,14 +47,19 @@ class NativeUserIngesterCommand extends Command
     /** @var array */
     private $errors = [];
 
+    /** @var string */
+    private $kernelEnvironment;
+
     public function __construct(
         IngesterSourceRegistry $sourceRegistry,
         EntityManagerInterface $entityManager,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+        string $kernelEnvironment
     ) {
         $this->sourceRegistry = $sourceRegistry;
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
+        $this->kernelEnvironment = $kernelEnvironment;
 
         parent::__construct(self::NAME);
     }
@@ -157,6 +162,7 @@ class NativeUserIngesterCommand extends Command
 
             return 1;
         } finally {
+            $this->refreshSequences($resultSetMapping);
             $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
         }
 
@@ -211,6 +217,25 @@ class NativeUserIngesterCommand extends Command
 
         $this->userQueryParts = [];
         $this->assignmentQueryParts = [];
+    }
+
+    private function refreshSequences(ResultSetMapping $mapping): void
+    {
+        if ($this->kernelEnvironment != 'test') {
+            $this->entityManager
+                ->createNativeQuery(
+                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
+                    $mapping
+                )
+                ->execute();
+
+            $this->entityManager
+                ->createNativeQuery(
+                    "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1) ) FROM users",
+                    $mapping
+                )
+                ->execute();
+        }
     }
 
     private function encodeUserPassword(User $user, string $value): string
