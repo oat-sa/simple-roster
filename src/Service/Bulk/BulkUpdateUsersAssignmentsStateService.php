@@ -37,6 +37,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_UPDATE) {
+                $this->logger->error('Bulk assignments cancel error: wrong type.', ['operation' => $operation]);
                 $result->addBulkOperationFailure($operation);
                 continue;
             }
@@ -63,6 +64,10 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
                 $result->addBulkOperationSuccess($operation);
             } catch (Throwable $exception) {
+                $this->logger->error(
+                    'Bulk assignments cancel error: ' . $exception->getMessage(),
+                    ['operation' => $operation]
+                );
                 $result->addBulkOperationFailure($operation);
             }
         }

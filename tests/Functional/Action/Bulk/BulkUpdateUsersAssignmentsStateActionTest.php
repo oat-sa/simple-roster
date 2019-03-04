@@ -166,6 +166,11 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         $this->getEntityManager()->refresh($user->getLastAssignment());
         $this->assertEquals(Assignment::STATE_READY, $user->getLastAssignment()->getState());
         $this->assertCount(1, $user->getAvailableAssignments());
+
+        $this->assertHasLogRecordWithMessage(
+            "Bulk assignments cancel error: User with username = 'nonExistingUser1' cannot be found.",
+            Logger::ERROR
+        );
     }
 
     public function testItUpdatesAssignmentStateWithValidUserProvided(): void
