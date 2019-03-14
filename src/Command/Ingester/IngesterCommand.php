@@ -75,6 +75,14 @@ class IngesterCommand extends Command
         );
 
         $this->addOption(
+            'charset',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'CSV source charset',
+            IngesterSourceInterface::DEFAULT_CSV_CHARSET
+        );
+
+        $this->addOption(
             'force',
             'f',
             InputOption::VALUE_NONE,
@@ -92,7 +100,8 @@ class IngesterCommand extends Command
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
-                ->setDelimiter($input->getOption('delimiter'));
+                ->setDelimiter($input->getOption('delimiter'))
+                ->setCharset($input->getOption('charset'));
 
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
