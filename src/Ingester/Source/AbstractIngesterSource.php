@@ -10,6 +10,9 @@ abstract class AbstractIngesterSource implements IngesterSourceInterface
     /** @var string */
     protected $delimiter = self::DEFAULT_CSV_DELIMITER;
 
+    /** @var string */
+    protected $charset = self::DEFAULT_CSV_CHARSET;
+
     public function setPath(string $path): IngesterSourceInterface
     {
         $this->path = $path;
@@ -20,6 +23,13 @@ abstract class AbstractIngesterSource implements IngesterSourceInterface
     public function setDelimiter(string $delimiter): IngesterSourceInterface
     {
         $this->delimiter = $delimiter;
+
+        return $this;
+    }
+
+    public function setCharset(string $charset): IngesterSourceInterface
+    {
+        $this->charset = $charset;
 
         return $this;
     }

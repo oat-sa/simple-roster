@@ -36,4 +36,22 @@ class LocalCsvIngesterSourceTest extends TestCase
             $this->assertCount(1, $row);
         }
     }
+
+    public function testGetContentWithOtherCharset(): void
+    {
+        $subject = new LocalCsvIngesterSource();
+        $subject
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/UTF-16LE-infrastructures.csv')
+            ->setCharset('UTF-16LE');
+
+        $output = $subject->getContent();
+
+        foreach ($output as $row) {
+            $this->assertCount(4, $row);
+            $this->assertEquals('ms', $row['label']);
+            $this->assertEquals('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            $this->assertEquals('key', $row['ltiKey']);
+            $this->assertEquals('secret', $row['ltiSecret']);
+        }
+    }
 }

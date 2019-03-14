@@ -20,6 +20,7 @@ $ bin/console roster:ingest <type> <source> <path> [--force]
 | Option | Description |
 | ------------- |:-------------|
 | -d, --delimiter | CSV delimiter [default: `,`] |
+| -c, --charset | CSV source charset [default: `UTF-8`] |
 | -f, --force      |  To involve actual database modifications or not [default: `false`] |
 
 #### Other options
@@ -39,6 +40,11 @@ $ bin/console roster:ingest infrastructure local /path/to/file.csv
 Ingesting infrastructures from a local CSV file:
 ```bash
 $ bin/console roster:ingest infrastructure local /path/to/file.csv --force
+```
+
+Ingesting infrastructures from a local UTF-16LE encoded CSV file:
+```bash
+$ bin/console roster:ingest infrastructure local /path/to/file.csv --charset="UTF-16LE" --force
 ```
 
 Ingesting line-items from a local CSV file:

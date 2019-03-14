@@ -28,6 +28,8 @@ class LineItemIngesterTest extends KernelTestCase
 
     public function testDryRunIngest(): void
     {
+        $this->prepareIngestionContext();
+
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv');
 
         $output = $this->subject->ingest($source);

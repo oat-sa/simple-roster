@@ -29,6 +29,8 @@ class UserIngesterTest extends KernelTestCase
 
     public function testDryRunIngest(): void
     {
+        $this->prepareIngestionContext();
+
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
         $output = $this->subject->ingest($source);

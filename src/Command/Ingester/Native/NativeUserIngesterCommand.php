@@ -92,6 +92,14 @@ class NativeUserIngesterCommand extends Command
         );
 
         $this->addOption(
+            'charset',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'CSV source charset',
+            IngesterSourceInterface::DEFAULT_CSV_CHARSET
+        );
+
+        $this->addOption(
             'batch',
             'b',
             InputOption::VALUE_REQUIRED,
@@ -116,7 +124,8 @@ class NativeUserIngesterCommand extends Command
             $source = $this->sourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
-                ->setDelimiter($input->getOption('delimiter'));
+                ->setDelimiter($input->getOption('delimiter'))
+                ->setCharset($input->getOption('charset'));
 
             $index = $this->getAvailableStartIndex();
             $lineItemCollection = $this->fetchLineItems();
