@@ -20,8 +20,14 @@ class LocalCsvIngesterSource extends AbstractIngesterSource
     {
         $reader = Reader::createFromPath($this->path);
 
-        return $reader
+        $reader
             ->setDelimiter($this->delimiter)
             ->setHeaderOffset(0);
+
+        if ($this->charset != self::DEFAULT_CSV_CHARSET) {
+            $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $this->charset));
+        }
+
+        return $reader;
     }
 }

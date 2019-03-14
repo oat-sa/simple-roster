@@ -26,7 +26,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testGetContentWithDefaultDelimiter(): void
     {
-        $this->prepareS3Client();
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $output = $this->subject->getContent();
 
@@ -41,7 +41,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testGetContentWithOtherDelimiter(): void
     {
-        $this->prepareS3Client();
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
         $this->subject->setDelimiter('|');
 
@@ -52,7 +52,24 @@ class S3CsvIngesterSourceTest extends TestCase
         }
     }
 
-    private function prepareS3Client(): void
+    public function testGetContentWithOtherCharset(): void
+    {
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/UTF-16LE-infrastructures.csv');
+
+        $this->subject->setCharset('UTF-16LE');
+
+        $output = $this->subject->getContent();
+
+        foreach ($output as $row) {
+            $this->assertCount(4, $row);
+            $this->assertEquals('ms', $row['label']);
+            $this->assertEquals('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            $this->assertEquals('key', $row['ltiKey']);
+            $this->assertEquals('secret', $row['ltiSecret']);
+        }
+    }
+
+    private function prepareS3Client(string $source): void
     {
         $this->client
             ->expects($this->once())
@@ -62,7 +79,7 @@ class S3CsvIngesterSourceTest extends TestCase
                 'Key' => 'path'
             ]])
             ->willReturn([
-                'Body' => file_get_contents(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv')
+                'Body' => file_get_contents($source)
             ]);
     }
 }

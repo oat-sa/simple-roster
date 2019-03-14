@@ -3,6 +3,7 @@
 REST back-end service that handles authentication and eligibilities.
 
 ## Table of Contents
+- [Versions](#versions)
 - [Installation](#installation)
 - [Documentation](#documentation)
     - [API documentation](#api-documentation)
@@ -14,6 +15,10 @@ REST back-end service that handles authentication and eligibilities.
     - [Blackfire usage](#blackfire-usage)
 - [Testing](#testing)
 - [Static code analysis with PHPStan](#static-code-analysis-with-phpstan)
+
+## Versions
+
+See [CHANGELOG.md](CHANGELOG.md) file.
 
 ## Installation
 

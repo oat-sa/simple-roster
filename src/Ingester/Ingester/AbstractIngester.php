@@ -27,15 +27,15 @@ abstract class AbstractIngester implements IngesterInterface
             $dryRun
         );
 
-        if (!$dryRun) {
-            $this->prepare();
-        }
+        $this->prepare();
 
         $lineNumber = 1;
         foreach ($source->getContent() as $data) {
             try {
+                $entity = $this->createEntity($data);
+
                 if (!$dryRun) {
-                    $this->managerRegistry->getManager()->persist($this->createEntity($data));
+                    $this->managerRegistry->getManager()->persist($entity);
                     $this->managerRegistry->getManager()->flush();
                 }
 

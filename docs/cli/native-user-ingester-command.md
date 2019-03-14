@@ -19,6 +19,7 @@ $ bin/console roster:native-ingest:user <source> <path> [--batch=1000]
 | Option | Description |
 | ------------- |:-------------|
 | -d, --delimiter | CSV delimiter [default: `,`] |
+| -c, --charset | CSV source charset [default: `UTF-8`] |
 | -b, --batch | Batch size [default: `1000`] |
 
 #### Other options
@@ -33,6 +34,11 @@ $ bin/console roster:native-ingest:user -h
 Native ingesting users from a local CSV file:
 ```bash
 $ bin/console roster:native-ingest:user local /path/to/file.csv
+```
+
+Native ingesting users from a local UTF-16LE encoded CSV file:
+```bash
+$ bin/console roster:native-ingest:user local /path/to/file.csv --charset="UTF-16LE"
 ```
 
 Native ingesting users from a S3 bucket CSV file:
