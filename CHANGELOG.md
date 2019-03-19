@@ -3,7 +3,6 @@
 ## 1.1.1
 
 ### Fixed
-
 - Execution speed and memory consumption of _bulk_ endpoints in case of large operation size.
 
 ## 1.1.0

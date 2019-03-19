@@ -40,7 +40,6 @@ RUN { \
     echo 'opcache.fast_shutdown=1'; \
     echo 'opcache.enable_cli=1'; \
     echo 'opcache.load_comments=1'; \
-    echo 'max_execution_time = 100'; \
 } >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
