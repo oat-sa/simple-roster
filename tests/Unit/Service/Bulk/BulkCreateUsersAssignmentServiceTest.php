@@ -69,4 +69,28 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
             ],
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
     }
+
+    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    {
+        $lastAssignment = (new Assignment())->setLineItem(new LineItem());
+
+        $this->userRepository
+            ->method('getByUsernameWithAssignments')
+            ->willReturnCallback(function (string $username) use ($lastAssignment) {
+                return (new User())
+                    ->setUsername($username)
+                    ->addAssignment($lastAssignment);
+            });
+
+        $bulkOperationCollection = (new BulkOperationCollection())
+            ->add(new BulkOperation('test', BulkOperation::TYPE_CREATE))
+            ->add(new BulkOperation('test1', BulkOperation::TYPE_CREATE))
+            ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush');
+
+        $this->subject->process($bulkOperationCollection);
+    }
 }

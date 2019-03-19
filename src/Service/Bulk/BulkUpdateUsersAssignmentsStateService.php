@@ -39,6 +39,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             if ($operation->getType() !== BulkOperation::TYPE_UPDATE) {
                 $this->logger->error('Bulk assignments cancel error: wrong type.', ['operation' => $operation]);
                 $result->addBulkOperationFailure($operation);
+
                 continue;
             }
 
@@ -60,8 +61,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                     ];
                 }
 
-                $this->entityManager->flush();
-
                 $result->addBulkOperationSuccess($operation);
             } catch (Throwable $exception) {
                 $this->logger->error(
@@ -73,6 +72,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         }
 
         if (!$result->hasFailures()) {
+            $this->entityManager->flush();
             $this->entityManager->commit();
 
             foreach ($this->logBuffer as $logRecord) {

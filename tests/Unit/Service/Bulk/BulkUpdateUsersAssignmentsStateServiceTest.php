@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Service\Bulk;
 
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
@@ -20,6 +21,9 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
     /** @var EntityManagerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $entityManager;
 
+    /** @var UserRepository|PHPUnit_Framework_MockObject_MockObject */
+    private $userRepository;
+
     /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $logger;
 
@@ -30,10 +34,12 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
+        $this->userRepository = $this->createMock(UserRepository::class);
+
         $this->entityManager
             ->method('getRepository')
             ->with(User::class)
-            ->willReturn($this->createMock(UserRepository::class));
+            ->willReturn($this->userRepository);
 
         $this->subject = new BulkUpdateUsersAssignmentsStateService($this->entityManager, $this->logger);
     }
@@ -41,7 +47,11 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
     {
         $expectedFailingOperation = new BulkOperation('expectedFailure', BulkOperation::TYPE_CREATE);
-        $successfulOperation = new BulkOperation('test', BulkOperation::TYPE_UPDATE);
+        $successfulOperation = new BulkOperation(
+            'test',
+            BulkOperation::TYPE_UPDATE,
+            ['state' => Assignment::STATE_CANCELLED]
+        );
 
         $bulkOperationCollection = (new BulkOperationCollection())
             ->add($expectedFailingOperation)
@@ -56,5 +66,23 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
                 ],
             ],
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
+    }
+
+    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    {
+        $this->userRepository
+            ->method('getByUsernameWithAssignments')
+            ->willReturn(new User());
+
+        $bulkOperationCollection = (new BulkOperationCollection())
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
+            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
+            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]));
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush');
+
+        $this->subject->process($bulkOperationCollection);
     }
 }
