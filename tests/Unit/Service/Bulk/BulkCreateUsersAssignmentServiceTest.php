@@ -72,14 +72,12 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $lastAssignment = (new Assignment())->setLineItem(new LineItem());
-
         $this->userRepository
             ->method('getByUsernameWithAssignments')
-            ->willReturnCallback(function (string $username) use ($lastAssignment) {
+            ->willReturnCallback(function (string $username) {
                 return (new User())
                     ->setUsername($username)
-                    ->addAssignment($lastAssignment);
+                    ->addAssignment((new Assignment())->setLineItem(new LineItem()));
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
