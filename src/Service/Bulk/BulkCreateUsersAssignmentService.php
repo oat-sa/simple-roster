@@ -40,6 +40,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
             if ($operation->getType() !== BulkOperation::TYPE_CREATE) {
                 $this->logger->error('Bulk assignments create error: wrong type.', ['operation' => $operation]);
                 $result->addBulkOperationFailure($operation);
+
                 continue;
             }
 
@@ -61,14 +62,12 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
                 $user->addAssignment($newAssignment);
 
                 $this->entityManager->persist($newAssignment);
-                $this->entityManager->flush();
 
                 $result->addBulkOperationSuccess($operation);
 
                 $this->logBuffer[] = [
                     'message' => sprintf(
-                        "Successful assignment create operation (id='%s') for user with username='%s'.",
-                        $newAssignment->getId(),
+                        "Successful assignment create operation for user with username='%s'.",
                         $user->getUsername()
                     ),
                     'lineItem' => $newAssignment->getLineItem(),
@@ -83,6 +82,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
         }
 
         if (!$result->hasFailures()) {
+            $this->entityManager->flush();
             $this->entityManager->commit();
 
             foreach ($this->logBuffer as $logRecord) {
