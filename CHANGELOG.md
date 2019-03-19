@@ -8,5 +8,5 @@
 ## 1.1.0
 
 ### Added
-- Feature to specify charset for regular and native ingesters
-- Feature to perform integrity checks on ingester dry runs
+- Possibility to specify charset for regular and native ingesters.
+- Possibility to perform integrity checks on ingester dry runs.
