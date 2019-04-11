@@ -5,17 +5,17 @@ namespace App\Tests\Unit\Logger;
 use App\Entity\User;
 use App\Logger\UserRequestSessionLogProcessor;
 use App\Request\RequestIdStorage;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
 class UserRequestSessionLogProcessorTest extends TestCase
 {
-    /** @var Security|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Security|MockObject */
     private $security;
 
-    /** @var SessionInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var SessionInterface|MockObject */
     private $session;
 
     /** @var RequestIdStorage */
@@ -24,7 +24,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
     /** @var UserRequestSessionLogProcessor */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +41,9 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArraySubset(['extra' => ['requestId' => 'expectedRequestId']], $logRecord);
+        $this->assertArrayHasKey('extra', $logRecord);
+        $this->assertArrayHasKey('requestId', $logRecord['extra']);
+        $this->assertEquals('expectedRequestId', $logRecord['extra']['requestId']);
     }
 
     public function testItExtendsLogRecordWithSessionId(): void
@@ -53,7 +55,9 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArraySubset(['extra' => ['sessionId' => 'expectedSessionId']], $logRecord);
+        $this->assertArrayHasKey('extra', $logRecord);
+        $this->assertArrayHasKey('sessionId', $logRecord['extra']);
+        $this->assertEquals('expectedSessionId', $logRecord['extra']['sessionId']);
     }
 
     public function testItExtendsLogRecordWithUsername(): void
@@ -64,13 +68,17 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArraySubset(['extra' => ['username' => 'expectedUsername']], $logRecord);
+        $this->assertArrayHasKey('extra', $logRecord);
+        $this->assertArrayHasKey('username', $logRecord['extra']);
+        $this->assertEquals('expectedUsername', $logRecord['extra']['username']);
     }
 
     public function testItExtendsLogRecordWithGuestUserIfUserCannotBeRetrieved(): void
     {
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArraySubset(['extra' => ['username' => 'guest']], $logRecord);
+        $this->assertArrayHasKey('extra', $logRecord);
+        $this->assertArrayHasKey('username', $logRecord['extra']);
+        $this->assertEquals('guest', $logRecord['extra']['username']);
     }
 }

@@ -16,10 +16,10 @@ class LocalCsvIngesterSourceTest extends TestCase
 
         foreach ($output as $row) {
             $this->assertCount(4, $row);
-            $this->assertContains('infra', $row['label']);
-            $this->assertContains('http://infra', $row['ltiDirectorLink']);
-            $this->assertContains('key', $row['ltiKey']);
-            $this->assertContains('secret', $row['ltiSecret']);
+            $this->assertStringContainsString('infra', $row['label']);
+            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            $this->assertStringContainsString('key', $row['ltiKey']);
+            $this->assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 

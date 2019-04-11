@@ -230,7 +230,7 @@ class NativeUserIngesterCommand extends Command
 
     private function refreshSequences(ResultSetMapping $mapping): void
     {
-        if ($this->kernelEnvironment != 'test') {
+        if ($this->kernelEnvironment !== 'test') {
             $this->entityManager
                 ->createNativeQuery(
                     "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",

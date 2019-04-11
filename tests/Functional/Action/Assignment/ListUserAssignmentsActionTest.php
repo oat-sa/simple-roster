@@ -23,13 +23,11 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $client->request(Request::METHOD_GET, '/api/v1/assignments');
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'Full authentication is required to access this resource.',
-                ],
-            ],
-            json_decode($client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(
+            'Full authentication is required to access this resource.',
+            $decodedResponse['error']['message']
         );
     }
 

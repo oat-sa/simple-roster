@@ -11,7 +11,7 @@ class RequestIdStorageTest extends TestCase
     /** @var RequestIdStorage */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

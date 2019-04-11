@@ -10,8 +10,8 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Bulk\BulkCreateUsersAssignmentService;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Psr\Log\LoggerInterface;
 
 class BulkCreateUsersAssignmentServiceTest extends TestCase
@@ -19,16 +19,16 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
     /** @var BulkCreateUsersAssignmentService */
     private $subject;
 
-    /** @var EntityManagerInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
-    /** @var UserRepository|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserRepository|MockObject */
     private $userRepository;
 
-    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +74,7 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
     {
         $this->userRepository
             ->method('getByUsernameWithAssignments')
-            ->willReturnCallback(function (string $username) {
+            ->willReturnCallback(static function (string $username) {
                 return (new User())
                     ->setUsername($username)
                     ->addAssignment((new Assignment())->setLineItem(new LineItem()));

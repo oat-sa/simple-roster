@@ -23,7 +23,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     /** @var Client */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,14 +47,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'API key authentication failure.',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
     public function testItThrowsBadRequestHttpExceptionIfRequestBodyIsInvalid(): void
@@ -69,13 +64,11 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'Invalid JSON request body received. Error: Syntax error',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(
+            'Invalid JSON request body received. Error: Syntax error',
+            $decodedResponse['error']['message']
         );
     }
 
@@ -91,16 +84,14 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => sprintf(
-                        "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
-                        BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
-                    )
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(
+            sprintf(
+                "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
+                BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
+            ),
+            $decodedResponse['error']['message']
         );
     }
 
@@ -116,14 +107,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'Empty request body received.',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Empty request body received.', $decodedResponse['error']['message']);
     }
 
     public function testItDoesNotCreateNewAssignmentsWithInvalidUsersProvided(): void
@@ -153,8 +139,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                     'results' => [
                         $user->getUsername() => true,
                         'nonExistingUser1' => false,
-                    ]
-                ]
+                    ],
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
@@ -193,8 +179,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                     'applied' => true,
                     'results' => [
                         $user->getUsername() => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
@@ -239,7 +225,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         foreach ($users as $user) {
             $payload[] = [
-                'identifier' => $user
+                'identifier' => $user,
             ];
         }
 

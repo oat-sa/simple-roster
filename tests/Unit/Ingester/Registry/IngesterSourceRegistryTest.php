@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Ingester\Registry;
 
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Registry\IngesterSourceRegistry;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class IngesterSourceRegistryTest extends TestCase
@@ -11,28 +12,27 @@ class IngesterSourceRegistryTest extends TestCase
     /** @var IngesterSourceRegistry */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->subject = new IngesterSourceRegistry();
     }
 
-    public function testItIsConstructedEmpty()
+    public function testItIsConstructedEmpty(): void
     {
         $this->assertEmpty($this->subject->all());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Ingester source named 'invalid' cannot be found.
-     */
-    public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterSourceName()
+    public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterSourceName(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Ingester source named 'invalid' cannot be found.");
+
         $this->subject->get('invalid');
     }
 
-    public function testItCanAddAnRetrieveIngesterSources()
+    public function testItCanAddAnRetrieveIngesterSources(): void
     {
         $source1 = $this->createMock(IngesterSourceInterface::class);
         $source2 = $this->createMock(IngesterSourceInterface::class);

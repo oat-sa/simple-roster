@@ -17,8 +17,5 @@
     "@default": true,
     "@removal": false
   },
-  "phpUnit": {
-    "customPath": "bin/phpunit"
-  },
   "tmpDir": "var/cache/infection"
 }

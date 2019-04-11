@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class IngesterResultTest extends TestCase
 {
-    public function testGettersPostConstruction()
+    public function testGettersPostConstruction(): void
     {
         $subject = new IngesterResult('ingester', 'source');
 
@@ -20,7 +20,7 @@ class IngesterResultTest extends TestCase
         $this->assertTrue($subject->isDryRun());
     }
 
-    public function testItCanAddSuccesses()
+    public function testItCanAddSuccesses(): void
     {
         $subject = new IngesterResult('ingester', 'source');
 
@@ -32,7 +32,7 @@ class IngesterResultTest extends TestCase
         $this->assertFalse($subject->hasFailures());
     }
 
-    public function testItCanAddAndRetrieveFailures()
+    public function testItCanAddAndRetrieveFailures(): void
     {
         $failure1 = new IngesterResultFailure(1, ['data'], 'reason1');
         $failure2 = new IngesterResultFailure(2, ['data2'], 'reason2');
@@ -54,7 +54,7 @@ class IngesterResultTest extends TestCase
         );
     }
 
-    public function testPostDryRunStringRepresentation()
+    public function testPostDryRunStringRepresentation(): void
     {
         $subject = new IngesterResult('ingester', 'source');
 
@@ -69,7 +69,7 @@ class IngesterResultTest extends TestCase
         );
     }
 
-    public function testPostRunStringRepresentation()
+    public function testPostRunStringRepresentation(): void
     {
         $subject = new IngesterResult('ingester', 'source', false);
 

@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class UserIngesterTest extends TestCase
 {
-    public function testRegistryItemName()
+    public function testRegistryItemName(): void
     {
         $subject = new UserIngester($this->createMock(ManagerRegistry::class));
 

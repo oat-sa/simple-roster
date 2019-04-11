@@ -11,7 +11,7 @@ trait LoggerTestingTrait
     /** @var TestHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->setUpTestLogHandler();
     }

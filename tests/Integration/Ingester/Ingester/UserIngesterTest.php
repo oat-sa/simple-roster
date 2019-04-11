@@ -9,6 +9,7 @@ use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserIngesterTest extends KernelTestCase
@@ -18,7 +19,7 @@ class UserIngesterTest extends KernelTestCase
     /** @var UserIngester */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,12 +44,11 @@ class UserIngesterTest extends KernelTestCase
         $this->assertEmpty($this->getRepository(User::class)->findAll());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot ingest 'user' since line-item table is empty.
-     */
     public function testIngestWithEmptyLineItems(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Cannot ingest 'user' since line-item table is empty.");
+
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users.csv');
 
         $this->subject->ingest($source, false);
@@ -83,7 +83,7 @@ class UserIngesterTest extends KernelTestCase
             ],
             $failure->getData()
         );
-        $this->assertContains('UNIQUE constraint failed: users.username', $failure->getReason());
+        $this->assertStringContainsString('UNIQUE constraint failed: users.username', $failure->getReason());
     }
 
     public function testIngestWithValidSource(): void

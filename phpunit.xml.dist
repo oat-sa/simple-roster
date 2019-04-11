@@ -38,7 +38,7 @@
         </whitelist>
     </filter>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-    </listeners>
+    <logging>
+        <log type="coverage-html" target="var/log/phpunit"/>
+    </logging>
 </phpunit>

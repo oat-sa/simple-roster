@@ -16,7 +16,7 @@ class IngesterCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class IngesterCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
@@ -53,7 +53,7 @@ class IngesterCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
@@ -80,12 +80,12 @@ class IngesterCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
             $this->commandTester->getDisplay()
         );
@@ -106,7 +106,7 @@ class IngesterCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(1, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[ERROR] Ingester named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );
@@ -122,7 +122,7 @@ class IngesterCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(1, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[ERROR] Ingester source named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );
