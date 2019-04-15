@@ -26,7 +26,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
             $bulkOperation = new BulkOperation(
                 $operation['identifier'],
                 $this->getBulkOperationTypeFromRequest($request),
-                $operation['attributes']  ?? []
+                $operation['attributes'] ?? []
             );
 
             $collection->add($bulkOperation);

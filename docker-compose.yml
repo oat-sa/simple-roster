@@ -8,7 +8,7 @@ services:
             - simple-roster
             - oat-docker
         volumes:
-            - .:/var/www/html:cached
+            - .:/var/www/html
             - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
         working_dir: /etc/nginx/conf.d
         labels:
@@ -26,7 +26,7 @@ services:
         networks:
             - simple-roster
         volumes:
-            - .:/var/www/html:cached
+            - .:/var/www/html
         working_dir: /var/www/html
 
     simple-roster-doctrine-redis:

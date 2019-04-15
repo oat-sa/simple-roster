@@ -6,12 +6,14 @@ use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+// TODO rename
 class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
 {
     /** @var EntityManagerInterface */
@@ -33,7 +35,9 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     {
         $result = new BulkResult();
 
-        $this->entityManager->beginTransaction();
+        if (!$operationCollection->isDryRun()) {
+            $this->entityManager->beginTransaction();
+        }
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_UPDATE) {
@@ -48,12 +52,20 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 $userRepository = $this->entityManager->getRepository(User::class);
                 $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
 
-                foreach ($user->getAvailableAssignments() as $assignment) {
-                    $assignment->setState($operation->getAttribute('state'));
+                foreach ($user->getAssignments() as $assignment) {
+                    if (!in_array(
+                        $assignment->getState(),
+                        [Assignment::STATE_READY, Assignment::STATE_STARTED],
+                        true
+                    )) {
+                        continue;
+                    }
+
+                    $assignment->setState(Assignment::STATE_CANCELLED);
 
                     $this->logBuffer[] = [
                         'message' => sprintf(
-                            "Successful assignment update operation (id='%s') for user with username='%s'.",
+                            "Successful assignment cancellation operation (id='%s') for user with username='%s'.",
                             $assignment->getId(),
                             $user->getUsername()
                         ),
@@ -71,7 +83,12 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             }
         }
 
-        if (!$result->hasFailures()) {
+        return $this->processResult($operationCollection, $result);
+    }
+
+    private function processResult(BulkOperationCollection $operationCollection, BulkResult $result): BulkResult
+    {
+        if (!$result->hasFailures() && !$operationCollection->isDryRun()) {
             $this->entityManager->flush();
             $this->entityManager->commit();
 
@@ -81,7 +98,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                     ['lineItem' => $logRecord['lineItem']]
                 );
             }
-        } else {
+        } elseif (!$operationCollection->isDryRun()) {
             $this->entityManager->rollback();
         }
 

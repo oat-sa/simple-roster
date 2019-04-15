@@ -30,7 +30,7 @@ class NativeUserIngesterCommand extends Command
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
-    private $sourceRegistry;
+    private $ingesterSourceRegistry;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -51,12 +51,12 @@ class NativeUserIngesterCommand extends Command
     private $kernelEnvironment;
 
     public function __construct(
-        IngesterSourceRegistry $sourceRegistry,
+        IngesterSourceRegistry $ingesterSourceRegistry,
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $passwordEncoder,
         string $kernelEnvironment
     ) {
-        $this->sourceRegistry = $sourceRegistry;
+        $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
         $this->kernelEnvironment = $kernelEnvironment;
@@ -73,7 +73,7 @@ class NativeUserIngesterCommand extends Command
             InputArgument::REQUIRED,
             sprintf(
                 'Source type to ingest from, possible values: ["%s"]',
-                implode('", "', array_keys($this->sourceRegistry->all()))
+                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
             )
         );
 
@@ -121,7 +121,7 @@ class NativeUserIngesterCommand extends Command
         $user = new User();
 
         try {
-            $source = $this->sourceRegistry
+            $source = $this->ingesterSourceRegistry
                 ->get($input->getArgument('source'))
                 ->setPath($input->getArgument('path'))
                 ->setDelimiter($input->getOption('delimiter'))

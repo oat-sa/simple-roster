@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Service\Bulk;
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Entity\Assignment;
+use App\Entity\LineItem;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
@@ -52,6 +53,17 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             BulkOperation::TYPE_UPDATE,
             ['state' => Assignment::STATE_CANCELLED]
         );
+
+        $expectedAssignment = (new Assignment())
+            ->setLineItem(new LineItem())
+            ->setState(Assignment::STATE_STARTED);
+
+        $expectedUser = (new User())
+            ->addAssignment($expectedAssignment);
+
+        $this->userRepository
+            ->method('getByUsernameWithAssignments')
+            ->willReturn($expectedUser);
 
         $bulkOperationCollection = (new BulkOperationCollection())
             ->add($expectedFailingOperation)
