@@ -155,7 +155,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         $this->assertCount(1, $user->getAvailableAssignments());
 
         $this->assertHasLogRecordWithMessage(
-            "Bulk assignments cancel error: User with username = 'nonExistingUser1' cannot be found.",
+            "Bulk assignments cancellation error: User with username = 'nonExistingUser1' cannot be found.",
             Logger::ERROR
         );
     }
@@ -215,7 +215,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            "Successful assignment cancellation operation (id='1') for user with username='user1'.",
+            "Successful assignment cancellation (assignmentId = '1', username = 'user1').",
             Logger::INFO
         );
     }

@@ -3,10 +3,9 @@
 namespace App\Bulk\Result;
 
 use ArrayIterator;
-use Countable;
 use IteratorAggregate;
 
-class BulkResultCollection implements IteratorAggregate, Countable
+class BulkResultCollection implements IteratorAggregate
 {
     /** @var BulkResult[] */
     private $bulkResults = [];
@@ -21,10 +20,5 @@ class BulkResultCollection implements IteratorAggregate, Countable
     public function getIterator()
     {
         return new ArrayIterator($this->bulkResults);
-    }
-
-    public function count()
-    {
-        return count($this->bulkResults);
     }
 }

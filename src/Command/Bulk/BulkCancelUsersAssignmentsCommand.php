@@ -12,6 +12,7 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,7 +110,7 @@ class BulkCancelUsersAssignmentsCommand extends Command
         $this->startWatch(self::NAME, __FUNCTION__);
         $consoleOutput = $this->ensureConsoleOutput($output);
         $style = new SymfonyStyle($input, $consoleOutput);
-        $batchSize = (int)$input->getOption('batch') ?: self::DEFAULT_BATCH_SIZE;
+        $batchSize = (int)$input->getOption('batch');
         $isDryRun = !(bool)$input->getOption('force');
 
         if (!$this->promptUser($style, $isDryRun)) {
@@ -129,7 +130,7 @@ class BulkCancelUsersAssignmentsCommand extends Command
             $totalNumberOfAssignments = 0;
             foreach ($source->getContent() as $row) {
                 if (!isset($row['username'])) {
-                    continue;
+                    throw new RuntimeException("Column 'username' cannot be found in source CSV file.");
                 }
 
                 $this->processRow($row['username'], $bulkOperationCollection, $bulkResultCollection, $batchSize);
@@ -240,7 +241,7 @@ class BulkCancelUsersAssignmentsCommand extends Command
     {
         if ($numberOfAssignments % $batchSize === 0) {
             $section->overwrite(
-                sprintf('Success: %s, batched errors: %s', $numberOfAssignments, $this->numberOfErrors)
+                sprintf('Processed: %s, batched errors: %s', $numberOfAssignments, $this->numberOfErrors)
             );
         }
     }

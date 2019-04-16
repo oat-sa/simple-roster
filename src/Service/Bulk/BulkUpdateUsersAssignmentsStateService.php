@@ -65,7 +65,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
                     $this->logBuffer[] = [
                         'message' => sprintf(
-                            "Successful assignment cancellation operation (id='%s') for user with username='%s'.",
+                            "Successful assignment cancellation (assignmentId = '%s', username = '%s').",
                             $assignment->getId(),
                             $user->getUsername()
                         ),
@@ -76,7 +76,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 $result->addBulkOperationSuccess($operation);
             } catch (Throwable $exception) {
                 $this->logger->error(
-                    'Bulk assignments cancel error: ' . $exception->getMessage(),
+                    'Bulk assignments cancellation error: ' . $exception->getMessage(),
                     ['operation' => $operation]
                 );
                 $result->addBulkOperationFailure($operation);
