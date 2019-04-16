@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -96,5 +97,60 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->method('flush');
 
         $this->subject->process($bulkOperationCollection);
+    }
+
+    /**
+     * @dataProvider provideUnsupportedAssignmentState
+     */
+    public function testItThrowsExceptionIfInvalidStateIsReceivedAsOperationAttribute(string $invalidState): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
+                $invalidState,
+                Assignment::STATE_CANCELLED
+            )
+        );
+
+        $this->userRepository
+            ->method('getByUsernameWithAssignments')
+            ->willReturn(new User());
+
+        $bulkOperationCollection = (new BulkOperationCollection())
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => $invalidState]));
+
+        $this->subject->process($bulkOperationCollection);
+    }
+
+    public function testItIgnoresCompletedAssignments(): void
+    {
+        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
+
+        $completedAssignment = (new Assignment())
+            ->setLineItem(new LineItem())
+            ->setState(Assignment::STATE_COMPLETED);
+
+        $user = (new User())
+            ->addAssignment($completedAssignment);
+
+        $this->userRepository
+            ->method('getByUsernameWithAssignments')
+            ->willReturn($user);
+
+        $bulkOperationCollection = (new BulkOperationCollection())->add($operation);
+
+        $this->subject->process($bulkOperationCollection)->jsonSerialize();
+
+        $this->assertEquals(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+    }
+
+    public function provideUnsupportedAssignmentState(): array
+    {
+        return [
+            Assignment::STATE_STARTED => [Assignment::STATE_STARTED],
+            Assignment::STATE_READY => [Assignment::STATE_READY],
+            Assignment::STATE_COMPLETED => [Assignment::STATE_COMPLETED],
+        ];
     }
 }

@@ -48,7 +48,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             [
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../Resources/Assignment/users-100.csv',
-                '--batch' => 5,
+                '--batch' => 3,
                 '--force' => 'true',
             ],
             [
@@ -184,5 +184,34 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             "[ERROR] Column 'username' cannot be found in source CSV file.",
             $this->commandTester->getDisplay()
         );
+    }
+
+    public function testItCanHandleErrorsDuringTheProcess(): void
+    {
+        $this->commandTester->setInputs(['yes']);
+
+        $output = $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../Resources/Assignment/users-100-with-invalid.csv',
+                '--batch' => 3,
+                '--force' => 'true',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+
+        $this->assertEquals(0, $output);
+        $this->assertStringContainsString(
+            'Processed: 100, batched errors: 5',
+            $this->commandTester->getDisplay()
+        );
+        $this->assertStringContainsString(
+            "[OK] Successfully cancelled '85' assignments out of '100'.",
+            $this->commandTester->getDisplay()
+        );
+
+        $this->assignmentRepository = $this->getRepository(Assignment::class);
     }
 }

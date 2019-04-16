@@ -34,7 +34,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     public function process(BulkOperationCollection $operationCollection): BulkResult
     {
         $result = new BulkResult();
-
         if (!$operationCollection->isDryRun()) {
             $this->entityManager->beginTransaction();
         }
@@ -87,7 +86,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             } catch (Throwable $exception) {
                 $this->logger->error(
                     'Bulk assignments cancellation error: ' . $exception->getMessage(),
-                    ['operation' => $operation]
+                    ['operation' => serialize($operation)]
                 );
                 $result->addBulkOperationFailure($operation);
             }

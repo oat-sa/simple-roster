@@ -5,7 +5,6 @@ namespace App\Command\Bulk;
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Bulk\Result\BulkResult;
-use App\Bulk\Result\BulkResultCollection;
 use App\Command\CommandWatcherTrait;
 use App\Entity\Assignment;
 use App\Ingester\Registry\IngesterSourceRegistry;
@@ -18,7 +17,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -38,8 +36,8 @@ class BulkCancelUsersAssignmentsCommand extends Command
     /** @var BulkUpdateUsersAssignmentsStateService */
     private $bulkAssignmentsUpdateService;
 
-    /** @var int */
-    private $numberOfErrors = 0;
+    /** @var BulkResult[] */
+    private $failedBulkResults = [];
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
@@ -124,52 +122,89 @@ class BulkCancelUsersAssignmentsCommand extends Command
         try {
             $source = $this->getIngesterSource($input);
             $bulkOperationCollection = new BulkOperationCollection($isDryRun);
-            $bulkResultCollection = new BulkResultCollection();
 
-            $totalNumberOfAssignments = 0;
+            $numberOfProcessedAssignments = 0;
             foreach ($source->getContent() as $row) {
                 if (!isset($row['username'])) {
                     throw new RuntimeException("Column 'username' cannot be found in source CSV file.");
                 }
 
-                $this->processRow($row['username'], $bulkOperationCollection, $bulkResultCollection, $batchSize);
-                $totalNumberOfAssignments++;
+                $operation = new BulkOperation(
+                    $row['username'],
+                    BulkOperation::TYPE_UPDATE,
+                    ['state' => Assignment::STATE_CANCELLED]
+                );
 
-                $this->refreshSection($section, $totalNumberOfAssignments, $batchSize);
+                $bulkOperationCollection->add($operation);
+
+                if (count($bulkOperationCollection) % $batchSize !== 0) {
+                    continue;
+                }
+
+                $numberOfProcessedAssignments += count($bulkOperationCollection);
+                $bulkResult = $this->processOperationCollection($bulkOperationCollection);
+
+                if ($bulkResult->hasFailures()) {
+                    $this->failedBulkResults[] = $bulkResult;
+                }
+
+                $section->overwrite(
+                    sprintf(
+                        'Processed: %s, batched errors: %s',
+                        $numberOfProcessedAssignments,
+                        count($this->failedBulkResults)
+                    )
+                );
             }
 
+            // Process remaining operations
             if (!$bulkOperationCollection->isEmpty()) {
-                $bulkResult = $this->bulkAssignmentsUpdateService->process($bulkOperationCollection);
-                $bulkResultCollection->add($bulkResult);
+                $numberOfProcessedAssignments += count($bulkOperationCollection);
+                $bulkResult = $this->processOperationCollection($bulkOperationCollection);
+
+                if ($bulkResult->hasFailures()) {
+                    $this->failedBulkResults[] = $bulkResult;
+                }
+
+                $section->overwrite(
+                    sprintf(
+                        'Processed: %s, batched errors: %s',
+                        $numberOfProcessedAssignments,
+                        count($this->failedBulkResults)
+                    )
+                );
             }
+
+
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 
             return 1;
         }
 
-        $numberOfCancelledAssignments = 0;
-        $totalNumberOfAssignments = 0;
-        /** @var BulkResult $bulkResult */
-        foreach ($bulkResultCollection as $bulkResult) {
-            $totalNumberOfAssignments += $bulkResult->count();
-            if ($bulkResult->hasFailures()) {
-                continue;
-            }
-
-            $numberOfCancelledAssignments += $bulkResult->count();
-        }
-
         $style->newLine(2);
         $style->success(sprintf(
             "Successfully cancelled '%s' assignments out of '%s'.",
-            $numberOfCancelledAssignments,
-            $totalNumberOfAssignments
+            $numberOfProcessedAssignments - count($this->failedBulkResults) * $batchSize,
+            $numberOfProcessedAssignments
         ));
+
+        foreach ($this->failedBulkResults as $failedBulkResult) {
+            $style->error(sprintf("Bulk operation error: '%s'", json_encode($failedBulkResult)));
+        }
 
         $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
+    }
+
+    private function processOperationCollection(BulkOperationCollection $bulkOperationCollection): BulkResult
+    {
+        $bulkResult = $this->bulkAssignmentsUpdateService->process($bulkOperationCollection);
+
+        $bulkOperationCollection->clear();
+
+        return $bulkResult;
     }
 
     /**
@@ -207,26 +242,6 @@ class BulkCancelUsersAssignmentsCommand extends Command
         return $style->askQuestion(new ConfirmationQuestion('Do you want to proceed?'));
     }
 
-    private function processRow(
-        string $username,
-        BulkOperationCollection $bulkOperationCollection,
-        BulkResultCollection $bulkResultCollection,
-        int $batchSize
-    ): void {
-        $operation = new BulkOperation($username, BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
-        $bulkOperationCollection->add($operation);
-        if (count($bulkOperationCollection) % $batchSize === 0) {
-            $bulkResult = $this->bulkAssignmentsUpdateService->process($bulkOperationCollection);
-
-            if ($bulkResult->hasFailures()) {
-                $this->numberOfErrors++;
-            }
-
-            $bulkResultCollection->add($bulkResult);
-            $bulkOperationCollection->clear();
-        }
-    }
-
     private function getIngesterSource(InputInterface $input): IngesterSourceInterface
     {
         return $this->ingesterSourceRegistry
@@ -234,14 +249,5 @@ class BulkCancelUsersAssignmentsCommand extends Command
             ->setPath($input->getArgument('path'))
             ->setDelimiter($input->getOption('delimiter'))
             ->setCharset($input->getOption('charset'));
-    }
-
-    private function refreshSection(ConsoleSectionOutput $section, int $numberOfAssignments, int $batchSize): void
-    {
-        if ($numberOfAssignments % $batchSize === 0) {
-            $section->overwrite(
-                sprintf('Processed: %s, batched errors: %s', $numberOfAssignments, $this->numberOfErrors)
-            );
-        }
     }
 }

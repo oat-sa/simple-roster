@@ -3,10 +3,9 @@
 namespace App\Bulk\Result;
 
 use App\Bulk\Operation\BulkOperation;
-use Countable;
 use JsonSerializable;
 
-class BulkResult implements JsonSerializable, Countable
+class BulkResult implements JsonSerializable
 {
     /** @var bool[] */
     private $results = [];
@@ -40,12 +39,6 @@ class BulkResult implements JsonSerializable, Countable
             ],
         ];
     }
-
-    public function count()
-    {
-        return count($this->results);
-    }
-
 
     private function addBulkOperationResult(BulkOperation $operation, bool $result): self
     {
