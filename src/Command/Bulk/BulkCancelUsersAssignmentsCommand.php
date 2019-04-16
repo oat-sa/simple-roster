@@ -26,7 +26,6 @@ use Throwable;
 
 class BulkCancelUsersAssignmentsCommand extends Command
 {
-    // TODO add watcher
     use CommandWatcherTrait;
 
     public const NAME = 'roster:assignments:bulk-cancel';
@@ -214,7 +213,7 @@ class BulkCancelUsersAssignmentsCommand extends Command
         BulkResultCollection $bulkResultCollection,
         int $batchSize
     ): void {
-        $operation = new BulkOperation($username, BulkOperation::TYPE_UPDATE);
+        $operation = new BulkOperation($username, BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
         $bulkOperationCollection->add($operation);
         if (count($bulkOperationCollection) % $batchSize === 0) {
             $bulkResult = $this->bulkAssignmentsUpdateService->process($bulkOperationCollection);

@@ -10,10 +10,10 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-// TODO rename
 class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
 {
     /** @var EntityManagerInterface */
@@ -45,6 +45,16 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 $result->addBulkOperationFailure($operation);
 
                 continue;
+            }
+
+            if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
+                throw new LogicException(
+                    sprintf(
+                        "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
+                        $operation->getAttribute('state'),
+                        Assignment::STATE_CANCELLED
+                    )
+                );
             }
 
             try {
