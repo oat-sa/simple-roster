@@ -109,6 +109,11 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->state === self::STATE_CANCELLED;
     }
 
+    public function isCancellable(): bool
+    {
+        return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
+    }
+
     public function jsonSerialize(): array
     {
         return [

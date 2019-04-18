@@ -15,7 +15,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcessorInterface
+class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProcessorInterface
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -36,7 +36,9 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
     {
         $result = new BulkResult();
 
-        $this->entityManager->beginTransaction();
+        if (!$operationCollection->isDryRun()) {
+            $this->entityManager->beginTransaction();
+        }
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_CREATE) {
@@ -57,7 +59,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
             }
         }
 
-        if (!$result->hasFailures()) {
+        if (!$result->hasFailures() && !$operationCollection->isDryRun()) {
             $this->entityManager->flush();
             $this->entityManager->commit();
 
@@ -67,7 +69,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
                     ['lineItem' => $logRecord['lineItem']]
                 );
             }
-        } else {
+        } elseif (!$operationCollection->isDryRun()) {
             $this->entityManager->rollback();
         }
 
@@ -86,8 +88,10 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
         $lastAssignment = $user->getLastAssignment();
 
-        foreach ($user->getAvailableAssignments() as $assignment) {
-            $assignment->setState(Assignment::STATE_CANCELLED);
+        foreach ($user->getAssignments() as $assignment) {
+            if ($assignment->isCancellable()) {
+                $assignment->setState(Assignment::STATE_CANCELLED);
+            }
         }
 
         $newAssignment = (new Assignment())
@@ -102,7 +106,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
 
         $this->logBuffer[] = [
             'message' => sprintf(
-                "Successful assignment create operation for user with username='%s'.",
+                "Successful assignment creation (username = '%s').",
                 $user->getUsername()
             ),
             'lineItem' => $newAssignment->getLineItem(),

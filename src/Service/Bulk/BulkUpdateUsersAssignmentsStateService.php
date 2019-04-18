@@ -10,6 +10,8 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -46,43 +48,10 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 continue;
             }
 
-            if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
-                throw new LogicException(
-                    sprintf(
-                        "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
-                        $operation->getAttribute('state'),
-                        Assignment::STATE_CANCELLED
-                    )
-                );
-            }
+            $this->validateStateTransition($operation);
 
             try {
-                /** @var UserRepository $userRepository */
-                $userRepository = $this->entityManager->getRepository(User::class);
-                $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
-
-                foreach ($user->getAssignments() as $assignment) {
-                    if (!in_array(
-                        $assignment->getState(),
-                        [Assignment::STATE_READY, Assignment::STATE_STARTED],
-                        true
-                    )) {
-                        continue;
-                    }
-
-                    $assignment->setState(Assignment::STATE_CANCELLED);
-
-                    $this->logBuffer[] = [
-                        'message' => sprintf(
-                            "Successful assignment cancellation (assignmentId = '%s', username = '%s').",
-                            $assignment->getId(),
-                            $user->getUsername()
-                        ),
-                        'lineItem' => $assignment->getLineItem(),
-                    ];
-                }
-
-                $result->addBulkOperationSuccess($operation);
+                $this->processOperation($operation, $result);
             } catch (Throwable $exception) {
                 $this->logger->error(
                     'Bulk assignments cancellation error: ' . $exception->getMessage(),
@@ -112,5 +81,56 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         }
 
         return $result;
+    }
+
+    /**
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function processOperation(BulkOperation $operation, BulkResult $result): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+
+        foreach ($user->getAssignments() as $assignment) {
+            if (!in_array(
+                $assignment->getState(),
+                [Assignment::STATE_READY, Assignment::STATE_STARTED],
+                true
+            )) {
+                continue;
+            }
+
+            $assignment->setState(Assignment::STATE_CANCELLED);
+
+            $this->logBuffer[] = [
+                'message' => sprintf(
+                    "Successful assignment cancellation (assignmentId = '%s', username = '%s').",
+                    $assignment->getId(),
+                    $user->getUsername()
+                ),
+                'lineItem' => $assignment->getLineItem(),
+            ];
+        }
+
+        $result->addBulkOperationSuccess($operation);
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function validateStateTransition(BulkOperation $operation): void
+    {
+        if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
+            throw new LogicException(
+                sprintf(
+                    "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
+                    $operation->getAttribute('state'),
+                    Assignment::STATE_CANCELLED
+                )
+            );
+        }
     }
 }

@@ -213,10 +213,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             $this->generateRequestPayload([$user->getUsername()])
         );
 
-        $this->assertHasLogRecordWithMessage(
-            "Successful assignment create operation for user with username='user1'.",
-            Logger::INFO
-        );
+        $this->assertHasLogRecordWithMessage("Successful assignment creation (username = 'user1').", Logger::INFO);
     }
 
     private function generateRequestPayload(array $users): string

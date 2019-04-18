@@ -4,19 +4,19 @@ namespace App\Action\Bulk;
 
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Responder\SerializerResponder;
-use App\Service\Bulk\BulkCreateUsersAssignmentService;
+use App\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Symfony\Component\HttpFoundation\Response;
 
 class BulkCreateUsersAssignmentsAction
 {
-    /** @var BulkCreateUsersAssignmentService */
+    /** @var BulkCreateUsersAssignmentsService */
     private $bulkCreateUsersAssignmentService;
 
     /** @var SerializerResponder */
     private $responder;
 
     public function __construct(
-        BulkCreateUsersAssignmentService $bulkCreateUsersAssignmentService,
+        BulkCreateUsersAssignmentsService $bulkCreateUsersAssignmentService,
         SerializerResponder $responder
     ) {
         $this->bulkCreateUsersAssignmentService = $bulkCreateUsersAssignmentService;
