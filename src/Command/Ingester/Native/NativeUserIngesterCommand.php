@@ -228,6 +228,9 @@ class NativeUserIngesterCommand extends Command
         $this->assignmentQueryParts = [];
     }
 
+    /**
+     * @codeCoverageIgnore Cannot be tested with SQLite database
+     */
     private function refreshSequences(ResultSetMapping $mapping): void
     {
         if ($this->kernelEnvironment !== 'test') {

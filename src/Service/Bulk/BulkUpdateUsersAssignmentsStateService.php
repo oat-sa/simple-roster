@@ -84,7 +84,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     }
 
     /**
-     *
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */

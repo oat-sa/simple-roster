@@ -76,7 +76,7 @@ class IngesterCommandTest extends KernelTestCase
             'type' => 'infrastructure',
             'source' => 'local',
             'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
-            '--force' => true
+            '--force' => true,
         ]);
 
         $this->assertEquals(0, $output);
@@ -102,7 +102,7 @@ class IngesterCommandTest extends KernelTestCase
             'type' => 'invalid',
             'source' => 'invalid',
             'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
-            '--force' => true
+            '--force' => true,
         ]);
 
         $this->assertEquals(1, $output);
@@ -118,7 +118,7 @@ class IngesterCommandTest extends KernelTestCase
             'type' => 'infrastructure',
             'source' => 'invalid',
             'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
-            '--force' => true
+            '--force' => true,
         ]);
 
         $this->assertEquals(1, $output);

@@ -2,9 +2,11 @@
 
 namespace App\Tests\Functional\Command\Bulk;
 
-use App\Command\Bulk\BulkCancelUsersAssignmentsCommand;
+use App\Command\Bulk\BulkCreateUsersAssignmentsCommand;
 use App\Entity\Assignment;
+use App\Entity\User;
 use App\Repository\AssignmentRepository;
+use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use LogicException;
@@ -13,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
+class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 {
     use DatabaseManualFixturesTrait;
     use LoggerTestingTrait;
@@ -29,14 +31,14 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         $this->setUpTestLogHandler();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(BulkCancelUsersAssignmentsCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(BulkCreateUsersAssignmentsCommand::NAME));
 
         $this->loadFixtures([
             __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
         ]);
     }
 
-    public function testItCanCancelUserAssignments(): void
+    public function testItCanCreateNewAssignmentsForUsersAlreadyHavingAssignments(): void
     {
         $this->commandTester->setInputs(['yes']);
 
@@ -58,15 +60,21 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
+            "[OK] Successfully created '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
-        $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(100, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
+        /** @var User $user */
+        foreach ($this->getRepository(User::class)->findAll() as $user) {
+            $userAssignments = $user->getAssignments();
+
+            $this->assertCount(2, $userAssignments);
+            $this->assertEquals(Assignment::STATE_CANCELLED, $userAssignments[0]->getState());
+            $this->assertEquals(Assignment::STATE_READY, $userAssignments[1]->getState());
+        }
     }
 
-    public function testItLogsSuccessfulAssignmentCancellations(): void
+    public function testItLogsSuccessfulAssignmentCreations(): void
     {
         $this->commandTester->setInputs(['yes']);
 
@@ -87,7 +95,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         for ($i = 1; $i <= 100; $i++) {
             $username = sprintf('user_%s', $i);
             $this->assertHasLogRecordWithMessage(
-                sprintf("Successful assignment cancellation (assignmentId = '%s', username = '%s')", $i, $username),
+                sprintf("Successful assignment creation (username = '%s').", $username),
                 Logger::INFO
             );
         }
@@ -110,12 +118,12 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
+            "[OK] Successfully created '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
         $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
+        $this->assertCount(100, $assignmentRepository->findAll());
     }
 
     public function testItAbortsTheProcessIfUserDoesNotWantToProceed(): void
@@ -139,12 +147,12 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringNotContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
+            "[OK] Successfully created '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
         $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
+        $this->assertCount(100, $assignmentRepository->findAll());
     }
 
     public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
@@ -193,7 +201,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../Resources/Assignment/100-users-with-5-invalid.csv',
                 '--batch' => 3,
-                '--force' => 'true',
+                '--force' => 'true'
             ],
             [
                 'capture_stderr_separately' => true,
@@ -206,7 +214,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '85' assignments out of '100'.",
+            "[OK] Successfully created '85' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
     }
