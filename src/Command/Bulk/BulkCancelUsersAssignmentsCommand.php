@@ -160,11 +160,8 @@ class BulkCancelUsersAssignmentsCommand extends Command
             // Process remaining operations
             if (!$bulkOperationCollection->isEmpty()) {
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
-                $bulkResult = $this->processOperationCollection($bulkOperationCollection);
 
-                if ($bulkResult->hasFailures()) {
-                    $this->failedBulkResults[] = $bulkResult;
-                }
+                $this->processRemainingOperations($bulkOperationCollection);
 
                 $section->overwrite(
                     sprintf(
@@ -249,5 +246,16 @@ class BulkCancelUsersAssignmentsCommand extends Command
             ->setPath($input->getArgument('path'))
             ->setDelimiter($input->getOption('delimiter'))
             ->setCharset($input->getOption('charset'));
+    }
+
+    private function processRemainingOperations(BulkOperationCollection $bulkOperationCollection): BulkResult
+    {
+        $bulkResult = $this->processOperationCollection($bulkOperationCollection);
+
+        if ($bulkResult->hasFailures()) {
+            $this->failedBulkResults[] = $bulkResult;
+        }
+
+        return $bulkResult;
     }
 }
