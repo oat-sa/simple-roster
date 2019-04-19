@@ -79,7 +79,7 @@ This project provides a ready to use docker stack with:
 - php fpm 7.2
 - nginx
 - postgres (container persistent storage)
-- redis (container persistent storage)
+- redis (containers persistent storage)
     - for doctrine data
     - and sessions storage
 - blackfire

@@ -109,11 +109,7 @@ class BulkCreateUsersAssignmentsCommand extends Command
         $batchSize = (int)$input->getOption('batch');
         $isDryRun = !(bool)$input->getOption('force');
 
-        if (!$this->promptUser($style, $isDryRun)) {
-            $style->success('Aborting.');
-
-            return 0;
-        }
+        $style->title('Simple Roster - Bulk Assignment Creation');
 
         $section = $consoleOutput->section();
         $section->writeln('Starting assignment creation...');
@@ -212,23 +208,6 @@ class BulkCreateUsersAssignmentsCommand extends Command
         }
 
         return $output;
-    }
-
-    private function promptUser(SymfonyStyle $style, bool $isDryRun): bool
-    {
-        $style->title('Simple Roster - Bulk Assignment Creation');
-        $style->text(
-            'You are about to create new assignments for every provided user. ' .
-            'For each new assignment the line item of the previous assignment will be used.'
-        );
-
-        if (!$isDryRun) {
-            $style->note(
-                'Dry mode is deactivated, therefore ALL database modifications will get applied.'
-            );
-        }
-
-        return $style->askQuestion(new ConfirmationQuestion('Do you want to proceed?'));
     }
 
     private function getIngesterSource(InputInterface $input): IngesterSourceInterface

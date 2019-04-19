@@ -110,11 +110,7 @@ class BulkCancelUsersAssignmentsCommand extends Command
         $batchSize = (int)$input->getOption('batch');
         $isDryRun = !(bool)$input->getOption('force');
 
-        if (!$this->promptUser($style, $isDryRun)) {
-            $style->success('Aborting.');
-
-            return 0;
-        }
+        $style->title('Simple Roster - Bulk Assignment Cancellation');
 
         $section = $consoleOutput->section();
         $section->writeln('Starting assignment cancellation...');
@@ -171,8 +167,6 @@ class BulkCancelUsersAssignmentsCommand extends Command
                     )
                 );
             }
-
-
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 
@@ -219,24 +213,6 @@ class BulkCancelUsersAssignmentsCommand extends Command
         }
 
         return $output;
-    }
-
-    private function promptUser(SymfonyStyle $style, bool $isDryRun): bool
-    {
-        $style->title('Simple Roster - Bulk Assignment Cancellation');
-        $style->text(sprintf(
-            "You are about to update all assignments with any of '%s' states to '%s' state for every provided user.",
-            strtoupper(implode(', ', [Assignment::STATE_READY, Assignment::STATE_STARTED])),
-            strtoupper(Assignment::STATE_CANCELLED)
-        ));
-
-        if (!$isDryRun) {
-            $style->note(
-                'Dry mode is deactivated, therefore ALL database modifications will get applied.'
-            );
-        }
-
-        return $style->askQuestion(new ConfirmationQuestion('Do you want to proceed?'));
     }
 
     private function getIngesterSource(InputInterface $input): IngesterSourceInterface
