@@ -4,7 +4,6 @@ namespace App\Tests\Functional\Command\Bulk;
 
 use App\Command\Bulk\BulkCancelUsersAssignmentsCommand;
 use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use LogicException;
@@ -38,8 +37,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItCanCancelUserAssignments(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -68,8 +65,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItLogsSuccessfulAssignmentCancellations(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -95,8 +90,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItDoesNotApplyDatabaseModificationsInDryMode(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -110,35 +103,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
-            $this->commandTester->getDisplay()
-        );
-
-        $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
-    }
-
-    public function testItAbortsTheProcessIfUserDoesNotWantToProceed(): void
-    {
-        $this->commandTester->setInputs(['no']);
-
-        $output = $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../Resources/Assignment/100-users.csv',
-                '--batch' => 5,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        );
-
-        $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            '[OK] Aborting.',
-            $this->commandTester->getDisplay()
-        );
-        $this->assertStringNotContainsString(
             "[OK] Successfully cancelled '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
@@ -165,8 +129,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItThrowsRuntimeExceptionIfUsernameColumnCannotBeFoundInSourceCsvFile(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -186,8 +148,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItCanHandleErrorsDuringTheProcess(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',

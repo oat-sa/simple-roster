@@ -5,8 +5,6 @@ namespace App\Tests\Functional\Command\Bulk;
 use App\Command\Bulk\BulkCreateUsersAssignmentsCommand;
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\Repository\AssignmentRepository;
-use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use LogicException;
@@ -40,8 +38,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItCanCreateNewAssignmentsForUsersAlreadyHavingAssignments(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -76,8 +72,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItLogsSuccessfulAssignmentCreations(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -103,8 +97,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItDoesNotApplyDatabaseModificationsInDryMode(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -118,35 +110,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
-            "[OK] Successfully created '100' assignments out of '100'.",
-            $this->commandTester->getDisplay()
-        );
-
-        $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(100, $assignmentRepository->findAll());
-    }
-
-    public function testItAbortsTheProcessIfUserDoesNotWantToProceed(): void
-    {
-        $this->commandTester->setInputs(['no']);
-
-        $output = $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../Resources/Assignment/100-users.csv',
-                '--batch' => 5,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        );
-
-        $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            '[OK] Aborting.',
-            $this->commandTester->getDisplay()
-        );
-        $this->assertStringNotContainsString(
             "[OK] Successfully created '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
@@ -173,8 +136,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItThrowsRuntimeExceptionIfUsernameColumnCannotBeFoundInSourceCsvFile(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
@@ -194,8 +155,6 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
     public function testItCanHandleErrorsDuringTheProcess(): void
     {
-        $this->commandTester->setInputs(['yes']);
-
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
