@@ -9,15 +9,14 @@ use App\Command\CommandWatcherTrait;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Service\Bulk\BulkCreateUsersAssignmentsService;
+use InvalidArgumentException;
 use LogicException;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
@@ -120,12 +119,9 @@ class BulkCreateUsersAssignmentsCommand extends Command
 
             $numberOfProcessedAssignments = 0;
             foreach ($source->getContent() as $row) {
-                if (!isset($row['username'])) {
-                    throw new RuntimeException("Column 'username' cannot be found in source CSV file.");
-                }
+                $this->validateRow($row);
 
                 $operation = new BulkOperation($row['username'], BulkOperation::TYPE_CREATE);
-
                 $bulkOperationCollection->add($operation);
 
                 if (count($bulkOperationCollection) % $batchSize !== 0) {
@@ -133,11 +129,7 @@ class BulkCreateUsersAssignmentsCommand extends Command
                 }
 
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
-                $bulkResult = $this->processOperationCollection($bulkOperationCollection);
-
-                if ($bulkResult->hasFailures()) {
-                    $this->failedBulkResults[] = $bulkResult;
-                }
+                $this->processOperationCollection($bulkOperationCollection);
 
                 $section->overwrite(
                     sprintf(
@@ -151,8 +143,7 @@ class BulkCreateUsersAssignmentsCommand extends Command
             // Process remaining operations
             if (!$bulkOperationCollection->isEmpty()) {
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
-
-                $this->processRemainingOperations($bulkOperationCollection);
+                $this->processOperationCollection($bulkOperationCollection);
 
                 $section->overwrite(
                     sprintf(
@@ -168,18 +159,7 @@ class BulkCreateUsersAssignmentsCommand extends Command
             return 1;
         }
 
-        $style->newLine(2);
-        $style->success(sprintf(
-            "Successfully created '%s' assignments out of '%s'.",
-            $numberOfProcessedAssignments - count($this->failedBulkResults) * $batchSize,
-            $numberOfProcessedAssignments
-        ));
-
-        foreach ($this->failedBulkResults as $failedBulkResult) {
-            $style->error(sprintf("Bulk operation error: '%s'", json_encode($failedBulkResult)));
-        }
-
-        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+        $this->displayResult($style, $numberOfProcessedAssignments, $batchSize);
 
         return 0;
     }
@@ -187,6 +167,10 @@ class BulkCreateUsersAssignmentsCommand extends Command
     private function processOperationCollection(BulkOperationCollection $bulkOperationCollection): BulkResult
     {
         $bulkResult = $this->bulkAssignmentsCreateService->process($bulkOperationCollection);
+
+        if ($bulkResult->hasFailures()) {
+            $this->failedBulkResults[] = $bulkResult;
+        }
 
         $bulkOperationCollection->clear();
 
@@ -219,14 +203,31 @@ class BulkCreateUsersAssignmentsCommand extends Command
             ->setCharset($input->getOption('charset'));
     }
 
-    private function processRemainingOperations(BulkOperationCollection $bulkOperationCollection): BulkResult
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function validateRow(array $row)
     {
-        $bulkResult = $this->processOperationCollection($bulkOperationCollection);
-
-        if ($bulkResult->hasFailures()) {
-            $this->failedBulkResults[] = $bulkResult;
+        if (!isset($row['username'])) {
+            throw new InvalidArgumentException("Column 'username' cannot be found in source CSV file.");
         }
 
-        return $bulkResult;
+        return $row;
+    }
+
+    private function displayResult(SymfonyStyle $style, int $numberOfProcessedAssignments, int $batchSize): void
+    {
+        $style->newLine(2);
+        $style->success(sprintf(
+            "Successfully created '%s' assignments out of '%s'.",
+            $numberOfProcessedAssignments - count($this->failedBulkResults) * $batchSize,
+            $numberOfProcessedAssignments
+        ));
+
+        foreach ($this->failedBulkResults as $failedBulkResult) {
+            $style->error(sprintf("Bulk operation error: '%s'", json_encode($failedBulkResult)));
+        }
+
+        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
     }
 }
