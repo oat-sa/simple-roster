@@ -9,7 +9,6 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
@@ -31,8 +30,12 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         $this->setDescription('Responsible for cancelling user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function process(InputInterface $input, ConsoleOutputInterface $consoleOutput, int $batchSize, bool $isDryRun): int
-    {
+    protected function process(
+        InputInterface $input,
+        ConsoleOutputInterface $consoleOutput,
+        int $batchSize,
+        bool $isDryRun
+    ): int {
         $style = new SymfonyStyle($input, $consoleOutput);
         $style->title('Simple Roster - Bulk Assignment Cancellation');
 

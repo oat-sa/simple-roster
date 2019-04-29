@@ -51,7 +51,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
 
     abstract protected function process(
         InputInterface $input,
-        ConsoleOutputInterface $consoleConsoleOutput,
+        ConsoleOutputInterface $consoleOutput,
         int $batchSize,
         bool $isDryRun
     ): int;

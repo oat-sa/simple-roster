@@ -29,12 +29,16 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         $this->setDescription('Responsible for creating user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function process(InputInterface $input, ConsoleOutputInterface $consoleConsoleOutput, int $batchSize, bool $isDryRun): int
-    {
-        $style = new SymfonyStyle($input, $consoleConsoleOutput);
+    protected function process(
+        InputInterface $input,
+        ConsoleOutputInterface $consoleOutput,
+        int $batchSize,
+        bool $isDryRun
+    ): int {
+        $style = new SymfonyStyle($input, $consoleOutput);
         $style->title('Simple Roster - Bulk Assignment Creation');
 
-        $section = $consoleConsoleOutput->section();
+        $section = $consoleOutput->section();
         $section->writeln('Starting assignment creation...');
 
         try {
