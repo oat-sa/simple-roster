@@ -35,8 +35,8 @@ class BulkResult implements JsonSerializable
         return [
             'data' => [
                 'applied' => !$this->hasFailures(),
-                'results' => $this->results
-            ]
+                'results' => $this->results,
+            ],
         ];
     }
 

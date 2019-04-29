@@ -69,7 +69,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getStartAt(): ?\DateTimeInterface
+    public function getStartAt(): ?DateTimeInterface
     {
         return $this->startAt;
     }

@@ -27,25 +27,25 @@ services:
     app.session_storage.connection:
         class: Redis
         calls:
-            - method: connect
-              arguments:
-                  - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
-                  - '%env(int:REDIS_SESSION_CACHE_PORT)%'
+            -   method: connect
+                arguments:
+                    - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
+                    - '%env(int:REDIS_SESSION_CACHE_PORT)%'
 
     app.doctrine_cache.connection:
         class: Redis
         calls:
-            - method: connect
-              arguments:
-                  - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-                  - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+            -   method: connect
+                arguments:
+                    - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+                    - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
 
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\RedisCache
         calls:
-            - method: setRedis
-              arguments:
-                  - '@app.doctrine_cache.connection'
+            -   method: setRedis
+                arguments:
+                    - '@app.doctrine_cache.connection'
 
     App\:
         resource: '../src/*'

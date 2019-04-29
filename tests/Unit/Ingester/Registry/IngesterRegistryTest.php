@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Ingester\Registry;
 
 use App\Ingester\Ingester\IngesterInterface;
 use App\Ingester\Registry\IngesterRegistry;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class IngesterRegistryTest extends TestCase
@@ -11,28 +12,27 @@ class IngesterRegistryTest extends TestCase
     /** @var IngesterRegistry */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->subject = new IngesterRegistry();
     }
 
-    public function testItIsConstructedEmpty()
+    public function testItIsConstructedEmpty(): void
     {
         $this->assertEmpty($this->subject->all());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Ingester named 'invalid' cannot be found.
-     */
-    public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterName()
+    public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterName(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Ingester named 'invalid' cannot be found.");
+
         $this->subject->get('invalid');
     }
 
-    public function testItCanAddAnRetrieveIngesters()
+    public function testItCanAddAnRetrieveIngesters(): void
     {
         $ingester1 = $this->createMock(IngesterInterface::class);
         $ingester2 = $this->createMock(IngesterInterface::class);

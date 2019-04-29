@@ -4,7 +4,7 @@ namespace App\Tests\Unit\Security\Authenticator;
 
 use App\Security\Authenticator\ApiKeyAuthenticator;
 use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -29,7 +29,7 @@ class ApiKeyAuthenticatorTest extends TestCase
             'key'
         );
 
-        /** @var Request|PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|MockObject $request */
         $request = $this->createMock(Request::class);
 
         $this->expectException(UnauthorizedHttpException::class);

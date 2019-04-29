@@ -8,7 +8,7 @@ includes:
 parameters:
   # Workaround for Symfony's phpunit-bridge
   autoload_files:
-    - bin/.phpunit/phpunit-6.5/vendor/autoload.php
+    - vendor/autoload.php
   paths:
     - src
     - tests

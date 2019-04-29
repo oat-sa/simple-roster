@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class InfrastructureIngesterTest extends TestCase
 {
-    public function testRegistryItemName()
+    public function testRegistryItemName(): void
     {
         $subject = new InfrastructureIngester($this->createMock(ManagerRegistry::class));
 

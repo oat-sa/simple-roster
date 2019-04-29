@@ -10,10 +10,12 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcessorInterface
+class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProcessorInterface
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -33,7 +35,6 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
     public function process(BulkOperationCollection $operationCollection): BulkResult
     {
         $result = new BulkResult();
-
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
@@ -45,33 +46,7 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
             }
 
             try {
-                /** @var UserRepository $userRepository */
-                $userRepository = $this->entityManager->getRepository(User::class);
-                $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
-
-                $lastAssignment = $user->getLastAssignment();
-
-                foreach ($user->getAvailableAssignments() as $assignment) {
-                    $assignment->setState(Assignment::STATE_CANCELLED);
-                }
-
-                $newAssignment = (new Assignment())
-                    ->setState(Assignment::STATE_READY)
-                    ->setLineItem($lastAssignment->getLineItem());
-
-                $user->addAssignment($newAssignment);
-
-                $this->entityManager->persist($newAssignment);
-
-                $result->addBulkOperationSuccess($operation);
-
-                $this->logBuffer[] = [
-                    'message' => sprintf(
-                        "Successful assignment create operation for user with username='%s'.",
-                        $user->getUsername()
-                    ),
-                    'lineItem' => $newAssignment->getLineItem(),
-                ];
+                $this->processOperation($operation, $result);
             } catch (Throwable $exception) {
                 $this->logger->error(
                     'Bulk assignments create error: ' . $exception->getMessage(),
@@ -81,6 +56,49 @@ class BulkCreateUsersAssignmentService implements BulkOperationCollectionProcess
             }
         }
 
+        return $this->processResult($result);
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function processOperation(BulkOperation $operation, BulkResult $result): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+
+        $lastAssignment = $user->getLastAssignment();
+
+        foreach ($user->getAssignments() as $assignment) {
+            if ($assignment->isCancellable() && !$operation->isDryRun()) {
+                $assignment->setState(Assignment::STATE_CANCELLED);
+            }
+        }
+
+        $newAssignment = (new Assignment())
+            ->setState(Assignment::STATE_READY)
+            ->setLineItem($lastAssignment->getLineItem());
+
+        if (!$operation->isDryRun()) {
+            $user->addAssignment($newAssignment);
+            $this->entityManager->persist($newAssignment);
+        }
+
+        $result->addBulkOperationSuccess($operation);
+
+        $this->logBuffer[] = [
+            'message' => sprintf(
+                "Successful assignment creation (username = '%s').",
+                $user->getUsername()
+            ),
+            'lineItem' => $newAssignment->getLineItem(),
+        ];
+    }
+
+    private function processResult(BulkResult $result): BulkResult
+    {
         if (!$result->hasFailures()) {
             $this->entityManager->flush();
             $this->entityManager->commit();

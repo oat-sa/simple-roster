@@ -6,9 +6,13 @@ use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -32,7 +36,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     public function process(BulkOperationCollection $operationCollection): BulkResult
     {
         $result = new BulkResult();
-
         $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
@@ -43,34 +46,24 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 continue;
             }
 
+            $this->validateStateTransition($operation);
+
             try {
-                /** @var UserRepository $userRepository */
-                $userRepository = $this->entityManager->getRepository(User::class);
-                $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
-
-                foreach ($user->getAvailableAssignments() as $assignment) {
-                    $assignment->setState($operation->getAttribute('state'));
-
-                    $this->logBuffer[] = [
-                        'message' => sprintf(
-                            "Successful assignment update operation (id='%s') for user with username='%s'.",
-                            $assignment->getId(),
-                            $user->getUsername()
-                        ),
-                        'lineItem' => $assignment->getLineItem(),
-                    ];
-                }
-
-                $result->addBulkOperationSuccess($operation);
+                $this->processOperation($operation, $result);
             } catch (Throwable $exception) {
                 $this->logger->error(
-                    'Bulk assignments cancel error: ' . $exception->getMessage(),
-                    ['operation' => $operation]
+                    'Bulk assignments cancellation error: ' . $exception->getMessage(),
+                    ['operation' => serialize($operation)]
                 );
                 $result->addBulkOperationFailure($operation);
             }
         }
 
+        return $this->processResult($result);
+    }
+
+    private function processResult(BulkResult $result): BulkResult
+    {
         if (!$result->hasFailures()) {
             $this->entityManager->flush();
             $this->entityManager->commit();
@@ -86,5 +79,53 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         }
 
         return $result;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function processOperation(BulkOperation $operation, BulkResult $result): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+
+        foreach ($user->getAssignments() as $assignment) {
+            if (!$assignment->isCancellable()) {
+                continue;
+            }
+
+            if (!$operation->isDryRun()) {
+                $assignment->setState(Assignment::STATE_CANCELLED);
+            }
+
+            $this->logBuffer[] = [
+                'message' => sprintf(
+                    "Successful assignment cancellation (assignmentId = '%s', username = '%s').",
+                    $assignment->getId(),
+                    $user->getUsername()
+                ),
+                'lineItem' => $assignment->getLineItem(),
+            ];
+        }
+
+        $result->addBulkOperationSuccess($operation);
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function validateStateTransition(BulkOperation $operation): void
+    {
+        if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
+            throw new LogicException(
+                sprintf(
+                    "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
+                    $operation->getAttribute('state'),
+                    Assignment::STATE_CANCELLED
+                )
+            );
+        }
     }
 }

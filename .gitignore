@@ -12,10 +12,10 @@
 ###> symfony/web-server-bundle ###
 /.web-server-pid
 ###< symfony/web-server-bundle ###
+/infection.json
+/phpstan.neon
 
-###> symfony/phpunit-bridge ###
-.phpunit
+###> phpunit/phpunit ###
 /phpunit.xml
-###< symfony/phpunit-bridge ###
-infection.json
-phpstan.neon
+.phpunit.result.cache
+###< phpunit/phpunit ###

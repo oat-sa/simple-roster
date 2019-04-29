@@ -128,7 +128,7 @@ class IngesterCommand extends Command
         $style->warning($result);
         $style->table(
             ['Line', 'Data', 'Reason'],
-            array_map(function (IngesterResultFailure $failure): array {
+            array_map(static function (IngesterResultFailure $failure): array {
                 return [
                     $failure->getLineNumber(),
                     implode(', ', $failure->getData()),

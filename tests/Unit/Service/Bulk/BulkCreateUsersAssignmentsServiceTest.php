@@ -8,27 +8,27 @@ use App\Entity\Assignment;
 use App\Entity\LineItem;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Bulk\BulkCreateUsersAssignmentService;
+use App\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Psr\Log\LoggerInterface;
 
-class BulkCreateUsersAssignmentServiceTest extends TestCase
+class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
-    /** @var BulkCreateUsersAssignmentService */
+    /** @var BulkCreateUsersAssignmentsService */
     private $subject;
 
-    /** @var EntityManagerInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
-    /** @var UserRepository|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserRepository|MockObject */
     private $userRepository;
 
-    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,16 +41,20 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
             ->with(User::class)
             ->willReturn($this->userRepository);
 
-        $this->subject = new BulkCreateUsersAssignmentService($this->entityManager, $this->logger);
+        $this->subject = new BulkCreateUsersAssignmentsService($this->entityManager, $this->logger);
     }
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
     {
-        $user = (new User())->addAssignment((new Assignment())->setLineItem(new LineItem()));
+        $user = (new User())->addAssignment((new Assignment())
+            ->setState(Assignment::STATE_READY)
+            ->setLineItem(new LineItem()));
 
         $this->userRepository
             ->method('getByUsernameWithAssignments')
-            ->willReturn($user);
+            ->willReturnCallback(static function (string $username) use ($user) {
+                return $user->setUsername($username);
+            });
 
         $expectedFailingOperation = new BulkOperation('expectedFailure', BulkOperation::TYPE_UPDATE);
         $successfulOperation = new BulkOperation('test', BulkOperation::TYPE_CREATE);
@@ -74,7 +78,7 @@ class BulkCreateUsersAssignmentServiceTest extends TestCase
     {
         $this->userRepository
             ->method('getByUsernameWithAssignments')
-            ->willReturnCallback(function (string $username) {
+            ->willReturnCallback(static function (string $username) {
                 return (new User())
                     ->setUsername($username)
                     ->addAssignment((new Assignment())->setLineItem(new LineItem()));

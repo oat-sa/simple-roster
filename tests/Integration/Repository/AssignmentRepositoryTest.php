@@ -16,7 +16,7 @@ class AssignmentRepositoryTest extends KernelTestCase
     /** @var AssignmentRepository */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -16,7 +16,7 @@ class InfrastructureIngesterTest extends KernelTestCase
     /** @var InfrastructureIngester */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -79,6 +79,7 @@ class InfrastructureIngesterTest extends KernelTestCase
         $this->assertEquals('infra_1', $user1->getLabel());
 
         $failure = current($output->getFailures());
+
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
             [
@@ -89,7 +90,8 @@ class InfrastructureIngesterTest extends KernelTestCase
             ],
             $failure->getData()
         );
-        $this->assertContains(
+
+        $this->assertStringContainsString(
             'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given,',
             $failure->getReason()
         );

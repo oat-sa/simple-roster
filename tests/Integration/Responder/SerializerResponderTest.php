@@ -15,7 +15,7 @@ class SerializerResponderTest extends KernelTestCase
     /** @var bool|null  */
     private $debug = true;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -56,14 +56,9 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreateDefaultErrorJsonResponseWithDebug(): void
@@ -75,14 +70,9 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'custom error message',
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals('custom error message', $decodedResponse['error']['message']);
     }
 
     public function testCreateCustomErrorJsonResponse(): void
@@ -99,14 +89,9 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreateCustomErrorJsonResponseWithDebug(): void
@@ -118,17 +103,13 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'custom error message',
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals('custom error message', $decodedResponse['error']['message']);
+
         $this->assertArrayHasKey(
             'trace',
-            json_decode($response->getContent(), true)['error']
+            $decodedResponse['error']
         );
     }
 
@@ -142,14 +123,9 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'custom error message',
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals('custom error message', $decodedResponse['error']['message']);
     }
 
     public function testCreate4xxHttpErrorJsonResponseWithDebug(): void
@@ -162,17 +138,13 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'custom error message',
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals('custom error message', $decodedResponse['error']['message']);
+
         $this->assertArrayHasKey(
             'trace',
-            json_decode($response->getContent(), true)['error']
+            $decodedResponse['error']
         );
     }
 
@@ -187,14 +159,9 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => SerializerResponder::DEFAULT_ERROR_MESSAGE,
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreate5xxHttpErrorJsonResponseWithDebug(): void
@@ -207,17 +174,13 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'custom error message',
-                ]
-            ],
-            json_decode($response->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($response->getContent(), true);
+        $this->assertEquals('custom error message', $decodedResponse['error']['message']);
+
         $this->assertArrayHasKey(
             'trace',
-            json_decode($response->getContent(), true)['error']
+            $decodedResponse['error']
         );
     }
 

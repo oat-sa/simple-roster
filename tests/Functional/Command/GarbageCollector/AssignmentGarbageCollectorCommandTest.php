@@ -21,7 +21,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     public function testOutputWhenThereIsNothingToUpdate(): void
     {
         $this->assertEquals(0, $this->commandTester->execute([]));
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[OK] Nothing to update.',
             $this->commandTester->getDisplay()
         );
@@ -49,7 +49,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $this->loadTestFixtures();
 
         $this->assertEquals(0, $this->commandTester->execute([]));
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
@@ -70,7 +70,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
                 '--force' => 'true', // Test if it gets casted properly
             ]
         ));
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
@@ -106,7 +106,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
                 ]
             )
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
             $this->commandTester->getDisplay()
         );
@@ -121,7 +121,10 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     public function testOutputInCaseOfException(): void
     {
         $this->assertEquals(1, $this->commandTester->execute(['--batch-size' => 0]));
-        $this->assertContains("[ERROR] Invalid 'batch-size' argument received.", $this->commandTester->getDisplay());
+        $this->assertStringContainsString(
+            "[ERROR] Invalid 'batch-size' argument received.",
+            $this->commandTester->getDisplay()
+        );
     }
 
     private function loadTestFixtures(): void

@@ -11,7 +11,7 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
-RUN yes | pecl install igbinary redis apcu
+RUN yes | pecl install igbinary redis apcu xdebug
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install pdo_mysql && \
@@ -30,7 +30,8 @@ RUN docker-php-ext-install pdo && \
     docker-php-ext-install sodium && \
     docker-php-ext-enable apcu && \
     docker-php-ext-enable igbinary && \
-    docker-php-ext-enable redis
+    docker-php-ext-enable redis && \
+    docker-php-ext-enable xdebug
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
@@ -41,6 +42,10 @@ RUN { \
     echo 'opcache.enable_cli=1'; \
     echo 'opcache.load_comments=1'; \
 } >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+RUN { \
+    echo 'memory_limit=512M'; \
+} >> /usr/local/etc/php/conf.d/docker-php-ext-memory-limit.ini
 
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
