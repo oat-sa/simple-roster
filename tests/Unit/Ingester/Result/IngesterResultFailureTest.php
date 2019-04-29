@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class IngesterResultFailureTest extends TestCase
 {
-    public function testGettersPostConstruction()
+    public function testGettersPostConstruction(): void
     {
         $subject = new IngesterResultFailure(10, ['data'], 'reason');
 

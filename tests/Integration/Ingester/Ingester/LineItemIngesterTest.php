@@ -8,6 +8,7 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LineItemIngesterTest extends KernelTestCase
@@ -17,7 +18,7 @@ class LineItemIngesterTest extends KernelTestCase
     /** @var LineItemIngester */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,12 +43,11 @@ class LineItemIngesterTest extends KernelTestCase
         $this->assertEmpty($this->getRepository(LineItem::class)->findAll());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot ingest 'line-item' since infrastructure table is empty.
-     */
     public function testIngestWithEmptyInfrastructures(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Cannot ingest 'line-item' since infrastructure table is empty.");
+
         $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv.csv');
 
         $this->subject->ingest($source, false);
@@ -73,6 +73,7 @@ class LineItemIngesterTest extends KernelTestCase
         $this->assertEquals('gra13_ita_1', $lineItem1->getSlug());
 
         $failure = current($output->getFailures());
+
         $this->assertEquals(2, $failure->getLineNumber());
         $this->assertEquals(
             [
@@ -85,7 +86,8 @@ class LineItemIngesterTest extends KernelTestCase
             ],
             $failure->getData()
         );
-        $this->assertContains('UNIQUE constraint failed: line_items.slug', $failure->getReason());
+
+        $this->assertStringContainsString('UNIQUE constraint failed: line_items.slug', $failure->getReason());
     }
 
     public function testIngestWithValidSource(): void

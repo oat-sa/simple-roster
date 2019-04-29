@@ -12,8 +12,8 @@ class BulkOperationCollectionTest extends TestCase
     {
         $subject = new BulkOperationCollection();
 
-        $operation1 = new BulkOperation('identifier1', BulkOperation::TYPE_UPDATE, ['key' => 'value']);
-        $operation2 = new BulkOperation('identifier2', BulkOperation::TYPE_CREATE, ['key2' => 'value2']);
+        $operation1 = new BulkOperation('identifier1', BulkOperation::TYPE_UPDATE);
+        $operation2 = new BulkOperation('identifier2', BulkOperation::TYPE_CREATE);
 
         $subject
             ->add($operation1)

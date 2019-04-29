@@ -4,8 +4,8 @@ namespace App\Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\RequestIdGeneratorSubscriber;
 use App\Request\RequestIdStorage;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,19 +14,19 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class RequestIdGeneratorSubscriberTest extends TestCase
 {
-    /** @var UuidFactoryInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UuidFactoryInterface|MockObject */
     private $uuidFactory;
 
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
-    /** @var GetResponseEvent|PHPUnit_Framework_MockObject_MockObject */
+    /** @var GetResponseEvent|MockObject */
     private $getResponseEvent;
 
     /** @var RequestIdGeneratorSubscriber */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class LocalCsvIngesterSourceTest extends TestCase
 {
-    public function testRegistryItemName()
+    public function testRegistryItemName(): void
     {
         $this->assertEquals('local', (new LocalCsvIngesterSource())->getRegistryItemName());
     }

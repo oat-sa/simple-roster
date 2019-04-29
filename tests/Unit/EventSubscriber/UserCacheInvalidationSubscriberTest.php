@@ -12,27 +12,27 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 
 class UserCacheInvalidationSubscriberTest extends TestCase
 {
     /** @var UserCacheInvalidationSubscriber */
     private $subject;
 
-    /** @var EntityManager|PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|MockObject */
     private $entityManager;
 
-    /** @var UnitOfWork|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UnitOfWork|MockObject */
     private $unitOfWork;
 
-    /** @var UserCacheIdGenerator|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserCacheIdGenerator|MockObject */
     private $userCacheIdGenerator;
 
-    /** @var Cache|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|MockObject */
     private $resultCacheImplementation;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -114,7 +114,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
     private function assertCacheDeletion(array $expectedUsernames): void
     {
         $expectedCacheIds = array_map(
-            function ($expectedUsername) {
+            static function ($expectedUsername) {
                 return sprintf('%s.cacheId', $expectedUsername);
             },
             $expectedUsernames
@@ -125,7 +125,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
             ->method('generate')
             ->withConsecutive(
                 ...array_map(
-                    function ($expectedUsername) {
+                    static function ($expectedUsername) {
                         return [$expectedUsername];
                     },
                     $expectedUsernames
@@ -140,7 +140,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
             ->method('delete')
             ->withConsecutive(
                 ...array_map(
-                    function ($expectedCacheId) {
+                    static function ($expectedCacheId) {
                         return [$expectedCacheId];
                     },
                     $expectedCacheIds

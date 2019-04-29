@@ -27,7 +27,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     /** @var Client */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,14 +64,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->client->request('GET', '/api/v1/assignments/2/lti-link');
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => "Assignment id '2' not found for user 'user1'.",
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
     }
 
     public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
@@ -88,13 +83,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->client->request('GET', '/api/v1/assignments/1/lti-link');
 
         $this->assertEquals(Response::HTTP_CONFLICT, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => "Assignment with id '1' does not have a suitable state.",
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(
+            "Assignment with id '1' does not have a suitable state.",
+            $decodedResponse['error']['message']
         );
     }
 
@@ -149,6 +142,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStarted(): void
     {
+        $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
+        $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
+
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
 
@@ -161,6 +157,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->logInAs($user, $this->client);
 
         $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = $initialLoadBalancerStatus;
+        $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
@@ -217,7 +216,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
         $this->assertHasRecordThatPasses(
-            function (array $record) use ($assignment, $ltiRequestInResponse) {
+            static function (array $record) use ($assignment, $ltiRequestInResponse) {
                 /** @var LtiRequest $ltiRequest */
                 $ltiRequest = $record['context']['ltiRequest'];
 

@@ -143,8 +143,8 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
     patch:
-      summary: Bulk upate users assignments
-      description: Bulk create users assignments
+      summary: Bulk update users assignments
+      description: Bulk update users assignments
       tags:
         - Assignments
         - Bulk

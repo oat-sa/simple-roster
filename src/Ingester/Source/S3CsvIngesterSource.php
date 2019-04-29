@@ -42,7 +42,7 @@ class S3CsvIngesterSource extends AbstractIngesterSource
             ->setDelimiter($this->delimiter)
             ->setHeaderOffset(0);
 
-        if ($this->charset != self::DEFAULT_CSV_CHARSET) {
+        if ($this->charset !== self::DEFAULT_CSV_CHARSET) {
             $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $this->charset));
         }
 

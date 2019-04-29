@@ -48,7 +48,7 @@ class UserProvider implements UserProviderInterface
         }
 
         // We dont refresh user on logout since we rely on session storage, so no need to reload it from database
-        if ($this->requestStack->getCurrentRequest()->attributes->get('_route') != 'logout') {
+        if ($this->requestStack->getCurrentRequest()->attributes->get('_route') !== 'logout') {
             try {
                 return $this->userRepository->getByUsernameWithAssignments($user->getUsername());
             } catch (ORMException $exception) {

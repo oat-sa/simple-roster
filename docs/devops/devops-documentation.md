@@ -188,4 +188,4 @@ Application logs are populated in `var/log/[dev|prod].log`
 
 ## Performances checklist
 
-Also, for prod instances, we should follow this [checklist](https://symfony.com/doc/current/performance.html). 
+Also, for prod instances, we should follow this [checklist](https://symfony.com/doc/current/performance.html).

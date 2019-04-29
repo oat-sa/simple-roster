@@ -9,22 +9,22 @@ use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
 use App\Service\CompleteUserAssignmentService;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use PHPUnit_Framework_MockObject_MockObject;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
     /** @var CompleteUserAssignmentService */
     private $subject;
 
-    /** @var AssignmentRepository|PHPUnit_Framework_MockObject_MockObject */
+    /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;
 
-    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (Assignment $assignment) {
+            ->with($this->callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_COMPLETED;
             }));
 

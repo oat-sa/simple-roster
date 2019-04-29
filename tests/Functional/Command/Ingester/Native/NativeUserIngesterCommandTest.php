@@ -21,7 +21,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,7 +61,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
@@ -91,7 +91,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Total of users imported: 12, batched errors: 0',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
@@ -119,7 +119,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(1, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
@@ -141,7 +141,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Total of users imported: 1, batched errors: 1',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );

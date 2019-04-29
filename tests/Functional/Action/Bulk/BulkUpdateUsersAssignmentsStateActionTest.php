@@ -23,7 +23,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
     /** @var Client */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,14 +47,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'API key authentication failure.',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
     public function testItThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void
@@ -69,13 +64,11 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'Invalid JSON request body received. Error: Syntax error',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(
+            'Invalid JSON request body received. Error: Syntax error',
+            $decodedResponse['error']['message']
         );
     }
 
@@ -91,14 +84,9 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => 'Empty request body received.',
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Empty request body received.', $decodedResponse['error']['message']);
     }
 
     public function testItThrowsRequestEntityTooLargeHttpExceptionIfRequestPayloadIsTooLarge(): void
@@ -113,16 +101,15 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => [
-                    'message' => sprintf(
-                        "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
-                        BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
-                    )
-                ],
-            ],
-            json_decode($this->client->getResponse()->getContent(), true)
+
+        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(
+            sprintf(
+                "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
+                BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
+            ),
+            $decodedResponse['error']['message']
         );
     }
 
@@ -155,8 +142,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
                     'results' => [
                         $user->getUsername() => true,
                         'nonExistingUser1' => false,
-                    ]
-                ]
+                    ],
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
@@ -168,7 +155,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         $this->assertCount(1, $user->getAvailableAssignments());
 
         $this->assertHasLogRecordWithMessage(
-            "Bulk assignments cancel error: User with username = 'nonExistingUser1' cannot be found.",
+            "Bulk assignments cancellation error: User with username = 'nonExistingUser1' cannot be found.",
             Logger::ERROR
         );
     }
@@ -196,8 +183,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
                     'applied' => true,
                     'results' => [
                         $user->getUsername() => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
@@ -228,7 +215,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            "Successful assignment update operation (id='1') for user with username='user1'.",
+            "Successful assignment cancellation (assignmentId = '1', username = 'user1').",
             Logger::INFO
         );
     }
@@ -241,8 +228,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $payload[] = [
                 'identifier' => $user,
                 'attributes' => [
-                    'state' => Assignment::STATE_CANCELLED
-                ]
+                    'state' => Assignment::STATE_CANCELLED,
+                ],
             ];
         }
 

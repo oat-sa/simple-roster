@@ -17,7 +17,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,12 +51,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
                 'capture_stderr_separately' => true,
             ]
         ));
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Number of warmed up cache entries: 100',
             $this->commandTester->getDisplay()
         );

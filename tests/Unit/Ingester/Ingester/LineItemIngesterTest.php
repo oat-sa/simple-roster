@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class LineItemIngesterTest extends TestCase
 {
-    public function testRegistryItemName()
+    public function testRegistryItemName(): void
     {
         $subject = new LineItemIngester($this->createMock(ManagerRegistry::class));
 

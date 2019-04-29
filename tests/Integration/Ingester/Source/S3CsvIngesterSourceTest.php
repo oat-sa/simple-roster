@@ -4,18 +4,18 @@ namespace App\Tests\Integration\Ingester\Source;
 
 use App\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 
 class S3CsvIngesterSourceTest extends TestCase
 {
     /** @var S3CsvIngesterSource */
     private $subject;
 
-    /** @var S3Client|PHPUnit_Framework_MockObject_MockObject */
+    /** @var S3Client|MockObject */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,10 +32,10 @@ class S3CsvIngesterSourceTest extends TestCase
 
         foreach ($output as $row) {
             $this->assertCount(4, $row);
-            $this->assertContains('infra', $row['label']);
-            $this->assertContains('http://infra', $row['ltiDirectorLink']);
-            $this->assertContains('key', $row['ltiKey']);
-            $this->assertContains('secret', $row['ltiSecret']);
+            $this->assertStringContainsString('infra', $row['label']);
+            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            $this->assertStringContainsString('key', $row['ltiKey']);
+            $this->assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 

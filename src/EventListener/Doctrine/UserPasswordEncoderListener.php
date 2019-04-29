@@ -25,7 +25,7 @@ class UserPasswordEncoderListener implements EntityListenerInterface
         $this->encodeUserPassword($user);
     }
 
-    private function encodeUserPassword(User $user)
+    private function encodeUserPassword(User $user): void
     {
         if (!empty($user->getPlainPassword())) {
             $user->setPassword($this->userPasswordEncoder->encodePassword($user, $user->getPlainPassword()));

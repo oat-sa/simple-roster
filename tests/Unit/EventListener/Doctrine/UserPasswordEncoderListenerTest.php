@@ -4,8 +4,8 @@ namespace App\Tests\Unit\EventListener\Doctrine;
 
 use App\Entity\User;
 use App\EventListener\Doctrine\UserPasswordEncoderListener;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordEncoderListenerTest extends TestCase
@@ -13,10 +13,10 @@ class UserPasswordEncoderListenerTest extends TestCase
     /** @var UserPasswordEncoderListener */
     private $subject;
 
-    /** @var UserPasswordEncoderInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserPasswordEncoderInterface|MockObject */
     private $userPasswordEncoderMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

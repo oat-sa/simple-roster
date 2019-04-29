@@ -3,6 +3,7 @@
 REST back-end service that handles authentication and eligibilities.
 
 ## Table of Contents
+
 - [Versions](#versions)
 - [Installation](#installation)
 - [Documentation](#documentation)
@@ -37,15 +38,19 @@ You can:
 #### CLI documentation
 
 Available commands:
-- **Data ingestion** : see [docs/cli/ingester-command.md](docs/cli/ingester-command.md)
-- **Native user data ingestion** : see [docs/cli/native-user-ingester-command.md](docs/cli/native-user-ingester-command.md)
-- **Garbage collection** (assignments) : see [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md)
-- **Doctrine result cache warming** : see [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md)
+
+| Command | Description | Documentation |
+| ------------- |:-------------|:-------|
+| `roster:ingest` | Data ingestion (infrastructures, line items, users) | [docs/cli/ingester-command.md](docs/cli/ingester-command.md) |
+| `roster:native-ingest:user` | Native user ingestion | [docs/cli/native-user-ingester-command.md](docs/cli/native-user-ingester-command.md) |
+| `roster:garbage-collector:assignment` | Assignment garbage collection | [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md) |
+| `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer | [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md) | 
+| `roster:assignments:bulk-cancel` | Assignment bulk cancellation | [docs/cli/assignment-bulk-cancellation-command.md](docs/cli/assignment-bulk-cancellation-command.md) |
+| `roster:assignments:bulk-create` | Assignment bulk creation | [docs/cli/assignment-bulk-creation-command.md](docs/cli/assignment-bulk-creation-command.md) |
 
 #### DevOps documentation
 
-You can:
-- find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
+You can find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
 
 ## Development
 
@@ -59,6 +64,18 @@ To run the application using PHP's built-in web server (or [Configure your Web S
 
 #### Docker usage
 
+You must have [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
+
+This project is built on top of **OAT Docker Stack**. In order to install it, follow the installation steps in it's README file: 
+
+[https://github.com/oat-sa/docker-stack#installation](https://github.com/oat-sa/docker-stack#installation)
+
+Set up docker containers:
+
+```bash
+$ docker-compose up -d
+```
+
 This project provides a ready to use docker stack with:
 - php fpm 7.2
 - nginx
@@ -67,21 +84,6 @@ This project provides a ready to use docker stack with:
     - for doctrine data
     - and sessions storage
 - blackfire
-
-You must have [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
-
-Start up the docker stack, from the root folder:
-
-```bash
- $ docker-compose up -d
-```
-
-Resources:
-- application is exposed on port **80**
-- postgres is exposed on port **5432**
-- redis for doctrine data is exposed on port **6379**
-- redis for session data is exposed on port **6380**
-- blackfire is exposed on port **8707**
 
 #### Blackfire usage
 
@@ -111,6 +113,7 @@ You can run all tests suites with:
  ```
  
 ## Static code analysis with PHPStan
+
 ```bash
 $ vendor/bin/phpstan analyse --level=max
 ```

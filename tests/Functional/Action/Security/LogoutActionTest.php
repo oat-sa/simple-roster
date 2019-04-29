@@ -14,7 +14,7 @@ class LogoutActionTest extends WebTestCase
     use DatabaseFixturesTrait;
     use UserAuthenticatorTrait;
 
-    public function testItLogsOutProperlyTheUser()
+    public function testItLogsOutProperlyTheUser(): void
     {
         $client = self::createClient();
 

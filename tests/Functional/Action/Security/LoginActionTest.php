@@ -27,12 +27,9 @@ class LoginActionTest extends WebTestCase
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
-        $this->assertArraySubset(
-            [
-                'error' => 'Invalid credentials.',
-            ],
-            json_decode($client->getResponse()->getContent(), true)
-        );
+
+        $decodedResponse = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid credentials.', $decodedResponse['error']);
     }
 
     public function testItLogsInProperlyTheUser(): void
