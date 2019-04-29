@@ -55,7 +55,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
+            "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
@@ -103,7 +103,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '100' assignments out of '100'.",
+            "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
@@ -166,7 +166,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully cancelled '85' assignments out of '100'.",
+            "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
     }

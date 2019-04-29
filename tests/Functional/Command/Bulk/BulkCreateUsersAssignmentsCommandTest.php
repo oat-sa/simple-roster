@@ -56,7 +56,7 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully created '100' assignments out of '100'.",
+            "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
@@ -110,7 +110,7 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
-            "[OK] Successfully created '100' assignments out of '100'.",
+            "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
@@ -173,7 +173,7 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
         $this->assertStringContainsString(
-            "[OK] Successfully created '85' assignments out of '100'.",
+            "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
     }
