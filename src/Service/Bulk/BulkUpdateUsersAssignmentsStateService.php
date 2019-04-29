@@ -36,9 +36,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     public function process(BulkOperationCollection $operationCollection): BulkResult
     {
         $result = new BulkResult();
-        if (!$operationCollection->isDryRun()) {
-            $this->entityManager->beginTransaction();
-        }
+        $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_UPDATE) {
@@ -61,12 +59,12 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             }
         }
 
-        return $this->processResult($operationCollection, $result);
+        return $this->processResult($result);
     }
 
-    private function processResult(BulkOperationCollection $operationCollection, BulkResult $result): BulkResult
+    private function processResult(BulkResult $result): BulkResult
     {
-        if (!$result->hasFailures() && !$operationCollection->isDryRun()) {
+        if (!$result->hasFailures()) {
             $this->entityManager->flush();
             $this->entityManager->commit();
 
@@ -76,7 +74,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                     ['lineItem' => $logRecord['lineItem']]
                 );
             }
-        } elseif (!$operationCollection->isDryRun()) {
+        } else {
             $this->entityManager->rollback();
         }
 
@@ -94,15 +92,13 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
 
         foreach ($user->getAssignments() as $assignment) {
-            if (!in_array(
-                $assignment->getState(),
-                [Assignment::STATE_READY, Assignment::STATE_STARTED],
-                true
-            )) {
+            if (!$assignment->isCancellable()) {
                 continue;
             }
 
-            $assignment->setState(Assignment::STATE_CANCELLED);
+            if (!$operation->isDryRun()) {
+                $assignment->setState(Assignment::STATE_CANCELLED);
+            }
 
             $this->logBuffer[] = [
                 'message' => sprintf(

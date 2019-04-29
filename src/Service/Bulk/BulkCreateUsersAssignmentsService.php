@@ -35,10 +35,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     public function process(BulkOperationCollection $operationCollection): BulkResult
     {
         $result = new BulkResult();
-
-        if (!$operationCollection->isDryRun()) {
-            $this->entityManager->beginTransaction();
-        }
+        $this->entityManager->beginTransaction();
 
         foreach ($operationCollection as $operation) {
             if ($operation->getType() !== BulkOperation::TYPE_CREATE) {
@@ -59,21 +56,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
             }
         }
 
-        if (!$result->hasFailures() && !$operationCollection->isDryRun()) {
-            $this->entityManager->flush();
-            $this->entityManager->commit();
-
-            foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info(
-                    $logRecord['message'],
-                    ['lineItem' => $logRecord['lineItem']]
-                );
-            }
-        } elseif (!$operationCollection->isDryRun()) {
-            $this->entityManager->rollback();
-        }
-
-        return $result;
+        return $this->processResult($result);
     }
 
     /**
@@ -89,7 +72,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
         $lastAssignment = $user->getLastAssignment();
 
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->isCancellable()) {
+            if ($assignment->isCancellable() && !$operation->isDryRun()) {
                 $assignment->setState(Assignment::STATE_CANCELLED);
             }
         }
@@ -98,9 +81,10 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
             ->setState(Assignment::STATE_READY)
             ->setLineItem($lastAssignment->getLineItem());
 
-        $user->addAssignment($newAssignment);
-
-        $this->entityManager->persist($newAssignment);
+        if (!$operation->isDryRun()) {
+            $user->addAssignment($newAssignment);
+            $this->entityManager->persist($newAssignment);
+        }
 
         $result->addBulkOperationSuccess($operation);
 
@@ -111,5 +95,24 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
             ),
             'lineItem' => $newAssignment->getLineItem(),
         ];
+    }
+
+    private function processResult(BulkResult $result): BulkResult
+    {
+        if (!$result->hasFailures()) {
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+
+            foreach ($this->logBuffer as $logRecord) {
+                $this->logger->info(
+                    $logRecord['message'],
+                    ['lineItem' => $logRecord['lineItem']]
+                );
+            }
+        } else {
+            $this->entityManager->rollback();
+        }
+
+        return $result;
     }
 }

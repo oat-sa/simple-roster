@@ -11,13 +11,6 @@ class BulkOperationCollection implements IteratorAggregate, Countable
     /** @var BulkOperation[] */
     private $operations = [];
 
-    /** @var bool */
-    private $isDryRun;
-
-    public function __construct(bool $isDryRun = false)
-    {
-        $this->isDryRun = $isDryRun;
-    }
 
     public function add(BulkOperation $operation): self
     {
@@ -31,11 +24,6 @@ class BulkOperationCollection implements IteratorAggregate, Countable
         $this->operations = [];
 
         return $this;
-    }
-
-    public function isDryRun(): bool
-    {
-        return $this->isDryRun;
     }
 
     public function count()

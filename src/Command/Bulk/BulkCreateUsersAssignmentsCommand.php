@@ -47,13 +47,16 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
 
         try {
             $source = $this->getIngesterSource($input);
-            $bulkOperationCollection = new BulkOperationCollection($isDryRun);
+            $bulkOperationCollection = new BulkOperationCollection();
 
             $numberOfProcessedAssignments = 0;
             foreach ($source->getContent() as $row) {
                 $this->validateRow($row);
 
                 $operation = new BulkOperation($row['username'], BulkOperation::TYPE_CREATE);
+
+                $operation->setIsDryRun($isDryRun);
+
                 $bulkOperationCollection->add($operation);
 
                 if (count($bulkOperationCollection) % $batchSize !== 0) {

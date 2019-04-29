@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 - 2019-04-18
+## 1.2.0 - 2019-04-29
 
 ### Added
 - Bulk assignment cancellation CLI command.

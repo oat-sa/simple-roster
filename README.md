@@ -3,6 +3,7 @@
 REST back-end service that handles authentication and eligibilities.
 
 ## Table of Contents
+
 - [Versions](#versions)
 - [Installation](#installation)
 - [Documentation](#documentation)
@@ -112,6 +113,7 @@ You can run all tests suites with:
  ```
  
 ## Static code analysis with PHPStan
+
 ```bash
 $ vendor/bin/phpstan analyse --level=max
 ```

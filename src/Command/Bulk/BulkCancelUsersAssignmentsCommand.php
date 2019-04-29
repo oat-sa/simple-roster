@@ -48,7 +48,7 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
 
         try {
             $source = $this->getIngesterSource($input);
-            $bulkOperationCollection = new BulkOperationCollection($isDryRun);
+            $bulkOperationCollection = new BulkOperationCollection();
 
             $numberOfProcessedAssignments = 0;
             foreach ($source->getContent() as $row) {
@@ -59,6 +59,8 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                     BulkOperation::TYPE_UPDATE,
                     ['state' => Assignment::STATE_CANCELLED]
                 );
+
+                $operation->setIsDryRun($isDryRun);
 
                 $bulkOperationCollection->add($operation);
 
