@@ -4,19 +4,17 @@ namespace App\Command\Bulk;
 
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
-use App\Command\CommandWatcherTrait;
 use App\Entity\Assignment;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsCommand
 {
-    use CommandWatcherTrait;
-
     public const NAME = 'roster:assignments:bulk-cancel';
 
     public function __construct(
@@ -33,14 +31,9 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         $this->setDescription('Responsible for cancelling user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function process(InputInterface $input, ConsoleOutputInterface $consoleOutput, int $batchSize, bool $isDryRun): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-        $consoleOutput = $this->ensureConsoleOutput($output);
         $style = new SymfonyStyle($input, $consoleOutput);
-        $batchSize = (int)$input->getOption('batch');
-        $isDryRun = !(bool)$input->getOption('force');
-
         $style->title('Simple Roster - Bulk Assignment Cancellation');
 
         $section = $consoleOutput->section();
@@ -71,13 +64,7 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
                 $this->processOperationCollection($bulkOperationCollection);
 
-                $section->overwrite(
-                    sprintf(
-                        'Processed: %s, batched errors: %s',
-                        $numberOfProcessedAssignments,
-                        count($this->failedBulkResults)
-                    )
-                );
+                $this->overwriteSection($section, $numberOfProcessedAssignments);
             }
 
             // Process remaining operations
@@ -86,13 +73,7 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
 
                 $this->processOperationCollection($bulkOperationCollection);
 
-                $section->overwrite(
-                    sprintf(
-                        'Processed: %s, batched errors: %s',
-                        $numberOfProcessedAssignments,
-                        count($this->failedBulkResults)
-                    )
-                );
+                $this->overwriteSection($section, $numberOfProcessedAssignments);
             }
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
@@ -101,7 +82,6 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         }
 
         $this->displayResult($style, $numberOfProcessedAssignments, $batchSize);
-        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }

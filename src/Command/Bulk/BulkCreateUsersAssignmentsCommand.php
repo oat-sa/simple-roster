@@ -4,18 +4,15 @@ namespace App\Command\Bulk;
 
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
-use App\Command\CommandWatcherTrait;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsCommand
 {
-    use CommandWatcherTrait;
-
     public const NAME = 'roster:assignments:bulk-create';
 
     public function __construct(
@@ -32,17 +29,12 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         $this->setDescription('Responsible for creating user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function process(InputInterface $input, ConsoleOutputInterface $consoleConsoleOutput, int $batchSize, bool $isDryRun): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-        $consoleOutput = $this->ensureConsoleOutput($output);
-        $style = new SymfonyStyle($input, $consoleOutput);
-        $batchSize = (int)$input->getOption('batch');
-        $isDryRun = !(bool)$input->getOption('force');
-
+        $style = new SymfonyStyle($input, $consoleConsoleOutput);
         $style->title('Simple Roster - Bulk Assignment Creation');
 
-        $section = $consoleOutput->section();
+        $section = $consoleConsoleOutput->section();
         $section->writeln('Starting assignment creation...');
 
         try {
@@ -66,13 +58,7 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
                 $this->processOperationCollection($bulkOperationCollection);
 
-                $section->overwrite(
-                    sprintf(
-                        'Processed: %s, batched errors: %s',
-                        $numberOfProcessedAssignments,
-                        count($this->failedBulkResults)
-                    )
-                );
+                $this->overwriteSection($section, $numberOfProcessedAssignments);
             }
 
             // Process remaining operations
@@ -80,13 +66,7 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
                 $this->processOperationCollection($bulkOperationCollection);
 
-                $section->overwrite(
-                    sprintf(
-                        'Processed: %s, batched errors: %s',
-                        $numberOfProcessedAssignments,
-                        count($this->failedBulkResults)
-                    )
-                );
+                $this->overwriteSection($section, $numberOfProcessedAssignments);
             }
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
@@ -95,7 +75,6 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         }
 
         $this->displayResult($style, $numberOfProcessedAssignments, $batchSize);
-        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }

@@ -5,6 +5,7 @@ namespace App\Command\Bulk;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use App\Bulk\Result\BulkResult;
+use App\Command\CommandWatcherTrait;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
@@ -14,12 +15,18 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractBulkUsersAssignmentsCommand extends Command
 {
+    use CommandWatcherTrait;
+
     private const DEFAULT_BATCH_SIZE = 1000;
+
+    /** @var string */
+    private $name;
 
     /** @var IngesterSourceRegistry */
     private $ingesterSourceRegistry;
@@ -35,11 +42,19 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
         IngesterSourceRegistry $ingesterSourceRegistry,
         BulkOperationCollectionProcessorInterface $bulkOperationCollectionProcessor
     ) {
+        $this->name = $name;
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->bulkOperationCollectionProcessor = $bulkOperationCollectionProcessor;
 
         parent::__construct($name);
     }
+
+    abstract protected function process(
+        InputInterface $input,
+        ConsoleOutputInterface $consoleConsoleOutput,
+        int $batchSize,
+        bool $isDryRun
+    ): int;
 
     protected function configure()
     {
@@ -52,11 +67,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
             )
         );
 
-        $this->addArgument(
-            'path',
-            InputArgument::REQUIRED,
-            'Source path to ingest from'
-        );
+        $this->addArgument('path', InputArgument::REQUIRED, 'Source path to ingest from');
 
         $this->addOption(
             'delimiter',
@@ -74,20 +85,25 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
             IngesterSourceInterface::DEFAULT_CSV_CHARSET
         );
 
-        $this->addOption(
-            'batch',
-            'b',
-            InputOption::VALUE_REQUIRED,
-            'Batch size',
-            self::DEFAULT_BATCH_SIZE
-        );
+        $this->addOption('batch', 'b', InputOption::VALUE_REQUIRED, 'Batch size', self::DEFAULT_BATCH_SIZE);
 
-        $this->addOption(
-            'force',
-            'f',
-            InputOption::VALUE_NONE,
-            'To apply actual database modifications or not'
-        );
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply actual database modifications or not');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->startWatch($this->name, __FUNCTION__);
+        $consoleOutput = $this->ensureConsoleOutput($output);
+
+        $style = new SymfonyStyle($input, $output);
+        $batchSize = (int)$input->getOption('batch');
+        $isDryRun = !(bool)$input->getOption('force');
+
+        $result = $this->process($input, $consoleOutput, $batchSize, $isDryRun);
+
+        $style->note(sprintf('Took: %s', $this->stopWatch($this->name)));
+
+        return $result;
     }
 
     protected function processOperationCollection(BulkOperationCollection $bulkOperationCollection): BulkResult
@@ -151,5 +167,16 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
         foreach ($this->failedBulkResults as $failedBulkResult) {
             $style->error(sprintf("Bulk operation error: '%s'", json_encode($failedBulkResult)));
         }
+    }
+
+    protected function overwriteSection(ConsoleSectionOutput $section, int $numberOfProcessedAssignments): void
+    {
+        $section->overwrite(
+            sprintf(
+                'Processed: %s, batched errors: %s',
+                $numberOfProcessedAssignments,
+                count($this->failedBulkResults)
+            )
+        );
     }
 }
