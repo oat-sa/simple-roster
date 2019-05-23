@@ -24,23 +24,34 @@ use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Internal\Hydration\IterableResult;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DoctrineResultCacheWarmerCommand extends Command
+final class DoctrineResultCacheWarmerCommand extends Command
 {
     use CommandWatcherTrait;
 
     public const NAME = 'roster:doctrine-result-cache:warmup';
+
+    private const OPTION_USER_IDS = 'user-ids';
+    private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
+    private const OPTION_BATCH_SIZE = 'batch-size';
+
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var Cache|null */
@@ -54,6 +65,24 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     /** @var EntityManagerInterface */
     private $entityManager;
+
+    /** @var int */
+    private $numberOfWarmedUpCacheEntries = 0;
+
+    /** @var int */
+    private $batchSize = 0;
+
+    /** @var ConsoleSectionOutput */
+    private $progressOutputSection;
+
+    /** @var int[] */
+    private $userIds;
+
+    /** @var int[] */
+    private $lineItemIds;
+
+    /** @var SymfonyStyle */
+    private $consoleOutput;
 
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
@@ -78,80 +107,268 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->setDescription('Warms up doctrine result cache.');
 
         $this->addOption(
-            'batch-size',
+            self::OPTION_BATCH_SIZE,
             'b',
             InputOption::VALUE_REQUIRED,
             'Number of assignments to process per batch',
             self::DEFAULT_BATCH_SIZE
         );
+
+        $this->addOption(
+            self::OPTION_USER_IDS,
+            'u',
+            InputOption::VALUE_OPTIONAL,
+            'User ids. Comma separated'
+        );
+
+        $this->addOption(
+            self::OPTION_LINE_ITEM_IDS,
+            'l',
+            InputOption::VALUE_OPTIONAL,
+            'Line item ids. Comma separated'
+        );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @return int
+     */
+    public function getNumberOfWarmedUpCacheEntries(): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-        $consoleOutput = $this->ensureConsoleOutput($output);
-        $style = new SymfonyStyle($input, $consoleOutput);
+        return $this->numberOfWarmedUpCacheEntries;
+    }
 
-        $section = $consoleOutput->section();
+    /**
+     * @param int $numberOfWarmedUpCacheEntries
+     */
+    public function setNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
+    {
+        $this->numberOfWarmedUpCacheEntries = $numberOfWarmedUpCacheEntries;
+    }
 
-        $batchSize = (int)$input->getOption('batch-size');
-        if ($batchSize < 1) {
+    /**
+     * @param int $numberOfWarmedUpCacheEntries
+     */
+    public function addNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
+    {
+        $this->numberOfWarmedUpCacheEntries += $numberOfWarmedUpCacheEntries;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if (($userIds = $input->getOption(self::OPTION_USER_IDS)) !== null) {
+            $this->userIds = explode(',', $userIds);
+
+            if (empty($this->userIds)) {
+                throw new RuntimeException(
+                    sprintf('Option %s is empty. Should contain at least one value', self::OPTION_USER_IDS)
+                );
+            }
+        }
+
+        if (($lineItemIds = $input->getOption(self::OPTION_LINE_ITEM_IDS)) !== null) {
+            $this->lineItemIds = explode(',', $lineItemIds);
+
+            if (empty($this->lineItemIds)) {
+                throw new RuntimeException(
+                    sprintf('Option %s is empty. Should contain at least one value', self::OPTION_LINE_ITEM_IDS)
+                );
+            }
+        }
+
+        $this->batchSize = (int)$input->getOption(self::OPTION_BATCH_SIZE);
+        if ($this->batchSize < 1) {
             throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
         }
 
-        $offset = 0;
-        $numberOfWarmedUpCacheEntries = 0;
+        $consoleOutput = $this->ensureConsoleOutput($output);
+        $this->consoleOutput = new SymfonyStyle($input, $consoleOutput);
+        $this->progressOutputSection = $consoleOutput->section();
+    }
 
-        $style->note('Warming up doctrine result cache...');
-        $section->writeln('Number of warmed up cache entries: 0');
-        $numberOfTotalUsers = $this->getTotalNumberOfUsers();
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int|null
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     * @throws DBALException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->startWatch(self::NAME, __FUNCTION__);
 
-        do {
-            $iterateResult = $this
-                ->getFindAllUsersNameQuery($offset, $batchSize)
-                ->iterate();
+        $this->consoleOutput->note('Warming up doctrine result cache...');
+        $this->progressOutputSection->writeln('Number of warmed up cache entries: 0');
 
-            foreach ($iterateResult as $row) {
-                $this->warmUpResultCacheForUserName(current($row)['username']);
+        $this->warmUpAll();
+        $this->warmUpSpecificUsers();
+        $this->warmUpByLineItemIds();
 
-                $numberOfWarmedUpCacheEntries++;
+        $this->echoAffectedEntries(true);
 
-                unset($row);
-            }
-
-            if ($numberOfWarmedUpCacheEntries % $batchSize === 0) {
-                $section->overwrite(
-                    sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
-                );
-            }
-
-            $offset += $batchSize;
-        } while ($offset <= $numberOfTotalUsers + $batchSize);
-
-        $style->success(
+        $this->consoleOutput->success(
             sprintf(
                 '%s result cache entries have been successfully warmed up.',
-                $numberOfWarmedUpCacheEntries
+                $this->getNumberOfWarmedUpCacheEntries()
             )
         );
 
-        $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+        $this->consoleOutput->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }
 
-    private function getFindAllUsersNameQuery(int $offset, int $batchSize): Query
+    /**
+     * @throws DBALException
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function warmUpByLineItemIds(): void
+    {
+        if (!$this->hasSpecificLineItems()) {
+            return;
+        }
+
+        $userObjects = $this->findUserNamesByLineItemIds($this->lineItemIds);
+
+        foreach ($userObjects as $userName) {
+            $this->warmUpResultCacheForUserName($userName);
+            $this->echoAffectedEntries();
+        }
+    }
+
+    private function hasSpecificUsers(): bool
+    {
+        return $this->userIds !== null;
+    }
+
+    private function hasSpecificLineItems(): bool
+    {
+        return $this->lineItemIds !== null;
+    }
+
+    /**
+     * @param IterableResult $iterateResult
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function warmUp(IterableResult $iterateResult): void
+    {
+        foreach ($iterateResult as $row) {
+            $this->warmUpResultCacheForUserName(current($row)['username']);
+            $this->echoAffectedEntries();
+        }
+    }
+
+    private function echoAffectedEntries(bool $force = false): void
+    {
+        $numberOfWarmedUpCacheEntries = $this->getNumberOfWarmedUpCacheEntries();
+
+        if ($force || $numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
+            $this->progressOutputSection->overwrite(
+                sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
+            );
+        }
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function warmUpSpecificUsers(): void
+    {
+        if (!$this->hasSpecificUsers()) {
+            return;
+        }
+
+        $offset = 0;
+        $numberOfTotalUsers = count($this->userIds);
+
+        do {
+            $userIds = array_slice($this->userIds, $offset, $this->batchSize);
+
+            $this->warmUp($this->findUsersNameById($userIds)->iterate());
+
+            $offset += $this->batchSize;
+        } while ($offset < $numberOfTotalUsers);
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    private function warmUpAll(): void
+    {
+        if ($this->hasSpecificLineItems() || $this->hasSpecificUsers()) {
+            return;
+        }
+
+        $offset = 0;
+        $numberOfTotalUsers = $this->getTotalNumberOfUsers();
+
+        do {
+            $this->warmUp($this->findAllUsersNameQuery($offset)->iterate());
+
+            $offset += $this->batchSize;
+        } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+    }
+
+    private function findAllUsersNameQuery(int $offset): Query
     {
         return $this->entityManager
             ->createQueryBuilder()
             ->select('u.username')
             ->from(User::class, 'u')
             ->setFirstResult($offset)
-            ->setMaxResults($batchSize)
+            ->setMaxResults($this->batchSize)
             ->getQuery()
             ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
     }
 
+    private function findUsersNameById(array $userIds): Query
+    {
+        return $this->entityManager
+            ->createQueryBuilder()
+            ->select('u.username')
+            ->from(User::class, 'u')
+            ->where('u.id IN (:users)')
+            ->setParameter('users', $userIds)
+            ->getQuery()
+            ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
+    }
+
+    /**
+     * @param array $lineItemIds
+     *
+     * @return iterable
+     * @throws DBALException
+     */
+    private function findUserNamesByLineItemIds(array $lineItemIds): iterable
+    {
+        $pdo = $this->entityManager->getConnection();
+
+        $query = '
+            select u.username
+            from users u
+            join assignments a on u.id = a.user_id
+            join line_items li on a.line_item_id = li.id and li.id in (' . implode(',', $lineItemIds) . ')
+        ';
+
+        $statement = $pdo->query($query);
+
+        while ($row = $statement->fetchColumn()) {
+            yield $row;
+        }
+    }
+
+    /**
+     * @return int
+     *
+     * @throws NonUniqueResultException
+     */
     private function getTotalNumberOfUsers(): int
     {
         return (int)$this->entityManager
@@ -162,6 +379,12 @@ class DoctrineResultCacheWarmerCommand extends Command
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param string $username
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
     private function warmUpResultCacheForUserName(string $username): void
     {
         $resultCacheId = $this->userCacheIdGenerator->generate($username);
@@ -171,6 +394,8 @@ class DoctrineResultCacheWarmerCommand extends Command
         $user = $this->userRepository->getByUsernameWithAssignments($username);
         $this->entityManager->clear();
         unset($user);
+
+        $this->addNumberOfWarmedUpCacheEntries(1);
     }
 
     /**
@@ -186,7 +411,7 @@ class DoctrineResultCacheWarmerCommand extends Command
                 )
             );
         }
-        
+
         return $output;
     }
 }

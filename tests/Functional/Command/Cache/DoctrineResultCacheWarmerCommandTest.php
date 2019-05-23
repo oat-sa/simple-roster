@@ -79,6 +79,54 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
+    public function testIteratesOneUser(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '3',
+                '--user-ids' => '1,99',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        $this->assertStringContainsString(
+            '[OK] 2 result cache entries have been successfully warmed up.',
+            $this->commandTester->getDisplay()
+        );
+
+        $this->assertStringContainsString(
+            'Number of warmed up cache entries: 2',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testIteratesLineItems(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+                '--line-item-ids' => '1,2',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        $display = $this->commandTester->getDisplay();
+
+        $this->assertStringContainsString(
+            '[OK] 60 result cache entries have been successfully warmed up.',
+            $display
+        );
+
+        $this->assertStringContainsString(
+            'Number of warmed up cache entries: 60',
+            $display
+        );
+    }
+
     public function testOutputInCaseOfException(): void
     {
         $this->expectException(InvalidArgumentException::class);
