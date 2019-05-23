@@ -156,7 +156,7 @@ final class DoctrineResultCacheWarmerCommand extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         if (($userIds = $input->getOption(self::OPTION_USER_IDS)) !== null) {
-            $this->userIds = explode(',', $userIds);
+            $this->userIds = array_filter(filter_var_array(explode(',', $userIds), FILTER_VALIDATE_INT), 'is_int');
 
             if (empty($this->userIds)) {
                 throw new RuntimeException(
@@ -166,7 +166,7 @@ final class DoctrineResultCacheWarmerCommand extends Command
         }
 
         if (($lineItemIds = $input->getOption(self::OPTION_LINE_ITEM_IDS)) !== null) {
-            $this->lineItemIds = explode(',', $lineItemIds);
+            $this->lineItemIds = array_filter(filter_var_array(explode(',', $lineItemIds), FILTER_VALIDATE_INT), 'is_int');
 
             if (empty($this->lineItemIds)) {
                 throw new RuntimeException(
