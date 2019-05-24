@@ -140,14 +140,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
     /**
      * @param int $numberOfWarmedUpCacheEntries
      */
-    public function setNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
-    {
-        $this->numberOfWarmedUpCacheEntries = $numberOfWarmedUpCacheEntries;
-    }
-
-    /**
-     * @param int $numberOfWarmedUpCacheEntries
-     */
     public function addNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
     {
         $this->numberOfWarmedUpCacheEntries += $numberOfWarmedUpCacheEntries;
