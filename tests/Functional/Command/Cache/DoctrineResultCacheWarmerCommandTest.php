@@ -165,8 +165,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         }
     }
 
-
-
     public function testOutputInCaseOfException(): void
     {
         $this->expectException(InvalidArgumentException::class);

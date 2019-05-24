@@ -130,14 +130,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
     }
 
     /**
-     * @return int
-     */
-    public function getNumberOfWarmedUpCacheEntries(): int
-    {
-        return $this->numberOfWarmedUpCacheEntries;
-    }
-
-    /**
      * @param int $numberOfWarmedUpCacheEntries
      */
     public function addNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
@@ -193,9 +185,17 @@ final class DoctrineResultCacheWarmerCommand extends Command
         $this->consoleOutput->note('Warming up doctrine result cache...');
         $this->progressOutputSection->writeln('Number of warmed up cache entries: 0');
 
-        $this->warmUpAll();
-        $this->warmUpSpecificUsers();
-        $this->warmUpByLineItemIds();
+        if (!($this->hasSpecificLineItems() || $this->hasSpecificUsers())) {
+            $this->warmUpAll();
+        }
+
+        if ($this->hasSpecificUsers()) {
+            $this->warmUpSpecificUsers();
+        }
+
+        if ($this->hasSpecificLineItems()) {
+            $this->warmUpByLineItemIds();
+        }
 
         $this->echoAffectedEntries(true);
 
@@ -217,10 +217,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
      */
     private function warmUpByLineItemIds(): void
     {
-        if (!$this->hasSpecificLineItems()) {
-            return;
-        }
-
         $paginator = $this->findUserNamesByLineItemIds($this->lineItemIds, 0);
         $countOfUsersToBeUpdated = $paginator->count();
         $updated = 0;
@@ -262,11 +258,9 @@ final class DoctrineResultCacheWarmerCommand extends Command
 
     private function echoAffectedEntries(bool $force = false): void
     {
-        $numberOfWarmedUpCacheEntries = $this->getNumberOfWarmedUpCacheEntries();
-
-        if ($force || $numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
+        if ($force || $this->numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
             $this->progressOutputSection->overwrite(
-                sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
+                sprintf('Number of warmed up cache entries: %s', $this->numberOfWarmedUpCacheEntries)
             );
         }
     }
@@ -277,10 +271,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
      */
     private function warmUpSpecificUsers(): void
     {
-        if (!$this->hasSpecificUsers()) {
-            return;
-        }
-
         $offset = 0;
         $numberOfTotalUsers = count($this->userIds);
 
@@ -299,10 +289,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
      */
     private function warmUpAll(): void
     {
-        if ($this->hasSpecificLineItems() || $this->hasSpecificUsers()) {
-            return;
-        }
-
         $offset = 0;
         $numberOfTotalUsers = $this->getTotalNumberOfUsers();
 
