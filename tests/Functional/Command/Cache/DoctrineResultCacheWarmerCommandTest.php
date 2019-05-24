@@ -179,4 +179,36 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             ]
         );
     }
+
+    public function testWrongEmptyUserIdsParameters(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->expectExceptionMessage('Option user-ids is empty. Should contain at least one value');
+
+        $this->commandTester->execute(
+            [
+                '--user-ids' => '',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
+
+    public function testWrongEmptyLineItemIdsParameters(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->expectExceptionMessage('Option line-item-ids is empty. Should contain at least one value');
+
+        $this->commandTester->execute(
+            [
+                '--line-item-ids' => '',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
 }

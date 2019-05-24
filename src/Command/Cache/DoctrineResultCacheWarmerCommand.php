@@ -143,7 +143,7 @@ final class DoctrineResultCacheWarmerCommand extends Command
             $this->userIds = array_filter(filter_var_array(explode(',', $userIds), FILTER_VALIDATE_INT), 'is_int');
 
             if (empty($this->userIds)) {
-                throw new RuntimeException(
+                throw new InvalidArgumentException(
                     sprintf('Option %s is empty. Should contain at least one value', self::OPTION_USER_IDS)
                 );
             }
@@ -153,7 +153,7 @@ final class DoctrineResultCacheWarmerCommand extends Command
             $this->lineItemIds = array_filter(filter_var_array(explode(',', $lineItemIds), FILTER_VALIDATE_INT), 'is_int');
 
             if (empty($this->lineItemIds)) {
-                throw new RuntimeException(
+                throw new InvalidArgumentException(
                     sprintf('Option %s is empty. Should contain at least one value', self::OPTION_LINE_ITEM_IDS)
                 );
             }
@@ -202,7 +202,7 @@ final class DoctrineResultCacheWarmerCommand extends Command
         $this->consoleOutput->success(
             sprintf(
                 '%s result cache entries have been successfully warmed up.',
-                $this->getNumberOfWarmedUpCacheEntries()
+                $this->numberOfWarmedUpCacheEntries
             )
         );
 
