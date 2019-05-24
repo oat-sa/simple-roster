@@ -20,7 +20,9 @@
 namespace App\Tests\Functional\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
+use App\Generator\UserCacheIdGenerator;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
+use Doctrine\Common\Cache\Cache;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,6 +36,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
+    /** @var UserCacheIdGenerator */
+    private $userCacheIdGenerator;
+
+    /** @var Cache */
+    private $cache;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -46,6 +54,9 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->loadFixtures([
             __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
         ]);
+
+        $this->userCacheIdGenerator = new UserCacheIdGenerator();
+        $this->cache = $this->getEntityManager()->getConfiguration()->getResultCacheImpl();
     }
 
     public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
@@ -60,6 +71,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItIteratesThroughAllUsers(): void
     {
+        $this->checkCache(false);
+
         $this->assertEquals(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
@@ -77,10 +90,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             'Number of warmed up cache entries: 100',
             $this->commandTester->getDisplay()
         );
+
+        $this->checkCache(true);
     }
 
     public function testIteratesOneUser(): void
     {
+        $this->checkCache(false);
+
         $this->assertEquals(0, $this->commandTester->execute(
             [
                 '--batch-size' => '3',
@@ -100,10 +117,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             'Number of warmed up cache entries: 2',
             $this->commandTester->getDisplay()
         );
+
+        $this->checkCache(true);
     }
 
     public function testIteratesLineItems(): void
     {
+        $this->checkCache(false);
+
         $this->assertEquals(0, $this->commandTester->execute(
             [
                 '--batch-size' => '10',
@@ -125,7 +146,26 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             'Number of warmed up cache entries: 90',
             $display
         );
+
+        $this->checkCache(true);
     }
+
+    private function checkCache(bool $empty): void
+    {
+        $userNames = ['user_1', 'user_99'];
+        $keys = array_map(
+            function ($userName) {
+                return $this->userCacheIdGenerator->generate($userName);
+            },
+            $userNames
+        );
+
+        foreach ($keys as $key) {
+            $this->assertEquals($empty, $this->cache->contains($key));
+        }
+    }
+
+
 
     public function testOutputInCaseOfException(): void
     {
