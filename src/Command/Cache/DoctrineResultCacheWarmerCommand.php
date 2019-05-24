@@ -24,13 +24,13 @@ use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
@@ -193,7 +193,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
      *
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
-     * @throws DBALException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -221,7 +220,6 @@ final class DoctrineResultCacheWarmerCommand extends Command
     }
 
     /**
-     * @throws DBALException
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
@@ -231,11 +229,18 @@ final class DoctrineResultCacheWarmerCommand extends Command
             return;
         }
 
-        $userObjects = $this->findUserNamesByLineItemIds($this->lineItemIds);
+        $paginator = $this->findUserNamesByLineItemIds($this->lineItemIds, 0);
+        $countOfUsersToBeUpdated = $paginator->count();
+        $updated = 0;
 
-        foreach ($userObjects as $userName) {
-            $this->warmUpResultCacheForUserName($userName);
-            $this->echoAffectedEntries();
+        while ($countOfUsersToBeUpdated - $updated > 0) {
+            $paginator = $this->findUserNamesByLineItemIds($this->lineItemIds, $updated);
+            /** @var User $user */
+            foreach ($paginator as $user) {
+                $this->warmUpResultCacheForUserName($user->getUsername());
+                $this->echoAffectedEntries();
+                $updated++;
+            }
         }
     }
 
@@ -342,26 +347,25 @@ final class DoctrineResultCacheWarmerCommand extends Command
 
     /**
      * @param array $lineItemIds
+     * @param int   $offset
      *
-     * @return iterable
-     * @throws DBALException
+     * @return Paginator
      */
-    private function findUserNamesByLineItemIds(array $lineItemIds): iterable
+    private function findUserNamesByLineItemIds(array $lineItemIds, int $offset): Paginator
     {
-        $pdo = $this->entityManager->getConnection();
+        $query = $this->entityManager
+            ->createQueryBuilder()
+            ->select('u')
+            ->setFirstResult($offset)
+            ->setMaxResults($this->batchSize)
+            ->from(User::class, 'u')
+            ->innerJoin('u.assignments', 'a')
+            ->innerJoin('a.lineItem', 'l')
+            ->where('l.id IN (:lineItemIds)')
+            ->setParameter('lineItemIds', $lineItemIds)
+            ->getQuery();
 
-        $query = '
-            select u.username
-            from users u
-            join assignments a on u.id = a.user_id
-            join line_items li on a.line_item_id = li.id and li.id in (' . implode(',', $lineItemIds) . ')
-        ';
-
-        $statement = $pdo->query($query);
-
-        while ($row = $statement->fetchColumn()) {
-            yield $row;
-        }
+        return new Paginator($query, false);
     }
 
     /**

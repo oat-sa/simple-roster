@@ -106,8 +106,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
-                '--batch-size' => '1',
-                '--line-item-ids' => '1,2',
+                '--batch-size' => '10',
+                '--line-item-ids' => '1,3',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -117,12 +117,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $display = $this->commandTester->getDisplay();
 
         $this->assertStringContainsString(
-            '[OK] 60 result cache entries have been successfully warmed up.',
+            '[OK] 90 result cache entries have been successfully warmed up.',
             $display
         );
 
         $this->assertStringContainsString(
-            'Number of warmed up cache entries: 60',
+            'Number of warmed up cache entries: 90',
             $display
         );
     }
