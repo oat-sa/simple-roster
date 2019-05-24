@@ -13,6 +13,8 @@ $ bin/console roster:doctrine-result-cache:warmup
 | Option | Description |
 | ------------- |:-------------|
 | -b, --batch-size | Number of cache entries to refresh per batch [default: `1000`] |
+| -u, --user-ids | User IDs that need to be warmed up. --user-ids=x[,x,[,...]] |
+| -l, --line-item-ids | Line item IDs of users that need to be warmed up. --line-item-ids=x[,x,[,...]] |
 
 #### Other options
 
