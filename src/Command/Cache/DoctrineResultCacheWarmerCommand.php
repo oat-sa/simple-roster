@@ -26,14 +26,9 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\Internal\Hydration\IterableResult;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use InvalidArgumentException;
 use LogicException;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -42,7 +37,7 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class DoctrineResultCacheWarmerCommand extends Command
+class DoctrineResultCacheWarmerCommand extends Command
 {
     use CommandWatcherTrait;
 
@@ -66,23 +61,20 @@ final class DoctrineResultCacheWarmerCommand extends Command
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var int */
-    private $numberOfWarmedUpCacheEntries = 0;
-
-    /** @var int */
-    private $batchSize = 0;
+    /** @var SymfonyStyle */
+    private $symfonyStyle;
 
     /** @var ConsoleSectionOutput */
-    private $progressOutputSection;
+    private $consoleSectionOutput;
 
-    /** @var int[] */
-    private $userIds;
+    /** @var int */
+    private $batchSize;
 
-    /** @var int[] */
-    private $lineItemIds;
+    /** @var array int[] */
+    private $userIds = [];
 
-    /** @var SymfonyStyle */
-    private $consoleOutput;
+    /** @var array */
+    private $lineItemIds = [];
 
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
@@ -117,256 +109,154 @@ final class DoctrineResultCacheWarmerCommand extends Command
         $this->addOption(
             self::OPTION_USER_IDS,
             'u',
-            InputOption::VALUE_OPTIONAL,
-            'User ids. Comma separated'
+            InputOption::VALUE_REQUIRED,
+            'User id list filter.'
         );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
             'l',
-            InputOption::VALUE_OPTIONAL,
-            'Line item ids. Comma separated'
+            InputOption::VALUE_REQUIRED,
+            'Line item id list filter.'
         );
     }
 
     /**
-     * @param int $numberOfWarmedUpCacheEntries
+     * @throws InvalidArgumentException
      */
-    public function addNumberOfWarmedUpCacheEntries(int $numberOfWarmedUpCacheEntries): void
-    {
-        $this->numberOfWarmedUpCacheEntries += $numberOfWarmedUpCacheEntries;
-    }
-
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        if (($userIds = $input->getOption(self::OPTION_USER_IDS)) !== null) {
-            $this->userIds = array_filter(filter_var_array(explode(',', $userIds), FILTER_VALIDATE_INT), 'is_int');
-
-            if (empty($this->userIds)) {
-                throw new InvalidArgumentException(
-                    sprintf('Option %s is empty. Should contain at least one value', self::OPTION_USER_IDS)
-                );
-            }
-        }
-
-        if (($lineItemIds = $input->getOption(self::OPTION_LINE_ITEM_IDS)) !== null) {
-            $this->lineItemIds = array_filter(filter_var_array(explode(',', $lineItemIds), FILTER_VALIDATE_INT), 'is_int');
-
-            if (empty($this->lineItemIds)) {
-                throw new InvalidArgumentException(
-                    sprintf('Option %s is empty. Should contain at least one value', self::OPTION_LINE_ITEM_IDS)
-                );
-            }
-        }
-
-        $this->batchSize = (int)$input->getOption(self::OPTION_BATCH_SIZE);
-        if ($this->batchSize < 1) {
-            throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
-        }
-
         $consoleOutput = $this->ensureConsoleOutput($output);
-        $this->consoleOutput = new SymfonyStyle($input, $consoleOutput);
-        $this->progressOutputSection = $consoleOutput->section();
-    }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return int|null
-     *
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->startWatch(self::NAME, __FUNCTION__);
+        $this->symfonyStyle = new SymfonyStyle($input, $consoleOutput);
+        $this->consoleSectionOutput = $consoleOutput->section();
 
-        $this->consoleOutput->note('Warming up doctrine result cache...');
-        $this->progressOutputSection->writeln('Number of warmed up cache entries: 0');
+        $this->initializeBatchSizeOption($input);
 
-        if (!($this->hasSpecificLineItems() || $this->hasSpecificUsers())) {
-            $this->warmUpAll();
+        if ($input->getOption(self::OPTION_USER_IDS)) {
+            $this->initializeUserIdsOption($input);
         }
 
-        if ($this->hasSpecificUsers()) {
-            $this->warmUpSpecificUsers();
+        if ($input->getOption(self::OPTION_LINE_ITEM_IDS)) {
+            $this->initializeLineItemIdsOption($input);
         }
 
-        if ($this->hasSpecificLineItems()) {
-            $this->warmUpByLineItemIds();
-        }
-
-        $this->echoAffectedEntries(true);
-
-        $this->consoleOutput->success(
-            sprintf(
-                '%s result cache entries have been successfully warmed up.',
-                $this->numberOfWarmedUpCacheEntries
-            )
-        );
-
-        $this->consoleOutput->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
-
-        return 0;
-    }
-
-    /**
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
-    private function warmUpByLineItemIds(): void
-    {
-        $paginator = $this->findUserNamesByLineItemIds($this->lineItemIds, 0);
-        $countOfUsersToBeUpdated = $paginator->count();
-        $updated = 0;
-
-        while ($countOfUsersToBeUpdated - $updated > 0) {
-            $paginator = $this->findUserNamesByLineItemIds($this->lineItemIds, $updated);
-            /** @var User $user */
-            foreach ($paginator as $user) {
-                $this->warmUpResultCacheForUserName($user->getUsername());
-                $this->echoAffectedEntries();
-                $updated++;
-            }
-        }
-    }
-
-    private function hasSpecificUsers(): bool
-    {
-        return $this->userIds !== null;
-    }
-
-    private function hasSpecificLineItems(): bool
-    {
-        return $this->lineItemIds !== null;
-    }
-
-    /**
-     * @param IterableResult $iterateResult
-     *
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
-    private function warmUp(IterableResult $iterateResult): void
-    {
-        foreach ($iterateResult as $row) {
-            $this->warmUpResultCacheForUserName(current($row)['username']);
-            $this->echoAffectedEntries();
-        }
-    }
-
-    private function echoAffectedEntries(bool $force = false): void
-    {
-        if ($force || $this->numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
-            $this->progressOutputSection->overwrite(
-                sprintf('Number of warmed up cache entries: %s', $this->numberOfWarmedUpCacheEntries)
+        if (!empty($this->userIds) && !empty($this->lineItemIds)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "'%s' and '%s' are exclusive options, please specify only one of them",
+                    self::OPTION_USER_IDS,
+                    self::OPTION_LINE_ITEM_IDS
+                )
             );
         }
     }
 
-    /**
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
-    private function warmUpSpecificUsers(): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->startWatch(self::NAME, __FUNCTION__);
+
         $offset = 0;
-        $numberOfTotalUsers = count($this->userIds);
+        $numberOfWarmedUpCacheEntries = 0;
+
+        $this->symfonyStyle->note('Warming up doctrine result cache...');
+        $this->consoleSectionOutput->writeln('Number of warmed up cache entries: 0');
+        $numberOfTotalUsers = $this->getNumberOfTotalUsers();
 
         do {
-            $userIds = array_slice($this->userIds, $offset, $this->batchSize);
+            $iterateResult = $this
+                ->getFindAllUsernameQuery($offset)
+                ->iterate();
 
-            $this->warmUp($this->findUsersNameById($userIds)->iterate());
+            foreach ($iterateResult as $row) {
+                $this->warmUpResultCacheForUserName(current($row)['username']);
 
-            $offset += $this->batchSize;
-        } while ($offset < $numberOfTotalUsers);
-    }
+                $numberOfWarmedUpCacheEntries++;
 
-    /**
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
-    private function warmUpAll(): void
-    {
-        $offset = 0;
-        $numberOfTotalUsers = $this->getTotalNumberOfUsers();
+                unset($row);
+            }
 
-        do {
-            $this->warmUp($this->findAllUsersNameQuery($offset)->iterate());
+            if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
+                $this->consoleSectionOutput->overwrite(
+                    sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
+                );
+            }
 
             $offset += $this->batchSize;
         } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+
+        $this->symfonyStyle->success(
+            sprintf(
+                '%s result cache entries have been successfully warmed up.',
+                $numberOfWarmedUpCacheEntries
+            )
+        );
+
+        $this->symfonyStyle->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+
+        return 0;
     }
 
-    private function findAllUsersNameQuery(int $offset): Query
+    private function getFindAllUsernameQuery(int $offset): Query
     {
-        return $this->entityManager
+        $queryBuilder = $this->entityManager
             ->createQueryBuilder()
             ->select('u.username')
-            ->from(User::class, 'u')
+            ->from(User::class, 'u');
+
+        if (!empty($this->userIds)) {
+            $queryBuilder
+                ->where('u.id IN (:userIds)')
+                ->setParameter('userIds', $this->userIds);
+        }
+
+        if ($this->lineItemIds) {
+            $queryBuilder
+                ->distinct()
+                ->leftJoin('u.assignments', 'a')
+                ->leftJoin('a.lineItem', 'l')
+                ->leftJoin('l.infrastructure', 'i')
+                ->where('l.id IN (:lineItemIds)')
+                ->setParameter('lineItemIds', $this->lineItemIds);
+        }
+
+        return $queryBuilder
             ->setFirstResult($offset)
             ->setMaxResults($this->batchSize)
             ->getQuery()
             ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
     }
 
-    private function findUsersNameById(array $userIds): Query
+    private function getNumberOfTotalUsers(): int
     {
-        return $this->entityManager
-            ->createQueryBuilder()
-            ->select('u.username')
-            ->from(User::class, 'u')
-            ->where('u.id IN (:users)')
-            ->setParameter('users', $userIds)
+        $queryBuilder =
+            $this->entityManager
+                ->createQueryBuilder()
+                ->select('COUNT(u.id) AS number_of_users')
+                ->from(User::class, 'u');
+
+        if ($this->userIds) {
+            $queryBuilder
+                ->where('u.id IN (:userIds)')
+                ->setParameter('userIds', $this->userIds);
+        }
+
+        if ($this->lineItemIds) {
+            $queryBuilder
+                ->leftJoin('u.assignments', 'a')
+                ->leftJoin('a.lineItem', 'l')
+                ->leftJoin('l.infrastructure', 'i')
+                ->where('l.id IN (:lineItemIds)')
+                ->setParameter('lineItemIds', $this->lineItemIds);
+        }
+
+        $result = $queryBuilder
             ->getQuery()
-            ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
+            ->getOneOrNullResult();
+
+        return (int)$result['number_of_users'];
     }
 
-    /**
-     * @param array $lineItemIds
-     * @param int   $offset
-     *
-     * @return Paginator
-     */
-    private function findUserNamesByLineItemIds(array $lineItemIds, int $offset): Paginator
-    {
-        $query = $this->entityManager
-            ->createQueryBuilder()
-            ->select('u')
-            ->setFirstResult($offset)
-            ->setMaxResults($this->batchSize)
-            ->from(User::class, 'u')
-            ->innerJoin('u.assignments', 'a')
-            ->innerJoin('a.lineItem', 'l')
-            ->where('l.id IN (:lineItemIds)')
-            ->setParameter('lineItemIds', $lineItemIds)
-            ->getQuery();
-
-        return new Paginator($query, false);
-    }
-
-    /**
-     * @return int
-     *
-     * @throws NonUniqueResultException
-     */
-    private function getTotalNumberOfUsers(): int
-    {
-        return (int)$this->entityManager
-            ->createQueryBuilder()
-            ->select('COUNT(u.id)')
-            ->from(User::class, 'u')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
-     * @param string $username
-     *
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     */
     private function warmUpResultCacheForUserName(string $username): void
     {
         $resultCacheId = $this->userCacheIdGenerator->generate($username);
@@ -375,9 +265,8 @@ final class DoctrineResultCacheWarmerCommand extends Command
         // Refresh by query
         $user = $this->userRepository->getByUsernameWithAssignments($username);
         $this->entityManager->clear();
-        unset($user);
 
-        $this->addNumberOfWarmedUpCacheEntries(1);
+        unset($user);
     }
 
     /**
@@ -395,5 +284,52 @@ final class DoctrineResultCacheWarmerCommand extends Command
         }
 
         return $output;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeBatchSizeOption(InputInterface $input): void
+    {
+        $this->batchSize = (int)$input->getOption(self::OPTION_BATCH_SIZE);
+        if ($this->batchSize < 1) {
+            throw new InvalidArgumentException(
+                sprintf("Invalid '%s' option received.", self::OPTION_BATCH_SIZE)
+            );
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeLineItemIdsOption(InputInterface $input): void
+    {
+        $this->lineItemIds = array_filter(
+            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
+            'is_numeric'
+        );
+
+        if (empty($this->lineItemIds)) {
+            throw new InvalidArgumentException(
+                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
+            );
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeUserIdsOption(InputInterface $input): void
+    {
+        $this->userIds = array_filter(
+            explode(',', (string)$input->getOption(self::OPTION_USER_IDS)),
+            'is_numeric'
+        );
+
+        if (empty($this->userIds)) {
+            throw new InvalidArgumentException(
+                sprintf("Invalid '%s' option received.", self::OPTION_USER_IDS)
+            );
+        }
     }
 }
