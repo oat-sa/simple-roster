@@ -20,7 +20,10 @@
 namespace App\Tests\Functional\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
+use App\Generator\UserCacheIdGenerator;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,6 +37,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
+    /** @var Cache */
+    private $doctrineResultCache;
+
+    /** @var UserCacheIdGenerator */
+    private $userCacheIdGenerator;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,6 +51,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(DoctrineResultCacheWarmerCommand::NAME));
+
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $this->doctrineResultCache = $entityManager->getConfiguration()->getResultCacheImpl();
+
+        $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
 
         $this->loadFixtures([
             __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
@@ -58,7 +73,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->commandTester->execute([]);
     }
 
-    public function testItIteratesThroughAllUsers(): void
+    public function testItCanWarmResultCacheForAllUsers(): void
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
@@ -68,6 +83,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
                 'capture_stderr_separately' => true,
             ]
         ));
+
+        for ($i = 1; $i <= 100; $i++) {
+            $username = sprintf('user_%d', $i);
+            $userCacheId = $this->userCacheIdGenerator->generate($username);
+
+            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+        }
+
         $this->assertStringContainsString(
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
@@ -79,10 +102,101 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
-    public function testOutputInCaseOfException(): void
+    public function testItCanWarmUpResultCacheByListOfUsers(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+                '--user-ids' => '1,2,3,4,5,6,7,8,9,10',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        for ($i = 1; $i <= 10; $i++) {
+            $username = sprintf('user_%d', $i);
+            $userCacheId = $this->userCacheIdGenerator->generate($username);
+
+            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+        }
+
+        for ($i = 11; $i <= 100; $i++) {
+            $username = sprintf('user_%d', $i);
+            $userCacheId = $this->userCacheIdGenerator->generate($username);
+
+            $this->assertFalse($this->doctrineResultCache->contains($userCacheId));
+        }
+
+        $this->assertStringContainsString(
+            '[OK] 10 result cache entries have been successfully warmed up.',
+            $this->commandTester->getDisplay()
+        );
+
+        $this->assertStringContainsString(
+            'Number of warmed up cache entries: 10',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testItCanWarmUpResultCacheByListOfLineItems(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+                '--line-item-ids' => '1,2',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        for ($i = 1; $i <= 60; $i++) {
+            $username = sprintf('user_%d', $i);
+            $userCacheId = $this->userCacheIdGenerator->generate($username);
+
+            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+        }
+
+        for ($i = 61; $i <= 100; $i++) {
+            $username = sprintf('user_%d', $i);
+            $userCacheId = $this->userCacheIdGenerator->generate($username);
+
+            $this->assertFalse($this->doctrineResultCache->contains($userCacheId));
+        }
+
+        $this->assertStringContainsString(
+            '[OK] 60 result cache entries have been successfully warmed up.',
+            $this->commandTester->getDisplay()
+        );
+
+        $this->assertStringContainsString(
+            'Number of warmed up cache entries: 60',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testItThrowsExceptionIfBothLineItemIdAndUserIdFiltersAreSpecified(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid 'batch-size' argument received.");
+        $this->expectExceptionMessage("'user-ids' and 'line-item-ids' are exclusive options, please specify only one of them");
+
+        $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+                '--user-ids' => '61,62,63',
+                '--line-item-ids' => '1,2',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
+
+    public function testItThrowsExceptionIfInvalidBatchSizeOptionReceived(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'batch-size' option received.");
 
         $this->commandTester->execute(
             [
@@ -92,5 +206,50 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
                 'capture_stderr_separately' => true,
             ]
         );
+    }
+
+    /**
+     * @dataProvider provideInvalidFilterOption
+     */
+    public function testItThrowsExceptionIfInvalidUserIdsOptionReceived($invalidOptionValue): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'user-ids' option received.");
+
+        $this->commandTester->execute(
+            [
+                '--user-ids' => $invalidOptionValue,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidFilterOption
+     */
+    public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived($invalidOptionValue): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'line-item-ids' option received.");
+
+        $this->commandTester->execute(
+            [
+                '--line-item-ids' => $invalidOptionValue,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
+
+    public function provideInvalidFilterOption(): array
+    {
+        return [
+            ['adsffdsfs'],
+            [','],
+            [',,,,,,'],
+        ];
     }
 }

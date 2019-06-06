@@ -13,11 +13,33 @@ App\Entity\LineItem:
     slug: 'lineItemSlug'
     startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
     endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+  lineItem2:
+    infrastructure: '@infrastructure'
+    label: 'The second line item'
+    uri: 'http://lineitemuri.com'
+    slug: 'lineItemSlug2'
+    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+  lineItem3:
+    infrastructure: '@infrastructure'
+    label: 'The third line item'
+    uri: 'http://lineitemuri.com'
+    slug: 'lineItemSlug3'
+    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
 
 App\Entity\Assignment:
-  assignment_{1..100}:
+  assignment_{1..50}:
     lineItem: '@lineItem'
     state: 'ready'
+  assignment_{51..60}:
+    lineItem: '@lineItem2'
+    state: 'ready'
+  assignment_{61..100}:
+    lineItem: '@lineItem3'
+    state: 'ready'
+
+
 
 App\Entity\User:
   user_{1..100}:

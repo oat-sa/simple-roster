@@ -2,7 +2,7 @@
     "name": "oat-sa/simple-roster",
     "description": "REST back-end service that handles authentication and eligibilities",
     "type": "project",
-    "license": "proprietary",
+    "license": "GPL-2.0",
     "repositories": [
         {
             "type": "vcs",
@@ -47,10 +47,10 @@
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "hautelook/alice-bundle": "^2.3",
         "infection/infection": "^0.12.0",
-        "phpstan/phpstan": "^0.11.2",
-        "phpstan/phpstan-doctrine": "^0.11.1",
-        "phpstan/phpstan-phpunit": "^0.11.0",
-        "phpstan/phpstan-symfony": "^0.11.1",
+        "phpstan/phpstan": "^0.11",
+        "phpstan/phpstan-doctrine": "^0.11",
+        "phpstan/phpstan-phpunit": "^0.11",
+        "phpstan/phpstan-symfony": "^0.11",
         "phpunit/phpunit": "^8.0",
         "symfony/debug-bundle": "^3.3|^4.0",
         "symfony/maker-bundle": "^1.9",
