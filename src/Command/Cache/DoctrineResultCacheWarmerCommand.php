@@ -254,7 +254,7 @@ class DoctrineResultCacheWarmerCommand extends Command
             ->getQuery()
             ->getOneOrNullResult();
 
-        return (int)$result['number_of_users'];
+        return null === $result ? 0 : (int)$result['number_of_users'];
     }
 
     private function warmUpResultCacheForUserName(string $username): void
