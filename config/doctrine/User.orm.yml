@@ -31,6 +31,7 @@ App\Entity\User:
             length: 255
             unique: false
             nullable: true
+            column: group_id
     oneToMany:
         assignments:
             targetEntity: App\Entity\Assignment
