@@ -36,12 +36,12 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
     public function testWithNonAuthenticatedUser(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/api/v1/assignments');
+        $kernelBrowser = self::createClient();
+        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($client->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
@@ -55,15 +55,15 @@ class ListUserAssignmentsActionTest extends WebTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $this->logInAs($user, $client);
+        $this->logInAs($user, $kernelBrowser);
 
-        $client->request(Request::METHOD_GET, '/api/v1/assignments');
+        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
         $this->assertEquals([
             'assignments' => [
                 [
@@ -79,7 +79,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-        ], json_decode($client->getResponse()->getContent(), true));
+        ], json_decode($kernelBrowser->getResponse()->getContent(), true));
     }
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
@@ -89,13 +89,13 @@ class ListUserAssignmentsActionTest extends WebTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $this->logInAs($user, $client);
+        $this->logInAs($user, $kernelBrowser);
 
-        $client->request(Request::METHOD_GET, '/api/v1/assignments');
+        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
-        $this->assertEquals(['assignments' => [],], json_decode($client->getResponse()->getContent(), true));
+        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(['assignments' => [],], json_decode($kernelBrowser->getResponse()->getContent(), true));
     }
 }

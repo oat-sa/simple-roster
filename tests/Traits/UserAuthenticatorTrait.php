@@ -20,17 +20,17 @@
 namespace App\Tests\Traits;
 
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 trait UserAuthenticatorTrait
 {
-    protected function logInAs(User $user, Client $client): void
+    protected function logInAs(User $user, KernelBrowser $kernelBrowser): void
     {
         /** @var Session $session */
-        $session = $client->getContainer()->get('session');
+        $session = $kernelBrowser->getContainer()->get('session');
 
         // the firewall context defaults to the firewall name
         $firewallContext = 'api';
@@ -40,6 +40,6 @@ trait UserAuthenticatorTrait
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
-        $client->getCookieJar()->set($cookie);
+        $kernelBrowser->getCookieJar()->set($cookie);
     }
 }

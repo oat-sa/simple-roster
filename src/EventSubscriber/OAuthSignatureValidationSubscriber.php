@@ -25,7 +25,7 @@ use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use App\Security\OAuth\OAuthSigner;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -58,7 +58,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /**
      * @throws NonUniqueResultException
      */
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         if (!$event->getController() instanceof OAuthSignatureValidatedActionInterface) {
             return;
