@@ -21,7 +21,7 @@ namespace App\EventSubscriber;
 
 use App\Responder\SerializerResponder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriber implements EventSubscriberInterface
@@ -41,7 +41,7 @@ class ErrorHandlerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event): void
+    public function onKernelException(ExceptionEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

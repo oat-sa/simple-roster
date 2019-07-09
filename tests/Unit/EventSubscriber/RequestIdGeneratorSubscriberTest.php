@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class RequestIdGeneratorSubscriberTest extends TestCase
@@ -37,8 +37,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
-    /** @var GetResponseEvent|MockObject */
-    private $getResponseEvent;
+    /** @var RequestEvent|MockObject */
+    private $requestEvent;
 
     /** @var RequestIdGeneratorSubscriber */
     private $subject;
@@ -49,7 +49,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->uuidFactory = $this->createMock(UuidFactoryInterface::class);
         $this->requestIdStorage = new RequestIdStorage();
-        $this->getResponseEvent = $this->createMock(GetResponseEvent::class);
+        $this->requestEvent = $this->createMock(RequestEvent::class);
 
         $this->subject = new RequestIdGeneratorSubscriber($this->uuidFactory, $this->requestIdStorage);
     }
@@ -78,15 +78,15 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ['HTTP_x-edge-request-id' => 'expectedRequestId']
         );
 
-        $this->getResponseEvent
+        $this->requestEvent
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->getResponseEvent
+        $this->requestEvent
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $this->subject->onKernelRequest($this->getResponseEvent);
+        $this->subject->onKernelRequest($this->requestEvent);
 
         $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
         $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
@@ -101,15 +101,15 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->method('uuid4')
             ->willReturn('expectedRequestId');
 
-        $this->getResponseEvent
+        $this->requestEvent
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->getResponseEvent
+        $this->requestEvent
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $this->subject->onKernelRequest($this->getResponseEvent);
+        $this->subject->onKernelRequest($this->requestEvent);
 
         $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
         $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
@@ -117,7 +117,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
     public function testItWillNotSetRequestIdOnSubRequests(): void
     {
-        $this->getResponseEvent
+        $this->requestEvent
             ->method('isMasterRequest')
             ->willReturn(false);
 
@@ -125,6 +125,6 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->expects($this->never())
             ->method('uuid4');
 
-        $this->subject->onKernelRequest($this->getResponseEvent);
+        $this->subject->onKernelRequest($this->requestEvent);
     }
 }

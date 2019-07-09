@@ -30,9 +30,9 @@ class LoginActionTest extends WebTestCase
 
     public function testItFailsWithWrongCredentials(): void
     {
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $client->request(
+        $kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/auth/login',
             [],
@@ -43,17 +43,17 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'invalid', 'password' => 'invalid'])
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($client->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals('Invalid credentials.', $decodedResponse['error']);
     }
 
     public function testItLogsInProperlyTheUser(): void
     {
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $client->request(
+        $kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/auth/login',
             [],
@@ -64,11 +64,11 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'user1', 'password' => 'password'])
         );
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertArrayHasKey('set-cookie', $client->getResponse()->headers->all());
+        $this->assertArrayHasKey('set-cookie', $kernelBrowser->getResponse()->headers->all());
 
-        $session = $client->getContainer()->get('session');
+        $session = $kernelBrowser->getContainer()->get('session');
 
         $this->assertNotEmpty($session->all());
     }

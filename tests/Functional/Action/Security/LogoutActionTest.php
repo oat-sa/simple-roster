@@ -33,19 +33,19 @@ class LogoutActionTest extends WebTestCase
 
     public function testItLogsOutProperlyTheUser(): void
     {
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
         $user = $this->getRepository(User::class)->find(1);
 
-        $this->logInAs($user, $client);
+        $this->logInAs($user, $kernelBrowser);
 
-        $session = $client->getContainer()->get('session');
+        $session = $kernelBrowser->getContainer()->get('session');
 
         $this->assertNotEmpty($session->all());
 
-        $client->request(Request::METHOD_POST, '/api/v1/auth/logout');
+        $kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEmpty($session->all());
     }

@@ -61,10 +61,16 @@ class UserIngester extends AbstractIngester
             ->setLineItem($this->lineItemCollection[$data['slug']])
             ->setState(Assignment::STATE_READY);
 
-        return (new User())
+        $user = (new User())
             ->setUsername($data['username'])
             ->setPassword($data['password'])
             ->setPlainPassword($data['password'])
             ->addAssignment($assignment);
+
+        if (isset($data['groupId'])) {
+            $user->setGroupId($data['groupId']);
+        }
+
+        return $user;
     }
 }

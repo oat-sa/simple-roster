@@ -30,27 +30,27 @@ class HealthCheckActionTest extends WebTestCase
 
     public function testItReturns200WhenApplicationInHealthy(): void
     {
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/api/v1/healthcheck');
+        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             [
                 'isDoctrineConnectionAvailable' => true,
                 'isDoctrineCacheAvailable' => true,
             ],
-            json_decode($client->getResponse()->getContent(), true)
+            json_decode($kernelBrowser->getResponse()->getContent(), true)
         );
     }
 
     public function testItReturns405OnInvalidMethod(): void
     {
-        $client = self::createClient();
+        $kernelBrowser = self::createClient();
 
-        $client->request(Request::METHOD_POST, '/api/v1/healthcheck');
+        $kernelBrowser->request(Request::METHOD_POST, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
     }
 }
