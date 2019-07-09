@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 - 2019-07-09
+
+### Added
+- `groupId` property to `User` entity for logical grouping of users.
+
+### Changed
+- Upgraded to Symfony version `4.3`
+
 ## 1.2.0 - 2019-04-29
 
 ### Added

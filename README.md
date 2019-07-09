@@ -1,58 +1,18 @@
 # Simple-Roster
 
-REST back-end service that handles authentication and eligibilities.
+>REST back-end service that handles authentication and eligibilities.
 
 ## Table of Contents
 
-- [Versions](#versions)
 - [Installation](#installation)
-- [Documentation](#documentation)
-    - [API documentation](#api-documentation)
-    - [CLI documentation](#cli-documentation)
-    - [DevOps documentation](#devops-documentation)
-- [Development](#development)
-    - [Build in server usage](#build-in-server-usage)
-    - [Docker usage](#docker-usage) 
-    - [Blackfire usage](#blackfire-usage)
+- [API documentation](#api-documentation)
+- [CLI documentation](#cli-documentation)
+- [DevOps documentation](#devops-documentation)
+- [Blackfire usage](#blackfire-usage)
 - [Testing](#testing)
 - [Static code analysis with PHPStan](#static-code-analysis-with-phpstan)
 
-## Versions
-
-See [CHANGELOG.md](CHANGELOG.md) file.
-
 ## Installation
-
-```bash
- $ composer install
-```
-
-## Documentation
-
-#### API documentation
-
-You can:
-- find the **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
-- use [https://editor.swagger.io/](https://editor.swagger.io/) to visualize it.
-
-#### CLI documentation
-
-Available commands:
-
-| Command | Description | Documentation |
-| ------------- |:-------------|:-------|
-| `roster:ingest` | Data ingestion (infrastructures, line items, users) | [docs/cli/ingester-command.md](docs/cli/ingester-command.md) |
-| `roster:native-ingest:user` | Native user ingestion | [docs/cli/native-user-ingester-command.md](docs/cli/native-user-ingester-command.md) |
-| `roster:garbage-collector:assignment` | Assignment garbage collection | [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md) |
-| `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer | [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md) | 
-| `roster:assignments:bulk-cancel` | Assignment bulk cancellation | [docs/cli/assignment-bulk-cancellation-command.md](docs/cli/assignment-bulk-cancellation-command.md) |
-| `roster:assignments:bulk-create` | Assignment bulk creation | [docs/cli/assignment-bulk-creation-command.md](docs/cli/assignment-bulk-creation-command.md) |
-
-#### DevOps documentation
-
-You can find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
-
-## Development
 
 #### Build in server usage
 
@@ -85,7 +45,30 @@ This project provides a ready to use docker stack with:
     - and sessions storage
 - blackfire
 
-#### Blackfire usage
+## API documentation
+
+You can:
+- find the **openapi v3** documentation in [openapi/api_v1.yml](openapi/api_v1.yml) file,
+- use [https://editor.swagger.io/](https://editor.swagger.io/) to visualize it.
+
+## CLI documentation
+
+Available commands:
+
+| Command | Description | Documentation |
+| ------------- |:-------------|:-------|
+| `roster:ingest` | Data ingestion (infrastructures, line items, users) | [docs/cli/ingester-command.md](docs/cli/ingester-command.md) |
+| `roster:native-ingest:user` | Native user ingestion | [docs/cli/native-user-ingester-command.md](docs/cli/native-user-ingester-command.md) |
+| `roster:garbage-collector:assignment` | Assignment garbage collection | [docs/cli/assignment-garbage-collector-command.md](docs/cli/assignment-garbage-collector-command.md) |
+| `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer | [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md) | 
+| `roster:assignments:bulk-cancel` | Assignment bulk cancellation | [docs/cli/assignment-bulk-cancellation-command.md](docs/cli/assignment-bulk-cancellation-command.md) |
+| `roster:assignments:bulk-create` | Assignment bulk creation | [docs/cli/assignment-bulk-creation-command.md](docs/cli/assignment-bulk-creation-command.md) |
+
+## DevOps documentation
+
+You can find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
+
+## Blackfire usage
 
 If you need to use blackfire, you can simply edit the `.env` file settings with your blackfire credentials.
 
