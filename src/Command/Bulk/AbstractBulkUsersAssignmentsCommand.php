@@ -139,7 +139,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
     /**
      * @throws LogicException
      */
-    protected function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
+    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
     {
         if (!$output instanceof ConsoleOutputInterface) {
             throw new LogicException(

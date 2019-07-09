@@ -45,6 +45,9 @@ class User implements UserInterface, EntityInterface
     /** @var string|null */
     private $plainPassword;
 
+    /** @var string|null */
+    private $groupId;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
@@ -82,6 +85,23 @@ class User implements UserInterface, EntityInterface
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getGroupId(): ?string
+    {
+        return $this->groupId;
+    }
+
+    public function hasGroupId(): bool
+    {
+        return null !== $this->groupId;
+    }
+
+    public function setGroupId(string $groupId): self
+    {
+        $this->groupId = $groupId;
 
         return $this;
     }

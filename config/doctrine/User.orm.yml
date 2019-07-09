@@ -5,35 +5,32 @@ App\Entity\User:
     id:
         id:
             type: integer
-            scale: 0
             length: null
             nullable: false
-            precision: 0
             id: true
             generator:
                 strategy: AUTO
     fields:
         username:
             type: string
-            scale: 0
             length: 255
             unique: true
             nullable: false
-            precision: 0
         password:
             type: string
-            scale: 0
             length: 255
             unique: false
             nullable: false
-            precision: 0
         roles:
             type: json_array
-            scale: 0
             length: null
             unique: false
             nullable: false
-            precision: 0
+        groupId:
+            type: string
+            length: 255
+            unique: false
+            nullable: true
     oneToMany:
         assignments:
             targetEntity: App\Entity\Assignment
