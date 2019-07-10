@@ -91,5 +91,10 @@ services:
         arguments:
             - '@app.session_storage.connection'
 
+    App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
+        factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
+        arguments:
+            - '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
