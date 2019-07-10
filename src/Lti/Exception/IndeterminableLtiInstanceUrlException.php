@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,36 +18,11 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\LoadBalancer;
+namespace App\Lti\Exception;
 
-/**
- * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php
- */
-class LtiInstanceLoadBalancer
+use RuntimeException;
+
+class IndeterminableLtiInstanceUrlException extends RuntimeException
 {
-    /** @var string[] */
-    private $ltiInstances;
 
-    public function __construct(array $ltiInstances)
-    {
-        $this->ltiInstances = $ltiInstances;
-    }
-
-    public function getLoadBalancedLtiInstanceUrl(string $value): string
-    {
-        $index = $this->asciiSum(hash('md5', $value)) % count($this->ltiInstances);
-
-        return $this->ltiInstances[$index];
-    }
-
-    private function asciiSum(string $value): int
-    {
-        $asciiSum = 0;
-
-        for ($i = 0, $iMax = strlen($value); $i < $iMax; $i++) {
-            $asciiSum += ord($value[$i]);
-        }
-
-        return $asciiSum;
-    }
 }

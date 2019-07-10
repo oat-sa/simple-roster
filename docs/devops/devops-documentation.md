@@ -1,6 +1,6 @@
 # DevOps Documentation
 
-DevOps related information for setting up / debug / maintain the application.
+> DevOps related information for setting up / debug / maintain the application.
 
 ## Configuration
 
@@ -65,6 +65,7 @@ The main configuration file is `.env`, located in root folder.
     | LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
     | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
     | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
+    | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 
 - Blackfire:
 
@@ -78,6 +79,18 @@ The main configuration file is `.env`, located in root folder.
 The default map of load balancer for LTI instances is located in `config/packages/lti_instances.yaml`.
 
 It can be overridden per instance (dev, prod) by dropping this file in `config/packages/<env>/lti_instances.yaml`.
+
+#### LTI load balancing strategy
+
+There are two different load balancing strategies that can be applied. It's configurable through the 
+`LTI_INSTANCE_LOAD_BALANCING_STRATEGY` environment variable in the `.env` file.
+
+| Strategy | Description |
+| ------------- |:-------------|
+| username | Username based strategy (default)|
+| userGroupId | User group ID based strategy |
+
+**Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified.
 
 #### Cache configuration
 
