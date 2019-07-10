@@ -1,10 +1,11 @@
 # Changelog
 
-## 1.3.0 - 2019-07-09
+## 1.3.0 - 2019-07-10
 
 ### Added
 - Added `groupId` property to `User` entity for logical grouping of users.
 - Added possibility to warm up result cache by line item ids or user ids in `DoctrineResultCacheWarmerCommand`.
+- Introduced LTI load balancing interface, implemented `User` group id based LTI load balancing strategy.
 
 ### Changed
 - Upgraded to Symfony version `4.3`
