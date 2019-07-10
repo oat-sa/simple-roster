@@ -23,6 +23,7 @@ namespace App\Tests\Unit\Lti\LoadBalancer;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class LtiInstanceLoadBalancerFactoryTest extends TestCase
@@ -55,7 +56,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
 
     public function testItThrowsExceptionIfInvalidLoadBalancerStrategyReceived(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             'Invalid load balancer strategy received. Possible values: username, userGroupId'
         );

@@ -20,7 +20,9 @@
 
 namespace App\Lti\Exception;
 
-class IndeterminableLtiInstanceUrlException extends \RuntimeException
+use RuntimeException;
+
+class IndeterminableLtiInstanceUrlException extends RuntimeException
 {
 
 }
