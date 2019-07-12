@@ -2,7 +2,7 @@
     "name": "oat-sa/simple-roster",
     "description": "REST back-end service that handles authentication and eligibilities",
     "type": "project",
-    "license": "proprietary",
+    "license": "GPL-2.0",
     "repositories": [
         {
             "type": "vcs",
@@ -26,37 +26,37 @@
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",
-        "symfony/browser-kit": "4.2.*",
-        "symfony/console": "4.2.*",
-        "symfony/dotenv": "4.2.*",
+        "symfony/browser-kit": "^4.0",
+        "symfony/console": "^4.0",
+        "symfony/dotenv": "^4.2",
         "symfony/flex": "^1.1",
-        "symfony/framework-bundle": "4.2.*",
-        "symfony/monolog-bundle": "^3.3",
+        "symfony/framework-bundle": "^4.0",
+        "symfony/monolog-bundle": "^3.0",
         "symfony/orm-pack": "^1.0",
-        "symfony/property-access": "4.2.*",
-        "symfony/property-info": "4.2.*",
-        "symfony/proxy-manager-bridge": "4.2.*",
-        "symfony/security-bundle": "4.2.*",
-        "symfony/serializer": "4.2.*",
-        "symfony/stopwatch": "4.2.*",
-        "symfony/validator": "4.2.*",
-        "symfony/yaml": "4.2.*"
+        "symfony/property-access": "^4.0",
+        "symfony/property-info": "^4.0",
+        "symfony/proxy-manager-bridge": "^4.0",
+        "symfony/security-bundle": "^4.0",
+        "symfony/serializer": "^4.0",
+        "symfony/stopwatch": "^4.0",
+        "symfony/validator": "^4.0",
+        "symfony/yaml": "^4.0"
     },
     "require-dev": {
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "hautelook/alice-bundle": "^2.3",
-        "infection/infection": "^0.12.0",
-        "phpstan/phpstan": "^0.11.2",
-        "phpstan/phpstan-doctrine": "^0.11.1",
-        "phpstan/phpstan-phpunit": "^0.11.0",
-        "phpstan/phpstan-symfony": "^0.11.1",
+        "infection/infection": "^0.13",
+        "phpstan/phpstan": "^0.11",
+        "phpstan/phpstan-doctrine": "^0.11",
+        "phpstan/phpstan-phpunit": "^0.11",
+        "phpstan/phpstan-symfony": "^0.11",
         "phpunit/phpunit": "^8.0",
-        "symfony/debug-bundle": "^3.3|^4.0",
+        "symfony/debug-bundle": "^4.0",
         "symfony/maker-bundle": "^1.9",
         "symfony/profiler-pack": "^1.0",
-        "symfony/var-dumper": "^3.3|^4.0",
-        "symfony/web-server-bundle": "4.2.*"
+        "symfony/var-dumper": "^4.0",
+        "symfony/web-server-bundle": "^4.0"
     },
     "config": {
         "preferred-install": {
@@ -99,7 +99,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "4.2.*"
+            "require": "^4.0"
         }
     }
 }

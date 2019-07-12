@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,38 +18,36 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\EventSubscriber;
+namespace App\Lti\LoadBalancer;
 
-use App\Responder\SerializerResponder;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-
-class ErrorHandlerSubscriber implements EventSubscriberInterface
+/**
+ * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php
+ */
+abstract class AbstractLtiInstanceLoadBalancer implements LtiInstanceLoadBalancerInterface
 {
-    /** @var SerializerResponder */
-    private $responder;
+    /** @var string[] */
+    private $ltiInstances;
 
-    public function __construct(SerializerResponder $responder)
+    public function __construct(array $ltiInstances)
     {
-        $this->responder = $responder;
+        $this->ltiInstances = $ltiInstances;
     }
 
-    public static function getSubscribedEvents()
+    protected function getLoadBalancedLtiInstanceUrl(string $value): string
     {
-        return [
-            KernelEvents::EXCEPTION => 'onKernelException',
-        ];
+        $index = $this->asciiSum(hash('md5', $value)) % count($this->ltiInstances);
+
+        return $this->ltiInstances[$index];
     }
 
-    public function onKernelException(ExceptionEvent $event): void
+    private function asciiSum(string $value): int
     {
-        if (!$event->isMasterRequest()) {
-            return;
+        $asciiSum = 0;
+
+        for ($i = 0, $iMax = strlen($value); $i < $iMax; $i++) {
+            $asciiSum += ord($value[$i]);
         }
 
-        $event->setResponse(
-            $this->responder->createErrorJsonResponse($event->getException())
-        );
+        return $asciiSum;
     }
 }

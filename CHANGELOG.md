@@ -1,26 +1,36 @@
 # Changelog
 
+## 1.3.0 - 2019-07-10
+
+### Added
+- Added `groupId` property to `User` entity for logical grouping of users.
+- Added possibility to warm up result cache by line item ids or user ids in `DoctrineResultCacheWarmerCommand`.
+- Introduced LTI load balancing interface, implemented `User` group id based LTI load balancing strategy.
+
+### Changed
+- Upgraded to Symfony version `4.3`
+
 ## 1.2.0 - 2019-04-29
 
 ### Added
-- Bulk assignment cancellation CLI command.
-- Bulk assignment creation CLI command.
-- OAT Docker stack support in development environment.
-- PHPUnit 8 support.
+- Added bulk assignment cancellation CLI command.
+- Added bulk assignment creation CLI command.
+- Added OAT Docker stack support in development environment.
+- Added PHPUnit 8 support.
 
 ### Removed
-- PHPUnit Bridge
+- Removed PHPUnit Bridge.
 
 ### Fixed
-- Bug in bulk assignment services due to `getAvailableAssignments()` method usage. From now on bulk operations are not time sensitive (`startAt` and `endAt` dates in `LineItem`).
+- Fixed bug in bulk assignment services due to `getAvailableAssignments()` method usage. From now on bulk operations are not time sensitive (`startAt` and `endAt` dates in `LineItem`).
 
 ## 1.1.1 - 2019-03-19
 
 ### Fixed
-- Execution speed and memory consumption of _bulk_ endpoints in case of large operation size.
+- Fixed execution speed and memory consumption of _bulk_ endpoints in case of large operation size.
 
 ## 1.1.0 - 2019-03-19
 
 ### Added
-- Possibility to specify charset for regular and native ingesters.
-- Possibility to perform integrity checks on ingester dry runs.
+- Added possibility to specify charset for regular and native ingesters.
+- Added possibility to perform integrity checks on ingester dry runs.

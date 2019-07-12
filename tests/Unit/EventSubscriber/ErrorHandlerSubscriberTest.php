@@ -25,7 +25,7 @@ use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriberTest extends TestCase
@@ -54,7 +54,7 @@ class ErrorHandlerSubscriberTest extends TestCase
 
     public function testItDoesNotSetResponseOnSubRequests(): void
     {
-        $event = $this->createMock(GetResponseForExceptionEvent::class);
+        $event = $this->createMock(ExceptionEvent::class);
         $event
             ->method('isMasterRequest')
             ->willReturn(false);
@@ -76,7 +76,7 @@ class ErrorHandlerSubscriberTest extends TestCase
             ->with($expectedException)
             ->willReturn($expectedResponse);
 
-        $event = $this->createMock(GetResponseForExceptionEvent::class);
+        $event = $this->createMock(ExceptionEvent::class);
 
         $event
             ->method('isMasterRequest')

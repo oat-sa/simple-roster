@@ -71,6 +71,17 @@ class UserIngesterTest extends KernelTestCase
         $this->subject->ingest($source, false);
     }
 
+    public function testItHasUserIngesterType(): void
+    {
+        $this->prepareIngestionContext();
+
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/users.csv');
+
+        $output = $this->subject->ingest($source, false);
+
+        $this->assertSame('user', $output->getIngesterType());
+    }
+
     public function testIngestWithInvalidSource(): void
     {
         $this->prepareIngestionContext();
@@ -79,8 +90,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals('user', $output->getIngesterType());
-        $this->assertFalse($output->isDryRun());
         $this->assertEquals(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
         $this->assertCount(1, $output->getFailures());
@@ -96,7 +105,7 @@ class UserIngesterTest extends KernelTestCase
             [
                 'username' => 'user_1',
                 'password' => 'password1',
-                'slug' => 'gra13_ita_1'
+                'slug' => 'gra13_ita_1',
             ],
             $failure->getData()
         );
@@ -111,8 +120,6 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals('user', $output->getIngesterType());
-        $this->assertFalse($output->isDryRun());
         $this->assertEquals(12, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
@@ -123,6 +130,29 @@ class UserIngesterTest extends KernelTestCase
 
         $user12 = $this->getRepository(User::class)->find(12);
         $this->assertEquals('user_12', $user12->getUsername());
+    }
+
+    public function testItCanIngestUsersWithGroupId(): void
+    {
+        $this->prepareIngestionContext();
+
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/users-with-groupId.csv');
+
+        $output = $this->subject->ingest($source, false);
+
+        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertFalse($output->hasFailures());
+
+        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+
+        $usersInGroup1 = $this->getRepository(User::class)->findBy(['groupId' => 'group_1']);
+        $this->assertCount(3, $usersInGroup1);
+
+        $usersInGroup2 = $this->getRepository(User::class)->findBy(['groupId' => 'group_2']);
+        $this->assertCount(4, $usersInGroup2);
+
+        $usersInGroup3 = $this->getRepository(User::class)->findBy(['groupId' => 'group_3']);
+        $this->assertCount(5, $usersInGroup3);
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface

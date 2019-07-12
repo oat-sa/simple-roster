@@ -31,7 +31,7 @@ use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
 use DateTimeZone;
 use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,8 +41,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     use UserAuthenticatorTrait;
     use LoggerTestingTrait;
 
-    /** @var Client */
-    private $client;
+    /** @var KernelBrowser */
+    private $kernelBrowser;
 
     protected function setUp(): void
     {
@@ -51,23 +51,23 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->setUpDatabase();
         $this->setUpFixtures();
 
-        $this->client = self::createClient();
+        $this->kernelBrowser = self::createClient();
 
         $this->setUpTestLogHandler();
     }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns405IfHttpMethodIsNotAllowed(): void
     {
-        $this->client->request('POST', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('POST', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
@@ -76,13 +76,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->client);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->client->request('GET', '/api/v1/assignments/2/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
     }
 
@@ -95,13 +95,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
         $this->getEntityManager()->flush();
 
-        $this->logInAs($user, $this->client);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_CONFLICT, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals(
             "Assignment with id '1' does not have a suitable state.",
             $decodedResponse['error']['message']
@@ -116,11 +116,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->client);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             [
@@ -149,7 +149,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
         );
 
         /** @var Assignment $assignment */
@@ -171,14 +171,14 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->client);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = $initialLoadBalancerStatus;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             [
@@ -207,7 +207,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'it-IT',
                 ],
             ],
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
         );
 
         /** @var Assignment $assignment */
@@ -226,10 +226,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
-        $this->logInAs($user, $this->client);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->client->request('GET', '/api/v1/assignments/1/lti-link');
-        $ltiRequestInResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $ltiRequestInResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
 
         $this->assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
         $this->assertHasRecordThatPasses(

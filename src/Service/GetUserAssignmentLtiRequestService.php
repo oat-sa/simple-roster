@@ -22,7 +22,7 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotProcessableException;
 use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancer;
+use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
@@ -42,7 +42,7 @@ class GetUserAssignmentLtiRequestService
     /** @var RouterInterface */
     private $router;
 
-    /** @var LtiInstanceLoadBalancer */
+    /** @var LtiInstanceLoadBalancerInterface */
     private $loadBalancer;
 
     /** @var string */
@@ -58,7 +58,7 @@ class GetUserAssignmentLtiRequestService
         OAuthSigner $signer,
         NonceGenerator $generator,
         RouterInterface $router,
-        LtiInstanceLoadBalancer $loadBalancer,
+        LtiInstanceLoadBalancerInterface $loadBalancer,
         string $ltiLaunchPresentationReturnUrl,
         string $ltiLaunchPresentationLocale,
         bool $ltiInstancesLoadBalancerEnabled
@@ -131,7 +131,7 @@ class GetUserAssignmentLtiRequestService
     private function getAssignmentLtiLink(Assignment $assignment): string
     {
         $link = $this->ltiInstancesLoadBalancerEnabled
-            ? $this->loadBalancer->getLoadBalancedLtiInstanceUrl($assignment->getUser()->getUsername())
+            ? $this->loadBalancer->getLtiInstanceUrl($assignment->getUser())
             : $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink();
 
         return sprintf(

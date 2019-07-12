@@ -35,16 +35,16 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $client = static::createClient();
+        $kernelBrowser = static::createClient();
 
-        $client->request('POST', '/api/v1/lti/outcome');
+        $kernelBrowser->request('POST', '/api/v1/lti/outcome');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongAuthentication(): void
     {
-        $client = static::createClient();
+        $kernelBrowser = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
@@ -58,7 +58,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $client->request(
+        $kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -68,12 +68,12 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             ]
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $client = static::createClient();
+        $kernelBrowser = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
@@ -93,7 +93,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $client->request(
+        $kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -104,7 +104,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_COMPLETED,
@@ -114,7 +114,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $client = static::createClient();
+        $kernelBrowser = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
@@ -133,7 +133,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $client->request(
+        $kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -144,7 +144,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_READY,
@@ -154,7 +154,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $client = static::createClient();
+        $kernelBrowser = static::createClient();
 
         $infrastructure = $this->getInfrastructure();
 
@@ -176,7 +176,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $client->request(
+        $kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -187,7 +187,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_READY,
