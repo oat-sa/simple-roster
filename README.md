@@ -7,7 +7,7 @@
 - [Installation](#installation)
 - [API documentation](#api-documentation)
 - [CLI documentation](#cli-documentation)
-- [DevOps documentation](#devops-documentation)
+- [DevOps documentation](docs/devops/devops-documentation.md)
 - [Blackfire usage](#blackfire-usage)
 - [Testing](#testing)
 - [Static code analysis with PHPStan](#static-code-analysis-with-phpstan)
@@ -63,10 +63,6 @@ Available commands:
 | `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer | [docs/cli/doctrine-result-cache-warmer-command.md](docs/cli/doctrine-result-cache-warmer-command.md) | 
 | `roster:assignments:bulk-cancel` | Assignment bulk cancellation | [docs/cli/assignment-bulk-cancellation-command.md](docs/cli/assignment-bulk-cancellation-command.md) |
 | `roster:assignments:bulk-create` | Assignment bulk creation | [docs/cli/assignment-bulk-creation-command.md](docs/cli/assignment-bulk-creation-command.md) |
-
-## DevOps documentation
-
-You can find the **DevOps** documentation in [docs/devops/devops-documentation.md](docs/devops/devops-documentation.md)
 
 ## Blackfire usage
 
