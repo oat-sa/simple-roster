@@ -2,6 +2,9 @@
 
 ## 1.3.1 - 2019-07-22
 
+### Added
+- Added `force` parameter to `NativeUserIngesterCommand`
+
 ### Fixed
 - Fixed fatal error during composer install caused by https://bugs.php.net/bug.php?id=76980 on php `7.2.20`.
 

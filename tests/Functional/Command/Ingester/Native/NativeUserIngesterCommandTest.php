@@ -63,6 +63,29 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
     }
 
+    public function testItDoesNotIngestUsersInDryRun(): void
+    {
+        $this->prepareIngestionContext();
+
+        $output = $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+
+        $this->assertEquals(0, $output);
+        $this->assertStringContainsString(
+            'Total of users imported: 0, batched errors: 0',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+
+        $this->assertCount(0, $this->getRepository(User::class)->findAll());
+    }
+
     public function testNonBatchedLocalIngestionSuccess(): void
     {
         $this->prepareIngestionContext();
@@ -71,6 +94,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             [
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+                '--force' => true,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -101,6 +125,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
                 '--batch' => 2,
+                '--force' => true,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -151,6 +176,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users.csv',
                 '--batch' => 1,
+                '--force' => true,
             ],
             [
                 'capture_stderr_separately' => true,
