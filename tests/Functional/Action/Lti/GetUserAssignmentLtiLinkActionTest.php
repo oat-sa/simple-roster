@@ -22,6 +22,7 @@ namespace App\Tests\Functional\Action\Lti;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Generator\NonceGenerator;
+use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use App\Lti\Request\LtiRequest;
 use App\Repository\UserRepository;
 use App\Security\OAuth\OAuthContext;
@@ -108,7 +109,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStarted(): void
+    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -117,6 +118,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $user = $userRepository->getByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
+
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
@@ -129,16 +132,62 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'vSMHIT7UXq0bcD04nkw8jo5p5qw=',
+                    'oauth_signature' => 'OaXyh9RqBX8maLsHb2ToCRGGC7c=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
-                    'context_id' => 1,
-                    'context_label' => 'lineItemSlug',
-                    'context_title' => 'The first line item',
-                    'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
+                    'context_id' => '1',
+                    'roles' => LtiRequest::LTI_ROLE,
+                    'user_id' => 1,
+                    'lis_person_name_full' => 'user1',
+                    'resource_link_id' => 1,
+                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
+                    'lis_result_sourcedid' => 1,
+                    'launch_presentation_return_url' => 'http://example.com/index.html',
+                    'launch_presentation_locale' => 'en-EN',
+                ],
+            ],
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+        );
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+    }
+
+    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedWithUserGroupIdLoadBalancerStrategy(): void
+    {
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY']
+            = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USER_GROUP_ID;
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->assertEquals(
+            [
+                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiParams' => [
+                    'oauth_body_hash' => '',
+                    'oauth_consumer_key' => 'myKey',
+                    'oauth_nonce' => (new NonceGenerator())->generate(),
+                    'oauth_signature' => 'tPlvsHl9eZ5MFEHBqemqLsjAtNo=',
+                    'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
+                    'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
+                    'oauth_version' => OAuthContext::VERSION_1_0,
+                    'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+                    'lti_version' => LtiRequest::LTI_VERSION,
+                    'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 1,
                     'lis_person_name_full' => 'user1',
@@ -165,6 +214,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
 
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USERNAME;
+
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
@@ -187,16 +238,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'ozqOmBP1G5OdOsq7irV3jsUG9PA=',
+                    'oauth_signature' => 'kfwT0UTPN2CZvmjvOJOPUSoJPp8=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
-                    'context_id' => 1,
-                    'context_label' => 'lineItemSlug',
-                    'context_title' => 'The first line item',
-                    'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
+                    'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 1,
                     'lis_person_name_full' => 'user1',

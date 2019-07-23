@@ -22,6 +22,7 @@ namespace App\Tests\Unit\Lti\LoadBalancer;
 
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
@@ -47,6 +48,13 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     public function testIfItIsLtiInstanceLoadBalancer(): void
     {
         $this->assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
+    }
+
+    public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDetermined(): void
+    {
+        $this->expectException(IndeterminableLtiInstanceUrlException::class);
+
+        $this->subject->getLtiInstanceUrl(new User());
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -82,10 +90,17 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
         }
     }
 
-    public function testItThrowsExceptionIfUserDoesNotHaveGroupId(): void
+    public function testItThrowsExceptionIfLtiRequestContextIdCannotBeDetermined(): void
     {
-        $this->expectException(IndeterminableLtiInstanceUrlException::class);
+        $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $this->subject->getLtiInstanceUrl(new User());
+        $this->subject->getLtiRequestContextId(new User());
+    }
+
+    public function testItCanReturnLtiRequestContextId(): void
+    {
+        $user = (new User())->setGroupId('group_5');
+
+        $this->assertSame('group_5', $this->subject->getLtiRequestContextId($user));
     }
 }

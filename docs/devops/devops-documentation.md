@@ -2,101 +2,68 @@
 
 > DevOps related information for setting up / debug / maintain the application.
 
-## Configuration
+## Table of Contents
+- [Environment variables](#environment-variables)
+    - [Application related environment variables](#application-related-environment-variables)
+    - [AWS related environment variables](#aws-related-environment-variables)
+    - [LTI related environment variables](#lti-related-environment-variables)
+    - [Blackfire related environment variables](#blackfire-related-environment-variables)
+- [Application setup steps](#application-setup-steps)
+- [LTI](#lti)
+    - [LTI load balancer configuration](#lti-load-balancer-configuration)
+    - [LTI load balancing strategy](#lti-load-balancing-strategy)
+- [Applying custom route prefix](#applying-custom-route-prefix)
+- [Useful commands](#useful-commands)
+- [Application logs](#application-logs)
+- [Production environment - checklist](https://symfony.com/doc/current/performance.html)
 
-#### Configuration file
+## Environment variables
 
 The main configuration file is `.env`, located in root folder.
 
-#### Configuration parameters
+#### Application related environment variables
 
-- Framework:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | APP_ENV | Application environment, `dev`, `prod` or `test` [default: `prod`] |
-    | APP_DEBUG | Application debug mode, [default: `false`] |
-    | APP_SECRET | Application secret |
-    | APP_API_KEY | Application API Key |
-    | APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
-    
-- AWS:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | AWS_REGION | AWS Region [default: `eu-west-1`] |
-    | AWS_VERSION | AWS Version [default: `latest`] |
-    | AWS_KEY | AWS Key |
-    | AWS_SECRET | AWS Secret |
-    | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
-    
-- Database:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | DATABASE_URL | Database url |
-    
-- Cache:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | REDIS_DOCTRINE_USER_CACHE_TTL | Doctrine User entity cache storage TTL [default: `3600`] |
-    | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
-    | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
-    | REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
-    | REDIS_SESSION_CACHE_PORT | Redis host for sessions cache storage |
-    
-- CORS:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | CORS_ALLOW_ORIGIN | Allowed CORS origin |
-    
-- Garbage collector:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-
-- LTI configuration:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
-    | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
-    | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
-    | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
-
-- Blackfire:
-
-    | Parameter | Description |
-    | ------------- |:-------------|
-    | BLACKFIRE_SERVER_ID | Blackfire server id |
-    | BLACKFIRE_SERVER_TOKEN | Blackfire server token |
-
-#### LTI load balancer configuration
-
-The default map of load balancer for LTI instances is located in `config/packages/lti_instances.yaml`.
-
-It can be overridden per instance (dev, prod) by dropping this file in `config/packages/<env>/lti_instances.yaml`.
-
-#### LTI load balancing strategy
-
-There are two different load balancing strategies that can be applied. It's configurable through the 
-`LTI_INSTANCE_LOAD_BALANCING_STRATEGY` environment variable in the `.env` file.
-
-| Strategy | Description |
+| Parameter | Description |
 | ------------- |:-------------|
-| username | Username based strategy (default)|
-| userGroupId | User group ID based strategy |
+| APP_ENV | Application environment, `dev`, `prod` or `test` [default: `prod`] |
+| APP_DEBUG | Application debug mode, [default: `false`] |
+| APP_SECRET | Application secret |
+| APP_API_KEY | Application API Key |
+| APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
+| DATABASE_URL | Database url |
+| REDIS_DOCTRINE_USER_CACHE_TTL | Doctrine User entity cache storage TTL [default: `3600`] |
+| REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
+| REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
+| REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
+| REDIS_SESSION_CACHE_PORT | Redis port for sessions cache storage |
+| CORS_ALLOW_ORIGIN | Allowed CORS origin |
+| ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
+  
+#### AWS related environment variables
 
-**Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified.
+| Parameter | Description |
+| ------------- |:-------------|
+| AWS_REGION | AWS Region [default: `eu-west-1`] |
+| AWS_VERSION | AWS Version [default: `latest`] |
+| AWS_KEY | AWS Key |
+| AWS_SECRET | AWS Secret |
+| AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
+     
+#### LTI related environment variables
 
-#### Cache configuration
+| Parameter | Description |
+| ------------- |:-------------|
+| LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
+| LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
+| LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
+| LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 
-The redis TTL value can be set in `.env`, with `REDIS_DOCTRINE_USER_CACHE_TTL` value.
+#### Blackfire related environment variables
 
-This value should be greater than the duration on the test campaign (so it never expires during the campaign).
+| Parameter | Description |
+| ------------- |:-------------|
+| BLACKFIRE_SERVER_ID | Blackfire server id |
+| BLACKFIRE_SERVER_TOKEN | Blackfire server token |
 
 ## Application setup steps
 
@@ -130,10 +97,46 @@ $ bin/console doctrine:schema:update --force
 $ bin/console doctrine:schema:drop --force
 ```
 
+## LTI
+
+#### LTI load balancer configuration
+
+The default map of load balancer for LTI instances is located in `config/packages/lti_instances.yaml`.
+
+It can be overridden per instance (dev, prod) by dropping this file in `config/packages/<env>/lti_instances.yaml`.
+
+The list of related environment variables can be found [here](#lti-related-environment-variables).
+
+#### LTI load balancing strategy
+
+There are two different load balancing strategies that can be applied. It's configurable through the 
+`LTI_INSTANCE_LOAD_BALANCING_STRATEGY` environment variable in the `.env` file.
+
+| Strategy | Description |
+| ------------- |:-------------|
+| username | Username based strategy (default)|
+| userGroupId | User group ID based strategy |
+
+**Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified, 
+otherwise the ingestion will fail.
+
+**Note 2:** The `contextId` LTI request parameter is automatically adjusted based on the active load balancing strategy.
+
+| Strategy | Value of `contextId` LTI request parameter |
+| ------------- |:-------------|
+| username | ID of `LineItem` of last assignment of the user|
+| userGroupId | `groupId` of the `User` |
+
 ## Applying custom route prefix
 
 Custom route prefix can be defined via `APP_ROUTE_PREFIX` application environment. 
 If you do so, please make sure to include the leading slash character, but *NO* trailing slash.
+
+Example:
+
+```bash
+APP_ROUTE_PREFIX=/api/v1
+```
 
 To apply the changes, you need to clear the application cache:
 
@@ -148,8 +151,6 @@ $ bin/console debug:router [--env=dev|prod]
 ```
 
 ## Useful commands
-
-#### Cache management commands
 
 - Clear application cache
 
@@ -181,24 +182,6 @@ $ bin/console doctrine:cache:clear-query
 $ bin/console doctrine:cache:clear-result
 ```
 
-#### Maintenance related commands
-
-- Assignment garbage collector (to collect stuck assignments)
-
-```bash
-$ bin/console roster:garbage-collector:assignment --force
-```
-
-#### Full list of available commands
-
-```bash
-$ bin/console
-```
-
-## Application logs file
+## Application logs
 
 Application logs are populated in `var/log/[dev|prod].log`
-
-## Performances checklist
-
-Also, for prod instances, we should follow this [checklist](https://symfony.com/doc/current/performance.html).

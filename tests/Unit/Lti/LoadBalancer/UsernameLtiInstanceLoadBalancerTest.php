@@ -20,7 +20,10 @@
 
 namespace App\Tests\Unit\Lti\LoadBalancer;
 
+use App\Entity\Assignment;
+use App\Entity\LineItem;
 use App\Entity\User;
+use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
@@ -79,5 +82,30 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
                 )
             );
         }
+    }
+
+    public function testItThrowsExceptionIfLtiRequestContextIdCannotBeDetermined(): void
+    {
+        $this->expectException(IndeterminableLtiRequestContextIdException::class);
+
+        $this->subject->getLtiRequestContextId(new User());
+    }
+
+    public function testItCanReturnLtiRequestContextId(): void
+    {
+        $lastAssignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
+        $user = (new User())->addAssignment($lastAssignment);
+
+        $this->assertSame('5', $this->subject->getLtiRequestContextId($user));
+    }
+
+    private function getLineItemMock(int $lineItemId): LineItem
+    {
+        $lineItem = $this->createMock(LineItem::class);
+        $lineItem
+            ->method('getId')
+            ->willReturn($lineItemId);
+
+        return $lineItem;
     }
 }
