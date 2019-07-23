@@ -2,4 +2,5 @@ App\Entity\User:
   user1:
     username: 'user1'
     plainPassword: 'password'
+    groupId: 'group_1'
     assignments: ['@assignment1']

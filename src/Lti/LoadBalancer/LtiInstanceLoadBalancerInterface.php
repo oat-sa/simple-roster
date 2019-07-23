@@ -22,6 +22,7 @@ namespace App\Lti\LoadBalancer;
 
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 interface LtiInstanceLoadBalancerInterface
 {
@@ -29,4 +30,9 @@ interface LtiInstanceLoadBalancerInterface
      * @throws IndeterminableLtiInstanceUrlException
      */
     public function getLtiInstanceUrl(User $user): string;
+
+    /**
+     * @throws IndeterminableLtiRequestContextIdException
+     */
+    public function getLtiRequestContextId(User $user): string;
 }

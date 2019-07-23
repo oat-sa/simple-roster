@@ -21,11 +21,29 @@
 namespace App\Lti\LoadBalancer;
 
 use App\Entity\User;
+use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
     public function getLtiInstanceUrl(User $user): string
     {
         return $this->getLoadBalancedLtiInstanceUrl($user->getUsername());
+    }
+
+    /**
+     * @throws IndeterminableLtiRequestContextIdException
+     */
+    public function getLtiRequestContextId(User $user): string
+    {
+        if (!$user->hasAssignment()) {
+            throw new IndeterminableLtiRequestContextIdException(
+                sprintf(
+                    "User with id='%s' does not have any assignments.",
+                    $user->getId()
+                )
+            );
+        }
+
+        return (string)$user->getLastAssignment()->getLineItem()->getId();
     }
 }
