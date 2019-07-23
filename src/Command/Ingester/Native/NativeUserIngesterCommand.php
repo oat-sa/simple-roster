@@ -27,16 +27,17 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Exception;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Exception;
 use Throwable;
 
 class NativeUserIngesterCommand extends Command
@@ -66,6 +67,15 @@ class NativeUserIngesterCommand extends Command
 
     /** @var string */
     private $kernelEnvironment;
+
+    /** @var SymfonyStyle */
+    private $symfonyStyle;
+
+    /** @var ConsoleSectionOutput */
+    private $consoleSectionOutput;
+
+    /** @var bool */
+    private $isDryRun;
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
@@ -123,15 +133,24 @@ class NativeUserIngesterCommand extends Command
             'Batch size',
             self::DEFAULT_BATCH_SIZE
         );
+
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply actual database modifications or not');
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $consoleOutput = $this->ensureConsoleOutput($output);
+
+        $this->symfonyStyle = new SymfonyStyle($input, $consoleOutput);
+        $this->consoleSectionOutput = $consoleOutput->section();
+        $this->isDryRun = !(bool)$input->getOption('force');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startWatch(self::NAME, __FUNCTION__);
-        $consoleOutput = $this->ensureConsoleOutput($output);
-        $style = new SymfonyStyle($input, $consoleOutput);
-        $section = $consoleOutput->section();
-        $section->writeln('Starting user ingestion...');
+
+        $this->consoleSectionOutput->writeln('Starting user ingestion...');
         $batchSize = $input->getOption('batch');
 
         $resultSetMapping = new ResultSetMapping();
@@ -165,14 +184,16 @@ class NativeUserIngesterCommand extends Command
 
                 if ($index % $batchSize === 0) {
                     $this->executeNativeInsertions($resultSetMapping);
-                    $section->overwrite(sprintf('Success: %s, batched errors: %s', $index, count($this->errors)));
+                    $this->consoleSectionOutput->overwrite(
+                        sprintf('Success: %s, batched errors: %s', $index, count($this->errors))
+                    );
                 }
 
                 $index++;
             }
 
             $this->executeNativeInsertions($resultSetMapping);
-            $section->overwrite(sprintf(
+            $this->consoleSectionOutput->overwrite(sprintf(
                 'Total of users imported: %s, batched errors: %s',
                 $this->getRealUserCount(),
                 count($this->errors)
@@ -180,16 +201,16 @@ class NativeUserIngesterCommand extends Command
 
             if (!empty($this->errors)) {
                 foreach ($this->errors as $error) {
-                    $style->error($error);
+                    $this->symfonyStyle->error($error);
                 }
             }
         } catch (Throwable $exception) {
-            $style->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
         } finally {
             $this->refreshSequences($resultSetMapping);
-            $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+            $this->symfonyStyle->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
         }
 
         return 0;
@@ -222,7 +243,7 @@ class NativeUserIngesterCommand extends Command
     private function executeNativeInsertions(ResultSetMapping $mapping): void
     {
         try {
-            if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts)) {
+            if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts) && !$this->isDryRun) {
                 $userQuery = sprintf(
                     'INSERT INTO users (id, username, password, roles) VALUES %s',
                     implode(',', $this->userQueryParts)
@@ -250,7 +271,7 @@ class NativeUserIngesterCommand extends Command
      */
     private function refreshSequences(ResultSetMapping $mapping): void
     {
-        if ($this->kernelEnvironment !== 'test') {
+        if ($this->kernelEnvironment !== 'test' && !$this->isDryRun) {
             $this->entityManager
                 ->createNativeQuery(
                     "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
