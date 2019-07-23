@@ -35,7 +35,7 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
      */
     public function getLtiRequestContextId(User $user): string
     {
-        if (!$user->hasLastAssignment()) {
+        if (!$user->hasAssignment()) {
             throw new IndeterminableLtiRequestContextIdException(
                 sprintf(
                     "User with id='%s' does not have any assignments.",
