@@ -14,7 +14,7 @@
         <env name="SHELL_VERBOSITY" value="-1"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
         <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/test.db3"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0"/>
     </php>
 
     <testsuites>
