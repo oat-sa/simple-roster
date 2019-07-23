@@ -1,9 +1,10 @@
 # Changelog
 
-## 1.3.1 - 2019-07-22
+## 1.4.0 - 2019-07-23
 
 ### Added
 - Added `force` parameter to `NativeUserIngesterCommand`
+- Added possibility to determine the `contextId` LTI request parameter based on LTI load balancing strategy.
 
 ### Fixed
 - Fixed fatal error during composer install caused by https://bugs.php.net/bug.php?id=76980 on php `7.2.20`.
