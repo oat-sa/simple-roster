@@ -17,7 +17,7 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Service;
+namespace App\Lti\Service;
 
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotProcessableException;
@@ -146,10 +146,7 @@ class GetUserAssignmentLtiRequestService
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
             'lti_version' => LtiRequest::LTI_VERSION,
-            'context_id' => $assignment->getLineItem()->getId(),
-            'context_label' => $assignment->getLineItem()->getSlug(),
-            'context_title' => $assignment->getLineItem()->getLabel(),
-            'context_type' => LtiRequest::LTI_CONTEXT_TYPE,
+            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment->getUser()),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getId(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),

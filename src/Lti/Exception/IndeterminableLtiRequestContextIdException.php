@@ -17,43 +17,11 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\Request;
+namespace App\Lti\Exception;
 
-use JsonSerializable;
+use RuntimeException;
 
-class LtiRequest implements JsonSerializable
+class IndeterminableLtiRequestContextIdException extends RuntimeException
 {
-    public const LTI_MESSAGE_TYPE = 'basic-lti-launch-request';
-    public const LTI_VERSION = 'LTI-1p0';
-    public const LTI_ROLE = 'Learner';
 
-    /** @var string */
-    private $link;
-
-    /** @var array  */
-    private $parameters;
-
-    public function __construct(string $link, array $parameters)
-    {
-        $this->link = $link;
-        $this->parameters = $parameters;
-    }
-
-    public function getLink(): string
-    {
-        return $this->link;
-    }
-
-    public function getParameters(): array
-    {
-        return $this->parameters;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'ltiLink' => $this->link,
-            'ltiParams' => $this->parameters,
-        ];
-    }
 }

@@ -21,6 +21,7 @@ namespace App\Lti\LoadBalancer;
 
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
@@ -36,5 +37,19 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
         }
 
         return $this->getLoadBalancedLtiInstanceUrl($user->getGroupId());
+    }
+
+    /**
+     * @throws IndeterminableLtiRequestContextIdException
+     */
+    public function getLtiRequestContextId(User $user): string
+    {
+        if (!$user->hasGroupId()) {
+            throw new IndeterminableLtiRequestContextIdException(
+                sprintf("User with id='%s' doesn't have group id.", $user->getId())
+            );
+        }
+
+        return $user->getGroupId();
     }
 }
