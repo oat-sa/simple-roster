@@ -119,7 +119,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
@@ -168,7 +168,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->logInAs($user, $this->kernelBrowser);
 
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY']
-            = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USER_GROUP_ID;
+            = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
@@ -214,7 +214,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
