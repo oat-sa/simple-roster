@@ -172,7 +172,7 @@ class NativeUserIngesterCommand extends Command
                     $index,
                     $row['username'],
                     $this->encodeUserPassword($user, $row['password']),
-                    $row['groupId'] ?? ''
+                    $row['groupId'] ?? null
                 );
 
                 $this->assignmentQueryParts[] = sprintf(
