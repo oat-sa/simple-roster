@@ -25,6 +25,7 @@ use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
+use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTrait;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -145,6 +146,45 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
         $user12 = $this->getRepository(User::class)->find(12);
         $this->assertEquals('user_12', $user12->getUsername());
+    }
+
+    public function testBatchedLocalIngestionWithGroupId(): void
+    {
+        $this->prepareIngestionContext();
+
+        $output = $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users-with-groupId.csv',
+                '--batch' => 2,
+                '--force' => true,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+
+        $this->assertEquals(0, $output);
+        $this->assertStringContainsString(
+            'Total of users imported: 12, batched errors: 0',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $this->assertCount(12, $userRepository->findAll());
+
+        $user1 = $userRepository->find(1);
+        $this->assertSame('user_1', $user1->getUsername());
+        $this->assertSame('group_1', $user1->getGroupId());
+
+        $user6 = $userRepository->find(6);
+        $this->assertSame('user_6', $user6->getUsername());
+        $this->assertSame('group_2', $user6->getGroupId());
+
+        $user12 = $userRepository->find(12);
+        $this->assertSame('user_12', $user12->getUsername());
+        $this->assertSame('group_3', $user12->getGroupId());
     }
 
     public function testBatchedLocalIngestionFailureWithEmptyLineItems(): void

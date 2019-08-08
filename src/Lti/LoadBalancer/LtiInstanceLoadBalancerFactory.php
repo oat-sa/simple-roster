@@ -24,12 +24,12 @@ use LogicException;
 
 class LtiInstanceLoadBalancerFactory
 {
-    public const LOAD_BALANCER_STRATEGY_USERNAME = 'username';
-    public const LOAD_BALANCER_STRATEGY_USER_GROUP_ID = 'userGroupId';
+    public const LOAD_BALANCING_STRATEGY_USERNAME = 'username';
+    public const LOAD_BALANCING_STRATEGY_USER_GROUP_ID = 'userGroupId';
 
-    private const VALID_LOAD_BALANCER_STRATEGIES = [
-        self::LOAD_BALANCER_STRATEGY_USERNAME,
-        self::LOAD_BALANCER_STRATEGY_USER_GROUP_ID,
+    private const VALID_LOAD_BALANCING_STRATEGIES = [
+        self::LOAD_BALANCING_STRATEGY_USERNAME,
+        self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID,
     ];
 
     /** @var string[] */
@@ -43,20 +43,20 @@ class LtiInstanceLoadBalancerFactory
     /**
      * @throws LogicException
      */
-    public function __invoke(string $loadBalancerStrategy): LtiInstanceLoadBalancerInterface
+    public function __invoke(string $loadBalancingStrategy): LtiInstanceLoadBalancerInterface
     {
-        switch ($loadBalancerStrategy) {
-            case self::LOAD_BALANCER_STRATEGY_USERNAME:
+        switch ($loadBalancingStrategy) {
+            case self::LOAD_BALANCING_STRATEGY_USERNAME:
                 return new UsernameLtiInstanceLoadBalancer($this->ltiInstances);
 
-            case self::LOAD_BALANCER_STRATEGY_USER_GROUP_ID:
+            case self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID:
                 return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstances);
 
             default:
                 throw new LogicException(
                     sprintf(
-                        'Invalid load balancer strategy received. Possible values: %s',
-                        implode(', ', self::VALID_LOAD_BALANCER_STRATEGIES)
+                        'Invalid load balancing strategy received. Possible values: %s',
+                        implode(', ', self::VALID_LOAD_BALANCING_STRATEGIES)
                     )
                 );
         }
