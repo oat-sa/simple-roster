@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1 - 2019-08-08
+
+### Fixed
+- Fixed missing User `groupId` handling in `NativeUserIngesterCommand`.
+- Fixed PHPUnit version to `<8.3` because of https://github.com/symfony/symfony/issues/32879.
+
 ## 1.4.0 - 2019-07-23
 
 ### Added

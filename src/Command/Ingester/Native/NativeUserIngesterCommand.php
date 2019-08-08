@@ -168,10 +168,11 @@ class NativeUserIngesterCommand extends Command
 
             foreach ($source->getContent() as $row) {
                 $this->userQueryParts[] = sprintf(
-                    "(%s, '%s', '%s', '[]')",
+                    "(%s, '%s', '%s', '[]', '%s')",
                     $index,
                     $row['username'],
-                    $this->encodeUserPassword($user, $row['password'])
+                    $this->encodeUserPassword($user, $row['password']),
+                    $row['groupId'] ?? ''
                 );
 
                 $this->assignmentQueryParts[] = sprintf(
@@ -245,7 +246,7 @@ class NativeUserIngesterCommand extends Command
         try {
             if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts) && !$this->isDryRun) {
                 $userQuery = sprintf(
-                    'INSERT INTO users (id, username, password, roles) VALUES %s',
+                    'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
                     implode(',', $this->userQueryParts)
                 );
 

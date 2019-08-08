@@ -42,7 +42,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             UsernameLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USERNAME)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME)
         );
     }
 
@@ -50,7 +50,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             UserGroupIdLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCER_STRATEGY_USER_GROUP_ID)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID)
         );
     }
 
@@ -58,7 +58,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
-            'Invalid load balancer strategy received. Possible values: username, userGroupId'
+            'Invalid load balancing strategy received. Possible values: username, userGroupId'
         );
 
         call_user_func($this->subject, 'invalid');
