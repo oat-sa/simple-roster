@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.2 - 2019-09-18
+
+## Fixed
+- Reverted temporary PHPUnit fix done in version `1.4.1`.
+- Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
+
 ## 1.4.1 - 2019-08-08
 
 ### Fixed
