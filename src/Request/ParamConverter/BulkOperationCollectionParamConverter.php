@@ -56,10 +56,6 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration)
     {
-        if (null === $configuration->getClass()) {
-            return false;
-        }
-
         return BulkOperationCollection::class === $configuration->getClass();
     }
 

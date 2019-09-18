@@ -78,7 +78,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -90,7 +90,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getLineItem(): ?LineItem
+    public function getLineItem(): LineItem
     {
         return $this->lineItem;
     }

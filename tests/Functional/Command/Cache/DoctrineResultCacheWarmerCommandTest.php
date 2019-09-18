@@ -211,7 +211,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /**
      * @dataProvider provideInvalidFilterOption
      */
-    public function testItThrowsExceptionIfInvalidUserIdsOptionReceived($invalidOptionValue): void
+    public function testItThrowsExceptionIfInvalidUserIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'user-ids' option received.");
@@ -229,7 +229,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /**
      * @dataProvider provideInvalidFilterOption
      */
-    public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived($invalidOptionValue): void
+    public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'line-item-ids' option received.");

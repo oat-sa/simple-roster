@@ -20,8 +20,8 @@
 namespace App\Tests\Traits;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -58,14 +58,14 @@ trait DatabaseTrait
     }
 
     /**
-     * @return ObjectManager|EntityManager
+     * @return ObjectManager|EntityManagerInterface
      */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManagerInterface
     {
         return $this->getManagerRegistry()->getManager();
     }
 
-    protected function getRepository(string $class): EntityRepository
+    protected function getRepository(string $class): ObjectRepository
     {
         return $this->getEntityManager()->getRepository($class);
     }

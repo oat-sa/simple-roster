@@ -123,6 +123,9 @@ class UserProviderTest extends KernelTestCase
                 return 'invalid';
             }
 
+            /**
+             * @return void
+             */
             public function eraseCredentials()
             {
             }
