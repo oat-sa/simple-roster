@@ -151,6 +151,6 @@ class IngesterCommandTest extends KernelTestCase
      */
     private function normalizeDisplay(string $commandDisplay): string
     {
-        return trim(preg_replace('/\s+/', ' ', $commandDisplay));
+        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }

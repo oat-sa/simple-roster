@@ -199,7 +199,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
     {
         $context = new OAuthContext(
             'bodyHash',
-            $infrastructure->getLtiKey(),
+            (string)$infrastructure->getLtiKey(),
             'nonce',
             'HMAC-SHA1',
             $time,
@@ -212,7 +212,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $context,
             'http://localhost/api/v1/lti/outcome',
             'POST',
-            $infrastructure->getLtiSecret()
+            (string)$infrastructure->getLtiSecret()
         );
     }
 
