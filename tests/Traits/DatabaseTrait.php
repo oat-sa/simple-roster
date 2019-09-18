@@ -57,9 +57,6 @@ trait DatabaseTrait
         return self::$kernel->getContainer()->get('doctrine');
     }
 
-    /**
-     * @return ObjectManager|EntityManagerInterface
-     */
     protected function getEntityManager(): EntityManagerInterface
     {
         return $this->getManagerRegistry()->getManager();

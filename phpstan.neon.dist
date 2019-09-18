@@ -24,3 +24,6 @@ parameters:
     # It is always a Carbon instance
     - message: '#^Call to an undefined method Carbon\\Carbon\|Closure::getTimestamp\(\).$#'
       path: tests
+    # Doctrine docblock error, Doctrine\Common\Persistence\ManagerRegistry always returns an instance of EntityManagerInterface
+    - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Common\\Persistence\\ObjectManager.$#'
+      path: tests
