@@ -1,10 +1,16 @@
 # Changelog
 
-## 1.4.2 - 2019-09-18
+## 1.5.0 - TODO: To be released
+
+## Changed
+- Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
+- Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
+- Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.
 
 ## Fixed
 - Reverted temporary PHPUnit fix done in version `1.4.1`.
 - Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
+- Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
 
 ## 1.4.1 - 2019-08-08
 
