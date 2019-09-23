@@ -35,7 +35,7 @@ class AuthorizationHeaderTokenExtractor
             return null;
         }
 
-        $authorizationHeader = $request->headers->get(self::AUTHORIZATION_HEADER);
+        $authorizationHeader = (string)$request->headers->get(self::AUTHORIZATION_HEADER);
 
         $headerParts = explode(' ', $authorizationHeader);
 
