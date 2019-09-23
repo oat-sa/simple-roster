@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -42,8 +43,11 @@ class UserRepository extends AbstractRepository
     /** @var int */
     private $userCacheTtl;
 
-    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator, int $userCacheTtl)
-    {
+    public function __construct(
+        RegistryInterface $registry,
+        UserCacheIdGenerator $userCacheIdGenerator,
+        int $userCacheTtl
+    ) {
         parent::__construct($registry, User::class);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
@@ -51,11 +55,16 @@ class UserRepository extends AbstractRepository
     }
 
     /**
+     * @throws InvalidUsernameException
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
     public function getByUsernameWithAssignments(string $username): User
     {
+        if (empty($username)) {
+            throw new InvalidUsernameException('Empty username received.');
+        }
+
         $user = $this
             ->createQueryBuilder('u')
             ->select('u, a, l, i')
