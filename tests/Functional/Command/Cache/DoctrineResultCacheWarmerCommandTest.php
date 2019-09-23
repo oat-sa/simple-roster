@@ -98,11 +98,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 100',
-            $this->commandTester->getDisplay()
-        );
     }
 
     public function testItCanWarmUpResultCacheByListOfUsers(): void
@@ -135,11 +130,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 10 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 10',
-            $this->commandTester->getDisplay()
-        );
     }
 
     public function testItCanWarmUpResultCacheByListOfLineItems(): void
@@ -170,11 +160,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertStringContainsString(
             '[OK] 60 result cache entries have been successfully warmed up.',
-            $this->commandTester->getDisplay()
-        );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 60',
             $this->commandTester->getDisplay()
         );
     }

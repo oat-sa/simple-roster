@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace App\Command\Cache;
 
-use App\Command\CommandWatcherTrait;
+use App\Command\CommandProgressBarFormatterTrait;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
@@ -42,7 +42,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
-    use CommandWatcherTrait;
+    use CommandProgressBarFormatterTrait;
 
     public const NAME = 'roster:doctrine-result-cache:warmup';
 
@@ -157,14 +157,19 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-
         $offset = 0;
         $numberOfWarmedUpCacheEntries = 0;
 
-        $this->symfonyStyle->note('Warming up doctrine result cache...');
-        $this->consoleSectionOutput->writeln('Number of warmed up cache entries: 0');
+        $this->symfonyStyle->note('Calculating total number of entries to warm up...');
+
         $numberOfTotalUsers = $this->getNumberOfTotalUsers();
+
+        $this->symfonyStyle->note('Warming up doctrine result cache...');
+
+        $progressBar = $this->createNewFormattedProgressBar($output);
+
+        $progressBar->setMaxSteps($numberOfTotalUsers);
+        $progressBar->start();
 
         do {
             $iterateResult = $this
@@ -180,13 +185,13 @@ class DoctrineResultCacheWarmerCommand extends Command
             }
 
             if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
-                $this->consoleSectionOutput->overwrite(
-                    sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
-                );
+                $progressBar->advance($this->batchSize);
             }
 
             $offset += $this->batchSize;
         } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+
+        $progressBar->finish();
 
         $this->symfonyStyle->success(
             sprintf(
@@ -194,8 +199,6 @@ class DoctrineResultCacheWarmerCommand extends Command
                 $numberOfWarmedUpCacheEntries
             )
         );
-
-        $this->symfonyStyle->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }

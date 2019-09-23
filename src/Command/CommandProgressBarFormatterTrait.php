@@ -28,7 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 trait CommandProgressBarFormatterTrait
 {
     /** @var string */
-    private $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
+    public $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
 
     public function createNewFormattedProgressBar(OutputInterface $output): ProgressBar
     {
