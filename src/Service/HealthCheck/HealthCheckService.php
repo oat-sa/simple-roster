@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +22,7 @@
 
 namespace App\Service\HealthCheck;
 
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\HealthCheck\HealthCheckResult;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -32,9 +36,19 @@ class HealthCheckService
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @throws DoctrineResultCacheImplementationNotFoundException
+     */
     public function getHealthCheckResult(): HealthCheckResult
     {
-        $cacheStatistics = $this->entityManager->getConfiguration()->getResultCacheImpl()->getStats();
+        $resultCacheImplementation = $this->entityManager->getConfiguration()->getResultCacheImpl();
+        if (null === $resultCacheImplementation) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $cacheStatistics = $resultCacheImplementation->getStats();
 
         return new HealthCheckResult(
             $this->entityManager->getConnection()->ping(),
