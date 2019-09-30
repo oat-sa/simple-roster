@@ -113,7 +113,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getInfrastructure(): ?Infrastructure
+    public function getInfrastructure(): Infrastructure
     {
         return $this->infrastructure;
     }

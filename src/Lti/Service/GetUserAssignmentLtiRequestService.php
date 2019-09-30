@@ -140,7 +140,7 @@ class GetUserAssignmentLtiRequestService
         return sprintf(
             '%s/%s',
             $link,
-            base64_encode(json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
+            base64_encode((string)json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
         );
     }
 

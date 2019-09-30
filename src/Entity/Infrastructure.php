@@ -39,12 +39,12 @@ class Infrastructure implements EntityInterface
     /** @var string */
     private $ltiSecret;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -56,7 +56,7 @@ class Infrastructure implements EntityInterface
         return $this;
     }
 
-    public function getLtiDirectorLink(): ?string
+    public function getLtiDirectorLink(): string
     {
         return $this->ltiDirectorLink;
     }
@@ -68,7 +68,7 @@ class Infrastructure implements EntityInterface
         return $this;
     }
 
-    public function getLtiKey(): ?string
+    public function getLtiKey(): string
     {
         return $this->ltiKey;
     }
@@ -80,7 +80,7 @@ class Infrastructure implements EntityInterface
         return $this;
     }
 
-    public function getLtiSecret(): ?string
+    public function getLtiSecret(): string
     {
         return $this->ltiSecret;
     }

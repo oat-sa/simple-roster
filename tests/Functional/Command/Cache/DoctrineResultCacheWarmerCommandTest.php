@@ -28,7 +28,6 @@ use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -64,16 +63,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->loadFixtures([
             __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
         ]);
-    }
-
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute([]);
     }
 
     public function testItCanWarmResultCacheForAllUsers(): void

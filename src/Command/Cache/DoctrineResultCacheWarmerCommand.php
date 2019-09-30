@@ -31,12 +31,9 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -52,7 +49,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
-    /** @var Cache|null */
+    /** @var Cache */
     private $resultCacheImplementation;
 
     /** @var UserCacheIdGenerator */
@@ -66,9 +63,6 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     /** @var SymfonyStyle */
     private $symfonyStyle;
-
-    /** @var ConsoleSectionOutput */
-    private $consoleSectionOutput;
 
     /** @var int */
     private $batchSize;
@@ -129,10 +123,7 @@ class DoctrineResultCacheWarmerCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $consoleOutput = $this->ensureConsoleOutput($output);
-
-        $this->symfonyStyle = new SymfonyStyle($input, $consoleOutput);
-        $this->consoleSectionOutput = $consoleOutput->section();
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
 
         $this->initializeBatchSizeOption($input);
 
@@ -163,6 +154,12 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->symfonyStyle->note('Calculating total number of entries to warm up...');
 
         $numberOfTotalUsers = $this->getNumberOfTotalUsers();
+
+        if ($numberOfTotalUsers === 0) {
+            $this->symfonyStyle->success('No matching cache entries, exiting.');
+
+            return 0;
+        }
 
         $this->symfonyStyle->note('Warming up doctrine result cache...');
 
@@ -273,23 +270,6 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->entityManager->clear();
 
         unset($user);
-    }
-
-    /**
-     * @throws LogicException
-     */
-    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
-    {
-        if (!$output instanceof ConsoleOutputInterface) {
-            throw new LogicException(
-                sprintf(
-                    "Output must be instance of '%s' because of section usage.",
-                    ConsoleOutputInterface::class
-                )
-            );
-        }
-
-        return $output;
     }
 
     /**

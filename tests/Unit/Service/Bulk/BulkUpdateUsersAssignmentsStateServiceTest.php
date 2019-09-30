@@ -80,6 +80,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->setState(Assignment::STATE_STARTED);
 
         $expectedUser = (new User())
+            ->setUsername('expectedUser')
             ->addAssignment($expectedAssignment);
 
         $this->userRepository
