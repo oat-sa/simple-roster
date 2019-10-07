@@ -42,7 +42,7 @@ trait DatabaseTrait
     {
         static::ensureKernelTestCase();
 
-        $kernel = parent::bootKernel();
+        $kernel = self::bootKernel();
 
         $entityManager = $this->getEntityManager();
 
