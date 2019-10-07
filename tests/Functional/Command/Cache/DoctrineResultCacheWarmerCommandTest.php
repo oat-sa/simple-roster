@@ -153,6 +153,23 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
+    public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--line-item-ids' => '999',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        $this->assertStringContainsString(
+            '[OK] No matching cache entries, exiting.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
     public function testItThrowsExceptionIfBothLineItemIdAndUserIdFiltersAreSpecified(): void
     {
         $this->expectException(InvalidArgumentException::class);

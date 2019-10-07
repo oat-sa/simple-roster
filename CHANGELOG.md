@@ -2,6 +2,9 @@
 
 ## 1.5.0 - TODO: To be released
 
+### Added
+- Introduced dedicated `docker` environment for development purposes.
+
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
 - Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).

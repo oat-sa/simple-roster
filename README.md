@@ -12,6 +12,37 @@
 - [Testing](#testing)
 - [Static code analysis with PHPStan](#static-code-analysis-with-phpstan)
 
+## Development environment
+
+The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
+In order to install it, follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
+
+Set up docker containers:
+
+```bash
+$ docker-compose up -d
+```
+
+## Code quality standards
+
+todo
+
+## REST documentation
+
+todo
+
+## CLI documentation
+
+todo
+
+## Deployment
+
+todo
+
+## Contributing
+
+todo
+
 ## Installation
 
 #### Build in server usage

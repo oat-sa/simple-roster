@@ -24,6 +24,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
@@ -47,6 +48,9 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         ];
     }
 
+    /**
+     * @throws DoctrineResultCacheImplementationNotFoundException
+     */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $entityManager = $eventArgs->getEntityManager();
@@ -69,12 +73,21 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         }
     }
 
+    /**
+     * @throws DoctrineResultCacheImplementationNotFoundException
+     */
     private function clearUserCache(User $user, EntityManager $entityManager): void
     {
-        $resultCache = $entityManager
+        $resultCacheImplementation = $entityManager
             ->getConfiguration()
             ->getResultCacheImpl();
 
-        $resultCache->delete($this->userCacheIdGenerator->generate($user->getUsername()));
+        if ($resultCacheImplementation === null) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $resultCacheImplementation->delete($this->userCacheIdGenerator->generate($user->getUsername()));
     }
 }

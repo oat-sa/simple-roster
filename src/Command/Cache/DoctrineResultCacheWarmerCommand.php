@@ -24,6 +24,7 @@ namespace App\Command\Cache;
 
 use App\Command\CommandProgressBarFormatterTrait;
 use App\Entity\User;
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
@@ -73,6 +74,9 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var array */
     private $lineItemIds = [];
 
+    /**
+     * @throws DoctrineResultCacheImplementationNotFoundException
+     */
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
         Configuration $doctrineConfiguration,
@@ -81,8 +85,17 @@ class DoctrineResultCacheWarmerCommand extends Command
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
         $this->entityManager = $entityManager;
+
+        $resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
+
+        if ($resultCacheImplementation === null) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $this->resultCacheImplementation = $resultCacheImplementation;
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);

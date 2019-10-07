@@ -25,6 +25,7 @@ namespace App\Tests\Unit\EventSubscriber;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\EventSubscriber\UserCacheInvalidationSubscriber;
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
@@ -129,6 +130,29 @@ class UserCacheInvalidationSubscriberTest extends TestCase
 
         // TODO: Cache gets cleared for each updated entity, this could be improved
         $this->assertCacheDeletion([$user->getUsername(), $user->getUsername()]);
+    }
+
+    public function testItThrowsExceptionIfDoctrineResultCacheImplementationIsNotSet(): void
+    {
+        $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
+
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $entityManager
+            ->method('getConfiguration')
+            ->willReturn($this->createMock(Configuration::class));
+
+        $entityManager
+            ->method('getUnitOfWork')
+            ->willReturn($this->unitOfWork);
+
+        $user = (new User())->setUsername('expectedUsername');
+        $assignment1 = (new Assignment())->setUser($user);
+        $assignment2 = (new Assignment())->setUser($user);
+
+        $this->setUnitOfWorkExpectations([], [$assignment1, $assignment2]);
+
+        $this->subject->onFlush(new OnFlushEventArgs($entityManager));
     }
 
     private function assertCacheDeletion(array $expectedUsernames): void

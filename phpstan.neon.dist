@@ -30,3 +30,5 @@ parameters:
     # There is always a request object
     - message: '#^Cannot access property \$attributes on Symfony\\Component\\HttpFoundation\\Request|null.$#'
       path: src/Security/Provider/UserProvider.php
+    - message: '#^Cannot cast array<string>|bool|string|null to int.$#'
+      path: src/Command
