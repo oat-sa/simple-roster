@@ -15,6 +15,11 @@
 - Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
 - Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
 
+## 1.4.2 - 2019-10-11
+
+### Changed
+- Updated `oat-sa/phing-tasks` dependency version in `composer.json` from `0.1` to `0.3`.
+
 ## 1.4.1 - 2019-08-08
 
 ### Fixed
