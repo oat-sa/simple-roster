@@ -21,7 +21,7 @@
         "league/csv": "^9.0",
         "nelmio/cors-bundle": "^1.5",
         "nesbot/carbon": "^2.11",
-        "oat-sa/phing-tasks": "^0.1",
+        "oat-sa/phing-tasks": "^0.3",
         "phing/phing": "^2.16",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",

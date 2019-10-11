@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2 - 2019-10-11
+
+### Changed
+- Updated 
+
 ## 1.4.1 - 2019-08-08
 
 ### Fixed
