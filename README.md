@@ -4,7 +4,7 @@
 
 ## Table of Contents
 
-- [Installation](#installation)
+- [Development environment](#development-environment)
 - [API documentation](#api-documentation)
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops/devops-documentation.md)
@@ -14,16 +14,52 @@
 
 ## Development environment
 
-The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
-In order to install it, follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
+### Docker installation
 
-Set up docker containers:
+The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
+In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
+
+The environment is pre-configured with the `.env.docker` file, so all you have to do is to set up the containers:
 
 ```bash
 $ docker-compose up -d
 ```
 
-## Code quality standards
+The application will be available on `https://simple-roster.docker.localhost` DNS host.
+
+**Note:** If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to localhost.
+
+### Custom installation
+
+If you don't want to use docker, you have to create a local copy of the `.env` file
+
+```bash
+$ cp .env .env.local
+```
+
+and then to define the environment variables according to your local environment, such as redis DNS, database url, etc. 
+
+To run the application with PHP's built-in web-server just launch:
+
+```bash
+ $ bin/console server:start
+```
+
+**Note:** If you want to run the application using your own web-server, please refer to Symfony's official [documentation](https://symfony.com/doc/current/setup/web_server_configuration.html).
+
+## Development guidelines
+
+todo
+
+### Coding conventions
+
+todo
+
+### Code quality standards
+
+todo
+
+### Test metrics
 
 todo
 
@@ -42,39 +78,6 @@ todo
 ## Contributing
 
 todo
-
-## Installation
-
-#### Build in server usage
-
-To run the application using PHP's built-in web server (or [Configure your Web Server](https://symfony.com/doc/current/setup/web_server_configuration.html)):
-
-```bash
- $ bin/console server:start
-```
-
-#### Docker usage
-
-You must have [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
-
-This project is built on top of **OAT Docker Stack**. In order to install it, follow the installation steps in it's README file: 
-
-[https://github.com/oat-sa/docker-stack#installation](https://github.com/oat-sa/docker-stack#installation)
-
-Set up docker containers:
-
-```bash
-$ docker-compose up -d
-```
-
-This project provides a ready to use docker stack with:
-- php fpm 7.2
-- nginx
-- postgres (container persistent storage)
-- redis (containers persistent storage)
-    - for doctrine data
-    - and sessions storage
-- blackfire
 
 ## API documentation
 
