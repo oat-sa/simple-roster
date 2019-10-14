@@ -25,19 +25,21 @@ The environment is pre-configured with the `.env.docker` file, so all you have t
 $ docker-compose up -d
 ```
 
-The application will be available on `https://simple-roster.docker.localhost` DNS host.
+The application will be available at `https://simple-roster.docker.localhost` DNS host.
 
-**Note:** If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to localhost.
+**Note:** If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to your localhost.
 
 ### Custom installation
 
-If you don't want to use docker, you have to create a local copy of the `.env` file
+If you don't want to use docker, you have to create a local copy of the `.env` file:
 
 ```bash
 $ cp .env .env.local
 ```
 
 and then to define the environment variables according to your local environment, such as redis DNS, database url, etc. 
+
+To see the full list of available environment variables please refer to the [devops documentation](docs/devops/devops-documentation.md).
 
 To run the application with PHP's built-in web-server just launch:
 
