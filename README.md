@@ -17,10 +17,6 @@ To learn more about `OneRoster`, please refer to the official specification at [
 - [OpenAPI documentation](#openapi-documentation)
 - [CLI documentation](#cli-documentation)
 - [Production environment](#production-environment)
-- [Contributing](#contributing)
-
-
-- [DevOps documentation](docs/devops/devops-documentation.md)
 
 ## Development environment
 
