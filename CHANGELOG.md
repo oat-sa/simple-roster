@@ -3,12 +3,13 @@
 ## 1.5.0 - TODO: To be released
 
 ### Added
-- Introduced dedicated `docker` environment for development purposes.
+- Introduced dedicated `docker` application environment for development purposes.
 
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
 - Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
 - Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.
+- Reworked `README.md` structure for better readability.
 
 ### Fixed
 - Reverted temporary PHPUnit fix done in version `1.4.1`.
