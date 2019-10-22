@@ -86,7 +86,7 @@ $ vendor/bin/phpstan analyse --level=max
 
 #### Test metrics
 
-The expected level of combines test coverage (unit, integration and functional) is `100%`, without exception.
+The expected level of combined test coverage (unit, integration and functional) is `100%`, without exception.
 
 Please make sure you have full test coverage before you push your changes:
 
