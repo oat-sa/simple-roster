@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -32,7 +35,7 @@ class AuthorizationHeaderTokenExtractor
             return null;
         }
 
-        $authorizationHeader = $request->headers->get(self::AUTHORIZATION_HEADER);
+        $authorizationHeader = (string)$request->headers->get(self::AUTHORIZATION_HEADER);
 
         $headerParts = explode(' ', $authorizationHeader);
 

@@ -19,6 +19,8 @@ services:
 
     simple-roster-phpfpm:
         container_name: simple-roster-phpfpm
+        env_file:
+          - .env.docker
         build:
             context: ./docker/phpfpm
         expose:

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -46,17 +49,22 @@ class AssignmentRepository extends AbstractRepository
         int $offset = null,
         int $limit = null
     ): Paginator {
-        $query = $this
+        $queryBuilder = $this
             ->createQueryBuilder('a')
             ->select('a')
             ->where('a.state = :state')
             ->andWhere('a.updatedAt <= :updatedAt')
             ->setParameter('state', $state)
-            ->setParameter('updatedAt', $updatedAt)
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery();
+            ->setParameter('updatedAt', $updatedAt);
 
-        return new Paginator($query, false);
+        if (null !== $offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
+
+        if (null !== $limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        return new Paginator($queryBuilder->getQuery(), false);
     }
 }

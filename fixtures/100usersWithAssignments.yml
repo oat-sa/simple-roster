@@ -39,8 +39,6 @@ App\Entity\Assignment:
     lineItem: '@lineItem3'
     state: 'ready'
 
-
-
 App\Entity\User:
   user_{1..100}:
     username: 'user_<current()>'

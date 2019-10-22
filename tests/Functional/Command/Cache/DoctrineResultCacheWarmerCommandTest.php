@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -25,7 +28,6 @@ use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -63,16 +65,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         ]);
     }
 
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute([]);
-    }
-
     public function testItCanWarmResultCacheForAllUsers(): void
     {
         $this->assertEquals(0, $this->commandTester->execute(
@@ -93,11 +85,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertStringContainsString(
             '[OK] 100 result cache entries have been successfully warmed up.',
-            $this->commandTester->getDisplay()
-        );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 100',
             $this->commandTester->getDisplay()
         );
     }
@@ -132,11 +119,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 10 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 10',
-            $this->commandTester->getDisplay()
-        );
     }
 
     public function testItCanWarmUpResultCacheByListOfLineItems(): void
@@ -169,9 +151,21 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 60 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+    }
+
+    public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--line-item-ids' => '999',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
 
         $this->assertStringContainsString(
-            'Number of warmed up cache entries: 60',
+            '[OK] No matching cache entries, exiting.',
             $this->commandTester->getDisplay()
         );
     }

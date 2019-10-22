@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -250,6 +253,6 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             ];
         }
 
-        return json_encode($payload);
+        return (string)json_encode($payload);
     }
 }

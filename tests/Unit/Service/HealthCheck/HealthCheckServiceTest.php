@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +22,7 @@
 
 namespace App\Tests\Unit\Service\HealthCheck;
 
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Service\HealthCheck\HealthCheckService;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
@@ -35,12 +39,29 @@ class HealthCheckServiceTest extends TestCase
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
+    /** @var Configuration|MockObject */
+    private $ormConfiguration;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->ormConfiguration = $this->createMock(Configuration::class);
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn($this->ormConfiguration);
+
         $this->subject = new HealthCheckService($this->entityManager);
+    }
+
+    public function testItThrowsExceptionIfResultCacheImplementationIsNotConfigured(): void
+    {
+        $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
+
+        $this->subject->getHealthCheckResult();
     }
 
     public function testGetHealthCheckResultSuccess(): void
@@ -51,8 +72,7 @@ class HealthCheckServiceTest extends TestCase
             ->method('getStats')
             ->willReturn(['uptime' => 1]);
 
-        $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock
+        $this->ormConfiguration
             ->expects($this->once())
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
@@ -67,10 +87,6 @@ class HealthCheckServiceTest extends TestCase
             ->expects($this->once())
             ->method('getConnection')
             ->willReturn($connectionMock);
-        $this->entityManager
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configurationMock);
 
         $output = $this->subject->getHealthCheckResult();
 
@@ -86,8 +102,7 @@ class HealthCheckServiceTest extends TestCase
             ->method('getStats')
             ->willReturn(false);
 
-        $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock
+        $this->ormConfiguration
             ->expects($this->once())
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
@@ -102,10 +117,6 @@ class HealthCheckServiceTest extends TestCase
             ->expects($this->once())
             ->method('getConnection')
             ->willReturn($connectionMock);
-        $this->entityManager
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configurationMock);
 
         $output = $this->subject->getHealthCheckResult();
 

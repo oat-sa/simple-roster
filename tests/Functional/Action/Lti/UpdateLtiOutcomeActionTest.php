@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -199,7 +202,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
     {
         $context = new OAuthContext(
             'bodyHash',
-            (string)$infrastructure->getLtiKey(),
+            $infrastructure->getLtiKey(),
             'nonce',
             'HMAC-SHA1',
             $time,
@@ -212,7 +215,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $context,
             'http://localhost/api/v1/lti/outcome',
             'POST',
-            (string)$infrastructure->getLtiSecret()
+            $infrastructure->getLtiSecret()
         );
     }
 
