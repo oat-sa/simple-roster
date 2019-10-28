@@ -158,20 +158,11 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
     /**
      * @throws InvalidArgumentException
      */
-    protected function validateRow(array $row)
+    protected function validateRow(array $row): void
     {
         if (!isset($row['username'])) {
             throw new InvalidArgumentException("Column 'username' cannot be found in source CSV file.");
         }
-    }
-
-    protected function getIngesterSource(InputInterface $input): IngesterSourceInterface
-    {
-        return $this->ingesterSourceRegistry
-            ->get($input->getArgument('source'))
-            ->setPath($input->getArgument('path'))
-            ->setDelimiter($input->getOption('delimiter'))
-            ->setCharset($input->getOption('charset'));
     }
 
     protected function displayResult(int $numberOfProcessedAssignments): void
