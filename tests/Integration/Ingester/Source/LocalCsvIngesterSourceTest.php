@@ -74,4 +74,12 @@ class LocalCsvIngesterSourceTest extends TestCase
             $this->assertEquals('secret', $row['ltiSecret']);
         }
     }
+
+    public function testContentIsCountable(): void
+    {
+        $subject = new LocalCsvIngesterSource();
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->assertSame(3, $subject->count());
+    }
 }

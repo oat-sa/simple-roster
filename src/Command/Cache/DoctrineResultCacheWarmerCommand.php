@@ -137,7 +137,7 @@ class DoctrineResultCacheWarmerCommand extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->symfonyStyle = new SymfonyStyle($input, $output);
-        $this->symfonyStyle->title('Simple Roster - Doctrine result cache warming');
+        $this->symfonyStyle->title('Simple Roster - Doctrine Result Cache Warmer');
 
         $this->initializeBatchSizeOption($input);
 

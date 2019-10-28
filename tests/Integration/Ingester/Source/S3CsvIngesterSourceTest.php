@@ -89,6 +89,33 @@ class S3CsvIngesterSourceTest extends TestCase
         }
     }
 
+    public function testContentIsCountable(): void
+    {
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->subject->setDelimiter('|');
+
+        $this->assertSame(3, $this->subject->count());
+    }
+
+    public function testItDoesFetchContentFromS3OnlyOnce(): void
+    {
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->subject->getContent();
+
+        // Retrieving it a second time should return in using property cache.
+        $output = $this->subject->getContent();
+
+        foreach ($output as $row) {
+            $this->assertCount(4, $row);
+            $this->assertStringContainsString('infra', $row['label']);
+            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            $this->assertStringContainsString('key', $row['ltiKey']);
+            $this->assertStringContainsString('secret', $row['ltiSecret']);
+        }
+    }
+
     private function prepareS3Client(string $source): void
     {
         $this->client
