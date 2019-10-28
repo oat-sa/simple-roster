@@ -27,8 +27,7 @@ use App\Bulk\Operation\BulkOperationCollection;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsCommand
@@ -49,56 +48,59 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         $this->setDescription('Responsible for creating user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function process(
-        InputInterface $input,
-        ConsoleOutputInterface $consoleOutput,
-        int $batchSize,
-        bool $isDryRun
-    ): int {
-        $style = new SymfonyStyle($input, $consoleOutput);
-        $style->title('Simple Roster - Bulk Assignment Creation');
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
 
-        $section = $consoleOutput->section();
-        $section->writeln('Starting assignment creation...');
+        $this->symfonyStyle->title('Simple Roster - Bulk Assignment Creation');
+    }
+
+    protected function process(OutputInterface $output): int
+    {
+        $this->symfonyStyle->note('Starting assignment creation...');
 
         try {
-            $source = $this->getIngesterSource($input);
             $bulkOperationCollection = new BulkOperationCollection();
 
+            $progressBar = $this->createNewFormattedProgressBar($output);
+
+            $progressBar->setMaxSteps($this->ingesterSource->count());
+            $progressBar->start();
+
             $numberOfProcessedAssignments = 0;
-            foreach ($source->getContent() as $row) {
+            foreach ($this->ingesterSource->getContent() as $row) {
                 $this->validateRow($row);
 
                 $operation = new BulkOperation($row['username'], BulkOperation::TYPE_CREATE);
 
-                $operation->setIsDryRun($isDryRun);
+                $operation->setIsDryRun($this->isDryRun);
 
                 $bulkOperationCollection->add($operation);
 
-                if (count($bulkOperationCollection) % $batchSize !== 0) {
+                if (count($bulkOperationCollection) % $this->batchSize !== 0) {
                     continue;
                 }
 
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
                 $this->processOperationCollection($bulkOperationCollection);
-
-                $this->overwriteSection($section, $numberOfProcessedAssignments);
+                $progressBar->advance($this->batchSize);
             }
 
             // Process remaining operations
             if (!$bulkOperationCollection->isEmpty()) {
-                $numberOfProcessedAssignments += count($bulkOperationCollection);
-                $this->processOperationCollection($bulkOperationCollection);
+                $remainingAssignmentsToProcess = count($bulkOperationCollection);
+                $numberOfProcessedAssignments += $remainingAssignmentsToProcess;
 
-                $this->overwriteSection($section, $numberOfProcessedAssignments);
+                $this->processOperationCollection($bulkOperationCollection);
+                $progressBar->advance($remainingAssignmentsToProcess);
             }
         } catch (Throwable $exception) {
-            $style->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->displayResult($style, $numberOfProcessedAssignments, $batchSize);
+        $this->displayResult($numberOfProcessedAssignments);
 
         return 0;
     }

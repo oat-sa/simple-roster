@@ -28,8 +28,7 @@ use App\Entity\Assignment;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsCommand
@@ -43,31 +42,35 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         parent::__construct(self::NAME, $ingesterSourceRegistry, $bulkAssignmentsUpdateService);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
         $this->setDescription('Responsible for cancelling user assignments based on user list (Local file, S3 bucket)');
     }
 
-    protected function process(
-        InputInterface $input,
-        ConsoleOutputInterface $consoleOutput,
-        int $batchSize,
-        bool $isDryRun
-    ): int {
-        $style = new SymfonyStyle($input, $consoleOutput);
-        $style->title('Simple Roster - Bulk Assignment Cancellation');
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
 
-        $section = $consoleOutput->section();
-        $section->writeln('Starting assignment cancellation...');
+        $this->symfonyStyle->title('Simple Roster - Bulk Assignment Cancellation');
+    }
+
+
+    protected function process(OutputInterface $output): int
+    {
+        $this->symfonyStyle->note('Starting assignment cancellation...');
 
         try {
-            $source = $this->getIngesterSource($input);
             $bulkOperationCollection = new BulkOperationCollection();
 
+            $progressBar = $this->createNewFormattedProgressBar($output);
+
+            $progressBar->setMaxSteps($this->ingesterSource->count());
+            $progressBar->start();
+
             $numberOfProcessedAssignments = 0;
-            foreach ($source->getContent() as $row) {
+            foreach ($this->ingesterSource->getContent() as $row) {
                 $this->validateRow($row);
 
                 $operation = new BulkOperation(
@@ -76,35 +79,37 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                     ['state' => Assignment::STATE_CANCELLED]
                 );
 
-                $operation->setIsDryRun($isDryRun);
+                $operation->setIsDryRun($this->isDryRun);
 
                 $bulkOperationCollection->add($operation);
 
-                if (count($bulkOperationCollection) % $batchSize !== 0) {
+                if (count($bulkOperationCollection) % $this->batchSize !== 0) {
                     continue;
                 }
 
                 $numberOfProcessedAssignments += count($bulkOperationCollection);
                 $this->processOperationCollection($bulkOperationCollection);
 
-                $this->overwriteSection($section, $numberOfProcessedAssignments);
+                $progressBar->advance($this->batchSize);
             }
 
             // Process remaining operations
             if (!$bulkOperationCollection->isEmpty()) {
-                $numberOfProcessedAssignments += count($bulkOperationCollection);
+                $remainingAssignmentsToProcess = count($bulkOperationCollection);
+                $numberOfProcessedAssignments += $remainingAssignmentsToProcess;
 
                 $this->processOperationCollection($bulkOperationCollection);
-
-                $this->overwriteSection($section, $numberOfProcessedAssignments);
+                $progressBar->advance($remainingAssignmentsToProcess);
             }
+
+            $progressBar->finish();
         } catch (Throwable $exception) {
-            $style->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->displayResult($style, $numberOfProcessedAssignments, $batchSize);
+        $this->displayResult($numberOfProcessedAssignments);
 
         return 0;
     }

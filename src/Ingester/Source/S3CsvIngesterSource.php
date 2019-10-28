@@ -35,6 +35,9 @@ class S3CsvIngesterSource extends AbstractIngesterSource
     /** @var string  */
     private $bucket;
 
+    /** @var Reader|null */
+    private $reader;
+
     public function __construct(S3Client $client, string $bucket)
     {
         $this->client = $client;
@@ -51,21 +54,41 @@ class S3CsvIngesterSource extends AbstractIngesterSource
      */
     public function getContent(): Traversable
     {
+        return $this->getReader();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function count()
+    {
+        return count($this->getReader());
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getReader(): Reader
+    {
+        if ($this->reader) {
+            return $this->reader;
+        }
+
         $result = $this->client->getObject([
             'Bucket' => $this->bucket,
             'Key'    => $this->path
         ]);
 
-        $reader = Reader::createFromString((string)($result['Body'] ?? ''));
+        $this->reader = Reader::createFromString((string)($result['Body'] ?? ''));
 
-        $reader
+        $this->reader
             ->setDelimiter($this->delimiter)
             ->setHeaderOffset(0);
 
         if ($this->charset !== self::DEFAULT_CSV_CHARSET) {
-            $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $this->charset));
+            $this->reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $this->charset));
         }
 
-        return $reader;
+        return $this->reader;
     }
 }
