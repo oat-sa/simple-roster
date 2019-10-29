@@ -45,7 +45,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
 
     protected const OPTION_DELIMITER = 'delimiter';
     protected const OPTION_CHARSET = 'charset';
-    protected const OPTION_BATCH = 'batch'; // TODO batch-size
+    protected const OPTION_BATCH = 'batch';
     protected const OPTION_FORCE = 'force';
 
     private const DEFAULT_BATCH_SIZE = 1000;
