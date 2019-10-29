@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Security\OAuth\OAuthContext;
 use App\Repository\InfrastructureRepository;
+use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use App\Security\OAuth\OAuthSigner;
 use Doctrine\ORM\NonUniqueResultException;

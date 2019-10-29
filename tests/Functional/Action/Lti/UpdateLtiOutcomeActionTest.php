@@ -24,9 +24,9 @@ namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
-use App\Security\OAuth\OAuthContext;
 use App\Repository\AssignmentRepository;
 use App\Repository\InfrastructureRepository;
+use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

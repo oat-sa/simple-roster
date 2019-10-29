@@ -23,11 +23,11 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Responder;
 
 use App\Responder\SerializerResponder;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Exception;
 use Throwable;
 
 class SerializerResponderTest extends KernelTestCase

@@ -22,12 +22,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Traits;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 
 trait DatabaseTrait
 {
