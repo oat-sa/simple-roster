@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace App\Command\Ingester;
 
-use App\Command\CommandWatcherTrait;
 use App\Ingester\Registry\IngesterRegistry;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Result\IngesterResult;
@@ -38,8 +37,6 @@ use Throwable;
 
 class IngesterCommand extends Command
 {
-    use CommandWatcherTrait;
-
     public const NAME = 'roster:ingest';
 
     /** @var IngesterRegistry */
@@ -47,6 +44,12 @@ class IngesterCommand extends Command
 
     /** @var IngesterSourceRegistry */
     private $sourceRegistry;
+
+    /** @var SymfonyStyle */
+    private $symfonyStyle;
+
+    /** @var bool */
+    private $isDryRun;
 
     public function __construct(
         IngesterRegistry $ingesterRegistry,
@@ -110,11 +113,16 @@ class IngesterCommand extends Command
         );
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
+        $this->symfonyStyle->title('Simple Roster - Ingester');
+
+        $this->isDryRun = !(bool)$input->getOption('force');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-        $style = new SymfonyStyle($input, $output);
-
         try {
             $ingester = $this->ingesterRegistry->get($input->getArgument('type'));
             $source = $this->sourceRegistry
@@ -125,34 +133,34 @@ class IngesterCommand extends Command
 
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
-            $this->displayIngestionResult($result, $style);
+            $this->displayIngestionResult($result);
         } catch (Throwable $exception) {
-            $style->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
         } finally {
-            $style->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+            $this->symfonyStyle->note('Done.');
         }
 
         return 0;
     }
 
-    private function displayIngestionResult(IngesterResult $result, SymfonyStyle $style): void
+    private function displayIngestionResult(IngesterResult $result): void
     {
         if (!$result->hasFailures()) {
-            $style->success((string)$result);
+            $this->symfonyStyle->success((string)$result);
 
             return;
         }
 
-        $style->warning((string)$result);
-        $style->table(
+        $this->symfonyStyle->warning((string)$result);
+        $this->symfonyStyle->table(
             ['Line', 'Data', 'Reason'],
             array_map(static function (IngesterResultFailure $failure): array {
                 return [
                     $failure->getLineNumber(),
                     implode(', ', $failure->getData()),
-                    $failure->getReason()
+                    $failure->getReason(),
                 ];
             }, $result->getFailures())
         );
