@@ -139,8 +139,8 @@ class LineItem implements JsonSerializable, EntityInterface
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
-            'startDateTime' => $this->getStartAt() ? $this->getStartAt()->getTimestamp() : '',
-            'endDateTime' => $this->getEndAt() ? $this->getEndAt()->getTimestamp() : '',
+            'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
+            'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'infrastructure' => $this->getInfrastructure()->getId(),
         ];
     }

@@ -51,7 +51,9 @@ class UserRequestSessionLogProcessor
     {
         $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
         $record['extra']['sessionId'] = $this->session->getId();
-        $record['extra']['username'] = $this->security->getUser() ? $this->security->getUser()->getUsername() : 'guest';
+        $record['extra']['username'] = $this->security->getUser() !== null
+            ? $this->security->getUser()->getUsername()
+            : 'guest';
 
         return $record;
     }
