@@ -61,7 +61,7 @@ class IngesterCommand extends Command
         parent::__construct(self::NAME);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Responsible for data ingesting from various sources (Local file, S3 bucket)');
 

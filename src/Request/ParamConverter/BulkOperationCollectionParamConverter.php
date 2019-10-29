@@ -34,7 +34,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
 {
     public const BULK_OPERATIONS_LIMIT = 1000;
 
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
         $class = $configuration->getClass();
         $param = $configuration->getName();
@@ -57,7 +57,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
         return true;
     }
 
-    public function supports(ParamConverter $configuration)
+    public function supports(ParamConverter $configuration): bool
     {
         return BulkOperationCollection::class === $configuration->getClass();
     }

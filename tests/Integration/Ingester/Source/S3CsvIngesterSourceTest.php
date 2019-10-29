@@ -104,7 +104,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
         $this->subject->getContent();
 
-        // Retrieving it a second time should return in using property cache.
+        // Retrieving it a second time should result in using class property cache.
         $output = $this->subject->getContent();
 
         foreach ($output as $row) {

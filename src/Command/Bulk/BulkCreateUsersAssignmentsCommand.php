@@ -41,7 +41,7 @@ class BulkCreateUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
         parent::__construct(self::NAME, $ingesterSourceRegistry, $bulkCreateUsersAssignmentService);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

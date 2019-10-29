@@ -37,7 +37,7 @@ class ErrorHandlerSubscriber implements EventSubscriberInterface
         $this->responder = $responder;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::EXCEPTION => 'onKernelException',

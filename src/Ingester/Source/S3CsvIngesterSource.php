@@ -60,7 +60,7 @@ class S3CsvIngesterSource extends AbstractIngesterSource
     /**
      * @throws Exception
      */
-    public function count()
+    public function count(): int
     {
         return count($this->getReader());
     }

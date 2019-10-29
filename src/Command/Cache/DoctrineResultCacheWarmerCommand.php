@@ -102,7 +102,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->userRepository = $userRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -134,7 +134,7 @@ class DoctrineResultCacheWarmerCommand extends Command
     /**
      * @throws InvalidArgumentException
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->symfonyStyle = new SymfonyStyle($input, $output);
         $this->symfonyStyle->title('Simple Roster - Doctrine Result Cache Warmer');
@@ -160,7 +160,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $offset = 0;
         $numberOfWarmedUpCacheEntries = 0;

@@ -84,7 +84,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
 
     abstract protected function process(OutputInterface $output): int;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument(
             self::ARGUMENT_SOURCE,
@@ -123,7 +123,7 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
         );
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->symfonyStyle = new SymfonyStyle($input, $output);
 
