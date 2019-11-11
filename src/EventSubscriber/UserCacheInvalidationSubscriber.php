@@ -88,6 +88,6 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
             );
         }
 
-        $resultCacheImplementation->delete($this->userCacheIdGenerator->generate($user->getUsername()));
+        $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
     }
 }

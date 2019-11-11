@@ -22,22 +22,20 @@ declare(strict_types=1);
 
 namespace App\Command\Ingester\Native;
 
-use App\Command\CommandWatcherTrait;
+use App\Command\CommandProgressBarFormatterTrait;
 use App\Entity\Assignment;
 use App\Entity\LineItem;
 use App\Entity\User;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Exception;
-use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -45,9 +43,10 @@ use Throwable;
 
 class NativeUserIngesterCommand extends Command
 {
-    use CommandWatcherTrait;
+    use CommandProgressBarFormatterTrait;
 
     public const NAME = 'roster:native-ingest:user';
+
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
@@ -74,11 +73,11 @@ class NativeUserIngesterCommand extends Command
     /** @var SymfonyStyle */
     private $symfonyStyle;
 
-    /** @var ConsoleSectionOutput */
-    private $consoleSectionOutput;
-
     /** @var bool */
     private $isDryRun;
+
+    /** @var int */
+    private $batchSize;
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
@@ -94,7 +93,7 @@ class NativeUserIngesterCommand extends Command
         parent::__construct(self::NAME);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
 
@@ -140,24 +139,23 @@ class NativeUserIngesterCommand extends Command
         $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply actual database modifications or not');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $consoleOutput = $this->ensureConsoleOutput($output);
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
+        $this->symfonyStyle->title('Simple Roster - Native User Ingester');
 
-        $this->symfonyStyle = new SymfonyStyle($input, $consoleOutput);
-        $this->consoleSectionOutput = $consoleOutput->section();
         $this->isDryRun = !(bool)$input->getOption('force');
+        $this->batchSize = (int)$input->getOption('batch');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-
-        $this->consoleSectionOutput->writeln('Starting user ingestion...');
-        $batchSize = $input->getOption('batch');
+        $this->symfonyStyle->note('Starting user ingestion...');
 
         $resultSetMapping = new ResultSetMapping();
         $user = new User();
+
+        $progressBar = $this->createNewFormattedProgressBar($output);
 
         try {
             $source = $this->ingesterSourceRegistry
@@ -165,6 +163,9 @@ class NativeUserIngesterCommand extends Command
                 ->setPath($input->getArgument('path'))
                 ->setDelimiter($input->getOption('delimiter'))
                 ->setCharset($input->getOption('charset'));
+
+            $progressBar->setMaxSteps($source->count());
+            $progressBar->start();
 
             $index = $this->getAvailableStartIndex();
             $lineItemCollection = $this->fetchLineItems();
@@ -186,22 +187,15 @@ class NativeUserIngesterCommand extends Command
                     Assignment::STATE_READY
                 );
 
-                if ($index % $batchSize === 0) {
+                if ($index % $this->batchSize === 0) {
                     $this->executeNativeInsertions($resultSetMapping);
-                    $this->consoleSectionOutput->overwrite(
-                        sprintf('Success: %s, batched errors: %s', $index, count($this->errors))
-                    );
+                    $progressBar->advance($this->batchSize);
                 }
 
                 $index++;
             }
 
             $this->executeNativeInsertions($resultSetMapping);
-            $this->consoleSectionOutput->overwrite(sprintf(
-                'Total of users imported: %s, batched errors: %s',
-                $this->getRealUserCount(),
-                count($this->errors)
-            ));
 
             if (!empty($this->errors)) {
                 foreach ($this->errors as $error) {
@@ -214,12 +208,15 @@ class NativeUserIngesterCommand extends Command
             return 1;
         } finally {
             $this->refreshSequences($resultSetMapping);
-            $this->symfonyStyle->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
+            $progressBar->finish();
         }
 
         return 0;
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     private function getAvailableStartIndex(): int
     {
         $index = $this->entityManager
@@ -230,18 +227,6 @@ class NativeUserIngesterCommand extends Command
             ->getSingleScalarResult();
 
         return $index + 1;
-    }
-
-    private function getRealUserCount(): int
-    {
-        $count = $this->entityManager
-            ->getRepository(User::class)
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        return (int)$count;
     }
 
     private function executeNativeInsertions(ResultSetMapping $mapping): void
@@ -316,22 +301,5 @@ class NativeUserIngesterCommand extends Command
         }
 
         return $lineItemCollection;
-    }
-
-    /**
-     * @throws LogicException
-     */
-    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
-    {
-        if (!$output instanceof ConsoleOutputInterface) {
-            throw new LogicException(
-                sprintf(
-                    "Output must be instance of '%s' because of section usage.",
-                    ConsoleOutputInterface::class
-                )
-            );
-        }
-
-        return $output;
     }
 }

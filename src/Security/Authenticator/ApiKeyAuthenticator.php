@@ -25,12 +25,13 @@ namespace App\Security\Authenticator;
 use App\Entity\User;
 use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
@@ -48,7 +49,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         $this->appApiKey = $appApiKey;
     }
 
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
     }
@@ -65,12 +66,12 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         return new User();
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         return $credentials['token'] === $this->appApiKey;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         return null;
     }
@@ -85,7 +86,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         throw $this->createUnauthorizedHttpException($authException);
     }
 
-    public function supportsRememberMe()
+    public function supportsRememberMe(): bool
     {
         return false;
     }

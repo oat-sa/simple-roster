@@ -29,7 +29,7 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
     public function getLtiInstanceUrl(User $user): string
     {
-        return $this->getLoadBalancedLtiInstanceUrl($user->getUsername());
+        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getUsername());
     }
 
     /**

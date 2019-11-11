@@ -94,7 +94,7 @@ Please make sure you have full test coverage before you push your changes:
  $ vendor/bin/phpunit --coverage-text
  ```
 
-We are also have expected mutation testing metrics that must be respected.
+We are also have minimum mutation score indicator threshold that must be respected.
 
 | Mutation metric                | Threshold |
 | -------------------------------| --------- |

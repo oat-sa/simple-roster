@@ -39,7 +39,7 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             );
         }
 
-        return $this->getLoadBalancedLtiInstanceUrl($user->getGroupId());
+        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getGroupId());
     }
 
     /**
@@ -53,6 +53,6 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             );
         }
 
-        return $user->getGroupId();
+        return (string)$user->getGroupId();
     }
 }

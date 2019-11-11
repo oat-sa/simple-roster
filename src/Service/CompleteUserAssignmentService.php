@@ -25,6 +25,7 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
+use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService
@@ -43,6 +44,7 @@ class CompleteUserAssignmentService
 
     /**
      * @throws AssignmentNotFoundException
+     * @throws ORMException
      */
     public function markAssignmentAsCompleted(int $assignmentId): void
     {

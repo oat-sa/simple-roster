@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Ingester\Registry;
 
-use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Registry\IngesterSourceRegistry;
+use App\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 

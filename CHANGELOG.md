@@ -15,6 +15,7 @@
 - Reverted temporary PHPUnit fix done in version `1.4.1`.
 - Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
 - Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
+- Fixed all static code analysis issues, achieving maximum quality strictness level.
 
 ## 1.4.2 - 2019-10-11
 

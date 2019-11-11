@@ -30,7 +30,6 @@ use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTrait;
-use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -52,21 +51,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
     }
 
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-            ]
-        );
-    }
-
     public function testItDoesNotIngestUsersInDryRun(): void
     {
         $this->prepareIngestionContext();
@@ -82,11 +66,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 0, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(0, $this->getRepository(User::class)->findAll());
     }
 
@@ -106,11 +85,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
@@ -137,11 +111,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
@@ -168,10 +137,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -227,11 +192,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 1, batched errors: 1',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);

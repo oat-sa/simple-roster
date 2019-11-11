@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Security\Provider;
 
 use App\Entity\User;
-use App\Security\Provider\UserProvider;
 use App\Repository\UserRepository;
+use App\Security\Provider\UserProvider;
 use App\Tests\Traits\DatabaseFixturesTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
