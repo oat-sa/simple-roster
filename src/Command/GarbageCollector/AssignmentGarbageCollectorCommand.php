@@ -51,6 +51,9 @@ class AssignmentGarbageCollectorCommand extends Command
     /** @var DateInterval */
     private $cleanUpInterval;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger,

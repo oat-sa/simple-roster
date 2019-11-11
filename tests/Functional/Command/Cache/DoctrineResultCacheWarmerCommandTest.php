@@ -23,10 +23,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
+use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use App\Tests\Traits\DatabaseManualFixturesTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -87,6 +89,30 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+    }
+
+    public function testItCanRefreshAlreadyExistingResultCache(): void
+    {
+        $this->getEntityManager()
+            ->createNativeQuery("UPDATE line_items SET label = 'expected label'", new ResultSetMapping())
+            ->execute();
+
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        for ($i = 1; $i <= 100; $i++) {
+            $username = sprintf('user_%d', $i);
+            /** @var User $user */
+            $user = $this->getRepository(User::class)->findOneBy(['username' => $username]);
+
+            $this->assertSame('expected label', $user->getLastAssignment()->getLineItem()->getLabel());
+        }
     }
 
     public function testItCanWarmUpResultCacheByListOfUsers(): void

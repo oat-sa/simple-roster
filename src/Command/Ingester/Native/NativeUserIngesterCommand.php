@@ -29,6 +29,7 @@ use App\Entity\User;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -213,6 +214,9 @@ class NativeUserIngesterCommand extends Command
         return 0;
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     private function getAvailableStartIndex(): int
     {
         $index = $this->entityManager

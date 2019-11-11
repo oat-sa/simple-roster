@@ -30,6 +30,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
@@ -160,6 +161,9 @@ class DoctrineResultCacheWarmerCommand extends Command
         }
     }
 
+    /**
+     * @throws ORMException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $offset = 0;
