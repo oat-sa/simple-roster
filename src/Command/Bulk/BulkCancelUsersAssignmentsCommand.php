@@ -82,12 +82,13 @@ class BulkCancelUsersAssignmentsCommand extends AbstractBulkUsersAssignmentsComm
                 $operation->setIsDryRun($this->isDryRun);
 
                 $bulkOperationCollection->add($operation);
+                $operationCount = count($bulkOperationCollection);
 
-                if (count($bulkOperationCollection) % $this->batchSize !== 0) {
+                if ($operationCount % $this->batchSize !== 0) {
                     continue;
                 }
 
-                $numberOfProcessedAssignments += count($bulkOperationCollection);
+                $numberOfProcessedAssignments += $operationCount;
                 $this->processOperationCollection($bulkOperationCollection);
 
                 $progressBar->advance($this->batchSize);
