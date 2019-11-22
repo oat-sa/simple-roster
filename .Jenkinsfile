@@ -7,7 +7,7 @@ pipeline {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
-                    dir './docker/phpfpm/'
+                    dir '${HOME}/docker/phpfpm/'
                 }
             }
             environment {
