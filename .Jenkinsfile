@@ -1,7 +1,13 @@
 pipeline {
-    agent { docker { image 'php' } }
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            dir 'docker/jenkins'
+            label 'test-label'
+        }
+    }
     stages {
-        stage('build') {
+        stage('test') {
             steps {
                 sh 'php --version'
             }
