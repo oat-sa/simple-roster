@@ -1,13 +1,13 @@
 pipeline {
     agent {
-        label 'master'
+        label 'build'
     }
     stages {
         stage('Tests') {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
-                    dir 'docker/phpfpm'
+                    dir './docker/phpfpm/'
                 }
             }
             environment {
