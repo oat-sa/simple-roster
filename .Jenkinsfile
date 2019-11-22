@@ -5,9 +5,9 @@ pipeline {
     stages {
         stage('Tests') {
             agent {
-                docker {
-                    image 'alexwijn/docker-git-php-composer'
-                    reuseNode true
+                dockerfile {
+                    filename 'Dockerfile'
+                    dir 'docker/phpfpm'
                 }
             }
             environment {
