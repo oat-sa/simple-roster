@@ -25,13 +25,17 @@ pipeline {
                         script: "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"$GIT_TOKEN\"}}\' composer install --no-interaction --no-ansi --no-progress"
                     )
                 }
+//                 sh(
+//                     label: 'Infection - Running mutation testing',
+//                     script: './vendor/bin/infection --threads=1 --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+//                 )
+//                 sh(
+//                     label: 'PHPUnit - Checking test coverage',
+//                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+//                 )
                 sh(
-                    label: 'Infection - Running mutation testing',
-                    script: './vendor/bin/infection --threads=1 --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
-                )
-                sh(
-                    label: 'PHPUnit - Checking test coverage',
-                    script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+                    label: 'Warming up application cache',
+                    script: './bin/console cache:warmup --env=test'
                 )
                 sh(
                     label: 'PHPStan - Running static code analysis',
