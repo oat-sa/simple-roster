@@ -2,6 +2,10 @@
 
 >REST back-end service intending to mimic a simplified version of OneRoster IMS specification.
 
+![current version](https://img.shields.io/badge/version-1.5.0-green.svg)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+![coverage](https://img.shields.io/badge/coverage-100%25-green.svg)
+
 `OneRoster` solves a school’s need to securely and reliably exchange roster information, course materials and grades between systems. 
 OneRoster supports the commonly used .csv mode for exchange and the latest real-time web services mode known as REST.  
 

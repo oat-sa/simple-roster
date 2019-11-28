@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Infrastructure;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method Infrastructure|null find($id, $lockMode = null, $lockVersion = null)
@@ -34,7 +34,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class InfrastructureRepository extends AbstractRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Infrastructure::class);
     }
