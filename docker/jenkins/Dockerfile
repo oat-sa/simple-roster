@@ -1,6 +1,7 @@
 FROM php:7.2-fpm
 
 ENV APP_ENV=test
+ENV APP_DEBUG=true
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 
 RUN apt-get update && \
