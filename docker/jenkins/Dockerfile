@@ -1,7 +1,7 @@
 FROM php:7.2-fpm
 
 ENV APP_ENV=test
-ENV SYMFONY_DEPRECATIONS_HELPER=max[direct]=10
+ENV SYMFONY_DEPRECATIONS_HELPER=max[direct]=35
 
 RUN apt-get update && \
     apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev zlib1g-dev libicu-dev g++ && \
