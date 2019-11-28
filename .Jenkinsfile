@@ -6,17 +6,11 @@ pipeline {
             label 'master'
         }
     }
+    environment {
+        HOME = '.'
+    }
     stages {
         stage('Tests') {
-            agent {
-                docker {
-                    image 'alexwijn/docker-git-php-composer'
-                    reuseNode true
-                }
-            }
-            environment {
-                HOME = '.'
-            }
             options {
                 skipDefaultCheckout()
             }
