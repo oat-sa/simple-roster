@@ -8,18 +8,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
-RUN yes | pecl install igbinary redis apcu xdebug
+RUN yes | pecl install igbinary apcu xdebug
 
 RUN docker-php-ext-install pdo && \
-    docker-php-ext-install pdo_mysql && \
     docker-php-ext-install intl && \
-    docker-php-ext-install mysqli && \
-    docker-php-ext-install pgsql && \
-    docker-php-ext-install pdo_pgsql && \
     docker-php-ext-install pdo_sqlite && \
     docker-php-ext-install gd && \
     docker-php-ext-install mbstring && \
