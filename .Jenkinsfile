@@ -1,6 +1,10 @@
 pipeline {
     agent {
-        label 'master'
+        dockerfile {
+            filename 'Dockerfile'
+            dir 'docker/jenkins'
+            label 'master'
+        }
     }
     stages {
         stage('Tests') {
