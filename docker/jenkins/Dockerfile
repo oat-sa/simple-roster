@@ -24,7 +24,6 @@ RUN docker-php-ext-install pdo && \
     docker-php-ext-install sodium && \
     docker-php-ext-enable apcu && \
     docker-php-ext-enable igbinary && \
-    docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug
 
 RUN { \
