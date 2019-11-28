@@ -8,7 +8,7 @@
     - Running PHPUnit test suite
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
-    - Running static dode analysis with PHPStan
+    - Running static code analysis with PHPStan
 
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
