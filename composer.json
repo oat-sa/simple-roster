@@ -52,9 +52,8 @@
         "phpstan/phpstan-doctrine": "^0.11",
         "phpstan/phpstan-phpunit": "^0.11",
         "phpstan/phpstan-symfony": "^0.11",
-        "phpunit/phpunit": "^8.0",
         "symfony/debug-bundle": "^4.0",
-        "symfony/phpunit-bridge": "^4.3",
+        "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
         "symfony/var-dumper": "^4.0",
         "symfony/web-server-bundle": "^4.0"

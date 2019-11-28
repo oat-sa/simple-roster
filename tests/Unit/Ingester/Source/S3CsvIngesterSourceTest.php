@@ -25,7 +25,7 @@ namespace App\Tests\Unit\Ingester\Source;
 use App\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class S3CsvIngesterSourceTest extends TestCase
 {

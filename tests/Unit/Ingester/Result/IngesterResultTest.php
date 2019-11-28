@@ -24,7 +24,7 @@ namespace App\Tests\Unit\Ingester\Result;
 
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Result\IngesterResultFailure;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class IngesterResultTest extends TestCase
 {

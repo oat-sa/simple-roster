@@ -25,7 +25,7 @@ namespace App\Tests\Unit\Security\Authenticator;
 use App\Security\Authenticator\ApiKeyAuthenticator;
 use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

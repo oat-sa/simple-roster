@@ -26,8 +26,20 @@ pipeline {
                     )
                 }
                 sh(
-                    label: 'Run backend tests',
-                    script: './bin/phpunit'
+                    label: 'PHPUnit - Running test suite',
+                    script: './bin/phpunit --coverage-clover=var/log/phpunit/coverage.xml'
+                )
+                sh(
+                    label: 'PHPUnit - Checking test coverage',
+                    script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+                )
+                sh (
+                    label: 'Infection - Running mutation testing',
+                    script: './vendor/bin/infection --threads=1 --min-msi=85'
+                )
+                sh(
+                    label: 'PHPStan - Running static code analysis',
+                    script: './'
                 )
             }
         }

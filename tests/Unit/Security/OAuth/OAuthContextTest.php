@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Security\OAuth;
 
 use App\Security\OAuth\OAuthContext;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class OAuthContextTest extends TestCase
 {

@@ -24,7 +24,7 @@ namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\UserIngester;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class UserIngesterTest extends TestCase
 {
