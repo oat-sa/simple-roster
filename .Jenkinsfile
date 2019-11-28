@@ -27,7 +27,7 @@ pipeline {
                 }
                 sh(
                     label: 'Infection - Running mutation testing',
-                    script: './vendor/bin/infection --threads=1 --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
                 sh(
                     label: 'PHPUnit - Checking test coverage',
