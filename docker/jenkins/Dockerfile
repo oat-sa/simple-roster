@@ -30,5 +30,7 @@ RUN { \
     echo 'memory_limit=512M'; \
 } >> /usr/local/etc/php/conf.d/docker-php-ext-memory-limit.ini
 
+RUN curl -ksS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
+
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
