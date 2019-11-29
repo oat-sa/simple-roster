@@ -7,7 +7,7 @@
             "Kernel.php"
         ]
     },
-    "timeout": 3,
+    "timeout": 15,
     "logs": {
         "text": "var/log/infection/infection.log",
         "summary": "var/log/infection/summary.log",
