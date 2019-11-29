@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             dir 'docker/jenkins'
-            label 'master'
+            label 'worker'
         }
     }
     environment {
