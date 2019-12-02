@@ -24,8 +24,8 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use DateTime;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)
@@ -35,7 +35,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AssignmentRepository extends AbstractRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Assignment::class);
     }

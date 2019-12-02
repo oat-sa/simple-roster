@@ -1,21 +1,24 @@
 {
-  "source": {
-    "directories": [
-      "src"
-    ],
-    "excludes": [
-      "Kernel.php"
-    ]
-  },
-  "timeout": 10,
-  "logs": {
-    "text": "var/log/infection/infection.log",
-    "summary": "var/log/infection/summary.log",
-    "perMutator": "var/log/infection/per-mutator.md"
-  },
-  "mutators": {
-    "@default": true,
-    "@removal": false
-  },
-  "tmpDir": "var/cache/infection"
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Kernel.php"
+        ]
+    },
+    "timeout": 10,
+    "logs": {
+        "text": "var/log/infection/infection.log",
+        "summary": "var/log/infection/summary.log",
+        "perMutator": "var/log/infection/per-mutator.md"
+    },
+    "mutators": {
+        "@default": true,
+        "@removal": false
+    },
+    "phpUnit": {
+        "customPath": "bin/phpunit"
+    },
+    "tmpDir": "var/cache/infection"
 }

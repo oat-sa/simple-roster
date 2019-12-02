@@ -25,9 +25,9 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -44,7 +44,7 @@ class UserRepository extends AbstractRepository
     private $userCacheTtl;
 
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         UserCacheIdGenerator $userCacheIdGenerator,
         int $userCacheTtl
     ) {

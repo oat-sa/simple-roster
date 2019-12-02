@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\LineItem;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)
@@ -33,7 +33,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class LineItemRepository extends AbstractRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LineItem::class);
     }

@@ -1,3 +1,12 @@
 doctrine:
     orm:
         auto_generate_proxy_classes: false
+        metadata_cache_driver:
+            type: service
+            id: app.doctrine_cache.provider
+        query_cache_driver:
+            type: service
+            id: app.doctrine_cache.provider
+        result_cache_driver:
+            type: service
+            id: app.doctrine_cache.provider

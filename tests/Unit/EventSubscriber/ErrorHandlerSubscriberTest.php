@@ -86,7 +86,7 @@ class ErrorHandlerSubscriberTest extends TestCase
             ->willReturn(true);
 
         $event
-            ->method('getException')
+            ->method('getThrowable')
             ->willReturn($expectedException);
 
         $event->expects($this->once())

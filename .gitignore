@@ -18,4 +18,5 @@
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
+bin/.phpunit
 ###< phpunit/phpunit ###

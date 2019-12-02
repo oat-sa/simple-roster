@@ -25,7 +25,7 @@ namespace App\Tests\Integration\Security\OAuth;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class OAuthSignerTest extends TestCase
 {

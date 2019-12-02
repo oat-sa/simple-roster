@@ -51,7 +51,7 @@ class ErrorHandlerSubscriber implements EventSubscriberInterface
         }
 
         $event->setResponse(
-            $this->responder->createErrorJsonResponse($event->getException())
+            $this->responder->createErrorJsonResponse($event->getThrowable())
         );
     }
 }

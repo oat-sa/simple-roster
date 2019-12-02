@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Lti\Request;
 
 use App\Lti\Request\LtiRequest;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class LtiRequestTest extends TestCase
 {
