@@ -206,6 +206,9 @@
     "phing/phing": {
         "version": "2.16.1"
     },
+    "php": {
+        "version": "7.2"
+    },
     "phpstan/extension-installer": {
         "version": "1.0.1"
     },
@@ -265,6 +268,18 @@
             "version": "5.2",
             "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
         }
+    },
+    "sensiolabs/security-checker": {
+        "version": "4.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.0",
+            "ref": "160c9b600564faa1224e8f387d49ef13ceb8b793"
+        },
+        "files": [
+            "config/packages/security_checker.yaml"
+        ]
     },
     "symfony/apache-pack": {
         "version": "1.0",
@@ -352,6 +367,12 @@
             "version": "3.3",
             "ref": "af951c413e84511daefa4ddb3eb8166108a30b6c"
         }
+    },
+    "symfony/http-client": {
+        "version": "v4.4.3"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.0.1"
     },
     "symfony/http-foundation": {
         "version": "v4.1.10"

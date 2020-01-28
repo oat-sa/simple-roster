@@ -76,5 +76,5 @@
 ## 1.1.0 - 2019-03-19
 
 ### Added
-- Added possibility to specify charset for regular and native ingester.
+- Added possibility to specify charset for regular and native ingesters.
 - Added possibility to perform integrity checks on ingester dry runs.
