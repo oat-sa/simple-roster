@@ -9,6 +9,7 @@
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
     - Running static code analysis with PHPStan
+- Added package dependency security checker into composer. 
 
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
