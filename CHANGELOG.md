@@ -9,6 +9,7 @@
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
     - Running static code analysis with PHPStan
+- Added package dependency security checker into composer. 
 
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
@@ -75,5 +76,5 @@
 ## 1.1.0 - 2019-03-19
 
 ### Added
-- Added possibility to specify charset for regular and native ingesters.
+- Added possibility to specify charset for regular and native ingester.
 - Added possibility to perform integrity checks on ingester dry runs.
