@@ -25,26 +25,39 @@ namespace App\Tests\Functional\Action\Assignment;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListUserAssignmentsActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
+
+    /** @var KernelBrowser */
+    private $kernelBrowser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->kernelBrowser = self::createClient();
+
+        $this->setUpDatabase(self::$kernel);
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+    }
 
     public function testWithNonAuthenticatedUser(): void
     {
-        $kernelBrowser = self::createClient();
-        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
@@ -58,15 +71,14 @@ class ListUserAssignmentsActionTest extends WebTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
-        $kernelBrowser = self::createClient();
 
-        $this->logInAs($user, $kernelBrowser);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertEquals([
             'assignments' => [
                 [
@@ -82,7 +94,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-        ], json_decode($kernelBrowser->getResponse()->getContent(), true));
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
     }
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
@@ -92,13 +104,17 @@ class ListUserAssignmentsActionTest extends WebTestCase
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
-        $kernelBrowser = self::createClient();
 
-        $this->logInAs($user, $kernelBrowser);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals(['assignments' => [],], json_decode($kernelBrowser->getResponse()->getContent(), true));
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(
+            [
+                'assignments' => [],
+            ],
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+        );
     }
 }

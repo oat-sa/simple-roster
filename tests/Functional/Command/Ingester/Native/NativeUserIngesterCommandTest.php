@@ -29,14 +29,14 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class NativeUserIngesterCommandTest extends KernelTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;

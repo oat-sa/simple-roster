@@ -25,7 +25,7 @@ namespace App\Tests\Functional\Command\Cache;
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -36,7 +36,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -62,9 +62,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
-        ]);
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItCanWarmResultCacheForAllUsers(): void

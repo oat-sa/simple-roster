@@ -1,4 +1,5 @@
 .idea/
+.php_cs.cache
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -12,6 +13,7 @@
 ###> symfony/web-server-bundle ###
 /.web-server-pid
 ###< symfony/web-server-bundle ###
+
 /infection.json
 /phpstan.neon
 

@@ -26,7 +26,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use Monolog\Logger;
@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
     /** @var KernelBrowser */
@@ -47,10 +47,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
-        $this->setUpFixtures();
-
         $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . $_ENV['APP_API_KEY']]);
+        $this->setUpDatabase(self::$kernel);
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();
     }

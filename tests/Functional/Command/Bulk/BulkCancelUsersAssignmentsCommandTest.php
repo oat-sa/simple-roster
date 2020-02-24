@@ -24,7 +24,7 @@ namespace App\Tests\Functional\Command\Bulk;
 
 use App\Command\Bulk\BulkCancelUsersAssignmentsCommand;
 use App\Entity\Assignment;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -33,7 +33,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
     /** @var CommandTester */
@@ -49,9 +49,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(BulkCancelUsersAssignmentsCommand::NAME));
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
-        ]);
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItCanCancelUserAssignments(): void

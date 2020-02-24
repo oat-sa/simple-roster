@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity repository-class="App\Repository\InfrastructureRepository" name="App\Entity\Infrastructure"
+            table="infrastructures">
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+            <sequence-generator sequence-name="infrastructures_id_seq" allocation-size="1" initial-value="1"/>
+        </id>
+        <field name="label" type="string" column="label" length="255" precision="0" scale="0" unique="true"
+               nullable="false"/>
+        <field name="ltiDirectorLink" type="string" column="lti_director_link" length="255" precision="0" scale="0"
+               nullable="false"/>
+        <field name="ltiKey" type="string" column="lti_key" length="255" precision="0" scale="0" unique="true"
+               nullable="false"/>
+        <field name="ltiSecret" type="string" column="lti_secret" length="255" precision="0" scale="0"
+               nullable="false"/>
+    </entity>
+</doctrine-mapping>

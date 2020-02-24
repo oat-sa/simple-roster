@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\HealthCheck;
 
-use App\Tests\Traits\DatabaseTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckActionTest extends WebTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     public function testItReturns200WhenApplicationInHealthy(): void
     {

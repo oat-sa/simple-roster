@@ -1,8 +1,0 @@
-App\Entity\LineItem:
-  lineItem1:
-    infrastructure: '@infrastructure1'
-    label: 'The first line item'
-    uri: 'http://lineitemuri.com'
-    slug: 'lineItemSlug'
-    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'

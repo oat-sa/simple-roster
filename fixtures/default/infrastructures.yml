@@ -1,6 +1,0 @@
-App\Entity\Infrastructure:
-  infrastructure1:
-    label: 'The first infrastructure'
-    ltiDirectorLink: 'http://lti-director.com'
-    ltiKey: 'myKey'
-    ltiSecret: 'mySecret'
