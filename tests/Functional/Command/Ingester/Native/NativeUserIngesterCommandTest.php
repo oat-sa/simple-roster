@@ -45,10 +45,12 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $application = new Application($kernel);
+        $kernel = self::bootKernel();
 
+        $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
+
+        $this->setUpDatabase();
     }
 
     public function testItDoesNotIngestUsersInDryRun(): void

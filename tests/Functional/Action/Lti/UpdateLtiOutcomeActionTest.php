@@ -45,7 +45,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
-        $this->setUpDatabase(self::$kernel);
+        $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 

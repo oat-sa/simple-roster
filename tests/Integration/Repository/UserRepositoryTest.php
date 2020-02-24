@@ -47,6 +47,8 @@ class UserRepositoryTest extends KernelTestCase
     {
         parent::setUp();
 
+        self::bootKernel();
+
         $this->setUpDatabase();
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 

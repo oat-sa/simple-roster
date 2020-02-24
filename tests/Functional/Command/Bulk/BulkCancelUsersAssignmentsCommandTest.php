@@ -43,12 +43,12 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $this->setUpTestLogHandler();
-
+        $kernel = self::bootKernel();
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(BulkCancelUsersAssignmentsCommand::NAME));
 
+        $this->setUpDatabase();
+        $this->setUpTestLogHandler();
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 

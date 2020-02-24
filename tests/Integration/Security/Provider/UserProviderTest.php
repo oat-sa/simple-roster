@@ -48,6 +48,8 @@ class UserProviderTest extends KernelTestCase
     {
         parent::setUp();
 
+        self::bootKernel();
+
         $this->setUpDatabase();
 
         /** @var UserRepository $userRepository */

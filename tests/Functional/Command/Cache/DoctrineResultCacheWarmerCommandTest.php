@@ -51,7 +51,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(DoctrineResultCacheWarmerCommand::NAME));
@@ -62,6 +62,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
 
+        $this->setUpDatabase();
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 

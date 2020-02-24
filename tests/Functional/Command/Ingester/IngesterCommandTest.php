@@ -40,9 +40,11 @@ class IngesterCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $application = new Application($kernel);
+        $kernel = self::bootKernel();
 
+        $this->setUpDatabase();
+
+        $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(IngesterCommand::NAME));
     }
 

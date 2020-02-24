@@ -28,19 +28,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 trait DatabaseTestingTrait
 {
     use BaseDatabaseTrait;
 
-    protected function setUpDatabase(KernelInterface $kernel = null): KernelInterface
+    protected function setUpDatabase(): void
     {
         static::ensureKernelTestCase();
-
-        if (null === $kernel) {
-            $kernel = self::bootKernel();
-        }
 
         $entityManager = $this->getEntityManager();
 
@@ -48,8 +43,6 @@ trait DatabaseTestingTrait
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         $schemaTool->updateSchema($metadata);
-
-        return $kernel;
     }
 
     /**

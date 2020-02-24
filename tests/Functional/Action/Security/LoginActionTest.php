@@ -39,7 +39,7 @@ class LoginActionTest extends WebTestCase
     {
         $this->kernelBrowser = self::createClient();
 
-        $this->setUpDatabase(self::$kernel);
+        $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         parent::setUp();

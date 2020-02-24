@@ -48,7 +48,8 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         parent::setUp();
 
         $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . $_ENV['APP_API_KEY']]);
-        $this->setUpDatabase(self::$kernel);
+
+        $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();

@@ -44,7 +44,9 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
+
+        $this->setUpDatabase();
         $this->setUpTestLogHandler();
 
         $application = new Application($kernel);

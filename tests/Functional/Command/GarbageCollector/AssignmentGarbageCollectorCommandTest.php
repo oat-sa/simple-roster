@@ -45,12 +45,14 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
 
         $this->setUpTestLogHandler();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
+
+        $this->setUpDatabase();
 
         Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }

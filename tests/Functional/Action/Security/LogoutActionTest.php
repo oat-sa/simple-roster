@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Security;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
@@ -44,7 +43,8 @@ class LogoutActionTest extends WebTestCase
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
-        $this->setUpDatabase(self::$kernel);
+
+        $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 
