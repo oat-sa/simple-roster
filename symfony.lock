@@ -185,9 +185,6 @@
     "nikic/php-parser": {
         "version": "v4.2.0"
     },
-    "oat-sa/phing-tasks": {
-        "version": "v0.1"
-    },
     "ocramius/package-versions": {
         "version": "1.3.0"
     },
@@ -199,9 +196,6 @@
     },
     "padraic/phar-updater": {
         "version": "v1.0.6"
-    },
-    "phing/phing": {
-        "version": "2.16.1"
     },
     "php": {
         "version": "7.2"
