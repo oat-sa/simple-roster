@@ -25,14 +25,14 @@ namespace App\Tests\Integration\Repository;
 use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var UserRepository */
     private $subject;
@@ -47,11 +47,10 @@ class UserRepositoryTest extends KernelTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
+        self::bootKernel();
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../fixtures/100usersWithAssignments.yml',
-        ]);
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
         $this->subject = self::$container->get(UserRepository::class);
         $this->doctrineResultCacheImplementation = self::$container->get('doctrine.orm.default_result_cache');

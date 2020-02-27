@@ -29,7 +29,7 @@ use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use App\Lti\Request\LtiRequest;
 use App\Repository\UserRepository;
 use App\Security\OAuth\OAuthContext;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
@@ -41,7 +41,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
     use LoggerTestingTrait;
 
@@ -52,10 +52,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
-        $this->setUpFixtures();
-
         $this->kernelBrowser = self::createClient();
+
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();
     }

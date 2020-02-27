@@ -25,7 +25,7 @@ namespace App\Tests\Integration\Security\Provider;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Security\Provider\UserProvider;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +36,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserProviderTest extends KernelTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var UserProvider */
     private $subject;
@@ -47,6 +47,8 @@ class UserProviderTest extends KernelTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        self::bootKernel();
 
         $this->setUpDatabase();
 

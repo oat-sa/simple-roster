@@ -24,7 +24,7 @@ namespace App\Tests\Functional\Command\GarbageCollector;
 
 use App\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use App\Entity\Assignment;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
@@ -35,7 +35,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
     /** @var CommandTester */
@@ -45,12 +45,14 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
 
         $this->setUpTestLogHandler();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(AssignmentGarbageCollectorCommand::NAME));
+
+        $this->setUpDatabase();
 
         Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }
@@ -66,7 +68,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testDryRunDoesNotUpdateAssignmentState(): void
     {
-        $this->loadTestFixtures();
+        $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $this->assertEquals(0, $this->commandTester->execute([]));
         $this->assertStringContainsString(
@@ -82,7 +84,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testItCanUpdateStuckAssignments(): void
     {
-        $this->loadTestFixtures();
+        $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $this->assertEquals(0, $this->commandTester->execute(
             [
@@ -115,7 +117,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testItCanUpdateStuckAssignmentsInMultipleBatch(): void
     {
-        $this->loadTestFixtures();
+        $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $this->assertEquals(
             0,
@@ -145,12 +147,5 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             "[ERROR] Invalid 'batch-size' argument received.",
             $this->commandTester->getDisplay()
         );
-    }
-
-    private function loadTestFixtures(): void
-    {
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/usersWithStartedButStuckAssignments.yml',
-        ]);
     }
 }

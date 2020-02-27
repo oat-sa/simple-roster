@@ -17,6 +17,7 @@
 - Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.
 - Changed Doctrine's ORM naming strategy from `underscore` to `underscore_number_aware`.
 - Reworked `README.md` structure for better readability.
+- Changed doctrine ORM mapping driver from `yaml` to `xml`.
 
 ### Fixed
 - Reverted temporary PHPUnit fix done in version `1.4.1`.

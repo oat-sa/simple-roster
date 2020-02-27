@@ -22,33 +22,46 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Security;
 
-use App\Entity\User;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Repository\UserRepository;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogoutActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
+
+    /** @var KernelBrowser */
+    private $kernelBrowser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->kernelBrowser = self::createClient();
+
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+    }
 
     public function testItLogsOutProperlyTheUser(): void
     {
-        $kernelBrowser = self::createClient();
+        $userRepository = self::$container->get(UserRepository::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
 
-        $user = $this->getRepository(User::class)->find(1);
+        $this->logInAs($user, $this->kernelBrowser);
 
-        $this->logInAs($user, $kernelBrowser);
-
-        $session = $kernelBrowser->getContainer()->get('session');
+        $session = $this->kernelBrowser->getContainer()->get('session');
 
         $this->assertNotEmpty($session->all());
 
-        $kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
+        $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEmpty($session->all());
     }

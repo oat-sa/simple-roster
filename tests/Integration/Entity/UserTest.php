@@ -24,12 +24,22 @@ namespace App\Tests\Integration\Entity;
 
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserTest extends KernelTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        self::bootKernel();
+
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+    }
 
     public function testItCanRetrieveAndRemoveAssignments(): void
     {

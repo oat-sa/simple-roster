@@ -26,23 +26,16 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Fidry\AliceDataFixtures\Loader\PurgerLoader;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
-use Symfony\Component\HttpKernel\KernelInterface;
 
-trait DatabaseTrait
+trait DatabaseTestingTrait
 {
     use BaseDatabaseTrait;
 
-    protected function setUp(): void
-    {
-        $this->setUpDatabase();
-    }
-
-    protected function setUpDatabase(): KernelInterface
+    protected function setUpDatabase(): void
     {
         static::ensureKernelTestCase();
-
-        $kernel = self::bootKernel();
 
         $entityManager = $this->getEntityManager();
 
@@ -50,8 +43,17 @@ trait DatabaseTrait
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         $schemaTool->updateSchema($metadata);
+    }
 
-        return $kernel;
+    /**
+     * @param string $filename Relative filename to tests/Fixtures directory.
+     */
+    protected function loadFixtureByFilename(string $filename): void
+    {
+        /** @var PurgerLoader $loader */
+        $loader = static::$container->get('fidry_alice_data_fixtures.loader.doctrine');
+
+        $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
     }
 
     protected function getManagerRegistry(): ManagerRegistry

@@ -29,14 +29,14 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class NativeUserIngesterCommandTest extends KernelTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -45,10 +45,12 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $application = new Application($kernel);
+        $kernel = self::bootKernel();
 
+        $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
+
+        $this->setUpDatabase();
     }
 
     public function testItDoesNotIngestUsersInDryRun(): void

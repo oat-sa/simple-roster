@@ -26,10 +26,11 @@ parameters:
     - message: '#^Call to an undefined method Carbon\\Carbon\|Closure::getTimestamp\(\).$#'
       path: tests
     # Doctrine docblock error, Doctrine\Common\Persistence\ManagerRegistry always returns an instance of EntityManagerInterface
-    - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Common\\Persistence\\ObjectManager.$#'
+    - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Persistence\\ObjectManager.$#'
       path: tests
     # There is always a request object
     - message: '#^Cannot access property \$attributes on Symfony\\Component\\HttpFoundation\\Request|null.$#'
       path: src/Security/Provider/UserProvider.php
+    # Symfony parameter handling
     - message: '#^Cannot cast array<string>|bool|string|null to int.$#'
       path: src/Command

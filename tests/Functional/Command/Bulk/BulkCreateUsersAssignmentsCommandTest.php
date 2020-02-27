@@ -25,7 +25,7 @@ namespace App\Tests\Functional\Command\Bulk;
 use App\Command\Bulk\BulkCreateUsersAssignmentsCommand;
 use App\Entity\Assignment;
 use App\Entity\User;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,7 +34,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
     /** @var CommandTester */
@@ -44,15 +44,15 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
+
+        $this->setUpDatabase();
         $this->setUpTestLogHandler();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(BulkCreateUsersAssignmentsCommand::NAME));
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
-        ]);
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItCanCreateNewAssignmentsForUsersAlreadyHavingAssignments(): void
@@ -159,7 +159,7 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
                 'source' => 'local',
                 'path' => __DIR__ . '/../../../Resources/Assignment/100-users-with-5-invalid.csv',
                 '--batch' => 3,
-                '--force' => 'true'
+                '--force' => 'true',
             ],
             [
                 'capture_stderr_separately' => true,

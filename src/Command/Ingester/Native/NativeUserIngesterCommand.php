@@ -28,6 +28,7 @@ use App\Entity\LineItem;
 use App\Entity\User;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -54,6 +55,9 @@ class NativeUserIngesterCommand extends Command
 
     /** @var EntityManagerInterface */
     private $entityManager;
+
+    /** @var UserRepository */
+    private $userRepository;
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
@@ -82,11 +86,13 @@ class NativeUserIngesterCommand extends Command
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
         EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
         UserPasswordEncoderInterface $passwordEncoder,
         string $kernelEnvironment
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->entityManager = $entityManager;
+        $this->userRepository = $userRepository;
         $this->passwordEncoder = $passwordEncoder;
         $this->kernelEnvironment = $kernelEnvironment;
 
@@ -219,8 +225,7 @@ class NativeUserIngesterCommand extends Command
      */
     private function getAvailableStartIndex(): int
     {
-        $index = $this->entityManager
-            ->getRepository(User::class)
+        $index = $this->userRepository
             ->createQueryBuilder('u')
             ->select('MAX(u.id)')
             ->getQuery()
