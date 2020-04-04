@@ -50,7 +50,8 @@ class ReplaceResultSourceIdExtractor
         $xml->registerXPathNamespace('x', $this->xmlNamespace);
 
         $sourceIdNodes = $xml->xpath(
-            '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
+            '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/' .
+            'x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
         );
 
         if (false === $sourceIdNodes || count($sourceIdNodes) !== 1 || !$sourceIdNodes[0] instanceof SimpleXMLElement) {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Security\Provider;
 
@@ -48,7 +48,7 @@ class UserProvider implements UserProviderInterface
     /**
      * @throws UsernameNotFoundException
      */
-    public function loadUserByUsername($username): UserInterface
+    public function loadUserByUsername(string $username): UserInterface
     {
         try {
             return $this->userRepository->getByUsernameWithAssignments($username);
@@ -79,7 +79,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function supportsClass($class): bool
+    public function supportsClass(string $class): bool
     {
         return User::class === $class;
     }

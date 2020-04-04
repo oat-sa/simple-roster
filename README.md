@@ -44,7 +44,7 @@ COMPOSER_HOME=~/.composer
 
 The environment is pre-configured with the `.env.docker` file, so all you have to do is to set up the containers:
 
-```bash
+```shell script
 $ docker-compose up -d
 ```
 
@@ -52,12 +52,17 @@ The application will be available at `https://simple-roster.docker.localhost` DN
 
 **Note:** If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to your localhost.
 
+To run tests in your docker container run:
+```shell script
+$ docker container exec -it simple-roster-phpfpm bash -c "APP_ENV=test bin/phpunit"
+```
+
 ### Local installation
 
 If you don't want to use docker, you have to create a local copy of the `.env` file:
 
-```bash
-$ cp .env.dist .env
+```shell script
+$ cp .env .env.local
 ```
 
 and then to define the environment variables according to your local environment, such as redis DNS, database url, etc. 
@@ -66,7 +71,7 @@ To see the full list of available environment variables please refer to the [dev
 
 To run the application with PHP's built-in web-server just launch:
 
-```bash
+```shell script
  $ bin/console server:start
 ```
 
@@ -97,7 +102,7 @@ For static code analysis we are using [PHPStan](https://github.com/phpstan/phpst
 
 Please make sure you run the following command every time before you push your changes:
 
-```bash
+```shell script
 $ vendor/bin/phpstan analyse --level=max
 ```
 
@@ -107,7 +112,7 @@ The expected level of combined test coverage (unit, integration and functional) 
 
 Please make sure you have full test coverage before you push your changes:
 
- ```bash
+ ```shell script
  $ vendor/bin/phpunit --coverage-text
  ```
 
@@ -119,7 +124,7 @@ We are also have minimum mutation score indicator threshold that must be respect
 
 Please make sure you run the following command every time before you push your changes:
 
-```bash
+```shell script
 $ vendor/bin/infection
 ```
 
@@ -148,4 +153,3 @@ The application currently offers the following CLI commands:
 ## Production environment
 
 For detailed application setup tests for production environment, please refer to the [DevOps documentation](docs/devops/devops-documentation.md).
-

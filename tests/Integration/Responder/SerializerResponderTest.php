@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Integration\Responder;
 
@@ -49,7 +49,7 @@ class SerializerResponderTest extends KernelTestCase
         $response = $this->createResponderInstance()->createJsonResponse($data);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertEquals(json_encode($data), $response->getContent());
+        $this->assertEquals(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
     }
 
     public function testCreateCustomJsonResponse(): void
@@ -64,7 +64,7 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
-        $this->assertEquals(json_encode($data), $response->getContent());
+        $this->assertEquals(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
     }
 
     public function testCreateDefaultErrorJsonResponse(): void
@@ -77,7 +77,7 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
@@ -91,7 +91,7 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals('custom error message', $decodedResponse['error']['message']);
     }
 
@@ -110,7 +110,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('header', $response->headers->get('some'));
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
@@ -124,7 +124,7 @@ class SerializerResponderTest extends KernelTestCase
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals('custom error message', $decodedResponse['error']['message']);
 
         $this->assertArrayHasKey(
@@ -144,7 +144,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals('custom error message', $decodedResponse['error']['message']);
     }
 
@@ -159,7 +159,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals('custom error message', $decodedResponse['error']['message']);
 
         $this->assertArrayHasKey(
@@ -180,7 +180,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
@@ -195,7 +195,7 @@ class SerializerResponderTest extends KernelTestCase
         $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
         $this->assertEquals('exceptionHeader', $response->headers->get('some'));
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals('custom error message', $decodedResponse['error']['message']);
 
         $this->assertArrayHasKey(

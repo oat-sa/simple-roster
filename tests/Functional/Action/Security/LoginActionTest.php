@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Security;
 
@@ -55,12 +55,18 @@ class LoginActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['username' => 'invalid', 'password' => 'invalid'])
+            json_encode(['username' => 'invalid', 'password' => 'invalid'], JSON_THROW_ON_ERROR, 512)
         );
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals('Invalid credentials.', $decodedResponse['error']);
     }
 
@@ -74,7 +80,7 @@ class LoginActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['username' => 'user1', 'password' => 'password'])
+            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
         );
 
         $this->assertEquals(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());

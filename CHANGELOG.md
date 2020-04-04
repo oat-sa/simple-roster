@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.0.0 - TODO: To be released
+
+### Added
+- Added dedicated `docker` application environment for development purposes.
+- Added Pull Request CI pipeline with Jenkins including:
+    - Running PHPUnit test suite
+    - Running PHPUnit code coverage checker
+    - Running mutation tests with Infection
+    - Running static code analysis with PHPStan and PHP CodeSniffer
+- Added package dependency security checker into composer. 
+
+### Changed
+- Increased PHP version requirements from `7.2` to `7.3`.
+- Upgraded Symfony framework version from `4` to `5`.
+- Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
+- Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
+- Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.
+- Changed Doctrine's ORM naming strategy from `underscore` to `underscore_number_aware`.
+- Reworked `README.md` structure for better readability.
+- Changed doctrine ORM mapping driver from `yaml` to `xml`.
+
+### Fixed
+- Reverted temporary PHPUnit fix done in version `1.4.1`.
+- Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
+- Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
+- Fixed all static code analysis issues, achieving maximum quality strictness level.
+
 ## 1.7.0 - 2020-09-16
 
 ### Added
@@ -8,6 +35,7 @@
 ### Fixed
 - Fixed [security breach](https://symfony.com/blog/cve-2020-15094-prevent-rce-when-calling-untrusted-remote-with-cachinghttpclient) by updating symfony/http-kernel to version 4.4.13. 
 - Fixed issue where attemptCount was always returning same value.
+
 
 ## 1.6.2 - 2020-09-03
 

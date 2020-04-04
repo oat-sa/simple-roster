@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,13 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Command\GarbageCollector;
 
 use App\Entity\Assignment;
 use App\Repository\AssignmentRepository;
+use ArrayIterator;
 use Carbon\Carbon;
 use DateInterval;
 use Exception;
@@ -66,7 +67,7 @@ class AssignmentGarbageCollectorCommand extends Command
         $this->cleanUpInterval = new DateInterval($cleanUpInterval);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -137,8 +138,14 @@ class AssignmentGarbageCollectorCommand extends Command
                 $batchSize
             );
 
+            /** @var ArrayIterator $stuckAssignmentsIterator */
+            $stuckAssignmentsIterator = $stuckAssignments->getIterator();
+            $assignmentCount = $stuckAssignmentsIterator->count();
+
+            $logMessagePlaceholder =
+                "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.";
+
             /** @var Assignment $assignment */
-            $assignmentCount = $stuckAssignments->getIterator()->count();
             foreach ($stuckAssignments as $assignment) {
                 $assignment->complete();
 
@@ -149,7 +156,7 @@ class AssignmentGarbageCollectorCommand extends Command
                 $numberOfCollectedAssignments++;
                 $this->logger->info(
                     sprintf(
-                        "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.",
+                        $logMessagePlaceholder,
                         $assignment->getId(),
                         $assignment->getUser()->getUsername(),
                         $assignment->getState()

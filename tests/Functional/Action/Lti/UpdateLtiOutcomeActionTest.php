@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Lti;
 
@@ -72,7 +72,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -90,7 +90,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($infrastructure, (string)$time);
 
-        /** @var string $xmlBody **/
+        /** @var string $xmlBody * */
         $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
@@ -105,7 +105,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -143,7 +143,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -184,7 +184,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
