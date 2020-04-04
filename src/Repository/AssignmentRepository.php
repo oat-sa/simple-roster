@@ -23,7 +23,6 @@ use App\Entity\Assignment;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)
