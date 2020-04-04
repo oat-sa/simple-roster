@@ -21,7 +21,7 @@ namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\LineItemIngester;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class LineItemIngesterTest extends TestCase
 {

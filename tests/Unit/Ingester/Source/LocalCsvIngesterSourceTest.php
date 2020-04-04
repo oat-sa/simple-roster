@@ -20,7 +20,7 @@
 namespace App\Tests\Unit\Ingester\Source;
 
 use App\Ingester\Source\LocalCsvIngesterSource;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class LocalCsvIngesterSourceTest extends TestCase
 {

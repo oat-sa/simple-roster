@@ -23,7 +23,7 @@ use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -39,7 +39,7 @@ class UserRepository extends AbstractRepository
     /** @var int */
     private $userCacheTtl;
 
-    public function __construct(RegistryInterface $registry, UserCacheIdGenerator $userCacheIdGenerator, int $userCacheTtl)
+    public function __construct(ManagerRegistry $registry, UserCacheIdGenerator $userCacheIdGenerator, int $userCacheTtl)
     {
         parent::__construct($registry, User::class);
 

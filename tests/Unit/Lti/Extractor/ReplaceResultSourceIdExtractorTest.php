@@ -21,7 +21,7 @@ namespace App\Tests\Unit\Lti\Extractor;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
 use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {

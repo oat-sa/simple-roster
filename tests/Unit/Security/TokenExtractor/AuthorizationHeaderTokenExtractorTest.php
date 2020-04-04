@@ -20,7 +20,7 @@
 namespace App\Tests\Unit\Security\TokenExtractor;
 
 use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthorizationHeaderTokenExtractorTest extends TestCase

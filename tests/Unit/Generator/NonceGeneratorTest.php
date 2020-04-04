@@ -21,7 +21,7 @@ namespace App\Tests\Unit\Generator;
 
 use App\Generator\NonceGenerator;
 use Carbon\Carbon;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class NonceGeneratorTest extends TestCase
 {
