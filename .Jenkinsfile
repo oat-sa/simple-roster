@@ -30,10 +30,6 @@ pipeline {
                     script: './bin/console cache:warmup --env=test'
                 )
                 sh(
-                    label: 'Running static code analysis - PHPStan',
-                    script: './vendor/bin/phpstan analyse --level=max'
-                )
-                sh(
                     label: 'Running static code analysis - PHP CodeSniffer',
                     script: './vendor/bin/phpcs -p'
                 )
@@ -44,6 +40,10 @@ pipeline {
                 sh(
                     label: 'PHPUnit - Checking test coverage',
                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+                )
+                sh(
+                    label: 'Running static code analysis - PHPStan',
+                    script: './vendor/bin/phpstan analyse --level=max'
                 )
             }
         }
