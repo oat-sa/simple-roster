@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.0 - TODO: To be released
+## 2.0.0 - TODO: To be released
 
 ### Added
 - Added dedicated `docker` application environment for development purposes.
@@ -8,10 +8,12 @@
     - Running PHPUnit test suite
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
-    - Running static code analysis with PHPStan
+    - Running static code analysis with PHPStan and PHP CodeSniffer
 - Added package dependency security checker into composer. 
 
 ### Changed
+- Increased PHP version requirements from `7.2` to `7.3`.
+- Upgraded Symfony framework version from `4` to `5`.
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
 - Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
 - Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.
@@ -24,6 +26,9 @@
 - Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
 - Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
 - Fixed all static code analysis issues, achieving maximum quality strictness level.
+
+### Removed
+- Removed `oat-sa/phing-tasks` composer dependency from `composer.json`.
 
 ## 1.4.2 - 2019-10-11
 

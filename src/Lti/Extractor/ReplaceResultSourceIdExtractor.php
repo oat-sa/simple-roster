@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Lti\Extractor;
 
@@ -42,7 +42,8 @@ class ReplaceResultSourceIdExtractor
         $xml->registerXPathNamespace('x', 'http://www.imsglobal.org/lis/oms1p0/pox');
 
         $sourceIdNodes = $xml->xpath(
-            '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
+            '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/' .
+            'x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
         );
 
         if (false === $sourceIdNodes || count($sourceIdNodes) !== 1 || !$sourceIdNodes[0] instanceof SimpleXMLElement) {

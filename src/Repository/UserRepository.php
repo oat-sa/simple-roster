@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -74,7 +74,7 @@ class UserRepository extends AbstractRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
-            ->useResultCache(true, $this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
+            ->enableResultCache($this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
 
         if (null === $user) {

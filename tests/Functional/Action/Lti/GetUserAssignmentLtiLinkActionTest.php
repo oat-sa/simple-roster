@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Lti;
 
@@ -86,7 +86,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
     }
 
@@ -105,7 +111,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals(
             "Assignment with id '1' does not have a suitable state.",
             $decodedResponse['error']['message']
@@ -122,7 +134,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] =
+            LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
@@ -152,7 +165,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -201,7 +214,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -217,7 +230,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] =
+            LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -258,7 +272,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'it-IT',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -280,7 +294,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->logInAs($user, $this->kernelBrowser);
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
-        $ltiRequestInResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $ltiRequestInResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
         $this->assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
         $this->assertHasRecordThatPasses(

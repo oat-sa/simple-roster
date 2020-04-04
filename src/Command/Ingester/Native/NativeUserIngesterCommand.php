@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Command\Ingester\Native;
 
@@ -165,10 +165,10 @@ class NativeUserIngesterCommand extends Command
 
         try {
             $source = $this->ingesterSourceRegistry
-                ->get($input->getArgument('source'))
-                ->setPath($input->getArgument('path'))
-                ->setDelimiter($input->getOption('delimiter'))
-                ->setCharset($input->getOption('charset'));
+                ->get((string)$input->getArgument('source'))
+                ->setPath((string)$input->getArgument('path'))
+                ->setDelimiter((string)$input->getOption('delimiter'))
+                ->setCharset((string)$input->getOption('charset'));
 
             $progressBar->setMaxSteps($source->count());
             $progressBar->start();

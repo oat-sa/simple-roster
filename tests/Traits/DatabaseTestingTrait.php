@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Traits;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
@@ -66,8 +66,11 @@ trait DatabaseTestingTrait
         return $this->getManagerRegistry()->getManager();
     }
 
-    protected function getRepository(string $class): ObjectRepository
+    /**
+     * @param class-string<mixed> $className
+     */
+    protected function getRepository(string $className): ObjectRepository
     {
-        return $this->getEntityManager()->getRepository($class);
+        return $this->getEntityManager()->getRepository($className);
     }
 }

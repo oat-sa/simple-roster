@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Request\ParamConverter;
 
@@ -67,7 +67,7 @@ class BulkOperationCollectionParamConverterTest extends TestCase
         $requestBodyContent = json_encode([
             ['identifier' => 'user1'],
             ['identifier' => 'user2'],
-        ]);
+        ], JSON_THROW_ON_ERROR, 512);
 
         $request = Request::create(
             '/test',

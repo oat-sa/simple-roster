@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Command\GarbageCollector;
 
@@ -97,10 +97,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
 
+        $logMessagePlaceholder =
+            "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.";
+
         for ($i = 1; $i <= 10; $i++) {
             $this->assertHasLogRecordWithMessage(
                 sprintf(
-                    "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.",
+                    $logMessagePlaceholder,
                     $i,
                     'userWithStartedButStuckAssignment_' . $i
                 ),

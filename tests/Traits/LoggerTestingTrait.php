@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Traits;
 
@@ -59,7 +59,7 @@ trait LoggerTestingTrait
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
                 Logger::getLevelName($level),
-                json_encode($record)
+                json_encode($record, JSON_THROW_ON_ERROR, 512)
             )
         );
     }

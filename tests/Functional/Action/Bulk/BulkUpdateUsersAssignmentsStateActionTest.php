@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Bulk;
 
@@ -67,7 +67,13 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
@@ -84,7 +90,13 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals(
             'Invalid JSON request body received. Error: Syntax error',
             $decodedResponse['error']['message']
@@ -99,12 +111,18 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode([])
+            json_encode([], JSON_THROW_ON_ERROR, 512)
         );
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals('Empty request body received.', $decodedResponse['error']['message']);
     }
 
@@ -119,9 +137,17 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT))
         );
 
-        $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(
+            Response::HTTP_REQUEST_ENTITY_TOO_LARGE,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
         $this->assertEquals(
             sprintf(
@@ -164,7 +190,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
                     ],
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         $this->assertCount(1, $this->getRepository(Assignment::class)->findAll());
@@ -205,7 +231,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
                     ],
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         $this->assertCount(1, $this->getRepository(Assignment::class)->findAll());
@@ -252,6 +278,6 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             ];
         }
 
-        return (string)json_encode($payload);
+        return (string)json_encode($payload, JSON_THROW_ON_ERROR, 512);
     }
 }

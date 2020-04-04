@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Request\ParamConverter;
 
 use App\Bulk\Operation\BulkOperation;
 use App\Bulk\Operation\BulkOperationCollection;
 use App\Http\Exception\RequestEntityTooLargeHttpException;
+use JsonException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,15 +63,22 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
         return BulkOperationCollection::class === $configuration->getClass();
     }
 
+    /**
+     * @throws BadRequestHttpException
+     * @throws RequestEntityTooLargeHttpException
+     */
     private function extractOperationsFromRequest(Request $request): array
     {
-        $operations = json_decode($request->getContent(), true);
-
-        if (json_last_error()) {
-            throw new BadRequestHttpException(sprintf(
-                'Invalid JSON request body received. Error: %s',
-                json_last_error_msg()
-            ));
+        try {
+            $operations = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $jsonException) {
+            throw new BadRequestHttpException(
+                sprintf(
+                    'Invalid JSON request body received. Error: %s',
+                    $jsonException->getMessage()
+                ),
+                $jsonException
+            );
         }
 
         if (empty($operations)) {
@@ -78,10 +86,12 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
         }
 
         if (count($operations) > static::BULK_OPERATIONS_LIMIT) {
-            throw new RequestEntityTooLargeHttpException(sprintf(
-                "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
-                static::BULK_OPERATIONS_LIMIT
-            ));
+            throw new RequestEntityTooLargeHttpException(
+                sprintf(
+                    "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
+                    static::BULK_OPERATIONS_LIMIT
+                )
+            );
         }
 
         return $operations;

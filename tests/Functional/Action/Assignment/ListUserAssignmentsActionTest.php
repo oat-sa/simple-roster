@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Assignment;
 
@@ -57,7 +57,13 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertEquals(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
@@ -94,7 +100,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
@@ -114,7 +120,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
             [
                 'assignments' => [],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 }

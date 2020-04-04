@@ -4,8 +4,9 @@
     "type": "project",
     "license": "GPL-2.0",
     "require": {
-        "php": "^7.2",
+        "php": "^7.3",
         "ext-ctype": "*",
+        "ext-redis": "*",
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-simplexml": "*",
@@ -13,42 +14,43 @@
         "aws/aws-sdk-php-symfony": "^2.0",
         "doctrine/annotations": "^1.6",
         "league/csv": "^9.0",
-        "nelmio/cors-bundle": "^1.5",
+        "nelmio/cors-bundle": "^2.0",
         "nesbot/carbon": "^2.11",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",
-        "symfony/browser-kit": "^4.0",
-        "symfony/console": "^4.0",
-        "symfony/dotenv": "^4.2",
+        "symfony/browser-kit": "^5.0",
+        "symfony/console": "^5.0",
+        "symfony/dotenv": "^5.0",
         "symfony/flex": "^1.1",
-        "symfony/framework-bundle": "^4.0",
+        "symfony/framework-bundle": "^5.0",
         "symfony/monolog-bundle": "^3.0",
         "symfony/orm-pack": "^1.0",
-        "symfony/property-access": "^4.0",
-        "symfony/property-info": "^4.0",
-        "symfony/proxy-manager-bridge": "^4.0",
-        "symfony/security-bundle": "^4.0",
-        "symfony/serializer": "^4.0",
-        "symfony/stopwatch": "^4.0",
-        "symfony/validator": "^4.0",
-        "symfony/yaml": "^4.0"
+        "symfony/property-access": "^5.0",
+        "symfony/property-info": "^5.0",
+        "symfony/proxy-manager-bridge": "^5.0",
+        "symfony/security-bundle": "^5.0",
+        "symfony/serializer": "^5.0",
+        "symfony/stopwatch": "^5.0",
+        "symfony/validator": "^5.0",
+        "symfony/yaml": "^5.0"
     },
     "require-dev": {
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "hautelook/alice-bundle": "^2.3",
-        "infection/infection": "^0.13",
+        "infection/infection": "^0.15",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan": "^0.11",
-        "phpstan/phpstan-doctrine": "^0.11",
-        "phpstan/phpstan-phpunit": "^0.11",
-        "phpstan/phpstan-symfony": "^0.11",
+        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-doctrine": "^0.12",
+        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan-symfony": "^0.12",
         "sensiolabs/security-checker": "^6.0",
-        "symfony/debug-bundle": "^4.0",
+        "squizlabs/php_codesniffer": "^3.5",
+        "symfony/debug-bundle": "^5.0",
         "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
-        "symfony/var-dumper": "^4.0",
+        "symfony/var-dumper": "^5.0",
         "symfony/web-server-bundle": "^4.0"
     },
     "config": {
@@ -93,7 +95,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "^4.0"
+            "require": "^5.0"
         }
     }
 }
