@@ -11,6 +11,7 @@ RUN apt-get update && \
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
 
 RUN yes | pecl install igbinary apcu xdebug
+RUN pecl install redis
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install intl && \
@@ -25,6 +26,7 @@ RUN docker-php-ext-install pdo && \
     docker-php-ext-install sodium && \
     docker-php-ext-enable apcu && \
     docker-php-ext-enable igbinary && \
+    docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug
 
 RUN { \
