@@ -2,7 +2,7 @@
 
 >REST back-end service intending to mimic a simplified version of OneRoster IMS specification.
 
-![current version](https://img.shields.io/badge/version-1.5.0-green.svg)
+![current version](https://img.shields.io/badge/version-2.0.0-green.svg)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 ![coverage](https://img.shields.io/badge/coverage-100%25-green.svg)
 
@@ -71,12 +71,16 @@ Please make sure you understand how it works before jumping into any development
 
 The application is built on top of the latest version of [Symfony](https://symfony.com/) PHP framework, and intends to follow it's best practices.
 
+### Code quality standards
+
 The project respects and follows the [PSR-12](https://www.php-fig.org/psr/psr-12/) extended coding style recommendations.
 Please make sure you have your [PHP CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) configured properly in your IDE. 
 
-### Code quality standards
+To run PHP CodeSniffer please run:
 
-The application has strict code quality requirements which must be respected in every Pull Request without exception.
+```shell script
+$ vendor/bin/phpcs -p
+```
 
 #### General rules
 
@@ -107,7 +111,7 @@ We are also have minimum mutation score indicator threshold that must be respect
 
 | Mutation metric                | Threshold |
 | -------------------------------| --------- |
-| Mutation Score Indicator (MSI) | 85%       |
+| Mutation Score Indicator (MSI) | 90%       |
 
 Please make sure you run the following command every time before you push your changes:
 

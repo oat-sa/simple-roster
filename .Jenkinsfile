@@ -34,11 +34,11 @@ pipeline {
                     script: './vendor/bin/phpcs -p'
                 )
                 sh(
-                    label: 'Infection - Running mutation testing',
-                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                    label: 'Running testing suite - PHPUnit & Infection',
+                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
                 sh(
-                    label: 'PHPUnit - Checking test coverage',
+                    label: 'Checking test coverage - PHPUnit',
                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
                 )
                 sh(
