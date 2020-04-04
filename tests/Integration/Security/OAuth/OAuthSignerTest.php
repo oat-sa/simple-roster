@@ -22,9 +22,9 @@ namespace App\Tests\Integration\Security\OAuth;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class OAuthSignerTest extends TestCase
+class OAuthSignerTest extends KernelTestCase
 {
     private const TIMESTAMP = '1549615519';
 

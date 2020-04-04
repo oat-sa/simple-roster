@@ -22,7 +22,7 @@ namespace App\Tests\Unit\Ingester\Registry;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class IngesterSourceRegistryTest extends TestCase
 {
