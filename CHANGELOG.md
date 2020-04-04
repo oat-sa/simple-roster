@@ -30,6 +30,12 @@
 ### Removed
 - Removed `oat-sa/phing-tasks` composer dependency from `composer.json`.
 
+## 1.4.3 - 2020-04-04
+
+### Security
+- Fixed [GHSA-g4m9-5hpf-hx72](https://github.com/advisories/GHSA-g4m9-5hpf-hx72) - Firewall configured with unanimous strategy was not actually unanimous in Symfony.
+- Fixed [GHSA-mcx4-f5f5-4859](https://github.com/advisories/GHSA-mcx4-f5f5-4859) - Prevent cache poisoning via a Response Content-Type header in Symfony.
+
 ## 1.4.2 - 2019-10-11
 
 ### Changed
