@@ -25,6 +25,7 @@ namespace App\Tests\Unit\Command\Cache;
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\UserRepository;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -35,10 +36,16 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
     {
         $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
 
+        $userRepository = $this->createMock(UserRepository::class);
         $userCacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
         $doctrineConfiguration = $this->createMock(Configuration::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
 
-        new DoctrineResultCacheWarmerCommand($userCacheIdGenerator, $doctrineConfiguration, $entityManager);
+        new DoctrineResultCacheWarmerCommand(
+            $userRepository,
+            $userCacheIdGenerator,
+            $doctrineConfiguration,
+            $entityManager
+        );
     }
 }

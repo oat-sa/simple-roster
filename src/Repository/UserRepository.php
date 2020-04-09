@@ -25,9 +25,13 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
+use App\Model\UsernameCollection;
+use App\ResultSet\UsernameResultSet;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use InvalidArgumentException;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -68,9 +72,9 @@ class UserRepository extends AbstractRepository
         $user = $this
             ->createQueryBuilder('u')
             ->select('u, a, l, i')
-            ->leftJoin('u.assignments', 'a')
-            ->leftJoin('a.lineItem', 'l')
-            ->leftJoin('l.infrastructure', 'i')
+            ->innerJoin('u.assignments', 'a')
+            ->innerJoin('a.lineItem', 'l')
+            ->innerJoin('l.infrastructure', 'i')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -82,5 +86,53 @@ class UserRepository extends AbstractRepository
         }
 
         return $user;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function findAllUsernamePaged(int $limit, int $lastUserId = null): UsernameResultSet
+    {
+        if ($limit < 1) {
+            throw new InvalidArgumentException("Invalid 'limit' parameter received.");
+        }
+
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->distinct()
+            ->select('u.id', 'u.username')
+            ->orderBy('u.id')
+            ->setMaxResults($limit + 1);
+
+        if (null !== $lastUserId) {
+            $queryBuilder
+                ->where('u.id > :lastUserId')
+                ->setParameter('lastUserId', $lastUserId);
+        }
+
+        $userIds = [];
+        $usernameCollection = new UsernameCollection();
+        $result = $queryBuilder->getQuery()->getResult();
+        foreach ($result as $row) {
+            if (count($usernameCollection) < $limit) {
+                $usernameCollection->add($row['username']);
+                $userIds[] = $row['id'];
+            }
+        }
+
+        return new UsernameResultSet(
+            $usernameCollection,
+            count($result) === $limit + 1,
+            $userIds[$limit - 1] ?? null
+        );
+    }
+
+    public function findAllUsernameByUserIdsPaged(int ...$userIds): Paginator
+    {
+        // TODO
+    }
+
+    public function findAllUsernameByLineItemIdsPaged(int ...$lineItemIds): Paginator
+    {
+        // TODO
     }
 }

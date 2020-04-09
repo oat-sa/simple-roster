@@ -161,8 +161,14 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
+    "pdepend/pdepend": {
+        "version": "2.7.1"
+    },
     "php": {
         "version": "7.3"
+    },
+    "phpmd/phpmd": {
+        "version": "2.8.2"
     },
     "phpstan/extension-installer": {
         "version": "1.0.1"

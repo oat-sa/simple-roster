@@ -91,4 +91,39 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->subject->getByUsernameWithAssignments('nonExistingUser');
     }
+
+    /**
+     * @dataProvider provideLimits
+     */
+    public function testItFindsAllUsernamePaged(int $limit): void
+    {
+        $lastUserId = null;
+        $userIdIndex = 0;
+        do {
+            $resultSet = $this->subject->findAllUsernamePaged($limit, $lastUserId);
+
+            $this->assertLessThanOrEqual($limit, count($resultSet));
+
+            foreach ($resultSet as $username) {
+                $userIdIndex++;
+                $this->assertSame(sprintf('user_%d', $userIdIndex), $username);
+            }
+
+            $lastUserId = $resultSet->getLastUserId();
+        } while ($resultSet->hasMore());
+
+        $this->assertSame(100, $userIdIndex);
+    }
+
+    public function provideLimits(): array
+    {
+        return [
+            'limit_1' => [1],
+            'limit_3' => [3],
+            'limit_10' => [10],
+            'limit_99' => [99],
+            'limit_100' => [100],
+            'limit_101' => [101],
+        ];
+    }
 }

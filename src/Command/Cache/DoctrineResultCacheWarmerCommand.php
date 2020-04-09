@@ -79,6 +79,7 @@ class DoctrineResultCacheWarmerCommand extends Command
      * @throws DoctrineResultCacheImplementationNotFoundException
      */
     public function __construct(
+        UserRepository $userRepository,
         UserCacheIdGenerator $userCacheIdGenerator,
         Configuration $doctrineConfiguration,
         EntityManagerInterface $entityManager
@@ -97,9 +98,6 @@ class DoctrineResultCacheWarmerCommand extends Command
         }
 
         $this->resultCacheImplementation = $resultCacheImplementation;
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->entityManager->getRepository(User::class);
         $this->userRepository = $userRepository;
     }
 
@@ -186,25 +184,22 @@ class DoctrineResultCacheWarmerCommand extends Command
         $progressBar->setMaxSteps($numberOfTotalUsers);
         $progressBar->start();
 
+        $lastUserId = null;
         do {
-            $iterateResult = $this
-                ->getFindAllUsernameQuery($offset)
-                ->iterate();
+            $resultSet = $this->userRepository->findAllUsernamePaged($this->batchSize, $lastUserId);
 
-            foreach ($iterateResult as $row) {
-                $this->warmUpResultCacheForUserName(current($row)['username']);
+            foreach ($resultSet as $username) {
+                $this->warmUpResultCacheForUserName($username);
 
                 $numberOfWarmedUpCacheEntries++;
-
-                unset($row);
             }
 
             if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
                 $progressBar->advance($this->batchSize);
             }
 
-            $offset += $this->batchSize;
-        } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+            $lastUserId = $resultSet->getLastUserId();
+        } while ($resultSet->hasMore());
 
         $progressBar->finish();
 
@@ -248,6 +243,9 @@ class DoctrineResultCacheWarmerCommand extends Command
             ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
     }
 
+    /**
+     * @todo to repository
+     */
     private function getNumberOfTotalUsers(): int
     {
         $queryBuilder =

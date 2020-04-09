@@ -84,18 +84,20 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
     private function processResult(BulkResult $result): BulkResult
     {
-        if (!$result->hasFailures()) {
-            $this->entityManager->flush();
-            $this->entityManager->commit();
-
-            foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info(
-                    $logRecord['message'],
-                    ['lineItem' => $logRecord['lineItem']]
-                );
-            }
-        } else {
+        if ($result->hasFailures()) {
             $this->entityManager->rollback();
+
+            return $result;
+        }
+
+        $this->entityManager->flush();
+        $this->entityManager->commit();
+
+        foreach ($this->logBuffer as $logRecord) {
+            $this->logger->info(
+                $logRecord['message'],
+                ['lineItem' => $logRecord['lineItem']]
+            );
         }
 
         return $result;
