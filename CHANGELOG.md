@@ -14,6 +14,7 @@
 ### Changed
 - Increased PHP version requirements from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
+- Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
 - Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
 - Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.

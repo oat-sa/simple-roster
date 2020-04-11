@@ -6,10 +6,10 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 ![coverage](https://img.shields.io/badge/coverage-100%25-green.svg)
 
-`OneRoster` solves a school’s need to securely and reliably exchange roster information, course materials and grades between systems. 
+*IMS OneRoster* solves a school’s need to securely and reliably exchange roster information, course materials and grades between systems. 
 OneRoster supports the commonly used .csv mode for exchange and the latest real-time web services mode known as REST.  
 
-To learn more about `OneRoster`, please refer to the official specification at [IMS Global](https://www.imsglobal.org/activity/onerosterlis).
+To learn more about *IMS OneRoster*, please refer to the official specification at [IMS Global](https://www.imsglobal.org/activity/onerosterlis).
 
 ## Table of Contents
 
@@ -26,23 +26,25 @@ To learn more about `OneRoster`, please refer to the official specification at [
 
 ### Docker environment
 
-The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
-In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
-
 The environment is pre-configured with the `.env.docker` file, so all you have to do is to set up the containers:
 
 ```shell script
 $ docker-compose up -d
 ```
 
-The application will be available at `https://simple-roster.docker.localhost` DNS host.
+And install the dependencies:
 
-**Note:** If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to your localhost.
-
-To run tests in your docker container run:
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "APP_ENV=test bin/phpunit"
+$ docker container exec -it simple-roster-phpfpm composer install
 ```
+
+The application is *NOT* exposed on any port by default.
+
+The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
+In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
+
+> The application will be automatically available at `https://simple-roster.docker.localhost` DNS host.
+> If your system cannot resolve `.docker.localhost` domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to your localhost.
 
 ### Local installation
 
@@ -64,6 +66,12 @@ To run the application with PHP's built-in web-server just launch:
 
 **Note:** If you want to run the application using your own web-server, please refer to Symfony's official [documentation](https://symfony.com/doc/current/setup/web_server_configuration.html) about web server configuration.
 
+To install dependencies run:
+
+```shell script
+$ composer install
+```
+
 ## Development guidelines
 
 For development workflow we are using [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
@@ -76,10 +84,10 @@ The application is built on top of the latest version of [Symfony](https://symfo
 The project respects and follows the [PSR-12](https://www.php-fig.org/psr/psr-12/) extended coding style recommendations.
 Please make sure you have your [PHP CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) configured properly in your IDE. 
 
-To run PHP CodeSniffer please run:
+To run PHP CodeSniffer in your docker container run:
 
 ```shell script
-$ vendor/bin/phpcs -p
+$ docker container exec -it simple-roster-phpfpm vendor/bin/phpcs -p
 ```
 
 #### General rules
@@ -91,32 +99,37 @@ Please make sure you have it configured properly in your IDE.
 
 For static code analysis we are using [PHPStan](https://github.com/phpstan/phpstan). The expected strictness level is `max`.
 
-Please make sure you run the following command every time before you push your changes:
+To run static code analysis with PHPStan in your docker container run:
 
 ```shell script
-$ vendor/bin/phpstan analyse --level=max
+$ docker container exec -it simple-roster-phpfpm vendor/bin/phpstan analyse --level=max
 ```
 
 #### Test metrics
 
-The expected level of combined test coverage (unit, integration and functional) is `100%`, without exception.
+To run tests in your docker container run:
+```shell script
+$ docker container exec -it simple-roster-phpfpm bash -c "APP_ENV=test bin/phpunit"
+```
 
-Please make sure you have full test coverage before you push your changes:
+The expected level of combined test coverage (unit, integration and functional) is `100%`.
+
+Please make sure you have the required test coverage before you push your changes:
 
  ```shell script
- $ vendor/bin/phpunit --coverage-text
+ $ docker container exec -it simple-roster-phpfpm bash -c "APP_ENV=test bin/phpunit --coverage-text"
  ```
 
-We are also have minimum mutation score indicator threshold that must be respected.
+You can find the mutation score requirements below:
 
 | Mutation metric                | Threshold |
 | -------------------------------| --------- |
 | Mutation Score Indicator (MSI) | 90%       |
 
-Please make sure you run the following command every time before you push your changes:
+To execute mutation tests run:
 
 ```shell script
-$ vendor/bin/infection
+$ docker container exec -it simple-roster-phpfpm bash -c "APP_ENV=test vendor/bin/infection --threads=$(nproc)"
 ```
 
 To learn more about mutation testing, please refer to the official documentation of [Infection](https://infection.github.io/) mutation testing framework.
