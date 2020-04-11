@@ -24,10 +24,12 @@ namespace App\Tests\Integration\Repository;
 
 use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\Criteria\FindUserCriteria;
 use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
@@ -59,7 +61,7 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItCanGetUserWithAssignmentsByUsername(): void
     {
-        $user = $this->subject->getByUsernameWithAssignments('user_1');
+        $user = $this->subject->findByUsernameWithAssignments('user_1');
 
         $this->assertSame('user_1', $user->getUsername());
         $this->assertCount(1, $user->getAssignments());
@@ -72,7 +74,7 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->assertFalse($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
 
-        $this->subject->getByUsernameWithAssignments($username);
+        $this->subject->findByUsernameWithAssignments($username);
 
         $this->assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
     }
@@ -82,20 +84,28 @@ class UserRepositoryTest extends KernelTestCase
         $this->expectException(InvalidUsernameException::class);
         $this->expectExceptionMessage('Empty username received.');
 
-        $this->subject->getByUsernameWithAssignments('');
+        $this->subject->findByUsernameWithAssignments('');
     }
 
     public function testItThrowsExceptionIfUserCannotBeFound(): void
     {
         $this->expectException(EntityNotFoundException::class);
 
-        $this->subject->getByUsernameWithAssignments('nonExistingUser');
+        $this->subject->findByUsernameWithAssignments('nonExistingUser');
+    }
+
+    public function testItThrowsExceptionIfInvalidLimitProvided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'limit' parameter received.");
+
+        $this->subject->findAllUsernamePaged(0, null);
     }
 
     /**
      * @dataProvider provideLimits
      */
-    public function testItFindsAllUsernamePaged(int $limit): void
+    public function testItCanFindAllUsernamesPaged(int $limit): void
     {
         $lastUserId = null;
         $userIdIndex = 0;
@@ -113,6 +123,27 @@ class UserRepositoryTest extends KernelTestCase
         } while ($resultSet->hasMore());
 
         $this->assertSame(100, $userIdIndex);
+    }
+
+    public function testItCanCountUsers(): void
+    {
+        $this->assertSame(100, $this->subject->countByCriteria());
+    }
+
+    public function testItCanCountUsersByUsernameCriteria(): void
+    {
+        $criteria = (new FindUserCriteria())
+            ->addUsernameCriterion('user_1', 'user_10', 'user_73', 'user_88');
+
+        $this->assertSame(4, $this->subject->countByCriteria($criteria));
+    }
+
+    public function testItCanCountUsersByLineItemSlugCriteria(): void
+    {
+        $criteria = (new FindUserCriteria())
+            ->addLineItemSlugCriterion('lineItemSlug2', 'lineItemSlug3');
+
+        $this->assertSame(50, $this->subject->countByCriteria($criteria));
     }
 
     public function provideLimits(): array

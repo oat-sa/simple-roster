@@ -23,8 +23,11 @@ declare(strict_types=1);
 namespace App\ResultSet;
 
 use App\Model\UsernameCollection;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
 
-class UsernameResultSet implements \Countable, \IteratorAggregate
+class UsernameResultSet implements Countable, IteratorAggregate
 {
     /** @var UsernameCollection */
     private $collection;
@@ -52,12 +55,12 @@ class UsernameResultSet implements \Countable, \IteratorAggregate
         return $this->lastUserId;
     }
 
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return $this->collection->getIterator();
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->collection);
     }

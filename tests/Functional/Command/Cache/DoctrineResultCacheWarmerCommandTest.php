@@ -114,12 +114,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         }
     }
 
-    public function testItCanWarmUpResultCacheByListOfUsers(): void
+    public function testItCanWarmUpResultCacheByListOfUsernames(): void
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
-                '--user-ids' => '1,2,3,4,5,6,7,8,9,10',
+                '--usernames' => 'user_1,user_2,user_3,user_4,user_5,user_6,user_7,user_8,user_9,user_10',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -146,12 +146,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
-    public function testItCanWarmUpResultCacheByListOfLineItems(): void
+    public function testItCanWarmUpResultCacheByListOfLineItemSlugs(): void
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
-                '--line-item-ids' => '1,2',
+                '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -182,7 +182,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         $this->assertEquals(0, $this->commandTester->execute(
             [
-                '--line-item-ids' => '999',
+                '--line-item-slugs' => 'invalid',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -199,14 +199,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "'user-ids' and 'line-item-ids' are exclusive options, please specify only one of them"
+            "'usernames' and 'line-item-slugs' are exclusive options, please specify only one of them"
         );
 
         $this->commandTester->execute(
             [
                 '--batch-size' => '1',
-                '--user-ids' => '61,62,63',
-                '--line-item-ids' => '1,2',
+                '--usernames' => 'user_61,user_62,user_63',
+                '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -235,11 +235,11 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     public function testItThrowsExceptionIfInvalidUserIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid 'user-ids' option received.");
+        $this->expectExceptionMessage("Invalid 'usernames' option received.");
 
         $this->commandTester->execute(
             [
-                '--user-ids' => $invalidOptionValue,
+                '--usernames' => $invalidOptionValue,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -253,11 +253,11 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid 'line-item-ids' option received.");
+        $this->expectExceptionMessage("Invalid 'line-item-slugs' option received.");
 
         $this->commandTester->execute(
             [
-                '--line-item-ids' => $invalidOptionValue,
+                '--line-item-slugs' => $invalidOptionValue,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -268,7 +268,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     public function provideInvalidFilterOption(): array
     {
         return [
-            ['adsffdsfs'],
             [','],
             [',,,,,,'],
         ];

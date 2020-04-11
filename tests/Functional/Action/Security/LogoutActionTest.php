@@ -51,7 +51,7 @@ class LogoutActionTest extends WebTestCase
     public function testItLogsOutProperlyTheUser(): void
     {
         $userRepository = self::$container->get(UserRepository::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 

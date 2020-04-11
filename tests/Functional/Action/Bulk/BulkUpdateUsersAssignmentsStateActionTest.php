@@ -164,7 +164,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_PATCH,
@@ -209,7 +209,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_PATCH,
@@ -238,7 +238,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
+        $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->assertEquals(Assignment::STATE_CANCELLED, $reloadedUser->getLastAssignment()->getState());
         $this->assertCount(0, $reloadedUser->getAvailableAssignments());
@@ -248,7 +248,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_PATCH,

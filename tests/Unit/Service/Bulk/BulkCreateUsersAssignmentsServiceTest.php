@@ -71,7 +71,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->setLineItem(new LineItem()));
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($user) {
                 return $user->setUsername($username);
             });
@@ -97,7 +97,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) {
                 return (new User())
                     ->setUsername($username)

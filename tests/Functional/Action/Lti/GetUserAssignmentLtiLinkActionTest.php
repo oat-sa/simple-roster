@@ -78,7 +78,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -100,7 +100,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
         $this->getEntityManager()->flush();
@@ -130,7 +130,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -179,7 +179,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -237,7 +237,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -286,7 +286,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);

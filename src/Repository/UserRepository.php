@@ -26,11 +26,11 @@ use App\Entity\User;
 use App\Exception\InvalidUsernameException;
 use App\Generator\UserCacheIdGenerator;
 use App\Model\UsernameCollection;
+use App\Repository\Criteria\FindUserCriteria;
 use App\ResultSet\UsernameResultSet;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use InvalidArgumentException;
 
 /**
@@ -63,7 +63,7 @@ class UserRepository extends AbstractRepository
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
-    public function getByUsernameWithAssignments(string $username): User
+    public function findByUsernameWithAssignments(string $username): User
     {
         if (empty($username)) {
             throw new InvalidUsernameException('Empty username received.');
@@ -91,10 +91,17 @@ class UserRepository extends AbstractRepository
     /**
      * @throws InvalidArgumentException
      */
-    public function findAllUsernamePaged(int $limit, int $lastUserId = null): UsernameResultSet
-    {
+    public function findAllUsernamePaged(
+        int $limit,
+        ?int $lastUserId,
+        FindUserCriteria $criteria = null
+    ): UsernameResultSet {
         if ($limit < 1) {
             throw new InvalidArgumentException("Invalid 'limit' parameter received.");
+        }
+
+        if (null === $criteria) {
+            $criteria = new FindUserCriteria();
         }
 
         $queryBuilder = $this->createQueryBuilder('u')
@@ -107,6 +114,21 @@ class UserRepository extends AbstractRepository
             $queryBuilder
                 ->where('u.id > :lastUserId')
                 ->setParameter('lastUserId', $lastUserId);
+        }
+
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->innerJoin('u.assignments', 'a')
+                ->innerJoin('a.lineItem', 'l')
+                ->innerJoin('l.infrastructure', 'i')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }
 
         $userIds = [];
@@ -126,13 +148,34 @@ class UserRepository extends AbstractRepository
         );
     }
 
-    public function findAllUsernameByUserIdsPaged(int ...$userIds): Paginator
+    public function countByCriteria(FindUserCriteria $criteria = null): int
     {
-        // TODO
-    }
+        if (!$criteria) {
+            $criteria = new FindUserCriteria();
+        }
 
-    public function findAllUsernameByLineItemIdsPaged(int ...$lineItemIds): Paginator
-    {
-        // TODO
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('COUNT(u.id) AS number_of_users');
+
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->leftJoin('u.assignments', 'a')
+                ->leftJoin('a.lineItem', 'l')
+                ->leftJoin('l.infrastructure', 'i')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        $result = $queryBuilder
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return null === $result ? 0 : (int)$result['number_of_users'];
     }
 }

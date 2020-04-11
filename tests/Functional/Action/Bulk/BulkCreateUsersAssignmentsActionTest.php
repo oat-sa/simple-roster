@@ -163,7 +163,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -206,7 +206,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();
 
         $this->kernelBrowser->request(
@@ -236,7 +236,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
+        $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
         $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
@@ -249,7 +249,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,

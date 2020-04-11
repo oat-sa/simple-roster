@@ -23,15 +23,14 @@ declare(strict_types=1);
 namespace App\Command\Cache;
 
 use App\Command\CommandProgressBarFormatterTrait;
-use App\Entity\User;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\Criteria\FindUserCriteria;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Query;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,8 +44,8 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     public const NAME = 'roster:doctrine-result-cache:warmup';
 
-    private const OPTION_USER_IDS = 'user-ids';
-    private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
+    private const OPTION_USERNAMES = 'usernames';
+    private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_BATCH_SIZE = 'batch-size';
 
     private const DEFAULT_BATCH_SIZE = 1000;
@@ -69,11 +68,11 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var int */
     private $batchSize;
 
-    /** @var array int[] */
-    private $userIds = [];
+    /** @var array string[] */
+    private $usernames = [];
 
     /** @var array */
-    private $lineItemIds = [];
+    private $lineItemSlugs = [];
 
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
@@ -88,7 +87,6 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
         $this->entityManager = $entityManager;
-
         $resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
 
         if ($resultCacheImplementation === null) {
@@ -116,17 +114,17 @@ class DoctrineResultCacheWarmerCommand extends Command
         );
 
         $this->addOption(
-            self::OPTION_USER_IDS,
+            self::OPTION_USERNAMES,
             'u',
             InputOption::VALUE_REQUIRED,
-            'User id list filter.'
+            'Username filter.'
         );
 
         $this->addOption(
-            self::OPTION_LINE_ITEM_IDS,
+            self::OPTION_LINE_ITEM_SLUGS,
             'l',
             InputOption::VALUE_REQUIRED,
-            'Line item id list filter.'
+            'Line item slug filter.'
         );
     }
 
@@ -140,20 +138,20 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->initializeBatchSizeOption($input);
 
-        if ($input->getOption(self::OPTION_USER_IDS)) {
-            $this->initializeUserIdsOption($input);
+        if ($input->getOption(self::OPTION_USERNAMES)) {
+            $this->initializeUsernamesOption($input);
         }
 
-        if ($input->getOption(self::OPTION_LINE_ITEM_IDS)) {
+        if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS)) {
             $this->initializeLineItemIdsOption($input);
         }
 
-        if (!empty($this->userIds) && !empty($this->lineItemIds)) {
+        if (!empty($this->usernames) && !empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
                 sprintf(
                     "'%s' and '%s' are exclusive options, please specify only one of them",
-                    self::OPTION_USER_IDS,
-                    self::OPTION_LINE_ITEM_IDS
+                    self::OPTION_USERNAMES,
+                    self::OPTION_LINE_ITEM_SLUGS
                 )
             );
         }
@@ -164,12 +162,12 @@ class DoctrineResultCacheWarmerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $offset = 0;
         $numberOfWarmedUpCacheEntries = 0;
 
         $this->symfonyStyle->note('Calculating total number of entries to warm up...');
 
-        $numberOfTotalUsers = $this->getNumberOfTotalUsers();
+        $criteria = $this->getFindUserCriteria();
+        $numberOfTotalUsers = $this->userRepository->countByCriteria($criteria);
 
         if ($numberOfTotalUsers === 0) {
             $this->symfonyStyle->success('No matching cache entries, exiting.');
@@ -186,7 +184,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $lastUserId = null;
         do {
-            $resultSet = $this->userRepository->findAllUsernamePaged($this->batchSize, $lastUserId);
+            $resultSet = $this->userRepository->findAllUsernamePaged($this->batchSize, $lastUserId, $criteria);
 
             foreach ($resultSet as $username) {
                 $this->warmUpResultCacheForUserName($username);
@@ -213,67 +211,19 @@ class DoctrineResultCacheWarmerCommand extends Command
         return 0;
     }
 
-    private function getFindAllUsernameQuery(int $offset): Query
+    private function getFindUserCriteria(): FindUserCriteria
     {
-        $queryBuilder = $this->entityManager
-            ->createQueryBuilder()
-            ->select('u.username')
-            ->from(User::class, 'u');
+        $criteria = new FindUserCriteria();
 
-        if (!empty($this->userIds)) {
-            $queryBuilder
-                ->where('u.id IN (:userIds)')
-                ->setParameter('userIds', $this->userIds);
+        if (!empty($this->usernames)) {
+            $criteria->addUsernameCriterion(...$this->usernames);
         }
 
-        if ($this->lineItemIds) {
-            $queryBuilder
-                ->distinct()
-                ->leftJoin('u.assignments', 'a')
-                ->leftJoin('a.lineItem', 'l')
-                ->leftJoin('l.infrastructure', 'i')
-                ->where('l.id IN (:lineItemIds)')
-                ->setParameter('lineItemIds', $this->lineItemIds);
+        if (!empty($this->lineItemSlugs)) {
+            $criteria->addLineItemSlugCriterion(...$this->lineItemSlugs);
         }
 
-        return $queryBuilder
-            ->setFirstResult($offset)
-            ->setMaxResults($this->batchSize)
-            ->getQuery()
-            ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
-    }
-
-    /**
-     * @todo to repository
-     */
-    private function getNumberOfTotalUsers(): int
-    {
-        $queryBuilder =
-            $this->entityManager
-                ->createQueryBuilder()
-                ->select('COUNT(u.id) AS number_of_users')
-                ->from(User::class, 'u');
-
-        if ($this->userIds) {
-            $queryBuilder
-                ->where('u.id IN (:userIds)')
-                ->setParameter('userIds', $this->userIds);
-        }
-
-        if ($this->lineItemIds) {
-            $queryBuilder
-                ->leftJoin('u.assignments', 'a')
-                ->leftJoin('a.lineItem', 'l')
-                ->leftJoin('l.infrastructure', 'i')
-                ->where('l.id IN (:lineItemIds)')
-                ->setParameter('lineItemIds', $this->lineItemIds);
-        }
-
-        $result = $queryBuilder
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        return null === $result ? 0 : (int)$result['number_of_users'];
+        return $criteria;
     }
 
     private function warmUpResultCacheForUserName(string $username): void
@@ -282,7 +232,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->resultCacheImplementation->delete($resultCacheId);
 
         // Refresh by query
-        $user = $this->userRepository->getByUsernameWithAssignments($username);
+        $user = $this->userRepository->findByUsernameWithAssignments($username);
         $this->entityManager->clear();
 
         unset($user);
@@ -306,14 +256,16 @@ class DoctrineResultCacheWarmerCommand extends Command
      */
     private function initializeLineItemIdsOption(InputInterface $input): void
     {
-        $this->lineItemIds = array_filter(
-            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
-            'is_numeric'
+        $this->lineItemSlugs = array_filter(
+            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_SLUGS)),
+            static function ($value) {
+                return !empty($value) && is_string($value);
+            }
         );
 
-        if (empty($this->lineItemIds)) {
+        if (empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
-                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
+                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_SLUGS)
             );
         }
     }
@@ -321,16 +273,18 @@ class DoctrineResultCacheWarmerCommand extends Command
     /**
      * @throws InvalidArgumentException
      */
-    private function initializeUserIdsOption(InputInterface $input): void
+    private function initializeUsernamesOption(InputInterface $input): void
     {
-        $this->userIds = array_filter(
-            explode(',', (string)$input->getOption(self::OPTION_USER_IDS)),
-            'is_numeric'
+        $this->usernames = array_filter(
+            explode(',', (string)$input->getOption(self::OPTION_USERNAMES)),
+            static function ($value) {
+                return !empty($value) && is_string($value);
+            }
         );
 
-        if (empty($this->userIds)) {
+        if (empty($this->usernames)) {
             throw new InvalidArgumentException(
-                sprintf("Invalid '%s' option received.", self::OPTION_USER_IDS)
+                sprintf("Invalid '%s' option received.", self::OPTION_USERNAMES)
             );
         }
     }

@@ -87,7 +87,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+        $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         $lastAssignment = $user->getLastAssignment();
 

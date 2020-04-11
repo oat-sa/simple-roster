@@ -84,7 +84,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->addAssignment($expectedAssignment);
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn($expectedUser);
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -105,7 +105,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn(new User());
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -135,7 +135,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         );
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn(new User());
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -156,7 +156,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->addAssignment($completedAssignment);
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn($user);
 
         $bulkOperationCollection = (new BulkOperationCollection())->add($operation);

@@ -20,31 +20,53 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Repository\Criteria;
 
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
-
-class UsernameCollection implements Countable, IteratorAggregate
+class FindUserCriteria
 {
     /** @var string[] */
-    private $collection = [];
+    private $usernames = [];
 
-    public function add(string $username): self
+    /** @var string[] */
+    private $lineItemSlugs = [];
+
+    public function addUsernameCriterion(string ...$usernames): self
     {
-        $this->collection[] = $username;
+        $this->usernames = $usernames;
 
         return $this;
     }
 
-    public function getIterator(): ArrayIterator
+    /**
+     * @return string[]
+     */
+    public function getUsernameCriterion(): array
     {
-        return new ArrayIterator($this->collection);
+        return $this->usernames;
     }
 
-    public function count(): int
+    public function hasUsernameCriterion(): bool
     {
-        return count($this->collection);
+        return !empty($this->usernames);
+    }
+
+    public function addLineItemSlugCriterion(string ...$lineItemSlugs): self
+    {
+        $this->lineItemSlugs = $lineItemSlugs;
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLineItemSlugCriterion(): array
+    {
+        return $this->lineItemSlugs;
+    }
+
+    public function hasLineItemSlugCriterion(): bool
+    {
+        return !empty($this->lineItemSlugs);
     }
 }
