@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4 - 2020-04-14
+
+### Removed
+- Removed `oat-sa/phing-tasks` dependency from `composer.json`.
+
 ## 1.4.3 - 2020-04-04
 
 ### Security
