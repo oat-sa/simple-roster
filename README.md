@@ -32,13 +32,13 @@ The environment is pre-configured with the `.env.docker` file, so all you have t
 $ docker-compose up -d
 ```
 
-And install the dependencies:
+The application is *NOT* exposed on any port by default.
+
+To install dependencies:
 
 ```shell script
 $ docker container exec -it simple-roster-phpfpm composer install
 ```
-
-The application is *NOT* exposed on any port by default.
 
 The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
 In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.

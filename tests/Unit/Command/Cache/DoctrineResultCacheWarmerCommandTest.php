@@ -41,10 +41,13 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
         $doctrineConfiguration = $this->createMock(Configuration::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
 
+        $entityManager
+            ->method('getConfiguration')
+            ->willReturn($doctrineConfiguration);
+
         new DoctrineResultCacheWarmerCommand(
             $userRepository,
             $userCacheIdGenerator,
-            $doctrineConfiguration,
             $entityManager
         );
     }

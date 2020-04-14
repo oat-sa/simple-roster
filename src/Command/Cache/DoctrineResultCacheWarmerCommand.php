@@ -28,7 +28,6 @@ use App\Generator\UserCacheIdGenerator;
 use App\Repository\Criteria\FindUserCriteria;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
@@ -80,14 +79,13 @@ class DoctrineResultCacheWarmerCommand extends Command
     public function __construct(
         UserRepository $userRepository,
         UserCacheIdGenerator $userCacheIdGenerator,
-        Configuration $doctrineConfiguration,
         EntityManagerInterface $entityManager
     ) {
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
         $this->entityManager = $entityManager;
-        $resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
+        $resultCacheImplementation = $this->entityManager->getConfiguration()->getResultCacheImpl();
 
         if ($resultCacheImplementation === null) {
             throw new DoctrineResultCacheImplementationNotFoundException(

@@ -44,7 +44,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             UsernameLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME)
         );
     }
 
@@ -52,7 +52,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             UserGroupIdLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID)
         );
     }
 
