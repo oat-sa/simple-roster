@@ -25,6 +25,11 @@
 - Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
 - Fixed all static code analysis issues, achieving maximum quality strictness level.
 
+## 1.4.4 - 2020-04-14
+
+### Removed
+- Removed `oat-sa/phing-tasks` dependency from `composer.json`.
+
 ## 1.4.3 - 2020-04-04
 
 ### Security
