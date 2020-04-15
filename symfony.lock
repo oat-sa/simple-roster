@@ -198,7 +198,7 @@
         "version": "v1.0.6"
     },
     "php": {
-        "version": "7.3"
+        "version": "7.2"
     },
     "phpstan/extension-installer": {
         "version": "1.0.1"
