@@ -45,7 +45,8 @@ class AssignmentRepository extends AbstractRepository
     /**
      * @return Paginator|Assignment[]
      */
-    public function findByStateAndUpdatedAtPaged(string $state,
+    public function findByStateAndUpdatedAtPaged(
+        string $state,
         DateTime $updatedAt,
         int $offset = null,
         int $limit = null
