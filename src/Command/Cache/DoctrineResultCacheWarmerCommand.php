@@ -156,6 +156,8 @@ class DoctrineResultCacheWarmerCommand extends Command
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @throws ORMException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

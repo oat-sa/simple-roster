@@ -30,23 +30,23 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkCreateUsersAssignmentsAction
 {
     /** @var BulkCreateUsersAssignmentsService */
-    private $bulkCreateUsersAssignmentService;
+    private $bulkCreateAssignmentService;
 
     /** @var SerializerResponder */
     private $responder;
 
     public function __construct(
-        BulkCreateUsersAssignmentsService $bulkCreateUsersAssignmentService,
+        BulkCreateUsersAssignmentsService $bulkCreateAssignmentService,
         SerializerResponder $responder
     ) {
-        $this->bulkCreateUsersAssignmentService = $bulkCreateUsersAssignmentService;
+        $this->bulkCreateAssignmentService = $bulkCreateAssignmentService;
         $this->responder = $responder;
     }
 
     public function __invoke(BulkOperationCollection $operationCollection): Response
     {
         return $this->responder->createJsonResponse(
-            $this->bulkCreateUsersAssignmentService->process($operationCollection),
+            $this->bulkCreateAssignmentService->process($operationCollection),
             Response::HTTP_CREATED
         );
     }

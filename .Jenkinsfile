@@ -34,16 +34,20 @@ pipeline {
                     script: './vendor/bin/phpcs -p'
                 )
                 sh(
+                    label: 'Running static code analysis - PHPStan',
+                    script: './vendor/bin/phpstan analyse --level=max'
+                )
+                sh(
+                    label: 'Running static code analysis - PHPMD',
+                    script: './vendor/bin/phpmd src,tests json phpmd.xml'
+                )
+                sh(
                     label: 'Running testing suite - PHPUnit & Infection',
                     script: './vendor/bin/infection --threads=$(nproc) --min-msi=90 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
                 sh(
                     label: 'Checking test coverage - PHPUnit',
                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
-                )
-                sh(
-                    label: 'Running static code analysis - PHPStan',
-                    script: './vendor/bin/phpstan analyse --level=max'
                 )
             }
         }

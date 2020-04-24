@@ -24,13 +24,13 @@ namespace App\Command\Ingester\Native;
 
 use App\Command\CommandProgressBarFormatterTrait;
 use App\Entity\Assignment;
-use App\Entity\LineItem;
 use App\Entity\User;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
+use App\Repository\AssignmentRepository;
+use App\Repository\LineItemRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -39,6 +39,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Throwable;
 
@@ -58,6 +59,12 @@ class NativeUserIngesterCommand extends Command
 
     /** @var UserRepository */
     private $userRepository;
+
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
+
+    /** @var LineItemRepository */
+    private $lineItemRepository;
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
@@ -87,12 +94,16 @@ class NativeUserIngesterCommand extends Command
         IngesterSourceRegistry $ingesterSourceRegistry,
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
+        AssignmentRepository $assignmentRepository,
+        LineItemRepository $lineItemRepository,
         UserPasswordEncoderInterface $passwordEncoder,
         string $kernelEnvironment
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
+        $this->assignmentRepository = $assignmentRepository;
+        $this->lineItemRepository = $lineItemRepository;
         $this->passwordEncoder = $passwordEncoder;
         $this->kernelEnvironment = $kernelEnvironment;
 
@@ -158,6 +169,7 @@ class NativeUserIngesterCommand extends Command
     {
         $this->symfonyStyle->note('Starting user ingestion...');
 
+        $csvFilePath = (string)$input->getArgument('path');
         $resultSetMapping = new ResultSetMapping();
         $user = new User();
 
@@ -166,30 +178,40 @@ class NativeUserIngesterCommand extends Command
         try {
             $source = $this->ingesterSourceRegistry
                 ->get((string)$input->getArgument('source'))
-                ->setPath((string)$input->getArgument('path'))
+                ->setPath($csvFilePath)
                 ->setDelimiter((string)$input->getOption('delimiter'))
                 ->setCharset((string)$input->getOption('charset'));
 
-            $progressBar->setMaxSteps($source->count());
+            $process = new Process(['wc', '-l', $csvFilePath]);
+            $process->run();
+            $numberOfUsers = (int)$process->getOutput() - 1;
+
+            $progressBar->setMaxSteps($numberOfUsers);
             $progressBar->start();
 
-            $index = $this->getAvailableStartIndex();
-            $lineItemCollection = $this->fetchLineItems();
+            $index = $this->userRepository->findNextAvailableUserIndex();
+            $lineItemCollection = $this->lineItemRepository->findAll();
+
+            if ($lineItemCollection->isEmpty()) {
+                throw new Exception("Cannot native ingest 'user' since line-item table is empty.");
+            }
 
             foreach ($source->getContent() as $row) {
                 $this->userQueryParts[] = sprintf(
                     "(%s, '%s', '%s', '[]', '%s')",
                     $index,
                     $row['username'],
-                    $this->encodeUserPassword($user, $row['password']),
+                    $this->passwordEncoder->encodePassword($user, $row['password']),
                     $row['groupId'] ?? null
                 );
+
+                $lineItem = $lineItemCollection->getBySlug($row['slug']);
 
                 $this->assignmentQueryParts[] = sprintf(
                     "(%s, %s, %s, '%s')",
                     $index,
                     $index,
-                    $lineItemCollection[$row['slug']]->getId(),
+                    $lineItem->getId(),
                     Assignment::STATE_READY
                 );
 
@@ -212,26 +234,12 @@ class NativeUserIngesterCommand extends Command
             $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
-        } finally {
-            $this->refreshSequences($resultSetMapping);
-            $progressBar->finish();
         }
 
+        $this->refreshSequences($resultSetMapping);
+        $progressBar->finish();
+
         return 0;
-    }
-
-    /**
-     * @throws NonUniqueResultException
-     */
-    private function getAvailableStartIndex(): int
-    {
-        $index = $this->userRepository
-            ->createQueryBuilder('u')
-            ->select('MAX(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        return $index + 1;
     }
 
     private function executeNativeInsertions(ResultSetMapping $mapping): void
@@ -266,45 +274,8 @@ class NativeUserIngesterCommand extends Command
     private function refreshSequences(ResultSetMapping $mapping): void
     {
         if ($this->kernelEnvironment !== 'test' && !$this->isDryRun) {
-            $this->entityManager
-                ->createNativeQuery(
-                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
-                    $mapping
-                )
-                ->execute();
-
-            $this->entityManager
-                ->createNativeQuery(
-                    "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1) ) FROM users",
-                    $mapping
-                )
-                ->execute();
+            $this->assignmentRepository->refreshSequence($mapping);
+            $this->userRepository->refreshSequence($mapping);
         }
-    }
-
-    private function encodeUserPassword(User $user, string $value): string
-    {
-        return $this->passwordEncoder->encodePassword($user, $value);
-    }
-
-    /**
-     * @return LineItem[]
-     * @throws Exception
-     */
-    private function fetchLineItems(): array
-    {
-        /** @var LineItem[] $lineItems */
-        $lineItems = $this->entityManager->getRepository(LineItem::class)->findAll();
-
-        if (empty($lineItems)) {
-            throw new Exception("Cannot native ingest 'user' since line-item table is empty.");
-        }
-
-        $lineItemCollection = [];
-        foreach ($lineItems as $lineItem) {
-            $lineItemCollection[$lineItem->getSlug()] = $lineItem;
-        }
-
-        return $lineItemCollection;
     }
 }

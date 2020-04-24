@@ -30,23 +30,23 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkUpdateUsersAssignmentsStateAction
 {
     /** @var BulkUpdateUsersAssignmentsStateService */
-    private $bulkUpdateUsersAssignmentsStateService;
+    private $bulkAssignmentsStateService;
 
     /** @var SerializerResponder */
     private $responder;
 
     public function __construct(
-        BulkUpdateUsersAssignmentsStateService $bulkUpdateUsersAssignmentsStateService,
+        BulkUpdateUsersAssignmentsStateService $bulkUpdateAssignmentsStateService,
         SerializerResponder $responder
     ) {
-        $this->bulkUpdateUsersAssignmentsStateService = $bulkUpdateUsersAssignmentsStateService;
+        $this->bulkAssignmentsStateService = $bulkUpdateAssignmentsStateService;
         $this->responder = $responder;
     }
 
     public function __invoke(BulkOperationCollection $operationCollection): Response
     {
         return $this->responder->createJsonResponse(
-            $this->bulkUpdateUsersAssignmentsStateService->process($operationCollection)
+            $this->bulkAssignmentsStateService->process($operationCollection)
         );
     }
 }

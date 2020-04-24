@@ -26,11 +26,13 @@ use App\Entity\Assignment;
 use App\Entity\EntityInterface;
 use App\Entity\LineItem;
 use App\Entity\User;
+use App\Exception\LineItemNotFoundException;
+use App\Model\LineItemCollection;
 use Exception;
 
 class UserIngester extends AbstractIngester
 {
-    /** @var LineItem[] */
+    /** @var LineItemCollection */
     private $lineItemCollection;
 
     public function getRegistryItemName(): string
@@ -43,25 +45,23 @@ class UserIngester extends AbstractIngester
      */
     protected function prepare(): void
     {
-        /** @var LineItem[] $lineItems */
-        $lineItems = $this->managerRegistry->getRepository(LineItem::class)->findAll();
+        $this->lineItemCollection = $this->managerRegistry->getRepository(LineItem::class)->findAll();
 
-        if (empty($lineItems)) {
+        if ($this->lineItemCollection->isEmpty()) {
             throw new Exception(
                 sprintf("Cannot ingest '%s' since line-item table is empty.", $this->getRegistryItemName())
             );
         }
-
-        foreach ($lineItems as $lineItem) {
-            $this->lineItemCollection[$lineItem->getSlug()] = $lineItem;
-        }
     }
 
+    /**
+     * @throws LineItemNotFoundException
+     */
     protected function createEntity(array $data): EntityInterface
     {
         $assignment = new Assignment();
         $assignment
-            ->setLineItem($this->lineItemCollection[$data['slug']])
+            ->setLineItem($this->lineItemCollection->getBySlug($data['slug']))
             ->setState(Assignment::STATE_READY);
 
         $user = (new User())

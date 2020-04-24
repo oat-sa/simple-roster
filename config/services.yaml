@@ -9,7 +9,7 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $debug: '%env(resolve:APP_DEBUG)%'
+            $kernelDebug: '%kernel.debug%'
             $kernelEnvironment: '%kernel.environment%'
             $ltiInstances: '%ltiInstances%'
             $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'

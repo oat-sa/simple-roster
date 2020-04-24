@@ -137,6 +137,9 @@ abstract class AbstractBulkUsersAssignmentsCommand extends Command
             ->setCharset((string)$input->getOption(self::OPTION_CHARSET));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return $this->process($output);

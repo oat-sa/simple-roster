@@ -36,12 +36,12 @@ class SerializerResponder
     private $serializer;
 
     /** @var bool */
-    private $debug;
+    private $kernelDebug;
 
-    public function __construct(SerializerInterface $serializer, bool $debug = false)
+    public function __construct(SerializerInterface $serializer, bool $kernelDebug = false)
     {
         $this->serializer = $serializer;
-        $this->debug = $debug;
+        $this->kernelDebug = $kernelDebug;
     }
 
     /**
@@ -67,7 +67,7 @@ class SerializerResponder
             'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE,
         ];
 
-        if ($this->debug) {
+        if ($this->kernelDebug) {
             $content['message'] = $exception->getMessage();
             $content['trace'] = $exception->getTraceAsString();
         }

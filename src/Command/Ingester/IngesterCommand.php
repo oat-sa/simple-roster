@@ -51,10 +51,8 @@ class IngesterCommand extends Command
     /** @var bool */
     private $isDryRun;
 
-    public function __construct(
-        IngesterRegistry $ingesterRegistry,
-        IngesterSourceRegistry $sourceRegistry
-    ) {
+    public function __construct(IngesterRegistry $ingesterRegistry, IngesterSourceRegistry $sourceRegistry)
+    {
         $this->ingesterRegistry = $ingesterRegistry;
         $this->sourceRegistry = $sourceRegistry;
 
@@ -121,6 +119,9 @@ class IngesterCommand extends Command
         $this->isDryRun = !(bool)$input->getOption('force');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {

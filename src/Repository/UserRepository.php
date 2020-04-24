@@ -31,6 +31,8 @@ use App\ResultSet\UsernameResultSet;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
 
 /**
@@ -177,5 +179,32 @@ class UserRepository extends AbstractRepository
             ->getOneOrNullResult();
 
         return null === $result ? 0 : (int)$result['number_of_users'];
+    }
+
+    public function findNextAvailableUserIndex(): int
+    {
+        $index = $this
+            ->createQueryBuilder('u')
+            ->select('MAX(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int)$index + 1;
+    }
+
+    /**
+     * @codeCoverageIgnore Cannot be tested with SQLite database
+     *
+     * @throws ORMException
+     */
+    public function refreshSequence(ResultSetMapping $resultSetMapping): void
+    {
+        $this
+            ->getEntityManager()
+            ->createNativeQuery(
+                "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1) ) FROM users",
+                $resultSetMapping
+            )
+            ->execute();
     }
 }

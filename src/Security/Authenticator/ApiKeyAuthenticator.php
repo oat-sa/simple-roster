@@ -49,6 +49,9 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         $this->appApiKey = $appApiKey;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function supports(Request $request): bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
@@ -61,26 +64,41 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         return new User();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function checkCredentials($credentials, UserInterface $user): bool
     {
         return $credentials['token'] === $this->appApiKey;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
         return null;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         throw $this->createUnauthorizedHttpException($exception);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         throw $this->createUnauthorizedHttpException($authException);

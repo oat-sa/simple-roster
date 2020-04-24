@@ -37,6 +37,9 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
         $this->serializerResponder = $serializerResponder;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onLogoutSuccess(Request $request)
     {
         return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);

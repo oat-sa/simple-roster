@@ -23,12 +23,12 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\LineItem;
+use App\Model\LineItemCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)
  * @method LineItem|null findOneBy(array $criteria, array $orderBy = null)
- * @method LineItem[]    findAll()
  * @method LineItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class LineItemRepository extends AbstractRepository
@@ -36,5 +36,16 @@ class LineItemRepository extends AbstractRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LineItem::class);
+    }
+
+    public function findAll(): LineItemCollection
+    {
+        $collection = new LineItemCollection();
+        /** @var LineItem $lineItem */
+        foreach (parent::findAll() as $lineItem) {
+            $collection->add($lineItem);
+        }
+
+        return $collection;
     }
 }

@@ -25,6 +25,8 @@ namespace App\Repository;
 use App\Entity\Assignment;
 use DateTime;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -43,8 +45,7 @@ class AssignmentRepository extends AbstractRepository
     /**
      * @return Paginator|Assignment[]
      */
-    public function findAllByStateAndUpdatedAtPaginated(
-        string $state,
+    public function findByStateAndUpdatedAtPaged(string $state,
         DateTime $updatedAt,
         int $offset = null,
         int $limit = null
@@ -66,5 +67,21 @@ class AssignmentRepository extends AbstractRepository
         }
 
         return new Paginator($queryBuilder->getQuery(), false);
+    }
+
+    /**
+     * @codeCoverageIgnore Cannot be tested with SQLite database
+     *
+     * @throws ORMException
+     */
+    public function refreshSequence(ResultSetMapping $resultSetMapping): void
+    {
+        $this
+            ->getEntityManager()
+            ->createNativeQuery(
+                "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
+                $resultSetMapping
+            )
+            ->execute();
     }
 }
