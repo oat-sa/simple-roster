@@ -1,0 +1,43 @@
+apiVersion: skaffold/v2beta2 
+kind: Config
+metadata:
+  name: poc-demo
+profiles:
+  - name: dev
+    activation:
+    - kubeContext: minikube
+      command: dev
+    build:
+      tagPolicy:
+        sha256: {}
+#        envTemplate:
+#          template: "{{.IMAGE_NAME}}:dev"
+      artifacts:
+        - image: simple-roster-nginx
+          context: .
+          docker:
+            dockerfile: ./docker/nginx/Dockerfile
+            noCache: false
+        - image: simple-roster
+          context: .
+          docker:
+            dockerfile: ./docker/phpfpm/Dockerfile
+            noCache: false
+    deploy:
+      helm:
+        flags:
+          global:
+            - '--debug'
+########### because of helm 3 changing from patch to replace, we need to use force=false for the moment
+          upgrade:
+            - '--force=false'
+        releases: 
+          - name: simple-roster
+            namespace: poc
+            chartPath: charts/poc
+#            setValues:
+#              defaultBackend.service.omitClusterIP: true
+#              controller.service.omitClusterIP: true
+#              service.omitClusterIP: true
+            valuesFiles:
+              - ./env.yaml

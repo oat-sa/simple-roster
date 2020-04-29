@@ -1,0 +1,13 @@
+#---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: {{ .Chart.Name }}-env-fe-cm
+#data:
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-env-fe-cm-file
+data:
+{{ default .Values.proxyApp.env dict | indent 2 }}

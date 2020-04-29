@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poc.fullname" . }}-fe
+  labels:
+    {{- include "poc.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "poc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        app: {{ include "poc.fullname" . }}
+        tier: fe
+        {{- include "poc.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "poc.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+#      volumes:
+#        - name: {{ .Chart.Name }}-nginx-conf
+#          configMap:
+#            name: {{ .Chart.Name }}-conf-fe-cm
+#            items:
+#            - key: fe.nginx.conf
+#              path: fe.nginx.conf
+      containers:
+        - name: {{ .Chart.Name }}-fe
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.proxyApp.repository }}:{{ .Values.proxyApp.tag  }}"
+          imagePullPolicy: {{ .Values.proxyApp.pullPolicy }}
+          envFrom:
+#            - configMapRef:
+#                name: {{ .Chart.Name }}-env-fe-cm
+            - configMapRef:
+                name: {{ .Chart.Name }}-env-fe-cm-file
+#            - secretRef:
+#                name: {{ .Chart.Name }}-env-fe-secrets
+          env:
+            - name: NGINX_HOST
+              value: {{ include "poc.fullname" . }}-fe
+            - name: FPM_HOST
+              value: {{ include "poc.fullname" . }}-be
+          command:  [ "/bin/bash" ]
+          args: [ "-c", "envsubst '$NGINX_HOST','$NGINX_PORT','$FPM_HOST','$FPM_PORT'  < /etc/nginx.template > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'" ]
+#          volumeMounts:
+#            - name: {{ .Chart.Name }}-nginx-conf
+#              mountPath: /etc/nginx.template
+#              subPath: fe.nginx.conf
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /.ping
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /.ping
+              port: 80
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

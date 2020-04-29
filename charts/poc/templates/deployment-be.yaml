@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poc.fullname" . }}-be
+  labels:
+    {{- include "poc.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "poc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        app: {{ include "poc.fullname" . }}
+        tier: be
+        {{- include "poc.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "poc.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+#      volumes:
+#        - name: {{ .Chart.Name }}-be-fpm-www-conf
+#          configMap:
+#            name: {{ .Chart.Name }}-conf-be-cm
+#            items:
+#            - key: be.www.conf
+#              path: be.www.conf
+      containers:
+        - name: {{ .Chart.Name }}-be
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.mainApp.repository }}:{{ .Values.mainApp.tag }}"
+          imagePullPolicy: {{ .Values.mainApp.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-env-be-cm
+            - configMapRef:
+                name: {{ .Chart.Name }}-env-be-cm-file
+            - secretRef:
+                name: {{ .Chart.Name }}-env-be-secrets
+#          volumeMounts:
+#            - name: {{ .Chart.Name }}-be-fpm-www-conf
+#              mountPath: /usr/local/etc/php-fpm.d/www.conf
+#              subPath: be.www.conf
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
