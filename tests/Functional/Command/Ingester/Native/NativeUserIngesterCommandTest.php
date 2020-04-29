@@ -173,7 +173,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $this->assertEquals(1, $output);
         $this->assertStringContainsString(
             "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay()
         );
     }
 
@@ -198,15 +198,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
         $user1 = $this->getRepository(User::class)->find(1);
         $this->assertEquals('user_1', $user1->getUsername());
-    }
-
-    /**
-     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
-     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
-     */
-    private function normalizeDisplay(string $commandDisplay): string
-    {
-        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 
     private function prepareIngestionContext(): void

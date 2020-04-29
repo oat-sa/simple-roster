@@ -23,15 +23,18 @@ declare(strict_types=1);
 namespace App\Command\Ingester\Native;
 
 use App\Command\CommandProgressBarFormatterTrait;
+use App\DataTransferObject\AssignmentDto;
+use App\DataTransferObject\UserDto;
+use App\DataTransferObject\UserDtoCollection;
 use App\Entity\Assignment;
 use App\Entity\User;
+use App\Exception\LineItemNotFoundException;
+use App\Ingester\Ingester\NativeUserIngester;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
-use App\Repository\AssignmentRepository;
+use App\Model\LineItemCollection;
 use App\Repository\LineItemRepository;
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\ResultSetMapping;
+use App\Repository\NativeUserRepository;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -54,32 +57,17 @@ class NativeUserIngesterCommand extends Command
     /** @var IngesterSourceRegistry */
     private $ingesterSourceRegistry;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    /** @var NativeUserIngester */
+    private $nativeUserIngester;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    /** @var NativeUserRepository */
+    private $nativeUserRepository;
 
     /** @var LineItemRepository */
     private $lineItemRepository;
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
-
-    /** @var array */
-    private $userQueryParts = [];
-
-    /** @var array */
-    private $assignmentQueryParts = [];
-
-    /** @var array */
-    private $errors = [];
-
-    /** @var string */
-    private $kernelEnvironment;
 
     /** @var SymfonyStyle */
     private $symfonyStyle;
@@ -92,20 +80,16 @@ class NativeUserIngesterCommand extends Command
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
-        EntityManagerInterface $entityManager,
-        UserRepository $userRepository,
-        AssignmentRepository $assignmentRepository,
+        NativeUserIngester $nativeUserIngester,
+        NativeUserRepository $nativeUserRepository,
         LineItemRepository $lineItemRepository,
-        UserPasswordEncoderInterface $passwordEncoder,
-        string $kernelEnvironment
+        UserPasswordEncoderInterface $passwordEncoder
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
-        $this->entityManager = $entityManager;
-        $this->userRepository = $userRepository;
-        $this->assignmentRepository = $assignmentRepository;
+        $this->nativeUserIngester = $nativeUserIngester;
+        $this->nativeUserRepository = $nativeUserRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->passwordEncoder = $passwordEncoder;
-        $this->kernelEnvironment = $kernelEnvironment;
 
         parent::__construct(self::NAME);
     }
@@ -170,9 +154,6 @@ class NativeUserIngesterCommand extends Command
         $this->symfonyStyle->note('Starting user ingestion...');
 
         $csvFilePath = (string)$input->getArgument('path');
-        $resultSetMapping = new ResultSetMapping();
-        $user = new User();
-
         $progressBar = $this->createNewFormattedProgressBar($output);
 
         try {
@@ -189,93 +170,63 @@ class NativeUserIngesterCommand extends Command
             $progressBar->setMaxSteps($numberOfUsers);
             $progressBar->start();
 
-            $index = $this->userRepository->findNextAvailableUserIndex();
+            $index = $this->nativeUserRepository->findNextAvailableUserIndex();
             $lineItemCollection = $this->lineItemRepository->findAll();
 
             if ($lineItemCollection->isEmpty()) {
                 throw new Exception("Cannot native ingest 'user' since line-item table is empty.");
             }
 
+            $userDtoCollection = new UserDtoCollection();
             foreach ($source->getContent() as $row) {
-                $this->userQueryParts[] = sprintf(
-                    "(%s, '%s', '%s', '[]', '%s')",
-                    $index,
-                    $row['username'],
-                    $this->passwordEncoder->encodePassword($user, $row['password']),
-                    $row['groupId'] ?? null
-                );
-
-                $lineItem = $lineItemCollection->getBySlug($row['slug']);
-
-                $this->assignmentQueryParts[] = sprintf(
-                    "(%s, %s, %s, '%s')",
-                    $index,
-                    $index,
-                    $lineItem->getId(),
-                    Assignment::STATE_READY
-                );
+                $userDtoCollection->add($this->createUserDto($lineItemCollection, $row, $index));
 
                 if ($index % $this->batchSize === 0) {
-                    $this->executeNativeInsertions($resultSetMapping);
+                    if (!$this->isDryRun) {
+                        $this->nativeUserIngester->ingest($userDtoCollection);
+                    }
+
+                    $userDtoCollection->clear();
                     $progressBar->advance($this->batchSize);
                 }
 
                 $index++;
             }
 
-            $this->executeNativeInsertions($resultSetMapping);
-
-            if (!empty($this->errors)) {
-                foreach ($this->errors as $error) {
-                    $this->symfonyStyle->error($error);
-                }
+            if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
+                $this->nativeUserIngester->ingest($userDtoCollection);
             }
+
+//            foreach ($this->errors as $error) {
+//                $this->symfonyStyle->error($error);
+//            }
+
+            $progressBar->finish();
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->refreshSequences($resultSetMapping);
-        $progressBar->finish();
-
         return 0;
     }
 
-    private function executeNativeInsertions(ResultSetMapping $mapping): void
-    {
-        try {
-            if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts) && !$this->isDryRun) {
-                $userQuery = sprintf(
-                    'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
-                    implode(',', $this->userQueryParts)
-                );
-
-                $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
-
-                $assignmentQuery = sprintf(
-                    'INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s',
-                    implode(',', $this->assignmentQueryParts)
-                );
-
-                $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
-            }
-        } catch (Throwable $exception) {
-            $this->errors[] = $exception->getMessage();
-        }
-
-        $this->userQueryParts = [];
-        $this->assignmentQueryParts = [];
-    }
-
     /**
-     * @codeCoverageIgnore Cannot be tested with SQLite database
+     *
+     * @throws LineItemNotFoundException
      */
-    private function refreshSequences(ResultSetMapping $mapping): void
+    private function createUserDto(LineItemCollection $lineItemCollection, array $row, int $index): UserDto
     {
-        if ($this->kernelEnvironment !== 'test' && !$this->isDryRun) {
-            $this->assignmentRepository->refreshSequence($mapping);
-            $this->userRepository->refreshSequence($mapping);
-        }
+        $lineItem = $lineItemCollection->getBySlug($row['slug']);
+        $newAssignment = new AssignmentDto($index, Assignment::STATE_READY, $index, $lineItem->getId());
+
+        return new UserDto(
+            $index,
+            $row['username'],
+            $this->passwordEncoder->encodePassword(new User(), $row['password']),
+            $newAssignment,
+            [],
+            $row['groupId'] ?? null
+        );
     }
 }

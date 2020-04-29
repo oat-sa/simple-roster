@@ -59,7 +59,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
             "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay()
         );
 
         $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
@@ -77,7 +77,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
             "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay()
         );
 
         $this->assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
@@ -104,7 +104,7 @@ class IngesterCommandTest extends KernelTestCase
         $this->assertEquals(0, $output);
         $this->assertStringContainsString(
             "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay()
         );
 
         $this->assertStringContainsString(
@@ -148,14 +148,5 @@ class IngesterCommandTest extends KernelTestCase
             "[ERROR] Ingester source named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );
-    }
-
-    /**
-     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
-     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
-     */
-    private function normalizeDisplay(string $commandDisplay): string
-    {
-        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }
