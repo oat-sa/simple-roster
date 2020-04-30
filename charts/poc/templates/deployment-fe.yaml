@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "poc.fullname" . }}-fe
+  name: {{ .Release.Name }}-fe
   labels:
     {{- include "poc.labels" . | nindent 4 }}
 spec:
@@ -30,9 +30,9 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 #      volumes:
-#        - name: {{ .Chart.Name }}-nginx-conf
+#        - name: {{ .Release.Name }}-nginx-conf
 #          configMap:
-#            name: {{ .Chart.Name }}-conf-fe-cm
+#            name: {{ .Release.Name }}-conf-fe-cm
 #            items:
 #            - key: fe.nginx.conf
 #              path: fe.nginx.conf
@@ -44,11 +44,11 @@ spec:
           imagePullPolicy: {{ .Values.proxyApp.pullPolicy }}
           envFrom:
 #            - configMapRef:
-#                name: {{ .Chart.Name }}-env-fe-cm
+#                name: {{ .Release.Name }}-env-fe-cm
             - configMapRef:
-                name: {{ .Chart.Name }}-env-fe-cm-file
+                name: {{ .Release.Name }}-env-fe-cm-file
 #            - secretRef:
-#                name: {{ .Chart.Name }}-env-fe-secrets
+#                name: {{ .Release.Name }}-env-fe-secrets
           env:
             - name: NGINX_HOST
               value: {{ include "poc.fullname" . }}-fe
@@ -57,7 +57,7 @@ spec:
           command:  [ "/bin/bash" ]
           args: [ "-c", "envsubst '$NGINX_HOST','$NGINX_PORT','$FPM_HOST','$FPM_PORT'  < /etc/nginx.template > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'" ]
 #          volumeMounts:
-#            - name: {{ .Chart.Name }}-nginx-conf
+#            - name: {{ .Release.Name }}-nginx-conf
 #              mountPath: /etc/nginx.template
 #              subPath: fe.nginx.conf
           ports:

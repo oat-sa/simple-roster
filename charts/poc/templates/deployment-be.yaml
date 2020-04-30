@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "poc.fullname" . }}-be
+  name: {{ .Release.Name }}-be
   labels:
     {{- include "poc.labels" . | nindent 4 }}
 spec:
@@ -30,27 +30,27 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 #      volumes:
-#        - name: {{ .Chart.Name }}-be-fpm-www-conf
+#        - name: {{ .Release.Name }}-be-fpm-www-conf
 #          configMap:
-#            name: {{ .Chart.Name }}-conf-be-cm
+#            name: {{ .Release.Name }}-conf-be-cm
 #            items:
 #            - key: be.www.conf
 #              path: be.www.conf
       containers:
-        - name: {{ .Chart.Name }}-be
+        - name: {{ .Release.Name }}-be
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.mainApp.repository }}:{{ .Values.mainApp.tag }}"
           imagePullPolicy: {{ .Values.mainApp.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ .Chart.Name }}-env-be-cm
+                name: {{ .Release.Name }}-env-be-cm
             - configMapRef:
-                name: {{ .Chart.Name }}-env-be-cm-file
+                name: {{ .Release.Name }}-env-be-cm-file
             - secretRef:
-                name: {{ .Chart.Name }}-env-be-secrets
+                name: {{ .Release.Name }}-env-be-secrets
 #          volumeMounts:
-#            - name: {{ .Chart.Name }}-be-fpm-www-conf
+#            - name: {{ .Release.Name }}-be-fpm-www-conf
 #              mountPath: /usr/local/etc/php-fpm.d/www.conf
 #              subPath: be.www.conf
           ports:

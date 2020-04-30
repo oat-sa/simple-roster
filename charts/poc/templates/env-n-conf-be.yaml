@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Chart.Name }}-env-be-cm
+  name: {{ .Release.Name }}-env-be-cm
 data: 
   REDIS_DOCTRINE_CACHE_HOST: {{ .Release.Name }}-doctrine-redis-master
   REDIS_DOCTRINE_CACHE_PORT: "6379"
@@ -12,13 +12,13 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Chart.Name }}-env-be-secrets
+  name: {{ .Release.Name }}-env-be-secrets
 data:
   DATABASE_URL: {{ list "pgsql://" .Values.postgresql.postgresqlUsername ":" .Values.postgresql.postgresqlPassword  "@" .Release.Name "-postgresql:5432/db" | join "" | b64enc | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Chart.Name }}-env-be-cm-file
+  name: {{ .Release.Name }}-env-be-cm-file
 data:
 {{ default  .Values.mainApp.env  dict | indent 2 }}

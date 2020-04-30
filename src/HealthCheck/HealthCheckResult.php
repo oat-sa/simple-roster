@@ -53,6 +53,7 @@ class HealthCheckResult implements JsonSerializable
         return [
             'isDoctrineConnectionAvailable' => $this->isDoctrineConnectionAvailable,
             'isDoctrineCacheAvailable' => $this->isDoctrineCacheAvailable,
+            'hostname' => $_ENV['HOSTNAME'],
         ];
     }
 }
