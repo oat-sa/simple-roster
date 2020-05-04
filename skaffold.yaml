@@ -41,3 +41,44 @@ profiles:
 #              service.omitClusterIP: true
             valuesFiles:
               - ./env.yaml
+  - name: ci
+    activation:
+    - kubeContext:
+      command: run
+    build:
+      googleCloudBuild:
+        projectId: tao-ci-cd
+      tagPolicy:
+        sha256: {}
+#        envTemplate:
+#          template: "{{.IMAGE_NAME}}:dev"
+      artifacts:
+        - image: gcr.io/tao-ci-cd/poc/simple-roster-nginx
+          context: .
+          kaniko:
+            image: gcr.io/kaniko-project/executor
+            dockerfile: ./docker/nginx/Dockerfile
+            cache:
+              repo: gcr.io/tao-ci-cd/cache/poc/simple-roster-nginx
+
+        - image: gcr.io/tao-ci-cd/poc/simple-roster
+          context: .
+          kaniko:
+            image: gcr.io/kaniko-project/executor
+            dockerfile: ./docker/phpfpm/Dockerfile
+            cache:
+              repo: gcr.io/tao-ci-cd/cache/poc/simple-roster
+    deploy:
+      helm:
+        flags:
+          global:
+            - '--debug'
+########### because of helm 3 changing from patch to replace, we need to use force=false for the moment
+          upgrade:
+            - '--force=false'
+        releases:
+          - name: simple-roster
+            namespace: poc
+            chartPath: charts/poc
+            valuesFiles:
+              - ./env.ci.yaml
