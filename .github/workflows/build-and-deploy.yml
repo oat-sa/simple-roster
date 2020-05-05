@@ -36,7 +36,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader --no-scripts
 
 # We are suppose to cleanup before pushing artifact...
 
@@ -56,7 +56,7 @@ jobs:
         with:
           name: package
           path: package
-          
+
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
         with:
