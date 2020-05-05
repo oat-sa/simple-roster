@@ -67,6 +67,12 @@ jobs:
         run: |
           tar xzf ./package.tar.gz
 
+      - name: Prepare credentials
+        env:
+          GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS }}
+        run: |
+          echo "$GCLOUD_CREDENTIALS" | base64 -d > gcloud_credentials
+
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
         with:
@@ -74,6 +80,8 @@ jobs:
           skaffold: '1.8.0'
 
       - name: Run Skaffold
+        env: 
+          GOOGLE_APPLICATION_CREDENTIALS: gcloud_credentials
         run: |
           skaffold run
 
