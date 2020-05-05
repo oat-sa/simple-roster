@@ -49,7 +49,7 @@ profiles:
       googleCloudBuild:
         projectId: tao-ci-cd
       tagPolicy:
-        sha256: {}
+        gitCommit: {}
 #        envTemplate:
 #          template: "{{.IMAGE_NAME}}:dev"
       artifacts:
@@ -81,4 +81,5 @@ profiles:
             namespace: poc
             chartPath: charts/poc
             valuesFiles:
+              - ./env.ci.version.yaml
               - ./env.ci.yaml

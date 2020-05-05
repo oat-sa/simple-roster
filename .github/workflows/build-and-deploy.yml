@@ -45,6 +45,13 @@ jobs:
       - name: Prepare artefact
         run: |
           echo VERSION=${GITHUB_SHA} >>source/.env
+          cat >source/env.ci.version.yaml <<EOF
+          mainApp:
+            tag: ${GITHUB_SHA}
+
+          proxyApp:
+            tag: ${GITHUB_SHA}
+          EOF
           tar -C source -czf package.tar.gz .
 
       - name: Upload artifact
