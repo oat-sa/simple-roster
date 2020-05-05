@@ -91,5 +91,7 @@ jobs:
         run: |
           # should be moved to another place (maybe skaffold?)
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          # OBVIOUSLY THE SAME FOR THAT SHIT
+          gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-1
           skaffold run
 
