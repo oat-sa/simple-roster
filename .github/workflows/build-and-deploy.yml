@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          path: source
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
         with:
@@ -36,15 +38,19 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
+          cd source
           composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader --no-scripts
 
 # We are suppose to cleanup before pushing artifact...
+      - name: Prepare artefact
+        run: |
+          tar -C source -czf package.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: .
+          path: ./package.tar.gz
 
   skaffold:
     name: Build and Deploy
@@ -55,7 +61,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: package
-          path: package
+          path: package.tar.gz
+
+      - name: Prepare artefact
+        run: |
+          tar xzf package.tar.gz
 
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
@@ -65,6 +75,5 @@ jobs:
 
       - name: Run Skaffold
         run: |
-          cd package
           skaffold run
 
