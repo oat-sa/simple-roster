@@ -8,6 +8,8 @@ spec:
   progressDeadlineSeconds: 600
   # set revision to zero to try to resolve a problem with non-termination of pods
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
@@ -26,6 +28,7 @@ spec:
         {{- include "poc.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
+      terminationGracePeriodSeconds: 0
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
