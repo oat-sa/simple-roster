@@ -5,6 +5,9 @@ metadata:
   labels:
     {{- include "poc.labels" . | nindent 4 }}
 spec:
+  progressDeadlineSeconds: 600
+  # set revision to zero to try to resolve a problem with non-termination of pods
+  revisionHistoryLimit: 0
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
