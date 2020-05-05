@@ -44,6 +44,7 @@ jobs:
 # We are suppose to cleanup before pushing artifact...
       - name: Prepare artefact
         run: |
+          echo VERSION=${GITHUB_SHA} >>source/.env
           tar -C source -czf package.tar.gz .
 
       - name: Upload artifact
