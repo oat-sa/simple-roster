@@ -61,11 +61,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: package
-          path: package.tar.gz
+          path: .
 
       - name: Prepare artefact
         run: |
-          tar xzf package.tar.gz
+          tar xzf ./package.tar.gz
 
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
