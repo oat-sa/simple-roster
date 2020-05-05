@@ -44,7 +44,7 @@ jobs:
 # We are suppose to cleanup before pushing artifact...
       - name: Prepare artefact
         run: |
-          tar -C source -czf package.tar.gz
+          tar -C source -czf package.tar.gz .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
