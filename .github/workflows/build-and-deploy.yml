@@ -56,11 +56,14 @@ jobs:
         with:
           name: package
           path: package
+          
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
         with:
           helm: '3.2.0'
           skaffold: '1.8.0'
+
+      - name: Run Skaffold
         run: |
           cd package
           skaffold run
