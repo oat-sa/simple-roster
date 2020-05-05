@@ -49,9 +49,8 @@ profiles:
       googleCloudBuild:
         projectId: tao-ci-cd
       tagPolicy:
-        gitCommit: {}
-#        envTemplate:
-#          template: "{{.IMAGE_NAME}}:dev"
+        envTemplate:
+          template: "{{.IMAGE_NAME}}:{{.GITHUB_SHA}}"
       artifacts:
         - image: gcr.io/tao-ci-cd/poc/simple-roster-nginx
           context: .
