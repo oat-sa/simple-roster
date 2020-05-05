@@ -89,5 +89,7 @@ jobs:
 #        env: 
 #          GOOGLE_APPLICATION_CREDENTIALS: gcloud_credentials
         run: |
+          # should be moved to another place (maybe skaffold?)
+          helm repo add bitnami https://charts.bitnami.com/bitnami
           skaffold run
 
