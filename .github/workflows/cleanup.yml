@@ -32,8 +32,8 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
           gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2 --project tao-ci-cd
-          PR=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
-          skaffold delete -n ${PR}
+          PR=$(echo $GITHUB_REF | cut -d/ -f3)
+          skaffold delete -n pr${PR}
           kubectl delete ns pr${PR}
 
 
