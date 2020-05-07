@@ -1,0 +1,41 @@
+name: Skaffold PoC
+
+on:
+  pull_request:
+    branches:
+      - poc/skaffold
+    types: [closed]
+#  push:
+#    branches:
+#      - poc/skaffold
+
+jobs:
+  skaffold:
+    name: Build and Deploy
+    runs-on: ubuntu-18.04
+    needs: symfony
+    steps:
+      - name: Set up tools
+        uses: daisaru11/setup-cd-tools@v1
+        with:
+          helm: '3.2.0'
+          skaffold: '1.8.0'
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          service_account_key: ${{ secrets.GCLOUD_CREDENTIALS }}
+          export_default_credentials: true
+
+      - name: Run Skaffold
+        run: |
+          # should be moved to another place (maybe skaffold?)
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          # OBVIOUSLY THE SAME FOR THAT SHIT
+          gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2 --project tao-ci-cd
+          PR=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+          skaffold delete -n ${PR}
+          kubectl delete ns pr${PR}
+
+
+

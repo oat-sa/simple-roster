@@ -1,9 +1,13 @@
 name: Skaffold PoC
 
 on:
-  push:
+  pull_request:
     branches:
       - poc/skaffold
+    types: [opened, synchronize]
+#  push:
+#    branches:
+#      - poc/skaffold
 
 jobs:
   symfony:
@@ -94,5 +98,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
           gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2 --project tao-ci-cd
-          skaffold run
+          PR=$(echo $GITHUB_REF | cut -d/ -f3)
+          kubectl create ns pr${PR} || true
+          skaffold run -n pr${PR}
 
