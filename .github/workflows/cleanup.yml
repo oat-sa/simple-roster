@@ -26,6 +26,9 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_CREDENTIALS }}
           export_default_credentials: true
 
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Run Skaffold
         run: |
           # should be moved to another place (maybe skaffold?)
