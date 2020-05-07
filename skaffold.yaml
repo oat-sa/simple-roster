@@ -55,7 +55,7 @@ profiles:
         - image: gcr.io/tao-ci-cd/poc/simple-roster-nginx
           context: .
           kaniko:
-            image: gcr.io/kaniko-project/executor:0.20.0
+            image: gcr.io/kaniko-project/executor:0.19.0
             dockerfile: ./docker/nginx/Dockerfile
             cache:
               repo: gcr.io/tao-ci-cd/cache/poc/simple-roster-nginx
@@ -63,7 +63,7 @@ profiles:
         - image: gcr.io/tao-ci-cd/poc/simple-roster
           context: .
           kaniko:
-            image: gcr.io/kaniko-project/executor:0.20.0
+            image: gcr.io/kaniko-project/executor:0.19.0
             dockerfile: ./docker/phpfpm/Dockerfile
             cache:
               repo: gcr.io/tao-ci-cd/cache/poc/simple-roster
