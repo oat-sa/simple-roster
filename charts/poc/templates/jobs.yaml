@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-be-job
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
+  labels:
+    {{- include "poc.labels" . | nindent 4 }}
+spec:
+  activeDeadlineSeconds: 600
+{{- if not .Values.autoscaling.enabled }}
+{{- end }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        app: {{ include "poc.fullname" . }}
+        tier: be-job
+        {{- include "poc.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+#      volumes:
+#        - name: {{ .Release.Name }}-be-fpm-www-conf
+#          configMap:
+#            name: {{ .Release.Name }}-conf-be-cm
+#            items:
+#            - key: be.www.conf
+#              path: be.www.conf
+      restartPolicy: Never
+      containers:
+        - name: {{ .Release.Name }}-be-job
+          command: ["/bin/sh", "-c"]
+          args:
+           - |
+              bin/console doctrine:database:create -n --if-not-exists
+              bin/console doctrine:migrations:migrate -n --allow-no-migration
+              exit 0
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.mainApp.repository }}:{{ .Values.mainApp.tag }}"
+          imagePullPolicy: {{ .Values.mainApp.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-env-be-cm
+            - configMapRef:
+                name: {{ .Release.Name }}-env-be-cm-file
+            - secretRef:
+                name: {{ .Release.Name }}-env-be-secrets
+#          volumeMounts:
+#            - name: {{ .Release.Name }}-be-fpm-www-conf
+#              mountPath: /usr/local/etc/php-fpm.d/www.conf
+#              subPath: be.www.conf
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

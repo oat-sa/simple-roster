@@ -11,15 +11,14 @@ on:
 
 jobs:
   skaffold:
-    name: Build and Deploy
+    name: Cleanup
     runs-on: ubuntu-18.04
-    needs: symfony
     steps:
       - name: Set up tools
         uses: daisaru11/setup-cd-tools@v1
         with:
           helm: '3.2.0'
-          skaffold: '1.8.0'
+          skaffold: '1.9.0'
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
