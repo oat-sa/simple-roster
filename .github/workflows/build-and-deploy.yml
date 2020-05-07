@@ -73,7 +73,7 @@ jobs:
         uses: daisaru11/setup-cd-tools@v1
         with:
           helm: '3.2.0'
-          skaffold: '1.9.0'
+          skaffold: '1.9.1'
 
       - name: Download artifact
         uses: actions/download-artifact@v2
