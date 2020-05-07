@@ -96,12 +96,15 @@ jobs:
       - name: Run Skaffold
         env:
           PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
+          repo=${REPO#*/}
+          namespace=${repo}-pr${PR}
           # should be moved to another place (maybe skaffold?)
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
           gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2
           gcloud auth configure-docker
-          kubectl create ns pr${PR} || true
-          skaffold run -n pr${PR}
+          kubectl create ns ${namespace} || true
+          skaffold run -n ${namespace}
 

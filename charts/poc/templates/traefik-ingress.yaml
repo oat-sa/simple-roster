@@ -1,0 +1,41 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "poc.fullname" . }}-{{ .Release.Namespace }}-fe
+  namespace: {{ .Values.ingress.traefik.namespace }}
+spec:
+  entryPoints:                      # [1]
+    - web
+  routes:                           # [2]
+  - kind: Rule
+    match: Host(`{{ .Release.Namespace }}.{{ .Values.ingress.tld }}`) # [3]
+    priority: 10                    # [4]
+    services:                       # [8]
+    - kind: Service
+      name: {{ include "poc.fullname" . }}-fe
+      namespace: {{ .Release.Namespace }}
+      passHostHeader: true
+      port: 80
+
+#      responseForwarding:
+#        flushInterval: 1ms
+#      scheme: https
+#      sticky:
+#        cookie:
+#          httpOnly: true
+#          name: cookie
+#          secure: true
+#          sameSite: none
+#      strategy: RoundRobin
+#      weight: 10
+#  tls:                              # [9]
+#    secretName: supersecret         # [10]
+#    options:                        # [11]
+#      name: opt                     # [12]
+#      namespace: default            # [13]
+#    certResolver: foo               # [14]
+#    domains:                        # [15]
+#    - main: example.net             # [16]
+#      sans:                         # [17]
+#      - a.example.net
+#      - b.example.net

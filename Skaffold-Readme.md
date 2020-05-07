@@ -16,16 +16,31 @@ Follow the installation instructions for the following tools:
 
 ## Prepare your environment
 
+Ensure your system has dnsmasq installed. This guide assumes you are using NetworkManager. 
+
+Ensure the `main` section of `/etc/NetworkManager/NetworkManager.conf` contains a line with `dns=dnsmasq`.
+
+
 ```bash
 
 # Add dependencies repository
 helm repo add bitnami https://charts.bitnami.com/bitnami 
+helm repo add traefik https://containous.github.io/traefik-helm-chart
+helm repo update
 
 # Install and start minikube virtual machine
-minikube start --driver=virtualbox
+minikube start --driver=virtualbox --extra-config=apiserver.service-node-port-range=80-32000
 
-# Create a namespace where we will work
+# Add minikube TLD to dnsmasq and forward it to your new cluster
+echo "address=/minikube/$(minikube ip)" | sudo tee /etc/dnsmasq.d/minikube.local.conf
+sudo systemctl restart dnsmasq NetworkManager
+
+# Create a namespace where we will work (you can choose another namespace than 'poc', but keep 'traefik' for ingress)
+kubectl create ns traefik
 kubectl create ns poc
+
+# Install Traefik
+helm install -n traefik  traefik traefik/traefik --set ports.web.nodePort=80,ports.websecure.nodePort=443
 
 ```
 
@@ -51,9 +66,12 @@ skaffold dev --force=false
 
 ```
 
+
 Starting now, every change in your working tree will be tracked and will trigger a redeployment of the application.
 
 If any code addition/modification/deletion requires resource replacements on Kubernetes, you will need to quit the running `skaffold` process with `^C` then run it again to redeploy the complete environment.
+
+You can add `-n my-namespace` to deploy to another namespace.
 
 ## Access published application
 
@@ -66,6 +84,8 @@ minikube service list
 ```
 
 You will have an overview of the published service from Kubernetes.
+
+If you manage to deploy with traefik, you should be able to access your deployed service with `http://poc.minikube` or `http://my-namespace.minikube` depending the namespace you are deploying to.
 
 ## Monitor and control the application
 
