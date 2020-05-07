@@ -1,7 +1,7 @@
-apiVersion: apps/v1
+apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-be
+  name: {{ .Release.Name }}-be-job
   labels:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded  
