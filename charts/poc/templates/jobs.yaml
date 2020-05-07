@@ -6,6 +6,7 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
   labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     {{- include "poc.labels" . | nindent 4 }}
 spec:
   activeDeadlineSeconds: 600
@@ -41,7 +42,10 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
            - |
-              bin/console doctrine:database:create -n --if-not-exists
+              until bin/console doctrine:database:create --if-not-exists 
+              do 
+                sleep 1
+              done
               bin/console doctrine:migrations:migrate -n --allow-no-migration
               exit 0
           securityContext:
