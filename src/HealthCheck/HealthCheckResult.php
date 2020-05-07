@@ -55,6 +55,7 @@ class HealthCheckResult implements JsonSerializable
             'isDoctrineCacheAvailable' => $this->isDoctrineCacheAvailable,
             'hostname' => $_ENV['HOSTNAME'],
             'myVersion' => $_ENV['VERSION'],
+            'thisIsImportant' => 'GITOPS-99002'
         ];
     }
 }
