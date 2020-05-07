@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta2 
+apiVersion: skaffold/v2beta3 
 kind: Config
 metadata:
   name: poc-demo
@@ -48,6 +48,7 @@ profiles:
     build:
       googleCloudBuild:
         projectId: tao-ci-cd
+        kanikoImage: gcr.io/kaniko-project/executor:v0.20.0
       tagPolicy:
         envTemplate:
           template: "{{.IMAGE_NAME}}:{{.GITHUB_SHA}}"
@@ -55,7 +56,6 @@ profiles:
         - image: gcr.io/tao-ci-cd/poc/simple-roster-nginx
           context: .
           kaniko:
-            image: gcr.io/kaniko-project/executor
             dockerfile: ./docker/nginx/Dockerfile
             cache:
               repo: gcr.io/tao-ci-cd/cache/poc/simple-roster-nginx
@@ -63,7 +63,6 @@ profiles:
         - image: gcr.io/tao-ci-cd/poc/simple-roster
           context: .
           kaniko:
-            image: gcr.io/kaniko-project/executor
             dockerfile: ./docker/phpfpm/Dockerfile
             cache:
               repo: gcr.io/tao-ci-cd/cache/poc/simple-roster
