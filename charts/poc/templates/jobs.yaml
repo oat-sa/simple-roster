@@ -6,6 +6,7 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
   labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     {{- include "poc.labels" . | nindent 4 }}
 spec:
   activeDeadlineSeconds: 600
