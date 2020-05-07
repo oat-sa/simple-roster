@@ -2,18 +2,15 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Release.Name }}-be-job
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
   labels:
-    "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-delete-policy": hook-succeeded  
     {{- include "poc.labels" . | nindent 4 }}
 spec:
-  progressDeadlineSeconds: 600
+  activeDeadlineSeconds: 600
 {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
 {{- end }}
-  selector:
-    matchLabels:
-      {{- include "poc.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -29,7 +26,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "poc.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 #      volumes:
@@ -39,8 +35,7 @@ spec:
 #            items:
 #            - key: be.www.conf
 #              path: be.www.conf
-      spec:
-        restartPolicy: Never
+      restartPolicy: Never
       containers:
         - name: {{ .Release.Name }}-be-job
           command: ["/bin/sh", "-c"]
@@ -48,6 +43,7 @@ spec:
            - |
               bin/console doctrine:database:create -n --if-not-exists
               bin/console doctrine:migrations:migrate -n --allow-no-migration
+              exit 0
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.mainApp.repository }}:{{ .Values.mainApp.tag }}"
@@ -77,3 +73,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
