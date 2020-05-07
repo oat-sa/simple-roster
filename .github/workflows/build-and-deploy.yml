@@ -94,13 +94,14 @@ jobs:
           export_default_credentials: true
 
       - name: Run Skaffold
+        env:
+          PR: ${{ github.event.pull_request.number }}
         run: |
           # should be moved to another place (maybe skaffold?)
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
           gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2
           gcloud auth configure-docker
-          PR=$(echo $GITHUB_REF | cut -d/ -f3)
           kubectl create ns pr${PR} || true
           skaffold run -n pr${PR}
 

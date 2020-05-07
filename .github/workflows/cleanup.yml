@@ -30,13 +30,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Skaffold
+        env:
+          PR: ${{ github.event.pull_request.number }}
         run: |
           # should be moved to another place (maybe skaffold?)
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
           gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2 --project tao-ci-cd
-          PR=$(echo $GITHUB_REF | cut -d/ -f3)
-          env
           skaffold delete -n pr${PR}
           kubectl delete ns pr${PR}
 
