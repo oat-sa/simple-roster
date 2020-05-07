@@ -4,10 +4,7 @@ on:
   pull_request:
     branches:
       - poc/skaffold
-    types: [opened, synchronize]
-#  push:
-#    branches:
-#      - poc/skaffold
+    types: [opened, reopened, synchronize]
 
 jobs:
   symfony:
