@@ -61,10 +61,13 @@ controller.service.omitClusterIP: true
 defaultBackend.service.omitClusterIP: true
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 80
 
 ingress:
+  tld: localhost
+  traefik:
+    namespace: traefik
   enabled: true
   annotations: {}
     # kubernetes.io/ingress.class: nginx
