@@ -69,8 +69,8 @@ profiles:
     deploy:
       helm:
         flags:
-          global:
-            - '--debug'
+#          global:
+#            - '--debug'
 ########### because of helm 3 changing from patch to replace, we need to use force=false for the moment
           upgrade:
             - '--force=false'
