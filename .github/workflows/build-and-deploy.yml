@@ -100,7 +100,7 @@ jobs:
           # should be moved to another place (maybe skaffold?)
           helm repo add bitnami https://charts.bitnami.com/bitnami
           # OBVIOUSLY THE SAME FOR THAT SHIT
-          gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-2
+          gcloud container clusters get-credentials --zone us-central1-c experimental-cluster-ci-cd-4
           gcloud auth configure-docker
           kubectl create ns ${namespace} || true
           skaffold run -n ${namespace}
