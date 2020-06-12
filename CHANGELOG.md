@@ -18,6 +18,7 @@
 - Changed Doctrine's ORM naming strategy from `underscore` to `underscore_number_aware`.
 - Reworked `README.md` structure for better readability.
 - Changed doctrine ORM mapping driver from `yaml` to `xml`.
+- Username is now passed in `user_id` LTI parameter
 
 ### Fixed
 - Reverted temporary PHPUnit fix done in version `1.4.1`.
