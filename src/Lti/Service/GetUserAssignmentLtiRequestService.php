@@ -151,7 +151,7 @@ class GetUserAssignmentLtiRequestService
             'lti_version' => LtiRequest::LTI_VERSION,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment->getUser()),
             'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getId(),
+            'user_id' => $assignment->getUser()->getUsername(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate(
