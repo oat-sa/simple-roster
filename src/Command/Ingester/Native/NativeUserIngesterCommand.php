@@ -197,10 +197,6 @@ class NativeUserIngesterCommand extends Command
                 $this->nativeUserIngester->ingest($userDtoCollection);
             }
 
-//            foreach ($this->errors as $error) {
-//                $this->symfonyStyle->error($error);
-//            }
-
             $progressBar->finish();
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
@@ -225,7 +221,6 @@ class NativeUserIngesterCommand extends Command
             $row['username'],
             $this->passwordEncoder->encodePassword(new User(), $row['password']),
             $newAssignment,
-            [],
             $row['groupId'] ?? null
         );
     }

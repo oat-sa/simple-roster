@@ -38,9 +38,6 @@ class UserDto
     /** @var AssignmentDto */
     private $assignment;
 
-    /** @var string[] */
-    private $roles;
-
     /** @var string|null */
     private $groupId;
 
@@ -52,14 +49,12 @@ class UserDto
         string $username,
         string $password,
         AssignmentDto $assignment,
-        array $roles,
         ?string $groupId
     ) {
         $this->id = $id;
         $this->username = $username;
         $this->password = $password;
         $this->assignment = $assignment;
-        $this->roles = $roles;
         $this->groupId = $groupId;
 
         if ($id !== $assignment->getUserId()) {
@@ -80,14 +75,6 @@ class UserDto
     public function getPassword(): string
     {
         return $this->password;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getRoles(): array
-    {
-        return $this->roles;
     }
 
     public function getGroupId(): ?string
