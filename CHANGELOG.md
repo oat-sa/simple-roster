@@ -8,11 +8,10 @@
     - Running PHPUnit test suite
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
-    - Running static code analysis with PHPStan and PHP CodeSniffer
+    - Running static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer
 - Added package dependency security checker into composer. 
 
 ### Changed
-- Increased PHP version requirements from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
