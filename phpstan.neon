@@ -1,5 +1,5 @@
 parameters:
-  autoload_files:
+  bootstrapFiles:
     - vendor/autoload.php
     - bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
   paths:
@@ -20,9 +20,6 @@ parameters:
       path: tests
     # Kernel is always booted in a working functional/integration test
     - message: '#^Cannot call method get() on Symfony\\Component\\DependencyInjection\\ContainerInterface|null.$#'
-      path: tests
-    # It is always a Carbon instance
-    - message: '#^Call to an undefined method Carbon\\Carbon\|Closure::getTimestamp\(\).$#'
       path: tests
     # Doctrine docblock error, Doctrine\Common\Persistence\ManagerRegistry always returns an instance of EntityManagerInterface
     - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Persistence\\ObjectManager.$#'

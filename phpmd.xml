@@ -29,7 +29,9 @@
         </properties>
     </rule>
     <rule ref="rulesets/controversial.xml"/>
-    <rule ref="rulesets/design.xml"/>
+    <rule ref="rulesets/design.xml">
+        <exclude name="CouplingBetweenObjects"/> <!--todo-->
+    </rule>
     <rule ref="rulesets/naming.xml">
         <exclude name="LongVariable"/>
         <exclude name="ShortVariable"/>

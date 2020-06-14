@@ -146,12 +146,6 @@ class UserRepositoryTest extends KernelTestCase
         $this->assertSame(50, $this->subject->countByCriteria($criteria));
     }
 
-    public function testItCanFindNextAvailableUserIndex(): void
-    {
-        $this->markTestSkipped(); // TODO
-        $this->assertSame(101, $this->subject->findNextAvailableUserIndex());
-    }
-
     public function provideLimits(): array
     {
         return [
