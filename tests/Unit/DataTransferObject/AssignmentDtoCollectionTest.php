@@ -20,34 +20,32 @@
 
 declare(strict_types=1);
 
-namespace App\DataTransferObject;
+namespace App\Tests\Unit\DataTransferObject;
 
-use ArrayIterator;
+use App\DataTransferObject\AssignmentDto;
+use App\DataTransferObject\AssignmentDtoCollection;
 use Countable;
 use IteratorAggregate;
+use PHPUnit\Framework\TestCase;
 
-class AssignmentDtoCollection implements Countable, IteratorAggregate
+class AssignmentDtoCollectionTest extends TestCase
 {
-    /** @var AssignmentDto[] */
-    private $collection = [];
-
-    public function add(AssignmentDto $dto): self
+    public function testItImplementsCountable(): void
     {
-        $this->collection[] = $dto;
-
-        return $this;
+        $this->assertInstanceOf(Countable::class, new AssignmentDtoCollection());
     }
 
-    /**
-     * @return ArrayIterator|AssignmentDto[]
-     */
-    public function getIterator(): ArrayIterator
+    public function testItImplementsIteratorAggregate(): void
     {
-        return new ArrayIterator($this->collection);
+        $this->assertInstanceOf(IteratorAggregate::class, new AssignmentDtoCollection());
     }
 
-    public function count()
+    public function testIfAssignmentCanBeAdded(): void
     {
-        return count($this->collection);
+        $assignment = new AssignmentDto(1, 'test', 1, 1);
+        $subject = (new AssignmentDtoCollection())->add($assignment);
+
+        $this->assertCount(1, $subject);
+        $this->assertSame($assignment, $subject->getIterator()->current());
     }
 }
