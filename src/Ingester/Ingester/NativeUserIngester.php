@@ -42,7 +42,7 @@ class NativeUserIngester
         $this->assignmentRepository = $assignmentRepository;
     }
 
-    public function ingest(UserDtoCollection $users)
+    public function ingest(UserDtoCollection $users): void
     {
         try {
             $assignmentDtoCollection = new AssignmentDtoCollection();
