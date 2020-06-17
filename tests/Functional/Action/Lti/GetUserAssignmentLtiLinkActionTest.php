@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -26,7 +29,7 @@ use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use App\Lti\Request\LtiRequest;
 use App\Repository\UserRepository;
 use App\Security\OAuth\OAuthContext;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
@@ -38,7 +41,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
     use LoggerTestingTrait;
 
@@ -49,10 +52,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
-        $this->setUpFixtures();
-
         $this->kernelBrowser = self::createClient();
+
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();
     }
@@ -132,7 +135,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'OaXyh9RqBX8maLsHb2ToCRGGC7c=',
+                    'oauth_signature' => 'oxXzS9KaVG7kiu6SIqRXCYgZn7E=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -140,7 +143,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
-                    'user_id' => 1,
+                    'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
@@ -181,7 +184,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'tPlvsHl9eZ5MFEHBqemqLsjAtNo=',
+                    'oauth_signature' => 'Wv2Cjd2fo3ZiznrdSNB5qrgd2OQ=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -189,7 +192,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
-                    'user_id' => 1,
+                    'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
@@ -238,7 +241,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'myKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'kfwT0UTPN2CZvmjvOJOPUSoJPp8=',
+                    'oauth_signature' => 'NDgJcOtOaGTc/t44toJNoYXdCd8=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -246,7 +249,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
-                    'user_id' => 1,
+                    'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
                     'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',

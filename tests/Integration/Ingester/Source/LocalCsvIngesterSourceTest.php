@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -70,5 +73,13 @@ class LocalCsvIngesterSourceTest extends TestCase
             $this->assertEquals('key', $row['ltiKey']);
             $this->assertEquals('secret', $row['ltiSecret']);
         }
+    }
+
+    public function testContentIsCountable(): void
+    {
+        $subject = new LocalCsvIngesterSource();
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->assertSame(3, $subject->count());
     }
 }

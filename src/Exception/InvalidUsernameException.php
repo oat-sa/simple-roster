@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,20 +20,10 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Traits;
+namespace App\Exception;
 
-trait DatabaseFixturesTrait
+use RuntimeException;
+
+class InvalidUsernameException extends RuntimeException
 {
-    use DatabaseTrait;
-
-    protected function setUp(): void
-    {
-        $this->setUpDatabase();
-        $this->setUpFixtures();
-    }
-
-    protected function setUpFixtures(): void
-    {
-        static::populateDatabase();
-    }
 }

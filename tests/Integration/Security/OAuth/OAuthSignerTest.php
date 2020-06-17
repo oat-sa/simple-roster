@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -22,9 +25,9 @@ namespace App\Tests\Integration\Security\OAuth;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 
-class OAuthSignerTest extends KernelTestCase
+class OAuthSignerTest extends TestCase
 {
     private const TIMESTAMP = '1549615519';
 

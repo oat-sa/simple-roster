@@ -19,6 +19,8 @@ services:
 
     simple-roster-phpfpm:
         container_name: simple-roster-phpfpm
+        env_file:
+          - .env.docker
         build:
             context: ./docker/phpfpm
         expose:
@@ -65,7 +67,7 @@ services:
             - POSTGRES_PASSWORD=simple-roster
             - POSTGRES_DB=simple-roster
         volumes:
-            - simple-roster-postgres-volume:/var/lib/postgresql
+            - simple-roster-postgres-volume:/var/lib/postgres/data:cached
 
     simple-roster-blackfire:
         container_name: simple-roster-blackfire

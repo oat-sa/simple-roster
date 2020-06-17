@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -24,13 +27,13 @@ use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Tests\Traits\DatabaseTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LineItemIngesterTest extends KernelTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     /** @var LineItemIngester */
     private $subject;
@@ -38,6 +41,8 @@ class LineItemIngesterTest extends KernelTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        self::bootKernel();
 
         $this->setUpDatabase();
 

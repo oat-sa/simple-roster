@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -137,7 +140,7 @@ class GetUserAssignmentLtiRequestService
         return sprintf(
             '%s/%s',
             $link,
-            base64_encode(json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
+            base64_encode((string)json_encode(['delivery' => $assignment->getLineItem()->getUri()]))
         );
     }
 
@@ -148,7 +151,7 @@ class GetUserAssignmentLtiRequestService
             'lti_version' => LtiRequest::LTI_VERSION,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment->getUser()),
             'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getId(),
+            'user_id' => $assignment->getUser()->getUsername(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate(

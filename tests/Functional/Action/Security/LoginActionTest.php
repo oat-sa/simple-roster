@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,20 +22,32 @@
 
 namespace App\Tests\Functional\Action\Security;
 
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
+
+    /** @var KernelBrowser */
+    private $kernelBrowser;
+
+    protected function setUp(): void
+    {
+        $this->kernelBrowser = self::createClient();
+
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
+        parent::setUp();
+    }
 
     public function testItFailsWithWrongCredentials(): void
     {
-        $kernelBrowser = self::createClient();
-
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/auth/login',
             [],
@@ -43,17 +58,15 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'invalid', 'password' => 'invalid'])
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         $this->assertEquals('Invalid credentials.', $decodedResponse['error']);
     }
 
     public function testItLogsInProperlyTheUser(): void
     {
-        $kernelBrowser = self::createClient();
-
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/auth/login',
             [],
@@ -64,11 +77,11 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'user1', 'password' => 'password'])
         );
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertArrayHasKey('set-cookie', $kernelBrowser->getResponse()->headers->all());
+        $this->assertArrayHasKey('set-cookie', $this->kernelBrowser->getResponse()->headers->all());
 
-        $session = $kernelBrowser->getContainer()->get('session');
+        $session = $this->kernelBrowser->getContainer()->get('session');
 
         $this->assertNotEmpty($session->all());
     }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,19 +23,20 @@
 namespace App\Tests\Functional\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
+use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -47,7 +51,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
 
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(DoctrineResultCacheWarmerCommand::NAME));
@@ -58,19 +62,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
-        ]);
-    }
-
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute([]);
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItCanWarmResultCacheForAllUsers(): void
@@ -95,11 +88,30 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+    }
 
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 100',
-            $this->commandTester->getDisplay()
-        );
+    public function testItCanRefreshAlreadyExistingResultCache(): void
+    {
+        $this->getEntityManager()
+            ->createNativeQuery("UPDATE line_items SET label = 'expected label'", new ResultSetMapping())
+            ->execute();
+
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--batch-size' => '1',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        for ($i = 1; $i <= 100; $i++) {
+            $username = sprintf('user_%d', $i);
+            /** @var User $user */
+            $user = $this->getRepository(User::class)->findOneBy(['username' => $username]);
+
+            $this->assertSame('expected label', $user->getLastAssignment()->getLineItem()->getLabel());
+        }
     }
 
     public function testItCanWarmUpResultCacheByListOfUsers(): void
@@ -130,11 +142,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertStringContainsString(
             '[OK] 10 result cache entries have been successfully warmed up.',
-            $this->commandTester->getDisplay()
-        );
-
-        $this->assertStringContainsString(
-            'Number of warmed up cache entries: 10',
             $this->commandTester->getDisplay()
         );
     }
@@ -169,9 +176,21 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             '[OK] 60 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
+    }
+
+    public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
+    {
+        $this->assertEquals(0, $this->commandTester->execute(
+            [
+                '--line-item-ids' => '999',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
 
         $this->assertStringContainsString(
-            'Number of warmed up cache entries: 60',
+            '[OK] No matching cache entries, exiting.',
             $this->commandTester->getDisplay()
         );
     }
@@ -211,7 +230,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /**
      * @dataProvider provideInvalidFilterOption
      */
-    public function testItThrowsExceptionIfInvalidUserIdsOptionReceived($invalidOptionValue): void
+    public function testItThrowsExceptionIfInvalidUserIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'user-ids' option received.");
@@ -229,7 +248,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     /**
      * @dataProvider provideInvalidFilterOption
      */
-    public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived($invalidOptionValue): void
+    public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived(string $invalidOptionValue): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'line-item-ids' option received.");

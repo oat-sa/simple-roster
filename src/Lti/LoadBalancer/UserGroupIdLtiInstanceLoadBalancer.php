@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -36,7 +39,7 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             );
         }
 
-        return $this->getLoadBalancedLtiInstanceUrl($user->getGroupId());
+        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getGroupId());
     }
 
     /**
@@ -50,6 +53,6 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             );
         }
 
-        return $user->getGroupId();
+        return (string)$user->getGroupId();
     }
 }

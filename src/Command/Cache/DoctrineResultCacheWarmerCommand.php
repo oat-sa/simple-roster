@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,27 +22,26 @@
 
 namespace App\Command\Cache;
 
-use App\Command\CommandWatcherTrait;
+use App\Command\CommandProgressBarFormatterTrait;
 use App\Entity\User;
+use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DoctrineResultCacheWarmerCommand extends Command
 {
-    use CommandWatcherTrait;
+    use CommandProgressBarFormatterTrait;
 
     public const NAME = 'roster:doctrine-result-cache:warmup';
 
@@ -49,7 +51,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
-    /** @var Cache|null */
+    /** @var Cache */
     private $resultCacheImplementation;
 
     /** @var UserCacheIdGenerator */
@@ -64,9 +66,6 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var SymfonyStyle */
     private $symfonyStyle;
 
-    /** @var ConsoleSectionOutput */
-    private $consoleSectionOutput;
-
     /** @var int */
     private $batchSize;
 
@@ -76,6 +75,9 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var array */
     private $lineItemIds = [];
 
+    /**
+     * @throws DoctrineResultCacheImplementationNotFoundException
+     */
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
         Configuration $doctrineConfiguration,
@@ -84,15 +86,24 @@ class DoctrineResultCacheWarmerCommand extends Command
         parent::__construct(self::NAME);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
         $this->entityManager = $entityManager;
+
+        $resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
+
+        if ($resultCacheImplementation === null) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $this->resultCacheImplementation = $resultCacheImplementation;
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
         $this->userRepository = $userRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -124,12 +135,10 @@ class DoctrineResultCacheWarmerCommand extends Command
     /**
      * @throws InvalidArgumentException
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $consoleOutput = $this->ensureConsoleOutput($output);
-
-        $this->symfonyStyle = new SymfonyStyle($input, $consoleOutput);
-        $this->consoleSectionOutput = $consoleOutput->section();
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
+        $this->symfonyStyle->title('Simple Roster - Doctrine Result Cache Warmer');
 
         $this->initializeBatchSizeOption($input);
 
@@ -152,16 +161,30 @@ class DoctrineResultCacheWarmerCommand extends Command
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @throws ORMException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->startWatch(self::NAME, __FUNCTION__);
-
         $offset = 0;
         $numberOfWarmedUpCacheEntries = 0;
 
-        $this->symfonyStyle->note('Warming up doctrine result cache...');
-        $this->consoleSectionOutput->writeln('Number of warmed up cache entries: 0');
+        $this->symfonyStyle->note('Calculating total number of entries to warm up...');
+
         $numberOfTotalUsers = $this->getNumberOfTotalUsers();
+
+        if ($numberOfTotalUsers === 0) {
+            $this->symfonyStyle->success('No matching cache entries, exiting.');
+
+            return 0;
+        }
+
+        $this->symfonyStyle->note('Warming up doctrine result cache...');
+
+        $progressBar = $this->createNewFormattedProgressBar($output);
+
+        $progressBar->setMaxSteps($numberOfTotalUsers);
+        $progressBar->start();
 
         do {
             $iterateResult = $this
@@ -177,13 +200,13 @@ class DoctrineResultCacheWarmerCommand extends Command
             }
 
             if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
-                $this->consoleSectionOutput->overwrite(
-                    sprintf('Number of warmed up cache entries: %s', $numberOfWarmedUpCacheEntries)
-                );
+                $progressBar->advance($this->batchSize);
             }
 
             $offset += $this->batchSize;
         } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+
+        $progressBar->finish();
 
         $this->symfonyStyle->success(
             sprintf(
@@ -191,8 +214,6 @@ class DoctrineResultCacheWarmerCommand extends Command
                 $numberOfWarmedUpCacheEntries
             )
         );
-
-        $this->symfonyStyle->note(sprintf('Took: %s', $this->stopWatch(self::NAME)));
 
         return 0;
     }
@@ -267,23 +288,6 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->entityManager->clear();
 
         unset($user);
-    }
-
-    /**
-     * @throws LogicException
-     */
-    private function ensureConsoleOutput(OutputInterface $output): ConsoleOutputInterface
-    {
-        if (!$output instanceof ConsoleOutputInterface) {
-            throw new LogicException(
-                sprintf(
-                    "Output must be instance of '%s' because of section usage.",
-                    ConsoleOutputInterface::class
-                )
-            );
-        }
-
-        return $output;
     }
 
     /**

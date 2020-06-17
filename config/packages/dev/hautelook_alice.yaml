@@ -1,2 +1,2 @@
 hautelook_alice:
-    fixtures_path: fixtures/default
+    fixtures_path: tests/Fixtures/

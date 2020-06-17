@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -110,7 +113,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getInfrastructure(): ?Infrastructure
+    public function getInfrastructure(): Infrastructure
     {
         return $this->infrastructure;
     }
@@ -136,8 +139,8 @@ class LineItem implements JsonSerializable, EntityInterface
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
-            'startDateTime' => $this->getStartAt() ? $this->getStartAt()->getTimestamp() : '',
-            'endDateTime' => $this->getEndAt() ? $this->getEndAt()->getTimestamp() : '',
+            'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
+            'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'infrastructure' => $this->getInfrastructure()->getId(),
         ];
     }

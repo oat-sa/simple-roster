@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,14 +24,14 @@ namespace App\Tests\Integration\Repository;
 
 use App\Entity\Assignment;
 use App\Repository\AssignmentRepository;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use DateInterval;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AssignmentRepositoryTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var AssignmentRepository */
     private $subject;
@@ -37,11 +40,10 @@ class AssignmentRepositoryTest extends KernelTestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
+        self::bootKernel();
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../fixtures/usersWithStartedButStuckAssignments.yml',
-        ]);
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $this->subject = self::$container->get(AssignmentRepository::class);
     }

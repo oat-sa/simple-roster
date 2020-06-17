@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,17 +24,28 @@ namespace App\Tests\Unit\Ingester\Source;
 
 use App\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class S3CsvIngesterSourceTest extends TestCase
 {
+    /** @var S3CsvIngesterSource */
+    private $subject;
+
+    /** @var S3Client|MockObject */
+    private $s3ClientMock;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->s3ClientMock = $this->createMock(S3Client::class);
+
+        $this->subject = new S3CsvIngesterSource($this->s3ClientMock, 'bucket');
+    }
+
     public function testRegistryItemName(): void
     {
-        $subject = new S3CsvIngesterSource(
-            $this->createMock(S3Client::class),
-            'bucket'
-        );
-
-        $this->assertEquals('s3', $subject->getRegistryItemName());
+        $this->assertEquals('s3', $this->subject->getRegistryItemName());
     }
 }

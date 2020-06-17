@@ -22,7 +22,6 @@
         "symfony/console": "^4.0",
         "symfony/dotenv": "^4.2",
         "symfony/flex": "^1.1",
-        "symfony/form": "^4.0",
         "symfony/framework-bundle": "^4.0",
         "symfony/monolog-bundle": "^3.0",
         "symfony/orm-pack": "^1.0",
@@ -40,13 +39,14 @@
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "hautelook/alice-bundle": "^2.3",
         "infection/infection": "^0.13",
+        "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.11",
         "phpstan/phpstan-doctrine": "^0.11",
         "phpstan/phpstan-phpunit": "^0.11",
         "phpstan/phpstan-symfony": "^0.11",
-        "phpunit/phpunit": "<8.3",
+        "sensiolabs/security-checker": "^6.0",
         "symfony/debug-bundle": "^4.0",
-        "symfony/phpunit-bridge": "^4.3",
+        "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
         "symfony/var-dumper": "^4.0",
         "symfony/web-server-bundle": "^4.0"
@@ -77,7 +77,8 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd"
+            "cache:clear": "symfony-cmd",
+            "security-checker security:check": "script"
         },
         "post-install-cmd": [
             "@auto-scripts"

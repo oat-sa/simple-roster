@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,9 +24,8 @@ namespace App\Tests\Functional\Command\Bulk;
 
 use App\Command\Bulk\BulkCancelUsersAssignmentsCommand;
 use App\Entity\Assignment;
-use App\Tests\Traits\DatabaseManualFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
-use LogicException;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -31,7 +33,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
 {
-    use DatabaseManualFixturesTrait;
+    use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
     /** @var CommandTester */
@@ -41,15 +43,13 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $this->setUpTestLogHandler();
-
+        $kernel = self::bootKernel();
         $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(BulkCancelUsersAssignmentsCommand::NAME));
 
-        $this->loadFixtures([
-            __DIR__ . '/../../../../fixtures/100usersWithAssignments.yml',
-        ]);
+        $this->setUpDatabase();
+        $this->setUpTestLogHandler();
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItCanCancelUserAssignments(): void
@@ -67,10 +67,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Processed: 100, batched errors: 0',
-            $this->commandTester->getDisplay()
-        );
         $this->assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
@@ -128,22 +124,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         $this->assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
     }
 
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../Resources/Assignment/100-users.csv',
-                '--batch' => 5,
-            ]
-        );
-    }
-
     public function testItThrowsRuntimeExceptionIfUsernameColumnCannotBeFoundInSourceCsvFile(): void
     {
         $output = $this->commandTester->execute(
@@ -178,10 +158,6 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Processed: 100, batched errors: 5',
-            $this->commandTester->getDisplay()
-        );
         $this->assertStringContainsString(
             "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()

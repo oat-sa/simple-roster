@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,8 +22,8 @@
 
 namespace App\EventSubscriber;
 
-use App\Security\OAuth\OAuthContext;
 use App\Repository\InfrastructureRepository;
+use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use App\Security\OAuth\OAuthSigner;
 use Doctrine\ORM\NonUniqueResultException;

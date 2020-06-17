@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -78,7 +81,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -90,7 +93,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getLineItem(): ?LineItem
+    public function getLineItem(): LineItem
     {
         return $this->lineItem;
     }

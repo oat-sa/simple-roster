@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -83,6 +86,33 @@ class S3CsvIngesterSourceTest extends TestCase
             $this->assertEquals('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
             $this->assertEquals('key', $row['ltiKey']);
             $this->assertEquals('secret', $row['ltiSecret']);
+        }
+    }
+
+    public function testContentIsCountable(): void
+    {
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->subject->setDelimiter('|');
+
+        $this->assertSame(3, $this->subject->count());
+    }
+
+    public function testItDoesFetchContentFromS3OnlyOnce(): void
+    {
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+
+        $this->subject->getContent();
+
+        // Retrieving it a second time should result in using class property cache.
+        $output = $this->subject->getContent();
+
+        foreach ($output as $row) {
+            $this->assertCount(4, $row);
+            $this->assertStringContainsString('infra', $row['label']);
+            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            $this->assertStringContainsString('key', $row['ltiKey']);
+            $this->assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -48,7 +51,9 @@ class UserRequestSessionLogProcessor
     {
         $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
         $record['extra']['sessionId'] = $this->session->getId();
-        $record['extra']['username'] = $this->security->getUser() ? $this->security->getUser()->getUsername() : 'guest';
+        $record['extra']['username'] = $this->security->getUser() !== null
+            ? $this->security->getUser()->getUsername()
+            : 'guest';
 
         return $record;
     }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -83,7 +86,7 @@ class ErrorHandlerSubscriberTest extends TestCase
             ->willReturn(true);
 
         $event
-            ->method('getException')
+            ->method('getThrowable')
             ->willReturn($expectedException);
 
         $event->expects($this->once())

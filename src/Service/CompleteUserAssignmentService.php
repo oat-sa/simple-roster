@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -22,6 +25,7 @@ namespace App\Service;
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
+use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService
@@ -40,6 +44,7 @@ class CompleteUserAssignmentService
 
     /**
      * @throws AssignmentNotFoundException
+     * @throws ORMException
      */
     public function markAssignmentAsCompleted(int $assignmentId): void
     {

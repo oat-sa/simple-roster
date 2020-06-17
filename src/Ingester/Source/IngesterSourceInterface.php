@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,9 +23,10 @@
 namespace App\Ingester\Source;
 
 use App\Ingester\Registry\RegistryItemInterface;
+use Countable;
 use Traversable;
 
-interface IngesterSourceInterface extends RegistryItemInterface
+interface IngesterSourceInterface extends RegistryItemInterface, Countable
 {
     public const DEFAULT_CSV_DELIMITER = ',';
     public const DEFAULT_CSV_CHARSET = 'UTF-8';

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,14 +24,14 @@ namespace App\Tests\Functional\Command\Ingester;
 
 use App\Command\Ingester\IngesterCommand;
 use App\Entity\Infrastructure;
-use App\Tests\Traits\DatabaseTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class IngesterCommandTest extends KernelTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -37,9 +40,11 @@ class IngesterCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
-        $application = new Application($kernel);
+        $kernel = self::bootKernel();
 
+        $this->setUpDatabase();
+
+        $application = new Application($kernel);
         $this->commandTester = new CommandTester($application->find(IngesterCommand::NAME));
     }
 
@@ -151,6 +156,6 @@ class IngesterCommandTest extends KernelTestCase
      */
     private function normalizeDisplay(string $commandDisplay): string
     {
-        return trim(preg_replace('/\s+/', ' ', $commandDisplay));
+        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }

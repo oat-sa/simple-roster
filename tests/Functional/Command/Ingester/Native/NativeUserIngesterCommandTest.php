@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -26,15 +29,14 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTrait;
-use LogicException;
+use App\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class NativeUserIngesterCommandTest extends KernelTestCase
 {
-    use DatabaseTrait;
+    use DatabaseTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -43,25 +45,12 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = $this->setUpDatabase();
+        $kernel = self::bootKernel();
+
         $application = new Application($kernel);
-
         $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
-    }
 
-    public function testItThrowsExceptionIfNoConsoleOutputWasFound(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            "Output must be instance of 'Symfony\Component\Console\Output\ConsoleOutputInterface' because of section usage."
-        );
-
-        $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-            ]
-        );
+        $this->setUpDatabase();
     }
 
     public function testItDoesNotIngestUsersInDryRun(): void
@@ -79,11 +68,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 0, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(0, $this->getRepository(User::class)->findAll());
     }
 
@@ -103,11 +87,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
@@ -134,11 +113,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
@@ -165,10 +139,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 12, batched errors: 0',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -224,11 +194,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         );
 
         $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
-            'Total of users imported: 1, batched errors: 1',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
-
         $this->assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
@@ -241,7 +206,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
      */
     private function normalizeDisplay(string $commandDisplay): string
     {
-        return trim(preg_replace('/\s+/', ' ', $commandDisplay));
+        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 
     private function prepareIngestionContext(): void

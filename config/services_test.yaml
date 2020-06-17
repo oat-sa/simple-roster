@@ -1,3 +1,6 @@
 services:
     _defaults:
         public: true
+
+    app.doctrine_cache.provider:
+        class: Doctrine\Common\Cache\ArrayCache

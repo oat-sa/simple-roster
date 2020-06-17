@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,18 +20,22 @@
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Traits;
+namespace App\Command;
 
-use Fidry\AliceDataFixtures\Loader\PurgerLoader;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
-trait DatabaseManualFixturesTrait
+trait CommandProgressBarFormatterTrait
 {
-    use DatabaseTrait;
+    /** @var string */
+    public $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
 
-    protected function loadFixtures(array $files): void
+    public function createNewFormattedProgressBar(OutputInterface $output): ProgressBar
     {
-        /** @var PurgerLoader $loader */
-        $loader = static::$container->get('fidry_alice_data_fixtures.loader.doctrine');
-        $loader->load($files);
+        $progressBar = new ProgressBar($output);
+
+        $progressBar->setFormat($this->format);
+
+        return $progressBar;
     }
 }

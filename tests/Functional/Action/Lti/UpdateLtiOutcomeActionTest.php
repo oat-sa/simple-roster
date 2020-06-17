@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,31 +24,40 @@ namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
 use App\Entity\Infrastructure;
-use App\Security\OAuth\OAuthContext;
 use App\Repository\AssignmentRepository;
 use App\Repository\InfrastructureRepository;
+use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Tests\Traits\DatabaseTestingTrait;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLtiOutcomeActionTest extends WebTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
+
+    /** @var KernelBrowser */
+    private $kernelBrowser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->kernelBrowser = self::createClient();
+        $this->setUpDatabase();
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+    }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $kernelBrowser = static::createClient();
+        $this->kernelBrowser->request('POST', '/api/v1/lti/outcome');
 
-        $kernelBrowser->request('POST', '/api/v1/lti/outcome');
-
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongAuthentication(): void
     {
-        $kernelBrowser = static::createClient();
-
         $infrastructure = $this->getInfrastructure();
 
         $queryParameters = http_build_query([
@@ -58,7 +70,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -68,13 +80,11 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             ]
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $kernelBrowser = static::createClient();
-
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
@@ -93,7 +103,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -104,7 +114,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_COMPLETED,
@@ -114,8 +124,6 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $kernelBrowser = static::createClient();
-
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
@@ -133,7 +141,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -144,7 +152,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_READY,
@@ -154,8 +162,6 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $kernelBrowser = static::createClient();
-
         $infrastructure = $this->getInfrastructure();
 
         $time = time();
@@ -176,7 +182,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
-        $kernelBrowser->request(
+        $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti/outcome? '. $queryParameters,
             [],
@@ -187,7 +193,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
             Assignment::STATE_READY,

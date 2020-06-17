@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,9 +23,9 @@
 namespace App\Tests\Integration\Security\Provider;
 
 use App\Entity\User;
-use App\Security\Provider\UserProvider;
 use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseFixturesTrait;
+use App\Security\Provider\UserProvider;
+use App\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +36,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserProviderTest extends KernelTestCase
 {
-    use DatabaseFixturesTrait;
+    use DatabaseTestingTrait;
 
     /** @var UserProvider */
     private $subject;
@@ -44,6 +47,8 @@ class UserProviderTest extends KernelTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        self::bootKernel();
 
         $this->setUpDatabase();
 
@@ -123,6 +128,9 @@ class UserProviderTest extends KernelTestCase
                 return 'invalid';
             }
 
+            /**
+             * @return void
+             */
             public function eraseCredentials()
             {
             }

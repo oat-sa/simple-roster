@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,15 +22,12 @@
 
 namespace App\Tests\Functional\Action\HealthCheck;
 
-use App\Tests\Traits\DatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckActionTest extends WebTestCase
 {
-    use DatabaseTrait;
-
     public function testItReturns200WhenApplicationInHealthy(): void
     {
         $kernelBrowser = self::createClient();

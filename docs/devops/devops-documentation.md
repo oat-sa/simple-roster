@@ -16,6 +16,7 @@
 - [Useful commands](#useful-commands)
 - [Application logs](#application-logs)
 - [Production environment - checklist](https://symfony.com/doc/current/performance.html)
+- [Blackfire usage](#blackfire-usage)
 
 ## Environment variables
 
@@ -60,10 +61,12 @@ The main configuration file is `.env`, located in root folder.
 
 #### Blackfire related environment variables
 
-| Parameter | Description |
-| ------------- |:-------------|
-| BLACKFIRE_SERVER_ID | Blackfire server id |
-| BLACKFIRE_SERVER_TOKEN | Blackfire server token |
+If you need to use blackfire, you can simply edit the `.env` file settings with your blackfire credentials.
+
+```dotenv
+BLACKFIRE_SERVER_ID=<your_backfire_id>
+BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
+```
 
 ## Application setup steps
 
@@ -134,7 +137,7 @@ If you do so, please make sure to include the leading slash character, but *NO* 
 
 Example:
 
-```bash
+```dotenv
 APP_ROUTE_PREFIX=/api/v1
 ```
 
@@ -185,3 +188,4 @@ $ bin/console doctrine:cache:clear-result
 ## Application logs
 
 Application logs are populated in `var/log/[dev|prod].log`
+

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -129,9 +132,9 @@ class User implements UserInterface, EntityInterface
         return !$this->assignments->isEmpty();
     }
 
-    public function getLastAssignment(): ?Assignment
+    public function getLastAssignment(): Assignment
     {
-        return $this->assignments->last() ?: null;
+        return $this->assignments->last();
     }
 
     public function removeAssignment(Assignment $assignment): self
@@ -206,7 +209,7 @@ class User implements UserInterface, EntityInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         $this->plainPassword = null;
     }

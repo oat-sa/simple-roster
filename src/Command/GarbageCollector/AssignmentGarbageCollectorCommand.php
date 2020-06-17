@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -48,6 +51,9 @@ class AssignmentGarbageCollectorCommand extends Command
     /** @var DateInterval */
     private $cleanUpInterval;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger,

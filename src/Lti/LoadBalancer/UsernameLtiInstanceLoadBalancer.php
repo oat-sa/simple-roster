@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  *  This program is free software; you can redistribute it and/or
@@ -27,7 +29,7 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
     public function getLtiInstanceUrl(User $user): string
     {
-        return $this->getLoadBalancedLtiInstanceUrl($user->getUsername());
+        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getUsername());
     }
 
     /**

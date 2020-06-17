@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,9 +24,9 @@ namespace App\Action\Lti;
 
 use App\Exception\AssignmentNotFoundException;
 use App\Exception\InvalidLtiReplaceResultBodyException;
+use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
 use App\Responder\SerializerResponder;
 use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
-use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
 use App\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
