@@ -48,6 +48,9 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var Infrastructure */
     private $infrastructure;
 
+    /** @var int */
+    private $maxAttempts;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,6 +137,18 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt <= $date && $this->endAt >= $date;
     }
 
+    public function getMaxAttempts(): int
+    {
+        return $this->maxAttempts;
+    }
+
+    public function setMaxAttempts(int $maxAttempts): self
+    {
+        $this->maxAttempts = $maxAttempts;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -142,6 +157,7 @@ class LineItem implements JsonSerializable, EntityInterface
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'infrastructure' => $this->getInfrastructure()->getId(),
+            'maxAttempts' => $this->getMaxAttempts(),
         ];
     }
 }

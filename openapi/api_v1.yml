@@ -288,6 +288,10 @@ components:
           type: integer
           description: The infrastructure ID
           example: 1
+        maxAttempts:
+          type: integer
+          description: The maximum number of attempts
+          example: 1
     BulkCreateOperation:
       type: object
       properties:

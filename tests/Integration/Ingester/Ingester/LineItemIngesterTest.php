@@ -104,7 +104,8 @@ class LineItemIngesterTest extends KernelTestCase
                 'slug' => 'gra13_ita_1',
                 'infrastructure' => 'infra_2',
                 'startTimestamp' => '1546682400',
-                'endTimestamp' => '1546713000'
+                'endTimestamp' => '1546713000',
+                'maxAttempts' => 0,
             ],
             $failure->getData()
         );

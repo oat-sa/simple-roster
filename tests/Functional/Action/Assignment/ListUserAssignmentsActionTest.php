@@ -91,6 +91,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
                         'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
                 ],
             ],
