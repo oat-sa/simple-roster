@@ -72,7 +72,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $this->commandTester->execute([]));
         $this->assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
@@ -93,14 +93,25 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             ]
         ));
         $this->assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $this->assertHasLogRecordWithMessage(
                 sprintf(
-                    "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.",
+                    "Assignment with id='%s' of user with username='%s' has been collected and marked as 'completed' by garbage collector.",
+                    $i,
+                    'userWithStartedButStuckAssignment_' . $i
+                ),
+                Logger::INFO
+            );
+        }
+
+        for ($i = 4; $i <= 10; $i++) {
+            $this->assertHasLogRecordWithMessage(
+                sprintf(
+                    "Assignment with id='%s' of user with username='%s' has been collected and marked as 'ready' by garbage collector.",
                     $i,
                     'userWithStartedButStuckAssignment_' . $i
                 ),
@@ -110,7 +121,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         /** @var Assignment $assignment */
         foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
-            $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());
+            $this->assertCollectedAssignmentStateIsCorrect($assignment);
             $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
         }
     }
@@ -129,13 +140,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             )
         );
         $this->assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully marked as 'completed'.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
         /** @var Assignment $assignment */
         foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
-            $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());
+            $this->assertCollectedAssignmentStateIsCorrect($assignment);
             $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
         }
     }
@@ -147,5 +158,14 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             "[ERROR] Invalid 'batch-size' argument received.",
             $this->commandTester->getDisplay()
         );
+    }
+
+    public function assertCollectedAssignmentStateIsCorrect(Assignment $assignment): void
+    {
+        if ($assignment->getLineItem()->getMaxAttempts() === 0 || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()) {
+            $this->assertEquals(Assignment::STATE_READY, $assignment->getState());
+        } else {
+            $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());
+        }
     }
 }

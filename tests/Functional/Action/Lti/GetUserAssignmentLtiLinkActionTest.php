@@ -112,7 +112,29 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedWithUsernameLoadBalancerStrategy(): void
+    public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $user->getLastAssignment()->setAttemptsCount(2);
+        $this->getEntityManager()->flush();
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $this->assertEquals(
+            "Assignment with id '1' has reached the maximum attempts.",
+            $decodedResponse['error']['message']
+        );
+    }
+
+    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -158,9 +180,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
         $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+        $this->assertEquals(2, $assignment->getAttemptsCount());
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedWithUserGroupIdLoadBalancerStrategy(): void
+    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -207,9 +230,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
         $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+        $this->assertEquals(2, $assignment->getAttemptsCount());
     }
 
-    public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStarted(): void
+    public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
         $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
@@ -264,6 +288,32 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
         $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+        $this->assertEquals(2, $assignment->getAttemptsCount());
+    }
+
+    public function testItDoesNotUpdateStateAndAttemptsCountIfStateIsStarted(): void
+    {
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $assignment->setState(Assignment::STATE_STARTED);
+
+        $this->getEntityManager()->flush();
+
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
+        $this->assertEquals(1, $assignment->getAttemptsCount());
     }
 
     public function testItLogsSuccessfulLtiRequestCreation(): void

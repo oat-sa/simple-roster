@@ -93,6 +93,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
                         'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));

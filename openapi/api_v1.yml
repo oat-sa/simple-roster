@@ -264,6 +264,10 @@ components:
             - completed
             - cancelled
           example: started
+        attemptsCount:
+          type: integer
+          description: Number of time this assignment has been attempted.
+          example: 2
         lineItem:
           $ref: '#/components/schemas/LineItem'
     LineItem:
