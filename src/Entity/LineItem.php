@@ -49,7 +49,7 @@ class LineItem implements JsonSerializable, EntityInterface
     private $infrastructure;
 
     /** @var int */
-    private $maxAttempts;
+    private $maxAttempts = 0;
 
     public function getId(): ?int
     {
@@ -137,7 +137,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt <= $date && $this->endAt >= $date;
     }
 
-    public function getMaxAttempts(): ?int
+    public function getMaxAttempts(): int
     {
         return $this->maxAttempts;
     }
