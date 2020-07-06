@@ -112,6 +112,28 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
+    public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $user->getLastAssignment()->setAttemptsCount(2);
+        $this->getEntityManager()->flush();
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $this->assertEquals(
+            "Assignment with id '1' has reached the maximum attempts.",
+            $decodedResponse['error']['message']
+        );
+    }
+
     public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
