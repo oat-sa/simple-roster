@@ -130,9 +130,11 @@ class LineItemIngesterTest extends KernelTestCase
 
         $lineItem1 = $this->getRepository(LineItem::class)->find(1);
         $this->assertEquals('gra13_ita_1', $lineItem1->getSlug());
+        $this->assertEquals(1, $lineItem1->getMaxAttempts());
 
         $lineItem6 = $this->getRepository(LineItem::class)->find(6);
         $this->assertEquals('gra13_ita_6', $lineItem6->getSlug());
+        $this->assertEquals(2, $lineItem6->getMaxAttempts());
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface
