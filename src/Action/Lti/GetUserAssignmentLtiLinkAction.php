@@ -54,7 +54,8 @@ class GetUserAssignmentLtiLinkAction
         GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger
-    ) {
+    )
+    {
         $this->responder = $responder;
         $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
         $this->entityManager = $entityManager;
@@ -70,9 +71,11 @@ class GetUserAssignmentLtiLinkAction
             $assignment = $user->getAvailableAssignmentById($assignmentId);
             $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 
-            $assignment
-                ->setState(Assignment::STATE_STARTED)
-                ->incrementAttemptsCount();
+            if ($assignment->getState() !== Assignment::STATE_STARTED) {
+                $assignment
+                    ->setState(Assignment::STATE_STARTED)
+                    ->incrementAttemptsCount();
+            }
 
             $this->entityManager->flush();
 

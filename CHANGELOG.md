@@ -10,7 +10,7 @@
 ### Changed
 - Changed LTI outcome state update to `ready` if `Assignment` has additional attempts available.
 - Changed garbage collection state update to `ready` if `Assignment` has additional attempts available.
-- Increment the `attemptsCount` on upon LTI Launch.
+- Increment the `attemptsCount` on upon LTI Launch if state is not started.
 - Set default value of `0` for `attemptsCount` for new assignments during user ingestion.
 
 ## 1.5.0 - 2020-06-17

@@ -130,7 +130,7 @@ class GetUserAssignmentLtiRequestService
             );
         }
 
-        if ($assignment->getAttemptsCount() >= $assignment->getLineItem()->getMaxAttempts()) {
+        if ($assignment->getAttemptsCount() >= $assignment->getLineItem()->getMaxAttempts() && $assignment->getState() !== Assignment::STATE_STARTED) {
             throw new AssignmentNotProcessableException(
                 sprintf("Assignment with id '%s' has reached the maximum attempts.", $assignment->getId())
             );
