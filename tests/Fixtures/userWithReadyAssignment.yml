@@ -13,6 +13,7 @@ App\Entity\LineItem:
         slug: 'lineItemSlug'
         startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+        maxAttempts: 1
 
 App\Entity\User:
     user1:
