@@ -102,12 +102,12 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
 
         $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
 
-        $this->warmUserCache($user);
+        $this->warmUserCache($user, $entityManager);
     }
 
-    private function warmUserCache(User $user): void
+    private function warmUserCache(User $user, EntityManager $entityManager): void
     {
-        if ($user->getId() !== null) {
+        if ($entityManager->getUnitOfWork()->isInIdentityMap($user)) {
             // Refresh by query
             $this->userRepository->getByUsernameWithAssignments((string)$user->getUsername());
         }

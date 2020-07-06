@@ -160,6 +160,28 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $this->subject->onFlush(new OnFlushEventArgs($entityManager));
     }
 
+    public function testItWarmsUpTheCacheAfterInvalidation(): void
+    {
+        $user = (new User())->setUsername('expectedUsername');
+
+        $this
+            ->unitOfWork
+            ->expects($this->once())
+            ->method('isInIdentityMap')
+            ->with($user)
+            ->willReturn(true);
+
+        $this->setUnitOfWorkExpectations([], [], [$user]);
+
+        $this
+            ->userRepository
+            ->expects($this->once())
+            ->method('getByUsernameWithAssignments')
+            ->with($user->getUsername());
+
+        $this->assertCacheDeletion([$user->getUsername()]);
+    }
+
     private function assertCacheDeletion(array $expectedUsernames): void
     {
         $expectedCacheIds = array_map(
