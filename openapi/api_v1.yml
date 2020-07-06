@@ -81,7 +81,7 @@ paths:
   /assignments:
     get:
       summary: List user assignments
-      description: List current authenticated user available assignments (not cancelled, and with valid dates)
+      description: List current authenticated user assignments
       tags:
         - Assignments
       security:

@@ -64,10 +64,8 @@ class ListUserAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnListOfUserAssignmentsWhenCurrentDateMatchesLineItemAvailability(): void
+    public function testItReturnListOfUserAssignments(): void
     {
-        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
-
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
@@ -97,26 +95,5 @@ class ListUserAssignmentsActionTest extends WebTestCase
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
-    }
-
-    public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
-    {
-        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
-
-        $this->logInAs($user, $this->kernelBrowser);
-
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
-
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals(
-            [
-                'assignments' => [],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
-        );
     }
 }
