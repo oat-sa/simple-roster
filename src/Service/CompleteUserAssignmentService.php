@@ -54,7 +54,7 @@ class CompleteUserAssignmentService
             throw new AssignmentNotFoundException(sprintf("Assignment with id '%s' not found.", $assignmentId));
         }
 
-        $assignment->setState(Assignment::STATE_COMPLETED);
+        $assignment->complete();
 
         $this->assignmentRepository->persist($assignment);
         $this->assignmentRepository->flush();

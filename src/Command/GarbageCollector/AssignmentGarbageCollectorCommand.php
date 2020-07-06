@@ -58,7 +58,8 @@ class AssignmentGarbageCollectorCommand extends Command
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger,
         string $cleanUpInterval
-    ) {
+    )
+    {
         parent::__construct(self::NAME);
 
         $this->assignmentRepository = $assignmentRepository;
@@ -141,7 +142,8 @@ class AssignmentGarbageCollectorCommand extends Command
             /** @var Assignment $assignment */
             $assignmentCount = $stuckAssignments->getIterator()->count();
             foreach ($stuckAssignments as $assignment) {
-                $assignment->setState(Assignment::STATE_COMPLETED);
+                $assignment->complete();
+
                 if (!$isDryRun) {
                     $this->assignmentRepository->persist($assignment);
                 }

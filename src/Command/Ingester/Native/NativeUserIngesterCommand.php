@@ -186,11 +186,12 @@ class NativeUserIngesterCommand extends Command
                 );
 
                 $this->assignmentQueryParts[] = sprintf(
-                    "(%s, %s, %s, '%s')",
+                    "(%s, %s, %s, '%s', %d)",
                     $index,
                     $index,
                     $lineItemCollection[$row['slug']]->getId(),
-                    Assignment::STATE_READY
+                    Assignment::STATE_READY,
+                    0
                 );
 
                 if ($index % $this->batchSize === 0) {
@@ -246,7 +247,7 @@ class NativeUserIngesterCommand extends Command
                 $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
 
                 $assignmentQuery = sprintf(
-                    'INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s',
+                    'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
                     implode(',', $this->assignmentQueryParts)
                 );
 

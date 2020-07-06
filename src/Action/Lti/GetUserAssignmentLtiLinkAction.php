@@ -70,7 +70,10 @@ class GetUserAssignmentLtiLinkAction
             $assignment = $user->getAvailableAssignmentById($assignmentId);
             $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 
-            $assignment->setState(Assignment::STATE_STARTED);
+            $assignment
+                ->setState(Assignment::STATE_STARTED)
+                ->incrementAttemptsCount();
+
             $this->entityManager->flush();
 
             $this->logger->info(
