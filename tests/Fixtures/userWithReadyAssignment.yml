@@ -26,3 +26,4 @@ App\Entity\Assignment:
     assignment1:
         lineItem: '@lineItem1'
         state: 'ready'
+        attemptsCount: 1
