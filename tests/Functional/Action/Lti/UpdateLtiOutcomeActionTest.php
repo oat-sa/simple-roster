@@ -117,7 +117,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEquals(
-            Assignment::STATE_COMPLETED,
+            Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
     }
