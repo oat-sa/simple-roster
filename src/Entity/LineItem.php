@@ -137,7 +137,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt <= $date && $this->endAt >= $date;
     }
 
-    public function getMaxAttempts(): int
+    public function getMaxAttempts(): ?int
     {
         return $this->maxAttempts;
     }
