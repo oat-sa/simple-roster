@@ -26,6 +26,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\UserRepository;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -36,9 +37,16 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
 
-    public function __construct(UserCacheIdGenerator $userCacheIdGenerator)
+    /** @var UserRepository */
+    private $userRepository;
+
+    /** @var bool */
+    private $enabled = true;
+
+    public function __construct(UserCacheIdGenerator $userCacheIdGenerator, UserRepository $userRepository)
     {
         $this->userCacheIdGenerator = $userCacheIdGenerator;
+        $this->userRepository = $userRepository;
     }
 
     public function getSubscribedEvents()
@@ -53,13 +61,17 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entityManager = $eventArgs->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
         $scheduledEntityChanges = [
             'insert' => $unitOfWork->getScheduledEntityInsertions(),
             'update' => $unitOfWork->getScheduledEntityUpdates(),
-            'delete' => $unitOfWork->getScheduledEntityDeletions()
+            'delete' => $unitOfWork->getScheduledEntityDeletions(),
         ];
 
         foreach ($scheduledEntityChanges as $entities) {
@@ -89,5 +101,20 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         }
 
         $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
+
+        $this->warmUserCache($user);
+    }
+
+    private function warmUserCache(User $user): void
+    {
+        if ($user->getId() !== null) {
+            // Refresh by query
+            $this->userRepository->getByUsernameWithAssignments((string)$user->getUsername());
+        }
+    }
+
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
     }
 }

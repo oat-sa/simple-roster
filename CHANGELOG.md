@@ -13,6 +13,7 @@
 - Increment the `attemptsCount` on upon LTI Launch.
 - Set default value of `0` for `attemptsCount` for new assignments during user ingestion.
 - The `/api/v1//assignments` endpoint now returns all users assignments (available or not).
+- The `UserCacheInvalidationSubscriber` now warms up the cache after invalidating it.
 
 ## 1.5.0 - 2020-06-17
 
