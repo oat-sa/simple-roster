@@ -9,7 +9,11 @@
         </id>
         <field name="state" type="string" column="state" length="255" precision="0" scale="0" nullable="false"/>
         <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
-        <field name="attemptsCount" type="integer" column="attempts_count" precision="0" scale="0" nullable="true"/>
+        <field name="attemptsCount" type="integer" column="attempts_count" precision="0" scale="0" nullable="true">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
         <many-to-one field="user" target-entity="App\Entity\User" inversed-by="assignments" fetch="LAZY">
             <cascade>
                 <cascade-persist/>

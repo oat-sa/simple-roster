@@ -72,12 +72,12 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         $this->assertEquals(0, $this->commandTester->execute([]));
         $this->assertStringContainsString(
-            "[OK] Total of '15' stuck assignments were successfully collected.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
         $this->assertCount(
-            15,
+            10,
             $this->getRepository(Assignment::class)->findBy(['state' => Assignment::STATE_STARTED])
         );
     }
@@ -93,11 +93,11 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             ]
         ));
         $this->assertStringContainsString(
-            "[OK] Total of '15' stuck assignments were successfully collected.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $this->assertHasLogRecordWithMessage(
                 sprintf(
                     "Assignment with id='%s' of user with username='%s' has been collected and marked as 'completed' by garbage collector.",
@@ -108,7 +108,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             );
         }
 
-        for ($i = 6; $i <= 15; $i++) {
+        for ($i = 4; $i <= 10; $i++) {
             $this->assertHasLogRecordWithMessage(
                 sprintf(
                     "Assignment with id='%s' of user with username='%s' has been collected and marked as 'ready' by garbage collector.",
@@ -140,7 +140,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             )
         );
         $this->assertStringContainsString(
-            "[OK] Total of '15' stuck assignments were successfully collected.",
+            "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 

@@ -58,8 +58,7 @@ class AssignmentGarbageCollectorCommand extends Command
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger,
         string $cleanUpInterval
-    )
-    {
+    ) {
         parent::__construct(self::NAME);
 
         $this->assignmentRepository = $assignmentRepository;
