@@ -112,6 +112,32 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
+    public function testItReturns409IfAssignmentIsNotAvailable(): void
+    {
+        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
+        $this->getEntityManager()->flush();
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $this->assertEquals(
+            "Assignment id '1' not found for user 'user1'.",
+            $decodedResponse['error']['message']
+        );
+
+        Carbon::setTestNow();
+    }
+
     public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
     {
         /** @var UserRepository $userRepository */
