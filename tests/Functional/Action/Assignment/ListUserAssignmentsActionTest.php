@@ -64,8 +64,10 @@ class ListUserAssignmentsActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnListOfUserAssignments(): void
+    public function testItReturnListOfUserAssignmentsWhenCurrentDateMatchesLineItemAvailability(): void
     {
+        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->getByUsernameWithAssignments('user1');
@@ -95,5 +97,43 @@ class ListUserAssignmentsActionTest extends WebTestCase
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+    }
+
+    public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
+    {
+        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->getByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+
+        $lineItem = $user->getLastAssignment()->getLineItem();
+
+        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertEquals(
+            [
+                'assignments' => [
+                    [
+                        'id' => $user->getLastAssignment()->getId(),
+                        'username' => $user->getUsername(),
+                        'state' => Assignment::STATE_READY,
+                        'lineItem' => [
+                            'uri' => $lineItem->getUri(),
+                            'label' => $lineItem->getLabel(),
+                            'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
+                            'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
+                            'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                            'maxAttempts' => $lineItem->getMaxAttempts(),
+                        ],
+                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    ],
+                ]
+            ],
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+        );
     }
 }
