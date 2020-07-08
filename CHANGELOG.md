@@ -12,7 +12,7 @@
 - Changed garbage collection state update to `ready` if `Assignment` has additional attempts available.
 - Increment the `attemptsCount` on upon LTI Launch if state is not started.
 - Set default value of `0` for `attemptsCount` for new assignments during user ingestion.
-- The `/api/v1//assignments` endpoint now returns all users assignments (available or not).
+- The `/api/v1/assignments` endpoint now returns all users assignments (available or not).
 
 ## 1.5.0 - 2020-06-17
 
