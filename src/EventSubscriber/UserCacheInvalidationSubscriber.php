@@ -40,9 +40,6 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     /** @var UserRepository */
     private $userRepository;
 
-    /** @var bool */
-    private $enabled = true;
-
     public function __construct(UserCacheIdGenerator $userCacheIdGenerator, UserRepository $userRepository)
     {
         $this->userCacheIdGenerator = $userCacheIdGenerator;
@@ -61,10 +58,6 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
-        if (!$this->enabled) {
-            return;
-        }
-
         $entityManager = $eventArgs->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
@@ -111,10 +104,5 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
             // Refresh by query
             $this->userRepository->getByUsernameWithAssignments((string)$user->getUsername());
         }
-    }
-
-    public function setEnabled(bool $enabled): void
-    {
-        $this->enabled = $enabled;
     }
 }
