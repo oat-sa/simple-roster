@@ -108,9 +108,8 @@ class AssignmentGarbageCollectorCommand extends Command
 
             $successMessage = $numberOfCollectedAssignments !== 0
                 ? sprintf(
-                    "Total of '%s' stuck assignments were successfully marked as '%s'.",
-                    $numberOfCollectedAssignments,
-                    Assignment::STATE_COMPLETED
+                    "Total of '%s' stuck assignments were successfully collected.",
+                    $numberOfCollectedAssignments
                 )
                 : 'Nothing to update.';
 
@@ -141,7 +140,8 @@ class AssignmentGarbageCollectorCommand extends Command
             /** @var Assignment $assignment */
             $assignmentCount = $stuckAssignments->getIterator()->count();
             foreach ($stuckAssignments as $assignment) {
-                $assignment->setState(Assignment::STATE_COMPLETED);
+                $assignment->complete();
+
                 if (!$isDryRun) {
                     $this->assignmentRepository->persist($assignment);
                 }
@@ -149,9 +149,10 @@ class AssignmentGarbageCollectorCommand extends Command
                 $numberOfCollectedAssignments++;
                 $this->logger->info(
                     sprintf(
-                        "Assignment with id='%s' of user with username='%s' has been marked as completed by garbage collector.",
+                        "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.",
                         $assignment->getId(),
-                        $assignment->getUser()->getUsername()
+                        $assignment->getUser()->getUsername(),
+                        $assignment->getState()
                     )
                 );
             }

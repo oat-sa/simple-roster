@@ -81,7 +81,7 @@ paths:
   /assignments:
     get:
       summary: List user assignments
-      description: List current authenticated user available assignments (not cancelled, and with valid dates)
+      description: List current authenticated user assignments
       tags:
         - Assignments
       security:
@@ -264,6 +264,10 @@ components:
             - completed
             - cancelled
           example: started
+        attemptsCount:
+          type: integer
+          description: Number of time this assignment has been attempted.
+          example: 2
         lineItem:
           $ref: '#/components/schemas/LineItem'
     LineItem:
@@ -287,6 +291,10 @@ components:
         infrastructure:
           type: integer
           description: The infrastructure ID
+          example: 1
+        maxAttempts:
+          type: integer
+          description: The maximum number of attempts
           example: 1
     BulkCreateOperation:
       type: object

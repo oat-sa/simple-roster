@@ -68,6 +68,7 @@ class LineItemIngester extends AbstractIngester
             ->setUri($data['uri'])
             ->setLabel($data['label'])
             ->setSlug($data['slug'])
+            ->setMaxAttempts((int)$data['maxAttempts'])
             ->setInfrastructure($this->infrastructureCollection[$data['infrastructure']]);
 
         if (isset($data['startTimestamp']) && $data['endTimestamp']) {

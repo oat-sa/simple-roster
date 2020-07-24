@@ -42,6 +42,6 @@ class ListUserAssignmentsAction
      */
     public function __invoke(UserInterface $user): Response
     {
-        return $this->responder->createJsonResponse(['assignments' => $user->getAvailableAssignments()]);
+        return $this->responder->createJsonResponse(['assignments' => $user->getAssignments()]);
     }
 }

@@ -91,13 +91,15 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
                         'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
     }
 
-    public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
+    public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
     {
         Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
 
@@ -109,10 +111,27 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
+        $lineItem = $user->getLastAssignment()->getLineItem();
+
         $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertEquals(
             [
-                'assignments' => [],
+                'assignments' => [
+                    [
+                        'id' => $user->getLastAssignment()->getId(),
+                        'username' => $user->getUsername(),
+                        'state' => Assignment::STATE_READY,
+                        'lineItem' => [
+                            'uri' => $lineItem->getUri(),
+                            'label' => $lineItem->getLabel(),
+                            'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
+                            'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
+                            'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                            'maxAttempts' => $lineItem->getMaxAttempts(),
+                        ],
+                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    ],
+                ]
             ],
             json_decode($this->kernelBrowser->getResponse()->getContent(), true)
         );

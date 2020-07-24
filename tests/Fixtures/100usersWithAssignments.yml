@@ -13,6 +13,7 @@ App\Entity\LineItem:
     slug: 'lineItemSlug'
     startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
     endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+    maxAttempts: 1
   lineItem2:
     infrastructure: '@infrastructure'
     label: 'The second line item'
@@ -20,6 +21,7 @@ App\Entity\LineItem:
     slug: 'lineItemSlug2'
     startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
     endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+    maxAttempts: 1
   lineItem3:
     infrastructure: '@infrastructure'
     label: 'The third line item'
@@ -27,6 +29,7 @@ App\Entity\LineItem:
     slug: 'lineItemSlug3'
     startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
     endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+    maxAttempts: 1
 
 App\Entity\Assignment:
   assignment_{1..50}:
