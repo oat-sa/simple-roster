@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.6.0 - To be released
+## 1.6.0 - 2020-07-23
 
 ### Added
 - Added new property `maxAttempts` to the `LineItem` entity.
