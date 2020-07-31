@@ -64,7 +64,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
     public function testItSubscribesToKernelRequestEventWithHighestPriority(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 255]],
             RequestIdGeneratorSubscriber::getSubscribedEvents()
         );
@@ -91,8 +91,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
+        $this->assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        $this->assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillGenerateNewRequestIdIfCloudfrontHeaderIsNotPresent(): void
@@ -114,8 +114,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
+        $this->assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        $this->assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillNotSetRequestIdOnSubRequests(): void

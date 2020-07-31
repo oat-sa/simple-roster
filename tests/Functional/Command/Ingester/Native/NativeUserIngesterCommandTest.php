@@ -67,7 +67,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertCount(0, $this->getRepository(User::class)->findAll());
     }
 
@@ -86,14 +86,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $this->assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        $this->assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionSuccess(): void
@@ -112,14 +112,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $this->assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        $this->assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionWithGroupId(): void
@@ -138,7 +138,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -170,7 +170,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(1, $output);
+        $this->assertSame(1, $output);
         $this->assertStringContainsString(
             "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
             $this->commandTester->getDisplay()
@@ -193,11 +193,11 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $this->assertSame('user_1', $user1->getUsername());
     }
 
     private function prepareIngestionContext(): void

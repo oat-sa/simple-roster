@@ -27,6 +27,7 @@ use App\Entity\User;
 use App\EventSubscriber\UserCacheInvalidationSubscriber;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -53,6 +54,9 @@ class UserCacheInvalidationSubscriberTest extends TestCase
     /** @var Cache|MockObject */
     private $resultCacheImplementation;
 
+    /** @var UserRepository|MockObject */
+    private $userRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -61,6 +65,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $this->unitOfWork = $this->createMock(UnitOfWork::class);
         $this->userCacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
         $this->resultCacheImplementation = $this->createMock(Cache::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $doctrineConfiguration = $this->createMock(Configuration::class);
         $doctrineConfiguration
@@ -75,12 +80,12 @@ class UserCacheInvalidationSubscriberTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
-        $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator);
+        $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator, $this->userRepository);
     }
 
     public function testSubscribedEvents(): void
     {
-        $this->assertEquals([Events::onFlush], $this->subject->getSubscribedEvents());
+        $this->assertSame([Events::onFlush], $this->subject->getSubscribedEvents());
     }
 
     public function testItInvalidatesSingleUserCacheUponEntityInsertion(): void
@@ -153,6 +158,28 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $this->setUnitOfWorkExpectations([], [$assignment1, $assignment2]);
 
         $this->subject->onFlush(new OnFlushEventArgs($entityManager));
+    }
+
+    public function testItWarmsUpTheCacheAfterInvalidation(): void
+    {
+        $user = (new User())->setUsername('expectedUsername');
+
+        $this
+            ->unitOfWork
+            ->expects($this->once())
+            ->method('isInIdentityMap')
+            ->with($user)
+            ->willReturn(true);
+
+        $this->setUnitOfWorkExpectations([], [], [$user]);
+
+        $this
+            ->userRepository
+            ->expects($this->once())
+            ->method('findByUsernameWithAssignments')
+            ->with($user->getUsername());
+
+        $this->assertCacheDeletion([$user->getUsername()]);
     }
 
     private function assertCacheDeletion(array $expectedUsernames): void

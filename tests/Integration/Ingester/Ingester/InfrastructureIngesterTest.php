@@ -53,9 +53,9 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertEquals('infrastructure', $output->getIngesterType());
+        $this->assertSame('infrastructure', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
-        $this->assertEquals(3, $output->getSuccessCount());
+        $this->assertSame(3, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
         $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
@@ -67,21 +67,21 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals('infrastructure', $output->getIngesterType());
+        $this->assertSame('infrastructure', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
-        $this->assertEquals(3, $output->getSuccessCount());
+        $this->assertSame(3, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
         $this->assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
 
         $user1 = $this->getRepository(Infrastructure::class)->find(1);
-        $this->assertEquals('infra_1', $user1->getLabel());
+        $this->assertSame('infra_1', $user1->getLabel());
 
         $user2 = $this->getRepository(Infrastructure::class)->find(2);
-        $this->assertEquals('infra_2', $user2->getLabel());
+        $this->assertSame('infra_2', $user2->getLabel());
 
         $user3 = $this->getRepository(Infrastructure::class)->find(3);
-        $this->assertEquals('infra_3', $user3->getLabel());
+        $this->assertSame('infra_3', $user3->getLabel());
     }
 
     public function testIngestWithInvalidSource(): void
@@ -90,20 +90,20 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals('infrastructure', $output->getIngesterType());
+        $this->assertSame('infrastructure', $output->getIngesterType());
         $this->assertFalse($output->isDryRun());
-        $this->assertEquals(1, $output->getSuccessCount());
+        $this->assertSame(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
 
         $this->assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
 
         $user1 = $this->getRepository(Infrastructure::class)->find(1);
-        $this->assertEquals('infra_1', $user1->getLabel());
+        $this->assertSame('infra_1', $user1->getLabel());
 
         $failure = current($output->getFailures());
 
-        $this->assertEquals(2, $failure->getLineNumber());
-        $this->assertEquals(
+        $this->assertSame(2, $failure->getLineNumber());
+        $this->assertSame(
             [
                 'label' => 'infra_2',
                 'ltiDirectorLink' => 'http://infra_2.com',

@@ -43,16 +43,17 @@ class NativeAssignmentRepository extends AbstractRepository
         $queryParts = [];
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "(%s, %s, %s, '%s')",
+                "(%s, %s, %s, '%s', %d)",
                 $assignmentDto->getId(),
                 $assignmentDto->getUserId(),
                 $assignmentDto->getLineItemId(),
-                $assignmentDto->getState()
+                $assignmentDto->getState(),
+                0
             );
         }
 
         $query = sprintf(
-            'INSERT INTO assignments (id, user_id, line_item_id, state) VALUES %s',
+            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
             implode(',', $queryParts)
         );
 

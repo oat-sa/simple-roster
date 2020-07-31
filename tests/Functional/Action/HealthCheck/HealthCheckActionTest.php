@@ -34,9 +34,9 @@ class HealthCheckActionTest extends WebTestCase
 
         $kernelBrowser->request(Request::METHOD_GET, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'isDoctrineConnectionAvailable' => true,
                 'isDoctrineCacheAvailable' => true,
@@ -51,6 +51,6 @@ class HealthCheckActionTest extends WebTestCase
 
         $kernelBrowser->request(Request::METHOD_POST, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
     }
 }

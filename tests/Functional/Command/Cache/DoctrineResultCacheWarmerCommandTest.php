@@ -68,7 +68,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmResultCacheForAllUsers(): void
     {
-        $this->assertEquals(0, $this->commandTester->execute(
+        $this->assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
             ],
@@ -96,7 +96,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             ->createNativeQuery("UPDATE line_items SET label = 'expected label'", new ResultSetMapping())
             ->execute();
 
-        $this->assertEquals(0, $this->commandTester->execute(
+        $this->assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
             ],
@@ -116,7 +116,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpResultCacheByListOfUsernames(): void
     {
-        $this->assertEquals(0, $this->commandTester->execute(
+        $this->assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
                 '--usernames' => 'user_1,user_2,user_3,user_4,user_5,user_6,user_7,user_8,user_9,user_10',
@@ -148,7 +148,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpResultCacheByListOfLineItemSlugs(): void
     {
-        $this->assertEquals(0, $this->commandTester->execute(
+        $this->assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
                 '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
@@ -180,7 +180,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
     {
-        $this->assertEquals(0, $this->commandTester->execute(
+        $this->assertSame(0, $this->commandTester->execute(
             [
                 '--line-item-slugs' => 'invalid',
             ],

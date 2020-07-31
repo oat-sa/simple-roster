@@ -8,17 +8,37 @@ App\Entity\Infrastructure:
 App\Entity\LineItem:
   lineItem:
     infrastructure: '@infrastructure'
-    label: 'The first line item'
+    label: 'The first line item with 1 maximum attempt'
     uri: 'http://lineitemuri.com'
     slug: 'lineItemSlug'
     startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
     endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+    maxAttempts: 1
+  lineItem2:
+    infrastructure: '@infrastructure'
+    label: 'The second line item with infinite attempts'
+    uri: 'http://lineitemuri.com'
+    slug: 'lineItem2Slug'
+    startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+    endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+    maxAttempts: 0
 
 App\Entity\Assignment:
-  startedButStuckAssignment_{1..10}:
+  startedButStuckAssignment_{1..3}:
     lineItem: '@lineItem'
     state: 'started'
     updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
+    attemptsCount: 1
+  startedButStuckAssignment_{4..7}:
+    lineItem: '@lineItem'
+    state: 'started'
+    updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
+    attemptsCount: 0
+  startedButStuckAssignment_{8..10}:
+    lineItem: '@lineItem2'
+    state: 'started'
+    updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
+    attemptsCount: 1
 
 App\Entity\User:
   userWithStartedButStuckAssignment_{1..10}:

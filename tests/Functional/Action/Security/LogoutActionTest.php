@@ -61,7 +61,7 @@ class LogoutActionTest extends WebTestCase
 
         $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $this->assertEmpty($session->all());
     }

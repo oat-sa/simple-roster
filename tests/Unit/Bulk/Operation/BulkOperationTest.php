@@ -31,9 +31,9 @@ class BulkOperationTest extends TestCase
     {
         $subject = new BulkOperation('identifier', BulkOperation::TYPE_UPDATE, ['key' => 'value']);
 
-        $this->assertEquals('identifier', $subject->getIdentifier());
-        $this->assertEquals(BulkOperation::TYPE_UPDATE, $subject->getType());
-        $this->assertEquals(['key' => 'value'], $subject->getAttributes());
-        $this->assertEquals('value', $subject->getAttribute('key'));
+        $this->assertSame('identifier', $subject->getIdentifier());
+        $this->assertSame(BulkOperation::TYPE_UPDATE, $subject->getType());
+        $this->assertSame(['key' => 'value'], $subject->getAttributes());
+        $this->assertSame('value', $subject->getAttribute('key'));
     }
 }

@@ -64,6 +64,9 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var DateTime */
     private $updatedAt;
 
+    /** @var int */
+    private $attemptsCount = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,12 +137,45 @@ class Assignment implements JsonSerializable, EntityInterface
         return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
     }
 
+    public function getAttemptsCount(): int
+    {
+        return $this->attemptsCount;
+    }
+
+    public function setAttemptsCount(int $attemptsCount): self
+    {
+        $this->attemptsCount = $attemptsCount;
+
+        return $this;
+    }
+
+    public function incrementAttemptsCount(): self
+    {
+        $this->attemptsCount++;
+
+        return $this;
+    }
+
+    public function complete(): self
+    {
+        $maxAttempts = $this->getLineItem()->getMaxAttempts();
+
+        if ($maxAttempts === 0 || $this->getAttemptsCount() < $maxAttempts) {
+            $this->setState(self::STATE_READY);
+        } else {
+            $this->setState(self::STATE_COMPLETED);
+        }
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
             'username' => $this->getUser()->getUsername(),
             'state' => $this->getState(),
+            'attemptsCount' => $this->getAttemptsCount(),
             'lineItem' => $this->lineItem,
         ];
     }

@@ -46,6 +46,6 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testRegistryItemName(): void
     {
-        $this->assertEquals('s3', $this->subject->getRegistryItemName());
+        $this->assertSame('s3', $this->subject->getRegistryItemName());
     }
 }

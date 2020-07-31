@@ -3,17 +3,39 @@
 ## 2.0.0 - TODO: To be released
 
 ### Added
+- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
+
+### Changed
+- Upgraded Symfony framework version from `4` to `5`.
+- Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
+
+## 1.6.0 - 2020-07-23
+
+### Added
+- Added new property `maxAttempts` to the `LineItem` entity.
+- Added support for ingestion of `maxAttempts` on the `LineItemIngester`.
+- Added new property `attemptsCount` to the `Assignment` entity.
+
+### Changed
+- Changed LTI outcome state update to `ready` if `Assignment` has additional attempts available.
+- Changed garbage collection state update to `ready` if `Assignment` has additional attempts available.
+- Increment the `attemptsCount` on upon LTI Launch if state is not started.
+- Set default value of `0` for `attemptsCount` for new assignments during user ingestion.
+- The `/api/v1/assignments` endpoint now returns all users assignments (available or not).
+- The `UserCacheInvalidationSubscriber` now warms up the cache after invalidating it.
+
+## 1.5.0 - 2020-06-17
+
+### Added
 - Added dedicated `docker` application environment for development purposes.
 - Added Pull Request CI pipeline with Jenkins including:
     - Running PHPUnit test suite
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
-    - Running static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer
+    - Running static code analysis with PHPStan
 - Added package dependency security checker into composer. 
 
 ### Changed
-- Upgraded Symfony framework version from `4` to `5`.
-- Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
 - Increased time cost of password encoding from `1` to `3` following [password hashing guidelines](https://libsodium.gitbook.io/doc/password_hashing/the_argon2i_function#guidelines-for-choosing-the-parameters).
 - Changed test suite bootstrapping mechanism to automatically clear cache before executing the test suite.

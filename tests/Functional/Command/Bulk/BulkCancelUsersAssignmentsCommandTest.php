@@ -66,7 +66,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
@@ -90,7 +90,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
 
         for ($i = 1; $i <= 100; $i++) {
             $username = sprintf('user_%s', $i);
@@ -114,7 +114,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
@@ -136,7 +136,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(1, $output);
+        $this->assertSame(1, $output);
         $this->assertStringContainsString(
             "[ERROR] Column 'username' cannot be found in source CSV file.",
             $this->commandTester->getDisplay()
@@ -157,7 +157,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        $this->assertSame(0, $output);
         $this->assertStringContainsString(
             "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()

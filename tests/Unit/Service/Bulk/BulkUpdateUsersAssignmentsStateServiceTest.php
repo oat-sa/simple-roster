@@ -91,7 +91,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertEquals([
+        $this->assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -163,7 +163,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
         $this->subject->process($bulkOperationCollection)->jsonSerialize();
 
-        $this->assertEquals(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+        $this->assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
     }
 
     public function provideUnsupportedAssignmentState(): array

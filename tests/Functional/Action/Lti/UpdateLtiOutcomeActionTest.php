@@ -53,7 +53,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('POST', '/api/v1/lti/outcome');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongAuthentication(): void
@@ -80,7 +80,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             ]
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
@@ -114,10 +114,10 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
-            Assignment::STATE_COMPLETED,
+        $this->assertSame(
+            Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
     }
@@ -152,9 +152,9 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        $this->assertSame(
             Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
@@ -193,9 +193,9 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        $this->assertSame(
             Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );

@@ -70,12 +70,14 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
-            ->setSlug('slug');
+            ->setSlug('slug')
+            ->setMaxAttempts(1);
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
             ->setLineItem($lineItem)
-            ->setUser($user);
+            ->setUser($user)
+            ->setAttemptsCount(1);
 
         $this->assignmentRepository
             ->expects($this->once())
@@ -88,6 +90,43 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->method('persist')
             ->with($this->callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_COMPLETED;
+            }));
+
+        $this->assignmentRepository
+            ->expects($this->once())
+            ->method('flush');
+
+        $this->subject->markAssignmentAsCompleted(5);
+    }
+
+    public function testItMarksAssignmentAsReady(): void
+    {
+        $user = (new User())->setUsername('expectedUsername');
+
+        $lineItem = (new LineItem())
+            ->setInfrastructure(new Infrastructure())
+            ->setUri('uri')
+            ->setLabel('label')
+            ->setSlug('slug')
+            ->setMaxAttempts(2);
+
+        $assignment = (new Assignment())
+            ->setState(Assignment::STATE_STARTED)
+            ->setLineItem($lineItem)
+            ->setUser($user)
+            ->setAttemptsCount(1);
+
+        $this->assignmentRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with(5)
+            ->willReturn($assignment);
+
+        $this->assignmentRepository
+            ->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(static function (Assignment $assignment) {
+                return $assignment->getState() === Assignment::STATE_READY;
             }));
 
         $this->assignmentRepository

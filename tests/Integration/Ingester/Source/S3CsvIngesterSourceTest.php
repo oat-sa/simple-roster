@@ -82,10 +82,10 @@ class S3CsvIngesterSourceTest extends TestCase
 
         foreach ($output as $row) {
             $this->assertCount(4, $row);
-            $this->assertEquals('ms', $row['label']);
-            $this->assertEquals('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
-            $this->assertEquals('key', $row['ltiKey']);
-            $this->assertEquals('secret', $row['ltiSecret']);
+            $this->assertSame('ms', $row['label']);
+            $this->assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            $this->assertSame('key', $row['ltiKey']);
+            $this->assertSame('secret', $row['ltiSecret']);
         }
     }
 

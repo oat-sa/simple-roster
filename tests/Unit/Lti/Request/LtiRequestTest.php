@@ -31,15 +31,15 @@ class LtiRequestTest extends TestCase
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 
-        $this->assertEquals('link', $subject->getLink());
-        $this->assertEquals(['param1', 'param2'], $subject->getParameters());
+        $this->assertSame('link', $subject->getLink());
+        $this->assertSame(['param1', 'param2'], $subject->getParameters());
     }
 
     public function testJsonSerialization(): void
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'ltiLink' => 'link',
                 'ltiParams' => ['param1', 'param2']

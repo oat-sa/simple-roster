@@ -37,7 +37,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        $this->assertSame(
             'VoEu7pwaoCuBG5+59qp1WcHhq/o=',
             $subject->sign($context, 'url', 'method', 'secret')
         );
@@ -49,7 +49,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        $this->assertSame(
             'Apr1WITmq9IoQ3lKJeCfFuNlA6M=',
             $subject->sign($context, 'some url', 'method', 'secret')
         );
@@ -61,7 +61,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        $this->assertSame(
             'Mtx4QCOoeGw3rgUXfn9bWxl8Rhw=',
             $subject->sign($context, 'url', 'method', 'secret', ['param1', 'param2'])
         );

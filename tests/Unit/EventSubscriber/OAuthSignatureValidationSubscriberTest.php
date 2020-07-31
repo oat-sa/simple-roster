@@ -30,7 +30,7 @@ class OAuthSignatureValidationSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::CONTROLLER => 'onKernelController'],
             OAuthSignatureValidationSubscriber::getSubscribedEvents()
         );

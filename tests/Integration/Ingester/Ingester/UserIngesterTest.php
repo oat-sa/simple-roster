@@ -58,9 +58,9 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertEquals('user', $output->getIngesterType());
+        $this->assertSame('user', $output->getIngesterType());
         $this->assertTrue($output->isDryRun());
-        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertSame(12, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
         $this->assertEmpty($this->getRepository(User::class)->findAll());
@@ -95,18 +95,18 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(1, $output->getSuccessCount());
+        $this->assertSame(1, $output->getSuccessCount());
         $this->assertTrue($output->hasFailures());
         $this->assertCount(1, $output->getFailures());
 
         $this->assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $this->assertSame('user_1', $user1->getUsername());
 
         $failure = current($output->getFailures());
-        $this->assertEquals(2, $failure->getLineNumber());
-        $this->assertEquals(
+        $this->assertSame(2, $failure->getLineNumber());
+        $this->assertSame(
             [
                 'username' => 'user_1',
                 'password' => 'password1',
@@ -125,16 +125,16 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertSame(12, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
         $this->assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        $this->assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        $this->assertSame('user_12', $user12->getUsername());
     }
 
     public function testItCanIngestUsersWithGroupId(): void
@@ -145,7 +145,7 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(12, $output->getSuccessCount());
+        $this->assertSame(12, $output->getSuccessCount());
         $this->assertFalse($output->hasFailures());
 
         $this->assertCount(12, $this->getRepository(User::class)->findAll());

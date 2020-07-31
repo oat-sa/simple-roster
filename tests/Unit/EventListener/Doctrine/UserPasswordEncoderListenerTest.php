@@ -74,7 +74,7 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this->subject->prePersist($entity);
 
-        $this->assertEquals(
+        $this->assertSame(
             'encodedPassword',
             $entity->getPassword()
         );
@@ -94,7 +94,7 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this->subject->preUpdate($entity);
 
-        $this->assertEquals(
+        $this->assertSame(
             'encodedPassword',
             $entity->getPassword()
         );

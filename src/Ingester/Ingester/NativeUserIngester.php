@@ -26,6 +26,7 @@ use App\DataTransferObject\AssignmentDtoCollection;
 use App\DataTransferObject\UserDtoCollection;
 use App\Repository\NativeAssignmentRepository;
 use App\Repository\NativeUserRepository;
+use Doctrine\ORM\ORMException;
 use Throwable;
 
 class NativeUserIngester
@@ -36,10 +37,17 @@ class NativeUserIngester
     /** @var NativeAssignmentRepository */
     private $assignmentRepository;
 
-    public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
-    {
+    /** @var string */
+    private $kernelEnvironment;
+
+    public function __construct(
+        NativeUserRepository $userRepository,
+        NativeAssignmentRepository $assignmentRepository,
+        string $kernelEnvironment
+    ) {
         $this->userRepository = $userRepository;
         $this->assignmentRepository = $assignmentRepository;
+        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     public function ingest(UserDtoCollection $users): void
@@ -53,10 +61,22 @@ class NativeUserIngester
 
             $this->assignmentRepository->insertMultiple($assignmentDtoCollection);
 
-            $this->userRepository->refreshSequence();
-            $this->assignmentRepository->refreshSequence();
+            $this->refreshSequences();
         } catch (Throwable $exception) {
             // TODO
+        }
+    }
+
+    /**
+     * @codeCoverageIgnore Cannot be tested with SQLite database
+     *
+     * @throws ORMException
+     */
+    private function refreshSequences()
+    {
+        if ($this->kernelEnvironment !== 'test') {
+            $this->userRepository->refreshSequence();
+            $this->assignmentRepository->refreshSequence();
         }
     }
 }

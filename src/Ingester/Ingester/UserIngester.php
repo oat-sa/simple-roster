@@ -62,7 +62,8 @@ class UserIngester extends AbstractIngester
         $assignment = new Assignment();
         $assignment
             ->setLineItem($this->lineItemCollection->getBySlug($data['slug']))
-            ->setState(Assignment::STATE_READY);
+            ->setState(Assignment::STATE_READY)
+            ->setAttemptsCount(0);
 
         $user = (new User())
             ->setUsername($data['username'])

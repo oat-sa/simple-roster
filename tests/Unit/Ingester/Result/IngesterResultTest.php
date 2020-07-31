@@ -32,9 +32,9 @@ class IngesterResultTest extends TestCase
     {
         $subject = new IngesterResult('ingester', 'source');
 
-        $this->assertEquals('ingester', $subject->getIngesterType());
-        $this->assertEquals('source', $subject->getSourceType());
-        $this->assertEquals(0, $subject->getSuccessCount());
+        $this->assertSame('ingester', $subject->getIngesterType());
+        $this->assertSame('source', $subject->getSourceType());
+        $this->assertSame(0, $subject->getSuccessCount());
         $this->assertEmpty($subject->getFailures());
         $this->assertFalse($subject->hasFailures());
         $this->assertTrue($subject->isDryRun());
@@ -48,7 +48,7 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addSuccess();
 
-        $this->assertEquals(2, $subject->getSuccessCount());
+        $this->assertSame(2, $subject->getSuccessCount());
         $this->assertFalse($subject->hasFailures());
     }
 
@@ -63,9 +63,9 @@ class IngesterResultTest extends TestCase
             ->addFailure($failure1)
             ->addFailure($failure2);
 
-        $this->assertEquals(0, $subject->getSuccessCount());
+        $this->assertSame(0, $subject->getSuccessCount());
         $this->assertTrue($subject->hasFailures());
-        $this->assertEquals(
+        $this->assertSame(
             [
                 1 => $failure1,
                 2 => $failure2
@@ -83,7 +83,7 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addFailure($this->createMock(IngesterResultFailure::class));
 
-        $this->assertEquals(
+        $this->assertSame(
             "[DRY_RUN] Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
             $subject->__toString()
         );
@@ -98,7 +98,7 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addFailure($this->createMock(IngesterResultFailure::class));
 
-        $this->assertEquals(
+        $this->assertSame(
             "Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
             $subject->__toString()
         );

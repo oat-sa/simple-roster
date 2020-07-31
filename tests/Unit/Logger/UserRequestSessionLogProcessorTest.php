@@ -63,7 +63,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('extra', $logRecord);
         $this->assertArrayHasKey('requestId', $logRecord['extra']);
-        $this->assertEquals('expectedRequestId', $logRecord['extra']['requestId']);
+        $this->assertSame('expectedRequestId', $logRecord['extra']['requestId']);
     }
 
     public function testItExtendsLogRecordWithSessionId(): void
@@ -77,7 +77,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('extra', $logRecord);
         $this->assertArrayHasKey('sessionId', $logRecord['extra']);
-        $this->assertEquals('expectedSessionId', $logRecord['extra']['sessionId']);
+        $this->assertSame('expectedSessionId', $logRecord['extra']['sessionId']);
     }
 
     public function testItExtendsLogRecordWithUsername(): void
@@ -90,7 +90,7 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('extra', $logRecord);
         $this->assertArrayHasKey('username', $logRecord['extra']);
-        $this->assertEquals('expectedUsername', $logRecord['extra']['username']);
+        $this->assertSame('expectedUsername', $logRecord['extra']['username']);
     }
 
     public function testItExtendsLogRecordWithGuestUserIfUserCannotBeRetrieved(): void
@@ -99,6 +99,6 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('extra', $logRecord);
         $this->assertArrayHasKey('username', $logRecord['extra']);
-        $this->assertEquals('guest', $logRecord['extra']['username']);
+        $this->assertSame('guest', $logRecord['extra']['username']);
     }
 }

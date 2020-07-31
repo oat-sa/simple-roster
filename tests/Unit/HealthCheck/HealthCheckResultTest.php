@@ -39,7 +39,7 @@ class HealthCheckResultTest extends TestCase
     {
         $subject = new HealthCheckResult(false, true);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'isDoctrineConnectionAvailable' => false,
                 'isDoctrineCacheAvailable' => true,

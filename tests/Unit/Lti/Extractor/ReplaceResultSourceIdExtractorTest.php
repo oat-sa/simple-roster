@@ -35,7 +35,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
-        $this->assertEquals(1, $subject->extractSourceId($xmlContent));
+        $this->assertSame(1, $subject->extractSourceId($xmlContent));
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlContent(): void

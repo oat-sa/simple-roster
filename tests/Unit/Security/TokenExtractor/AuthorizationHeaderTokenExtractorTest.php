@@ -56,6 +56,6 @@ class AuthorizationHeaderTokenExtractorTest extends TestCase
     {
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer 12345']);
 
-        $this->assertEquals('12345', $this->subject->extract($request));
+        $this->assertSame('12345', $this->subject->extract($request));
     }
 }

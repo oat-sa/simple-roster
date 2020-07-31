@@ -83,7 +83,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertEquals([
+        $this->assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [

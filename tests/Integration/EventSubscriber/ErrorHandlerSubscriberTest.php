@@ -51,7 +51,7 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
 
     public function testSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::EXCEPTION => 'onKernelException'],
             ErrorHandlerSubscriber::getSubscribedEvents()
         );

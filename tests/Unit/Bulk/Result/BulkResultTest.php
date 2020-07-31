@@ -39,7 +39,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationSuccess($operation2);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'data' => [
                     'applied' => true,
@@ -64,7 +64,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationFailure($operation2);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'data' => [
                     'applied' => false,

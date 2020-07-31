@@ -32,6 +32,6 @@ class UserIngesterTest extends TestCase
     {
         $subject = new UserIngester($this->createMock(ManagerRegistry::class));
 
-        $this->assertEquals('user', $subject->getRegistryItemName());
+        $this->assertSame('user', $subject->getRegistryItemName());
     }
 }

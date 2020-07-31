@@ -129,6 +129,12 @@ class GetUserAssignmentLtiRequestService
                 sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );
         }
+
+        if ($assignment->getAttemptsCount() >= $assignment->getLineItem()->getMaxAttempts() && $assignment->getState() !== Assignment::STATE_STARTED) {
+            throw new AssignmentNotProcessableException(
+                sprintf("Assignment with id '%s' has reached the maximum attempts.", $assignment->getId())
+            );
+        }
     }
 
     private function getAssignmentLtiLink(Assignment $assignment): string

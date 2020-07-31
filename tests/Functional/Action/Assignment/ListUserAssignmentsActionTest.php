@@ -55,7 +55,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -64,7 +64,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
         );
@@ -84,26 +84,28 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals([
+        $this->assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame([
             'assignments' => [
                 [
                     'id' => $user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
                     'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
                         'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
                         'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
-                    ],
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
+                    ]
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 
-    public function testItReturnListOfUserAssignmentsWhenCurrentDateDoesNotMatchLineItemAvailability(): void
+    public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
     {
         Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
 
@@ -115,10 +117,27 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals(
+        $lineItem = $user->getLastAssignment()->getLineItem();
+
+        $this->assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertSame(
             [
-                'assignments' => [],
+                'assignments' => [
+                    [
+                        'id' => $user->getLastAssignment()->getId(),
+                        'username' => $user->getUsername(),
+                        'state' => Assignment::STATE_READY,
+                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                        'lineItem' => [
+                            'uri' => $lineItem->getUri(),
+                            'label' => $lineItem->getLabel(),
+                            'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
+                            'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
+                            'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                            'maxAttempts' => $lineItem->getMaxAttempts(),
+                        ]
+                    ],
+                ]
             ],
             json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );

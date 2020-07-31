@@ -29,6 +29,6 @@ class LocalCsvIngesterSourceTest extends TestCase
 {
     public function testRegistryItemName(): void
     {
-        $this->assertEquals('local', (new LocalCsvIngesterSource())->getRegistryItemName());
+        $this->assertSame('local', (new LocalCsvIngesterSource())->getRegistryItemName());
     }
 }

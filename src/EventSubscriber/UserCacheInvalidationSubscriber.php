@@ -26,6 +26,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\UserRepository;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -36,9 +37,13 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
 
-    public function __construct(UserCacheIdGenerator $userCacheIdGenerator)
+    /** @var UserRepository */
+    private $userRepository;
+
+    public function __construct(UserCacheIdGenerator $userCacheIdGenerator, UserRepository $userRepository)
     {
         $this->userCacheIdGenerator = $userCacheIdGenerator;
+        $this->userRepository = $userRepository;
     }
 
     public function getSubscribedEvents()
@@ -59,7 +64,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         $scheduledEntityChanges = [
             'insert' => $unitOfWork->getScheduledEntityInsertions(),
             'update' => $unitOfWork->getScheduledEntityUpdates(),
-            'delete' => $unitOfWork->getScheduledEntityDeletions()
+            'delete' => $unitOfWork->getScheduledEntityDeletions(),
         ];
 
         foreach ($scheduledEntityChanges as $entities) {
@@ -89,5 +94,15 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         }
 
         $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
+
+        $this->warmUserCache($user, $entityManager);
+    }
+
+    private function warmUserCache(User $user, EntityManager $entityManager): void
+    {
+        if ($entityManager->getUnitOfWork()->isInIdentityMap($user)) {
+            // Refresh by query
+            $this->userRepository->findByUsernameWithAssignments((string)$user->getUsername());
+        }
     }
 }
