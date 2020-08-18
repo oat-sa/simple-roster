@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -37,13 +36,9 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    public function __construct(UserCacheIdGenerator $userCacheIdGenerator, UserRepository $userRepository)
+    public function __construct(UserCacheIdGenerator $userCacheIdGenerator)
     {
         $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->userRepository = $userRepository;
     }
 
     public function getSubscribedEvents()
@@ -66,7 +61,6 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
             'update' => $unitOfWork->getScheduledEntityUpdates(),
             'delete' => $unitOfWork->getScheduledEntityDeletions(),
         ];
-
         foreach ($scheduledEntityChanges as $entities) {
             foreach ($entities as $entity) {
                 if ($entity instanceof User) {
@@ -94,15 +88,19 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         }
 
         $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
-
         $this->warmUserCache($user, $entityManager);
     }
 
     private function warmUserCache(User $user, EntityManager $entityManager): void
     {
         if ($entityManager->getUnitOfWork()->isInIdentityMap($user)) {
+            // Repository must be instantiated here because lazy loading is not available for doctrine event
+            // subscribers. Injecting it in constructor leads to circular reference in DI container.
+            /** @var UserRepository $userRepository * */
+            $userRepository = $entityManager->getRepository(User::class);
+
             // Refresh by query
-            $this->userRepository->getByUsernameWithAssignments((string)$user->getUsername());
+            $userRepository->getByUsernameWithAssignments((string)$user->getUsername());
         }
     }
 }
