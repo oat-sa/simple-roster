@@ -6,6 +6,7 @@
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 
 ### Changed
+- Increased minium required PHP version from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 

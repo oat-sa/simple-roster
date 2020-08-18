@@ -51,7 +51,7 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var int */
     private $maxAttempts = 0;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

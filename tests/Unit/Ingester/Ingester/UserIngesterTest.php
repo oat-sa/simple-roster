@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\UserIngester;
+use App\Repository\LineItemRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
@@ -30,7 +31,10 @@ class UserIngesterTest extends TestCase
 {
     public function testRegistryItemName(): void
     {
-        $subject = new UserIngester($this->createMock(ManagerRegistry::class));
+        $subject = new UserIngester(
+            $this->createMock(LineItemRepository::class),
+            $this->createMock(ManagerRegistry::class)
+        );
 
         $this->assertSame('user', $subject->getRegistryItemName());
     }

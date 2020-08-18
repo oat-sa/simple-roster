@@ -95,7 +95,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
         $this->subject->setDelimiter('|');
 
-        $this->assertSame(3, $this->subject->count());
+        $this->assertCount(3, $this->subject);
     }
 
     public function testItDoesFetchContentFromS3OnlyOnce(): void

@@ -28,12 +28,24 @@ use App\Entity\LineItem;
 use App\Entity\User;
 use App\Exception\LineItemNotFoundException;
 use App\Model\LineItemCollection;
+use App\Repository\LineItemRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Exception;
 
 class UserIngester extends AbstractIngester
 {
     /** @var LineItemCollection */
     private $lineItemCollection;
+
+    /** @var LineItemRepository */
+    private $lineItemRepository;
+
+    public function __construct(LineItemRepository $lineItemRepository, ManagerRegistry $managerRegistry)
+    {
+        $this->lineItemRepository = $lineItemRepository;
+
+        parent::__construct($managerRegistry);
+    }
 
     public function getRegistryItemName(): string
     {
@@ -45,7 +57,7 @@ class UserIngester extends AbstractIngester
      */
     protected function prepare(): void
     {
-        $this->lineItemCollection = $this->managerRegistry->getRepository(LineItem::class)->findAll();
+        $this->lineItemCollection = $this->lineItemRepository->findAll();
 
         if ($this->lineItemCollection->isEmpty()) {
             throw new Exception(

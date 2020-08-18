@@ -28,6 +28,7 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
+use App\Repository\LineItemRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -47,7 +48,10 @@ class UserIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserIngester($this->getManagerRegistry());
+        $this->subject = new UserIngester(
+            self::$container->get(LineItemRepository::class),
+            $this->getManagerRegistry()
+        );
     }
 
     public function testDryRunIngest(): void

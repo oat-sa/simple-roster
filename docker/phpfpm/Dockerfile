@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 

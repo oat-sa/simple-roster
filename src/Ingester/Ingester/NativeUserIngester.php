@@ -72,7 +72,7 @@ class NativeUserIngester
      *
      * @throws ORMException
      */
-    private function refreshSequences()
+    private function refreshSequences(): void
     {
         if ($this->kernelEnvironment !== 'test') {
             $this->userRepository->refreshSequence();

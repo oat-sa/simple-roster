@@ -80,6 +80,6 @@ class LocalCsvIngesterSourceTest extends TestCase
         $subject = new LocalCsvIngesterSource();
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
-        $this->assertSame(3, $subject->count());
+        $this->assertCount(3, $subject);
     }
 }
