@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.1 - 2020-08-17
+
+### Fixed
+- Fixed circular reference during `composer install` caused by doctrine event subscriber depending on the DBAL connection directly.
+
 ## 1.6.0 - 2020-07-23
 
 ### Added
