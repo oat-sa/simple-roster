@@ -47,6 +47,20 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
         $subject->extractSourceId('invalid');
     }
 
+    public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlNamespace(): void
+    {
+        $this->expectException(InvalidLtiReplaceResultBodyException::class);
+
+        $subject = new ReplaceResultSourceIdExtractor();
+
+        /** @var string $xmlContent */
+        $xmlContent = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_namespace.xml'
+        );
+
+        $subject->extractSourceId($xmlContent);
+    }
+
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnMissingId(): void
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
