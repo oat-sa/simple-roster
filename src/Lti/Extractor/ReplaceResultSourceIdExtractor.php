@@ -39,7 +39,7 @@ class ReplaceResultSourceIdExtractor
             throw new InvalidLtiReplaceResultBodyException();
         }
 
-        $xml->registerXPathNamespace('x', 'http://www.imsglobal.org/lis/oms1p0/pox');
+        $xml->registerXPathNamespace('x', 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0');
 
         $sourceIdNodes = $xml->xpath(
             '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
