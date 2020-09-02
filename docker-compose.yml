@@ -20,15 +20,18 @@ services:
     simple-roster-phpfpm:
         container_name: simple-roster-phpfpm
         env_file:
-          - .env.docker
+            - .env.docker
         build:
             context: ./docker/phpfpm
+        environment:
+            COMPOSER_AUTH: $COMPOSER_AUTH
         expose:
             - 9000
         networks:
             - simple-roster
         volumes:
             - .:/var/www/html:cached
+            - $COMPOSER_HOME:/root/.composer
         working_dir: /var/www/html
 
     simple-roster-doctrine-redis:
