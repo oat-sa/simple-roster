@@ -26,6 +26,22 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 
 ### Docker environment
 
+The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
+In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
+
+Then copy the `.env.dist` file to `.env` file.
+
+```bash
+$ cp .env.dist .env
+```
+
+Then add your Composer settings such as path to your `COMPOSER_HOME` and `COMPOSER_AUTH` GitHub credentials.
+
+```dotenv
+COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}
+COMPOSER_HOME=~/.composer
+```
+
 The environment is pre-configured with the `.env.docker` file, so all you have to do is to set up the containers:
 
 ```shell script
@@ -50,8 +66,8 @@ In order to install it please follow the installation steps in it's [README](htt
 
 If you don't want to use docker, you have to create a local copy of the `.env` file:
 
-```shell script
-$ cp .env .env.local
+```bash
+$ cp .env.dist .env
 ```
 
 and then to define the environment variables according to your local environment, such as redis DNS, database url, etc. 

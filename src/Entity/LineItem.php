@@ -149,6 +149,11 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
+    public function hasMaxAttempts(): bool
+    {
+        return $this->maxAttempts !== 0;
+    }
+
     public function jsonSerialize(): array
     {
         return [

@@ -10,6 +10,11 @@
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 
+## 1.6.2 - 2020-09-02
+
+### Fixed
+- Fixed assignment attempt handling logic in case no maximum attempts count defined.
+
 ## 1.6.1 - 2020-08-17
 
 ### Fixed

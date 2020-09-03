@@ -152,22 +152,21 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
     {
+        $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $user->getLastAssignment()->setAttemptsCount(2);
-        $this->getEntityManager()->flush();
+        $user = $userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
 
         $this->assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertSame(
-            "Assignment with id '1' has reached the maximum attempts.",
+        $this->assertEquals(
+            "Assignment with id '2' has reached the maximum attempts.",
             $decodedResponse['error']['message']
         );
     }

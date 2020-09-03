@@ -124,15 +124,25 @@ class GetUserAssignmentLtiRequestService
      */
     private function checkIfAssignmentCanBeProcessed(Assignment $assignment): void
     {
-        if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED], true)) {
+        $lineItem = $assignment->getLineItem();
+        $maxAttempts = $lineItem->getMaxAttempts();
+        $attemptsCount = $assignment->getAttemptsCount();
+
+        if (
+            $lineItem->hasMaxAttempts() &&
+            (
+                $attemptsCount > $maxAttempts ||
+                ($maxAttempts === $attemptsCount && $assignment->getState() === Assignment::STATE_COMPLETED)
+            )
+        ) {
             throw new AssignmentNotProcessableException(
-                sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
+                sprintf("Assignment with id '%s' has reached the maximum attempts.", $assignment->getId())
             );
         }
 
-        if ($assignment->getAttemptsCount() >= $assignment->getLineItem()->getMaxAttempts() && $assignment->getState() !== Assignment::STATE_STARTED) {
+        if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED], true)) {
             throw new AssignmentNotProcessableException(
-                sprintf("Assignment with id '%s' has reached the maximum attempts.", $assignment->getId())
+                sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );
         }
     }
