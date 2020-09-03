@@ -1,0 +1,29 @@
+App\Entity\Infrastructure:
+    infrastructure2:
+        label: 'The first infrastructure'
+        ltiDirectorLink: 'http://lti-director.com'
+        ltiKey: 'myKey'
+        ltiSecret: 'mySecret'
+
+App\Entity\LineItem:
+    lineItem2:
+        infrastructure: '@infrastructure2'
+        label: 'The first line item'
+        uri: 'http://lineitemuri.com'
+        slug: 'lineItemSlug'
+        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+        maxAttempts: 2
+
+App\Entity\User:
+    user2:
+        username: 'userWithAllAttemptsTaken'
+        plainPassword: 'password'
+        groupId: 'group_1'
+        assignments: ['@assignment2']
+
+App\Entity\Assignment:
+    assignment2:
+        lineItem: '@lineItem2'
+        state: 'completed'
+        attemptsCount: 2

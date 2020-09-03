@@ -54,8 +54,7 @@ class GetUserAssignmentLtiLinkAction
         GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->responder = $responder;
         $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
         $this->entityManager = $entityManager;
