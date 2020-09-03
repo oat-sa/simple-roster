@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.6.2 - 2020-09-02
+## 1.6.2 - 2020-09-03
 
 ### Fixed
 - Fixed assignment attempt handling logic in case no maximum attempts count defined.
