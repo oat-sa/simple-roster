@@ -79,8 +79,13 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $this->entityManager
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
+        
+        $this->entityManager
+            ->method('getRepository')
+            ->with(User::class)
+            ->willReturn($this->userRepository);
 
-        $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator, $this->userRepository);
+        $this->subject = new UserCacheInvalidationSubscriber($this->userCacheIdGenerator);
     }
 
     public function testSubscribedEvents(): void
