@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Lti\Extractor;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
@@ -33,7 +33,10 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
         $subject = new ReplaceResultSourceIdExtractor();
 
         /** @var string $xmlContent */
-        $xmlContent = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
+        $xmlContent = file_get_contents(
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/valid_replace_result_body.xml'
+        );
 
         $this->assertEquals(1, $subject->extractSourceId($xmlContent));
     }
@@ -55,7 +58,8 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_namespace.xml'
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/invalid_replace_result_body_wrong_namespace.xml'
         );
 
         $subject->extractSourceId($xmlContent);
@@ -69,7 +73,8 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
         );
 
         $subject->extractSourceId($xmlContent);
