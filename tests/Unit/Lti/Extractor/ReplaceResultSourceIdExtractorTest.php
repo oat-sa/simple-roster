@@ -28,9 +28,11 @@ use PHPUnit\Framework\TestCase;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {
+    private const LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0';
+
     public function testItCanExtractSourceId(): void
     {
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
@@ -45,7 +47,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
 
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         $subject->extractSourceId('invalid');
     }
@@ -54,7 +56,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
 
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
@@ -69,7 +71,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
 
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
