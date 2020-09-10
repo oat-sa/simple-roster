@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {
     private const LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0';
-    private const OLD_LTI_OUTCOME_XML_NAMESPACE = 'valid_replace_result_body_with_old_namespace.xml';
+    private const OLD_LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/lis/oms1p0/pox';
 
     public function testItCanExtractSourceId(): void
     {
@@ -83,15 +83,14 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
         $subject->extractSourceId($xmlContent);
     }
 
-    public function testItCanExtractSourceIdWithEnviromentValue(): void
+    public function testItCanExtractSourceIdWithEnvironmentalValue(): void
     {
         $xmlNamespace = $_ENV['LTI_OUTCOME_XML_NAMESPACE'] ?? self::OLD_LTI_OUTCOME_XML_NAMESPACE;
 
-        echo $xmlNamespace;
-
         $xmlTestingSources = [
             self::LTI_OUTCOME_XML_NAMESPACE => 'Resources/LtiOutcome/valid_replace_result_body.xml',
-            self::OLD_LTI_OUTCOME_XML_NAMESPACE => 'Resources/LtiOutcome/valid_replace_result_body_with_old_namespace.xml'
+            self::OLD_LTI_OUTCOME_XML_NAMESPACE =>
+                'Resources/LtiOutcome/valid_replace_result_body_with_old_namespace.xml'
         ];
         $subject = new ReplaceResultSourceIdExtractor($xmlNamespace);
 
