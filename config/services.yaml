@@ -98,3 +98,7 @@ services:
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
+
+    App\Lti\Extractor\ReplaceResultSourceIdExtractor:
+        arguments:
+            $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
