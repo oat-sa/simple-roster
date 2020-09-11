@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.0
+## 1.7.0 - To be released
 
 ### Added
 - Added xml namespace environment variable for ReplaceResultRequest, used by ReplaceResultSourceIdExtractor, to follow [LTI 1.1 specifications](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-26).
