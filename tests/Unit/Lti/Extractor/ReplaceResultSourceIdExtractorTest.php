@@ -82,24 +82,4 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         $subject->extractSourceId($xmlContent);
     }
-
-    public function testItCanExtractSourceIdWithEnvironmentalValue(): void
-    {
-        $xmlNamespace = $_ENV['LTI_OUTCOME_XML_NAMESPACE'] ?? self::OLD_LTI_OUTCOME_XML_NAMESPACE;
-
-        $xmlTestingSources = [
-            self::LTI_OUTCOME_XML_NAMESPACE => 'Resources/LtiOutcome/valid_replace_result_body.xml',
-            self::OLD_LTI_OUTCOME_XML_NAMESPACE =>
-                'Resources/LtiOutcome/valid_replace_result_body_with_old_namespace.xml'
-        ];
-        $subject = new ReplaceResultSourceIdExtractor($xmlNamespace);
-
-        /** @var string $xmlContent */
-        $xmlContent = file_get_contents(
-            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
-            . $xmlTestingSources[$xmlNamespace]
-        );
-
-        $this->assertEquals(1, $subject->extractSourceId($xmlContent));
-    }
 }
