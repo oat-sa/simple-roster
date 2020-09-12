@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 - To be released
+
+### Added
+- Added xml namespace environment variable for ReplaceResultRequest, used by ReplaceResultSourceIdExtractor, to follow [LTI 1.1 specifications](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-26).
+- Fixed [security breach](https://symfony.com/blog/cve-2020-15094-prevent-rce-when-calling-untrusted-remote-with-cachinghttpclient) by updating symfony/http-kernel to version 4.4.13. 
+
 ## 1.6.2 - 2020-09-03
 
 ### Fixed
