@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0 - TODO
+
+### Added
+- Added possibility to specify LTI key and secret through environment variables
+
 ## 1.7.0 - 2020-09-16
 
 ### Added
