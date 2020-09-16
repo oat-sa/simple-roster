@@ -42,10 +42,14 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(InfrastructureRepository $repository, OAuthSigner $signer)
+    /** @var string */
+    private $ltiSecret;
+
+    public function __construct(InfrastructureRepository $repository, OAuthSigner $signer, string $ltiSecret)
     {
         $this->repository = $repository;
         $this->signer = $signer;
+        $this->ltiSecret = $ltiSecret;
     }
 
     /**
@@ -92,7 +96,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
             $request->getMethod(),
-            $infrastructure->getLtiSecret()
+            $this->ltiSecret
         );
 
         if ($signature !== $request->query->get('oauth_signature')) {
