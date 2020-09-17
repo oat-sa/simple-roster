@@ -110,8 +110,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             10 => Assignment::STATE_READY,
         ];
 
-        $logMessagePlaceholder =
-            "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.";
+        $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected and " .
+            "marked as '%s' by garbage collector.";
 
         for ($i = 1; $i <= 10; $i++) {
             $this->assertHasLogRecordWithMessage(

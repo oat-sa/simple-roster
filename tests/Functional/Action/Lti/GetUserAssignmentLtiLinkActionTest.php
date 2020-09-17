@@ -174,7 +174,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUsernameLoadBalancerStrategy(): void
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -226,7 +226,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 

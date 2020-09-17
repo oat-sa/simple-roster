@@ -142,8 +142,8 @@ class AssignmentGarbageCollectorCommand extends Command
             $stuckAssignmentsIterator = $stuckAssignments->getIterator();
             $assignmentCount = $stuckAssignmentsIterator->count();
 
-            $logMessagePlaceholder =
-                "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.";
+            $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected " .
+                "and marked as '%s' by garbage collector.";
 
             /** @var Assignment $assignment */
             foreach ($stuckAssignments as $assignment) {
