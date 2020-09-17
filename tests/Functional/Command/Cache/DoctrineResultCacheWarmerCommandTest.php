@@ -30,6 +30,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -58,7 +59,12 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
-        $this->doctrineResultCache = $entityManager->getConfiguration()->getResultCacheImpl();
+        $doctrineResultCache = $entityManager->getConfiguration()->getResultCacheImpl();
+
+        if (!$doctrineResultCache instanceof Cache) {
+            throw new LogicException('Doctrine result cache is not configured.');
+        }
+        $this->doctrineResultCache = $doctrineResultCache;
 
         $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
 

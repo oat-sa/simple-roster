@@ -115,11 +115,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
-        );
+        self::assertSame(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
@@ -153,11 +149,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
-        );
+        self::assertSame(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -194,11 +186,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
-        );
+        self::assertSame(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     private function generateSignature(Infrastructure $infrastructure, string $time): string
@@ -227,7 +215,11 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         /** @var InfrastructureRepository $repository */
         $repository = $this->getRepository(Infrastructure::class);
 
-        return $repository->find(1);
+        $infrastructure = $repository->find(1);
+
+        self::assertInstanceOf(Infrastructure::class, $infrastructure);
+
+        return $infrastructure;
     }
 
     private function getAssignment(): Assignment
@@ -235,6 +227,10 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         /** @var AssignmentRepository $repository */
         $repository = $this->getRepository(Assignment::class);
 
-        return $repository->find(1);
+        $assignment = $repository->find(1);
+
+        self::assertInstanceOf(Assignment::class, $assignment);
+
+        return $assignment;
     }
 }

@@ -145,14 +145,17 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertCount(12, $userRepository->findAll());
 
         $user1 = $userRepository->find(1);
+        self::assertInstanceOf(User::class, $user1);
         self::assertSame('user_1', $user1->getUsername());
         self::assertSame('group_1', $user1->getGroupId());
 
         $user6 = $userRepository->find(6);
+        self::assertInstanceOf(User::class, $user6);
         self::assertSame('user_6', $user6->getUsername());
         self::assertSame('group_2', $user6->getGroupId());
 
         $user12 = $userRepository->find(12);
+        self::assertInstanceOf(User::class, $user12);
         self::assertSame('user_12', $user12->getUsername());
         self::assertSame('group_3', $user12->getGroupId());
     }

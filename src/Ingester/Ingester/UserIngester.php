@@ -57,7 +57,7 @@ class UserIngester extends AbstractIngester
      */
     protected function prepare(): void
     {
-        $this->lineItemCollection = $this->lineItemRepository->findAll();
+        $this->lineItemCollection = $this->lineItemRepository->findAllAsCollection();
 
         if ($this->lineItemCollection->isEmpty()) {
             throw new Exception(

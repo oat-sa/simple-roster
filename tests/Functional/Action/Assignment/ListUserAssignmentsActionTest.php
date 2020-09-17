@@ -28,6 +28,7 @@ use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,6 +85,9 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
+        $startDate = $lineItem->getStartAt();
+        $endDate = $lineItem->getEndAt();
+
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame([
             'assignments' => [
@@ -95,11 +99,11 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     'lineItem' => [
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
-                        'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
-                        'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
                         'maxAttempts' => $lineItem->getMaxAttempts(),
-                    ]
+                    ],
                 ],
             ],
         ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
@@ -119,27 +123,28 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
+        $startDate = $lineItem->getStartAt();
+        $endDate = $lineItem->getEndAt();
+
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(
-            [
-                'assignments' => [
-                    [
-                        'id' => $user->getLastAssignment()->getId(),
-                        'username' => $user->getUsername(),
-                        'state' => Assignment::STATE_READY,
-                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
-                        'lineItem' => [
-                            'uri' => $lineItem->getUri(),
-                            'label' => $lineItem->getLabel(),
-                            'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
-                            'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
-                            'infrastructure' => $lineItem->getInfrastructure()->getId(),
-                            'maxAttempts' => $lineItem->getMaxAttempts(),
-                        ]
+        self::assertSame([
+            'assignments' => [
+                [
+                    'id' => $user->getLastAssignment()->getId(),
+                    'username' => $user->getUsername(),
+                    'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    'lineItem' => [
+                        'uri' => $lineItem->getUri(),
+                        'label' => $lineItem->getLabel(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                        'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
-                ]
+                ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 }

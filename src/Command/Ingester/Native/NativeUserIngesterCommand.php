@@ -171,7 +171,7 @@ class NativeUserIngesterCommand extends Command
             $progressBar->start();
 
             $index = $this->nativeUserRepository->findNextAvailableUserIndex();
-            $lineItemCollection = $this->lineItemRepository->findAll();
+            $lineItemCollection = $this->lineItemRepository->findAllAsCollection();
 
             if ($lineItemCollection->isEmpty()) {
                 throw new Exception("Cannot native ingest 'user' since line-item table is empty.");

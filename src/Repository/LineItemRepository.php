@@ -38,11 +38,11 @@ class LineItemRepository extends AbstractRepository
         parent::__construct($registry, LineItem::class);
     }
 
-    public function findAll(): LineItemCollection
+    public function findAllAsCollection(): LineItemCollection
     {
         $collection = new LineItemCollection();
         /** @var LineItem $lineItem */
-        foreach (parent::findAll() as $lineItem) {
+        foreach ($this->findAll() as $lineItem) {
             $collection->add($lineItem);
         }
 

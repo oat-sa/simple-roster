@@ -18,9 +18,6 @@ parameters:
     # In tests we control the JSON content, it will be always a valid string
     - message: '#^(.+) of function json_decode expects string, string\|false given.$#'
       path: tests
-    # Kernel is always booted in a working functional/integration test
-    - message: '#^Cannot call method get\(\) on Symfony\\Component\\DependencyInjection\\ContainerInterface\|null.$#'
-      path: tests
     # Doctrine docblock error, Doctrine\Common\Persistence\ManagerRegistry always returns an instance of EntityManagerInterface
     - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Persistence\\ObjectManager.$#'
       path: tests
