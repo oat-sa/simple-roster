@@ -10,6 +10,15 @@
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 
+## 1.7.0 - 2020-09-16
+
+### Added
+- Added xml namespace environment variable for ReplaceResultRequest, used by ReplaceResultSourceIdExtractor, to follow [LTI 1.1 specifications](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-26).
+
+### Fixed
+- Fixed [security breach](https://symfony.com/blog/cve-2020-15094-prevent-rce-when-calling-untrusted-remote-with-cachinghttpclient) by updating symfony/http-kernel to version 4.4.13. 
+- Fixed issue where attemptCount was always returning same value.
+
 ## 1.6.2 - 2020-09-03
 
 ### Fixed

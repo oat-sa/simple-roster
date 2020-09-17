@@ -28,6 +28,14 @@ use Throwable;
 
 class ReplaceResultSourceIdExtractor
 {
+    /** @var string */
+    private $xmlNamespace;
+
+    public function __construct(string $xmlNamespace)
+    {
+        $this->xmlNamespace = $xmlNamespace;
+    }
+
     /**
      * @throws InvalidLtiReplaceResultBodyException
      */
@@ -39,7 +47,7 @@ class ReplaceResultSourceIdExtractor
             throw new InvalidLtiReplaceResultBodyException();
         }
 
-        $xml->registerXPathNamespace('x', 'http://www.imsglobal.org/lis/oms1p0/pox');
+        $xml->registerXPathNamespace('x', $this->xmlNamespace);
 
         $sourceIdNodes = $xml->xpath(
             '/x:imsx_POXEnvelopeRequest/x:imsx_POXBody/x:replaceResultRequest/' .
