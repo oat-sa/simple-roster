@@ -76,6 +76,7 @@ class GetUserAssignmentLtiLinkAction
                     ->incrementAttemptsCount();
             }
 
+            $this->entityManager->persist($assignment);
             $this->entityManager->flush();
 
             $this->logger->info(
