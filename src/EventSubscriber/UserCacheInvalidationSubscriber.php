@@ -101,7 +101,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
             $userRepository = $entityManager->getRepository(User::class);
 
             // Refresh by query
-            $this->userRepository->findByUsernameWithAssignments((string)$user->getUsername());
+            $userRepository->findByUsernameWithAssignments((string)$user->getUsername());
         }
     }
 }

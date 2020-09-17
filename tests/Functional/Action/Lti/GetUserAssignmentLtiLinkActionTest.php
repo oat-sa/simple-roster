@@ -165,7 +165,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        self::assertEquals(
+        self::assertSame(
             "Assignment with id '2' has reached the maximum attempts.",
             $decodedResponse['error']['message']
         );

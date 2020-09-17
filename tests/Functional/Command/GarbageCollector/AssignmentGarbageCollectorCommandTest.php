@@ -173,8 +173,10 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()
         ) {
             self::assertSame(Assignment::STATE_READY, $assignment->getState());
-        } else {
-            self::assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
+
+            return;
         }
+
+        self::assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
     }
 }

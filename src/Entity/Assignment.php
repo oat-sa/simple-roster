@@ -161,12 +161,10 @@ class Assignment implements JsonSerializable, EntityInterface
         $maxAttempts = $this->getLineItem()->getMaxAttempts();
 
         if ($maxAttempts === 0 || $this->getAttemptsCount() < $maxAttempts) {
-            $this->setState(self::STATE_READY);
-        } else {
-            $this->setState(self::STATE_COMPLETED);
+            return $this->setState(self::STATE_READY);
         }
 
-        return $this;
+        return $this->setState(self::STATE_COMPLETED);
     }
 
     public function jsonSerialize(): array
