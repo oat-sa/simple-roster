@@ -144,7 +144,6 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
-        );
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 }
