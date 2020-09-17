@@ -39,7 +39,7 @@ class ApiKeyAuthenticatorTest extends TestCase
             'key'
         );
 
-        $this->assertFalse($subject->supportsRememberMe());
+        self::assertFalse($subject->supportsRememberMe());
     }
 
     public function testItThrowsExceptionUnauthorizedExceptionOnAuthenticationError(): void

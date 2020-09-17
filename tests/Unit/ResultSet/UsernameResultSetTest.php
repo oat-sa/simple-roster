@@ -36,8 +36,8 @@ class UsernameResultSetTest extends TestCase
 
         $subject = new UsernameResultSet($expectedCollection, true, null);
 
-        $this->assertCount(2, $subject);
-        $this->assertSame('username1', $subject->getIterator()->offsetGet(0));
-        $this->assertSame('username2', $subject->getIterator()->offsetGet(1));
+        self::assertCount(2, $subject);
+        self::assertSame('username1', $subject->getIterator()->offsetGet(0));
+        self::assertSame('username2', $subject->getIterator()->offsetGet(1));
     }
 }

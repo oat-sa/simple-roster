@@ -51,7 +51,7 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
 
     public function testSubscribedEvents(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::EXCEPTION => 'onKernelException'],
             ErrorHandlerSubscriber::getSubscribedEvents()
         );
@@ -73,7 +73,7 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
 
         $this->subject->onKernelException($exceptionEvent);
 
-        $this->assertNull($exceptionEvent->getResponse());
+        self::assertNull($exceptionEvent->getResponse());
     }
 
     public function testItSetsProperResponseFromResponderOnMasterRequest(): void
@@ -94,6 +94,6 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
 
         $expectedJsonResponse = $this->responder->createErrorJsonResponse($throwable);
 
-        $this->assertEquals($expectedJsonResponse, $exceptionEvent->getResponse());
+        self::assertEquals($expectedJsonResponse, $exceptionEvent->getResponse());
     }
 }

@@ -40,14 +40,14 @@ class LineItemTest extends TestCase
 
     public function testItIsAvailableForDateIfStartDateIsNotSet(): void
     {
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 
     public function testItIsAvailableForDateIfEndDateIsNotSet(): void
     {
         $this->subject->setStartAt(new DateTime('-3 days'));
 
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 
     public function testItIsAvailableForDateIfDateIsBetweenStartDateAndEndDate(): void
@@ -56,6 +56,6 @@ class LineItemTest extends TestCase
             ->setStartAt(new DateTime('-1 day'))
             ->setEndAt(new DateTime('+1 day'));
 
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 }

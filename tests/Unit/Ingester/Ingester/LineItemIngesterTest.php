@@ -32,6 +32,6 @@ class LineItemIngesterTest extends TestCase
     {
         $subject = new LineItemIngester($this->createMock(ManagerRegistry::class));
 
-        $this->assertSame('line-item', $subject->getRegistryItemName());
+        self::assertSame('line-item', $subject->getRegistryItemName());
     }
 }

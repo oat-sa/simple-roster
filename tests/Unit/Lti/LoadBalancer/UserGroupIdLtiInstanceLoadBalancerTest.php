@@ -49,7 +49,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
     public function testIfItIsLtiInstanceLoadBalancer(): void
     {
-        $this->assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
+        self::assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
     }
 
     public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDetermined(): void
@@ -79,7 +79,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
             $actualLtiInstanceUrl = $this->subject->getLtiInstanceUrl($user);
 
-            $this->assertSame(
+            self::assertSame(
                 $expectedLtiInstanceUrl,
                 $actualLtiInstanceUrl,
                 sprintf(
@@ -103,6 +103,6 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $user = (new User())->setGroupId('group_5');
 
-        $this->assertSame('group_5', $this->subject->getLtiRequestContextId($user));
+        self::assertSame('group_5', $this->subject->getLtiRequestContextId($user));
     }
 }

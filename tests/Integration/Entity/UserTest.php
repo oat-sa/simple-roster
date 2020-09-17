@@ -49,14 +49,14 @@ class UserTest extends KernelTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
-        $this->assertCount(1, $subject->getAssignments());
-        $this->assertCount(1, $subject->getAvailableAssignments());
+        self::assertCount(1, $subject->getAssignments());
+        self::assertCount(1, $subject->getAvailableAssignments());
 
-        $this->assertSame($assignment, current($subject->getAvailableAssignments()));
+        self::assertSame($assignment, current($subject->getAvailableAssignments()));
 
         $subject->removeAssignment($assignment);
 
-        $this->assertEmpty($subject->getAssignments());
-        $this->assertEmpty($subject->getAvailableAssignments());
+        self::assertEmpty($subject->getAssignments());
+        self::assertEmpty($subject->getAvailableAssignments());
     }
 }

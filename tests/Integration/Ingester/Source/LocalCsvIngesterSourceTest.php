@@ -35,11 +35,11 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertStringContainsString('infra', $row['label']);
-            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
-            $this->assertStringContainsString('key', $row['ltiKey']);
-            $this->assertStringContainsString('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertStringContainsString('infra', $row['label']);
+            self::assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            self::assertStringContainsString('key', $row['ltiKey']);
+            self::assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 
@@ -53,7 +53,7 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(1, $row);
+            self::assertCount(1, $row);
         }
     }
 
@@ -67,11 +67,11 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertSame('ms', $row['label']);
-            $this->assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
-            $this->assertSame('key', $row['ltiKey']);
-            $this->assertSame('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertSame('ms', $row['label']);
+            self::assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            self::assertSame('key', $row['ltiKey']);
+            self::assertSame('secret', $row['ltiSecret']);
         }
     }
 
@@ -80,6 +80,6 @@ class LocalCsvIngesterSourceTest extends TestCase
         $subject = new LocalCsvIngesterSource();
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
-        $this->assertCount(3, $subject);
+        self::assertCount(3, $subject);
     }
 }

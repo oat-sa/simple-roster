@@ -67,8 +67,8 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertCount(0, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(0, $this->getRepository(User::class)->findAll());
     }
 
     public function testNonBatchedLocalIngestionSuccess(): void
@@ -86,14 +86,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertSame('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertSame('user_12', $user12->getUsername());
+        self::assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionSuccess(): void
@@ -112,14 +112,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertSame('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertSame('user_12', $user12->getUsername());
+        self::assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionWithGroupId(): void
@@ -138,23 +138,23 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
+        self::assertSame(0, $output);
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $this->assertCount(12, $userRepository->findAll());
+        self::assertCount(12, $userRepository->findAll());
 
         $user1 = $userRepository->find(1);
-        $this->assertSame('user_1', $user1->getUsername());
-        $this->assertSame('group_1', $user1->getGroupId());
+        self::assertSame('user_1', $user1->getUsername());
+        self::assertSame('group_1', $user1->getGroupId());
 
         $user6 = $userRepository->find(6);
-        $this->assertSame('user_6', $user6->getUsername());
-        $this->assertSame('group_2', $user6->getGroupId());
+        self::assertSame('user_6', $user6->getUsername());
+        self::assertSame('group_2', $user6->getGroupId());
 
         $user12 = $userRepository->find(12);
-        $this->assertSame('user_12', $user12->getUsername());
-        $this->assertSame('group_3', $user12->getGroupId());
+        self::assertSame('user_12', $user12->getUsername());
+        self::assertSame('group_3', $user12->getGroupId());
     }
 
     public function testBatchedLocalIngestionFailureWithEmptyLineItems(): void
@@ -170,8 +170,8 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(1, $output);
-        $this->assertStringContainsString(
+        self::assertSame(1, $output);
+        self::assertStringContainsString(
             "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
             $this->commandTester->getDisplay()
         );
@@ -193,11 +193,11 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertCount(1, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertSame('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
     }
 
     private function prepareIngestionContext(): void

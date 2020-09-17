@@ -61,23 +61,23 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArrayHasKey('extra', $logRecord);
-        $this->assertArrayHasKey('requestId', $logRecord['extra']);
-        $this->assertSame('expectedRequestId', $logRecord['extra']['requestId']);
+        self::assertArrayHasKey('extra', $logRecord);
+        self::assertArrayHasKey('requestId', $logRecord['extra']);
+        self::assertSame('expectedRequestId', $logRecord['extra']['requestId']);
     }
 
     public function testItExtendsLogRecordWithSessionId(): void
     {
         $this->session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getId')
             ->willReturn('expectedSessionId');
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArrayHasKey('extra', $logRecord);
-        $this->assertArrayHasKey('sessionId', $logRecord['extra']);
-        $this->assertSame('expectedSessionId', $logRecord['extra']['sessionId']);
+        self::assertArrayHasKey('extra', $logRecord);
+        self::assertArrayHasKey('sessionId', $logRecord['extra']);
+        self::assertSame('expectedSessionId', $logRecord['extra']['sessionId']);
     }
 
     public function testItExtendsLogRecordWithUsername(): void
@@ -88,17 +88,17 @@ class UserRequestSessionLogProcessorTest extends TestCase
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArrayHasKey('extra', $logRecord);
-        $this->assertArrayHasKey('username', $logRecord['extra']);
-        $this->assertSame('expectedUsername', $logRecord['extra']['username']);
+        self::assertArrayHasKey('extra', $logRecord);
+        self::assertArrayHasKey('username', $logRecord['extra']);
+        self::assertSame('expectedUsername', $logRecord['extra']['username']);
     }
 
     public function testItExtendsLogRecordWithGuestUserIfUserCannotBeRetrieved(): void
     {
         $logRecord = call_user_func($this->subject, ['logRecord']);
 
-        $this->assertArrayHasKey('extra', $logRecord);
-        $this->assertArrayHasKey('username', $logRecord['extra']);
-        $this->assertSame('guest', $logRecord['extra']['username']);
+        self::assertArrayHasKey('extra', $logRecord);
+        self::assertArrayHasKey('username', $logRecord['extra']);
+        self::assertSame('guest', $logRecord['extra']['username']);
     }
 }

@@ -90,7 +90,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
 
     public function testSubscribedEvents(): void
     {
-        $this->assertSame([Events::onFlush], $this->subject->getSubscribedEvents());
+        self::assertSame([Events::onFlush], $this->subject->getSubscribedEvents());
     }
 
     public function testItInvalidatesSingleUserCacheUponEntityInsertion(): void
@@ -171,7 +171,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
 
         $this
             ->unitOfWork
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isInIdentityMap')
             ->with($user)
             ->willReturn(true);
@@ -180,7 +180,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
 
         $this
             ->userRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('findByUsernameWithAssignments')
             ->with($user->getUsername());
 
@@ -197,7 +197,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         );
 
         $this->userCacheIdGenerator
-            ->expects($this->exactly(count($expectedUsernames)))
+            ->expects(self::exactly(count($expectedUsernames)))
             ->method('generate')
             ->withConsecutive(
                 ...array_map(
@@ -212,7 +212,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $eventArgs = new OnFlushEventArgs($this->entityManager);
 
         $this->resultCacheImplementation
-            ->expects($this->exactly(count($expectedUsernames)))
+            ->expects(self::exactly(count($expectedUsernames)))
             ->method('delete')
             ->withConsecutive(
                 ...array_map(
@@ -232,17 +232,17 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         array $deletedEntities = []
     ): void {
         $this->unitOfWork
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getScheduledEntityInsertions')
             ->willReturn($insertedEntities);
 
         $this->unitOfWork
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getScheduledEntityUpdates')
             ->willReturn($updatedEntities);
 
         $this->unitOfWork
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getScheduledEntityDeletions')
             ->willReturn($deletedEntities);
     }

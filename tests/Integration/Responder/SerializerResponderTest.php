@@ -48,8 +48,8 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createJsonResponse($data);
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertSame(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
     }
 
     public function testCreateCustomJsonResponse(): void
@@ -62,9 +62,9 @@ class SerializerResponderTest extends KernelTestCase
             ['some' => 'header']
         );
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertSame('header', $response->headers->get('some'));
-        $this->assertSame(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
+        self::assertSame(Response::HTTP_CREATED, $response->getStatusCode());
+        self::assertSame('header', $response->headers->get('some'));
+        self::assertSame(json_encode($data, JSON_THROW_ON_ERROR, 512), $response->getContent());
     }
 
     public function testCreateDefaultErrorJsonResponse(): void
@@ -75,10 +75,10 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
+        self::assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreateDefaultErrorJsonResponseWithDebug(): void
@@ -89,10 +89,10 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('custom error message', $decodedResponse['error']['message']);
+        self::assertSame('custom error message', $decodedResponse['error']['message']);
     }
 
     public function testCreateCustomErrorJsonResponse(): void
@@ -107,11 +107,11 @@ class SerializerResponderTest extends KernelTestCase
             ['some' => 'header']
         );
 
-        $this->assertSame(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
-        $this->assertSame('header', $response->headers->get('some'));
+        self::assertSame(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
+        self::assertSame('header', $response->headers->get('some'));
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
+        self::assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreateCustomErrorJsonResponseWithDebug(): void
@@ -122,12 +122,12 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('custom error message', $decodedResponse['error']['message']);
+        self::assertSame('custom error message', $decodedResponse['error']['message']);
 
-        $this->assertArrayHasKey(
+        self::assertArrayHasKey(
             'trace',
             $decodedResponse['error']
         );
@@ -141,11 +141,11 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
-        $this->assertSame('exceptionHeader', $response->headers->get('some'));
+        self::assertSame(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
+        self::assertSame('exceptionHeader', $response->headers->get('some'));
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('custom error message', $decodedResponse['error']['message']);
+        self::assertSame('custom error message', $decodedResponse['error']['message']);
     }
 
     public function testCreate4xxHttpErrorJsonResponseWithDebug(): void
@@ -156,13 +156,13 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
-        $this->assertSame('exceptionHeader', $response->headers->get('some'));
+        self::assertSame(Response::HTTP_I_AM_A_TEAPOT, $response->getStatusCode());
+        self::assertSame('exceptionHeader', $response->headers->get('some'));
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('custom error message', $decodedResponse['error']['message']);
+        self::assertSame('custom error message', $decodedResponse['error']['message']);
 
-        $this->assertArrayHasKey(
+        self::assertArrayHasKey(
             'trace',
             $decodedResponse['error']
         );
@@ -177,11 +177,11 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertSame('exceptionHeader', $response->headers->get('some'));
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        self::assertSame('exceptionHeader', $response->headers->get('some'));
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
+        self::assertSame(SerializerResponder::DEFAULT_ERROR_MESSAGE, $decodedResponse['error']['message']);
     }
 
     public function testCreate5xxHttpErrorJsonResponseWithDebug(): void
@@ -192,13 +192,13 @@ class SerializerResponderTest extends KernelTestCase
 
         $response = $this->createResponderInstance()->createErrorJsonResponse($exception);
 
-        $this->assertSame(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
-        $this->assertSame('exceptionHeader', $response->headers->get('some'));
+        self::assertSame(Response::HTTP_NOT_IMPLEMENTED, $response->getStatusCode());
+        self::assertSame('exceptionHeader', $response->headers->get('some'));
 
         $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('custom error message', $decodedResponse['error']['message']);
+        self::assertSame('custom error message', $decodedResponse['error']['message']);
 
-        $this->assertArrayHasKey(
+        self::assertArrayHasKey(
             'trace',
             $decodedResponse['error']
         );

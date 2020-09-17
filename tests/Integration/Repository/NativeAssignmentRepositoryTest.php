@@ -66,6 +66,6 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultiple($assignmentCollection);
 
-        $this->assertCount(3, $this->assignmentRepository->findBy(['id' => [11, 12, 13]]));
+        self::assertCount(3, $this->assignmentRepository->findBy(['id' => [11, 12, 13]]));
     }
 }

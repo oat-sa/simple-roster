@@ -70,16 +70,16 @@ class NativeUserRepositoryTest extends KernelTestCase
         $user1 = $this->userRepository->find(1);
         $user2 = $this->userRepository->find(2);
 
-        $this->assertInstanceOf(User::class, $user1);
-        $this->assertInstanceOf(User::class, $user2);
+        self::assertInstanceOf(User::class, $user1);
+        self::assertInstanceOf(User::class, $user2);
 
-        $this->assertSame(1, $user1->getId());
-        $this->assertSame(2, $user2->getId());
+        self::assertSame(1, $user1->getId());
+        self::assertSame(2, $user2->getId());
     }
 
     public function testItCanFindNextAvailableUserIndex(): void
     {
-        $this->assertSame(1, $this->subject->findNextAvailableUserIndex());
+        self::assertSame(1, $this->subject->findNextAvailableUserIndex());
 
         $assignment = new AssignmentDto(1, 'test', 1, 1);
         $user = new UserDto(1, 'test1', 'test', $assignment, null);
@@ -88,6 +88,6 @@ class NativeUserRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultiple($userCollection);
 
-        $this->assertSame(2, $this->subject->findNextAvailableUserIndex());
+        self::assertSame(2, $this->subject->findNextAvailableUserIndex());
     }
 }

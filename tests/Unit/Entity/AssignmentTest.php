@@ -51,7 +51,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertSame(
+        self::assertSame(
             Assignment::STATE_COMPLETED,
             $this->subject->getState()
         );
@@ -65,7 +65,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertSame(
+        self::assertSame(
             Assignment::STATE_READY,
             $this->subject->getState()
         );
@@ -79,7 +79,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertSame(
+        self::assertSame(
             Assignment::STATE_READY,
             $this->subject->getState()
         );

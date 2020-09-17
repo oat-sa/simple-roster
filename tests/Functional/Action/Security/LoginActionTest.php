@@ -58,7 +58,7 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'invalid', 'password' => 'invalid'], JSON_THROW_ON_ERROR, 512)
         );
 
-        $this->assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -67,7 +67,7 @@ class LoginActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        $this->assertSame('Invalid credentials.', $decodedResponse['error']);
+        self::assertSame('Invalid credentials.', $decodedResponse['error']);
     }
 
     public function testItLogsInProperlyTheUser(): void
@@ -83,12 +83,12 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
         );
 
-        $this->assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertArrayHasKey('set-cookie', $this->kernelBrowser->getResponse()->headers->all());
+        self::assertArrayHasKey('set-cookie', $this->kernelBrowser->getResponse()->headers->all());
 
         $session = $this->kernelBrowser->getContainer()->get('session');
 
-        $this->assertNotEmpty($session->all());
+        self::assertNotEmpty($session->all());
     }
 }

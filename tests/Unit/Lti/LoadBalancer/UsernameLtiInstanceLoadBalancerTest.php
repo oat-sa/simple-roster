@@ -50,7 +50,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testIfItIsLtiInstanceLoadBalancer(): void
     {
-        $this->assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
+        self::assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -73,7 +73,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
             $actualLtiInstanceUrl = $this->subject->getLtiInstanceUrl($user);
 
-            $this->assertSame(
+            self::assertSame(
                 $expectedLtiInstanceUrl,
                 $actualLtiInstanceUrl,
                 sprintf(
@@ -98,7 +98,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
         $lastAssignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
         $user = (new User())->addAssignment($lastAssignment);
 
-        $this->assertSame('5', $this->subject->getLtiRequestContextId($user));
+        self::assertSame('5', $this->subject->getLtiRequestContextId($user));
     }
 
     private function getLineItemMock(int $lineItemId): LineItem

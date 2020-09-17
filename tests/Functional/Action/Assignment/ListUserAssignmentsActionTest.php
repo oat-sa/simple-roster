@@ -55,7 +55,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -64,7 +64,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        $this->assertSame(
+        self::assertSame(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
         );
@@ -84,8 +84,8 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertSame([
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame([
             'assignments' => [
                 [
                     'id' => $user->getLastAssignment()->getId(),
@@ -119,8 +119,8 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertSame(
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(
             [
                 'assignments' => [
                     [

@@ -31,15 +31,15 @@ class HealthCheckResultTest extends TestCase
     {
         $subject = new HealthCheckResult(true, false);
 
-        $this->assertTrue($subject->isDoctrineConnectionAvailable());
-        $this->assertFalse($subject->isDoctrineCacheAvailable());
+        self::assertTrue($subject->isDoctrineConnectionAvailable());
+        self::assertFalse($subject->isDoctrineCacheAvailable());
     }
 
     public function testJsonSerialization(): void
     {
         $subject = new HealthCheckResult(false, true);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'isDoctrineConnectionAvailable' => false,
                 'isDoctrineCacheAvailable' => true,

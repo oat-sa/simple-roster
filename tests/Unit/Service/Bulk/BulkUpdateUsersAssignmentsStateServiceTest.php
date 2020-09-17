@@ -91,7 +91,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertSame([
+        self::assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -114,7 +114,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->process($bulkOperationCollection);
@@ -163,7 +163,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
         $this->subject->process($bulkOperationCollection)->jsonSerialize();
 
-        $this->assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+        self::assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
     }
 
     public function provideUnsupportedAssignmentState(): array

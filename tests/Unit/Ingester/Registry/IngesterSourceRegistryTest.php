@@ -41,7 +41,7 @@ class IngesterSourceRegistryTest extends TestCase
 
     public function testItIsConstructedEmpty(): void
     {
-        $this->assertEmpty($this->subject->all());
+        self::assertEmpty($this->subject->all());
     }
 
     public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterSourceName(): void
@@ -57,15 +57,15 @@ class IngesterSourceRegistryTest extends TestCase
         $source1 = $this->createMock(IngesterSourceInterface::class);
         $source2 = $this->createMock(IngesterSourceInterface::class);
 
-        $source1->expects($this->once())->method('getRegistryItemName')->willReturn('sourceName1');
-        $source2->expects($this->once())->method('getRegistryItemName')->willReturn('sourceName2');
+        $source1->expects(self::once())->method('getRegistryItemName')->willReturn('sourceName1');
+        $source2->expects(self::once())->method('getRegistryItemName')->willReturn('sourceName2');
 
         $this->subject
             ->add($source1)
             ->add($source2);
 
-        $this->assertCount(2, $this->subject->all());
-        $this->assertSame($source1, $this->subject->get('sourceName1'));
-        $this->assertSame($source2, $this->subject->get('sourceName2'));
+        self::assertCount(2, $this->subject->all());
+        self::assertSame($source1, $this->subject->get('sourceName1'));
+        self::assertSame($source2, $this->subject->get('sourceName2'));
     }
 }

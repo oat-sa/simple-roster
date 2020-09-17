@@ -83,7 +83,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertSame([
+        self::assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -110,7 +110,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->process($bulkOperationCollection);

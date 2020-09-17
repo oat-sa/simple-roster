@@ -68,7 +68,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmResultCacheForAllUsers(): void
     {
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
             ],
@@ -81,10 +81,10 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             $username = sprintf('user_%d', $i);
             $userCacheId = $this->userCacheIdGenerator->generate($username);
 
-            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+            self::assertTrue($this->doctrineResultCache->contains($userCacheId));
         }
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '[OK] 100 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
@@ -96,7 +96,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             ->createNativeQuery("UPDATE line_items SET label = 'expected label'", new ResultSetMapping())
             ->execute();
 
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
             ],
@@ -110,13 +110,13 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             /** @var User $user */
             $user = $this->getRepository(User::class)->findOneBy(['username' => $username]);
 
-            $this->assertSame('expected label', $user->getLastAssignment()->getLineItem()->getLabel());
+            self::assertSame('expected label', $user->getLastAssignment()->getLineItem()->getLabel());
         }
     }
 
     public function testItCanWarmUpResultCacheByListOfUsernames(): void
     {
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
                 '--usernames' => 'user_1,user_2,user_3,user_4,user_5,user_6,user_7,user_8,user_9,user_10',
@@ -130,17 +130,17 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             $username = sprintf('user_%d', $i);
             $userCacheId = $this->userCacheIdGenerator->generate($username);
 
-            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+            self::assertTrue($this->doctrineResultCache->contains($userCacheId));
         }
 
         for ($i = 11; $i <= 100; $i++) {
             $username = sprintf('user_%d', $i);
             $userCacheId = $this->userCacheIdGenerator->generate($username);
 
-            $this->assertFalse($this->doctrineResultCache->contains($userCacheId));
+            self::assertFalse($this->doctrineResultCache->contains($userCacheId));
         }
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '[OK] 10 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
@@ -148,7 +148,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpResultCacheByListOfLineItemSlugs(): void
     {
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => '1',
                 '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
@@ -162,17 +162,17 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             $username = sprintf('user_%d', $i);
             $userCacheId = $this->userCacheIdGenerator->generate($username);
 
-            $this->assertTrue($this->doctrineResultCache->contains($userCacheId));
+            self::assertTrue($this->doctrineResultCache->contains($userCacheId));
         }
 
         for ($i = 61; $i <= 100; $i++) {
             $username = sprintf('user_%d', $i);
             $userCacheId = $this->userCacheIdGenerator->generate($username);
 
-            $this->assertFalse($this->doctrineResultCache->contains($userCacheId));
+            self::assertFalse($this->doctrineResultCache->contains($userCacheId));
         }
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '[OK] 60 result cache entries have been successfully warmed up.',
             $this->commandTester->getDisplay()
         );
@@ -180,7 +180,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
     {
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--line-item-slugs' => 'invalid',
             ],
@@ -189,7 +189,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             ]
         ));
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '[OK] No matching cache entries, exiting.',
             $this->commandTester->getDisplay()
         );

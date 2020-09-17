@@ -31,19 +31,19 @@ class UsernameCollectionTest extends TestCase
 {
     public function testItImplementsCountable(): void
     {
-        $this->assertInstanceOf(Countable::class, new UsernameCollection());
+        self::assertInstanceOf(Countable::class, new UsernameCollection());
     }
 
     public function testItImplementsIteratorAggregate(): void
     {
-        $this->assertInstanceOf(IteratorAggregate::class, new UsernameCollection());
+        self::assertInstanceOf(IteratorAggregate::class, new UsernameCollection());
     }
 
     public function testIfUsernameCanBeAdded(): void
     {
         $subject = (new UsernameCollection())->add('test');
 
-        $this->assertCount(1, $subject);
-        $this->assertSame('test', $subject->getIterator()->current());
+        self::assertCount(1, $subject);
+        self::assertSame('test', $subject->getIterator()->current());
     }
 }

@@ -69,8 +69,8 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
@@ -79,9 +79,9 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
         foreach ($this->getRepository(User::class)->findAll() as $user) {
             $userAssignments = $user->getAssignments();
 
-            $this->assertCount(2, $userAssignments);
-            $this->assertSame(Assignment::STATE_CANCELLED, $userAssignments[0]->getState());
-            $this->assertSame(Assignment::STATE_READY, $userAssignments[1]->getState());
+            self::assertCount(2, $userAssignments);
+            self::assertSame(Assignment::STATE_CANCELLED, $userAssignments[0]->getState());
+            self::assertSame(Assignment::STATE_READY, $userAssignments[1]->getState());
         }
     }
 
@@ -99,7 +99,7 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
+        self::assertSame(0, $output);
 
         for ($i = 1; $i <= 100; $i++) {
             $username = sprintf('user_%s', $i);
@@ -123,14 +123,14 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
         $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(100, $assignmentRepository->findAll());
+        self::assertCount(100, $assignmentRepository->findAll());
     }
 
     public function testItThrowsRuntimeExceptionIfUsernameColumnCannotBeFoundInSourceCsvFile(): void
@@ -145,8 +145,8 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(1, $output);
-        $this->assertStringContainsString(
+        self::assertSame(1, $output);
+        self::assertStringContainsString(
             "[ERROR] Column 'username' cannot be found in source CSV file.",
             $this->commandTester->getDisplay()
         );
@@ -166,8 +166,8 @@ class BulkCreateUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );

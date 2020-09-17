@@ -39,8 +39,8 @@ class BulkOperationCollectionTest extends TestCase
             ->add($operation1)
             ->add($operation2);
 
-        $this->assertCount(2, $subject);
-        $this->assertSame(
+        self::assertCount(2, $subject);
+        self::assertSame(
             [
                 'identifier1' => $operation1,
                 'identifier2' => $operation2,

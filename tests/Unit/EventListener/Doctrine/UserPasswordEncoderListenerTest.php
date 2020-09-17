@@ -50,11 +50,11 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('encodePassword');
 
         $entity
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setPassword');
 
         $this->subject->prePersist($entity);
@@ -67,14 +67,14 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('encodePassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
         $this->subject->prePersist($entity);
 
-        $this->assertSame(
+        self::assertSame(
             'encodedPassword',
             $entity->getPassword()
         );
@@ -87,14 +87,14 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('encodePassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
         $this->subject->preUpdate($entity);
 
-        $this->assertSame(
+        self::assertSame(
             'encodedPassword',
             $entity->getPassword()
         );

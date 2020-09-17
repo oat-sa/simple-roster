@@ -31,8 +31,8 @@ class IngesterResultFailureTest extends TestCase
     {
         $subject = new IngesterResultFailure(10, ['data'], 'reason');
 
-        $this->assertSame(10, $subject->getLineNumber());
-        $this->assertSame(['data'], $subject->getData());
-        $this->assertSame('reason', $subject->getReason());
+        self::assertSame(10, $subject->getLineNumber());
+        self::assertSame(['data'], $subject->getData());
+        self::assertSame('reason', $subject->getReason());
     }
 }

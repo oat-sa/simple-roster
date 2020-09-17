@@ -80,20 +80,20 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setAttemptsCount(1);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('persist')
-            ->with($this->callback(static function (Assignment $assignment) {
+            ->with(self::callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_COMPLETED;
             }));
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->markAssignmentAsCompleted(5);
@@ -117,20 +117,20 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setAttemptsCount(1);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('persist')
-            ->with($this->callback(static function (Assignment $assignment) {
+            ->with(self::callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_READY;
             }));
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->markAssignmentAsCompleted(5);
@@ -152,13 +152,13 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setUser($user);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('info')
             ->with(
                 "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",

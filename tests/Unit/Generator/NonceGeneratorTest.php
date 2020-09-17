@@ -38,6 +38,6 @@ class NonceGeneratorTest extends TestCase
         Carbon::setTestNow(Carbon::create(2019, 1, 2));
         $nonce2 = $subject->generate();
 
-        $this->assertNotEquals($nonce1, $nonce2);
+        self::assertNotEquals($nonce1, $nonce2);
     }
 }

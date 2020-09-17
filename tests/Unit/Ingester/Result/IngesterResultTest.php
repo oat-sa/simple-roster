@@ -32,12 +32,12 @@ class IngesterResultTest extends TestCase
     {
         $subject = new IngesterResult('ingester', 'source');
 
-        $this->assertSame('ingester', $subject->getIngesterType());
-        $this->assertSame('source', $subject->getSourceType());
-        $this->assertSame(0, $subject->getSuccessCount());
-        $this->assertEmpty($subject->getFailures());
-        $this->assertFalse($subject->hasFailures());
-        $this->assertTrue($subject->isDryRun());
+        self::assertSame('ingester', $subject->getIngesterType());
+        self::assertSame('source', $subject->getSourceType());
+        self::assertSame(0, $subject->getSuccessCount());
+        self::assertEmpty($subject->getFailures());
+        self::assertFalse($subject->hasFailures());
+        self::assertTrue($subject->isDryRun());
     }
 
     public function testItCanAddSuccesses(): void
@@ -48,8 +48,8 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addSuccess();
 
-        $this->assertSame(2, $subject->getSuccessCount());
-        $this->assertFalse($subject->hasFailures());
+        self::assertSame(2, $subject->getSuccessCount());
+        self::assertFalse($subject->hasFailures());
     }
 
     public function testItCanAddAndRetrieveFailures(): void
@@ -63,9 +63,9 @@ class IngesterResultTest extends TestCase
             ->addFailure($failure1)
             ->addFailure($failure2);
 
-        $this->assertSame(0, $subject->getSuccessCount());
-        $this->assertTrue($subject->hasFailures());
-        $this->assertSame(
+        self::assertSame(0, $subject->getSuccessCount());
+        self::assertTrue($subject->hasFailures());
+        self::assertSame(
             [
                 1 => $failure1,
                 2 => $failure2
@@ -83,7 +83,7 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addFailure($this->createMock(IngesterResultFailure::class));
 
-        $this->assertSame(
+        self::assertSame(
             "[DRY_RUN] Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
             $subject->__toString()
         );
@@ -98,7 +98,7 @@ class IngesterResultTest extends TestCase
             ->addSuccess()
             ->addFailure($this->createMock(IngesterResultFailure::class));
 
-        $this->assertSame(
+        self::assertSame(
             "Ingestion (type='ingester', source='source'): 2 successes, 1 failures.",
             $subject->__toString()
         );

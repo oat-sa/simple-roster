@@ -56,13 +56,13 @@ class IngesterCommandTest extends KernelTestCase
             'path' => __DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv',
         ]);
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertEmpty($this->getRepository(Infrastructure::class)->findAll());
+        self::assertEmpty($this->getRepository(Infrastructure::class)->findAll());
     }
 
     public function testLocalIngestionSuccess(): void
@@ -74,22 +74,22 @@ class IngesterCommandTest extends KernelTestCase
             '--force' => 'true' // Test if it gets casted properly
         ]);
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
 
         $user1 = $this->getRepository(Infrastructure::class)->find(1);
-        $this->assertSame('infra_1', $user1->getLabel());
+        self::assertSame('infra_1', $user1->getLabel());
 
         $user2 = $this->getRepository(Infrastructure::class)->find(2);
-        $this->assertSame('infra_2', $user2->getLabel());
+        self::assertSame('infra_2', $user2->getLabel());
 
         $user3 = $this->getRepository(Infrastructure::class)->find(3);
-        $this->assertSame('infra_3', $user3->getLabel());
+        self::assertSame('infra_3', $user3->getLabel());
     }
 
     public function testLocalIngestionFailure(): void
@@ -101,21 +101,21 @@ class IngesterCommandTest extends KernelTestCase
             '--force' => true,
         ]);
 
-        $this->assertSame(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
             $this->commandTester->getDisplay()
         );
 
-        $this->assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
 
         $user1 = $this->getRepository(Infrastructure::class)->find(1);
-        $this->assertSame('infra_1', $user1->getLabel());
+        self::assertSame('infra_1', $user1->getLabel());
     }
 
     public function testInvalidIngesterFailure(): void
@@ -127,8 +127,8 @@ class IngesterCommandTest extends KernelTestCase
             '--force' => true,
         ]);
 
-        $this->assertSame(1, $output);
-        $this->assertStringContainsString(
+        self::assertSame(1, $output);
+        self::assertStringContainsString(
             "[ERROR] Ingester named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );
@@ -143,8 +143,8 @@ class IngesterCommandTest extends KernelTestCase
             '--force' => true,
         ]);
 
-        $this->assertSame(1, $output);
-        $this->assertStringContainsString(
+        self::assertSame(1, $output);
+        self::assertStringContainsString(
             "[ERROR] Ingester source named 'invalid' cannot be found.",
             $this->commandTester->getDisplay()
         );

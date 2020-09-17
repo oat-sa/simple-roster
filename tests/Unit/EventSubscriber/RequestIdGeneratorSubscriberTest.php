@@ -59,12 +59,12 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
     public function testItIsAnEventSubscriber(): void
     {
-        $this->assertInstanceOf(EventSubscriberInterface::class, $this->subject);
+        self::assertInstanceOf(EventSubscriberInterface::class, $this->subject);
     }
 
     public function testItSubscribesToKernelRequestEventWithHighestPriority(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 255]],
             RequestIdGeneratorSubscriber::getSubscribedEvents()
         );
@@ -91,8 +91,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertSame('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
+        self::assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        self::assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillGenerateNewRequestIdIfCloudfrontHeaderIsNotPresent(): void
@@ -100,7 +100,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
         $request = Request::create('/test');
 
         $this->uuidFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('uuid4')
             ->willReturn('expectedRequestId');
 
@@ -114,8 +114,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertSame('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
+        self::assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        self::assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillNotSetRequestIdOnSubRequests(): void
@@ -125,7 +125,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->willReturn(false);
 
         $this->uuidFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('uuid4');
 
         $this->subject->onKernelRequest($this->requestEvent);

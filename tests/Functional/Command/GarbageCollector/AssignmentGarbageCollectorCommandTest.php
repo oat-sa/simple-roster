@@ -59,8 +59,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function testOutputWhenThereIsNothingToUpdate(): void
     {
-        $this->assertSame(0, $this->commandTester->execute([]));
-        $this->assertStringContainsString(
+        self::assertSame(0, $this->commandTester->execute([]));
+        self::assertStringContainsString(
             '[OK] Nothing to update.',
             $this->commandTester->getDisplay()
         );
@@ -70,13 +70,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
-        $this->assertSame(0, $this->commandTester->execute([]));
-        $this->assertStringContainsString(
+        self::assertSame(0, $this->commandTester->execute([]));
+        self::assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
-        $this->assertCount(
+        self::assertCount(
             10,
             $this->getRepository(Assignment::class)->findBy(['state' => Assignment::STATE_STARTED])
         );
@@ -86,13 +86,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
-        $this->assertSame(0, $this->commandTester->execute(
+        self::assertSame(0, $this->commandTester->execute(
             [
                 '--batch-size' => 1,
                 '--force' => 'true', // Test if it gets casted properly
             ]
         ));
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
@@ -128,7 +128,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         /** @var Assignment $assignment */
         foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
             $this->assertCollectedAssignmentStateIsCorrect($assignment);
-            $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
+            self::assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
         }
     }
 
@@ -136,7 +136,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
-        $this->assertSame(
+        self::assertSame(
             0,
             $this->commandTester->execute(
                 [
@@ -145,7 +145,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
                 ]
             )
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             "[OK] Total of '10' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
@@ -153,14 +153,14 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         /** @var Assignment $assignment */
         foreach ($this->getRepository(Assignment::class)->findAll() as $assignment) {
             $this->assertCollectedAssignmentStateIsCorrect($assignment);
-            $this->assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
+            self::assertEquals(Carbon::now()->toDateTime(), $assignment->getUpdatedAt());
         }
     }
 
     public function testOutputInCaseOfException(): void
     {
-        $this->assertSame(1, $this->commandTester->execute(['--batch-size' => 0]));
-        $this->assertStringContainsString(
+        self::assertSame(1, $this->commandTester->execute(['--batch-size' => 0]));
+        self::assertStringContainsString(
             "[ERROR] Invalid 'batch-size' argument received.",
             $this->commandTester->getDisplay()
         );
@@ -172,9 +172,9 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $assignment->getLineItem()->getMaxAttempts() === 0
             || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()
         ) {
-            $this->assertSame(Assignment::STATE_READY, $assignment->getState());
+            self::assertSame(Assignment::STATE_READY, $assignment->getState());
         } else {
-            $this->assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
+            self::assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
         }
     }
 }

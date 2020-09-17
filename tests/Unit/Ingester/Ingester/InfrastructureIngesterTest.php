@@ -32,6 +32,6 @@ class InfrastructureIngesterTest extends TestCase
     {
         $subject = new InfrastructureIngester($this->createMock(ManagerRegistry::class));
 
-        $this->assertSame('infrastructure', $subject->getRegistryItemName());
+        self::assertSame('infrastructure', $subject->getRegistryItemName());
     }
 }

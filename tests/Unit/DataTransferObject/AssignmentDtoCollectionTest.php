@@ -32,12 +32,12 @@ class AssignmentDtoCollectionTest extends TestCase
 {
     public function testItImplementsCountable(): void
     {
-        $this->assertInstanceOf(Countable::class, new AssignmentDtoCollection());
+        self::assertInstanceOf(Countable::class, new AssignmentDtoCollection());
     }
 
     public function testItImplementsIteratorAggregate(): void
     {
-        $this->assertInstanceOf(IteratorAggregate::class, new AssignmentDtoCollection());
+        self::assertInstanceOf(IteratorAggregate::class, new AssignmentDtoCollection());
     }
 
     public function testIfAssignmentCanBeAdded(): void
@@ -45,7 +45,7 @@ class AssignmentDtoCollectionTest extends TestCase
         $assignment = new AssignmentDto(1, 'test', 1, 1);
         $subject = (new AssignmentDtoCollection())->add($assignment);
 
-        $this->assertCount(1, $subject);
-        $this->assertSame($assignment, $subject->getIterator()->current());
+        self::assertCount(1, $subject);
+        self::assertSame($assignment, $subject->getIterator()->current());
     }
 }

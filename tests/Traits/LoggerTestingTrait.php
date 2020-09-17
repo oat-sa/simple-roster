@@ -54,7 +54,7 @@ trait LoggerTestingTrait
 
     public function assertHasLogRecord(array $record, int $level): void
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->handler->hasRecord($record, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
@@ -66,7 +66,7 @@ trait LoggerTestingTrait
 
     public function assertHasLogRecordWithMessage(string $message, int $level): void
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->handler->hasRecordThatContains($message, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
@@ -78,6 +78,6 @@ trait LoggerTestingTrait
 
     public function assertHasRecordThatPasses(callable $callable, int $level): void
     {
-        $this->assertTrue($this->handler->hasRecordThatPasses($callable, $level));
+        self::assertTrue($this->handler->hasRecordThatPasses($callable, $level));
     }
 }

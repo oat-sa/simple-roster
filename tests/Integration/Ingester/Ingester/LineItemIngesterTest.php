@@ -57,12 +57,12 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertSame('line-item', $output->getIngesterType());
-        $this->assertTrue($output->isDryRun());
-        $this->assertSame(6, $output->getSuccessCount());
-        $this->assertFalse($output->hasFailures());
+        self::assertSame('line-item', $output->getIngesterType());
+        self::assertTrue($output->isDryRun());
+        self::assertSame(6, $output->getSuccessCount());
+        self::assertFalse($output->hasFailures());
 
-        $this->assertEmpty($this->getRepository(LineItem::class)->findAll());
+        self::assertEmpty($this->getRepository(LineItem::class)->findAll());
     }
 
     public function testIngestWithEmptyInfrastructures(): void
@@ -83,21 +83,21 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertSame('line-item', $output->getIngesterType());
-        $this->assertFalse($output->isDryRun());
-        $this->assertSame(1, $output->getSuccessCount());
-        $this->assertTrue($output->hasFailures());
-        $this->assertCount(3, $output->getFailures());
+        self::assertSame('line-item', $output->getIngesterType());
+        self::assertFalse($output->isDryRun());
+        self::assertSame(1, $output->getSuccessCount());
+        self::assertTrue($output->hasFailures());
+        self::assertCount(3, $output->getFailures());
 
-        $this->assertCount(1, $this->getRepository(LineItem::class)->findAll());
+        self::assertCount(1, $this->getRepository(LineItem::class)->findAll());
 
         $lineItem1 = $this->getRepository(LineItem::class)->find(1);
-        $this->assertSame('gra13_ita_1', $lineItem1->getSlug());
+        self::assertSame('gra13_ita_1', $lineItem1->getSlug());
 
         $failure = current($output->getFailures());
 
-        $this->assertSame(2, $failure->getLineNumber());
-        $this->assertSame(
+        self::assertSame(2, $failure->getLineNumber());
+        self::assertSame(
             [
                 'uri' => 'http://taoplatform.loc/delivery_2.rdf',
                 'label' => 'label2',
@@ -110,7 +110,7 @@ class LineItemIngesterTest extends KernelTestCase
             $failure->getData()
         );
 
-        $this->assertStringContainsString('UNIQUE constraint failed: line_items.slug', $failure->getReason());
+        self::assertStringContainsString('UNIQUE constraint failed: line_items.slug', $failure->getReason());
     }
 
     public function testIngestWithValidSource(): void
@@ -121,20 +121,20 @@ class LineItemIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertSame('line-item', $output->getIngesterType());
-        $this->assertFalse($output->isDryRun());
-        $this->assertSame(6, $output->getSuccessCount());
-        $this->assertFalse($output->hasFailures());
+        self::assertSame('line-item', $output->getIngesterType());
+        self::assertFalse($output->isDryRun());
+        self::assertSame(6, $output->getSuccessCount());
+        self::assertFalse($output->hasFailures());
 
-        $this->assertCount(6, $this->getRepository(LineItem::class)->findAll());
+        self::assertCount(6, $this->getRepository(LineItem::class)->findAll());
 
         $lineItem1 = $this->getRepository(LineItem::class)->find(1);
-        $this->assertSame('gra13_ita_1', $lineItem1->getSlug());
-        $this->assertSame(1, $lineItem1->getMaxAttempts());
+        self::assertSame('gra13_ita_1', $lineItem1->getSlug());
+        self::assertSame(1, $lineItem1->getMaxAttempts());
 
         $lineItem6 = $this->getRepository(LineItem::class)->find(6);
-        $this->assertSame('gra13_ita_6', $lineItem6->getSlug());
-        $this->assertSame(2, $lineItem6->getMaxAttempts());
+        self::assertSame('gra13_ita_6', $lineItem6->getSlug());
+        self::assertSame(2, $lineItem6->getMaxAttempts());
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface

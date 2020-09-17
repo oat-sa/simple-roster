@@ -51,11 +51,11 @@ class S3CsvIngesterSourceTest extends TestCase
         $output = $this->subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertStringContainsString('infra', $row['label']);
-            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
-            $this->assertStringContainsString('key', $row['ltiKey']);
-            $this->assertStringContainsString('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertStringContainsString('infra', $row['label']);
+            self::assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            self::assertStringContainsString('key', $row['ltiKey']);
+            self::assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 
@@ -68,7 +68,7 @@ class S3CsvIngesterSourceTest extends TestCase
         $output = $this->subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(1, $row);
+            self::assertCount(1, $row);
         }
     }
 
@@ -81,11 +81,11 @@ class S3CsvIngesterSourceTest extends TestCase
         $output = $this->subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertSame('ms', $row['label']);
-            $this->assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
-            $this->assertSame('key', $row['ltiKey']);
-            $this->assertSame('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertSame('ms', $row['label']);
+            self::assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            self::assertSame('key', $row['ltiKey']);
+            self::assertSame('secret', $row['ltiSecret']);
         }
     }
 
@@ -95,7 +95,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
         $this->subject->setDelimiter('|');
 
-        $this->assertCount(3, $this->subject);
+        self::assertCount(3, $this->subject);
     }
 
     public function testItDoesFetchContentFromS3OnlyOnce(): void
@@ -108,18 +108,18 @@ class S3CsvIngesterSourceTest extends TestCase
         $output = $this->subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertStringContainsString('infra', $row['label']);
-            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
-            $this->assertStringContainsString('key', $row['ltiKey']);
-            $this->assertStringContainsString('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertStringContainsString('infra', $row['label']);
+            self::assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            self::assertStringContainsString('key', $row['ltiKey']);
+            self::assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 
     private function prepareS3Client(string $source): void
     {
         $this->client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('__call')
             ->with('getObject', [[
                 'Bucket' => 'bucket',

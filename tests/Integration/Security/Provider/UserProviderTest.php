@@ -95,13 +95,13 @@ class UserProviderTest extends KernelTestCase
         $toRefreshUser = (new User())->setUsername('invalid');
         $refreshedUser = $this->subject->refreshUser($toRefreshUser);
 
-        $this->assertSame($toRefreshUser, $refreshedUser);
+        self::assertSame($toRefreshUser, $refreshedUser);
     }
 
     public function testItSupportsUserClassImplementations(): void
     {
-        $this->assertTrue($this->subject->supportsClass(User::class));
-        $this->assertFalse($this->subject->supportsClass('invalid'));
+        self::assertTrue($this->subject->supportsClass(User::class));
+        self::assertFalse($this->subject->supportsClass('invalid'));
     }
 
     private function createNonSupportedUserInterfaceImplementation(): UserInterface
@@ -140,7 +140,7 @@ class UserProviderTest extends KernelTestCase
     private function prepareRequestStackMock(int $expectedCalls, string $expectedRoute): void
     {
         $this->requestStack
-            ->expects($this->exactly($expectedCalls))
+            ->expects(self::exactly($expectedCalls))
             ->method('getCurrentRequest')
             ->willReturn(new Request([], [], ['_route' => $expectedRoute]));
     }

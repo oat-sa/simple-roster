@@ -50,7 +50,7 @@ class HealthCheckServiceTest extends TestCase
         $this->ormConfiguration = $this->createMock(Configuration::class);
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConfiguration')
             ->willReturn($this->ormConfiguration);
 
@@ -68,59 +68,59 @@ class HealthCheckServiceTest extends TestCase
     {
         $resultCacheImplMock = $this->createMock(Cache::class);
         $resultCacheImplMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getStats')
             ->willReturn(['uptime' => 1]);
 
         $this->ormConfiguration
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
 
         $connectionMock = $this->createMock(Connection::class);
         $connectionMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('ping')
             ->willReturn(true);
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConnection')
             ->willReturn($connectionMock);
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertTrue($output->isDoctrineConnectionAvailable());
-        $this->assertTrue($output->isDoctrineCacheAvailable());
+        self::assertTrue($output->isDoctrineConnectionAvailable());
+        self::assertTrue($output->isDoctrineCacheAvailable());
     }
 
     public function testGetHealthCheckResultFailure(): void
     {
         $resultCacheImplMock = $this->createMock(Cache::class);
         $resultCacheImplMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getStats')
             ->willReturn(false);
 
         $this->ormConfiguration
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
 
         $connectionMock = $this->createMock(Connection::class);
         $connectionMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('ping')
             ->willReturn(false);
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConnection')
             ->willReturn($connectionMock);
 
         $output = $this->subject->getHealthCheckResult();
 
-        $this->assertFalse($output->isDoctrineConnectionAvailable());
-        $this->assertFalse($output->isDoctrineCacheAvailable());
+        self::assertFalse($output->isDoctrineConnectionAvailable());
+        self::assertFalse($output->isDoctrineCacheAvailable());
     }
 }

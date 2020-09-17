@@ -33,12 +33,12 @@ class LineItemCollectionTest extends TestCase
 {
     public function testItImplementsCountable(): void
     {
-        $this->assertInstanceOf(Countable::class, new LineItemCollection());
+        self::assertInstanceOf(Countable::class, new LineItemCollection());
     }
 
     public function testItImplementsIteratorAggregate(): void
     {
-        $this->assertInstanceOf(IteratorAggregate::class, new LineItemCollection());
+        self::assertInstanceOf(IteratorAggregate::class, new LineItemCollection());
     }
 
     public function testIfLineItemCanBeAdded(): void
@@ -46,8 +46,8 @@ class LineItemCollectionTest extends TestCase
         $lineItem = (new LineItem())->setSlug('test');
         $subject = (new LineItemCollection())->add($lineItem);
 
-        $this->assertCount(1, $subject);
-        $this->assertSame($lineItem, $subject->getIterator()->current());
+        self::assertCount(1, $subject);
+        self::assertSame($lineItem, $subject->getIterator()->current());
     }
 
     public function testItThrowsExceptionIfLineItemCannotBeFoundBySlug(): void

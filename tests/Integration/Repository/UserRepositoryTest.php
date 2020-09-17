@@ -63,8 +63,8 @@ class UserRepositoryTest extends KernelTestCase
     {
         $user = $this->subject->findByUsernameWithAssignments('user_1');
 
-        $this->assertSame('user_1', $user->getUsername());
-        $this->assertCount(1, $user->getAssignments());
+        self::assertSame('user_1', $user->getUsername());
+        self::assertCount(1, $user->getAssignments());
     }
 
     public function testItUsesResultCacheImplementationForGettingTheUserWithAssignments(): void
@@ -72,11 +72,11 @@ class UserRepositoryTest extends KernelTestCase
         $username = 'user_1';
         $expectedResultCacheId = $this->userCacheIdGenerator->generate($username);
 
-        $this->assertFalse($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertFalse($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
 
         $this->subject->findByUsernameWithAssignments($username);
 
-        $this->assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
     }
 
     public function testItThrowsExceptionIfWeTryToGetUserWithAssignmentsWithEmptyUsername(): void
@@ -112,22 +112,22 @@ class UserRepositoryTest extends KernelTestCase
         do {
             $resultSet = $this->subject->findAllUsernamePaged($limit, $lastUserId);
 
-            $this->assertLessThanOrEqual($limit, count($resultSet));
+            self::assertLessThanOrEqual($limit, count($resultSet));
 
             foreach ($resultSet as $username) {
                 $userIdIndex++;
-                $this->assertSame(sprintf('user_%d', $userIdIndex), $username);
+                self::assertSame(sprintf('user_%d', $userIdIndex), $username);
             }
 
             $lastUserId = $resultSet->getLastUserId();
         } while ($resultSet->hasMore());
 
-        $this->assertSame(100, $userIdIndex);
+        self::assertSame(100, $userIdIndex);
     }
 
     public function testItCanCountUsers(): void
     {
-        $this->assertSame(100, $this->subject->countByCriteria());
+        self::assertSame(100, $this->subject->countByCriteria());
     }
 
     public function testItCanCountUsersByUsernameCriteria(): void
@@ -135,7 +135,7 @@ class UserRepositoryTest extends KernelTestCase
         $criteria = (new FindUserCriteria())
             ->addUsernameCriterion('user_1', 'user_10', 'user_73', 'user_88');
 
-        $this->assertSame(4, $this->subject->countByCriteria($criteria));
+        self::assertSame(4, $this->subject->countByCriteria($criteria));
     }
 
     public function testItCanCountUsersByLineItemSlugCriteria(): void
@@ -143,7 +143,7 @@ class UserRepositoryTest extends KernelTestCase
         $criteria = (new FindUserCriteria())
             ->addLineItemSlugCriterion('lineItemSlug2', 'lineItemSlug3');
 
-        $this->assertSame(50, $this->subject->countByCriteria($criteria));
+        self::assertSame(50, $this->subject->countByCriteria($criteria));
     }
 
     public function provideLimits(): array

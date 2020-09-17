@@ -38,11 +38,11 @@ class OAuthContextTest extends TestCase
             'version'
         );
 
-        $this->assertSame('bodyHash', $subject->getBodyHash());
-        $this->assertSame('consumerKey', $subject->getConsumerKey());
-        $this->assertSame('nonce', $subject->getNonce());
-        $this->assertSame('signatureMethod', $subject->getSignatureMethod());
-        $this->assertSame('timestamp', $subject->getTimestamp());
-        $this->assertSame('version', $subject->getVersion());
+        self::assertSame('bodyHash', $subject->getBodyHash());
+        self::assertSame('consumerKey', $subject->getConsumerKey());
+        self::assertSame('nonce', $subject->getNonce());
+        self::assertSame('signatureMethod', $subject->getSignatureMethod());
+        self::assertSame('timestamp', $subject->getTimestamp());
+        self::assertSame('version', $subject->getVersion());
     }
 }
