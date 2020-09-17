@@ -140,7 +140,7 @@ You can find the mutation score requirements below:
 
 | Mutation metric                | Threshold |
 | -------------------------------| --------- |
-| Mutation Score Indicator (MSI) | 90%       |
+| Mutation Score Indicator (MSI) | 95%       |
 
 To execute mutation tests run:
 
