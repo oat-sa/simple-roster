@@ -104,11 +104,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function hasStartAt(): bool
-    {
-        return $this->startAt instanceof DateTimeInterface;
-    }
-
     public function getEndAt(): ?DateTimeInterface
     {
         return $this->endAt;
@@ -119,11 +114,6 @@ class LineItem implements JsonSerializable, EntityInterface
         $this->endAt = $endAt;
 
         return $this;
-    }
-
-    public function hasEndAt(): bool
-    {
-        return $this->endAt instanceof DateTimeInterface;
     }
 
     public function getInfrastructure(): Infrastructure
