@@ -98,7 +98,8 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         );
 
         $logMessagePlaceholder =
-            "Assignment with id='%s' of user with username='%s' has been collected and marked as 'completed' by garbage collector.";
+            "Assignment with id='%s' of user with username='%s' has been collected and " .
+            "marked as 'completed' by garbage collector.";
 
         for ($i = 1; $i <= 10; $i++) {
             $this->assertHasLogRecordWithMessage(
@@ -154,7 +155,10 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
     public function assertCollectedAssignmentStateIsCorrect(Assignment $assignment): void
     {
-        if ($assignment->getLineItem()->getMaxAttempts() === 0 || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()) {
+        if (
+            $assignment->getLineItem()->getMaxAttempts() === 0
+            || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()
+        ) {
             $this->assertEquals(Assignment::STATE_READY, $assignment->getState());
         } else {
             $this->assertEquals(Assignment::STATE_COMPLETED, $assignment->getState());

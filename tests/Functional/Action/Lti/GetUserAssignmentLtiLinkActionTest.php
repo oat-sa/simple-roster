@@ -171,7 +171,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUsernameLoadBalancerStrategy(): void
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -221,7 +224,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->assertEquals(2, $assignment->getAttemptsCount());
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
@@ -271,6 +277,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->assertEquals(2, $assignment->getAttemptsCount());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
         $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
