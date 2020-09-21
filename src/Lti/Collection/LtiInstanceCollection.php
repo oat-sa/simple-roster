@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,29 +15,40 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace App\Lti\Collection;
 
-use App\Entity\EntityInterface;
-use App\Entity\Infrastructure;
+use App\Entity\LtiInstance;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use Traversable;
 
-class InfrastructureIngester extends AbstractIngester
+class LtiInstanceCollection implements Countable, IteratorAggregate
 {
-    public function getRegistryItemName(): string
+    private $ltiInstances = [];
+
+    public function add(LtiInstance $ltiInstance): self
     {
-        return 'infrastructure';
+        $this->ltiInstances[] = $ltiInstance;
+
+        return $this;
     }
 
-    protected function createEntity(array $data): EntityInterface
+    /**
+     * @return ArrayIterator|Traversable
+     */
+    public function getIterator()
     {
-        return (new Infrastructure())
-            ->setLabel($data['label'])
-            ->setLtiDirectorLink($data['ltiDirectorLink'])
-            ->setLtiKey($data['ltiKey'])
-            ->setLtiSecret($data['ltiSecret']);
+        return new ArrayIterator($this->ltiInstances);
+    }
+
+    public function count()
+    {
+        return count($this->ltiInstances);
     }
 }

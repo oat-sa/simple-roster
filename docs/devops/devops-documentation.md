@@ -54,7 +54,6 @@ The main configuration file is `.env`, located in root folder.
 
 | Parameter | Description |
 | ------------- |:-------------|
-| LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
 | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
 | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |

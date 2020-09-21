@@ -54,17 +54,13 @@ class GetUserAssignmentLtiRequestService
     /** @var string */
     private $ltiLaunchPresentationLocale;
 
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
-
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
         RouterInterface $router,
         LtiInstanceLoadBalancerInterface $loadBalancer,
         string $ltiLaunchPresentationReturnUrl,
-        string $ltiLaunchPresentationLocale,
-        bool $ltiInstancesLoadBalancerEnabled
+        string $ltiLaunchPresentationLocale
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
@@ -72,7 +68,6 @@ class GetUserAssignmentLtiRequestService
         $this->loadBalancer = $loadBalancer;
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
         $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
-        $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
     }
 
     /**
@@ -82,9 +77,12 @@ class GetUserAssignmentLtiRequestService
     {
         $this->checkIfAssignmentCanBeProcessed($assignment);
 
+        // TODO LTI key an secret must be determined after checking which instance the user with be redirected to
+
         $context = new OAuthContext(
             '',
-            $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
+//            $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
+            'TODO',
             $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
             (string)Carbon::now()->getTimestamp(),
@@ -98,7 +96,8 @@ class GetUserAssignmentLtiRequestService
             $context,
             $ltiLink,
             Request::METHOD_POST,
-            $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
+//            $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
+            'TODO',
             $ltiParameters
         );
 
@@ -149,9 +148,7 @@ class GetUserAssignmentLtiRequestService
 
     private function getAssignmentLtiLink(Assignment $assignment): string
     {
-        $link = $this->ltiInstancesLoadBalancerEnabled
-            ? $this->loadBalancer->getLtiInstanceUrl($assignment->getUser())
-            : $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink();
+        $link = $this->loadBalancer->getLtiInstanceUrl($assignment->getUser());
 
         return sprintf(
             '%s/%s',

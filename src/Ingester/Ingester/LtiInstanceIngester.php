@@ -20,18 +20,26 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Ingester\Ingester;
+namespace App\Ingester\Ingester;
 
-use App\Ingester\Ingester\InfrastructureIngester;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use PHPUnit\Framework\TestCase;
+use App\Entity\EntityInterface;
+use App\Entity\LtiInstance;
 
-class InfrastructureIngesterTest extends TestCase
+class LtiInstanceIngester extends AbstractIngester
 {
-    public function testRegistryItemName(): void
+    public function getRegistryItemName(): string
     {
-        $subject = new InfrastructureIngester($this->createMock(ManagerRegistry::class));
+        return 'lti-instance';
+    }
 
-        self::assertSame('infrastructure', $subject->getRegistryItemName());
+    protected function createEntity(array $data): EntityInterface
+    {
+        return new LtiInstance(
+            0,
+            $data['label'],
+            $data['ltiLink'],
+            $data['ltiKey'],
+            $data['ltiSecret']
+        );
     }
 }

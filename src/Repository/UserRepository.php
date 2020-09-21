@@ -71,10 +71,9 @@ class UserRepository extends AbstractRepository
 
         $user = $this
             ->createQueryBuilder('u')
-            ->select('u, a, l, i')
+            ->select('u, a, l')
             ->innerJoin('u.assignments', 'a')
             ->innerJoin('a.lineItem', 'l')
-            ->innerJoin('l.infrastructure', 'i')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -126,7 +125,6 @@ class UserRepository extends AbstractRepository
             $queryBuilder
                 ->innerJoin('u.assignments', 'a')
                 ->innerJoin('a.lineItem', 'l')
-                ->innerJoin('l.infrastructure', 'i')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }
@@ -167,7 +165,6 @@ class UserRepository extends AbstractRepository
             $queryBuilder
                 ->leftJoin('u.assignments', 'a')
                 ->leftJoin('a.lineItem', 'l')
-                ->leftJoin('l.infrastructure', 'i')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }

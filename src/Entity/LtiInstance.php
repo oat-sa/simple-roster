@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,14 +15,14 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace App\Entity;
 
-class Infrastructure implements EntityInterface
+class LtiInstance implements EntityInterface
 {
     /** @var int */
     private $id;
@@ -31,7 +31,7 @@ class Infrastructure implements EntityInterface
     private $label;
 
     /** @var string */
-    private $ltiDirectorLink;
+    private $ltiLink;
 
     /** @var string */
     private $ltiKey;
@@ -39,7 +39,17 @@ class Infrastructure implements EntityInterface
     /** @var string */
     private $ltiSecret;
 
-    public function getId(): int
+    public function __construct(int $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
+    {
+        $this->id = $id;
+        $this->label = $label;
+        $this->ltiLink = $ltiLink;
+        $this->ltiKey = $ltiKey;
+        $this->ltiSecret = $ltiSecret;
+    }
+
+    // TODO: should not be nullable
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -49,23 +59,9 @@ class Infrastructure implements EntityInterface
         return $this->label;
     }
 
-    public function setLabel(string $label): self
+    public function getLtiLink(): string
     {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    public function getLtiDirectorLink(): string
-    {
-        return $this->ltiDirectorLink;
-    }
-
-    public function setLtiDirectorLink(string $ltiDirectorLink): self
-    {
-        $this->ltiDirectorLink = $ltiDirectorLink;
-
-        return $this;
+        return $this->ltiLink;
     }
 
     public function getLtiKey(): string
@@ -73,22 +69,8 @@ class Infrastructure implements EntityInterface
         return $this->ltiKey;
     }
 
-    public function setLtiKey(string $ltiKey): self
-    {
-        $this->ltiKey = $ltiKey;
-
-        return $this;
-    }
-
     public function getLtiSecret(): string
     {
         return $this->ltiSecret;
-    }
-
-    public function setLtiSecret(string $ltiSecret): self
-    {
-        $this->ltiSecret = $ltiSecret;
-
-        return $this;
     }
 }

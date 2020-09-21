@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\User;
-use App\Ingester\Ingester\InfrastructureIngester;
+use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
@@ -171,8 +171,8 @@ class UserIngesterTest extends KernelTestCase
 
     private function prepareIngestionContext(): void
     {
-        static::$container->get(InfrastructureIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv'),
+        static::$container->get(LtiInstanceIngester::class)->ingest(
+            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv'),
             false
         );
 

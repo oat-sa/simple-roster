@@ -23,9 +23,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
-use App\Entity\Infrastructure;
+use App\Entity\LtiInstance;
 use App\Repository\AssignmentRepository;
-use App\Repository\InfrastructureRepository;
+use App\Repository\LtiInstanceRepository;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use App\Tests\Traits\DatabaseTestingTrait;
@@ -58,11 +58,11 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns401IfWrongAuthentication(): void
     {
-        $infrastructure = $this->getInfrastructure();
+        $ltiInstance = $this->getLtiInstance();
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $ltiInstance->getLtiKey(),
             'oauth_nonce' => 'nonce',
             'oauth_signature' => 'signature',
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -85,17 +85,17 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $infrastructure = $this->getInfrastructure();
+        $ltiInstance = $this->getLtiInstance();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature($ltiInstance, (string)$time);
 
         /** @var string $xmlBody * */
         $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $ltiInstance->getLtiKey(),
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -120,16 +120,16 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $infrastructure = $this->getInfrastructure();
+        $ltiInstance = $this->getLtiInstance();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature($ltiInstance, (string)$time);
 
         $xmlBody = 'test';
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $ltiInstance->getLtiKey(),
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -154,10 +154,10 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $infrastructure = $this->getInfrastructure();
+        $ltiInstance = $this->getLtiInstance();
 
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature($ltiInstance, (string)$time);
 
         /** @var string $xmlBody */
         $xmlBody = file_get_contents(
@@ -166,7 +166,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $ltiInstance->getLtiKey(),
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -189,11 +189,11 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         self::assertSame(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
-    private function generateSignature(Infrastructure $infrastructure, string $time): string
+    private function generateSignature(LtiInstance $ltiInstance, string $time): string
     {
         $context = new OAuthContext(
             'bodyHash',
-            $infrastructure->getLtiKey(),
+            $ltiInstance->getLtiKey(),
             'nonce',
             'HMAC-SHA1',
             $time,
@@ -206,20 +206,20 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $context,
             'http://localhost/api/v1/lti/outcome',
             'POST',
-            $infrastructure->getLtiSecret()
+            $ltiInstance->getLtiSecret()
         );
     }
 
-    private function getInfrastructure(): Infrastructure
+    private function getLtiInstance(): LtiInstance
     {
-        /** @var InfrastructureRepository $repository */
-        $repository = $this->getRepository(Infrastructure::class);
+        /** @var LtiInstanceRepository $repository */
+        $repository = $this->getRepository(LtiInstance::class);
 
-        $infrastructure = $repository->find(1);
+        $ltiInstance = $repository->find(1);
 
-        self::assertInstanceOf(Infrastructure::class, $infrastructure);
+        self::assertInstanceOf(LtiInstance::class, $ltiInstance);
 
-        return $infrastructure;
+        return $ltiInstance;
     }
 
     private function getAssignment(): Assignment

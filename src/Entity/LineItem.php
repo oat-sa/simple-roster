@@ -45,9 +45,6 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var DateTimeInterface */
     private $endAt;
 
-    /** @var Infrastructure */
-    private $infrastructure;
-
     /** @var int */
     private $maxAttempts = 0;
 
@@ -116,18 +113,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getInfrastructure(): Infrastructure
-    {
-        return $this->infrastructure;
-    }
-
-    public function setInfrastructure(Infrastructure $infrastructure): self
-    {
-        $this->infrastructure = $infrastructure;
-
-        return $this;
-    }
-
     public function isAvailableForDate(DateTimeInterface $date): bool
     {
         if (null === $this->startAt || null === $this->endAt) {
@@ -161,7 +146,6 @@ class LineItem implements JsonSerializable, EntityInterface
             'label' => $this->getLabel(),
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
-            'infrastructure' => $this->getInfrastructure()->getId(),
             'maxAttempts' => $this->getMaxAttempts(),
         ];
     }

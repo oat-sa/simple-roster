@@ -46,7 +46,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testGetContentWithDefaultDelimiter(): void
     {
-        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $output = $this->subject->getContent();
 
@@ -61,7 +61,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testGetContentWithOtherDelimiter(): void
     {
-        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $this->subject->setDelimiter('|');
 
@@ -91,7 +91,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testContentIsCountable(): void
     {
-        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $this->subject->setDelimiter('|');
 
@@ -100,7 +100,7 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testItDoesFetchContentFromS3OnlyOnce(): void
     {
-        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $this->prepareS3Client(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $this->subject->getContent();
 

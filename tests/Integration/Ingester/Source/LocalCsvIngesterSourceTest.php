@@ -30,7 +30,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     public function testGetContentWithDefaultDelimiter(): void
     {
         $subject = new LocalCsvIngesterSource();
-        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $output = $subject->getContent();
 
@@ -47,7 +47,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     {
         $subject = new LocalCsvIngesterSource();
         $subject
-            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv')
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv')
             ->setDelimiter('|');
 
         $output = $subject->getContent();
@@ -78,7 +78,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     public function testContentIsCountable(): void
     {
         $subject = new LocalCsvIngesterSource();
-        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         self::assertCount(3, $subject);
     }

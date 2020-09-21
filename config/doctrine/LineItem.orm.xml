@@ -13,11 +13,6 @@
                nullable="false"/>
         <field name="startAt" type="datetime" column="start_at" precision="0" scale="0" nullable="true"/>
         <field name="endAt" type="datetime" column="end_at" precision="0" scale="0" nullable="true"/>
-        <many-to-one field="infrastructure" target-entity="App\Entity\Infrastructure" fetch="LAZY">
-            <join-columns>
-                <join-column name="infrastructure_id" referenced-column-name="id"/>
-            </join-columns>
-        </many-to-one>
         <field name="maxAttempts" type="integer" column="max_attempts" precision="0" scale="0" nullable="true">
             <options>
                 <option name="default">0</option>

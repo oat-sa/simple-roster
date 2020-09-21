@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Assignment;
-use App\Entity\Infrastructure;
 use App\Entity\LineItem;
 use App\Entity\User;
 use App\Exception\AssignmentNotFoundException;
@@ -67,7 +66,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -104,7 +102,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -141,7 +138,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug');

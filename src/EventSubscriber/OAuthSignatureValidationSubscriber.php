@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Repository\InfrastructureRepository;
+use App\Repository\LtiInstanceRepository;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use App\Security\OAuth\OAuthSigner;
@@ -36,13 +36,13 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 {
     public const AUTH_REALM = 'SimpleRoster';
 
-    /** @var InfrastructureRepository */
+    /** @var LtiInstanceRepository */
     private $repository;
 
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(InfrastructureRepository $repository, OAuthSigner $signer)
+    public function __construct(LtiInstanceRepository $repository, OAuthSigner $signer)
     {
         $this->repository = $repository;
         $this->signer = $signer;
@@ -69,11 +69,11 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $infrastructure = $this->repository->getByLtiKey(
+        $ltiInstance = $this->repository->getByLtiKey(
             (string)$request->query->get('oauth_consumer_key')
         );
 
-        if (!$infrastructure) {
+        if (!$ltiInstance) {
             throw new UnauthorizedHttpException(
                 sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
             );
@@ -92,7 +92,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
             $request->getMethod(),
-            $infrastructure->getLtiSecret()
+            $ltiInstance->getLtiSecret()
         );
 
         if ($signature !== $request->query->get('oauth_signature')) {

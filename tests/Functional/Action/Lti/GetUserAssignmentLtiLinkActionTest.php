@@ -280,10 +280,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
-        $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
-        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
@@ -297,7 +295,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = $initialLoadBalancerStatus;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());

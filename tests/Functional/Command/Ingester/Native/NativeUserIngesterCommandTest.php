@@ -24,7 +24,7 @@ namespace App\Tests\Functional\Command\Ingester\Native;
 
 use App\Command\Ingester\Native\NativeUserIngesterCommand;
 use App\Entity\User;
-use App\Ingester\Ingester\InfrastructureIngester;
+use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
@@ -205,8 +205,8 @@ class NativeUserIngesterCommandTest extends KernelTestCase
 
     private function prepareIngestionContext(): void
     {
-        static::$container->get(InfrastructureIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../../Resources/Ingester/Valid/infrastructures.csv'),
+        static::$container->get(LtiInstanceIngester::class)->ingest(
+            $this->createIngesterSource(__DIR__ . '/../../../../Resources/Ingester/Valid/lti-instances.csv'),
             false
         );
 
