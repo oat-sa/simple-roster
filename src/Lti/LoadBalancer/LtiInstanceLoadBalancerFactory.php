@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Repository\LtiInstanceRepository;
 use LogicException;
 
 class LtiInstanceLoadBalancerFactory
@@ -34,12 +35,12 @@ class LtiInstanceLoadBalancerFactory
         self::STRATEGY_USER_GROUP_ID,
     ];
 
-    /** @var string[] */
-    private $ltiInstances;
+    /** @var LtiInstanceRepository */
+    private $ltiInstanceRepository;
 
-    public function __construct(array $ltiInstances)
+    public function __construct(LtiInstanceRepository $ltiInstanceRepository)
     {
-        $this->ltiInstances = $ltiInstances;
+        $this->ltiInstanceRepository = $ltiInstanceRepository;
     }
 
     /**
@@ -49,9 +50,9 @@ class LtiInstanceLoadBalancerFactory
     {
         switch ($ltiLoadBalancingStrategy) {
             case self::STRATEGY_USERNAME:
-                return new UsernameLtiInstanceLoadBalancer($this->ltiInstances);
+                return new UsernameLtiInstanceLoadBalancer($this->ltiInstanceRepository->findAllAsCollection());
             case self::STRATEGY_USER_GROUP_ID:
-                return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstances);
+                return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceRepository->findAllAsCollection());
             default:
                 throw new LogicException(
                     sprintf(

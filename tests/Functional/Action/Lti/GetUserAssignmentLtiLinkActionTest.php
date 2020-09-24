@@ -192,12 +192,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'oxXzS9KaVG7kiu6SIqRXCYgZn7E=',
+                    'oauth_signature' => 'IiqrCaXlAfnoRYJNtJlH/xNXvhg=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -244,12 +245,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'Wv2Cjd2fo3ZiznrdSNB5qrgd2OQ=',
+                    'oauth_signature' => 'KeYIIv6CwygCaWDBtNe+QU1vX7I=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -301,12 +303,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'NDgJcOtOaGTc/t44toJNoYXdCd8=',
+                    'oauth_signature' => 'uaEAaZX4pLE8hiP+86aRalNBO3w=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,

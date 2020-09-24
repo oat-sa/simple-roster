@@ -1,3 +1,12 @@
+App\Entity\LtiInstance:
+    ltiInstance:
+        __construct:
+            id: 1
+            label: 'testLtiInstance'
+            ltiLink: 'https://lti-instance.taocolud.org'
+            ltiKey: 'testLtiKey'
+            ltiSecret: 'testLtiSecret'
+
 App\Entity\LineItem:
     lineItem1:
         label: 'The first line item'

@@ -39,7 +39,7 @@ if (
     );
 } else {
     $path = dirname(__DIR__) . '/.env';
-    $dotenv = new Dotenv(false);
+    $dotenv = new Dotenv();
 
     // load all the .env files
     if (method_exists($dotenv, 'loadEnv')) {

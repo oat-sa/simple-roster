@@ -48,7 +48,6 @@ class LtiInstance implements EntityInterface
         $this->ltiSecret = $ltiSecret;
     }
 
-    // TODO: should not be nullable
     public function getId(): ?int
     {
         return $this->id;

@@ -23,6 +23,8 @@ declare(strict_types=1);
 namespace App\Lti\Service;
 
 use App\Entity\Assignment;
+use App\Entity\LineItem;
+use App\Entity\LtiInstance;
 use App\Exception\AssignmentNotProcessableException;
 use App\Generator\NonceGenerator;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
@@ -30,6 +32,7 @@ use App\Lti\Request\LtiRequest;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
+use JsonException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -72,32 +75,31 @@ class GetUserAssignmentLtiRequestService
 
     /**
      * @throws AssignmentNotProcessableException
+     * @throws JsonException
      */
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
         $this->checkIfAssignmentCanBeProcessed($assignment);
 
-        // TODO LTI key an secret must be determined after checking which instance the user with be redirected to
+        $ltiInstance = $this->loadBalancer->getLtiInstance($assignment->getUser());
 
         $context = new OAuthContext(
             '',
-//            $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
-            'TODO',
+            $ltiInstance->getLtiKey(),
             $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
             (string)Carbon::now()->getTimestamp(),
             OAuthContext::VERSION_1_0
         );
 
-        $ltiLink = $this->getAssignmentLtiLink($assignment);
+        $ltiLink = $this->getLtiLaunchLink($ltiInstance, $assignment->getLineItem());
         $ltiParameters = $this->getAssignmentLtiParameters($assignment);
 
         $signature = $this->signer->sign(
             $context,
             $ltiLink,
             Request::METHOD_POST,
-//            $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
-            'TODO',
+            $ltiInstance->getLtiSecret(),
             $ltiParameters
         );
 
@@ -146,16 +148,14 @@ class GetUserAssignmentLtiRequestService
         }
     }
 
-    private function getAssignmentLtiLink(Assignment $assignment): string
+    private function getLtiLaunchLink(LtiInstance $ltiInstance, LineItem $lineItem): string
     {
-        $link = $this->loadBalancer->getLtiInstanceUrl($assignment->getUser());
-
         return sprintf(
-            '%s/%s',
-            $link,
+            '%s/ltiDeliveryProvider/DeliveryTool/launch/%s',
+            rtrim($ltiInstance->getLtiLink(), '/'),
             base64_encode(
                 json_encode(
-                    ['delivery' => $assignment->getLineItem()->getUri()],
+                    ['delivery' => $lineItem->getUri()],
                     JSON_THROW_ON_ERROR,
                     512
                 )

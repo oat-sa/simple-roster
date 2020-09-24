@@ -26,17 +26,36 @@ use App\Entity\LtiInstance;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OutOfBoundsException;
 use Traversable;
 
 class LtiInstanceCollection implements Countable, IteratorAggregate
 {
+    /** @var LtiInstance[] */
     private $ltiInstances = [];
 
     public function add(LtiInstance $ltiInstance): self
     {
-        $this->ltiInstances[] = $ltiInstance;
+        if (!$this->contains($ltiInstance)) {
+            $this->ltiInstances[] = $ltiInstance;
+        }
 
         return $this;
+    }
+
+    public function getByIndex(int $index): LtiInstance
+    {
+        if ($index < 0 || $index >= count($this)) {
+            throw new OutOfBoundsException(
+                sprintf(
+                    'Invalid index received: %d, possible range: 0..%d',
+                    $index,
+                    count($this) - 1
+                )
+            );
+        }
+
+        return $this->ltiInstances[$index];
     }
 
     /**
@@ -50,5 +69,17 @@ class LtiInstanceCollection implements Countable, IteratorAggregate
     public function count()
     {
         return count($this->ltiInstances);
+    }
+
+    private function contains(LtiInstance $ltiInstance): bool
+    {
+        /** @var LtiInstance $instance */
+        foreach ($this as $instance) {
+            if ($instance->getLabel() === $ltiInstance->getLabel()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

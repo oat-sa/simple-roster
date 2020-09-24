@@ -1,6 +1,6 @@
 # Data ingestion
 
-[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `infrastructure`, `line-item` and `user` data.
+[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `lti-instance`, `line-item` and `user` data.
 
 ## Usage:
 ```bash
@@ -11,7 +11,7 @@ $ bin/console roster:ingest <type> <source> <path> [--force]
 
 | Option | Description |
 | ------------- |:-------------|
-| type | Can be **infrastructure**, **line-item** or **user** |
+| type | Can be **lti-instance**, **line-item** or **user** |
 | source | Can be **local**, or **s3** |
 | path      |  Local or S3 path to ingest data from |
 
@@ -32,19 +32,19 @@ $ bin/console roster:ingest -h
 
 ## Examples:
 
-Dry run ingesting infrastructures from a local CSV file:
+Dry run ingesting LTI instances from a local CSV file:
 ```bash
-$ bin/console roster:ingest infrastructure local /path/to/file.csv
+$ bin/console roster:ingest lti-instance local /path/to/file.csv
 ```
 
-Ingesting infrastructures from a local CSV file:
+Ingesting LTI instances from a local CSV file:
 ```bash
-$ bin/console roster:ingest infrastructure local /path/to/file.csv --force
+$ bin/console roster:ingest lti-instance local /path/to/file.csv --force
 ```
 
-Ingesting infrastructures from a local UTF-16LE encoded CSV file:
+Ingesting LTI instances from a local UTF-16LE encoded CSV file:
 ```bash
-$ bin/console roster:ingest infrastructure local /path/to/file.csv --charset="UTF-16LE" --force
+$ bin/console roster:ingest lti-instance local /path/to/file.csv --charset="UTF-16LE" --force
 ```
 
 Ingesting line-items from a local CSV file:

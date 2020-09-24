@@ -24,6 +24,7 @@ namespace App\Tests\Unit\Lti\Service;
 
 use App\Entity\Assignment;
 use App\Entity\LineItem;
+use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Exception\AssignmentNotProcessableException;
 use App\Generator\NonceGenerator;
@@ -49,16 +50,12 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
     /** @var string */
     private $ltiLaunchPresentationLocale;
 
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
-
     public function setUp(): void
     {
         parent::setUp();
 
         $this->ltiLaunchPresentationReturnUrl = 'http://example.com/index.html';
         $this->ltiLaunchPresentationLocale = 'fr-FR';
-        $this->ltiInstancesLoadBalancerEnabled = true;
         $this->loadBalancer = $this->createMock(LtiInstanceLoadBalancerInterface::class);
 
         $this->subject = new GetUserAssignmentLtiRequestService(
@@ -67,8 +64,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             $this->createMock(RouterInterface::class),
             $this->loadBalancer,
             $this->ltiLaunchPresentationReturnUrl,
-            $this->ltiLaunchPresentationLocale,
-            $this->ltiInstancesLoadBalancerEnabled
+            $this->ltiLaunchPresentationLocale
         );
     }
 
@@ -136,8 +132,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setMaxAttempts($maxAttempts)
             ->setUri('http://test-delivery-uri.html');
 
-        $user = (new User())
-            ->setUsername('testUsername');
+        $user = (new User())->setUsername('testUsername');
 
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);
 
@@ -152,19 +147,33 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setState($assignmentStatus);
 
         $expectedLtiContextId = 'expectedLtiContextId';
-
         $this->loadBalancer
             ->expects(self::once())
             ->method('getLtiRequestContextId')
             ->with($user)
             ->willReturn($expectedLtiContextId);
 
+        $expectedLtiInstance = new LtiInstance(
+            1,
+            'ltiInstanceLabel',
+            'http://lti-infra.taocloud.org',
+            'ltiKey',
+            'ltiSecret'
+        );
+
+        $this->loadBalancer
+            ->expects(self::once())
+            ->method('getLtiInstance')
+            ->with($user)
+            ->willReturn($expectedLtiInstance);
+
         self::assertSame(
             [
-                'ltiLink' => '/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
+                'ltiLink' => 'http://lti-infra.taocloud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'testLtiKey',
+                    'oauth_consumer_key' => $expectedLtiInstance->getLtiKey(),
                     'oauth_nonce' => '',
                     'oauth_signature' => '',
                     'oauth_signature_method' => 'HMAC-SHA1',

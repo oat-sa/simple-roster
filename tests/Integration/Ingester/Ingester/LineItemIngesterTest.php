@@ -65,16 +65,6 @@ class LineItemIngesterTest extends KernelTestCase
         self::assertEmpty($this->getRepository(LineItem::class)->findAll());
     }
 
-    public function testIngestWithEmptyInfrastructures(): void
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Cannot ingest 'line-item' since infrastructure table is empty.");
-
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv.csv');
-
-        $this->subject->ingest($source, false);
-    }
-
     public function testIngestWithInvalidSource(): void
     {
         $this->prepareIngestionContext();
@@ -102,7 +92,6 @@ class LineItemIngesterTest extends KernelTestCase
                 'uri' => 'http://taoplatform.loc/delivery_2.rdf',
                 'label' => 'label2',
                 'slug' => 'gra13_ita_1',
-                'infrastructure' => 'infra_2',
                 'startTimestamp' => '1546682400',
                 'endTimestamp' => '1546713000',
                 'maxAttempts' => '0',

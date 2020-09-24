@@ -22,14 +22,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Lti\LoadBalancer;
 
+use App\Lti\Collection\LtiInstanceCollection;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use App\Repository\LtiInstanceRepository;
 use LogicException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LtiInstanceLoadBalancerFactoryTest extends TestCase
 {
+    /** @var LtiInstanceRepository|MockObject */
+    private $ltiInstanceRepository;
+
     /** @var LtiInstanceLoadBalancerFactory */
     private $subject;
 
@@ -37,11 +43,18 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->subject = new LtiInstanceLoadBalancerFactory([]);
+        $this->ltiInstanceRepository = $this->createMock(LtiInstanceRepository::class);
+        $this->subject = new LtiInstanceLoadBalancerFactory($this->ltiInstanceRepository);
     }
 
     public function testItCanResolveUsernameLtiInstanceLoadBalancerStrategy(): void
     {
+        $expectedCollectionToPass = new LtiInstanceCollection();
+        $this->ltiInstanceRepository
+            ->expects(self::once())
+            ->method('findAllAsCollection')
+            ->willReturn($expectedCollectionToPass);
+
         self::assertInstanceOf(
             UsernameLtiInstanceLoadBalancer::class,
             call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME)
@@ -50,6 +63,12 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
 
     public function testItCanResolveUserGroupIdLtiInstanceLoadBalancerStrategy(): void
     {
+        $expectedCollectionToPass = new LtiInstanceCollection();
+        $this->ltiInstanceRepository
+            ->expects(self::once())
+            ->method('findAllAsCollection')
+            ->willReturn($expectedCollectionToPass);
+
         self::assertInstanceOf(
             UserGroupIdLtiInstanceLoadBalancer::class,
             call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID)

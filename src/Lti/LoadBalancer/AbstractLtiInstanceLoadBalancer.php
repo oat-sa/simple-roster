@@ -22,24 +22,27 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\LtiInstance;
+use App\Lti\Collection\LtiInstanceCollection;
+
 /**
  * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php
  */
 abstract class AbstractLtiInstanceLoadBalancer implements LtiInstanceLoadBalancerInterface
 {
-    /** @var string[] */
-    private $ltiInstances;
+    /** @var LtiInstanceCollection */
+    private $ltiInstanceCollection;
 
-    public function __construct(array $ltiInstances)
+    public function __construct(LtiInstanceCollection $ltiInstanceCollection)
     {
-        $this->ltiInstances = $ltiInstances;
+        $this->ltiInstanceCollection = $ltiInstanceCollection;
     }
 
-    protected function getLoadBalancedLtiInstanceUrl(string $value): string
+    protected function computeLtiInstanceByString(string $value): LtiInstance
     {
-        $index = $this->asciiSum(hash('md5', $value)) % count($this->ltiInstances);
+        $index = $this->asciiSum(hash('md5', $value)) % count($this->ltiInstanceCollection);
 
-        return $this->ltiInstances[$index];
+        return $this->ltiInstanceCollection->getByIndex($index);
     }
 
     private function asciiSum(string $value): int

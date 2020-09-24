@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
@@ -31,7 +32,7 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
     /**
      * @throws IndeterminableLtiInstanceUrlException
      */
-    public function getLtiInstanceUrl(User $user): string
+    public function getLtiInstance(User $user): LtiInstance
     {
         if (!$user->hasGroupId()) {
             throw new IndeterminableLtiInstanceUrlException(
@@ -39,7 +40,7 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             );
         }
 
-        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getGroupId());
+        return $this->computeLtiInstanceByString((string)$user->getGroupId());
     }
 
     /**

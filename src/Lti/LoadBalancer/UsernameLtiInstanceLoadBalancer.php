@@ -22,14 +22,15 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
-    public function getLtiInstanceUrl(User $user): string
+    public function getLtiInstance(User $user): LtiInstance
     {
-        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getUsername());
+        return $this->computeLtiInstanceByString((string)$user->getUsername());
     }
 
     /**

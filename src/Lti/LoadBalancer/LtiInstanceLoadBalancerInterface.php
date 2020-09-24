@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
@@ -31,7 +32,7 @@ interface LtiInstanceLoadBalancerInterface
     /**
      * @throws IndeterminableLtiInstanceUrlException
      */
-    public function getLtiInstanceUrl(User $user): string;
+    public function getLtiInstance(User $user): LtiInstance;
 
     /**
      * @throws IndeterminableLtiRequestContextIdException

@@ -114,7 +114,7 @@ class LtiInstanceIngesterTest extends KernelTestCase
         );
 
         self::assertStringContainsString(
-            'Argument 1 passed to App\Lti\Entity\LtiInstance::setLtiSecret() must be of the type string, null given,',
+            'App\Entity\LtiInstance::__construct() must be of the type string, null given,',
             $failure->getReason()
         );
     }

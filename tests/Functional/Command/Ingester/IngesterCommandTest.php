@@ -51,14 +51,14 @@ class IngesterCommandTest extends KernelTestCase
     public function testDryRunLocalIngestion(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
             'path' => __DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv',
         ]);
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
+            "[OK] [DRY_RUN] Ingestion (type='lti-instance', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -68,7 +68,7 @@ class IngesterCommandTest extends KernelTestCase
     public function testLocalIngestionSuccess(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
             'path' => __DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv',
             '--force' => 'true' // Test if it gets casted properly
@@ -76,7 +76,7 @@ class IngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
+            "[OK] Ingestion (type='lti-instance', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
@@ -95,7 +95,7 @@ class IngesterCommandTest extends KernelTestCase
     public function testLocalIngestionFailure(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
             'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv',
             '--force' => true,
@@ -103,12 +103,12 @@ class IngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
+            "[WARNING] Ingestion (type='lti-instance', source='local'): 1 successes, 1 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
         self::assertStringContainsString(
-            'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
+            'Argument 5 passed to App\Entity\LtiInstance::__construct() must be of the type string, null given',
             $this->commandTester->getDisplay()
         );
 
@@ -137,7 +137,7 @@ class IngesterCommandTest extends KernelTestCase
     public function testInvalidSourceFailure(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'invalid',
             'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv',
             '--force' => true,
