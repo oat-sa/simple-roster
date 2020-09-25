@@ -35,31 +35,33 @@ use Doctrine\ORM\NonUniqueResultException;
  */
 class LtiInstanceRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public const CACHE_ID_ALL_LTI_INSTANCES = 'lti_instances.all';
+
+    /** @var int */
+    private $ltiInstancesCacheTtl;
+
+    public function __construct(ManagerRegistry $registry, int $ltiInstancesCacheTtl)
     {
         parent::__construct($registry, LtiInstance::class);
+
+        $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
     }
 
     public function findAllAsCollection(): LtiInstanceCollection
     {
-        $ltiInstanceCollection = new LtiInstanceCollection();
         $ltiInstances = $this->createQueryBuilder('l')
             ->select('l')
             ->getQuery()
-//            ->enableResultCache() TODO
+            ->enableResultCache($this->ltiInstancesCacheTtl, self::CACHE_ID_ALL_LTI_INSTANCES)
             ->getResult();
 
-        foreach ($ltiInstances as $ltiInstance) {
-            $ltiInstanceCollection->add($ltiInstance);
-        }
-
-        return $ltiInstanceCollection;
+        return new LtiInstanceCollection(...$ltiInstances);
     }
 
     /**
      * @throws NonUniqueResultException
      */
-    public function getByLtiKey(string $ltiKey): ?LtiInstance
+    public function findByLtiKey(string $ltiKey): ?LtiInstance
     {
         return $this
             ->createQueryBuilder('i')

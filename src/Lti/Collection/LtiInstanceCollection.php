@@ -34,6 +34,13 @@ class LtiInstanceCollection implements Countable, IteratorAggregate
     /** @var LtiInstance[] */
     private $ltiInstances = [];
 
+    public function __construct(LtiInstance ...$ltiInstances)
+    {
+        foreach ($ltiInstances as $ltiInstance) {
+            $this->add($ltiInstance);
+        }
+    }
+
     public function add(LtiInstance $ltiInstance): self
     {
         if (!$this->contains($ltiInstance)) {

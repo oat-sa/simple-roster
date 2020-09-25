@@ -69,7 +69,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $ltiInstance = $this->repository->getByLtiKey(
+        $ltiInstance = $this->repository->findByLtiKey(
             (string)$request->query->get('oauth_consumer_key')
         );
 

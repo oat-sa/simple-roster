@@ -15,6 +15,7 @@ services:
             $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
             $appApiKey: '%env(resolve:APP_API_KEY)%'
             $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
+            $ltiInstancesCacheTtl: '%env(CACHE_TTL_LTI_INSTANCES)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
