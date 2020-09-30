@@ -214,7 +214,7 @@ class NativeUserIngesterCommand extends Command
     private function createUserDto(LineItemCollection $lineItemCollection, array $row, int $index): UserDto
     {
         $lineItem = $lineItemCollection->getBySlug($row['slug']);
-        $newAssignment = new AssignmentDto($index, Assignment::STATE_READY, $index, $lineItem->getId());
+        $newAssignment = new AssignmentDto($index, Assignment::STATE_READY, $index, (int)$lineItem->getId());
 
         return new UserDto(
             $index,

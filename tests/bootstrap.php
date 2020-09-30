@@ -20,6 +20,12 @@
 
 declare(strict_types=1);
 
+use Symfony\Component\Dotenv\Dotenv;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+(new Dotenv())->loadEnv(dirname(__DIR__) . '/.env.test');
+
 if (isset($_ENV['BOOTSTRAP_CLEAR_CACHE_ENV'])) {
     passthru(sprintf(
         'APP_ENV=%s php "%s/../bin/console" cache:clear --no-warmup',
@@ -28,4 +34,4 @@ if (isset($_ENV['BOOTSTRAP_CLEAR_CACHE_ENV'])) {
     ));
 }
 
-require __DIR__ . '/../config/bootstrap.php';
+//require __DIR__ . '/../config/bootstrap.php';

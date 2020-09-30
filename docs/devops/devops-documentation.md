@@ -37,6 +37,7 @@ The main configuration file is `.env`, located in root folder.
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
 | REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
 | REDIS_SESSION_CACHE_PORT | Redis port for sessions cache storage |
+| CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list query. [default: `3600`] |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
   
@@ -46,8 +47,8 @@ The main configuration file is `.env`, located in root folder.
 | ------------- |:-------------|
 | AWS_REGION | AWS Region [default: `eu-west-1`] |
 | AWS_VERSION | AWS Version [default: `latest`] |
-| AWS_KEY | AWS Key |
-| AWS_SECRET | AWS Secret |
+| AWS_KEY | AWS Key (used only in `dev` environment) |
+| AWS_SECRET | AWS Secret (used only in `dev` environment) |
 | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
      
 #### LTI related environment variables
@@ -187,5 +188,5 @@ $ bin/console doctrine:cache:clear-result
 
 ## Application logs
 
-Application logs are populated in `var/log/[dev|prod].log`
+Application logs can be found in `var/log/[dev|prod].log` file.
 
