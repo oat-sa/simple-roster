@@ -25,6 +25,7 @@ namespace App\Tests\Functional\Command\Cache;
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\LtiInstanceRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
@@ -72,10 +73,64 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
+    public function testItThrowsExceptionIfInvalidCachePoolArgumentGiven(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid cache pool received.');
+
+        $this->commandTester->execute(
+            [
+                'cache-pool' => 'unexpected',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+    }
+
+    public function testItWarnsIfThereAreNoLtiInstancesFoundInDatabase(): void
+    {
+        self::assertSame(0, $this->commandTester->execute(
+            [
+                'cache-pool' => 'lti-instance',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            '[WARNING] There are no LTI instances found in the database.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testItCanWarmLtiInstanceResultCache(): void
+    {
+        $this->loadFixtureByFilename('5ltiInstances.yml');
+
+        self::assertSame(0, $this->commandTester->execute(
+            [
+                'cache-pool' => 'lti-instance',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertTrue($this->doctrineResultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
+
+        self::assertStringContainsString(
+            '[OK] Result cache entry for 5 LTI instances has been successfully warmed up. [TTL: 3,600 seconds]',
+            $this->commandTester->getDisplay()
+        );
+    }
+
     public function testItCanWarmResultCacheForAllUsers(): void
     {
         self::assertSame(0, $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => '1',
             ],
             [
@@ -104,6 +159,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => '1',
             ],
             [
@@ -124,6 +180,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         self::assertSame(0, $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => '1',
                 '--usernames' => 'user_1,user_2,user_3,user_4,user_5,user_6,user_7,user_8,user_9,user_10',
             ],
@@ -156,6 +213,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         self::assertSame(0, $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => '1',
                 '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
             ],
@@ -188,6 +246,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     {
         self::assertSame(0, $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--line-item-slugs' => 'invalid',
             ],
             [
@@ -210,6 +269,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => '1',
                 '--usernames' => 'user_61,user_62,user_63',
                 '--line-item-slugs' => 'lineItemSlug1,lineItemSlug2',
@@ -227,6 +287,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--batch-size' => 0,
             ],
             [
@@ -245,6 +306,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--usernames' => $invalidOptionValue,
             ],
             [
@@ -263,6 +325,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->commandTester->execute(
             [
+                'cache-pool' => 'user',
                 '--line-item-slugs' => $invalidOptionValue,
             ],
             [

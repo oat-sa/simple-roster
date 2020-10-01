@@ -26,12 +26,14 @@ use App\Command\CommandProgressBarFormatterTrait;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\Criteria\FindUserCriteria;
+use App\Repository\LtiInstanceRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,6 +44,11 @@ class DoctrineResultCacheWarmerCommand extends Command
     use CommandProgressBarFormatterTrait;
 
     public const NAME = 'roster:doctrine-result-cache:warmup';
+
+    private const ARGUMENT_CACHE_POOL = 'cache-pool';
+
+    private const CACHE_POOL_USER = 'user';
+    private const CACHE_POOL_LTI_INSTANCE = 'lti-instance';
 
     private const OPTION_USERNAMES = 'usernames';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
@@ -58,6 +65,9 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var UserRepository */
     private $userRepository;
 
+    /** @var LtiInstanceRepository */
+    private $ltiInstanceRepository;
+
     /** @var EntityManagerInterface */
     private $entityManager;
 
@@ -67,19 +77,27 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var int */
     private $batchSize;
 
-    /** @var array string[] */
+    /** @var string */
+    private $cachePool;
+
+    /** @var string[] */
     private $usernames = [];
 
     /** @var array */
     private $lineItemSlugs = [];
+
+    /** @var int */
+    private $ltiInstancesCacheTtl;
 
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
      */
     public function __construct(
         UserRepository $userRepository,
+        LtiInstanceRepository $ltiInstanceRepository,
         UserCacheIdGenerator $userCacheIdGenerator,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        int $ltiInstancesCacheTtl
     ) {
         parent::__construct(self::NAME);
 
@@ -95,6 +113,8 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->resultCacheImplementation = $resultCacheImplementation;
         $this->userRepository = $userRepository;
+        $this->ltiInstanceRepository = $ltiInstanceRepository;
+        $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
     }
 
     protected function configure(): void
@@ -102,6 +122,15 @@ class DoctrineResultCacheWarmerCommand extends Command
         parent::configure();
 
         $this->setDescription('Warms up doctrine result cache.');
+
+        $this->addArgument(
+            self::ARGUMENT_CACHE_POOL,
+            InputArgument::REQUIRED,
+            sprintf(
+                'Result cache pool to warmup [Possible values: %s] ',
+                implode(', ', [self::CACHE_POOL_USER, self::CACHE_POOL_LTI_INSTANCE])
+            )
+        );
 
         $this->addOption(
             self::OPTION_BATCH_SIZE,
@@ -115,14 +144,14 @@ class DoctrineResultCacheWarmerCommand extends Command
             self::OPTION_USERNAMES,
             'u',
             InputOption::VALUE_REQUIRED,
-            'Username filter.'
+            'Comma separated list of usernames to scope the cache warmup'
         );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_SLUGS,
             'l',
             InputOption::VALUE_REQUIRED,
-            'Line item slug filter.'
+            'Comma separated list of line item slugs to scope the cache warmup'
         );
     }
 
@@ -135,6 +164,12 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->symfonyStyle->title('Simple Roster - Doctrine Result Cache Warmer');
 
         $this->initializeBatchSizeOption($input);
+
+        $this->cachePool = (string)$input->getArgument(self::ARGUMENT_CACHE_POOL);
+
+        if (!in_array($this->cachePool, [self::CACHE_POOL_LTI_INSTANCE, self::CACHE_POOL_USER])) {
+            throw new InvalidArgumentException('Invalid cache pool received.');
+        }
 
         if ($input->getOption(self::OPTION_USERNAMES)) {
             $this->initializeUsernamesOption($input);
@@ -162,6 +197,10 @@ class DoctrineResultCacheWarmerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($this->cachePool === self::CACHE_POOL_LTI_INSTANCE) {
+            return $this->executeLtiInstanceCacheWarmup();
+        }
+
         $numberOfWarmedUpCacheEntries = 0;
 
         $this->symfonyStyle->note('Calculating total number of entries to warm up...');
@@ -205,6 +244,30 @@ class DoctrineResultCacheWarmerCommand extends Command
             sprintf(
                 '%s result cache entries have been successfully warmed up.',
                 $numberOfWarmedUpCacheEntries
+            )
+        );
+
+        return 0;
+    }
+
+    protected function executeLtiInstanceCacheWarmup(): int
+    {
+        $this->resultCacheImplementation->delete(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
+
+        // Refresh by query
+        $ltiInstances = $this->ltiInstanceRepository->findAllAsCollection();
+
+        if (!count($ltiInstances)) {
+            $this->symfonyStyle->warning('There are no LTI instances found in the database.');
+
+            return 0;
+        }
+
+        $this->symfonyStyle->success(
+            sprintf(
+                'Result cache entry for %d LTI instances has been successfully warmed up. [TTL: %s seconds]',
+                count($ltiInstances),
+                number_format($this->ltiInstancesCacheTtl)
             )
         );
 
