@@ -122,7 +122,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache entry for 5 LTI instances has been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
 
@@ -340,5 +340,14 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [','],
             [',,,,,,'],
         ];
+    }
+
+    /**
+     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
+     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
+     */
+    private function normalizeDisplay(string $commandDisplay): string
+    {
+        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }
