@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Lti\Service;
 
 use App\Entity\Assignment;
-use App\Entity\Infrastructure;
 use App\Entity\LineItem;
 use App\Entity\User;
 use App\Exception\AssignmentNotProcessableException;
@@ -69,7 +68,9 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             $this->loadBalancer,
             $this->ltiLaunchPresentationReturnUrl,
             $this->ltiLaunchPresentationLocale,
-            $this->ltiInstancesLoadBalancerEnabled
+            $this->ltiInstancesLoadBalancerEnabled,
+            'testLtiKey',
+            'testLtiSecret'
         );
     }
 
@@ -133,14 +134,8 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
     ): void {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
-        $infrastructure = (new Infrastructure())
-            ->setLabel('testLabel')
-            ->setLtiKey('testLtiKey')
-            ->setLtiSecret('testLtiSecret');
-
         $lineItem = (new LineItem())
             ->setMaxAttempts($maxAttempts)
-            ->setInfrastructure($infrastructure)
             ->setUri('http://test-delivery-uri.html');
 
         $user = (new User())
