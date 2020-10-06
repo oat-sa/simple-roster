@@ -64,6 +64,7 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --
 ```
 
 Exit from screen `cache-warmup-0` by pressing `CTRL+A` then `CTRL+D`.
+
 Now let's warmup the cache for all users where `ID % 4 === 1`.
 
 ```shell script
@@ -72,6 +73,7 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --
 ```
 
 Exit from screen `cache-warmup-1` by pressing `CTRL+A` then `CTRL+D`.
+
 Now let's warmup the cache for all users where `ID % 4 === 2`.
 
 ```shell script
@@ -80,6 +82,7 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --
 ```
 
 Exit from screen `cache-warmup-2` by pressing `CTRL+A` then `CTRL+D`.
+
 Now let's warmup the cache for all users where `ID % 4 === 3`.
 
 ```shell script
