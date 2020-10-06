@@ -409,7 +409,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $userRepository = $this->getRepository(User::class);
 
         foreach ($userRepository->findAll() as $user) {
-            $cacheId = $this->userCacheIdGenerator->generate($user->getUsername());
+            $cacheId = $this->userCacheIdGenerator->generate((string)$user->getUsername());
 
             in_array($user->getId() % $modulo, $remainders)
                 ? self::assertTrue($this->resultCacheImplementation->contains($cacheId))
