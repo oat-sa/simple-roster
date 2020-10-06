@@ -7,6 +7,9 @@
 - Added `modulo` and `remainder` options to `DoctrineResultCacheWarmerCommand` for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
 - Added separate log channel for cache warmup for better trackability of failed cache warmups.
 
+### Changed
+- Performance improvement of `NativeUserIngesterCommand` by counting the number of users by using process component.
+
 ## 1.7.0 - 2020-09-16
 
 ### Added
