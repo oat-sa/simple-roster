@@ -4,6 +4,8 @@
 
 ### Added
 - Added possibility to specify LTI key and secret through environment variables.
+- Added `modulo` and `remainder` options to `DoctrineResultCacheWarmerCommand` for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
+- Added separate log channel for cache warmup for better trackability of failed cache warmups.
 
 ## 1.7.0 - 2020-09-16
 

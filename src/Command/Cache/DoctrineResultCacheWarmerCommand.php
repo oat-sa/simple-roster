@@ -27,12 +27,13 @@ use App\Entity\User;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
 use App\Repository\UserRepository;
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,10 +49,12 @@ class DoctrineResultCacheWarmerCommand extends Command
     private const OPTION_USER_IDS = 'user-ids';
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_BATCH_SIZE = 'batch-size';
+    private const OPTION_MODULO = 'modulo';
+    private const OPTION_REMAINDER = 'remainder';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
-    /** @var Cache */
+    /** @var CacheProvider */
     private $resultCacheImplementation;
 
     /** @var UserCacheIdGenerator */
@@ -62,6 +65,9 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     /** @var EntityManagerInterface */
     private $entityManager;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var SymfonyStyle */
     private $symfonyStyle;
@@ -75,13 +81,20 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var array */
     private $lineItemIds = [];
 
+    /** @var int */
+    private $modulo;
+
+    /** @var int */
+    private $remainder;
+
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
      */
     public function __construct(
         UserCacheIdGenerator $userCacheIdGenerator,
         Configuration $doctrineConfiguration,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger
     ) {
         parent::__construct(self::NAME);
 
@@ -90,7 +103,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $resultCacheImplementation = $doctrineConfiguration->getResultCacheImpl();
 
-        if ($resultCacheImplementation === null) {
+        if (!$resultCacheImplementation instanceof CacheProvider) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
@@ -101,6 +114,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
         $this->userRepository = $userRepository;
+        $this->logger = $logger;
     }
 
     protected function configure(): void
@@ -121,14 +135,30 @@ class DoctrineResultCacheWarmerCommand extends Command
             self::OPTION_USER_IDS,
             'u',
             InputOption::VALUE_REQUIRED,
-            'User id list filter.'
+            'User id list filter'
         );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
             'l',
             InputOption::VALUE_REQUIRED,
-            'Line item id list filter.'
+            'Line item id list filter'
+        );
+
+        $this->addOption(
+            self::OPTION_MODULO,
+            'm',
+            InputOption::VALUE_REQUIRED,
+            "Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < |Q|), where A = user id, Q = quotient, " .
+            "R = 'remainder' option"
+        );
+
+        $this->addOption(
+            self::OPTION_REMAINDER,
+            'r',
+            InputOption::VALUE_REQUIRED,
+            "Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < |Q|), where A = user id, Q = quotient, " .
+            "M = 'modulo' option"
         );
     }
 
@@ -158,6 +188,14 @@ class DoctrineResultCacheWarmerCommand extends Command
                     self::OPTION_LINE_ITEM_IDS
                 )
             );
+        }
+
+        if ($input->getOption(self::OPTION_MODULO)) {
+            $this->initializeModuloOption($input);
+        }
+
+        if ($input->getOption(self::OPTION_REMAINDER) !== null) {
+            $this->initializeRemainderOption($input);
         }
     }
 
@@ -204,7 +242,7 @@ class DoctrineResultCacheWarmerCommand extends Command
             }
 
             $offset += $this->batchSize;
-        } while ($offset <= $numberOfTotalUsers + $this->batchSize);
+        } while ($numberOfWarmedUpCacheEntries < $numberOfTotalUsers);
 
         $progressBar->finish();
 
@@ -241,6 +279,13 @@ class DoctrineResultCacheWarmerCommand extends Command
                 ->setParameter('lineItemIds', $this->lineItemIds);
         }
 
+        if ($this->modulo && $this->remainder !== null) {
+            $queryBuilder
+                ->where('MOD(u.id, :denominator) = :remainder')
+                ->setParameter('denominator', $this->modulo)
+                ->setParameter('remainder', $this->remainder);
+        }
+
         return $queryBuilder
             ->setFirstResult($offset)
             ->setMaxResults($this->batchSize)
@@ -271,6 +316,13 @@ class DoctrineResultCacheWarmerCommand extends Command
                 ->setParameter('lineItemIds', $this->lineItemIds);
         }
 
+        if ($this->modulo && $this->remainder !== null) {
+            $queryBuilder
+                ->andWhere('MOD(u.id, :denominator) = :remainder')
+                ->setParameter('denominator', $this->modulo)
+                ->setParameter('remainder', $this->remainder);
+        }
+
         $result = $queryBuilder
             ->getQuery()
             ->getOneOrNullResult();
@@ -286,6 +338,16 @@ class DoctrineResultCacheWarmerCommand extends Command
         // Refresh by query
         $user = $this->userRepository->getByUsernameWithAssignments($username);
         $this->entityManager->clear();
+
+        if (!$this->resultCacheImplementation->contains($resultCacheId)) {
+            $this->logger->error(
+                sprintf(
+                    "Unsuccessful cache warmup for user '%s' (cache id: '%s')",
+                    $username,
+                    $resultCacheId
+                )
+            );
+        }
 
         unset($user);
     }
@@ -335,5 +397,70 @@ class DoctrineResultCacheWarmerCommand extends Command
                 sprintf("Invalid '%s' option received.", self::OPTION_USER_IDS)
             );
         }
+    }
+
+    private function initializeModuloOption(InputInterface $input): void
+    {
+        if ($input->getOption(self::OPTION_REMAINDER) === null) {
+            throw new InvalidArgumentException(
+                sprintf("Command option '%s' is expected to be specified.", self::OPTION_REMAINDER)
+            );
+        }
+
+        if (!is_numeric($input->getOption(self::OPTION_MODULO))) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Command option '%s' is expected to be numeric.",
+                    self::OPTION_MODULO
+                )
+            );
+        }
+
+        $modulo = (int)$input->getOption(self::OPTION_MODULO);
+
+        if ($modulo < 2 || $modulo > 100) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Invalid '%s' option received: %d, expected value: 2 <= m <= 100",
+                    self::OPTION_MODULO,
+                    $modulo
+                )
+            );
+        }
+
+        $this->modulo = $modulo;
+    }
+
+    private function initializeRemainderOption(InputInterface $input): void
+    {
+        if (!$input->getOption(self::OPTION_MODULO)) {
+            throw new InvalidArgumentException(
+                sprintf("Command option '%s' is expected to be specified.", self::OPTION_MODULO)
+            );
+        }
+
+        if (!is_numeric($input->getOption(self::OPTION_REMAINDER))) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Command option '%s' is expected to be numeric.",
+                    self::OPTION_REMAINDER
+                )
+            );
+        }
+
+        $remainder = (int)$input->getOption(self::OPTION_REMAINDER);
+
+        if ($remainder < 0 || $remainder >= $this->modulo) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Invalid '%s' option received: %d, expected value: 0 <= r <= %d",
+                    self::OPTION_REMAINDER,
+                    $remainder,
+                    $this->modulo - 1
+                )
+            );
+        }
+
+        $this->remainder = $remainder;
     }
 }
