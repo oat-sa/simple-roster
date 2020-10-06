@@ -49,8 +49,8 @@ multiple commands in parallel with different `remainder` option.
 
 | Option | Description |
 | ------------- |:---------------|
-| -m, --modulo | Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < Q), where A = user id, Q = quotient, R = 'remainder' option. |
-| -r, --remainder | Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < Q), where A = user id, Q = quotient, M = 'modulo' option. |
+| -m, --modulo | Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < M), where A = user id, Q = quotient, R = 'remainder' option. |
+| -r, --remainder | Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < M), where A = user id, Q = quotient, M = 'modulo' option. |
 
 ### Example
 

@@ -149,7 +149,7 @@ class DoctrineResultCacheWarmerCommand extends Command
             self::OPTION_MODULO,
             'm',
             InputOption::VALUE_REQUIRED,
-            "Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < |Q|), where A = user id, Q = quotient, " .
+            "Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < |M|), where A = user id, Q = quotient, " .
             "R = 'remainder' option"
         );
 
@@ -157,7 +157,7 @@ class DoctrineResultCacheWarmerCommand extends Command
             self::OPTION_REMAINDER,
             'r',
             InputOption::VALUE_REQUIRED,
-            "Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < |Q|), where A = user id, Q = quotient, " .
+            "Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < |M|), where A = user id, Q = quotient, " .
             "M = 'modulo' option"
         );
     }
