@@ -6,6 +6,7 @@
 - Added possibility to specify LTI key and secret through environment variables.
 - Added `modulo` and `remainder` options to `DoctrineResultCacheWarmerCommand` for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
 - Added separate log channel for cache warmup for better trackability of failed cache warmups.
+- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`. More details [here](docs/cli/native-user-ingester-command.md#user-ingestion-with-multiple-assignments).
 
 ### Changed
 - Performance improvement of `NativeUserIngesterCommand` by counting the number of users by using process component.
