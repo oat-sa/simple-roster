@@ -281,8 +281,8 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         if ($this->modulo && $this->remainder !== null) {
             $queryBuilder
-                ->where('MOD(u.id, :denominator) = :remainder')
-                ->setParameter('denominator', $this->modulo)
+                ->where('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $this->modulo)
                 ->setParameter('remainder', $this->remainder);
         }
 
@@ -318,8 +318,8 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         if ($this->modulo && $this->remainder !== null) {
             $queryBuilder
-                ->andWhere('MOD(u.id, :denominator) = :remainder')
-                ->setParameter('denominator', $this->modulo)
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $this->modulo)
                 ->setParameter('remainder', $this->remainder);
         }
 
