@@ -74,7 +74,7 @@ class UserRepository extends AbstractRepository
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
-            ->useResultCache(true, $this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
+            ->enableResultCache($this->userCacheTtl, $this->userCacheIdGenerator->generate($username))
             ->getOneOrNullResult();
 
         if (null === $user) {

@@ -28,6 +28,7 @@ use App\Generator\UserCacheIdGenerator;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class DoctrineResultCacheWarmerCommandTest extends TestCase
 {
@@ -35,10 +36,11 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
     {
         $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
 
-        $userCacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
-        $doctrineConfiguration = $this->createMock(Configuration::class);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-
-        new DoctrineResultCacheWarmerCommand($userCacheIdGenerator, $doctrineConfiguration, $entityManager);
+        new DoctrineResultCacheWarmerCommand(
+            $this->createMock(UserCacheIdGenerator::class),
+            $this->createMock(Configuration::class),
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(LoggerInterface::class)
+        );
     }
 }
