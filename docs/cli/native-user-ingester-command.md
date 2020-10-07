@@ -63,7 +63,6 @@ Here is an example csv structure:
 
 > Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops/devops-documentation.md#lti-load-balancing-strategy).
 
-
 ```csv
 username,password,slug,groupId
 user_1,password_1,lineItem_slug_1,group_1
