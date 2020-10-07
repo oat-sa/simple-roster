@@ -75,13 +75,13 @@ BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 - Install dependencies with Composer
 
 ```shell script
-$ composer install --optimize-autoloader
+$ sudo -u www-data composer install --optimize-autoloader
 ```
 
 - Optimize composer autoloader
 
 ```shell script
-$ composer dump-autoload --optimize --no-dev --classmap-authoritative
+$ sudo -u www-data composer dump-autoload --optimize --no-dev --classmap-authoritative
 ```
 
 - Create database with Doctrine
