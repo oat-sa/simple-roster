@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
@@ -45,8 +46,9 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
     /**
      * @throws IndeterminableLtiRequestContextIdException
      */
-    public function getLtiRequestContextId(User $user): string
+    public function getLtiRequestContextId(Assignment $assignment): string
     {
+        $user = $assignment->getUser();
         if (!$user->hasGroupId()) {
             throw new IndeterminableLtiRequestContextIdException(
                 sprintf("User with id='%s' doesn't have group id.", $user->getId())

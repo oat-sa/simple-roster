@@ -3,7 +3,7 @@
 ## 1.8.0 - To be released
 
 ### Added
-- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`.
+- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`. More details [here](docs/cli/native-user-ingester-command.md#user-ingestion-with-multiple-assignments).
 
 ## 1.7.0 - 2020-09-16
 
