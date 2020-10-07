@@ -16,7 +16,6 @@
 - [Useful commands](#useful-commands)
 - [Application logs](#application-logs)
 - [Production environment - checklist](https://symfony.com/doc/current/performance.html)
-- [Blackfire usage](#blackfire-usage)
 
 ## Environment variables
 
@@ -184,4 +183,3 @@ $ sudo -u www-data bin/console doctrine:cache:clear-result
 ## Application logs
 
 Application logs can be found in `var/log/` folder.
-
