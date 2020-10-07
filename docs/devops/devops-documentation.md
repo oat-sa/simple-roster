@@ -58,6 +58,8 @@ The main configuration file is `.env`, located in root folder.
 | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
+| LTI_KEY | LTI consumer key for LTI launch |
+| LTI_SECRET | LTI consumer secret for LTI launch |
 
 #### Blackfire related environment variables
 

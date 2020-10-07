@@ -41,6 +41,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Throwable;
 
@@ -167,16 +168,21 @@ class NativeUserIngesterCommand extends Command
 
         $resultSetMapping = new ResultSetMapping();
 
+        $csvFilePath = (string)$input->getArgument('path');
         $progressBar = $this->createNewFormattedProgressBar($output);
 
         try {
             $source = $this->ingesterSourceRegistry
-                ->get($input->getArgument('source'))
-                ->setPath($input->getArgument('path'))
-                ->setDelimiter($input->getOption('delimiter'))
-                ->setCharset($input->getOption('charset'));
+                ->get((string)$input->getArgument('source'))
+                ->setPath($csvFilePath)
+                ->setDelimiter((string)$input->getOption('delimiter'))
+                ->setCharset((string)$input->getOption('charset'));
 
-            $progressBar->setMaxSteps($source->count());
+            $process = new Process(['wc', '-l', $csvFilePath]);
+            $process->run();
+            $numberOfUsers = (int)$process->getOutput() - 1;
+
+            $progressBar->setMaxSteps($numberOfUsers);
             $progressBar->start();
 
             $lineItemCollection = $this->fetchLineItems();
