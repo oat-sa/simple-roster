@@ -94,6 +94,6 @@ Exit from screen `cache-warmup-3` by pressing `CTRL+A` then `CTRL+D`.
 
 Once all the commands have finished, the result cache should be warmed up for all the users in the system.
 
-> **Improtant** - Always take into account the physical limitations of your web server, database instance and cache server 
+> **Important** - Always take into account the physical limitations of your web server, database instance and cache server 
 > before deciding how many command instances to launch in parallel.
   
