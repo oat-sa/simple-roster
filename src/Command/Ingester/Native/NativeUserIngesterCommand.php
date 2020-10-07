@@ -28,9 +28,11 @@ use App\Entity\LineItem;
 use App\Entity\User;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
+use App\Repository\AssignmentRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -58,6 +60,9 @@ class NativeUserIngesterCommand extends Command
 
     /** @var UserRepository */
     private $userRepository;
+
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
@@ -87,12 +92,14 @@ class NativeUserIngesterCommand extends Command
         IngesterSourceRegistry $ingesterSourceRegistry,
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
+        AssignmentRepository $assignmentRepository,
         UserPasswordEncoderInterface $passwordEncoder,
         string $kernelEnvironment
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
+        $this->assignmentRepository = $assignmentRepository;
         $this->passwordEncoder = $passwordEncoder;
         $this->kernelEnvironment = $kernelEnvironment;
 
@@ -159,7 +166,6 @@ class NativeUserIngesterCommand extends Command
         $this->symfonyStyle->note('Starting user ingestion...');
 
         $resultSetMapping = new ResultSetMapping();
-        $user = new User();
 
         $progressBar = $this->createNewFormattedProgressBar($output);
 
@@ -173,58 +179,113 @@ class NativeUserIngesterCommand extends Command
             $progressBar->setMaxSteps($source->count());
             $progressBar->start();
 
-            $index = $this->getAvailableStartIndex();
             $lineItemCollection = $this->fetchLineItems();
 
-            foreach ($source->getContent() as $row) {
-                $this->userQueryParts[] = sprintf(
-                    "(%s, '%s', '%s', '[]', '%s')",
-                    $index,
-                    $row['username'],
-                    $this->encodeUserPassword($user, $row['password']),
-                    $row['groupId'] ?? null
-                );
-
-                $this->assignmentQueryParts[] = sprintf(
-                    "(%s, %s, %s, '%s', %d)",
-                    $index,
-                    $index,
-                    $lineItemCollection[$row['slug']]->getId(),
-                    Assignment::STATE_READY,
-                    0
-                );
-
-                if ($index % $this->batchSize === 0) {
-                    $this->executeNativeInsertions($resultSetMapping);
+            $batchedRawUsers = [];
+            $numberOfProcessedRows = 1;
+            foreach ($source->getContent() as $rawUser) {
+                $batchedRawUsers[] = $rawUser;
+                if ($numberOfProcessedRows % $this->batchSize === 0) {
+                    $this->processBatchedRawUsers($batchedRawUsers, $lineItemCollection);
+                    $batchedRawUsers = [];
                     $progressBar->advance($this->batchSize);
                 }
 
-                $index++;
+                $numberOfProcessedRows++;
             }
 
-            $this->executeNativeInsertions($resultSetMapping);
-
-            if (!empty($this->errors)) {
-                foreach ($this->errors as $error) {
-                    $this->symfonyStyle->error($error);
-                }
+            if ($batchedRawUsers) {
+                $this->processBatchedRawUsers($batchedRawUsers, $lineItemCollection);
             }
         } catch (Throwable $exception) {
-            $this->symfonyStyle->error($exception->getMessage());
-
-            return 1;
+            $this->errors[] = $exception->getMessage();
+            $this->userQueryParts = [];
+            $this->assignmentQueryParts = [];
         } finally {
             $this->refreshSequences($resultSetMapping);
             $progressBar->finish();
         }
 
-        return 0;
+        foreach ($this->errors as $error) {
+            $this->symfonyStyle->error($error);
+        }
+
+        return (int)!empty($this->errors);
+    }
+
+    /**
+     * @param LineItem[] $lineItemCollection
+     *
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    private function processBatchedRawUsers(array $rawUsers, array $lineItemCollection): void
+    {
+        $usernamesToCheck = array_map(
+            static function (array $rawUser) {
+                return $rawUser['username'];
+            },
+            $rawUsers
+        );
+
+        $existingUsernames = [];
+        foreach ($this->userRepository->findBy(['username' => array_unique($usernamesToCheck)]) as $user) {
+            $existingUsernames[$user->getId()] = $user->getUsername();
+        }
+
+        $userIndex = $this->getAvailableUserStartIndex();
+        $assignmentIndex = $this->getAvailableAssignmentStartIndex();
+
+        $resultSetMapping = new ResultSetMapping();
+        $user = new User();
+        foreach ($rawUsers as $rawUser) {
+            if (in_array($rawUser['username'], $existingUsernames, true)) {
+                $userId = array_search($rawUser['username'], $existingUsernames, true);
+
+                $this->assignmentQueryParts[] = sprintf(
+                    "(%s, %s, %s, '%s', %d)",
+                    $assignmentIndex,
+                    $userId,
+                    $lineItemCollection[$rawUser['slug']]->getId(),
+                    Assignment::STATE_READY,
+                    0
+                );
+            } else {
+                $this->userQueryParts[] = sprintf(
+                    "(%s, '%s', '%s', '[]', '%s')",
+                    $userIndex,
+                    $rawUser['username'],
+                    $this->encodeUserPassword($user, $rawUser['password']),
+                    $rawUser['groupId'] ?? null
+                );
+
+                $this->assignmentQueryParts[] = sprintf(
+                    "(%s, %s, %s, '%s', %d)",
+                    $assignmentIndex,
+                    $userIndex,
+                    $lineItemCollection[$rawUser['slug']]->getId(),
+                    Assignment::STATE_READY,
+                    0
+                );
+
+                // Make sure we don't create the same user twice
+                $existingUsernames[$userIndex] = $rawUser['username'];
+
+                $userIndex++;
+            }
+
+            $assignmentIndex++;
+        }
+
+        $this->executeNativeInsertions($resultSetMapping);
+        $this->refreshSequences($resultSetMapping);
     }
 
     /**
      * @throws NonUniqueResultException
+     * @throws NoResultException
      */
-    private function getAvailableStartIndex(): int
+    private function getAvailableUserStartIndex(): int
     {
         $index = $this->userRepository
             ->createQueryBuilder('u')
@@ -235,26 +296,39 @@ class NativeUserIngesterCommand extends Command
         return $index + 1;
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    private function getAvailableAssignmentStartIndex(): int
+    {
+        $index = $this->assignmentRepository
+            ->createQueryBuilder('a')
+            ->select('MAX(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $index + 1;
+    }
+
     private function executeNativeInsertions(ResultSetMapping $mapping): void
     {
-        try {
-            if (!empty($this->userQueryParts) && !empty($this->assignmentQueryParts) && !$this->isDryRun) {
-                $userQuery = sprintf(
-                    'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
-                    implode(',', $this->userQueryParts)
-                );
+        if (!empty($this->userQueryParts) && !$this->isDryRun) {
+            $userQuery = sprintf(
+                'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
+                implode(',', $this->userQueryParts)
+            );
 
-                $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
+            $this->entityManager->createNativeQuery($userQuery, $mapping)->execute();
+        }
 
-                $assignmentQuery = sprintf(
-                    'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
-                    implode(',', $this->assignmentQueryParts)
-                );
+        if (!empty($this->assignmentQueryParts) && !$this->isDryRun) {
+            $assignmentQuery = sprintf(
+                'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
+                implode(',', $this->assignmentQueryParts)
+            );
 
-                $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
-            }
-        } catch (Throwable $exception) {
-            $this->errors[] = $exception->getMessage();
+            $this->entityManager->createNativeQuery($assignmentQuery, $mapping)->execute();
         }
 
         $this->userQueryParts = [];
@@ -269,14 +343,14 @@ class NativeUserIngesterCommand extends Command
         if ($this->kernelEnvironment !== 'test' && !$this->isDryRun) {
             $this->entityManager
                 ->createNativeQuery(
-                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
+                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1)) FROM assignments",
                     $mapping
                 )
                 ->execute();
 
             $this->entityManager
                 ->createNativeQuery(
-                    "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1) ) FROM users",
+                    "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1)) FROM users",
                     $mapping
                 )
                 ->execute();

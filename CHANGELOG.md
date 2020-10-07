@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0 - To be released
+
+### Added
+- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`.
+
 ## 1.7.0 - 2020-09-16
 
 ### Added
