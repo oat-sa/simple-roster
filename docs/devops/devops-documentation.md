@@ -16,7 +16,6 @@
 - [Useful commands](#useful-commands)
 - [Application logs](#application-logs)
 - [Production environment - checklist](https://symfony.com/doc/current/performance.html)
-- [Blackfire usage](#blackfire-usage)
 
 ## Environment variables
 
@@ -59,6 +58,8 @@ The main configuration file is `.env`, located in root folder.
 | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
+| LTI_KEY | LTI consumer key for LTI launch |
+| LTI_SECRET | LTI consumer secret for LTI launch |
 
 #### Blackfire related environment variables
 
@@ -73,32 +74,32 @@ BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
 
 - Install dependencies with Composer
 
-```bash
-$ composer install --optimize-autoloader
+```shell script
+$ sudo -u www-data composer install --optimize-autoloader
 ```
 
 - Optimize composer autoloader
 
-```bash
-$ composer dump-autoload --optimize --no-dev --classmap-authoritative
+```shell script
+$ sudo -u www-data composer dump-autoload --optimize --no-dev --classmap-authoritative
 ```
 
 - Create database with Doctrine
 
-```bash
-$ bin/console doctrine:database:create
+```shell script
+$ sudo -u www-data bin/console doctrine:database:create
 ``` 
 
 - Create database schema with Doctrine
 
-```bash
-$ bin/console doctrine:schema:update --force
+```shell script
+$ sudo -u www-data bin/console doctrine:schema:update --force
 ```
 
 - If needed, drop database schema with Doctrine
 
-```bash
-$ bin/console doctrine:schema:drop --force
+```shell script
+$ sudo -u www-data bin/console doctrine:schema:drop --force
 ```
 
 ## LTI
@@ -116,20 +117,15 @@ The list of related environment variables can be found [here](#lti-related-envir
 There are two different load balancing strategies that can be applied. It's configurable through the 
 `LTI_INSTANCE_LOAD_BALANCING_STRATEGY` environment variable in the `.env` file.
 
-| Strategy | Description |
-| ------------- |:-------------|
-| username | Username based strategy (default)|
-| userGroupId | User group ID based strategy |
+| Strategy | Description | LTI context id |
+| -------------|-------------|-----------|
+| username | Username based strategy (default)| `id` of `LineItem` of current `Assignment`|
+| userGroupId | User group ID based strategy | `groupId` of `User` |
 
-**Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified, 
+> **Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified, 
 otherwise the ingestion will fail.
 
-**Note 2:** The `contextId` LTI request parameter is automatically adjusted based on the active load balancing strategy.
-
-| Strategy | Value of `contextId` LTI request parameter |
-| ------------- |:-------------|
-| username | ID of `LineItem` of last assignment of the user|
-| userGroupId | `groupId` of the `User` |
+> **Note 2:** The `contextId` LTI request parameter is automatically adjusted based on the active load balancing strategy.
 
 ## Applying custom route prefix
 
@@ -144,49 +140,48 @@ APP_ROUTE_PREFIX=/api/v1
 
 To apply the changes, you need to clear the application cache:
 
-```bash
-$ bin/console cache:clear [--env=dev|prod]
+```shell script
+$ sudo -u www-data bin/console cache:clear [--env=dev|prod]
 ```
 
 To verify the changes:
 
-```bash
-$ bin/console debug:router [--env=dev|prod]
+```shell script
+$ sudo -u www-data bin/console debug:router [--env=dev|prod]
 ```
 
 ## Useful commands
 
 - Clear application cache
 
-```bash
-$ bin/console cache:clear [--env=dev|prod]
+```shell script
+$ sudo -u www-data bin/console cache:clear [--env=dev|prod]
 ```
 
 - Warm-up Doctrine cache
 
-```bash
-$ bin/console roster:doctrine-result-cache:warmup
+```shell script
+$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
 ```
 
 - Refresh Doctrine metadata cache
 
-```bash
-$ bin/console doctrine:cache:clear-metadata
+```shell script
+$ sudo -u www-data bin/console doctrine:cache:clear-metadata
 ```
 
 - Refresh Doctrine query cache
 
-```bash
-$ bin/console doctrine:cache:clear-query
+```shell script
+$ sudo -u www-data bin/console doctrine:cache:clear-query
 ```
 
 - Refresh Doctrine result cache
 
-```bash
-$ bin/console doctrine:cache:clear-result
+```shell script
+$ sudo -u www-data bin/console doctrine:cache:clear-result
 ```
 
 ## Application logs
 
-Application logs are populated in `var/log/[dev|prod].log`
-
+Application logs can be found in `var/log/` folder.

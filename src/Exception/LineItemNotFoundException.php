@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use Exception;
+use RuntimeException;
 
-class LineItemNotFoundException extends Exception
+class LineItemNotFoundException extends RuntimeException
 {
 
 }

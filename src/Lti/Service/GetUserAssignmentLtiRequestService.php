@@ -57,6 +57,12 @@ class GetUserAssignmentLtiRequestService
     /** @var bool */
     private $ltiInstancesLoadBalancerEnabled;
 
+    /** @var string */
+    private $ltiKey;
+
+    /** @var string */
+    private $ltiSecret;
+
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
@@ -64,7 +70,9 @@ class GetUserAssignmentLtiRequestService
         LtiInstanceLoadBalancerInterface $loadBalancer,
         string $ltiLaunchPresentationReturnUrl,
         string $ltiLaunchPresentationLocale,
-        bool $ltiInstancesLoadBalancerEnabled
+        bool $ltiInstancesLoadBalancerEnabled,
+        string $ltiKey,
+        string $ltiSecret
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
@@ -73,6 +81,8 @@ class GetUserAssignmentLtiRequestService
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
         $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
         $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
+        $this->ltiKey = $ltiKey;
+        $this->ltiSecret = $ltiSecret;
     }
 
     /**
@@ -84,7 +94,7 @@ class GetUserAssignmentLtiRequestService
 
         $context = new OAuthContext(
             '',
-            $assignment->getLineItem()->getInfrastructure()->getLtiKey(),
+            $this->ltiKey,
             $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
             (string)Carbon::now()->getTimestamp(),
@@ -98,7 +108,7 @@ class GetUserAssignmentLtiRequestService
             $context,
             $ltiLink,
             Request::METHOD_POST,
-            $assignment->getLineItem()->getInfrastructure()->getLtiSecret(),
+            $this->ltiSecret,
             $ltiParameters
         );
 
@@ -171,7 +181,7 @@ class GetUserAssignmentLtiRequestService
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
             'lti_version' => LtiRequest::LTI_VERSION,
-            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment->getUser()),
+            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),

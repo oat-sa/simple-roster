@@ -200,7 +200,48 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        self::assertSame('user_1', $user1->getUsername());
+        self::assertEquals('user_1', $user1->getUsername());
+    }
+
+    public function testItCanIngestUsersWithMultipleAssignments(): void
+    {
+        $this->prepareIngestionContext();
+
+        self::assertSame(0, $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users-with-multiple-assignments.csv',
+                '--batch' => 2,
+                '--force' => true,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+
+        $user1 = $userRepository->find(1);
+        self::assertInstanceOf(User::class, $user1);
+        self::assertCount(6, $user1->getAssignments());
+
+        $user2 = $userRepository->find(2);
+        self::assertInstanceOf(User::class, $user2);
+        self::assertCount(4, $user2->getAssignments());
+
+        $user3 = $userRepository->find(3);
+        self::assertInstanceOf(User::class, $user3);
+        self::assertCount(5, $user3->getAssignments());
+    }
+
+    /**
+     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
+     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
+     */
+    private function normalizeDisplay(string $commandDisplay): string
+    {
+        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 
     private function prepareIngestionContext(): void

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -20,29 +20,43 @@
 
 declare(strict_types=1);
 
-namespace App\DataTransferObject;
+namespace App\Repository\Criteria;
 
-class AssignmentDto
+use InvalidArgumentException;
+
+class EuclideanDivisionCriterion
 {
-    /** @var string */
-    private $state;
+    /** @var int */
+    private $modulo;
 
     /** @var int */
-    private $lineItemId;
+    private $remainder;
 
-    public function __construct(string $state, int $lineItemId)
+    public function __construct(int $modulo, int $remainder)
     {
-        $this->state = $state;
-        $this->lineItemId = $lineItemId;
+        if ($modulo < 2) {
+            throw new InvalidArgumentException('Modulo must be greater than 1');
+        }
+
+        if ($remainder < 0) {
+            throw new InvalidArgumentException('Remainder must be greater than 0');
+        }
+
+        if ($remainder >= $modulo) {
+            throw new InvalidArgumentException(sprintf('Remainder must be less than %d', $modulo));
+        }
+
+        $this->modulo = $modulo;
+        $this->remainder = $remainder;
     }
 
-    public function getState(): string
+    public function getModulo(): int
     {
-        return $this->state;
+        return $this->modulo;
     }
 
-    public function getLineItemId(): int
+    public function getRemainder(): int
     {
-        return $this->lineItemId;
+        return $this->remainder;
     }
 }

@@ -36,7 +36,7 @@ trait LoggerTestingTrait
         $this->setUpTestLogHandler();
     }
 
-    protected function setUpTestLogHandler(): void
+    protected function setUpTestLogHandler(string ...$channels): void
     {
         static::ensureKernelTestCase();
 
@@ -45,6 +45,12 @@ trait LoggerTestingTrait
         $this->handler = new TestHandler();
 
         $logger->pushHandler($this->handler);
+
+        foreach ($channels as $channel) {
+            $logger = static::$container->get(sprintf('monolog.logger.%s', $channel));
+
+            $logger->pushHandler($this->handler);
+        }
     }
 
     public function getLogRecords(): array

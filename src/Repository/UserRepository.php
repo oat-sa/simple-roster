@@ -131,6 +131,13 @@ class UserRepository extends AbstractRepository
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }
 
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->where('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
+        }
+
         $userIds = [];
         $usernameCollection = new UsernameCollection();
         $result = $queryBuilder->getQuery()->getResult();
@@ -170,6 +177,13 @@ class UserRepository extends AbstractRepository
                 ->leftJoin('l.infrastructure', 'i')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->where('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
         }
 
         $result = $queryBuilder

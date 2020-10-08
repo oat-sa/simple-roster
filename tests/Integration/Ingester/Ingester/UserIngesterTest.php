@@ -25,7 +25,7 @@ namespace App\Tests\Integration\Ingester\Ingester;
 use App\Entity\User;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Ingester\UserIngester;
+use App\Ingester\Ingester\NativeUserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\LineItemRepository;
@@ -37,7 +37,7 @@ class UserIngesterTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var UserIngester */
+    /** @var NativeUserIngester */
     private $subject;
 
     protected function setUp(): void
@@ -48,7 +48,7 @@ class UserIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserIngester(
+        $this->subject = new NativeUserIngester(
             self::$container->get(LineItemRepository::class),
             $this->getManagerRegistry()
         );

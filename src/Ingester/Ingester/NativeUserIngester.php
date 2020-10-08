@@ -22,11 +22,10 @@ declare(strict_types=1);
 
 namespace App\Ingester\Ingester;
 
-use App\DataTransferObject\AssignmentDtoCollection;
 use App\DataTransferObject\UserDtoCollection;
+use App\Entity\User;
 use App\Repository\NativeAssignmentRepository;
 use App\Repository\NativeUserRepository;
-use Doctrine\ORM\ORMException;
 use Throwable;
 
 class NativeUserIngester
@@ -37,46 +36,34 @@ class NativeUserIngester
     /** @var NativeAssignmentRepository */
     private $assignmentRepository;
 
-    /** @var string */
-    private $kernelEnvironment;
-
-    public function __construct(
-        NativeUserRepository $userRepository,
-        NativeAssignmentRepository $assignmentRepository,
-        string $kernelEnvironment
-    ) {
+    public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
+    {
         $this->userRepository = $userRepository;
         $this->assignmentRepository = $assignmentRepository;
-        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     public function ingest(UserDtoCollection $users): void
     {
         try {
-            $assignmentDtoCollection = new AssignmentDtoCollection();
-            $this->userRepository->insertMultiple($users);
+            $existingUsers = $this->userRepository->findBy(['username' => $users->getAllUsernames()]);
+            $existingUsernames = array_map(static function (User $user) {
+                return $user->getUsername();
+            }, $existingUsers);
+
             foreach ($users as $user) {
-                $assignmentDtoCollection->add($user->getAssignment());
+                // TODO grab assignments
+                if (in_array($user->getUsername(), $existingUsernames, true)) {
+                    $users->remove($user);
+                }
             }
 
-            $this->assignmentRepository->insertMultiple($assignmentDtoCollection);
+            $this->userRepository->insertMultiple($users);
 
-            $this->refreshSequences();
+
+//            $this->assignmentRepository->insertMultiple($assignmentDtoCollection);
+
         } catch (Throwable $exception) {
             // TODO
-        }
-    }
-
-    /**
-     * @codeCoverageIgnore Cannot be tested with SQLite database
-     *
-     * @throws ORMException
-     */
-    private function refreshSequences(): void
-    {
-        if ($this->kernelEnvironment !== 'test') {
-            $this->userRepository->refreshSequence();
-            $this->assignmentRepository->refreshSequence();
         }
     }
 }

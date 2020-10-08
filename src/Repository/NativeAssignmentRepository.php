@@ -25,8 +25,11 @@ namespace App\Repository;
 use App\DataTransferObject\AssignmentDtoCollection;
 use App\Entity\Assignment;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\Persistence\Mapping\MappingException;
 
 class NativeAssignmentRepository extends AbstractRepository
 {
@@ -37,6 +40,7 @@ class NativeAssignmentRepository extends AbstractRepository
 
     /**
      * @throws ORMException
+     * @throws MappingException
      */
     public function insertMultiple(AssignmentDtoCollection $assignments): void
     {
@@ -62,6 +66,21 @@ class NativeAssignmentRepository extends AbstractRepository
     }
 
     /**
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getAvailableAssignmentStartIndex(): int
+    {
+        $index = $this
+            ->createQueryBuilder('a')
+            ->select('MAX(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int)$index + 1;
+    }
+
+    /**
      * @codeCoverageIgnore Cannot be tested with SQLite database
      *
      * @throws ORMException
@@ -71,7 +90,7 @@ class NativeAssignmentRepository extends AbstractRepository
         $this
             ->getEntityManager()
             ->createNativeQuery(
-                "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
+                "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1)) FROM assignments",
                 new ResultSetMapping()
             )
             ->execute();

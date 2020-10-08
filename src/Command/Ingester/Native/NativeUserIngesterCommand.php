@@ -34,8 +34,7 @@ use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Model\LineItemCollection;
 use App\Repository\LineItemRepository;
-use App\Repository\NativeUserRepository;
-use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,9 +59,6 @@ class NativeUserIngesterCommand extends Command
     /** @var NativeUserIngester */
     private $nativeUserIngester;
 
-    /** @var NativeUserRepository */
-    private $nativeUserRepository;
-
     /** @var LineItemRepository */
     private $lineItemRepository;
 
@@ -81,13 +77,11 @@ class NativeUserIngesterCommand extends Command
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
         NativeUserIngester $nativeUserIngester,
-        NativeUserRepository $nativeUserRepository,
         LineItemRepository $lineItemRepository,
         UserPasswordEncoderInterface $passwordEncoder
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
         $this->nativeUserIngester = $nativeUserIngester;
-        $this->nativeUserRepository = $nativeUserRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->passwordEncoder = $passwordEncoder;
 
@@ -165,23 +159,33 @@ class NativeUserIngesterCommand extends Command
 
             $process = new Process(['wc', '-l', $csvFilePath]);
             $process->run();
-            $numberOfUsers = (int)$process->getOutput() - 1;
 
-            $progressBar->setMaxSteps($numberOfUsers);
+            $progressBar->setMaxSteps((int)$process->getOutput() - 1);
             $progressBar->start();
 
-            $index = $this->nativeUserRepository->findNextAvailableUserIndex();
-            $lineItemCollection = $this->lineItemRepository->findAllAsCollection();
+            $lineItems = $this->lineItemRepository->findAllAsCollection();
 
-            if ($lineItemCollection->isEmpty()) {
-                throw new Exception("Cannot native ingest 'user' since line-item table is empty.");
+            if ($lineItems->isEmpty()) {
+                throw new LineItemNotFoundException("No line items were found in database.");
             }
 
             $userDtoCollection = new UserDtoCollection();
-            foreach ($source->getContent() as $row) {
-                $userDtoCollection->add($this->createUserDto($lineItemCollection, $row, $index));
+            $numberOfProcessedRows = 1;
+            foreach ($source->getContent() as $rawUser) {
+                $this->validateRawUser($rawUser);
 
-                if ($index % $this->batchSize === 0) {
+                $username = $rawUser['username'];
+
+                $userDto = $userDtoCollection->containsWithUsername($username)
+                    ? $userDtoCollection->getByUsername($username)
+                    : $this->createUserDto($rawUser);
+
+                $assignmentDto = $this->createAssignmentDto($rawUser['slug'], $lineItems);
+
+                $userDto->addAssignment($assignmentDto);
+                $userDtoCollection->add($userDto);
+
+                if ($numberOfProcessedRows % $this->batchSize === 0) {
                     if (!$this->isDryRun) {
                         $this->nativeUserIngester->ingest($userDtoCollection);
                     }
@@ -190,7 +194,7 @@ class NativeUserIngesterCommand extends Command
                     $progressBar->advance($this->batchSize);
                 }
 
-                $index++;
+                $numberOfProcessedRows++;
             }
 
             if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
@@ -208,20 +212,43 @@ class NativeUserIngesterCommand extends Command
     }
 
     /**
+     * @throws InvalidArgumentException
+     */
+    private function validateRawUser(array $rawUser): void
+    {
+        if (!isset($rawUser['username'])) {
+            throw new InvalidArgumentException('Username column is not set');
+        }
+
+        if (!isset($rawUser['password'])) {
+            throw new InvalidArgumentException('Password column is not set');
+        }
+
+        if (!isset($rawUser['slug'])) {
+            throw new InvalidArgumentException('Slug column is not set');
+        }
+    }
+
+    /**
      *
+     * @throws InvalidArgumentException
+     */
+    private function createUserDto(array $rawUser): UserDto
+    {
+        return new UserDto(
+            $rawUser['username'],
+            $this->passwordEncoder->encodePassword(new User(), $rawUser['password']),
+            $rawUser['groupId'] ?? null
+        );
+    }
+
+    /**
      * @throws LineItemNotFoundException
      */
-    private function createUserDto(LineItemCollection $lineItemCollection, array $row, int $index): UserDto
+    private function createAssignmentDto(string $lineItemSlug, LineItemCollection $lineItems): AssignmentDto
     {
-        $lineItem = $lineItemCollection->getBySlug($row['slug']);
-        $newAssignment = new AssignmentDto($index, Assignment::STATE_READY, $index, $lineItem->getId());
+        $lineItem = $lineItems->getBySlug($lineItemSlug);
 
-        return new UserDto(
-            $index,
-            $row['username'],
-            $this->passwordEncoder->encodePassword(new User(), $row['password']),
-            $newAssignment,
-            $row['groupId'] ?? null
-        );
+        return new AssignmentDto(Assignment::STATE_READY, $lineItem->getId());
     }
 }

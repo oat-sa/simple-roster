@@ -30,6 +30,9 @@ class FindUserCriteria
     /** @var string[] */
     private $lineItemSlugs = [];
 
+    /** @var EuclideanDivisionCriterion|null */
+    private $euclideanDivisionCriterion;
+
     public function addUsernameCriterion(string ...$usernames): self
     {
         $this->usernames = $usernames;
@@ -68,5 +71,22 @@ class FindUserCriteria
     public function hasLineItemSlugCriterion(): bool
     {
         return !empty($this->lineItemSlugs);
+    }
+
+    public function addEuclideanDivisionCriterion(EuclideanDivisionCriterion $criterion): self
+    {
+        $this->euclideanDivisionCriterion = $criterion;
+
+        return $this;
+    }
+
+    public function getEuclideanDivisionCriterion(): ?EuclideanDivisionCriterion
+    {
+        return $this->euclideanDivisionCriterion;
+    }
+
+    public function hasEuclideanDivisionCriterion(): bool
+    {
+        return null !== $this->euclideanDivisionCriterion;
     }
 }

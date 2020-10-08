@@ -31,9 +31,25 @@ class AssignmentDtoCollection implements Countable, IteratorAggregate
     /** @var AssignmentDto[] */
     private $collection = [];
 
+    public function __construct(AssignmentDto ...$assignments)
+    {
+        foreach ($assignments as $assignment) {
+            $this->add($assignment);
+        }
+    }
+
     public function add(AssignmentDto $dto): self
     {
         $this->collection[] = $dto;
+
+        return $this;
+    }
+
+    public function merge(AssignmentDtoCollection $assignments): self
+    {
+        foreach ($assignments as $assignment) {
+            $this->add($assignment);
+        }
 
         return $this;
     }
