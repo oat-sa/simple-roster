@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.8.0 - 2020-10-07
+## 1.8.0 - 2020-10-08
 
 ### Added
 - Added possibility to specify LTI key and secret through environment variables.
