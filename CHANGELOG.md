@@ -7,7 +7,7 @@
 - Switched from ORM to native queries in `NativeUserIngesterCommand` for better performance.
 
 ### Fixed
-- Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination.
+- Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
 
 ## 1.8.0 - 2020-10-08
 
