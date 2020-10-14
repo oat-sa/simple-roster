@@ -24,8 +24,8 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use DateTime;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)

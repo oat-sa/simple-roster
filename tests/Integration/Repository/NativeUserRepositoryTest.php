@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Repository;
 
 use App\DataTransferObject\AssignmentDto;
+use App\DataTransferObject\AssignmentDtoCollection;
 use App\DataTransferObject\UserDto;
 use App\DataTransferObject\UserDtoCollection;
 use App\Entity\User;
@@ -55,11 +56,11 @@ class NativeUserRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleUsers(): void
     {
-        $assignment1 = new AssignmentDto(1, 'test', 1, 1);
-        $user1 = new UserDto(1, 'test1', 'test', $assignment1, null);
+        $assignment1 = new AssignmentDto('test', 1, 1);
+        $user1 = new UserDto('test1', 'test', null, new AssignmentDtoCollection($assignment1));
 
-        $assignment2 = new AssignmentDto(1, 'test', 2, 2);
-        $user2 = new UserDto(2, 'test2', 'test', $assignment2, null);
+        $assignment2 = new AssignmentDto('test', 2, 2);
+        $user2 = new UserDto('test2', 'test', null, new AssignmentDtoCollection($assignment2));
 
         $userCollection = (new UserDtoCollection())
             ->add($user1)
@@ -75,19 +76,5 @@ class NativeUserRepositoryTest extends KernelTestCase
 
         self::assertSame(1, $user1->getId());
         self::assertSame(2, $user2->getId());
-    }
-
-    public function testItCanFindNextAvailableUserIndex(): void
-    {
-        self::assertSame(1, $this->subject->findNextAvailableUserIndex());
-
-        $assignment = new AssignmentDto(1, 'test', 1, 1);
-        $user = new UserDto(1, 'test1', 'test', $assignment, null);
-
-        $userCollection = (new UserDtoCollection())->add($user);
-
-        $this->subject->insertMultiple($userCollection);
-
-        self::assertSame(2, $this->subject->findNextAvailableUserIndex());
     }
 }

@@ -160,26 +160,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertSame('group_3', $user12->getGroupId());
     }
 
-    public function testBatchedLocalIngestionFailureWithEmptyLineItems(): void
-    {
-        $output = $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-                '--batch' => 1,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        );
-
-        self::assertSame(1, $output);
-        self::assertStringContainsString(
-            "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
-            $this->commandTester->getDisplay()
-        );
-    }
-
     public function testBatchedLocalIngestionFailureWithInvalidUsers(): void
     {
         $this->prepareIngestionContext();

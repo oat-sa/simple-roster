@@ -22,16 +22,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Ingester\Ingester;
 
-use App\Ingester\Ingester\NativeUserIngester;
+use App\Ingester\Ingester\UserIngester;
 use App\Repository\LineItemRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class UserIngesterTest extends TestCase
 {
     public function testRegistryItemName(): void
     {
-        $subject = new NativeUserIngester(
+        $subject = new UserIngester(
             $this->createMock(LineItemRepository::class),
             $this->createMock(ManagerRegistry::class)
         );

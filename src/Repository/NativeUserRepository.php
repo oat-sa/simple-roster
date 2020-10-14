@@ -24,11 +24,11 @@ namespace App\Repository;
 
 use App\DataTransferObject\UserDtoCollection;
 use App\Entity\User;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 
 /**
@@ -55,18 +55,25 @@ class NativeUserRepository extends AbstractRepository
      */
     public function insertMultiple(UserDtoCollection $users): void
     {
-        $index = $this->findNextAvailableUserIndex();
+        if ($users->isEmpty()) {
+            return;
+        }
+
         $queryParts = [];
+        $userIndex = $this->findNextAvailableUserIndex();
+
         foreach ($users as $user) {
             $queryParts[] = sprintf(
                 "(%s, '%s', '%s', '[]', '%s')",
-                $index,
+                $userIndex,
                 $user->getUsername(),
                 $user->getPassword(),
                 $user->getGroupId()
             );
 
-            $index++;
+            $user->assignUserIdForAssignments($userIndex);
+
+            $userIndex++;
         }
 
         $query = sprintf(
@@ -76,7 +83,6 @@ class NativeUserRepository extends AbstractRepository
 
         $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
         $this->_em->clear();
-
         $this->refreshSequence();
     }
 
@@ -102,7 +108,7 @@ class NativeUserRepository extends AbstractRepository
      */
     private function refreshSequence(): void
     {
-        if (!$this->kernelEnvironment !== 'test') {
+        if ($this->kernelEnvironment !== 'test') {
             $this
                 ->getEntityManager()
                 ->createNativeQuery(
@@ -111,6 +117,5 @@ class NativeUserRepository extends AbstractRepository
                 )
                 ->execute();
         }
-
     }
 }

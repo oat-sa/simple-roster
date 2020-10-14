@@ -22,11 +22,10 @@ declare(strict_types=1);
 
 namespace App\Ingester\Ingester;
 
+use App\DataTransferObject\AssignmentDtoCollection;
 use App\DataTransferObject\UserDtoCollection;
-use App\Entity\User;
 use App\Repository\NativeAssignmentRepository;
 use App\Repository\NativeUserRepository;
-use Throwable;
 
 class NativeUserIngester
 {
@@ -44,26 +43,24 @@ class NativeUserIngester
 
     public function ingest(UserDtoCollection $users): void
     {
-        try {
-            $existingUsers = $this->userRepository->findBy(['username' => $users->getAllUsernames()]);
-            $existingUsernames = array_map(static function (User $user) {
-                return $user->getUsername();
-            }, $existingUsers);
-
-            foreach ($users as $user) {
-                // TODO grab assignments
-                if (in_array($user->getUsername(), $existingUsernames, true)) {
-                    $users->remove($user);
-                }
-            }
-
-            $this->userRepository->insertMultiple($users);
-
-
-//            $this->assignmentRepository->insertMultiple($assignmentDtoCollection);
-
-        } catch (Throwable $exception) {
-            // TODO
+        $existingUsernames = [];
+        // TODO replace with native query after develop merge
+        foreach ($this->userRepository->findBy(['username' => $users->getAllUsernames()]) as $existingUser) {
+            $existingUsernames[$existingUser->getUsername()] = $existingUser->getId();
         }
+
+        $assignmentsToIngest = new AssignmentDtoCollection();
+        foreach ($users as $user) {
+            $assignmentsToIngest->merge($user->getAssignments());
+            if (array_key_exists($user->getUsername(), $existingUsernames)) {
+                $users->remove($user);
+
+                $user->assignUserIdForAssignments($existingUsernames[$user->getUsername()]);
+            }
+        }
+
+        $this->userRepository->insertMultiple($users);
+
+        $this->assignmentRepository->insertMultiple($assignmentsToIngest);
     }
 }

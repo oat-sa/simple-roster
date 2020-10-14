@@ -88,4 +88,13 @@ class UserDto
 
         return $this;
     }
+
+    public function assignUserIdForAssignments(int $userId): self
+    {
+        foreach ($this->assignments as $assignment) {
+            $assignment->setUserId($userId);
+        }
+
+        return $this;
+    }
 }

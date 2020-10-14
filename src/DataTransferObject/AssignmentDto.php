@@ -30,10 +30,14 @@ class AssignmentDto
     /** @var int */
     private $lineItemId;
 
-    public function __construct(string $state, int $lineItemId)
+    /** @var int|null */
+    private $userId;
+
+    public function __construct(string $state, int $lineItemId, int $userId = null)
     {
         $this->state = $state;
         $this->lineItemId = $lineItemId;
+        $this->userId = $userId;
     }
 
     public function getState(): string
@@ -44,5 +48,17 @@ class AssignmentDto
     public function getLineItemId(): int
     {
         return $this->lineItemId;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(int $userId): self
+    {
+        $this->userId = $userId;
+
+        return $this;
     }
 }

@@ -24,7 +24,7 @@ namespace App\Repository;
 
 use App\Entity\LineItem;
 use App\Model\LineItemCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)

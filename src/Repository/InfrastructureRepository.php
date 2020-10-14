@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Infrastructure;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Infrastructure|null find($id, $lockMode = null, $lockVersion = null)

@@ -42,7 +42,7 @@ class AssignmentDtoCollectionTest extends TestCase
 
     public function testIfAssignmentCanBeAdded(): void
     {
-        $assignment = new AssignmentDto(1, 'test', 1, 1);
+        $assignment = new AssignmentDto('test', 1, 1);
         $subject = (new AssignmentDtoCollection())->add($assignment);
 
         self::assertCount(1, $subject);

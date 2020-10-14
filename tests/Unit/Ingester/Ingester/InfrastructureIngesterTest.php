@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\InfrastructureIngester;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class InfrastructureIngesterTest extends TestCase

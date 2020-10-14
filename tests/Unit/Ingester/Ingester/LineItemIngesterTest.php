@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\LineItemIngester;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class LineItemIngesterTest extends TestCase

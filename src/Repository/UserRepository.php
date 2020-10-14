@@ -28,9 +28,9 @@ use App\Generator\UserCacheIdGenerator;
 use App\Model\UsernameCollection;
 use App\Repository\Criteria\FindUserCriteria;
 use App\ResultSet\UsernameResultSet;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
 
 /**
