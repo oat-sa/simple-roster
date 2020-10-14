@@ -235,14 +235,14 @@ class NativeUserIngesterCommand extends Command
         );
 
         $existingUsernames = [];
-        foreach ($this->userRepository->findBy(['username' => array_unique($usernamesToCheck)]) as $user) {
-            $existingUsernames[$user->getId()] = $user->getUsername();
+        $resultSetMapping = new ResultSetMapping();
+        foreach ($this->findUsernames(array_unique($usernamesToCheck)) as $user) {
+            $existingUsernames[$user['id']] = $user['username'];
         }
 
         $userIndex = $this->getAvailableUserStartIndex();
         $assignmentIndex = $this->getAvailableAssignmentStartIndex();
 
-        $resultSetMapping = new ResultSetMapping();
         $user = new User();
         foreach ($rawUsers as $rawUser) {
             if (in_array($rawUser['username'], $existingUsernames, true)) {
@@ -315,6 +315,24 @@ class NativeUserIngesterCommand extends Command
             ->getSingleScalarResult();
 
         return $index + 1;
+    }
+
+    /**
+     * @param string[] $usernames
+     */
+    private function findUsernames(array $usernames): array
+    {
+        $query = sprintf(
+            "SELECT id, username FROM users WHERE username IN (%s)",
+            implode(',', array_map(static function (string $username) {
+                return "'" . $username . "'";
+            }, $usernames))
+        );
+
+        $statement = $this->entityManager->getConnection()->prepare($query);
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 
     private function executeNativeInsertions(ResultSetMapping $mapping): void

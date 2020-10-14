@@ -204,9 +204,6 @@ class DoctrineResultCacheWarmerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $offset = 0;
-        $numberOfWarmedUpCacheEntries = 0;
-
         $this->symfonyStyle->note('Calculating total number of entries to warm up...');
 
         $numberOfTotalUsers = $this->getNumberOfTotalUsers();
@@ -224,13 +221,17 @@ class DoctrineResultCacheWarmerCommand extends Command
         $progressBar->setMaxSteps($numberOfTotalUsers);
         $progressBar->start();
 
+        $lastUserId = 0;
+        $numberOfWarmedUpCacheEntries = 0;
         do {
             $iterateResult = $this
-                ->getFindAllUsernameQuery($offset)
+                ->getFindAllUsernameQuery($lastUserId)
                 ->iterate();
 
             foreach ($iterateResult as $row) {
-                $this->warmUpResultCacheForUserName(current($row)['username']);
+                $username = current($row)['username'];
+                $lastUserId = current($row)['id'];
+                $this->warmUpResultCacheForUserName($username);
 
                 $numberOfWarmedUpCacheEntries++;
 
@@ -240,8 +241,6 @@ class DoctrineResultCacheWarmerCommand extends Command
             if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
                 $progressBar->advance($this->batchSize);
             }
-
-            $offset += $this->batchSize;
         } while ($numberOfWarmedUpCacheEntries < $numberOfTotalUsers);
 
         $progressBar->finish();
@@ -256,16 +255,18 @@ class DoctrineResultCacheWarmerCommand extends Command
         return 0;
     }
 
-    private function getFindAllUsernameQuery(int $offset): Query
+    private function getFindAllUsernameQuery(int $lastUserId): Query
     {
         $queryBuilder = $this->entityManager
             ->createQueryBuilder()
-            ->select('u.username')
-            ->from(User::class, 'u');
+            ->select('u.id, u.username')
+            ->from(User::class, 'u')
+            ->andWhere('u.id > :lastUserId')
+            ->setParameter('lastUserId', $lastUserId);
 
         if (!empty($this->userIds)) {
             $queryBuilder
-                ->where('u.id IN (:userIds)')
+                ->andWhere('u.id IN (:userIds)')
                 ->setParameter('userIds', $this->userIds);
         }
 
@@ -275,20 +276,20 @@ class DoctrineResultCacheWarmerCommand extends Command
                 ->leftJoin('u.assignments', 'a')
                 ->leftJoin('a.lineItem', 'l')
                 ->leftJoin('l.infrastructure', 'i')
-                ->where('l.id IN (:lineItemIds)')
+                ->andWhere('l.id IN (:lineItemIds)')
                 ->setParameter('lineItemIds', $this->lineItemIds);
         }
 
         if ($this->modulo && $this->remainder !== null) {
             $queryBuilder
-                ->where('MOD(u.id, :modulo) = :remainder')
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
                 ->setParameter('modulo', $this->modulo)
                 ->setParameter('remainder', $this->remainder);
         }
 
         return $queryBuilder
-            ->setFirstResult($offset)
             ->setMaxResults($this->batchSize)
+            ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->setHydrationMode(Query::HYDRATE_SINGLE_SCALAR);
     }
