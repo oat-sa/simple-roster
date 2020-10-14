@@ -38,10 +38,6 @@ pipeline {
                     script: './vendor/bin/phpmd src,tests json phpmd.xml'
                 )
                 sh(
-                    label: 'Running testing suite',
-                    script: './bin/phpunit'
-                )
-                sh(
                     label: 'Running testing suite - PHPUnit & Infection',
                     script: './vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
