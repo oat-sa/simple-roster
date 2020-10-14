@@ -25,7 +25,6 @@ namespace App\Tests\Integration\Ingester\Ingester;
 use App\Entity\User;
 use App\Ingester\Ingester\InfrastructureIngester;
 use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Ingester\NativeUserIngester;
 use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
@@ -38,7 +37,7 @@ class UserIngesterTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var NativeUserIngester */
+    /** @var UserIngester */
     private $subject;
 
     protected function setUp(): void

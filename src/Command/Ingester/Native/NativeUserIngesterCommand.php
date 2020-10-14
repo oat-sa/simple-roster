@@ -217,15 +217,15 @@ class NativeUserIngesterCommand extends Command
     private function validateRawUser(array $rawUser): void
     {
         if (!isset($rawUser['username'])) {
-            throw new InvalidArgumentException('Username column is not set');
+            throw new InvalidArgumentException("Column 'username' is not set in source file.");
         }
 
         if (!isset($rawUser['password'])) {
-            throw new InvalidArgumentException('Password column is not set');
+            throw new InvalidArgumentException("Column 'password' is not set in source file.");
         }
 
         if (!isset($rawUser['slug'])) {
-            throw new InvalidArgumentException('Slug column is not set');
+            throw new InvalidArgumentException("Column 'slug' is not set in source file.");
         }
     }
 

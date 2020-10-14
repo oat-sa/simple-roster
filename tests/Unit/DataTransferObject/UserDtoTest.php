@@ -23,19 +23,49 @@ declare(strict_types=1);
 namespace App\Tests\Unit\DataTransferObject;
 
 use App\DataTransferObject\AssignmentDto;
+use App\DataTransferObject\AssignmentDtoCollection;
 use App\DataTransferObject\UserDto;
+use App\Entity\Assignment;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class UserDtoTest extends TestCase
 {
-    public function testItThrowsExceptionIfUserIdsAreNotMatchingWithAssignment(): void
+    public function testItThrowsExceptionIfEmptyUsernameReceived(): void
     {
-        $this->markTestSkipped(); // FIXME
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("User id must match with assignment's user id.");
+        $this->expectExceptionMessage('Username cannot be empty');
 
-        $assignment = new AssignmentDto('test', 2, 1);
-        new UserDto('test', 'test');
+        new UserDto('', 'password');
+    }
+
+    public function testItThrowsExceptionIfEmptyPasswordReceived(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Password cannot be empty');
+
+        new UserDto('username', '');
+    }
+
+    public function testItThrowsExceptionIfGroupIdIsSetBuItIsEmpty(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Group id cannot be empty');
+
+        new UserDto('username', 'password', '');
+    }
+
+    public function testIfUserIdCanBeAssignedToEveryAssignments(): void
+    {
+        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1);
+        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1);
+
+        $user = new UserDto('username', 'password', null, new AssignmentDtoCollection($assignment1, $assignment2));
+
+        $user->assignUserIdForAssignments(3);
+
+        foreach ($user->getAssignments() as $assignment) {
+            self::assertSame(3, $assignment->getUserId());
+        }
     }
 }

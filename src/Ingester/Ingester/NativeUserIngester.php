@@ -46,7 +46,7 @@ class NativeUserIngester
         $existingUsernames = [];
         // TODO replace with native query after develop merge
         foreach ($this->userRepository->findBy(['username' => $users->getAllUsernames()]) as $existingUser) {
-            $existingUsernames[$existingUser->getUsername()] = $existingUser->getId();
+            $existingUsernames[$existingUser->getUsername()] = (int)$existingUser->getId();
         }
 
         $assignmentsToIngest = new AssignmentDtoCollection();

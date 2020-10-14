@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,17 +15,26 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-use Symfony\Component\Dotenv\Dotenv;
+namespace App\Tests\Unit\DataTransferObject;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+use App\DataTransferObject\UserDtoCollection;
+use App\Exception\UserNotFoundException;
+use PHPUnit\Framework\TestCase;
 
-if (file_exists(dirname(__DIR__) . '/config/bootstrap.php')) {
-    require dirname(__DIR__) . '/config/bootstrap.php';
-} elseif (method_exists(Dotenv::class, 'bootEnv')) {
-    (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env.test');
+class UserDtoCollectionTest extends TestCase
+{
+    public function testItThrowsExceptionIfUserCannotBeFoundByUsername(): void
+    {
+        $this->expectException(UserNotFoundException::class);
+        $this->expectExceptionMessage("User with username 'nonExistingUser' is not found.");
+
+        $subject = new UserDtoCollection();
+
+        $subject->getByUsername('nonExistingUser');
+    }
 }

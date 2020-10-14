@@ -39,7 +39,7 @@ class EuclideanDivisionCriterion
         }
 
         if ($remainder < 0) {
-            throw new InvalidArgumentException('Remainder must be greater than 0');
+            throw new InvalidArgumentException('Remainder must be greater or equal to 0');
         }
 
         if ($remainder >= $modulo) {

@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace App\Repository\Criteria;
 
+use Exception;
+
 class FindUserCriteria
 {
     /** @var string[] */
@@ -80,8 +82,15 @@ class FindUserCriteria
         return $this;
     }
 
-    public function getEuclideanDivisionCriterion(): ?EuclideanDivisionCriterion
+    /**
+     * @throws Exception
+     */
+    public function getEuclideanDivisionCriterion(): EuclideanDivisionCriterion
     {
+        if (null === $this->euclideanDivisionCriterion) {
+            throw new Exception('Criterion is not defined.');
+        }
+
         return $this->euclideanDivisionCriterion;
     }
 

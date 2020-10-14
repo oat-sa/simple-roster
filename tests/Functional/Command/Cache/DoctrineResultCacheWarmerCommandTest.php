@@ -34,8 +34,8 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
-use Monolog\Logger;
 use LogicException;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -308,6 +308,9 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
     }
 
     /**
+     * @param mixed $modulo
+     * @param mixed $remainder
+     *
      * #@dataProvider provideInvalidModuloAndRemainderInputs
      */
     public function testItThrowsExceptionIfInvalidModuloOrRemainderParametersReceived(

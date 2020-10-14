@@ -71,6 +71,67 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertCount(0, $this->getRepository(User::class)->findAll());
     }
 
+    public function testItThrowsExceptionIfNoLineItemsAreIngested(): void
+    {
+        self::assertSame(1, $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            '[ERROR] No line items were found in database.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidUserFiles
+     */
+    public function testItThrowsExceptionIfSourceFileStructureIsNotValid(
+        string $filePath,
+        string $expectedExceptionMessage
+    ): void {
+        $this->prepareIngestionContext();
+
+        self::assertSame(1, $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => $filePath,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            $expectedExceptionMessage,
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function provideInvalidUserFiles(): array
+    {
+        return [
+            'withoutUsernameColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-username-column.csv',
+                'expectedExceptionMessage' => "Column 'username' is not set in source file.",
+            ],
+            'withoutPasswordColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-password-column.csv',
+                'expectedExceptionMessage' => "Column 'password' is not set in source file.",
+            ],
+            'withoutSlugColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-slug-column.csv',
+                'expectedExceptionMessage' => "Column 'slug' is not set in source file.",
+            ],
+        ];
+    }
+
     public function testNonBatchedLocalIngestionSuccess(): void
     {
         $this->prepareIngestionContext();
@@ -213,15 +274,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $user3 = $userRepository->find(3);
         self::assertInstanceOf(User::class, $user3);
         self::assertCount(5, $user3->getAssignments());
-    }
-
-    /**
-     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
-     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
-     */
-    private function normalizeDisplay(string $commandDisplay): string
-    {
-        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 
     private function prepareIngestionContext(): void
