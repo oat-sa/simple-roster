@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Assignment;
 use App\Exception\AssignmentNotFoundException;
 use App\Repository\AssignmentRepository;
 use Doctrine\ORM\ORMException;
