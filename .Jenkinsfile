@@ -38,7 +38,7 @@ pipeline {
                     script: './vendor/bin/phpmd src,tests json phpmd.xml'
                 )
                 sh(
-                    label: 'Running testing suite'
+                    label: 'Running testing suite',
                     script: './bin/phpunit'
                 )
                 sh(
