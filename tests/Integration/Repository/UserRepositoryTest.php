@@ -99,7 +99,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'limit' parameter received.");
 
-        $this->subject->findAllUsernamePaged(0, null);
+        $this->subject->findAllUsernamesPaged(0, null);
     }
 
     /**
@@ -110,7 +110,7 @@ class UserRepositoryTest extends KernelTestCase
         $lastUserId = null;
         $userIdIndex = 0;
         do {
-            $resultSet = $this->subject->findAllUsernamePaged($limit, $lastUserId);
+            $resultSet = $this->subject->findAllUsernamesPaged($limit, $lastUserId);
 
             self::assertLessThanOrEqual($limit, count($resultSet));
 

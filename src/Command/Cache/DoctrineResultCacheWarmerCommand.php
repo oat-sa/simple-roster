@@ -223,7 +223,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $lastUserId = null;
         do {
-            $resultSet = $this->userRepository->findAllUsernamePaged($this->batchSize, $lastUserId, $criteria);
+            $resultSet = $this->userRepository->findAllUsernamesPaged($this->batchSize, $lastUserId, $criteria);
 
             foreach ($resultSet as $username) {
                 $this->warmUpResultCacheForUserName($username);

@@ -345,6 +345,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 0,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -357,6 +358,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 1,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -369,6 +371,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 2,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -381,6 +384,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 3,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -393,6 +397,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 4,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,
@@ -405,6 +410,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
             [
                 '--modulo' => 6,
                 '--remainder' => 5,
+                '--batch-size' => 10,
             ],
             [
                 'capture_stderr_separately' => true,

@@ -91,7 +91,7 @@ class UserRepository extends AbstractRepository
     /**
      * @throws InvalidArgumentException
      */
-    public function findAllUsernamePaged(
+    public function findAllUsernamesPaged(
         int $limit,
         ?int $lastUserId,
         FindUserCriteria $criteria = null
@@ -107,12 +107,12 @@ class UserRepository extends AbstractRepository
         $queryBuilder = $this->createQueryBuilder('u')
             ->distinct()
             ->select('u.id', 'u.username')
-            ->orderBy('u.id')
+            ->orderBy('u.id', 'ASC')
             ->setMaxResults($limit + 1);
 
         if (null !== $lastUserId) {
             $queryBuilder
-                ->where('u.id > :lastUserId')
+                ->andWhere('u.id > :lastUserId')
                 ->setParameter('lastUserId', $lastUserId);
         }
 
@@ -133,7 +133,7 @@ class UserRepository extends AbstractRepository
 
         if ($criteria->hasEuclideanDivisionCriterion()) {
             $queryBuilder
-                ->where('MOD(u.id, :modulo) = :remainder')
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
                 ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
                 ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
         }
