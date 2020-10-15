@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.8.1 - 2020-10-14
+## 1.8.1 - 2020-10-15
 
 ### Changed
 - Switched from offset based pagination to cursor based in `DoctrineResultCacheWarmerCommand` for better performance.
