@@ -77,7 +77,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? ' . $queryParameters,
+            '/api/v1/lti/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -108,7 +108,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? ' . $queryParameters,
+            '/api/v1/lti/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -144,7 +144,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? ' . $queryParameters,
+            '/api/v1/lti/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -183,7 +183,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? ' . $queryParameters,
+            '/api/v1/lti/outcome?' . $queryParameters,
             [],
             [],
             [
