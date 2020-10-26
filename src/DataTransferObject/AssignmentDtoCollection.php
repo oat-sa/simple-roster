@@ -29,13 +29,11 @@ use IteratorAggregate;
 class AssignmentDtoCollection implements Countable, IteratorAggregate
 {
     /** @var AssignmentDto[] */
-    private $collection = [];
+    private $collection;
 
     public function __construct(AssignmentDto ...$assignments)
     {
-        foreach ($assignments as $assignment) {
-            $this->add($assignment);
-        }
+        $this->collection = $assignments;
     }
 
     public function add(AssignmentDto $dto): self
@@ -62,7 +60,7 @@ class AssignmentDtoCollection implements Countable, IteratorAggregate
         return new ArrayIterator($this->collection);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->collection);
     }

@@ -176,7 +176,7 @@ class NativeUserIngesterCommand extends Command
 
                 $username = $rawUser['username'];
 
-                $userDto = $userDtoCollection->containsWithUsername($username)
+                $userDto = $userDtoCollection->containsUsername($username)
                     ? $userDtoCollection->getByUsername($username)
                     : $this->createUserDto($rawUser);
 

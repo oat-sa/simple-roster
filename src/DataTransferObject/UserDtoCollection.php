@@ -34,7 +34,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
 
     public function add(UserDto $user): self
     {
-        if (!$this->containsWithUsername($user->getUsername())) {
+        if (!$this->containsUsername($user->getUsername())) {
             $this->users[$user->getUsername()] = $user;
         }
 
@@ -43,7 +43,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
 
     public function remove(UserDto $user): self
     {
-        if ($this->containsWithUsername($user->getUsername())) {
+        if ($this->containsUsername($user->getUsername())) {
             unset($this->users[$user->getUsername()]);
         }
 
@@ -65,7 +65,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
         return new ArrayIterator($this->users);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->users);
     }
@@ -77,7 +77,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
 
     public function getByUsername(string $username): UserDto
     {
-        if (!$this->containsWithUsername($username)) {
+        if (!$this->containsUsername($username)) {
             throw new UserNotFoundException(
                 sprintf("User with username '%s' is not found.", $username)
             );
@@ -86,7 +86,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
         return $this->users[$username];
     }
 
-    public function containsWithUsername(string $username): bool
+    public function containsUsername(string $username): bool
     {
         return isset($this->users[$username]);
     }

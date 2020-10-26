@@ -74,7 +74,7 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var int */
     private $batchSize;
 
-    /** @var array string[] */
+    /** @var string[] */
     private $usernames = [];
 
     /** @var array */
@@ -313,7 +313,7 @@ class DoctrineResultCacheWarmerCommand extends Command
     {
         $this->lineItemSlugs = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_SLUGS)),
-            static function ($value) {
+            static function ($value): bool {
                 return !empty($value) && is_string($value);
             }
         );
@@ -332,7 +332,7 @@ class DoctrineResultCacheWarmerCommand extends Command
     {
         $this->usernames = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_USERNAMES)),
-            static function ($value) {
+            static function ($value): bool {
                 return !empty($value) && is_string($value);
             }
         );
