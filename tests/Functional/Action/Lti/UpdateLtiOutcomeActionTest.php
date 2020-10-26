@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,12 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Action\Lti;
 
 use App\Entity\Assignment;
-use App\Entity\Infrastructure;
 use App\Repository\AssignmentRepository;
-use App\Repository\InfrastructureRepository;
 use App\Security\OAuth\OAuthContext;
 use App\Security\OAuth\OAuthSigner;
 use App\Tests\Traits\DatabaseTestingTrait;
@@ -40,11 +38,20 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
     /** @var KernelBrowser */
     private $kernelBrowser;
 
+    /** @var string */
+    private $testLtiKey;
+
+    /** @var string */
+    private $testLtiSecret;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->testLtiKey = self::$container->getParameter('app.lti.key');
+        $this->testLtiSecret = self::$container->getParameter('app.lti.secret');
+
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
@@ -53,16 +60,14 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('POST', '/api/v1/lti/outcome');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongAuthentication(): void
     {
-        $infrastructure = $this->getInfrastructure();
-
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $this->testLtiKey,
             'oauth_nonce' => 'nonce',
             'oauth_signature' => 'signature',
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -72,7 +77,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -80,22 +85,20 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             ]
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $infrastructure = $this->getInfrastructure();
-
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature((string)$time);
 
-        /** @var string $xmlBody **/
+        /** @var string $xmlBody * */
         $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $this->testLtiKey,
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -105,7 +108,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -114,9 +117,9 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertEquals(
             Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
@@ -124,16 +127,14 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $infrastructure = $this->getInfrastructure();
-
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature((string)$time);
 
         $xmlBody = 'test';
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $this->testLtiKey,
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -143,7 +144,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -152,9 +153,9 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertEquals(
             Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
@@ -162,10 +163,8 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $infrastructure = $this->getInfrastructure();
-
         $time = time();
-        $signature = $this->generateSignature($infrastructure, (string)$time);
+        $signature = $this->generateSignature((string)$time);
 
         /** @var string $xmlBody */
         $xmlBody = file_get_contents(
@@ -174,7 +173,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
-            'oauth_consumer_key' => $infrastructure->getLtiKey(),
+            'oauth_consumer_key' => $this->testLtiKey,
             'oauth_nonce' => 'nonce',
             'oauth_signature' => $signature,
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -184,7 +183,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome? '. $queryParameters,
+            '/api/v1/lti/outcome? ' . $queryParameters,
             [],
             [],
             [
@@ -193,19 +192,19 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertEquals(
             Assignment::STATE_READY,
             $this->getAssignment()->getState()
         );
     }
 
-    private function generateSignature(Infrastructure $infrastructure, string $time): string
+    private function generateSignature(string $time): string
     {
         $context = new OAuthContext(
             'bodyHash',
-            $infrastructure->getLtiKey(),
+            $this->testLtiKey,
             'nonce',
             'HMAC-SHA1',
             $time,
@@ -218,16 +217,8 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $context,
             'http://localhost/api/v1/lti/outcome',
             'POST',
-            $infrastructure->getLtiSecret()
+            $this->testLtiSecret
         );
-    }
-
-    private function getInfrastructure(): Infrastructure
-    {
-        /** @var InfrastructureRepository $repository */
-        $repository = $this->getRepository(Infrastructure::class);
-
-        return $repository->find(1);
     }
 
     private function getAssignment(): Assignment
