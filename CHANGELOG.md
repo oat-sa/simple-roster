@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.8.1 - 2020-10-27
+
+### Changed
+- Switched from offset based pagination to cursor based in `DoctrineResultCacheWarmerCommand` for better performance.
+- Switched from ORM to native queries in `NativeUserIngesterCommand` for better performance.
+
+### Fixed
+- Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
+
 ## 1.8.0 - 2020-10-08
 
 ### Added
