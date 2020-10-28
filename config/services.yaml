@@ -6,7 +6,7 @@
 parameters:
     locale: 'en'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
-    app.lti_load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+    app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti.key: '%env(resolve:LTI_KEY)%'
     app.lti.secret: '%env(resolve:LTI_SECRET)%'
 
@@ -102,7 +102,7 @@ services:
     App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
         factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
-            - '%app.lti_load_balancing_strategy%'
+            - '%app.lti.load_balancing_strategy%'
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory

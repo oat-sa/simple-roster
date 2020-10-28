@@ -87,6 +87,27 @@ class NativeUserRepository extends AbstractRepository
     }
 
     /**
+     * @param string[] $usernames
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function findUsernames(array $usernames): array
+    {
+        $query = sprintf(
+            "SELECT id, username FROM users WHERE username IN (%s)",
+            implode(',', array_map(static function (string $username) {
+                return "'" . $username . "'";
+            }, $usernames))
+        );
+
+        $statement = $this->_em->getConnection()->prepare($query);
+        $statement->execute();
+
+        return $statement->fetchAllAssociative();
+    }
+
+    /**
      * @throws NoResultException
      * @throws NonUniqueResultException
      */

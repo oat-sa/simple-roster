@@ -77,4 +77,19 @@ class NativeUserRepositoryTest extends KernelTestCase
         self::assertSame(1, $user1->getId());
         self::assertSame(2, $user2->getId());
     }
+
+    public function testItCanFindUsersByUsername(): void
+    {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
+        $expectedUsernames = ['user_1', 'user_2', 'user_3', 'user_4', 'user_5'];
+
+        $users = $this->subject->findUsernames($expectedUsernames);
+
+        self::assertCount(5, $users);
+
+        foreach ($expectedUsernames as $expectedUsername) {
+            self::assertContains($expectedUsername, $expectedUsernames);
+        }
+    }
 }

@@ -44,9 +44,8 @@ class NativeUserIngester
     public function ingest(UserDtoCollection $users): void
     {
         $existingUsernames = [];
-        // TODO replace with native query after develop merge
-        foreach ($this->userRepository->findBy(['username' => $users->getAllUsernames()]) as $existingUser) {
-            $existingUsernames[$existingUser->getUsername()] = (int)$existingUser->getId();
+        foreach ($this->userRepository->findUsernames($users->getAllUsernames()) as $existingUser) {
+            $existingUsernames[$existingUser['username']] = (int)$existingUser['id'];
         }
 
         $assignmentsToIngest = new AssignmentDtoCollection();

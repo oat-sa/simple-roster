@@ -45,7 +45,7 @@ a single assignment will be created based on the line item `slug` defined.
 
 Here is an example csv structure: 
 
-> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops/devops-documentation.md#lti-load-balancing-strategy).
+> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops-documentation.md#lti-load-balancing-strategy).
 
 ```csv
 username,password,slug,groupId
@@ -61,7 +61,7 @@ It is also possible to create multiple assignments per user by slightly altering
 
 Here is an example csv structure:
 
-> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops/devops-documentation.md#lti-load-balancing-strategy).
+> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops-documentation.md#lti-load-balancing-strategy).
 
 ```csv
 username,password,slug,groupId
