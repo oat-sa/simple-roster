@@ -42,10 +42,22 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(InfrastructureRepository $repository, OAuthSigner $signer)
-    {
+    /** @var string */
+    private $ltiKey;
+
+    /** @var string */
+    private $ltiSecret;
+
+    public function __construct(
+        InfrastructureRepository $repository,
+        OAuthSigner $signer,
+        string $ltiKey,
+        string $ltiSecret
+    ) {
         $this->repository = $repository;
         $this->signer = $signer;
+        $this->ltiKey = $ltiKey;
+        $this->ltiSecret = $ltiSecret;
     }
 
     /**
@@ -69,11 +81,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $infrastructure = $this->repository->getByLtiKey(
-            (string)$request->query->get('oauth_consumer_key')
-        );
-
-        if (!$infrastructure) {
+        if ((string)$request->query->get('oauth_consumer_key') !== $this->ltiKey) {
             throw new UnauthorizedHttpException(
                 sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
             );
@@ -92,7 +100,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
             $request->getMethod(),
-            $infrastructure->getLtiSecret()
+            $this->ltiSecret
         );
 
         if ($signature !== $request->query->get('oauth_signature')) {

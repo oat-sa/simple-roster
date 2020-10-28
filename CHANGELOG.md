@@ -10,7 +10,7 @@
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 
-## 1.8.1 - 2020-10-14
+## 1.8.1 - 2020-10-27
 
 ### Changed
 - Switched from offset based pagination to cursor based in `DoctrineResultCacheWarmerCommand` for better performance.
@@ -18,6 +18,7 @@
 
 ### Fixed
 - Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
 
 ## 1.8.0 - 2020-10-08
 

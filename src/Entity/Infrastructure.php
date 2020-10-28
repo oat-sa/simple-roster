@@ -68,21 +68,11 @@ class Infrastructure implements EntityInterface
         return $this;
     }
 
-    public function getLtiKey(): string
-    {
-        return $this->ltiKey;
-    }
-
     public function setLtiKey(string $ltiKey): self
     {
         $this->ltiKey = $ltiKey;
 
         return $this;
-    }
-
-    public function getLtiSecret(): string
-    {
-        return $this->ltiSecret;
     }
 
     public function setLtiSecret(string $ltiSecret): self
