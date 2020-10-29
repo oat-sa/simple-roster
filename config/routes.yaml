@@ -36,3 +36,8 @@ updateLtiOutcome:
   methods: POST
   defaults: { _controller: App\Action\Lti\UpdateLtiOutcomeAction }
 
+lti13Launch:
+  path: '/lti13/launch'
+  methods: GET
+  defaults: { _controller: App\Action\Lti\Lti13LaunchAction }
+

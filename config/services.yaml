@@ -110,3 +110,9 @@ services:
     App\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
             $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+
+    OAT\Library\Lti1p3Core\User\UserIdentityFactoryInterface:
+        class: OAT\Library\Lti1p3Core\User\UserIdentityFactory
+
+    OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
+        class: App\Security\Authenticator\OidcUserAuthenticator
