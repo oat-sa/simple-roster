@@ -150,7 +150,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->loadBalancer
             ->expects(self::once())
             ->method('getLtiRequestContextId')
-            ->with($user)
+            ->with($assignment)
             ->willReturn($expectedLtiContextId);
 
         $expectedLtiInstance = new LtiInstance(

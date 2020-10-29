@@ -79,7 +79,7 @@ class UserCacheInvalidationSubscriberTest extends TestCase
         $this->entityManager
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
-        
+
         $this->entityManager
             ->method('getRepository')
             ->with(User::class)

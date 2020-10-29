@@ -24,12 +24,11 @@ namespace App\Ingester\Ingester;
 
 use App\Entity\Assignment;
 use App\Entity\EntityInterface;
-use App\Entity\LineItem;
 use App\Entity\User;
 use App\Exception\LineItemNotFoundException;
 use App\Model\LineItemCollection;
 use App\Repository\LineItemRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 
 class UserIngester extends AbstractIngester

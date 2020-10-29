@@ -24,8 +24,8 @@ namespace App\Repository;
 
 use App\Entity\LtiInstance;
 use App\Lti\Collection\LtiInstanceCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method LtiInstance|null   find($id, $lockMode = null, $lockVersion = null)

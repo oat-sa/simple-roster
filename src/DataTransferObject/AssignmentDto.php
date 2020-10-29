@@ -24,29 +24,20 @@ namespace App\DataTransferObject;
 
 class AssignmentDto
 {
-    /** @var int */
-    private $id;
-
     /** @var string */
     private $state;
 
     /** @var int */
-    private $userId;
-
-    /** @var int */
     private $lineItemId;
 
-    public function __construct(int $id, string $state, int $userId, int $lineItemId)
-    {
-        $this->id = $id;
-        $this->state = $state;
-        $this->userId = $userId;
-        $this->lineItemId = $lineItemId;
-    }
+    /** @var int|null */
+    private $userId;
 
-    public function getId(): int
+    public function __construct(string $state, int $lineItemId, int $userId = null)
     {
-        return $this->id;
+        $this->state = $state;
+        $this->lineItemId = $lineItemId;
+        $this->userId = $userId;
     }
 
     public function getState(): string
@@ -54,13 +45,20 @@ class AssignmentDto
         return $this->state;
     }
 
-    public function getUserId(): int
+    public function getLineItemId(): int
+    {
+        return $this->lineItemId;
+    }
+
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    public function getLineItemId(): int
+    public function setUserId(int $userId): self
     {
-        return $this->lineItemId;
+        $this->userId = $userId;
+
+        return $this;
     }
 }

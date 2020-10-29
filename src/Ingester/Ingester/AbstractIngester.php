@@ -26,7 +26,7 @@ use App\Entity\EntityInterface;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Result\IngesterResultFailure;
 use App\Ingester\Source\IngesterSourceInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface

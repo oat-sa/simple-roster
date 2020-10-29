@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\DataTransferObject;
 
+use App\Exception\UserNotFoundException;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
@@ -29,18 +30,29 @@ use IteratorAggregate;
 class UserDtoCollection implements Countable, IteratorAggregate
 {
     /** @var UserDto[] */
-    private $collection = [];
+    private $users = [];
 
-    public function add(UserDto $dto): self
+    public function add(UserDto $user): self
     {
-        $this->collection[] = $dto;
+        if (!$this->containsUsername($user->getUsername())) {
+            $this->users[$user->getUsername()] = $user;
+        }
+
+        return $this;
+    }
+
+    public function remove(UserDto $user): self
+    {
+        if ($this->containsUsername($user->getUsername())) {
+            unset($this->users[$user->getUsername()]);
+        }
 
         return $this;
     }
 
     public function clear(): self
     {
-        $this->collection = [];
+        $this->users = [];
 
         return $this;
     }
@@ -50,16 +62,42 @@ class UserDtoCollection implements Countable, IteratorAggregate
      */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->collection);
+        return new ArrayIterator($this->users);
     }
 
-    public function count()
+    public function count(): int
     {
-        return count($this->collection);
+        return count($this->users);
     }
 
     public function isEmpty(): bool
     {
         return count($this) === 0;
+    }
+
+    public function getByUsername(string $username): UserDto
+    {
+        if (!$this->containsUsername($username)) {
+            throw new UserNotFoundException(
+                sprintf("User with username '%s' is not found.", $username)
+            );
+        }
+
+        return $this->users[$username];
+    }
+
+    public function containsUsername(string $username): bool
+    {
+        return isset($this->users[$username]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllUsernames(): array
+    {
+        return array_map(static function (UserDto $user) {
+            return $user->getUsername();
+        }, $this->users);
     }
 }

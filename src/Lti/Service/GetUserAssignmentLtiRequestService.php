@@ -168,7 +168,7 @@ class GetUserAssignmentLtiRequestService
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
             'lti_version' => LtiRequest::LTI_VERSION,
-            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment->getUser()),
+            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),

@@ -24,32 +24,45 @@ namespace App\Repository;
 
 use App\DataTransferObject\AssignmentDtoCollection;
 use App\Entity\Assignment;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 
 class NativeAssignmentRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /** @var string */
+    private $kernelEnvironment;
+
+    public function __construct(ManagerRegistry $registry, string $kernelEnvironment)
     {
         parent::__construct($registry, Assignment::class);
+
+        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     /**
      * @throws ORMException
+     * @throws MappingException
      */
     public function insertMultiple(AssignmentDtoCollection $assignments): void
     {
         $queryParts = [];
+        $assignmentIndex = $this->getAvailableAssignmentStartIndex();
+
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
                 "(%s, %s, %s, '%s', %d)",
-                $assignmentDto->getId(),
+                $assignmentIndex,
                 $assignmentDto->getUserId(),
                 $assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
                 0
             );
+
+            $assignmentIndex++;
         }
 
         $query = sprintf(
@@ -59,6 +72,22 @@ class NativeAssignmentRepository extends AbstractRepository
 
         $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
         $this->_em->clear();
+        $this->refreshSequence();
+    }
+
+    /**
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    private function getAvailableAssignmentStartIndex(): int
+    {
+        $index = $this
+            ->createQueryBuilder('a')
+            ->select('MAX(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int)$index + 1;
     }
 
     /**
@@ -66,14 +95,16 @@ class NativeAssignmentRepository extends AbstractRepository
      *
      * @throws ORMException
      */
-    public function refreshSequence(): void
+    private function refreshSequence(): void
     {
-        $this
-            ->getEntityManager()
-            ->createNativeQuery(
-                "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1) ) FROM assignments",
-                new ResultSetMapping()
-            )
-            ->execute();
+        if ($this->kernelEnvironment !== 'test') {
+            $this
+                ->getEntityManager()
+                ->createNativeQuery(
+                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1)) FROM assignments",
+                    new ResultSetMapping()
+                )
+                ->execute();
+        }
     }
 }

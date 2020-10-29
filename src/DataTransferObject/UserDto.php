@@ -26,45 +26,40 @@ use InvalidArgumentException;
 
 class UserDto
 {
-    /** @var int */
-    private $id;
-
     /** @var string */
     private $username;
 
     /** @var string */
     private $password;
 
-    /** @var AssignmentDto */
-    private $assignment;
-
     /** @var string|null */
     private $groupId;
 
-    /**
-     * @throws InvalidArgumentException
-     */
+    /** @var AssignmentDtoCollection */
+    private $assignments;
+
     public function __construct(
-        int $id,
         string $username,
         string $password,
-        AssignmentDto $assignment,
-        ?string $groupId
+        string $groupId = null,
+        AssignmentDtoCollection $assignments = null
     ) {
-        $this->id = $id;
+        if (empty($username)) {
+            throw new InvalidArgumentException('Username cannot be empty');
+        }
+
+        if (empty($password)) {
+            throw new InvalidArgumentException('Password cannot be empty');
+        }
+
+        if (null !== $groupId && empty($groupId)) {
+            throw new InvalidArgumentException('Group id cannot be empty');
+        }
+
         $this->username = $username;
         $this->password = $password;
-        $this->assignment = $assignment;
         $this->groupId = $groupId;
-
-        if ($id !== $assignment->getUserId()) {
-            throw new InvalidArgumentException("User id must match with assignment's user id.");
-        }
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
+        $this->assignments = $assignments ?? new AssignmentDtoCollection();
     }
 
     public function getUsername(): string
@@ -82,8 +77,24 @@ class UserDto
         return $this->groupId;
     }
 
-    public function getAssignment(): AssignmentDto
+    public function getAssignments(): AssignmentDtoCollection
     {
-        return $this->assignment;
+        return $this->assignments;
+    }
+
+    public function addAssignment(AssignmentDto $assignmentDto): self
+    {
+        $this->assignments->add($assignmentDto);
+
+        return $this;
+    }
+
+    public function assignUserIdForAssignments(int $userId): self
+    {
+        foreach ($this->assignments as $assignment) {
+            $assignment->setUserId($userId);
+        }
+
+        return $this;
     }
 }

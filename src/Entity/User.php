@@ -127,11 +127,6 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
-    public function hasAssignment(): bool
-    {
-        return !$this->assignments->isEmpty();
-    }
-
     public function getLastAssignment(): Assignment
     {
         return $this->assignments->last();

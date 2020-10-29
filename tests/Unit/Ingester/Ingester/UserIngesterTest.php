@@ -24,7 +24,7 @@ namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\UserIngester;
 use App\Repository\LineItemRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class UserIngesterTest extends TestCase

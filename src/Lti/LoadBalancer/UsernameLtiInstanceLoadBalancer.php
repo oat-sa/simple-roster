@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
+use App\Entity\Assignment;
 use App\Entity\LtiInstance;
 use App\Entity\User;
-use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
@@ -33,20 +33,8 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
         return $this->computeLtiInstanceByString((string)$user->getUsername());
     }
 
-    /**
-     * @throws IndeterminableLtiRequestContextIdException
-     */
-    public function getLtiRequestContextId(User $user): string
+    public function getLtiRequestContextId(Assignment $assignment): string
     {
-        if (!$user->hasAssignment()) {
-            throw new IndeterminableLtiRequestContextIdException(
-                sprintf(
-                    "User with id='%s' does not have any assignments.",
-                    $user->getId()
-                )
-            );
-        }
-
-        return (string)$user->getLastAssignment()->getLineItem()->getId();
+        return (string)$assignment->getLineItem()->getId();
     }
 }

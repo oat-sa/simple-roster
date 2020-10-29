@@ -1,9 +1,17 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
-    app.lti_load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+    app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+    app.lti.key: '%env(resolve:LTI_KEY)%'
+    app.lti.secret: '%env(resolve:LTI_SECRET)%'
 
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true
         autoconfigure: true
@@ -14,6 +22,8 @@ services:
             $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
             $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
             $appApiKey: '%env(resolve:APP_API_KEY)%'
+            $ltiKey: '%app.lti.key%'
+            $ltiSecret: '%app.lti.secret%'
             $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
             $ltiInstancesCacheTtl: '%env(CACHE_TTL_LTI_INSTANCES)%'
 
@@ -74,6 +84,10 @@ services:
         arguments:
             $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
 
+    App\Command\Cache\DoctrineResultCacheWarmerCommand:
+        tags:
+            - { name: monolog.logger, channel: cache_warmup }
+
     App\Logger\UserRequestSessionLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
@@ -87,7 +101,7 @@ services:
     App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
         factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
-            - '%app.lti_load_balancing_strategy%'
+            - '%app.lti.load_balancing_strategy%'
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory

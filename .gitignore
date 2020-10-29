@@ -5,6 +5,7 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 src/.preload.php
 /var/
@@ -15,13 +16,13 @@ src/.preload.php
 /.web-server-pid
 ###< symfony/web-server-bundle ###
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-bin/.phpunit
-###< phpunit/phpunit ###
-
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
 /.php_cs.cache
 ###< squizlabs/php_codesniffer ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

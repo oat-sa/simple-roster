@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Lti\LoadBalancer;
 
 use App\Entity\LtiInstance;
+use App\Entity\Assignment;
 use App\Entity\User;
 use App\Lti\Collection\LtiInstanceCollection;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
@@ -104,13 +105,16 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $this->subject->getLtiRequestContextId(new User());
+        $assignment = (new Assignment())->setUser(new User());
+
+        $this->subject->getLtiRequestContextId($assignment);
     }
 
     public function testItCanReturnLtiRequestContextId(): void
     {
         $user = (new User())->setGroupId('group_5');
+        $assignment = (new Assignment())->setUser($user);
 
-        self::assertSame('group_5', $this->subject->getLtiRequestContextId($user));
+        $this->assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
     }
 }

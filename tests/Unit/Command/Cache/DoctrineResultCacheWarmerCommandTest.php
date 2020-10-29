@@ -30,6 +30,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class DoctrineResultCacheWarmerCommandTest extends TestCase
 {
@@ -49,6 +50,7 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
             $this->createMock(LtiInstanceRepository::class),
             $this->createMock(UserCacheIdGenerator::class),
             $entityManager,
+            $this->createMock(LoggerInterface::class),
             0
         );
     }

@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Traits;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 

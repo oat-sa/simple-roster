@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Traits;
 
+use LogicException;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -36,7 +37,7 @@ trait LoggerTestingTrait
         $this->setUpTestLogHandler();
     }
 
-    protected function setUpTestLogHandler(): void
+    protected function setUpTestLogHandler(string ...$channels): void
     {
         static::ensureKernelTestCase();
 
@@ -45,6 +46,16 @@ trait LoggerTestingTrait
         $this->handler = new TestHandler();
 
         $logger->pushHandler($this->handler);
+
+        foreach ($channels as $channel) {
+            $logger = static::$container->get(sprintf('monolog.logger.%s', $channel));
+
+            if (!$logger instanceof Logger) {
+                throw new LogicException(sprintf("Logger 'monolog.logger.%s' is not defined.", $channel));
+            }
+
+            $logger->pushHandler($this->handler);
+        }
     }
 
     public function getLogRecords(): array

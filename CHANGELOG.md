@@ -6,9 +6,30 @@
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 
 ### Changed
-- Increased minium required PHP version from `7.2` to `7.3`.
+- Raised minimum required PHP version from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
+
+## 1.8.1 - 2020-10-27
+
+### Changed
+- Switched from offset based pagination to cursor based in `DoctrineResultCacheWarmerCommand` for better performance.
+- Switched from ORM to native queries in `NativeUserIngesterCommand` for better performance.
+
+### Fixed
+- Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
+
+## 1.8.0 - 2020-10-08
+
+### Added
+- Added possibility to specify LTI key and secret through environment variables.
+- Added `modulo` and `remainder` options to `DoctrineResultCacheWarmerCommand` for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
+- Added separate log channel for cache warmup for better trackability of failed cache warmups.
+- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`. More details [here](docs/cli/native-user-ingester-command.md#user-ingestion-with-multiple-assignments).
+
+### Changed
+- Performance improvement of `NativeUserIngesterCommand` by counting the number of users by using process component.
 
 ## 1.7.0 - 2020-09-16
 
