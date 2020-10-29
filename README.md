@@ -11,7 +11,7 @@ OneRoster supports the commonly used .csv mode for exchange and the latest real-
 
 To learn more about *IMS OneRoster*, please refer to the official specification at [IMS Global](https://www.imsglobal.org/activity/onerosterlis).
 
-## Table of Contents
+## Table of contents
 
 - [Docker development](docs/docker-development.md)
 - [Local development](docs/local-development.md)
@@ -39,7 +39,3 @@ The application currently offers the following CLI commands:
 | `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer                        | [link](docs/cli/doctrine-result-cache-warmer-command.md) | 
 | `roster:assignments:bulk-cancel`      | Assignment bulk cancellation                        | [link](docs/cli/assignment-bulk-cancellation-command.md) |
 | `roster:assignments:bulk-create`      | Assignment bulk creation                            | [link](docs/cli/assignment-bulk-creation-command.md)     |
-
-## Production environment
-
-For detailed application setup tests for production environment, please refer to the [DevOps documentation](docs/devops-documentation.md).
