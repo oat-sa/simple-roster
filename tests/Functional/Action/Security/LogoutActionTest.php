@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Security;
 
@@ -51,18 +51,18 @@ class LogoutActionTest extends WebTestCase
     public function testItLogsOutProperlyTheUser(): void
     {
         $userRepository = self::$container->get(UserRepository::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
         $session = $this->kernelBrowser->getContainer()->get('session');
 
-        $this->assertNotEmpty($session->all());
+        self::assertNotEmpty($session->all());
 
         $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEmpty($session->all());
+        self::assertEmpty($session->all());
     }
 }

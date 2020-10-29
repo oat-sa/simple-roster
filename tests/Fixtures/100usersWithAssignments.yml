@@ -10,7 +10,7 @@ App\Entity\LineItem:
         infrastructure: '@infrastructure'
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug'
+        slug: 'lineItemSlug1'
         startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1

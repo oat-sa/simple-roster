@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Bulk;
 
@@ -47,7 +47,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . $_ENV['APP_API_KEY']]);
+        $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . 'testApiKey']);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -66,10 +66,16 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             '{}'
         );
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals('API key authentication failure.', $decodedResponse['error']['message']);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
     public function testItThrowsBadRequestHttpExceptionIfRequestBodyIsInvalid(): void
@@ -83,10 +89,16 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             'invalid body content'
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame(
             'Invalid JSON request body received. Error: Syntax error',
             $decodedResponse['error']['message']
         );
@@ -103,10 +115,19 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT))
         );
 
-        $this->assertEquals(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(
+            Response::HTTP_REQUEST_ENTITY_TOO_LARGE,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame(
             sprintf(
                 "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
                 BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
@@ -126,17 +147,23 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             $this->generateRequestPayload([])
         );
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals('Empty request body received.', $decodedResponse['error']['message']);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame('Empty request body received.', $decodedResponse['error']['message']);
     }
 
     public function testItDoesNotCreateNewAssignmentsWithInvalidUsersProvided(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -150,9 +177,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             ])
         );
 
-        $this->assertEquals(Response::HTTP_CREATED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_CREATED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => false,
@@ -162,10 +189,10 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
-        $this->assertCount(1, $this->getRepository(Assignment::class)->findAll());
+        self::assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
         $this->assertHasLogRecordWithMessage(
             "Bulk assignments create error: User with username = 'nonExistingUser1' cannot be found.",
@@ -179,7 +206,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();
 
         $this->kernelBrowser->request(
@@ -191,9 +218,9 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             $this->generateRequestPayload([$user->getUsername()])
         );
 
-        $this->assertEquals(Response::HTTP_CREATED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_CREATED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => true,
@@ -202,18 +229,18 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                     ],
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
-        $this->assertCount(2, $this->getRepository(Assignment::class)->findAll());
+        self::assertCount(2, $this->getRepository(Assignment::class)->findAll());
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $reloadedUser = $userRepository->getByUsernameWithAssignments('user1');
+        $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->assertEquals(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
-        $this->assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
-        $this->assertCount(1, $reloadedUser->getAvailableAssignments());
+        self::assertSame(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
+        self::assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
+        self::assertCount(1, $reloadedUser->getAvailableAssignments());
     }
 
     public function testItLogsSuccessfulBulkOperations(): void
@@ -222,7 +249,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -246,6 +273,6 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
             ];
         }
 
-        return (string)json_encode($payload);
+        return (string)json_encode($payload, JSON_THROW_ON_ERROR, 512);
     }
 }

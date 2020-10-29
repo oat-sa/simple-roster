@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Action\Bulk;
 
 use App\Bulk\Operation\BulkOperationCollection;
@@ -30,23 +30,23 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkCreateUsersAssignmentsAction
 {
     /** @var BulkCreateUsersAssignmentsService */
-    private $bulkCreateUsersAssignmentService;
+    private $bulkCreateAssignmentService;
 
     /** @var SerializerResponder */
     private $responder;
 
     public function __construct(
-        BulkCreateUsersAssignmentsService $bulkCreateUsersAssignmentService,
+        BulkCreateUsersAssignmentsService $bulkCreateAssignmentService,
         SerializerResponder $responder
     ) {
-        $this->bulkCreateUsersAssignmentService = $bulkCreateUsersAssignmentService;
+        $this->bulkCreateAssignmentService = $bulkCreateAssignmentService;
         $this->responder = $responder;
     }
 
     public function __invoke(BulkOperationCollection $operationCollection): Response
     {
         return $this->responder->createJsonResponse(
-            $this->bulkCreateUsersAssignmentService->process($operationCollection),
+            $this->bulkCreateAssignmentService->process($operationCollection),
             Response::HTTP_CREATED
         );
     }

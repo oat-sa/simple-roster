@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Integration\Security\Provider;
 
@@ -95,13 +95,13 @@ class UserProviderTest extends KernelTestCase
         $toRefreshUser = (new User())->setUsername('invalid');
         $refreshedUser = $this->subject->refreshUser($toRefreshUser);
 
-        $this->assertSame($toRefreshUser, $refreshedUser);
+        self::assertSame($toRefreshUser, $refreshedUser);
     }
 
     public function testItSupportsUserClassImplementations(): void
     {
-        $this->assertTrue($this->subject->supportsClass(User::class));
-        $this->assertFalse($this->subject->supportsClass('invalid'));
+        self::assertTrue($this->subject->supportsClass(User::class));
+        self::assertFalse($this->subject->supportsClass('invalid'));
     }
 
     private function createNonSupportedUserInterfaceImplementation(): UserInterface
@@ -140,7 +140,7 @@ class UserProviderTest extends KernelTestCase
     private function prepareRequestStackMock(int $expectedCalls, string $expectedRoute): void
     {
         $this->requestStack
-            ->expects($this->exactly($expectedCalls))
+            ->expects(self::exactly($expectedCalls))
             ->method('getCurrentRequest')
             ->willReturn(new Request([], [], ['_route' => $expectedRoute]));
     }

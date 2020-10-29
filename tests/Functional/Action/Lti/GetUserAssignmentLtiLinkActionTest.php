@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Action\Lti;
 
@@ -64,37 +64,43 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns405IfHttpMethodIsNotAllowed(): void
     {
         $this->kernelBrowser->request('POST', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
     }
 
     public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
         $this->getEntityManager()->flush();
@@ -103,10 +109,16 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame(
             "Assignment with id '1' does not have a suitable state.",
             $decodedResponse['error']['message']
         );
@@ -118,7 +130,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
         $this->getEntityManager()->flush();
@@ -127,10 +139,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        self::assertSame(
             "Assignment id '1' not found for user 'user1'.",
             $decodedResponse['error']['message']
         );
@@ -144,38 +156,41 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('userWithAllAttemptsTaken');
+        $user = $userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
 
         $this->logInAs($user, $this->kernelBrowser);
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
 
-        $this->assertEquals(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        self::assertSame(
             "Assignment with id '2' has reached the maximum attempts.",
             $decodedResponse['error']['message']
         );
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUsernameLoadBalancerStrategy(): void
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
@@ -184,7 +199,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'W2kb9O2WIIagLkcg4KWO9T0qZK4=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
-                    'oauth_timestamp' => (int)Carbon::getTestNow()->getTimestamp(),
+                    'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
@@ -199,33 +214,35 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
-        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
-        $this->assertEquals(2, $assignment->getAttemptsCount());
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(2, $assignment->getAttemptsCount());
     }
 
-    public function testItReturnsLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY']
-            = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
@@ -234,7 +251,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'Horn2o6nNJA72epnAcnOYT31bH4=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
-                    'oauth_timestamp' => (int)Carbon::getTestNow()->getTimestamp(),
+                    'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
@@ -249,15 +266,18 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
-        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
-        $this->assertEquals(2, $assignment->getAttemptsCount());
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(2, $assignment->getAttemptsCount());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
         $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
@@ -265,14 +285,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
-
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME;
+        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -281,9 +300,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = $initialLoadBalancerStatus;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
@@ -292,7 +311,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'gpqZmB5b/491hgU5HuXRTQDXiWQ=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
-                    'oauth_timestamp' => (int)Carbon::getTestNow()->getTimestamp(),
+                    'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
                     'lti_version' => LtiRequest::LTI_VERSION,
@@ -307,13 +326,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'it-IT',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
-        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
-        $this->assertEquals(2, $assignment->getAttemptsCount());
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(2, $assignment->getAttemptsCount());
     }
 
     public function testItDoesNotUpdateStateAndAttemptsCountIfStateIsStarted(): void
@@ -327,18 +346,18 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
-        $this->assertEquals(Assignment::STATE_STARTED, $assignment->getState());
-        $this->assertEquals(1, $assignment->getAttemptsCount());
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(1, $assignment->getAttemptsCount());
     }
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
@@ -347,7 +366,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
@@ -355,9 +374,14 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->logInAs($user, $this->kernelBrowser);
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
-        $ltiRequestInResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $ltiRequestInResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
-        $this->assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+        self::assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
         $this->assertHasRecordThatPasses(
             static function (array $record) use ($assignment, $ltiRequestInResponse) {
                 /** @var LtiRequest $ltiRequest */

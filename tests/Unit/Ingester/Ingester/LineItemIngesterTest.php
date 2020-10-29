@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\LineItemIngester;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class LineItemIngesterTest extends TestCase
@@ -32,6 +32,6 @@ class LineItemIngesterTest extends TestCase
     {
         $subject = new LineItemIngester($this->createMock(ManagerRegistry::class));
 
-        $this->assertEquals('line-item', $subject->getRegistryItemName());
+        self::assertSame('line-item', $subject->getRegistryItemName());
     }
 }

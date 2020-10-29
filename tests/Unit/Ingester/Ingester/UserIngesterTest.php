@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,18 +18,24 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Ingester\Ingester;
 
 use App\Ingester\Ingester\UserIngester;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use App\Repository\LineItemRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class UserIngesterTest extends TestCase
 {
     public function testRegistryItemName(): void
     {
-        $subject = new UserIngester($this->createMock(ManagerRegistry::class));
+        $subject = new UserIngester(
+            $this->createMock(LineItemRepository::class),
+            $this->createMock(ManagerRegistry::class)
+        );
 
-        $this->assertEquals('user', $subject->getRegistryItemName());
+        self::assertSame('user', $subject->getRegistryItemName());
     }
 }

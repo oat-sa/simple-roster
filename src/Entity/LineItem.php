@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -51,7 +51,7 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var int */
     private $maxAttempts = 0;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

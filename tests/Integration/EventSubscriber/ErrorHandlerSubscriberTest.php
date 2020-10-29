@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,36 +18,40 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\EventSubscriber;
+declare(strict_types=1);
+
+namespace App\Tests\Integration\EventSubscriber;
 
 use App\EventSubscriber\ErrorHandlerSubscriber;
 use App\Responder\SerializerResponder;
-use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ErrorHandlerSubscriberTest extends TestCase
+class ErrorHandlerSubscriberTest extends KernelTestCase
 {
     /** @var ErrorHandlerSubscriber */
     private $subject;
 
-    /** @var SerializerResponder|MockObject */
+    /** @var SerializerResponder */
     private $responder;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->responder = $this->createMock(SerializerResponder::class);
+        self::bootKernel();
+        $this->responder = self::$container->get(SerializerResponder::class);
         $this->subject = new ErrorHandlerSubscriber($this->responder);
     }
 
     public function testSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertSame(
             [KernelEvents::EXCEPTION => 'onKernelException'],
             ErrorHandlerSubscriber::getSubscribedEvents()
         );
@@ -57,42 +59,41 @@ class ErrorHandlerSubscriberTest extends TestCase
 
     public function testItDoesNotSetResponseOnSubRequests(): void
     {
-        $event = $this->createMock(ExceptionEvent::class);
-        $event
-            ->method('isMasterRequest')
-            ->willReturn(false);
+        /** @var Request|MockObject $requestMock */
+        $requestMock = $this->createMock(Request::class);
 
-        $event
-            ->expects($this->never())
-            ->method('setResponse');
+        $throwable = new ServiceUnavailableHttpException();
 
-        $this->subject->onKernelException($event);
+        $exceptionEvent = new ExceptionEvent(
+            static::$kernel,
+            $requestMock,
+            HttpKernelInterface::SUB_REQUEST,
+            $throwable
+        );
+
+        $this->subject->onKernelException($exceptionEvent);
+
+        self::assertNull($exceptionEvent->getResponse());
     }
 
     public function testItSetsProperResponseFromResponderOnMasterRequest(): void
     {
-        $expectedException = new Exception();
-        $expectedResponse = new JsonResponse();
+        /** @var Request|MockObject $requestMock */
+        $requestMock = $this->createMock(Request::class);
 
-        $this->responder
-            ->method('createErrorJsonResponse')
-            ->with($expectedException)
-            ->willReturn($expectedResponse);
+        $throwable = new ServiceUnavailableHttpException();
 
-        $event = $this->createMock(ExceptionEvent::class);
+        $exceptionEvent = new ExceptionEvent(
+            static::$kernel,
+            $requestMock,
+            HttpKernelInterface::MASTER_REQUEST,
+            $throwable
+        );
 
-        $event
-            ->method('isMasterRequest')
-            ->willReturn(true);
+        $this->subject->onKernelException($exceptionEvent);
 
-        $event
-            ->method('getThrowable')
-            ->willReturn($expectedException);
+        $expectedJsonResponse = $this->responder->createErrorJsonResponse($throwable);
 
-        $event->expects($this->once())
-            ->method('setResponse')
-            ->with($expectedResponse);
-
-        $this->subject->onKernelException($event);
+        self::assertEquals($expectedJsonResponse, $exceptionEvent->getResponse());
     }
 }

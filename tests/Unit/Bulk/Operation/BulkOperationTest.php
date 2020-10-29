@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Bulk\Operation;
 
 use App\Bulk\Operation\BulkOperation;
@@ -31,9 +31,9 @@ class BulkOperationTest extends TestCase
     {
         $subject = new BulkOperation('identifier', BulkOperation::TYPE_UPDATE, ['key' => 'value']);
 
-        $this->assertEquals('identifier', $subject->getIdentifier());
-        $this->assertEquals(BulkOperation::TYPE_UPDATE, $subject->getType());
-        $this->assertEquals(['key' => 'value'], $subject->getAttributes());
-        $this->assertEquals('value', $subject->getAttribute('key'));
+        self::assertSame('identifier', $subject->getIdentifier());
+        self::assertSame(BulkOperation::TYPE_UPDATE, $subject->getType());
+        self::assertSame(['key' => 'value'], $subject->getAttributes());
+        self::assertSame('value', $subject->getAttribute('key'));
     }
 }

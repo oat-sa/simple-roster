@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Command\Bulk;
 
@@ -66,14 +66,14 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
         $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(100, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
+        self::assertCount(100, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
     }
 
     public function testItLogsSuccessfulAssignmentCancellations(): void
@@ -90,7 +90,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        self::assertSame(0, $output);
 
         for ($i = 1; $i <= 100; $i++) {
             $username = sprintf('user_%s', $i);
@@ -114,14 +114,14 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '100' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );
 
         $assignmentRepository = $this->getRepository(Assignment::class);
-        $this->assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
+        self::assertCount(0, $assignmentRepository->findBy(['state' => Assignment::STATE_CANCELLED]));
     }
 
     public function testItThrowsRuntimeExceptionIfUsernameColumnCannotBeFoundInSourceCsvFile(): void
@@ -136,8 +136,8 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(1, $output);
-        $this->assertStringContainsString(
+        self::assertSame(1, $output);
+        self::assertStringContainsString(
             "[ERROR] Column 'username' cannot be found in source CSV file.",
             $this->commandTester->getDisplay()
         );
@@ -157,8 +157,8 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertStringContainsString(
+        self::assertSame(0, $output);
+        self::assertStringContainsString(
             "[OK] Successfully processed '85' assignments out of '100'.",
             $this->commandTester->getDisplay()
         );

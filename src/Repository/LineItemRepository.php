@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,15 +18,17 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\LineItem;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use App\Model\LineItemCollection;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)
  * @method LineItem|null findOneBy(array $criteria, array $orderBy = null)
- * @method LineItem[]    findAll()
  * @method LineItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class LineItemRepository extends AbstractRepository
@@ -36,5 +36,16 @@ class LineItemRepository extends AbstractRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LineItem::class);
+    }
+
+    public function findAllAsCollection(): LineItemCollection
+    {
+        $collection = new LineItemCollection();
+        /** @var LineItem $lineItem */
+        foreach ($this->findAll() as $lineItem) {
+            $collection->add($lineItem);
+        }
+
+        return $collection;
     }
 }

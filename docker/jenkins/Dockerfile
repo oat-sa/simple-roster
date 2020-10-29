@@ -1,16 +1,17 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 ENV APP_ENV=test
 ENV APP_DEBUG=true
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 
 RUN apt-get update && \
-    apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev zlib1g-dev libicu-dev g++ && \
+    apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev zlib1g-dev libicu-dev g++ libzip-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
 
 RUN yes | pecl install igbinary apcu xdebug
+RUN pecl install redis
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install intl && \
@@ -25,6 +26,7 @@ RUN docker-php-ext-install pdo && \
     docker-php-ext-install sodium && \
     docker-php-ext-enable apcu && \
     docker-php-ext-enable igbinary && \
+    docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug
 
 RUN { \

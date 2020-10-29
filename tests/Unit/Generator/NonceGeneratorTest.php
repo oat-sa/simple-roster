@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Generator;
 
@@ -38,6 +38,6 @@ class NonceGeneratorTest extends TestCase
         Carbon::setTestNow(Carbon::create(2019, 1, 2));
         $nonce2 = $subject->generate();
 
-        $this->assertNotEquals($nonce1, $nonce2);
+        self::assertNotEquals($nonce1, $nonce2);
     }
 }

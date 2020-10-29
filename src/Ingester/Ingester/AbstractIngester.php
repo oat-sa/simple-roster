@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,13 +18,15 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Ingester\Ingester;
 
 use App\Entity\EntityInterface;
 use App\Ingester\Result\IngesterResult;
 use App\Ingester\Result\IngesterResultFailure;
 use App\Ingester\Source\IngesterSourceInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface

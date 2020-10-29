@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Lti\Request;
 
 use App\Lti\Request\LtiRequest;
@@ -31,15 +31,15 @@ class LtiRequestTest extends TestCase
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 
-        $this->assertEquals('link', $subject->getLink());
-        $this->assertEquals(['param1', 'param2'], $subject->getParameters());
+        self::assertSame('link', $subject->getLink());
+        self::assertSame(['param1', 'param2'], $subject->getParameters());
     }
 
     public function testJsonSerialization(): void
     {
         $subject = new LtiRequest('link', ['param1', 'param2']);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'ltiLink' => 'link',
                 'ltiParams' => ['param1', 'param2']

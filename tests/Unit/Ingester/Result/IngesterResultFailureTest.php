@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Ingester\Result;
 
 use App\Ingester\Result\IngesterResultFailure;
@@ -31,8 +31,8 @@ class IngesterResultFailureTest extends TestCase
     {
         $subject = new IngesterResultFailure(10, ['data'], 'reason');
 
-        $this->assertEquals(10, $subject->getLineNumber());
-        $this->assertEquals(['data'], $subject->getData());
-        $this->assertEquals('reason', $subject->getReason());
+        self::assertSame(10, $subject->getLineNumber());
+        self::assertSame(['data'], $subject->getData());
+        self::assertSame('reason', $subject->getReason());
     }
 }

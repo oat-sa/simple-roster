@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Ingester\Source;
 
 use App\Ingester\Source\LocalCsvIngesterSource;
@@ -29,6 +29,6 @@ class LocalCsvIngesterSourceTest extends TestCase
 {
     public function testRegistryItemName(): void
     {
-        $this->assertEquals('local', (new LocalCsvIngesterSource())->getRegistryItemName());
+        self::assertSame('local', (new LocalCsvIngesterSource())->getRegistryItemName());
     }
 }

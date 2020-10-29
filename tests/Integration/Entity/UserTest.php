@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Integration\Entity;
 
@@ -49,14 +49,14 @@ class UserTest extends KernelTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
-        $this->assertCount(1, $subject->getAssignments());
-        $this->assertCount(1, $subject->getAvailableAssignments());
+        self::assertCount(1, $subject->getAssignments());
+        self::assertCount(1, $subject->getAvailableAssignments());
 
-        $this->assertSame($assignment, current($subject->getAvailableAssignments()));
+        self::assertSame($assignment, current($subject->getAvailableAssignments()));
 
         $subject->removeAssignment($assignment);
 
-        $this->assertEmpty($subject->getAssignments());
-        $this->assertEmpty($subject->getAvailableAssignments());
+        self::assertEmpty($subject->getAssignments());
+        self::assertEmpty($subject->getAvailableAssignments());
     }
 }

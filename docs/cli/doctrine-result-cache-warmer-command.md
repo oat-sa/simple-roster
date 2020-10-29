@@ -2,7 +2,7 @@
 
 [DoctrineResultCacheWarmerCommand](../../src/Command/Cache/DoctrineResultCacheWarmerCommand.php) is responsible for refreshing the result cache of Doctrine.
 
-Currently we use result cache for `getByUsernameWithAssignments()` method in `UserRepository`.
+Currently we use result cache for `findByUsernameWithAssignments()` method in `UserRepository`.
 
 ## Basic usage
 ```bash
@@ -13,8 +13,8 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
 | Option | Description |
 | ------------- |:-------------|
 | -b, --batch-size | Number of cache entries to refresh per batch [default: `1000`] |
-| -u, --user-ids | List of comma separated user IDs to warm up. |
-| -l, --line-item-ids | List of comma separated Line item IDs to warm up. |
+| -u, --usernames | List of comma separated usernames to warm up. |
+| -l, --line-item-slugs | List of comma separated Line item slugs to warm up. |
 
 For the full list of options please refer to the helper option:
 ```bash
@@ -31,12 +31,12 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --batch-size=
 
 Warming up result cache entries for specific users:
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --user-ids=1,2,3,4
+$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --usernames=user1,user2,user3,user4
 ```
 
 Warming up result cache entries for specific line items:
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --line-item-ids=1,5,10
+$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --line-item-slugs=slug1,slug2,slug3
 ```
 
 ## Advanced usage

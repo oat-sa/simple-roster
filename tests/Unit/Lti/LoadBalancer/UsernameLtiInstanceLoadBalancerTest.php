@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Lti\LoadBalancer;
 
@@ -49,7 +49,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testIfItIsLtiInstanceLoadBalancer(): void
     {
-        $this->assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
+        self::assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -72,7 +72,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
             $actualLtiInstanceUrl = $this->subject->getLtiInstanceUrl($user);
 
-            $this->assertSame(
+            self::assertSame(
                 $expectedLtiInstanceUrl,
                 $actualLtiInstanceUrl,
                 sprintf(

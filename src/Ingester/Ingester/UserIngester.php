@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,18 +18,33 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Ingester\Ingester;
 
 use App\Entity\Assignment;
 use App\Entity\EntityInterface;
-use App\Entity\LineItem;
 use App\Entity\User;
+use App\Exception\LineItemNotFoundException;
+use App\Model\LineItemCollection;
+use App\Repository\LineItemRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 
 class UserIngester extends AbstractIngester
 {
-    /** @var LineItem[] */
+    /** @var LineItemCollection */
     private $lineItemCollection;
+
+    /** @var LineItemRepository */
+    private $lineItemRepository;
+
+    public function __construct(LineItemRepository $lineItemRepository, ManagerRegistry $managerRegistry)
+    {
+        $this->lineItemRepository = $lineItemRepository;
+
+        parent::__construct($managerRegistry);
+    }
 
     public function getRegistryItemName(): string
     {
@@ -43,25 +56,23 @@ class UserIngester extends AbstractIngester
      */
     protected function prepare(): void
     {
-        /** @var LineItem[] $lineItems */
-        $lineItems = $this->managerRegistry->getRepository(LineItem::class)->findAll();
+        $this->lineItemCollection = $this->lineItemRepository->findAllAsCollection();
 
-        if (empty($lineItems)) {
+        if ($this->lineItemCollection->isEmpty()) {
             throw new Exception(
                 sprintf("Cannot ingest '%s' since line-item table is empty.", $this->getRegistryItemName())
             );
         }
-
-        foreach ($lineItems as $lineItem) {
-            $this->lineItemCollection[$lineItem->getSlug()] = $lineItem;
-        }
     }
 
+    /**
+     * @throws LineItemNotFoundException
+     */
     protected function createEntity(array $data): EntityInterface
     {
         $assignment = new Assignment();
         $assignment
-            ->setLineItem($this->lineItemCollection[$data['slug']])
+            ->setLineItem($this->lineItemCollection->getBySlug($data['slug']))
             ->setState(Assignment::STATE_READY)
             ->setAttemptsCount(0);
 

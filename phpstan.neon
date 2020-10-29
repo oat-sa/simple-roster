@@ -1,12 +1,14 @@
 parameters:
-  autoload_files:
+  bootstrapFiles:
     - vendor/autoload.php
     - bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
   paths:
     - src
     - tests
   symfony:
-    container_xml_path: 'var/cache/test/srcApp_KernelTestDebugContainer.xml'
+    container_xml_path: 'var/cache/test/App_KernelTestDebugContainer.xml'
+  checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false
   doctrine:
     repositoryClass: App\Repository\AbstractRepository
   ignoreErrors:
@@ -16,21 +18,12 @@ parameters:
     # In tests we control the JSON content, it will be always a valid string
     - message: '#^(.+) of function json_decode expects string, string\|false given.$#'
       path: tests
-    # Kernel is always booted in a working functional/integration test
-    - message: '#^Cannot call method get() on Symfony\\Component\\DependencyInjection\\ContainerInterface|null.$#'
-      path: tests
-    # In functional tests we control the JSON content, it will be always a valid string
-    - message: '#^Parameter \#6 \$content of method Symfony\\Component\\BrowserKit\\Client::request\(\) expects string\|null, string\|false given.$#'
-      path: tests
-    # It is always a Carbon instance
-    - message: '#^Call to an undefined method Carbon\\Carbon\|Closure::getTimestamp\(\).$#'
-      path: tests
     # Doctrine docblock error, Doctrine\Common\Persistence\ManagerRegistry always returns an instance of EntityManagerInterface
     - message: '#^Method (.+)::getEntityManager\(\) should return Doctrine\\ORM\\EntityManagerInterface but returns Doctrine\\Persistence\\ObjectManager.$#'
       path: tests
     # There is always a request object
-    - message: '#^Cannot access property \$attributes on Symfony\\Component\\HttpFoundation\\Request|null.$#'
+    - message: '#^Cannot access property \$attributes on Symfony\\Component\\HttpFoundation\\Request\|null.$#'
       path: src/Security/Provider/UserProvider.php
-    # Symfony parameter handling
-    - message: '#^Cannot cast array<string>|bool|string|null to int.$#'
+    # Symfony CLI parameter handling
+    - message: '#^Cannot cast array<string>(\|bool)?\|string\|null to (int|string).$#'
       path: src/Command

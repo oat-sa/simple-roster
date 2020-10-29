@@ -226,6 +226,10 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         /** @var AssignmentRepository $repository */
         $repository = $this->getRepository(Assignment::class);
 
-        return $repository->find(1);
+        $assignment = $repository->find(1);
+
+        self::assertInstanceOf(Assignment::class, $assignment);
+
+        return $assignment;
     }
 }

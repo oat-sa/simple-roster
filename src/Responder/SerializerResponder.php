@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Responder;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,16 +34,19 @@ class SerializerResponder
 
     /** @var SerializerInterface */
     private $serializer;
-    
-    /** @var bool */
-    private $debug;
 
-    public function __construct(SerializerInterface $serializer, bool $debug = false)
+    /** @var bool */
+    private $kernelDebug;
+
+    public function __construct(SerializerInterface $serializer, bool $kernelDebug = false)
     {
         $this->serializer = $serializer;
-        $this->debug = $debug;
+        $this->kernelDebug = $kernelDebug;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function createJsonResponse($data, int $statusCode = Response::HTTP_OK, array $headers = []): JsonResponse
     {
         return JsonResponse::fromJsonString(
@@ -53,15 +56,18 @@ class SerializerResponder
         );
     }
 
-    public function createErrorJsonResponse(Throwable $exception, int $statusCode = 500, array $headers = []): JsonResponse
-    {
+    public function createErrorJsonResponse(
+        Throwable $exception,
+        int $statusCode = 500,
+        array $headers = []
+    ): JsonResponse {
         $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode;
 
         $content = [
-            'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE
+            'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE,
         ];
 
-        if ($this->debug) {
+        if ($this->kernelDebug) {
             $content['message'] = $exception->getMessage();
             $content['trace'] = $exception->getTraceAsString();
         }

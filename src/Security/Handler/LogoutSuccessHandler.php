@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Security\Handler;
 
 use App\Responder\SerializerResponder;
@@ -37,6 +37,9 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
         $this->serializerResponder = $serializerResponder;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onLogoutSuccess(Request $request)
     {
         return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);

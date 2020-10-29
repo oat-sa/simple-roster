@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Service\Bulk;
 
@@ -71,7 +71,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->setLineItem(new LineItem()));
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($user) {
                 return $user->setUsername($username);
             });
@@ -83,7 +83,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertEquals([
+        self::assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -97,7 +97,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) {
                 return (new User())
                     ->setUsername($username)
@@ -110,7 +110,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->process($bulkOperationCollection);

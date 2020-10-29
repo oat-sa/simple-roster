@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Bulk\Result;
 
@@ -39,7 +39,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationSuccess($operation2);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => true,
@@ -64,7 +64,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationFailure($operation2);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => false,

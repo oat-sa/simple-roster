@@ -1,16 +1,23 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
+    app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti.key: '%env(resolve:LTI_KEY)%'
     app.lti.secret: '%env(resolve:LTI_SECRET)%'
 
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
         bind:
-            $debug: '%env(resolve:APP_DEBUG)%'
+            $kernelDebug: '%kernel.debug%'
             $kernelEnvironment: '%kernel.environment%'
             $ltiInstances: '%ltiInstances%'
             $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
@@ -19,6 +26,7 @@ services:
             $appApiKey: '%env(resolve:APP_API_KEY)%'
             $ltiKey: '%app.lti.key%'
             $ltiSecret: '%app.lti.secret%'
+            $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
@@ -59,10 +67,6 @@ services:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    App\Repository\UserRepository:
-        arguments:
-            $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
-
     App\Ingester\Registry\IngesterRegistry:
         arguments: [!tagged 'app.ingester']
 
@@ -82,8 +86,6 @@ services:
             $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
 
     App\Command\Cache\DoctrineResultCacheWarmerCommand:
-        arguments:
-            $doctrineConfiguration: '@doctrine.orm.default_configuration'
         tags:
             - { name: monolog.logger, channel: cache_warmup }
 
@@ -100,7 +102,7 @@ services:
     App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
         factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
-            - '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+            - '%app.lti.load_balancing_strategy%'
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory

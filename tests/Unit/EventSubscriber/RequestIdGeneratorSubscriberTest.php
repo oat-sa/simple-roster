@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\EventSubscriber;
 
@@ -59,12 +59,12 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
     public function testItIsAnEventSubscriber(): void
     {
-        $this->assertInstanceOf(EventSubscriberInterface::class, $this->subject);
+        self::assertInstanceOf(EventSubscriberInterface::class, $this->subject);
     }
 
     public function testItSubscribesToKernelRequestEventWithHighestPriority(): void
     {
-        $this->assertEquals(
+        self::assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 255]],
             RequestIdGeneratorSubscriber::getSubscribedEvents()
         );
@@ -91,8 +91,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
+        self::assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        self::assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillGenerateNewRequestIdIfCloudfrontHeaderIsNotPresent(): void
@@ -100,7 +100,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
         $request = Request::create('/test');
 
         $this->uuidFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('uuid4')
             ->willReturn('expectedRequestId');
 
@@ -114,8 +114,8 @@ class RequestIdGeneratorSubscriberTest extends TestCase
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        $this->assertEquals('expectedRequestId', $request->attributes->get('requestId'));
-        $this->assertEquals('expectedRequestId', $this->requestIdStorage->getRequestId());
+        self::assertSame('expectedRequestId', $request->attributes->get('requestId'));
+        self::assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillNotSetRequestIdOnSubRequests(): void
@@ -125,7 +125,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->willReturn(false);
 
         $this->uuidFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('uuid4');
 
         $this->subject->onKernelRequest($this->requestEvent);

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Service\Bulk;
 
@@ -84,14 +84,14 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->addAssignment($expectedAssignment);
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn($expectedUser);
 
         $bulkOperationCollection = (new BulkOperationCollection())
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertEquals([
+        self::assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -105,7 +105,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn(new User());
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -114,7 +114,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->process($bulkOperationCollection);
@@ -135,7 +135,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         );
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn(new User());
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -156,14 +156,14 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->addAssignment($completedAssignment);
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturn($user);
 
         $bulkOperationCollection = (new BulkOperationCollection())->add($operation);
 
         $this->subject->process($bulkOperationCollection)->jsonSerialize();
 
-        $this->assertEquals(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+        self::assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
     }
 
     public function provideUnsupportedAssignmentState(): array

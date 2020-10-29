@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Integration\Repository;
 
@@ -51,18 +51,18 @@ class AssignmentRepositoryTest extends KernelTestCase
     public function testItCanReturnAssignmentsByStateAndUpdatedAt(): void
     {
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findAllByStateAndUpdatedAtPaginated(Assignment::STATE_STARTED, $dateTime);
+        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime);
 
-        $this->assertCount(10, $assignments->getIterator());
-        $this->assertCount(10, $assignments);
+        self::assertCount(10, $assignments->getIterator());
+        self::assertCount(10, $assignments);
     }
 
     public function testItCanReturnAssignmentsByStateAndUpdatedAtPaginated(): void
     {
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findAllByStateAndUpdatedAtPaginated(Assignment::STATE_STARTED, $dateTime, 2, 3);
+        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime, 2, 3);
 
-        $this->assertCount(3, $assignments->getIterator());
-        $this->assertCount(10, $assignments);
+        self::assertCount(3, $assignments->getIterator());
+        self::assertCount(10, $assignments);
     }
 }

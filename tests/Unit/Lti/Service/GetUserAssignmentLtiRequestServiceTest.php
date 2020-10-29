@@ -156,12 +156,12 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $expectedLtiContextId = 'expectedLtiContextId';
 
         $this->loadBalancer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getLtiRequestContextId')
             ->with($assignment)
             ->willReturn($expectedLtiContextId);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'ltiLink' => '/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
                 'ltiParams' => [

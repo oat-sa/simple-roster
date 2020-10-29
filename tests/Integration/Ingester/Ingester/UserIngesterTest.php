@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\User;
@@ -28,6 +28,7 @@ use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
+use App\Repository\LineItemRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -47,7 +48,10 @@ class UserIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new UserIngester($this->getManagerRegistry());
+        $this->subject = new UserIngester(
+            self::$container->get(LineItemRepository::class),
+            $this->getManagerRegistry()
+        );
     }
 
     public function testDryRunIngest(): void
@@ -58,12 +62,12 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source);
 
-        $this->assertEquals('user', $output->getIngesterType());
-        $this->assertTrue($output->isDryRun());
-        $this->assertEquals(12, $output->getSuccessCount());
-        $this->assertFalse($output->hasFailures());
+        self::assertSame('user', $output->getIngesterType());
+        self::assertTrue($output->isDryRun());
+        self::assertSame(12, $output->getSuccessCount());
+        self::assertFalse($output->hasFailures());
 
-        $this->assertEmpty($this->getRepository(User::class)->findAll());
+        self::assertEmpty($this->getRepository(User::class)->findAll());
     }
 
     public function testIngestWithEmptyLineItems(): void
@@ -84,7 +88,7 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertSame('user', $output->getIngesterType());
+        self::assertSame('user', $output->getIngesterType());
     }
 
     public function testIngestWithInvalidSource(): void
@@ -95,18 +99,18 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(1, $output->getSuccessCount());
-        $this->assertTrue($output->hasFailures());
-        $this->assertCount(1, $output->getFailures());
+        self::assertSame(1, $output->getSuccessCount());
+        self::assertTrue($output->hasFailures());
+        self::assertCount(1, $output->getFailures());
 
-        $this->assertCount(1, $this->getRepository(User::class)->findAll());
+        self::assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $failure = current($output->getFailures());
-        $this->assertEquals(2, $failure->getLineNumber());
-        $this->assertEquals(
+        self::assertSame(2, $failure->getLineNumber());
+        self::assertSame(
             [
                 'username' => 'user_1',
                 'password' => 'password1',
@@ -114,7 +118,7 @@ class UserIngesterTest extends KernelTestCase
             ],
             $failure->getData()
         );
-        $this->assertStringContainsString('UNIQUE constraint failed: users.username', $failure->getReason());
+        self::assertStringContainsString('UNIQUE constraint failed: users.username', $failure->getReason());
     }
 
     public function testIngestWithValidSource(): void
@@ -125,16 +129,16 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(12, $output->getSuccessCount());
-        $this->assertFalse($output->hasFailures());
+        self::assertSame(12, $output->getSuccessCount());
+        self::assertFalse($output->hasFailures());
 
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        self::assertSame('user_12', $user12->getUsername());
     }
 
     public function testItCanIngestUsersWithGroupId(): void
@@ -145,19 +149,19 @@ class UserIngesterTest extends KernelTestCase
 
         $output = $this->subject->ingest($source, false);
 
-        $this->assertEquals(12, $output->getSuccessCount());
-        $this->assertFalse($output->hasFailures());
+        self::assertSame(12, $output->getSuccessCount());
+        self::assertFalse($output->hasFailures());
 
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $usersInGroup1 = $this->getRepository(User::class)->findBy(['groupId' => 'group_1']);
-        $this->assertCount(3, $usersInGroup1);
+        self::assertCount(3, $usersInGroup1);
 
         $usersInGroup2 = $this->getRepository(User::class)->findBy(['groupId' => 'group_2']);
-        $this->assertCount(4, $usersInGroup2);
+        self::assertCount(4, $usersInGroup2);
 
         $usersInGroup3 = $this->getRepository(User::class)->findBy(['groupId' => 'group_3']);
-        $this->assertCount(5, $usersInGroup3);
+        self::assertCount(5, $usersInGroup3);
     }
 
     private function createIngesterSource(string $path): IngesterSourceInterface

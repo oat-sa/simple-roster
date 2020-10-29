@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Action\Assignment;
 
 use App\Entity\Assignment;
@@ -28,6 +28,7 @@ use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,10 +56,16 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        $this->assertEquals(
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame(
             'Full authentication is required to access this resource.',
             $decodedResponse['error']['message']
         );
@@ -70,7 +77,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -78,25 +85,28 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals([
+        $startDate = $lineItem->getStartAt();
+        $endDate = $lineItem->getEndAt();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame([
             'assignments' => [
                 [
                     'id' => $user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
                     'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
-                        'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
-                        'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                         'infrastructure' => $lineItem->getInfrastructure()->getId(),
                         'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
-                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                 ],
             ],
-        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 
     public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
@@ -105,7 +115,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments('user1');
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -113,27 +123,27 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
-        $this->assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertEquals(
-            [
-                'assignments' => [
-                    [
-                        'id' => $user->getLastAssignment()->getId(),
-                        'username' => $user->getUsername(),
-                        'state' => Assignment::STATE_READY,
-                        'lineItem' => [
-                            'uri' => $lineItem->getUri(),
-                            'label' => $lineItem->getLabel(),
-                            'startDateTime' => $lineItem->getStartAt()->getTimestamp(),
-                            'endDateTime' => $lineItem->getEndAt()->getTimestamp(),
-                            'infrastructure' => $lineItem->getInfrastructure()->getId(),
-                            'maxAttempts' => $lineItem->getMaxAttempts(),
-                        ],
-                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+        $startDate = $lineItem->getStartAt();
+        $endDate = $lineItem->getEndAt();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame([
+            'assignments' => [
+                [
+                    'id' => $user->getLastAssignment()->getId(),
+                    'username' => $user->getUsername(),
+                    'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    'lineItem' => [
+                        'uri' => $lineItem->getUri(),
+                        'label' => $lineItem->getLabel(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                        'infrastructure' => $lineItem->getInfrastructure()->getId(),
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
-                ]
+                ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
-        );
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Ingester\Registry;
 
@@ -41,7 +41,7 @@ class IngesterRegistryTest extends TestCase
 
     public function testItIsConstructedEmpty(): void
     {
-        $this->assertEmpty($this->subject->all());
+        self::assertEmpty($this->subject->all());
     }
 
     public function testItThrowsAnErrorWhenRetrievingAnInvalidIngesterName(): void
@@ -57,15 +57,15 @@ class IngesterRegistryTest extends TestCase
         $ingester1 = $this->createMock(IngesterInterface::class);
         $ingester2 = $this->createMock(IngesterInterface::class);
 
-        $ingester1->expects($this->once())->method('getRegistryItemName')->willReturn('ingesterName1');
-        $ingester2->expects($this->once())->method('getRegistryItemName')->willReturn('ingesterName2');
+        $ingester1->expects(self::once())->method('getRegistryItemName')->willReturn('ingesterName1');
+        $ingester2->expects(self::once())->method('getRegistryItemName')->willReturn('ingesterName2');
 
         $this->subject
             ->add($ingester1)
             ->add($ingester2);
 
-        $this->assertCount(2, $this->subject->all());
-        $this->assertSame($ingester1, $this->subject->get('ingesterName1'));
-        $this->assertSame($ingester2, $this->subject->get('ingesterName2'));
+        self::assertCount(2, $this->subject->all());
+        self::assertSame($ingester1, $this->subject->get('ingesterName1'));
+        self::assertSame($ingester2, $this->subject->get('ingesterName2'));
     }
 }

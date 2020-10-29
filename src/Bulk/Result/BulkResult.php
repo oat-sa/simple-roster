@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Bulk\Result;
 
@@ -50,7 +50,7 @@ class BulkResult implements JsonSerializable
         return $this->failuresCount > 0;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'data' => [

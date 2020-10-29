@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Service\Bulk;
 
@@ -84,18 +84,20 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
     private function processResult(BulkResult $result): BulkResult
     {
-        if (!$result->hasFailures()) {
-            $this->entityManager->flush();
-            $this->entityManager->commit();
-
-            foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info(
-                    $logRecord['message'],
-                    ['lineItem' => $logRecord['lineItem']]
-                );
-            }
-        } else {
+        if ($result->hasFailures()) {
             $this->entityManager->rollback();
+
+            return $result;
+        }
+
+        $this->entityManager->flush();
+        $this->entityManager->commit();
+
+        foreach ($this->logBuffer as $logRecord) {
+            $this->logger->info(
+                $logRecord['message'],
+                ['lineItem' => $logRecord['lineItem']]
+            );
         }
 
         return $result;
@@ -109,7 +111,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+        $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         foreach ($user->getAssignments() as $assignment) {
             if (!$assignment->isCancellable()) {

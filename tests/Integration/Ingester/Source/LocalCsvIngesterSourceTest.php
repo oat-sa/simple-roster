@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration\Ingester\Source;
 
 use App\Ingester\Source\LocalCsvIngesterSource;
@@ -35,11 +35,11 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertStringContainsString('infra', $row['label']);
-            $this->assertStringContainsString('http://infra', $row['ltiDirectorLink']);
-            $this->assertStringContainsString('key', $row['ltiKey']);
-            $this->assertStringContainsString('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertStringContainsString('infra', $row['label']);
+            self::assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            self::assertStringContainsString('key', $row['ltiKey']);
+            self::assertStringContainsString('secret', $row['ltiSecret']);
         }
     }
 
@@ -53,7 +53,7 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(1, $row);
+            self::assertCount(1, $row);
         }
     }
 
@@ -67,11 +67,11 @@ class LocalCsvIngesterSourceTest extends TestCase
         $output = $subject->getContent();
 
         foreach ($output as $row) {
-            $this->assertCount(4, $row);
-            $this->assertEquals('ms', $row['label']);
-            $this->assertEquals('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
-            $this->assertEquals('key', $row['ltiKey']);
-            $this->assertEquals('secret', $row['ltiSecret']);
+            self::assertCount(4, $row);
+            self::assertSame('ms', $row['label']);
+            self::assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            self::assertSame('key', $row['ltiKey']);
+            self::assertSame('secret', $row['ltiSecret']);
         }
     }
 
@@ -80,6 +80,6 @@ class LocalCsvIngesterSourceTest extends TestCase
         $subject = new LocalCsvIngesterSource();
         $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
 
-        $this->assertSame(3, $subject->count());
+        self::assertCount(3, $subject);
     }
 }

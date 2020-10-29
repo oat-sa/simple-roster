@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Command\Cache;
 
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Exception\DoctrineResultCacheImplementationNotFoundException;
 use App\Generator\UserCacheIdGenerator;
+use App\Repository\UserRepository;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -36,10 +37,17 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
     {
         $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
 
+        $doctrineConfiguration = $this->createMock(Configuration::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $entityManager
+            ->method('getConfiguration')
+            ->willReturn($doctrineConfiguration);
+
         new DoctrineResultCacheWarmerCommand(
+            $this->createMock(UserRepository::class),
             $this->createMock(UserCacheIdGenerator::class),
-            $this->createMock(Configuration::class),
-            $this->createMock(EntityManagerInterface::class),
+            $entityManager,
             $this->createMock(LoggerInterface::class)
         );
     }

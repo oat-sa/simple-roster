@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,8 +18,11 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Traits;
 
+use LogicException;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -49,6 +50,10 @@ trait LoggerTestingTrait
         foreach ($channels as $channel) {
             $logger = static::$container->get(sprintf('monolog.logger.%s', $channel));
 
+            if (!$logger instanceof Logger) {
+                throw new LogicException(sprintf("Logger 'monolog.logger.%s' is not defined.", $channel));
+            }
+
             $logger->pushHandler($this->handler);
         }
     }
@@ -60,19 +65,19 @@ trait LoggerTestingTrait
 
     public function assertHasLogRecord(array $record, int $level): void
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->handler->hasRecord($record, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
                 Logger::getLevelName($level),
-                json_encode($record)
+                json_encode($record, JSON_THROW_ON_ERROR, 512)
             )
         );
     }
 
     public function assertHasLogRecordWithMessage(string $message, int $level): void
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->handler->hasRecordThatContains($message, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
@@ -84,6 +89,6 @@ trait LoggerTestingTrait
 
     public function assertHasRecordThatPasses(callable $callable, int $level): void
     {
-        $this->assertTrue($this->handler->hasRecordThatPasses($callable, $level));
+        self::assertTrue($this->handler->hasRecordThatPasses($callable, $level));
     }
 }

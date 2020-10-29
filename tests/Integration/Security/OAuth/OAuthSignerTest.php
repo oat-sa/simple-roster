@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration\Security\OAuth;
 
 use App\Security\OAuth\OAuthContext;
@@ -37,7 +37,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        self::assertSame(
             'VoEu7pwaoCuBG5+59qp1WcHhq/o=',
             $subject->sign($context, 'url', 'method', 'secret')
         );
@@ -49,7 +49,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        self::assertSame(
             'Apr1WITmq9IoQ3lKJeCfFuNlA6M=',
             $subject->sign($context, 'some url', 'method', 'secret')
         );
@@ -61,7 +61,7 @@ class OAuthSignerTest extends TestCase
 
         $context = $this->generateOAuthContext(OAuthContext::METHOD_MAC_SHA1);
 
-        $this->assertEquals(
+        self::assertSame(
             'Mtx4QCOoeGw3rgUXfn9bWxl8Rhw=',
             $subject->sign($context, 'url', 'method', 'secret', ['param1', 'param2'])
         );

@@ -1,8 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,18 +18,20 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Lti\LoadBalancer;
 
 use LogicException;
 
 class LtiInstanceLoadBalancerFactory
 {
-    public const LOAD_BALANCING_STRATEGY_USERNAME = 'username';
-    public const LOAD_BALANCING_STRATEGY_USER_GROUP_ID = 'userGroupId';
+    public const STRATEGY_USERNAME = 'username';
+    public const STRATEGY_USER_GROUP_ID = 'userGroupId';
 
     private const VALID_LOAD_BALANCING_STRATEGIES = [
-        self::LOAD_BALANCING_STRATEGY_USERNAME,
-        self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID,
+        self::STRATEGY_USERNAME,
+        self::STRATEGY_USER_GROUP_ID,
     ];
 
     /** @var string[] */
@@ -46,15 +45,13 @@ class LtiInstanceLoadBalancerFactory
     /**
      * @throws LogicException
      */
-    public function __invoke(string $loadBalancingStrategy): LtiInstanceLoadBalancerInterface
+    public function __invoke(string $ltiLoadBalancingStrategy): LtiInstanceLoadBalancerInterface
     {
-        switch ($loadBalancingStrategy) {
-            case self::LOAD_BALANCING_STRATEGY_USERNAME:
+        switch ($ltiLoadBalancingStrategy) {
+            case self::STRATEGY_USERNAME:
                 return new UsernameLtiInstanceLoadBalancer($this->ltiInstances);
-
-            case self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID:
+            case self::STRATEGY_USER_GROUP_ID:
                 return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstances);
-
             default:
                 throw new LogicException(
                     sprintf(

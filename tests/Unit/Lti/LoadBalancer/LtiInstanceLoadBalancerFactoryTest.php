@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Lti\LoadBalancer;
 
@@ -42,17 +42,17 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
 
     public function testItCanResolveUsernameLtiInstanceLoadBalancerStrategy(): void
     {
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             UsernameLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME)
         );
     }
 
     public function testItCanResolveUserGroupIdLtiInstanceLoadBalancerStrategy(): void
     {
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             UserGroupIdLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID)
         );
     }
 

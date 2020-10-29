@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Functional\Command\Ingester\Native;
 
@@ -67,8 +67,69 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertCount(0, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(0, $this->getRepository(User::class)->findAll());
+    }
+
+    public function testItThrowsExceptionIfNoLineItemsAreIngested(): void
+    {
+        self::assertSame(1, $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            '[ERROR] No line items were found in database.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidUserFiles
+     */
+    public function testItThrowsExceptionIfSourceFileStructureIsNotValid(
+        string $filePath,
+        string $expectedExceptionMessage
+    ): void {
+        $this->prepareIngestionContext();
+
+        self::assertSame(1, $this->commandTester->execute(
+            [
+                'source' => 'local',
+                'path' => $filePath,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            $expectedExceptionMessage,
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function provideInvalidUserFiles(): array
+    {
+        return [
+            'withoutUsernameColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-username-column.csv',
+                'expectedExceptionMessage' => "Column 'username' is not set in source file.",
+            ],
+            'withoutPasswordColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-password-column.csv',
+                'expectedExceptionMessage' => "Column 'password' is not set in source file.",
+            ],
+            'withoutSlugColumn' => [
+                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-slug-column.csv',
+                'expectedExceptionMessage' => "Column 'slug' is not set in source file.",
+            ],
+        ];
     }
 
     public function testNonBatchedLocalIngestionSuccess(): void
@@ -86,14 +147,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        self::assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionSuccess(): void
@@ -112,14 +173,14 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertCount(12, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(12, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        self::assertSame('user_1', $user1->getUsername());
 
         $user12 = $this->getRepository(User::class)->find(12);
-        $this->assertEquals('user_12', $user12->getUsername());
+        self::assertSame('user_12', $user12->getUsername());
     }
 
     public function testBatchedLocalIngestionWithGroupId(): void
@@ -138,43 +199,26 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
+        self::assertSame(0, $output);
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $this->assertCount(12, $userRepository->findAll());
+        self::assertCount(12, $userRepository->findAll());
 
         $user1 = $userRepository->find(1);
-        $this->assertSame('user_1', $user1->getUsername());
-        $this->assertSame('group_1', $user1->getGroupId());
+        self::assertInstanceOf(User::class, $user1);
+        self::assertSame('user_1', $user1->getUsername());
+        self::assertSame('group_1', $user1->getGroupId());
 
         $user6 = $userRepository->find(6);
-        $this->assertSame('user_6', $user6->getUsername());
-        $this->assertSame('group_2', $user6->getGroupId());
+        self::assertInstanceOf(User::class, $user6);
+        self::assertSame('user_6', $user6->getUsername());
+        self::assertSame('group_2', $user6->getGroupId());
 
         $user12 = $userRepository->find(12);
-        $this->assertSame('user_12', $user12->getUsername());
-        $this->assertSame('group_3', $user12->getGroupId());
-    }
-
-    public function testBatchedLocalIngestionFailureWithEmptyLineItems(): void
-    {
-        $output = $this->commandTester->execute(
-            [
-                'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
-                '--batch' => 1,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        );
-
-        $this->assertEquals(1, $output);
-        $this->assertStringContainsString(
-            "[ERROR] Cannot native ingest 'user' since line-item table is empty.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
+        self::assertInstanceOf(User::class, $user12);
+        self::assertSame('user_12', $user12->getUsername());
+        self::assertSame('group_3', $user12->getGroupId());
     }
 
     public function testBatchedLocalIngestionFailureWithInvalidUsers(): void
@@ -193,11 +237,11 @@ class NativeUserIngesterCommandTest extends KernelTestCase
             ]
         );
 
-        $this->assertEquals(0, $output);
-        $this->assertCount(1, $this->getRepository(User::class)->findAll());
+        self::assertSame(0, $output);
+        self::assertCount(1, $this->getRepository(User::class)->findAll());
 
         $user1 = $this->getRepository(User::class)->find(1);
-        $this->assertEquals('user_1', $user1->getUsername());
+        self::assertEquals('user_1', $user1->getUsername());
     }
 
     public function testItCanIngestUsersWithMultipleAssignments(): void
@@ -230,15 +274,6 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $user3 = $userRepository->find(3);
         self::assertInstanceOf(User::class, $user3);
         self::assertCount(5, $user3->getAssignments());
-    }
-
-    /**
-     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
-     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
-     */
-    private function normalizeDisplay(string $commandDisplay): string
-    {
-        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 
     private function prepareIngestionContext(): void

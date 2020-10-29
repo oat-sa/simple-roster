@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\HealthCheck;
 
 use App\HealthCheck\HealthCheckResult;
@@ -31,15 +31,15 @@ class HealthCheckResultTest extends TestCase
     {
         $subject = new HealthCheckResult(true, false);
 
-        $this->assertTrue($subject->isDoctrineConnectionAvailable());
-        $this->assertFalse($subject->isDoctrineCacheAvailable());
+        self::assertTrue($subject->isDoctrineConnectionAvailable());
+        self::assertFalse($subject->isDoctrineCacheAvailable());
     }
 
     public function testJsonSerialization(): void
     {
         $subject = new HealthCheckResult(false, true);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'isDoctrineConnectionAvailable' => false,
                 'isDoctrineCacheAvailable' => true,

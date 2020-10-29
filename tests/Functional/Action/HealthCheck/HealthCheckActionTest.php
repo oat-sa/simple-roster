@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Action\HealthCheck;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -34,14 +34,14 @@ class HealthCheckActionTest extends WebTestCase
 
         $kernelBrowser->request(Request::METHOD_GET, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'isDoctrineConnectionAvailable' => true,
                 'isDoctrineCacheAvailable' => true,
             ],
-            json_decode($kernelBrowser->getResponse()->getContent(), true)
+            json_decode($kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 
@@ -51,6 +51,6 @@ class HealthCheckActionTest extends WebTestCase
 
         $kernelBrowser->request(Request::METHOD_POST, '/api/v1/healthcheck');
 
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
     }
 }

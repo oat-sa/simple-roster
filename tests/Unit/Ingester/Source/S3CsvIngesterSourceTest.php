@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Ingester\Source;
 
@@ -46,6 +46,6 @@ class S3CsvIngesterSourceTest extends TestCase
 
     public function testRegistryItemName(): void
     {
-        $this->assertEquals('s3', $this->subject->getRegistryItemName());
+        self::assertSame('s3', $this->subject->getRegistryItemName());
     }
 }

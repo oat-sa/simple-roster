@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
+
+declare(strict_types=1);
 
 namespace App\Command\Ingester;
 
@@ -51,10 +51,8 @@ class IngesterCommand extends Command
     /** @var bool */
     private $isDryRun;
 
-    public function __construct(
-        IngesterRegistry $ingesterRegistry,
-        IngesterSourceRegistry $sourceRegistry
-    ) {
+    public function __construct(IngesterRegistry $ingesterRegistry, IngesterSourceRegistry $sourceRegistry)
+    {
         $this->ingesterRegistry = $ingesterRegistry;
         $this->sourceRegistry = $sourceRegistry;
 
@@ -121,15 +119,18 @@ class IngesterCommand extends Command
         $this->isDryRun = !(bool)$input->getOption('force');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $ingester = $this->ingesterRegistry->get($input->getArgument('type'));
+            $ingester = $this->ingesterRegistry->get((string)$input->getArgument('type'));
             $source = $this->sourceRegistry
-                ->get($input->getArgument('source'))
-                ->setPath($input->getArgument('path'))
-                ->setDelimiter($input->getOption('delimiter'))
-                ->setCharset($input->getOption('charset'));
+                ->get((string)$input->getArgument('source'))
+                ->setPath((string)$input->getArgument('path'))
+                ->setDelimiter((string)$input->getOption('delimiter'))
+                ->setCharset((string)$input->getOption('charset'));
 
             $result = $ingester->ingest($source, !(bool)$input->getOption('force'));
 
