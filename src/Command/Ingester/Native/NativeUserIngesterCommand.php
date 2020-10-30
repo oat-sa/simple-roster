@@ -249,6 +249,6 @@ class NativeUserIngesterCommand extends Command
     {
         $lineItem = $lineItems->getBySlug($lineItemSlug);
 
-        return new AssignmentDto(Assignment::STATE_READY, $lineItem->getId(), 0);
+        return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), 0);
     }
 }
