@@ -113,3 +113,6 @@ services:
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: App\Security\Lti\OidcUserAuthenticator
+
+    League\OAuth2\Server\Repositories\ScopeRepositoryInterface:
+        class: App\Security\Lti\ScopeRepository

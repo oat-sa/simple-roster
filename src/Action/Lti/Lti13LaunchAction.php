@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace App\Action\Lti;
 
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
@@ -58,7 +59,8 @@ class Lti13LaunchAction
             ],
             [
                 'customClaim' => 'customValue',
-                new ContextClaim('contextIdentifier', [], 'contextLabel')
+                new ContextClaim('contextIdentifier', [], 'contextLabel'),
+                new BasicOutcomeClaim('12345', 'http://simple-roster-nginx/lti13/basic-outcome')
             ]
         );
 

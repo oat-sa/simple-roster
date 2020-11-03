@@ -22,6 +22,11 @@ security:
                     - App\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
+        secured_service_area:
+            pattern: ^/lti13/basic-outcome
+            stateless: true
+            lti1p3_service: true
+
         api:
             anonymous: ~
             pattern: '^%app.route_prefix%'

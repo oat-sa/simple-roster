@@ -40,3 +40,8 @@ lti13Launch:
   path: '/lti13/launch'
   methods: GET
   defaults: { _controller: App\Action\Lti\Lti13LaunchAction }
+
+lti13BasicOutcome:
+  path: '/lti13/basic-outcome'
+  methods: [GET,POST]
+  defaults: { _controller: App\Action\Lti\Lti13BasicOutcomeAction }
