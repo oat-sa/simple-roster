@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Request;
+namespace OAT\SimpleRoster\Lti\Request;
 
 use JsonSerializable;
 

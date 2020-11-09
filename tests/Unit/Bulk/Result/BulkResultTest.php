@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Bulk\Result;
+namespace OAT\SimpleRoster\Tests\Unit\Bulk\Result;
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Result\BulkResult;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use PHPUnit\Framework\TestCase;
 
 class BulkResultTest extends TestCase

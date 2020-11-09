@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Logger;
+namespace OAT\SimpleRoster\Logger;
 
-use App\Request\RequestIdStorage;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 

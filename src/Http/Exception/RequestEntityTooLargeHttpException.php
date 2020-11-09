@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Exception;
+namespace OAT\SimpleRoster\Http\Exception;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;

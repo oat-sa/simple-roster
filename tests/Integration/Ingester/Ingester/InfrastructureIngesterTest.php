@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Ingester\Ingester;
+namespace OAT\SimpleRoster\Tests\Integration\Ingester\Ingester;
 
-use App\Entity\Infrastructure;
-use App\Ingester\Ingester\InfrastructureIngester;
-use App\Ingester\Source\IngesterSourceInterface;
-use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class InfrastructureIngesterTest extends KernelTestCase
@@ -114,7 +114,7 @@ class InfrastructureIngesterTest extends KernelTestCase
         );
 
         self::assertStringContainsString(
-            'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given,',
+            'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() must be of the type string, null given,',
             $failure->getReason()
         );
     }

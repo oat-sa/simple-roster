@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Logger;
+namespace OAT\SimpleRoster\Tests\Unit\Logger;
 
-use App\Entity\User;
-use App\Logger\UserRequestSessionLogProcessor;
-use App\Request\RequestIdStorage;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Logger\UserRequestSessionLogProcessor;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

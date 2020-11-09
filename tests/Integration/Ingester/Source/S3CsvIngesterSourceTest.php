@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Ingester\Source;
+namespace OAT\SimpleRoster\Tests\Integration\Ingester\Source;
 
-use App\Ingester\Source\S3CsvIngesterSource;
+use OAT\SimpleRoster\Ingester\Source\S3CsvIngesterSource;
 use Aws\S3\S3Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

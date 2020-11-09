@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Security\Authenticator;
+namespace OAT\SimpleRoster\Security\Authenticator;
 
-use App\Entity\User;
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;

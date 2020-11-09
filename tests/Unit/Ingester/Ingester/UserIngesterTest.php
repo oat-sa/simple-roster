@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Ingester\Ingester;
+namespace OAT\SimpleRoster\Tests\Unit\Ingester\Ingester;
 
-use App\Ingester\Ingester\UserIngester;
-use App\Repository\LineItemRepository;
+use OAT\SimpleRoster\Ingester\Ingester\UserIngester;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 

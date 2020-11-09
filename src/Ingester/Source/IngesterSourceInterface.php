@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Source;
+namespace OAT\SimpleRoster\Ingester\Source;
 
-use App\Ingester\Registry\RegistryItemInterface;
+use OAT\SimpleRoster\Ingester\Registry\RegistryItemInterface;
 use Countable;
 use Traversable;
 

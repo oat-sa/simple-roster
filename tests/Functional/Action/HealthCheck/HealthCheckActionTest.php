@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\HealthCheck;
+namespace OAT\SimpleRoster\Tests\Functional\Action\HealthCheck;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

@@ -10,7 +10,7 @@ parameters:
   checkMissingIterableValueType: false
   checkGenericClassInNonGenericObjectType: false
   doctrine:
-    repositoryClass: App\Repository\AbstractRepository
+    repositoryClass: OAT\SimpleRoster\Repository\AbstractRepository
   ignoreErrors:
     # Symfony issue: https://github.com/phpstan/phpstan-symfony/issues/4
     - message: '#^Service "[^"]+" is private.$#'

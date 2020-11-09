@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Action\Lti;
+namespace OAT\SimpleRoster\Action\Lti;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\AssignmentNotFoundException;
-use App\Exception\AssignmentNotProcessableException;
-use App\Lti\Service\GetUserAssignmentLtiRequestService;
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;

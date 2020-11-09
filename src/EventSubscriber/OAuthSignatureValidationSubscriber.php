@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace OAT\SimpleRoster\EventSubscriber;
 
-use App\Repository\InfrastructureRepository;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
-use App\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Repository\InfrastructureRepository;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;

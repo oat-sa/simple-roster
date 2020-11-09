@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\User;
-use App\Exception\InvalidUsernameException;
-use App\Generator\UserCacheIdGenerator;
-use App\Model\UsernameCollection;
-use App\Repository\Criteria\FindUserCriteria;
-use App\ResultSet\UsernameResultSet;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\InvalidUsernameException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Model\UsernameCollection;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;

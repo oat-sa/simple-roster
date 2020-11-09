@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Repository\Criteria;
+namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
 
-use App\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use Exception;
 use PHPUnit\Framework\TestCase;
 

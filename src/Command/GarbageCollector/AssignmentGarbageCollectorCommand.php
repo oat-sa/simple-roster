@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Command\GarbageCollector;
+namespace OAT\SimpleRoster\Command\GarbageCollector;
 
-use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use ArrayIterator;
 use Carbon\Carbon;
 use DateInterval;

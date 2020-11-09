@@ -1,13 +1,13 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     encoders:
-        App\Entity\User:
+        OAT\SimpleRoster\Entity\User:
             algorithm: auto
             memory_cost: 1024
             time_cost: 3
     providers:
         app_user_provider:
-            id: App\Security\Provider\UserProvider
+            id: OAT\SimpleRoster\Security\Provider\UserProvider
 
     firewalls:
         dev:
@@ -19,7 +19,7 @@ security:
             pattern: '^%app.route_prefix%/bulk'
             guard:
                 authenticators:
-                    - App\Security\Authenticator\ApiKeyAuthenticator
+                    - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
         api:
@@ -27,7 +27,7 @@ security:
             pattern: '^%app.route_prefix%'
             logout:
                 path: logout
-                success_handler: App\Security\Handler\LogoutSuccessHandler
+                success_handler: OAT\SimpleRoster\Security\Handler\LogoutSuccessHandler
             json_login:
                 check_path: login
                 remember_me: false

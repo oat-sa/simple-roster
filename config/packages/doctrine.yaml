@@ -29,7 +29,7 @@ doctrine:
             type: service
             id: app.doctrine_cache.provider
         mappings:
-            App:
+            OAT\SimpleRoster:
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine'
-                prefix: App\Entity
+                prefix: OAT\SimpleRoster\Entity

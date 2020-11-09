@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Service\HealthCheck;
+namespace OAT\SimpleRoster\Service\HealthCheck;
 
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\HealthCheck\HealthCheckResult;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\HealthCheck\HealthCheckResult;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HealthCheckService

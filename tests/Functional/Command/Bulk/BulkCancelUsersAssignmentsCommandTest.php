@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Bulk;
+namespace OAT\SimpleRoster\Tests\Functional\Command\Bulk;
 
-use App\Command\Bulk\BulkCancelUsersAssignmentsCommand;
-use App\Entity\Assignment;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Command\Bulk\BulkCancelUsersAssignmentsCommand;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

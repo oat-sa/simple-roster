@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener\Doctrine;
+namespace OAT\SimpleRoster\EventListener\Doctrine;
 
 interface EntityListenerInterface
 {

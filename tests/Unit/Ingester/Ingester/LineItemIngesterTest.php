@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Ingester\Ingester;
+namespace OAT\SimpleRoster\Tests\Unit\Ingester\Ingester;
 
-use App\Ingester\Ingester\LineItemIngester;
+use OAT\SimpleRoster\Ingester\Ingester\LineItemIngester;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 

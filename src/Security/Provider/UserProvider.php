@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Security\Provider;
+namespace OAT\SimpleRoster\Security\Provider;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Doctrine\ORM\ORMException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;

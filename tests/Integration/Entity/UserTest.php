@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Entity;
+namespace OAT\SimpleRoster\Tests\Integration\Entity;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserTest extends KernelTestCase

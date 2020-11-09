@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Bulk\Operation;
+namespace OAT\SimpleRoster\Tests\Unit\Bulk\Operation;
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use PHPUnit\Framework\TestCase;
 
 class BulkOperationCollectionTest extends TestCase

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener\Doctrine;
+namespace OAT\SimpleRoster\EventListener\Doctrine;
 
-use App\Entity\User;
+use OAT\SimpleRoster\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordEncoderListener implements EntityListenerInterface

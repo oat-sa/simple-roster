@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
 /**
  * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php

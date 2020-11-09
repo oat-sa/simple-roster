@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Ingester\Native;
+namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester\Native;
 
-use App\Command\Ingester\Native\NativeUserIngesterCommand;
-use App\Entity\User;
-use App\Ingester\Ingester\InfrastructureIngester;
-use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Source\IngesterSourceInterface;
-use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Command\Ingester\Native\NativeUserIngesterCommand;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
+use OAT\SimpleRoster\Ingester\Ingester\LineItemIngester;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;

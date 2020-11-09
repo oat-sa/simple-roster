@@ -29,11 +29,11 @@ services:
             $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
 
     _instanceof:
-        App\Ingester\Ingester\IngesterInterface:
+        OAT\SimpleRoster\Ingester\Ingester\IngesterInterface:
             tags: ['app.ingester']
-        App\Ingester\Source\IngesterSourceInterface:
+        OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface:
             tags: ['app.ingester_source']
-        App\EventListener\Doctrine\EntityListenerInterface:
+        OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
             tags: ['doctrine.orm.entity_listener']
 
     app.session_storage.connection:
@@ -59,37 +59,37 @@ services:
                 arguments:
                     - '@app.doctrine_cache.connection'
 
-    App\:
+    OAT\SimpleRoster\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
 
-    App\Action\:
+    OAT\SimpleRoster\Action\:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    App\Ingester\Registry\IngesterRegistry:
+    OAT\SimpleRoster\Ingester\Registry\IngesterRegistry:
         arguments: [!tagged 'app.ingester']
 
-    App\Ingester\Registry\IngesterSourceRegistry:
+    OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry:
         arguments: [!tagged 'app.ingester_source']
 
-    App\Ingester\Source\S3CsvIngesterSource:
+    OAT\SimpleRoster\Ingester\Source\S3CsvIngesterSource:
         arguments:
             $client: '@aws.s3'
             $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
 
-    App\EventSubscriber\UserCacheInvalidationSubscriber:
+    OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
         tags: ['doctrine.event_subscriber']
 
-    App\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
+    OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
         arguments:
             $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
 
-    App\Command\Cache\DoctrineResultCacheWarmerCommand:
+    OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand:
         tags:
             - { name: monolog.logger, channel: cache_warmup }
 
-    App\Logger\UserRequestSessionLogProcessor:
+    OAT\SimpleRoster\Logger\UserRequestSessionLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
             - { name: 'monolog.processor', channel: 'app' }
@@ -99,14 +99,14 @@ services:
         arguments:
             - '@app.session_storage.connection'
 
-    App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
-        factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
+    OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
+        factory: '@OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
             - '%app.lti.load_balancing_strategy%'
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
 
-    App\Lti\Extractor\ReplaceResultSourceIdExtractor:
+    OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
             $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'

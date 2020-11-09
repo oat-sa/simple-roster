@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Bulk;
+namespace OAT\SimpleRoster\Tests\Functional\Action\Bulk;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;

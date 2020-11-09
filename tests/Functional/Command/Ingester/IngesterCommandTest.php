@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Ingester;
+namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
-use App\Command\Ingester\IngesterCommand;
-use App\Entity\Infrastructure;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Command\Ingester\IngesterCommand;
+use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -108,7 +108,7 @@ class IngesterCommandTest extends KernelTestCase
         );
 
         self::assertStringContainsString(
-            'Argument 1 passed to App\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
+            'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
             $this->commandTester->getDisplay()
         );
 
