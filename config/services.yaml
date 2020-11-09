@@ -9,6 +9,7 @@ parameters:
     app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti.key: '%env(resolve:LTI_KEY)%'
     app.lti.secret: '%env(resolve:LTI_SECRET)%'
+    app.lti.version: '%env(resolve:LTI_VERSION)%'
 
 services:
     # default configuration for services in *this* file
@@ -26,6 +27,7 @@ services:
             $appApiKey: '%env(resolve:APP_API_KEY)%'
             $ltiKey: '%app.lti.key%'
             $ltiSecret: '%app.lti.secret%'
+            $ltiVersion: '%app.lti.version%'
             $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
 
     _instanceof:

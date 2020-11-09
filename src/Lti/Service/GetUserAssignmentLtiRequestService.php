@@ -63,6 +63,9 @@ class GetUserAssignmentLtiRequestService
     /** @var string */
     private $ltiSecret;
 
+    /** @var string */
+    private $ltiVersion;
+
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
@@ -72,7 +75,8 @@ class GetUserAssignmentLtiRequestService
         string $ltiLaunchPresentationLocale,
         bool $ltiInstancesLoadBalancerEnabled,
         string $ltiKey,
-        string $ltiSecret
+        string $ltiSecret,
+        string $ltiVersion
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
@@ -83,6 +87,7 @@ class GetUserAssignmentLtiRequestService
         $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
         $this->ltiKey = $ltiKey;
         $this->ltiSecret = $ltiSecret;
+        $this->ltiVersion = $ltiVersion;
     }
 
     /**
@@ -180,7 +185,7 @@ class GetUserAssignmentLtiRequestService
     {
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'lti_version' => LtiRequest::LTI_VERSION,
+            'lti_version' => $this->ltiVersion,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),

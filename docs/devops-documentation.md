@@ -38,7 +38,6 @@ The main configuration file is `.env`, located in root folder.
 | REDIS_SESSION_CACHE_PORT | Redis port for sessions cache storage |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-  
 #### AWS related environment variables
 
 | Parameter | Description |
@@ -60,6 +59,7 @@ The main configuration file is `.env`, located in root folder.
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
 | LTI_KEY | LTI consumer key for LTI launch |
 | LTI_SECRET | LTI consumer secret for LTI launch |
+| LTI_VERSION | Defines if application should generate LTI-1p1 or LTI-1p3 links [default: `LTI-1p1`]
 
 #### Blackfire related environment variables
 

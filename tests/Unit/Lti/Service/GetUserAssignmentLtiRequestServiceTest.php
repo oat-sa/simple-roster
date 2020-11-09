@@ -70,7 +70,8 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             $this->ltiLaunchPresentationLocale,
             $this->ltiInstancesLoadBalancerEnabled,
             'testLtiKey',
-            'testLtiSecret'
+            'testLtiSecret',
+            'LTI-1p1'
         );
     }
 
@@ -173,7 +174,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
                     'oauth_timestamp' => (string)Carbon::now()->timestamp,
                     'oauth_version' => '1.0',
                     'lti_message_type' => 'basic-lti-launch-request',
-                    'lti_version' => 'LTI-1p0',
+                    'lti_version' => 'LTI-1p1',
                     'context_id' => $expectedLtiContextId,
                     'roles' => 'Learner',
                     'user_id' => 'testUsername',
