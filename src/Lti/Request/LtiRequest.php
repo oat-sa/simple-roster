@@ -33,18 +33,27 @@ class LtiRequest implements JsonSerializable
     /** @var string */
     private $link;
 
+    /** @var string */
+    private $version;
+
     /** @var array  */
     private $parameters;
 
-    public function __construct(string $link, array $parameters)
+    public function __construct(string $link, string $version, array $parameters)
     {
         $this->link = $link;
+        $this->version = $version;
         $this->parameters = $parameters;
     }
 
     public function getLink(): string
     {
         return $this->link;
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 
     public function getParameters(): array
@@ -56,6 +65,7 @@ class LtiRequest implements JsonSerializable
     {
         return [
             'ltiLink' => $this->link,
+            'ltiVersion' => $this->version,
             'ltiParams' => $this->parameters,
         ];
     }

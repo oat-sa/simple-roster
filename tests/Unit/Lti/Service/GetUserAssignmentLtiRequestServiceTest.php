@@ -165,6 +165,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         self::assertSame(
             [
                 'ltiLink' => '/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
+                'ltiVersion' => 'LTI-1p1',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
@@ -174,7 +175,6 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
                     'oauth_timestamp' => (string)Carbon::now()->timestamp,
                     'oauth_version' => '1.0',
                     'lti_message_type' => 'basic-lti-launch-request',
-                    'lti_version' => 'LTI-1p1',
                     'context_id' => $expectedLtiContextId,
                     'roles' => 'Learner',
                     'user_id' => 'testUsername',

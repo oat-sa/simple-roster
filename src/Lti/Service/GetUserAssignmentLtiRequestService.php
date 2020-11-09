@@ -36,6 +36,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class GetUserAssignmentLtiRequestService
 {
+    public const LTI_VERSION_1P1 = 'LTI-1p1';
+    public const LTI_VERSION_1P3 = 'LTI-1p3';
+
     /** @var OAuthSigner */
     private $signer;
 
@@ -97,40 +100,18 @@ class GetUserAssignmentLtiRequestService
     {
         $this->checkIfAssignmentCanBeProcessed($assignment);
 
-        $context = new OAuthContext(
-            '',
-            $this->ltiKey,
-            $this->generator->generate(),
-            OAuthContext::METHOD_MAC_SHA1,
-            (string)Carbon::now()->getTimestamp(),
-            OAuthContext::VERSION_1_0
-        );
-
         $ltiLink = $this->getAssignmentLtiLink($assignment);
         $ltiParameters = $this->getAssignmentLtiParameters($assignment);
+        $contextParameters = $this->getContextParameters($ltiLink, $ltiParameters);
 
-        $signature = $this->signer->sign(
-            $context,
-            $ltiLink,
-            Request::METHOD_POST,
-            $this->ltiSecret,
-            $ltiParameters
-        );
+        $parameters = $this->ltiVersion === self::LTI_VERSION_1P1
+            ? array_merge($contextParameters, $ltiParameters)
+            : [];
 
         return new LtiRequest(
             $ltiLink,
-            array_merge(
-                [
-                    'oauth_body_hash' => $context->getBodyHash(),
-                    'oauth_consumer_key' => $context->getConsumerKey(),
-                    'oauth_nonce' => $context->getNonce(),
-                    'oauth_signature' => $signature,
-                    'oauth_signature_method' => $context->getSignatureMethod(),
-                    'oauth_timestamp' => $context->getTimestamp(),
-                    'oauth_version' => $context->getVersion(),
-                ],
-                $ltiParameters
-            )
+            $this->ltiVersion,
+            $parameters
         );
     }
 
@@ -181,11 +162,40 @@ class GetUserAssignmentLtiRequestService
         );
     }
 
+    private function getContextParameters(string $ltiLink, array $ltiParameters): array
+    {
+        $context = new OAuthContext(
+            '',
+            $this->ltiKey,
+            $this->generator->generate(),
+            OAuthContext::METHOD_MAC_SHA1,
+            (string)Carbon::now()->getTimestamp(),
+            OAuthContext::VERSION_1_0
+        );
+
+        $signature = $this->signer->sign(
+            $context,
+            $ltiLink,
+            Request::METHOD_POST,
+            $this->ltiSecret,
+            $ltiParameters
+        );
+
+        return [
+            'oauth_body_hash' => $context->getBodyHash(),
+            'oauth_consumer_key' => $context->getConsumerKey(),
+            'oauth_nonce' => $context->getNonce(),
+            'oauth_signature' => $signature,
+            'oauth_signature_method' => $context->getSignatureMethod(),
+            'oauth_timestamp' => $context->getTimestamp(),
+            'oauth_version' => $context->getVersion(),
+        ];
+    }
+
     private function getAssignmentLtiParameters(Assignment $assignment): array
     {
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'lti_version' => $this->ltiVersion,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
