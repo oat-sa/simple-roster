@@ -18,7 +18,7 @@
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
 - Removed `lti_instances.yaml` configuration file.
-- Removed `LTI_KEY` and `LTI_SECRET` environment variables.
+- Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 
 ## 1.8.1 - 2020-10-27
 
