@@ -25,13 +25,9 @@
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
-        <field name="label" type="string" column="label" length="255" precision="0" scale="0" unique="true"
-               nullable="false"/>
-        <field name="ltiLink" type="string" column="lti_link" length="255" precision="0" scale="0"
-               nullable="false"/>
-        <field name="ltiKey" type="string" column="lti_key" length="255" precision="0" scale="0" unique="true"
-               nullable="false"/>
-        <field name="ltiSecret" type="string" column="lti_secret" length="255" precision="0" scale="0"
-               nullable="false"/>
+        <field name="label" column="label" length="255" precision="0" scale="0" unique="true"/>
+        <field name="ltiLink" column="lti_link" length="255" precision="0" scale="0" unique="true"/>
+        <field name="ltiKey" column="lti_key" length="255" precision="0" scale="0"/>
+        <field name="ltiSecret" column="lti_secret" length="255" precision="0" scale="0"/>
     </entity>
 </doctrine-mapping>

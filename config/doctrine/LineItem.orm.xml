@@ -25,10 +25,9 @@
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="line_items_id_seq" allocation-size="1" initial-value="1"/>
         </id>
-        <field name="label" type="string" column="label" length="255" precision="0" scale="0" nullable="false"/>
-        <field name="uri" type="string" column="uri" length="255" precision="0" scale="0" nullable="false"/>
-        <field name="slug" type="string" column="slug" length="255" precision="0" scale="0" unique="true"
-               nullable="false"/>
+        <field name="label" column="label" length="255" precision="0" scale="0"/>
+        <field name="uri" column="uri" length="255" precision="0" scale="0"/>
+        <field name="slug" column="slug" length="255" precision="0" scale="0" unique="true"/>
         <field name="startAt" type="datetime" column="start_at" precision="0" scale="0" nullable="true"/>
         <field name="endAt" type="datetime" column="end_at" precision="0" scale="0" nullable="true"/>
         <field name="maxAttempts" type="integer" column="max_attempts" precision="0" scale="0" nullable="true">

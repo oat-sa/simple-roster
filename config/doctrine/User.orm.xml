@@ -25,10 +25,10 @@
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="users_id_seq" allocation-size="1" initial-value="1"/>
         </id>
-        <field name="username" type="string" column="username" length="255" unique="true" nullable="false"/>
-        <field name="password" type="string" column="password" length="255" nullable="false"/>
-        <field name="roles" type="json_array" column="roles" nullable="false"/>
-        <field name="groupId" type="string" column="group_id" length="255" nullable="true"/>
+        <field name="username" column="username" length="255" unique="true"/>
+        <field name="password" column="password" length="255"/>
+        <field name="roles" type="json_array" column="roles"/>
+        <field name="groupId" column="group_id" length="255" nullable="true"/>
         <one-to-many field="assignments" target-entity="App\Entity\Assignment" mapped-by="user" fetch="LAZY">
             <cascade>
                 <cascade-persist/>
