@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Registry;
+namespace OAT\SimpleRoster\Ingester\Registry;
 
-use App\Ingester\Ingester\IngesterInterface;
+use OAT\SimpleRoster\Ingester\Ingester\IngesterInterface;
 use InvalidArgumentException;
 
 class IngesterRegistry

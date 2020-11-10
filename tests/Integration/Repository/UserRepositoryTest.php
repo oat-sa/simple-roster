@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Repository;
+namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use App\Exception\InvalidUsernameException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\Criteria\FindUserCriteria;
-use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Exception\InvalidUsernameException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
 use InvalidArgumentException;

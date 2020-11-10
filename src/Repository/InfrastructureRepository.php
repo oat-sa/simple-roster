@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\Infrastructure;
+use OAT\SimpleRoster\Entity\Infrastructure;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 

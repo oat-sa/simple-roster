@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Lti;
+namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSigner;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;

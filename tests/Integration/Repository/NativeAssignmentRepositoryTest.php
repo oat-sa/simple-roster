@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Repository;
+namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\AssignmentDtoCollection;
-use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
-use App\Repository\NativeAssignmentRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class NativeAssignmentRepositoryTest extends KernelTestCase

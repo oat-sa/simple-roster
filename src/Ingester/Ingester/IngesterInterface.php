@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\Ingester\Registry\RegistryItemInterface;
-use App\Ingester\Result\IngesterResult;
-use App\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Registry\RegistryItemInterface;
+use OAT\SimpleRoster\Ingester\Result\IngesterResult;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 
 interface IngesterInterface extends RegistryItemInterface
 {

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Source;
+namespace OAT\SimpleRoster\Ingester\Source;
 
 use League\Csv\Exception;
 use League\Csv\Reader;

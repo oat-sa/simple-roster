@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Action\Lti;
+namespace OAT\SimpleRoster\Action\Lti;
 
-use App\Exception\AssignmentNotFoundException;
-use App\Exception\InvalidLtiReplaceResultBodyException;
-use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use App\Responder\SerializerResponder;
-use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
-use App\Service\CompleteUserAssignmentService;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
+use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
+use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
+use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Request;
+namespace OAT\SimpleRoster\Request;
 
 use LogicException;
 

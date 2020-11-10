@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Source;
+namespace OAT\SimpleRoster\Ingester\Source;
 
 use Aws\S3\S3Client;
 use League\Csv\Exception;

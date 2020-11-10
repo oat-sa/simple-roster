@@ -21,9 +21,9 @@
                     \League\Csv\Reader,
                     \Symfony\Component\HttpFoundation\JsonResponse,
                     \Symfony\Component\HttpFoundation\Request,
-                    \App\EventSubscriber\ErrorHandlerSubscriber,
-                    \App\EventSubscriber\OAuthSignatureValidationSubscriber,
-                    \App\EventSubscriber\RequestIdGeneratorSubscriber
+                    \OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber,
+                    \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
+                    \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber
                 </value>
             </property>
         </properties>

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Action\Security;
+namespace OAT\SimpleRoster\Action\Security;
 
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 

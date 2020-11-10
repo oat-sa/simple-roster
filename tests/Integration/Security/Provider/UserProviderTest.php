@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Security\Provider;
+namespace OAT\SimpleRoster\Tests\Integration\Security\Provider;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Security\Provider\UserProvider;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Security\Provider\UserProvider;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;

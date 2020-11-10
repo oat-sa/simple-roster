@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
 
 class UsernameLtiInstanceLoadBalancerTest extends TestCase

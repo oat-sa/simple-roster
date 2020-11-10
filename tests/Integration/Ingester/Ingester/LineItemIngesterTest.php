@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Ingester\Ingester;
+namespace OAT\SimpleRoster\Tests\Integration\Ingester\Ingester;
 
-use App\Entity\LineItem;
-use App\Ingester\Ingester\InfrastructureIngester;
-use App\Ingester\Ingester\LineItemIngester;
-use App\Ingester\Source\IngesterSourceInterface;
-use App\Ingester\Source\LocalCsvIngesterSource;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
+use OAT\SimpleRoster\Ingester\Ingester\LineItemIngester;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

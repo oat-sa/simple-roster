@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\ResultSet;
+namespace OAT\SimpleRoster\ResultSet;
 
-use App\Model\UsernameCollection;
+use OAT\SimpleRoster\Model\UsernameCollection;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;

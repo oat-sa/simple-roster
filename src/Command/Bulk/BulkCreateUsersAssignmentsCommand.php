@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Bulk;
+namespace OAT\SimpleRoster\Command\Bulk;
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Service\Bulk\BulkCreateUsersAssignmentsService;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;

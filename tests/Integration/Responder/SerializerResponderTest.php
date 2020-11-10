@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Responder;
+namespace OAT\SimpleRoster\Tests\Integration\Responder;
 
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Response;

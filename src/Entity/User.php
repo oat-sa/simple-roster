@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace OAT\SimpleRoster\Entity;
 
-use App\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

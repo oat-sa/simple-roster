@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Service;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Exception\AssignmentNotProcessableException;
-use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Lti\Service\GetUserAssignmentLtiRequestService;
-use App\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Security;
+namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

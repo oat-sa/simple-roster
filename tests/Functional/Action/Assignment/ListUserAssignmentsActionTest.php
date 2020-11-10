@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Assignment;
+namespace OAT\SimpleRoster\Tests\Functional\Action\Assignment;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\UserAuthenticatorTrait;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;

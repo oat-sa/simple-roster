@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
-use App\Entity\Assignment;
-use App\Entity\User;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {

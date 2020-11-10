@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\EventSubscriber;
+namespace OAT\SimpleRoster\Tests\Unit\EventSubscriber;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\EventSubscriber\UserCacheInvalidationSubscriber;
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\UserRepository;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;

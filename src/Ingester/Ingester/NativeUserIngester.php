@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\DataTransferObject\AssignmentDtoCollection;
-use App\DataTransferObject\UserDtoCollection;
-use App\Repository\NativeAssignmentRepository;
-use App\Repository\NativeUserRepository;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
+use OAT\SimpleRoster\Repository\NativeUserRepository;
 
 class NativeUserIngester
 {

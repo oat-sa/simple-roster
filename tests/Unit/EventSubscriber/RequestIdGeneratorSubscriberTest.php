@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\EventSubscriber;
+namespace OAT\SimpleRoster\Tests\Unit\EventSubscriber;
 
-use App\EventSubscriber\RequestIdGeneratorSubscriber;
-use App\Request\RequestIdStorage;
+use OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactoryInterface;
