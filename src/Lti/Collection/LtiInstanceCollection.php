@@ -68,7 +68,7 @@ class LtiInstanceCollection implements Countable, IteratorAggregate
     /**
      * @return ArrayIterator|Traversable
      */
-    public function getIterator(): ArrayIterator
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->ltiInstances);
     }
