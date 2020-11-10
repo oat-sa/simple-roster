@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace App\Lti\LoadBalancer;
 
-use App\Entity\LtiInstance;
 use App\Entity\Assignment;
+use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use App\Lti\Exception\IndeterminableLtiRequestContextIdException;

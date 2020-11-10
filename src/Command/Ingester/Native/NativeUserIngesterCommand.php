@@ -93,18 +93,19 @@ class NativeUserIngesterCommand extends Command
         $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
-            'source',
-            InputArgument::REQUIRED,
-            sprintf(
-                'Source type to ingest from, possible values: ["%s"]',
-                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
-            )
-        );
-
-        $this->addArgument(
             'path',
             InputArgument::REQUIRED,
             'Source path to ingest from'
+        );
+
+        $this->addArgument(
+            'source',
+            InputArgument::OPTIONAL,
+            sprintf(
+                'Source type to ingest from, possible values: ["%s"]',
+                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
+            ),
+            'local'
         );
 
         $this->addOption(

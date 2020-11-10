@@ -27,7 +27,6 @@ use App\Entity\LineItem;
 use App\Entity\LtiInstance;
 use App\Entity\User;
 use App\Lti\Collection\LtiInstanceCollection;
-use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;

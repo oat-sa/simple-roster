@@ -5,10 +5,20 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    app.api_key: '%env(resolve:APP_API_KEY)%'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
+    app.assignment_state_interval_threshold: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
+    app.cache.host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+    app.cache.port: '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+    app.cache.session.host: '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
+    app.cache.session.port: '%env(int:REDIS_SESSION_CACHE_PORT)%'
+    app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
+    app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
     app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
-    app.lti.key: '%env(resolve:LTI_KEY)%'
-    app.lti.secret: '%env(resolve:LTI_SECRET)%'
+    app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+    app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
+    app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+    app.aws.ingest_bucket: '%env(AWS_S3_INGEST_BUCKET)%'
 
 services:
     # default configuration for services in *this* file
@@ -19,13 +29,12 @@ services:
         bind:
             $kernelDebug: '%kernel.debug%'
             $kernelEnvironment: '%kernel.environment%'
-            $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
-            $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
-            $appApiKey: '%env(resolve:APP_API_KEY)%'
-            $ltiKey: '%app.lti.key%'
-            $ltiSecret: '%app.lti.secret%'
-            $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
-            $ltiInstancesCacheTtl: '%env(CACHE_TTL_LTI_INSTANCES)%'
+            $ltiLaunchPresentationReturnUrl: '%app.lti.launch_presentation_return_url%'
+            $ltiLaunchPresentationLocale: '%app.lti.launch_presentation_locale%'
+            $appApiKey: '%app.api_key%'
+            $userCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
+            $ltiInstancesCacheTtl: '%app.cache.ttl.lti_instance_list%'
+            $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
 
     _instanceof:
         App\Ingester\Ingester\IngesterInterface:
@@ -40,16 +49,16 @@ services:
         calls:
             -   method: connect
                 arguments:
-                    - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
-                    - '%env(int:REDIS_SESSION_CACHE_PORT)%'
+                    - '%app.cache.session.host%'
+                    - '%app.cache.session.port%'
 
     app.doctrine_cache.connection:
         class: Redis
         calls:
             -   method: connect
                 arguments:
-                    - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-                    - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+                    - '%app.cache.host%'
+                    - '%app.cache.port%'
 
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\RedisCache
@@ -75,14 +84,14 @@ services:
     App\Ingester\Source\S3CsvIngesterSource:
         arguments:
             $client: '@aws.s3'
-            $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
+            $bucket: '%app.aws.ingest_bucket%'
 
     App\EventSubscriber\UserCacheInvalidationSubscriber:
         tags: ['doctrine.event_subscriber']
 
     App\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
         arguments:
-            $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
+            $cleanUpInterval: '%app.assignment_state_interval_threshold%'
 
     App\Command\Cache\DoctrineResultCacheWarmerCommand:
         tags:
@@ -108,4 +117,4 @@ services:
 
     App\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
-            $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+            $xmlNamespace: '%app.lti.outcome_xml_namespace%'

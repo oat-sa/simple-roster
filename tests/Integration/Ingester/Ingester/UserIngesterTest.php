@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\User;
-use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\LineItemIngester;
+use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;

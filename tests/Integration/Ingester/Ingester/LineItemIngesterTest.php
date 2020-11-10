@@ -23,12 +23,11 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Ingester\Ingester;
 
 use App\Entity\LineItem;
-use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\LineItemIngester;
+use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Tests\Traits\DatabaseTestingTrait;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LineItemIngesterTest extends KernelTestCase

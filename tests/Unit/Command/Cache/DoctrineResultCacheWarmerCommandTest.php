@@ -51,6 +51,7 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
             $this->createMock(UserCacheIdGenerator::class),
             $entityManager,
             $this->createMock(LoggerInterface::class),
+            0,
             0
         );
     }

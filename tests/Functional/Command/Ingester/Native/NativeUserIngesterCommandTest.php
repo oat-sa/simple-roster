@@ -24,8 +24,8 @@ namespace App\Tests\Functional\Command\Ingester\Native;
 
 use App\Command\Ingester\Native\NativeUserIngesterCommand;
 use App\Entity\User;
-use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Ingester\LineItemIngester;
+use App\Ingester\Ingester\LtiInstanceIngester;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Ingester\Source\LocalCsvIngesterSource;
 use App\Repository\UserRepository;

@@ -102,6 +102,9 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var int */
     private $ltiInstancesCacheTtl;
 
+    /** @var int */
+    private $userWithAssignmentsCacheTtl;
+
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
      */
@@ -111,7 +114,8 @@ class DoctrineResultCacheWarmerCommand extends Command
         UserCacheIdGenerator $userCacheIdGenerator,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        int $ltiInstancesCacheTtl
+        int $ltiInstancesCacheTtl,
+        int $userWithAssignmentsCacheTtl
     ) {
         parent::__construct(self::NAME);
 
@@ -130,6 +134,7 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->logger = $logger;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
+        $this->userWithAssignmentsCacheTtl = $userWithAssignmentsCacheTtl;
     }
 
     protected function configure(): void
@@ -140,11 +145,12 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->addArgument(
             self::ARGUMENT_CACHE_POOL,
-            InputArgument::REQUIRED,
+            InputArgument::OPTIONAL,
             sprintf(
                 'Result cache pool to warmup [Possible values: %s] ',
                 implode(', ', [self::CACHE_POOL_USER, self::CACHE_POOL_LTI_INSTANCE])
-            )
+            ),
+            self::CACHE_POOL_USER
         );
 
         $this->addOption(
@@ -281,8 +287,9 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->symfonyStyle->success(
             sprintf(
-                '%s result cache entries have been successfully warmed up.',
-                $numberOfWarmedUpCacheEntries
+                'Result cache for %d users have been successfully warmed up. [TTL: %s seconds]',
+                $numberOfWarmedUpCacheEntries,
+                number_format($this->userWithAssignmentsCacheTtl)
             )
         );
 
@@ -304,7 +311,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->symfonyStyle->success(
             sprintf(
-                'Result cache entry for %d LTI instances has been successfully warmed up. [TTL: %s seconds]',
+                'Result cache for %d LTI instances has been successfully warmed up. [TTL: %s seconds]',
                 count($ltiInstances),
                 number_format($this->ltiInstancesCacheTtl)
             )

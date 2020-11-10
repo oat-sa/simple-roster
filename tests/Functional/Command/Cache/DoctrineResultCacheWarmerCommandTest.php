@@ -25,8 +25,8 @@ namespace App\Tests\Functional\Command\Cache;
 use App\Command\Cache\DoctrineResultCacheWarmerCommand;
 use App\Entity\User;
 use App\Generator\UserCacheIdGenerator;
-use App\Repository\UserRepository;
 use App\Repository\LtiInstanceRepository;
+use App\Repository\UserRepository;
 use App\Tests\Traits\DatabaseTestingTrait;
 use App\Tests\Traits\LoggerTestingTrait;
 use Doctrine\Common\Cache\Cache;
@@ -132,7 +132,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         self::assertTrue($this->resultCacheImplementation->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
 
         self::assertStringContainsString(
-            '[OK] Result cache entry for 5 LTI instances has been successfully warmed up. [TTL: 3,600 seconds]',
+            '[OK] Result cache for 5 LTI instances has been successfully warmed up. [TTL: 3,600 seconds]',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
@@ -183,7 +183,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         }
 
         self::assertStringContainsString(
-            '[OK] 100 result cache entries have been successfully warmed up.',
+            '[OK] Result cache for 100 users have been successfully warmed up. [TTL: 3,600 seconds]',
             $this->commandTester->getDisplay()
         );
     }
@@ -241,7 +241,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         }
 
         self::assertStringContainsString(
-            '[OK] 10 result cache entries have been successfully warmed up.',
+            '[OK] Result cache for 10 users have been successfully warmed up. [TTL: 3,600 seconds]',
             $this->commandTester->getDisplay()
         );
     }
@@ -274,7 +274,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         }
 
         self::assertStringContainsString(
-            '[OK] 60 result cache entries have been successfully warmed up.',
+            '[OK] Result cache for 60 users have been successfully warmed up. [TTL: 3,600 seconds]',
             $this->commandTester->getDisplay()
         );
     }
