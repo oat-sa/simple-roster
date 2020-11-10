@@ -9,7 +9,7 @@
 - Raised minimum required PHP version from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
-- Application namespace now is `OAT\SimpleRoster` instead of `App`
+- Changed the Application namespace to `OAT\SimpleRoster` instead of `App`
 
 ### Fixed
 - Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files
