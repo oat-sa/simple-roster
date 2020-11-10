@@ -45,7 +45,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 {
     use CommandProgressBarFormatterTrait;
 
-    public const NAME = 'roster:doctrine-result-cache:warmup';
+    public const NAME = 'roster:cache:warmup';
 
     private const ARGUMENT_CACHE_POOL = 'cache-pool';
 

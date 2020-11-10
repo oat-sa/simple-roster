@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,12 +15,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace App\Command\Ingester\Native;
+namespace App\Command\Ingester;
 
 use App\Command\CommandProgressBarFormatterTrait;
 use App\DataTransferObject\AssignmentDto;
@@ -29,7 +29,7 @@ use App\DataTransferObject\UserDtoCollection;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Exception\LineItemNotFoundException;
-use App\Ingester\Ingester\NativeUserIngester;
+use App\Ingester\Ingester\UserIngester;
 use App\Ingester\Registry\IngesterSourceRegistry;
 use App\Ingester\Source\IngesterSourceInterface;
 use App\Model\LineItemCollection;
@@ -45,18 +45,18 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Throwable;
 
-class NativeUserIngesterCommand extends Command
+class UserIngesterCommand extends Command
 {
     use CommandProgressBarFormatterTrait;
 
-    public const NAME = 'roster:native-ingest:user';
+    public const NAME = 'roster:ingest:user';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
     private $ingesterSourceRegistry;
 
-    /** @var NativeUserIngester */
+    /** @var UserIngester */
     private $nativeUserIngester;
 
     /** @var LineItemRepository */
@@ -76,7 +76,7 @@ class NativeUserIngesterCommand extends Command
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
-        NativeUserIngester $nativeUserIngester,
+        UserIngester $nativeUserIngester,
         LineItemRepository $lineItemRepository,
         UserPasswordEncoderInterface $passwordEncoder
     ) {
@@ -90,7 +90,7 @@ class NativeUserIngesterCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
+        $this->setDescription('Responsible for user ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
             'path',

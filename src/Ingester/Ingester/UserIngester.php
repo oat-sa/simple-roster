@@ -15,77 +15,51 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace App\Ingester\Ingester;
 
-use App\Entity\Assignment;
-use App\Entity\EntityInterface;
-use App\Entity\User;
-use App\Exception\LineItemNotFoundException;
-use App\Model\LineItemCollection;
-use App\Repository\LineItemRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Exception;
+use App\DataTransferObject\AssignmentDtoCollection;
+use App\DataTransferObject\UserDtoCollection;
+use App\Repository\NativeAssignmentRepository;
+use App\Repository\NativeUserRepository;
 
-class UserIngester extends AbstractIngester
+class UserIngester
 {
-    /** @var LineItemCollection */
-    private $lineItemCollection;
+    /** @var NativeUserRepository */
+    private $userRepository;
 
-    /** @var LineItemRepository */
-    private $lineItemRepository;
+    /** @var NativeAssignmentRepository */
+    private $assignmentRepository;
 
-    public function __construct(LineItemRepository $lineItemRepository, ManagerRegistry $managerRegistry)
+    public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
     {
-        $this->lineItemRepository = $lineItemRepository;
-
-        parent::__construct($managerRegistry);
+        $this->userRepository = $userRepository;
+        $this->assignmentRepository = $assignmentRepository;
     }
 
-    public function getRegistryItemName(): string
+    public function ingest(UserDtoCollection $users): void
     {
-        return 'user';
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function prepare(): void
-    {
-        $this->lineItemCollection = $this->lineItemRepository->findAllAsCollection();
-
-        if ($this->lineItemCollection->isEmpty()) {
-            throw new Exception(
-                sprintf("Cannot ingest '%s' since line-item table is empty.", $this->getRegistryItemName())
-            );
-        }
-    }
-
-    /**
-     * @throws LineItemNotFoundException
-     */
-    protected function createEntity(array $data): EntityInterface
-    {
-        $assignment = new Assignment();
-        $assignment
-            ->setLineItem($this->lineItemCollection->getBySlug($data['slug']))
-            ->setState(Assignment::STATE_READY)
-            ->setAttemptsCount(0);
-
-        $user = (new User())
-            ->setUsername($data['username'])
-            ->setPassword($data['password'])
-            ->setPlainPassword($data['password'])
-            ->addAssignment($assignment);
-
-        if (isset($data['groupId'])) {
-            $user->setGroupId($data['groupId']);
+        $existingUsernames = [];
+        foreach ($this->userRepository->findUsernames($users->getAllUsernames()) as $existingUser) {
+            $existingUsernames[$existingUser['username']] = (int)$existingUser['id'];
         }
 
-        return $user;
+        $assignmentsToIngest = new AssignmentDtoCollection();
+        foreach ($users as $user) {
+            $assignmentsToIngest->merge($user->getAssignments());
+            if (array_key_exists($user->getUsername(), $existingUsernames)) {
+                $users->remove($user);
+
+                $user->assignUserIdForAssignments($existingUsernames[$user->getUsername()]);
+            }
+        }
+
+        $this->userRepository->insertMultiple($users);
+
+        $this->assignmentRepository->insertMultiple($assignmentsToIngest);
     }
 }

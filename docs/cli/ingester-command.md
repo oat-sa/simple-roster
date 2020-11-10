@@ -1,6 +1,6 @@
-# Data ingestion
+# Ingester command
 
-[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `lti-instance`, `line-item` and `user` data.
+[IngesterCommand](../../src/Command/Ingester/IngesterCommand.php) is responsible for ingesting `lti-instance` and `line-item` data into the application.
 
 - [Usage](#usage)
     - [Main arguments](#main-arguments)
@@ -16,7 +16,7 @@ $ sudo -u www-data bin/console roster:ingest <type> <path> <source> [--force]
 
 | Argument | Description |
 | ------------- |:-------------|
-| type | Can be **lti-instance**, **line-item** or **user** |
+| type | Can be **lti-instance** or **line-item** |
 | path | Local or S3 path to ingest data from |
 | source | Can be **local**, or **s3** [default: `local`] |
 
@@ -55,7 +55,7 @@ Ingesting line-items from a local CSV file:
 $ sudo -u www-data bin/console roster:ingest line-item /path/to/file.csv --force
 ```
 
-Ingesting users from a S3 bucket CSV file:
+Ingesting line-items from a S3 bucket CSV file:
 ```shell script
-$ sudo -u www-data bin/console roster:ingest user bucket/path/to/file.csv s3 --force
+$ sudo -u www-data bin/console roster:ingest line-item bucket/path/to/file.csv s3 --force
 ```

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,14 +15,14 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Ingester\Native;
+namespace App\Tests\Functional\Command\Ingester;
 
-use App\Command\Ingester\Native\NativeUserIngesterCommand;
+use App\Command\Ingester\UserIngesterCommand;
 use App\Entity\User;
 use App\Ingester\Ingester\LineItemIngester;
 use App\Ingester\Ingester\LtiInstanceIngester;
@@ -34,7 +34,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class NativeUserIngesterCommandTest extends KernelTestCase
+class UserIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
@@ -48,7 +48,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(NativeUserIngesterCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(UserIngesterCommand::NAME));
 
         $this->setUpDatabase();
     }
@@ -60,7 +60,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users.csv',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -76,7 +76,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertSame(1, $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users.csv',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -118,15 +118,15 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     {
         return [
             'withoutUsernameColumn' => [
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-username-column.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/users-without-username-column.csv',
                 'expectedExceptionMessage' => "Column 'username' is not set in source file.",
             ],
             'withoutPasswordColumn' => [
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-password-column.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/users-without-password-column.csv',
                 'expectedExceptionMessage' => "Column 'password' is not set in source file.",
             ],
             'withoutSlugColumn' => [
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users-without-slug-column.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/users-without-slug-column.csv',
                 'expectedExceptionMessage' => "Column 'slug' is not set in source file.",
             ],
         ];
@@ -139,7 +139,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users.csv',
                 '--force' => true,
             ],
             [
@@ -164,7 +164,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users.csv',
                 '--batch' => 2,
                 '--force' => true,
             ],
@@ -190,7 +190,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users-with-groupId.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users-with-groupId.csv',
                 '--batch' => 2,
                 '--force' => true,
             ],
@@ -228,7 +228,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Invalid/users.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/users.csv',
                 '--batch' => 1,
                 '--force' => true,
             ],
@@ -251,7 +251,7 @@ class NativeUserIngesterCommandTest extends KernelTestCase
         self::assertSame(0, $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../../Resources/Ingester/Valid/users-with-multiple-assignments.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/users-with-multiple-assignments.csv',
                 '--batch' => 2,
                 '--force' => true,
             ],
@@ -279,12 +279,12 @@ class NativeUserIngesterCommandTest extends KernelTestCase
     private function prepareIngestionContext(): void
     {
         static::$container->get(LtiInstanceIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../../Resources/Ingester/Valid/lti-instances.csv'),
+            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv'),
             false
         );
 
         static::$container->get(LineItemIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../../Resources/Ingester/Valid/line-items.csv'),
+            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv'),
             false
         );
     }

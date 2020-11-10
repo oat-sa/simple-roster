@@ -61,7 +61,9 @@ class IngesterCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Responsible for data ingesting from various sources (Local file, S3 bucket)');
+        $this->setDescription(
+            'Responsible for LTI instance and Line item ingestion from various sources (Local file, S3 bucket)'
+        );
 
         $this->addArgument(
             'type',

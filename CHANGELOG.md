@@ -4,10 +4,10 @@
 
 ### Added
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
-- Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
-- Added `usernames` and `line-item-slugs` input options to [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
+- Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
+- Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added default value (`local`) to `source` argument of [roster:ingest](docs/cli/ingester-command.md) command.
-- Added default value (`local`) to `source` argument of [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command.
+- Added default value (`local`) to `source` argument of [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.
@@ -17,30 +17,30 @@
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 
 ### Removed
-- Removed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
+- Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 
 ## 1.8.1 - 2020-10-27
 
 ### Changed
-- Switched from offset based pagination to cursor based in [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command for better performance.
-- Switched from ORM to native queries in [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command for better performance.
+- Switched from offset based pagination to cursor based in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command for better performance.
+- Switched from ORM to native queries in [roster:ingest:user](docs/cli/user-ingester-command.md) command for better performance.
 
 ### Fixed
-- Fixed bug in [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed bug in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command where lack of order by clause caused wrong pagination with PostgreSQL.
 - Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
 
 ## 1.8.0 - 2020-10-08
 
 ### Added
 - Added possibility to specify LTI key and secret through environment variables.
-- Added `modulo` and `remainder` options to [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
+- Added `modulo` and `remainder` options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command for parallelized cache warmups. More info [here](docs/cli/cache-warmer-command.md#advanced-usage).
 - Added separate log channel for cache warmup for better trackability of failed cache warmups.
-- Added possibility to ingest multiple assignments per user with [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command. More details [here](docs/cli/native-user-ingester-command.md#user-ingestion-with-multiple-assignments).
+- Added possibility to ingest multiple assignments per user with [roster:ingest:user](docs/cli/user-ingester-command.md) command. More details [here](docs/cli/user-ingester-command.md#user-ingestion-with-multiple-assignments).
 
 ### Changed
-- Performance improvement of [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command by counting the number of users by using process component.
+- Performance improvement of [roster:ingest:user](docs/cli/user-ingester-command.md) command by counting the number of users by using process component.
 
 ## 1.7.0 - 2020-09-16
 
@@ -121,13 +121,13 @@
 ## 1.4.1 - 2019-08-08
 
 ### Fixed
-- Fixed missing User `groupId` handling in [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command.
+- Fixed missing User `groupId` handling in [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Fixed PHPUnit version to `<8.3` because of https://github.com/symfony/symfony/issues/32879.
 
 ## 1.4.0 - 2019-07-23
 
 ### Added
-- Added `force` parameter to [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command.
+- Added `force` parameter to [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Added possibility to determine the `contextId` LTI request parameter based on LTI load balancing strategy.
 
 ### Fixed
@@ -137,7 +137,7 @@
 
 ### Added
 - Added `groupId` property to `User` entity for logical grouping of users.
-- Added possibility to warm up result cache by line item ids or user ids in [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
+- Added possibility to warm up result cache by line item ids or user ids in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Introduced LTI load balancing interface, implemented `User` group id based LTI load balancing strategy.
 
 ### Changed
