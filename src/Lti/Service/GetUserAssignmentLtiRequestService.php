@@ -24,73 +24,17 @@ namespace App\Lti\Service;
 
 use App\Entity\Assignment;
 use App\Exception\AssignmentNotProcessableException;
-use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use App\Lti\Factory\LtiRequestFactory;
 use App\Lti\Request\LtiRequest;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSigner;
-use Carbon\Carbon;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class GetUserAssignmentLtiRequestService
 {
-    public const LTI_VERSION_1P1 = 'LTI-1p1';
-    public const LTI_VERSION_1P3 = 'LTI-1p3';
+    /** @var LtiRequestFactory */
+    private $ltiRequestFactory;
 
-    /** @var OAuthSigner */
-    private $signer;
-
-    /** @var NonceGenerator */
-    private $generator;
-
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var LtiInstanceLoadBalancerInterface */
-    private $loadBalancer;
-
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
-
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
-
-    /** @var string */
-    private $ltiKey;
-
-    /** @var string */
-    private $ltiSecret;
-
-    /** @var string */
-    private $ltiVersion;
-
-    public function __construct(
-        OAuthSigner $signer,
-        NonceGenerator $generator,
-        RouterInterface $router,
-        LtiInstanceLoadBalancerInterface $loadBalancer,
-        string $ltiLaunchPresentationReturnUrl,
-        string $ltiLaunchPresentationLocale,
-        bool $ltiInstancesLoadBalancerEnabled,
-        string $ltiKey,
-        string $ltiSecret,
-        string $ltiVersion
-    ) {
-        $this->signer = $signer;
-        $this->generator = $generator;
-        $this->router = $router;
-        $this->loadBalancer = $loadBalancer;
-        $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
-        $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
-        $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
-        $this->ltiKey = $ltiKey;
-        $this->ltiSecret = $ltiSecret;
-        $this->ltiVersion = $ltiVersion;
+    public function __construct(LtiRequestFactory $ltiRequestFactory)
+    {
+        $this->ltiRequestFactory = $ltiRequestFactory;
     }
 
     /**
@@ -100,19 +44,7 @@ class GetUserAssignmentLtiRequestService
     {
         $this->checkIfAssignmentCanBeProcessed($assignment);
 
-        $ltiLink = $this->getAssignmentLtiLink($assignment);
-        $ltiParameters = $this->getAssignmentLtiParameters($assignment);
-        $contextParameters = $this->getContextParameters($ltiLink, $ltiParameters);
-
-        $parameters = $this->ltiVersion === self::LTI_VERSION_1P1
-            ? array_merge($contextParameters, $ltiParameters)
-            : [];
-
-        return new LtiRequest(
-            $ltiLink,
-            $this->ltiVersion,
-            $parameters
-        );
+        return $this->ltiRequestFactory->create($assignment);
     }
 
     /**
@@ -141,74 +73,5 @@ class GetUserAssignmentLtiRequestService
                 sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );
         }
-    }
-
-    private function getAssignmentLtiLink(Assignment $assignment): string
-    {
-        $link = $this->ltiInstancesLoadBalancerEnabled
-            ? $this->loadBalancer->getLtiInstanceUrl($assignment->getUser())
-            : $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink();
-
-        return sprintf(
-            '%s/%s',
-            $link,
-            base64_encode(
-                json_encode(
-                    ['delivery' => $assignment->getLineItem()->getUri()],
-                    JSON_THROW_ON_ERROR,
-                    512
-                )
-            )
-        );
-    }
-
-    private function getContextParameters(string $ltiLink, array $ltiParameters): array
-    {
-        $context = new OAuthContext(
-            '',
-            $this->ltiKey,
-            $this->generator->generate(),
-            OAuthContext::METHOD_MAC_SHA1,
-            (string)Carbon::now()->getTimestamp(),
-            OAuthContext::VERSION_1_0
-        );
-
-        $signature = $this->signer->sign(
-            $context,
-            $ltiLink,
-            Request::METHOD_POST,
-            $this->ltiSecret,
-            $ltiParameters
-        );
-
-        return [
-            'oauth_body_hash' => $context->getBodyHash(),
-            'oauth_consumer_key' => $context->getConsumerKey(),
-            'oauth_nonce' => $context->getNonce(),
-            'oauth_signature' => $signature,
-            'oauth_signature_method' => $context->getSignatureMethod(),
-            'oauth_timestamp' => $context->getTimestamp(),
-            'oauth_version' => $context->getVersion(),
-        ];
-    }
-
-    private function getAssignmentLtiParameters(Assignment $assignment): array
-    {
-        return [
-            'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
-            'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getUsername(),
-            'lis_person_name_full' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => $assignment->getId(),
-            'lis_outcome_service_url' => $this->router->generate(
-                'updateLtiOutcome',
-                [],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
-            'lis_result_sourcedid' => $assignment->getId(),
-            'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
-            'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
-        ];
     }
 }
