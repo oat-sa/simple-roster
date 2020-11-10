@@ -34,6 +34,7 @@ class Lti1p3RequestFactory
 {
     public function create(Assignment $assignment): LtiRequest
     {
+        $assignment->getState();
         return new LtiRequest('link', LtiRequest::LTI_VERSION_1P1, []);
     }
 }
