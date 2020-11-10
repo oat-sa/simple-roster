@@ -108,7 +108,9 @@ class IngesterCommandTest extends KernelTestCase
         );
 
         self::assertStringContainsString(
-            'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() must be of the type string, null given',
+            <<<MESSAGE_ERROR
+Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() must be of the type string, null given
+MESSAGE_ERROR,
             $this->commandTester->getDisplay()
         );
 
