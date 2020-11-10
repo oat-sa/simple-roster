@@ -6,7 +6,7 @@ parameters:
     - src
     - tests
   symfony:
-    container_xml_path: 'var/cache/test/App_KernelTestDebugContainer.xml'
+    container_xml_path: 'var/cache/test/OAT_SimpleRoster_KernelTestDebugContainer.xml'
   checkMissingIterableValueType: false
   checkGenericClassInNonGenericObjectType: false
   doctrine:
