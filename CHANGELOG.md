@@ -20,6 +20,7 @@
 ### Fixed
 - Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
 - Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
+- Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files
 
 ## 1.8.0 - 2020-10-08
 
