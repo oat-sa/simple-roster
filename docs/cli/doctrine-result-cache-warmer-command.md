@@ -4,6 +4,13 @@
 
 Currently we use result cache for `findByUsernameWithAssignments()` method in `UserRepository`.
 
+- [Basic usage](#basic-usage)
+    - [Main options](#main-options)
+    - [Examples](#examples)
+- [Advanced usage](#advanced-usage)
+    - [Advanced options](#advanced-options)
+    - [Example](#example)
+
 ## Basic usage
 ```bash
 $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
