@@ -184,7 +184,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 100 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
 
@@ -242,7 +242,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 10 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
 
@@ -275,7 +275,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 60 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay()
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
 

@@ -55,11 +55,6 @@
         "symfony/web-server-bundle": "^4.0"
     },
     "config": {
-        "platform": {
-            "php": "7.3",
-            "ext-redis": "5.2.1",
-            "ext-iconv": "1.11"
-        },
         "preferred-install": {
             "*": "dist"
         },
