@@ -32,10 +32,6 @@
     <rule ref="rulesets/design.xml">
         <exclude name="CouplingBetweenObjects"/> <!--todo-->
     </rule>
-    <rule ref="rulesets/naming.xml">
-        <exclude name="LongVariable"/>
-        <exclude name="ShortVariable"/>
-    </rule>
     <rule ref="rulesets/naming.xml/ShortVariable">
         <properties>
             <property name="exceptions" value="id"/>
