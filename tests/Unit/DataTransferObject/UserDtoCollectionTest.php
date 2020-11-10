@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\DataTransferObject;
+namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
-use App\DataTransferObject\UserDtoCollection;
-use App\Exception\UserNotFoundException;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Exception\UserNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class UserDtoCollectionTest extends TestCase

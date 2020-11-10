@@ -1,4 +1,4 @@
-App\Entity\LtiInstance:
+OAT\SimpleRoster\Entity\LtiInstance:
     cluster_w2n:
         __construct:
             id: 1

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Security\OAuth;
+namespace OAT\SimpleRoster\Tests\Unit\Security\OAuth;
 
-use App\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use PHPUnit\Framework\TestCase;
 
 class OAuthContextTest extends TestCase

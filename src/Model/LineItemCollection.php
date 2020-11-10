@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace OAT\SimpleRoster\Model;
 
-use App\Entity\LineItem;
-use App\Exception\LineItemNotFoundException;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 
 class LineItemCollection implements Countable, IteratorAggregate
 {

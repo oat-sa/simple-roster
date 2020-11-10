@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Service\HealthCheck;
+namespace OAT\SimpleRoster\Tests\Unit\Service\HealthCheck;
 
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Service\HealthCheck\HealthCheckService;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Service\HealthCheck\HealthCheckService;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;

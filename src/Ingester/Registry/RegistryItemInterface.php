@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Registry;
+namespace OAT\SimpleRoster\Ingester\Registry;
 
 interface RegistryItemInterface
 {

@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\EventListener\Doctrine;
+namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
 
-use App\Entity\User;
-use App\EventListener\Doctrine\UserPasswordEncoderListener;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;

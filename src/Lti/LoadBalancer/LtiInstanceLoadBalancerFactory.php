@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
-use App\Repository\LtiInstanceRepository;
 use LogicException;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 
 class LtiInstanceLoadBalancerFactory
 {

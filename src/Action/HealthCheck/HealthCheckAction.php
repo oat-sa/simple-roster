@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Action\HealthCheck;
+namespace OAT\SimpleRoster\Action\HealthCheck;
 
-use App\Responder\SerializerResponder;
-use App\Service\HealthCheck\HealthCheckService;
+use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\HealthCheck\HealthCheckService;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckAction

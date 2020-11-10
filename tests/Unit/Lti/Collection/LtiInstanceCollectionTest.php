@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Collection;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Collection;
 
-use App\Entity\LtiInstance;
-use App\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 

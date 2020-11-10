@@ -20,15 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Cache;
+namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
-use App\Command\Cache\DoctrineResultCacheWarmerCommand;
-use App\Entity\User;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\LtiInstanceRepository;
-use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\VoidCache;
 use Doctrine\ORM\Configuration;

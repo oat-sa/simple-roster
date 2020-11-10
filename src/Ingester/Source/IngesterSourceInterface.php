@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Source;
+namespace OAT\SimpleRoster\Ingester\Source;
 
-use App\Ingester\Registry\RegistryItemInterface;
 use Countable;
+use OAT\SimpleRoster\Ingester\Registry\RegistryItemInterface;
 use Traversable;
 
 interface IngesterSourceInterface extends RegistryItemInterface, Countable

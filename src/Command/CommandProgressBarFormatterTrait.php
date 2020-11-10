@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command;
+namespace OAT\SimpleRoster\Command;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;

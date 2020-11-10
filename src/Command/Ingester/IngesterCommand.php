@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Ingester;
+namespace OAT\SimpleRoster\Command\Ingester;
 
-use App\Ingester\Registry\IngesterRegistry;
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Ingester\Result\IngesterResult;
-use App\Ingester\Result\IngesterResultFailure;
-use App\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Registry\IngesterRegistry;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Ingester\Result\IngesterResult;
+use OAT\SimpleRoster\Ingester\Result\IngesterResultFailure;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\ResultSet;
+namespace OAT\SimpleRoster\ResultSet;
 
-use App\Model\UsernameCollection;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Model\UsernameCollection;
 
 class UsernameResultSet implements Countable, IteratorAggregate
 {

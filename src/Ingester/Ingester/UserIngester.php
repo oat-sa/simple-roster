@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\Entity\Assignment;
-use App\Entity\EntityInterface;
-use App\Entity\User;
-use App\Exception\LineItemNotFoundException;
-use App\Model\LineItemCollection;
-use App\Repository\LineItemRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 
 class UserIngester extends AbstractIngester
 {

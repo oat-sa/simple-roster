@@ -20,21 +20,21 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Ingester\Native;
+namespace OAT\SimpleRoster\Command\Ingester\Native;
 
-use App\Command\CommandProgressBarFormatterTrait;
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\UserDto;
-use App\DataTransferObject\UserDtoCollection;
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\LineItemNotFoundException;
-use App\Ingester\Ingester\NativeUserIngester;
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Ingester\Source\IngesterSourceInterface;
-use App\Model\LineItemCollection;
-use App\Repository\LineItemRepository;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Ingester\Ingester\NativeUserIngester;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

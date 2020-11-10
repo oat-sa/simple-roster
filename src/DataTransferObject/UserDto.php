@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\DataTransferObject;
+namespace OAT\SimpleRoster\DataTransferObject;
 
 use InvalidArgumentException;
 

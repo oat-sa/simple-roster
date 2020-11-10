@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Collection;
+namespace OAT\SimpleRoster\Lti\Collection;
 
-use App\Entity\LtiInstance;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OutOfBoundsException;
 use Traversable;
 

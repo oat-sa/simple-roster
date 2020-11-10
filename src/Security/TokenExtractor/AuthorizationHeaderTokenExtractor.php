@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Security\TokenExtractor;
+namespace OAT\SimpleRoster\Security\TokenExtractor;
 
 use Symfony\Component\HttpFoundation\Request;
 

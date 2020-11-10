@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Command\Cache;
+namespace OAT\SimpleRoster\Tests\Unit\Command\Cache;
 
-use App\Command\Cache\DoctrineResultCacheWarmerCommand;
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\LtiInstanceRepository;
-use App\Repository\UserRepository;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

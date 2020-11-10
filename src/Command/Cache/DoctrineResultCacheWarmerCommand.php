@@ -20,19 +20,19 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Cache;
+namespace OAT\SimpleRoster\Command\Cache;
 
-use App\Command\CommandProgressBarFormatterTrait;
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\Criteria\EuclideanDivisionCriterion;
-use App\Repository\Criteria\FindUserCriteria;
-use App\Repository\LtiInstanceRepository;
-use App\Repository\UserRepository;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

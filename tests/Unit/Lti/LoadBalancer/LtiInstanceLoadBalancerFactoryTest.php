@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
-use App\Lti\Collection\LtiInstanceCollection;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
-use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
-use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
-use App\Repository\LtiInstanceRepository;
 use LogicException;
+use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
+use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\Entity\EntityInterface;
-use App\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\LtiInstance;
 
 class LtiInstanceIngester extends AbstractIngester
 {

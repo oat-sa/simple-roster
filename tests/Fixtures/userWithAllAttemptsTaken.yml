@@ -1,4 +1,4 @@
-App\Entity\LineItem:
+OAT\SimpleRoster\Entity\LineItem:
     lineItem2:
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
@@ -7,14 +7,14 @@ App\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 2
 
-App\Entity\User:
+OAT\SimpleRoster\Entity\User:
     user2:
         username: 'userWithAllAttemptsTaken'
         plainPassword: 'password'
         groupId: 'group_1'
         assignments: ['@assignment2']
 
-App\Entity\Assignment:
+OAT\SimpleRoster\Entity\Assignment:
     assignment2:
         lineItem: '@lineItem2'
         state: 'completed'

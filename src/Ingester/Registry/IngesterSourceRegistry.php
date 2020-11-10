@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Registry;
+namespace OAT\SimpleRoster\Ingester\Registry;
 
-use App\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 
 class IngesterSourceRegistry
 {

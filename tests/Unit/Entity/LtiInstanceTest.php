@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Entity;
+namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use App\Entity\EntityInterface;
-use App\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use PHPUnit\Framework\TestCase;
 
 class LtiInstanceTest extends TestCase

@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace OAT\SimpleRoster\Service;
 
-use App\Exception\AssignmentNotFoundException;
-use App\Repository\AssignmentRepository;
 use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService

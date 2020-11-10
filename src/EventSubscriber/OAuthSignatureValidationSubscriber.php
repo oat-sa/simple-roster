@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace OAT\SimpleRoster\EventSubscriber;
 
-use App\Repository\LtiInstanceRepository;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
-use App\Security\OAuth\OAuthSigner;
 use Doctrine\ORM\NonUniqueResultException;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;

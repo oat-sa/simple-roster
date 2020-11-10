@@ -20,15 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Command\GarbageCollector;
+namespace OAT\SimpleRoster\Command\GarbageCollector;
 
-use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
 use ArrayIterator;
 use Carbon\Carbon;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

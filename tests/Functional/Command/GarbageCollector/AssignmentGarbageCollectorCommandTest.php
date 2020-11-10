@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\GarbageCollector;
+namespace OAT\SimpleRoster\Tests\Functional\Command\GarbageCollector;
 
-use App\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
-use App\Entity\Assignment;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Carbon\Carbon;
 use DateTime;
 use Monolog\Logger;

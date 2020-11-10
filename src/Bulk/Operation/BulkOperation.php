@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Bulk\Operation;
+namespace OAT\SimpleRoster\Bulk\Operation;
 
 class BulkOperation
 {
