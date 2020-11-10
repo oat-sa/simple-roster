@@ -11,6 +11,9 @@
 - Changed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command to `usernames` and `line-item-slugs`.
 - Application namespace now is `OAT\SimpleRoster` instead of `App`
 
+### Fixed
+- Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files
+
 ## 1.8.1 - 2020-10-27
 
 ### Changed
@@ -20,7 +23,6 @@
 ### Fixed
 - Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
 - Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
-- Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files
 
 ## 1.8.0 - 2020-10-08
 
