@@ -13,6 +13,7 @@
 - Raised minimum required PHP version from `7.2` to `7.3`.
 - Upgraded Symfony framework version from `4` to `5`.
 - `REDIS_DOCTRINE_USER_CACHE_TTL` environment variable has been renamed to `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS`.
+- Renamed `.env.dist` to `.env` following [Symfony best practices](https://symfony.com/doc/current/configuration/dot-env-changes.html).
 
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
