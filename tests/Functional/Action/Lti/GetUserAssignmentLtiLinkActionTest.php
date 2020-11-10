@@ -193,6 +193,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(
             [
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
@@ -202,7 +203,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -245,6 +245,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(
             [
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
@@ -254,7 +255,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -305,6 +305,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(
             [
                 'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
@@ -314,7 +315,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
