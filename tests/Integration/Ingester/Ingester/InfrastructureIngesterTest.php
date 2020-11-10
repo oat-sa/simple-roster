@@ -113,11 +113,11 @@ class InfrastructureIngesterTest extends KernelTestCase
             $failure->getData()
         );
 
-        $messageError = 'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() '
+        $errorMessage = 'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() '
             . 'must be of the type string, null given';
 
         self::assertStringContainsString(
-            $messageError,
+            $errorMessage,
             $failure->getReason()
         );
     }
