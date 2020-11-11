@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Exception;
+namespace OAT\SimpleRoster\Lti\Exception;
 
 use RuntimeException;
 
