@@ -20,15 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Factory;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Generator\NonceGenerator;
-use App\Lti\Factory\Lti1p1RequestFactory;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

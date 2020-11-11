@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Factory;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
-use App\Entity\Assignment;
-use App\Lti\Exception\InvalidLtiVersionException;
-use App\Lti\Factory\Lti1p1RequestFactory;
-use App\Lti\Factory\Lti1p3RequestFactory;
-use App\Lti\Factory\LtiRequestFactory;
-use App\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
+use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
+use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
