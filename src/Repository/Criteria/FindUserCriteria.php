@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Criteria;
+namespace OAT\SimpleRoster\Repository\Criteria;
 
 use Exception;
 

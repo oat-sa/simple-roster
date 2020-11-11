@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Bulk;
+namespace OAT\SimpleRoster\Command\Bulk;
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
-use App\Bulk\Result\BulkResult;
-use App\Command\CommandProgressBarFormatterTrait;
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
+use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

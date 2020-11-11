@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Factory;
+namespace OAT\SimpleRoster\Lti\Factory;
 
-use App\Entity\Assignment;
-use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Lti\Request\LtiRequest;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
 use JsonException;
 use Symfony\Component\HttpFoundation\Request;

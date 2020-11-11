@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Model;
+namespace OAT\SimpleRoster\Tests\Unit\Model;
 
-use App\Entity\LineItem;
-use App\Exception\LineItemNotFoundException;
-use App\Model\LineItemCollection;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Model\LineItemCollection;
 use Countable;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;

@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\LineItem;
-use App\Model\LineItemCollection;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Model\LineItemCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

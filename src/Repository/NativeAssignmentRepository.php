@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\DataTransferObject\AssignmentDtoCollection;
-use App\Entity\Assignment;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\Entity\Assignment;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;

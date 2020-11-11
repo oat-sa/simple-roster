@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Extractor;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Extractor;
 
-use App\Exception\InvalidLtiReplaceResultBodyException;
-use App\Lti\Extractor\ReplaceResultSourceIdExtractor;
+use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
+use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
 use PHPUnit\Framework\TestCase;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase

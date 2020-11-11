@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\EventSubscriber;
+namespace OAT\SimpleRoster\Tests\Integration\EventSubscriber;
 
-use App\EventSubscriber\ErrorHandlerSubscriber;
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;

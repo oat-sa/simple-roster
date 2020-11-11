@@ -20,18 +20,18 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Action\Lti;
+namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
-use App\Lti\Request\LtiRequest;
-use App\Repository\UserRepository;
-use App\Security\OAuth\OAuthContext;
-use App\Tests\Traits\DatabaseTestingTrait;
-use App\Tests\Traits\LoggerTestingTrait;
-use App\Tests\Traits\UserAuthenticatorTrait;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
 use DateTimeZone;
 use Monolog\Logger;

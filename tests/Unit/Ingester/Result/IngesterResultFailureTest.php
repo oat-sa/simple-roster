@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Ingester\Result;
+namespace OAT\SimpleRoster\Tests\Unit\Ingester\Result;
 
-use App\Ingester\Result\IngesterResultFailure;
+use OAT\SimpleRoster\Ingester\Result\IngesterResultFailure;
 use PHPUnit\Framework\TestCase;
 
 class IngesterResultFailureTest extends TestCase

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Extractor;
+namespace OAT\SimpleRoster\Lti\Extractor;
 
-use App\Exception\InvalidLtiReplaceResultBodyException;
+use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;
 use Throwable;
 

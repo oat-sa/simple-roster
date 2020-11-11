@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Ingester\Registry;
+namespace OAT\SimpleRoster\Tests\Unit\Ingester\Registry;
 
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

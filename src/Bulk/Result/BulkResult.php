@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Bulk\Result;
+namespace OAT\SimpleRoster\Bulk\Result;
 
-use App\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use JsonSerializable;
 
 class BulkResult implements JsonSerializable

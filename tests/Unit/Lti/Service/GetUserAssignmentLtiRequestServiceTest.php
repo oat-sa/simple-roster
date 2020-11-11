@@ -20,15 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Service;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Exception\AssignmentNotProcessableException;
-use App\Lti\Factory\LtiRequestFactory;
-use App\Lti\Request\LtiRequest;
-use App\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

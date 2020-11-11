@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Repository\Criteria;
+namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
 
-use App\Repository\Criteria\EuclideanDivisionCriterion;
+use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

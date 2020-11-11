@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Ingester\Source;
+namespace OAT\SimpleRoster\Tests\Integration\Ingester\Source;
 
-use App\Ingester\Source\LocalCsvIngesterSource;
+use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
 use PHPUnit\Framework\TestCase;
 
 class LocalCsvIngesterSourceTest extends TestCase

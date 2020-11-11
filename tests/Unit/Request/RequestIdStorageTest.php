@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Request;
+namespace OAT\SimpleRoster\Tests\Unit\Request;
 
-use App\Request\RequestIdStorage;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 

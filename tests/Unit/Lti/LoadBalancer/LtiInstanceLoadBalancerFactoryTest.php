@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
-use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
-use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
+use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 

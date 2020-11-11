@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace OAT\SimpleRoster\Entity;
 
 use DateTimeInterface;
 use JsonSerializable;

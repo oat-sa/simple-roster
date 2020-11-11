@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace OAT\SimpleRoster;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

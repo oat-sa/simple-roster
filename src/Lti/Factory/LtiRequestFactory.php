@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Factory;
+namespace OAT\SimpleRoster\Lti\Factory;
 
-use App\Entity\Assignment;
-use App\Lti\Exception\InvalidLtiVersionException;
-use App\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class LtiRequestFactory
 {

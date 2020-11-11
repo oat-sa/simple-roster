@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace OAT\SimpleRoster\EventSubscriber;
 
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;

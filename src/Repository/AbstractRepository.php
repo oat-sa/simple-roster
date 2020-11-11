@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\EntityInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace OAT\SimpleRoster\Model;
 
 use ArrayIterator;
 use Countable;

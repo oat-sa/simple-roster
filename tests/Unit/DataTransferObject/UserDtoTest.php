@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\DataTransferObject;
+namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\AssignmentDtoCollection;
-use App\DataTransferObject\UserDto;
-use App\Entity\Assignment;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
+use OAT\SimpleRoster\Entity\Assignment;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

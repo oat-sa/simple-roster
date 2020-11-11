@@ -20,15 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Factory;
+namespace OAT\SimpleRoster\Lti\Factory;
 
-use App\Entity\Assignment;
-use App\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 /**
  * Lti1p3RequestFactory
  *
- * @package App\Lti\Factory
+ * @package OAT\SimpleRoster\Lti\Factory
  */
 class Lti1p3RequestFactory
 {

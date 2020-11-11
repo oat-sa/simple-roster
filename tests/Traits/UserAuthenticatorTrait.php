@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Traits;
+namespace OAT\SimpleRoster\Tests\Traits;
 
-use App\Entity\User;
+use OAT\SimpleRoster\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;

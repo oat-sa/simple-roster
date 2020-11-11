@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\Service;
+namespace OAT\SimpleRoster\Lti\Service;
 
-use App\Entity\Assignment;
-use App\Exception\AssignmentNotProcessableException;
-use App\Lti\Factory\LtiRequestFactory;
-use App\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class GetUserAssignmentLtiRequestService
 {

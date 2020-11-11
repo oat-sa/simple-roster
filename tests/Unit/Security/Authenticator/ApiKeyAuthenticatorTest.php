@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Security\Authenticator;
+namespace OAT\SimpleRoster\Tests\Unit\Security\Authenticator;
 
-use App\Security\Authenticator\ApiKeyAuthenticator;
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+use OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
