@@ -35,6 +35,6 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
     public function create(Assignment $assignment): LtiRequest
     {
         $assignment->getState();
-        return new LtiRequest('links', LtiRequest::LTI_VERSION_1P1, []);
+        return new LtiRequest('link', LtiRequest::LTI_VERSION_1P3, []);
     }
 }

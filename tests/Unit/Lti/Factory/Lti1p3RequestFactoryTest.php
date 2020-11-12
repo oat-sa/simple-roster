@@ -25,53 +25,21 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Generator\NonceGenerator;
-use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
-use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
-use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\RouterInterface;
 
-class Lti1p1RequestFactoryTest extends TestCase
+class Lti1p3RequestFactoryTest extends TestCase
 {
-    /** @var Lti1p1RequestFactory */
+    /** @var Lti1p3RequestFactory */
     private $subject;
-
-    /** @var LtiInstanceLoadBalancerInterface|MockObject */
-    private $loadBalancer;
-
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
-
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ltiLaunchPresentationReturnUrl = 'http://example.com/index.html';
-        $this->ltiLaunchPresentationLocale = 'fr-FR';
-        $this->ltiInstancesLoadBalancerEnabled = true;
-        $this->loadBalancer = $this->createMock(LtiInstanceLoadBalancerInterface::class);
-
-        $this->subject = new Lti1p1RequestFactory(
-            $this->createMock(OAuthSigner::class),
-            $this->createMock(NonceGenerator::class),
-            $this->createMock(RouterInterface::class),
-            $this->loadBalancer,
-            $this->ltiLaunchPresentationReturnUrl,
-            $this->ltiLaunchPresentationLocale,
-            $this->ltiInstancesLoadBalancerEnabled,
-            'testLtiKey',
-            'testLtiSecret',
-        );
+        $this->subject = new Lti1p3RequestFactory();
     }
 
     /**
@@ -103,37 +71,11 @@ class Lti1p1RequestFactoryTest extends TestCase
             ->setAttemptsCount($attemptsCount)
             ->setState($assignmentStatus);
 
-        $expectedLtiContextId = 'expectedLtiContextId';
-
-        $this->loadBalancer
-            ->expects(self::once())
-            ->method('getLtiRequestContextId')
-            ->with($assignment)
-            ->willReturn($expectedLtiContextId);
-
         self::assertSame(
             [
-                'ltiLink' => '/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
-                'ltiParams' => [
-                    'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'testLtiKey',
-                    'oauth_nonce' => '',
-                    'oauth_signature' => '',
-                    'oauth_signature_method' => 'HMAC-SHA1',
-                    'oauth_timestamp' => (string)Carbon::now()->timestamp,
-                    'oauth_version' => '1.0',
-                    'lti_message_type' => 'basic-lti-launch-request',
-                    'context_id' => $expectedLtiContextId,
-                    'roles' => 'Learner',
-                    'user_id' => 'testUsername',
-                    'lis_person_name_full' => 'testUsername',
-                    'resource_link_id' => 5,
-                    'lis_outcome_service_url' => null,
-                    'lis_result_sourcedid' => 5,
-                    'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
-                    'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
-                ],
+                'ltiLink' => 'link',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P3,
+                'ltiParams' => [],
             ],
             $this->subject->create($assignment)->jsonSerialize()
         );

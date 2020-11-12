@@ -184,6 +184,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -221,6 +222,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     /**
@@ -236,6 +239,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -273,6 +277,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     /**
@@ -283,6 +289,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
@@ -358,6 +365,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(1, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
@@ -394,5 +403,43 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             },
             Logger::INFO
         );
+
+        Carbon::setTestNow();
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLti1p3Link(): void
+    {
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P3;
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        self::assertSame(
+            [
+                'ltiLink' => 'link',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P3,
+                'ltiParams' => [],
+            ],
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+        );
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 }
