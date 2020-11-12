@@ -375,7 +375,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
      * @param mixed $modulo
      * @param mixed $remainder
      *
-     * #@dataProvider provideInvalidModuloAndRemainderInputs
+     * @dataProvider provideInvalidModuloAndRemainderInputs
      */
     public function testItThrowsExceptionIfInvalidModuloOrRemainderParametersReceived(
         string $expectedExceptionMessage,
