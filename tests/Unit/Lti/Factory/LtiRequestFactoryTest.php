@@ -73,7 +73,7 @@ class LtiRequestFactoryTest extends TestCase
         $this->assertTrue($result instanceof Lti1p3RequestFactory);
     }
 
-    public function testShouldThrowInvalidLtiVersionException()
+    public function testShouldThrowInvalidLtiVersionException(): void
     {
         $this->expectException(InvalidLtiVersionException::class);
         $this->expectExceptionMessage('Invalid LTI Version specified: InvalidVersion');
