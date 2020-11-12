@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\Entity\EntityInterface;
-use App\Ingester\Result\IngesterResult;
-use App\Ingester\Result\IngesterResultFailure;
-use App\Ingester\Source\IngesterSourceInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Ingester\Result\IngesterResult;
+use OAT\SimpleRoster\Ingester\Result\IngesterResultFailure;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface

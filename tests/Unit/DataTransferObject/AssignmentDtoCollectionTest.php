@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\DataTransferObject;
+namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use Countable;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;

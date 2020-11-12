@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Security\TokenExtractor;
+namespace OAT\SimpleRoster\Tests\Unit\Security\TokenExtractor;
 
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 

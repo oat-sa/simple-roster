@@ -20,7 +20,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="App\Repository\LtiInstanceRepository" name="App\Entity\LtiInstance"
+    <entity repository-class="OAT\SimpleRoster\Repository\LtiInstanceRepository" name="OAT\SimpleRoster\Entity\LtiInstance"
             table="lti_instances">
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>

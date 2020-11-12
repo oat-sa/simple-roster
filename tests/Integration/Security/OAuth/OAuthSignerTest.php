@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Security\OAuth;
+namespace OAT\SimpleRoster\Tests\Integration\Security\OAuth;
 
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

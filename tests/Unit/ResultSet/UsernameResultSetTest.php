@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\ResultSet;
+namespace OAT\SimpleRoster\Tests\Unit\ResultSet;
 
-use App\Model\UsernameCollection;
-use App\ResultSet\UsernameResultSet;
+use OAT\SimpleRoster\Model\UsernameCollection;
+use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 use PHPUnit\Framework\TestCase;
 
 class UsernameResultSetTest extends TestCase

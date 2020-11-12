@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Model;
+namespace OAT\SimpleRoster\Tests\Unit\Model;
 
-use App\Model\UsernameCollection;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Model\UsernameCollection;
 use PHPUnit\Framework\TestCase;
 
 class UsernameCollectionTest extends TestCase

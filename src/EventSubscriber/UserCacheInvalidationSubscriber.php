@@ -20,17 +20,17 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace OAT\SimpleRoster\EventSubscriber;
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\UserRepository;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\UserRepository;
 
 class UserCacheInvalidationSubscriber implements EventSubscriber
 {

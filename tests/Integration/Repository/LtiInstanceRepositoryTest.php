@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Repository;
+namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use App\Entity\LtiInstance;
-use App\Repository\LtiInstanceRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LtiInstanceRepositoryTest extends KernelTestCase

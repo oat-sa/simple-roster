@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Repository;
+namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\AssignmentDtoCollection;
-use App\DataTransferObject\UserDto;
-use App\DataTransferObject\UserDtoCollection;
-use App\Entity\User;
-use App\Repository\NativeUserRepository;
-use App\Repository\UserRepository;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class NativeUserRepositoryTest extends KernelTestCase

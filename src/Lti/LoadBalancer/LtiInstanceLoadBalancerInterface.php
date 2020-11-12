@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
-use App\Entity\Assignment;
-use App\Entity\LtiInstance;
-use App\Entity\User;
-use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
-use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 interface LtiInstanceLoadBalancerInterface
 {

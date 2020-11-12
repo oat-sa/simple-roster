@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
-use App\Entity\Assignment;
-use App\Entity\LtiInstance;
-use App\Entity\User;
-use App\Lti\Collection\LtiInstanceCollection;
-use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
-use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
+use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Traits;
+namespace OAT\SimpleRoster\Tests\Traits;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;

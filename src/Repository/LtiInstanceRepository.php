@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\LtiInstance;
-use App\Lti\Collection\LtiInstanceCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
 
 /**
  * @method LtiInstance|null   find($id, $lockMode = null, $lockVersion = null)

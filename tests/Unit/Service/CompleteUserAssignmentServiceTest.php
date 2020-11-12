@@ -20,14 +20,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Service;
+namespace OAT\SimpleRoster\Tests\Unit\Service;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Exception\AssignmentNotFoundException;
-use App\Repository\AssignmentRepository;
-use App\Service\CompleteUserAssignmentService;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

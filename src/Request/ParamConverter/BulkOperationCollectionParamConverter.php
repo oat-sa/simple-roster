@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Request\ParamConverter;
+namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Http\Exception\RequestEntityTooLargeHttpException;
 use JsonException;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Http\Exception\RequestEntityTooLargeHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;

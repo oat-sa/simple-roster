@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Entity;
+namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use App\Entity\LineItem;
 use DateTime;
+use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
 
 class LineItemTest extends TestCase

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\HealthCheck;
+namespace OAT\SimpleRoster\Tests\Unit\HealthCheck;
 
-use App\HealthCheck\HealthCheckResult;
+use OAT\SimpleRoster\HealthCheck\HealthCheckResult;
 use PHPUnit\Framework\TestCase;
 
 class HealthCheckResultTest extends TestCase

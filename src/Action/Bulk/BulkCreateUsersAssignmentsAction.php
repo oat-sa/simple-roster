@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Action\Bulk;
+namespace OAT\SimpleRoster\Action\Bulk;
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Responder\SerializerResponder;
-use App\Service\Bulk\BulkCreateUsersAssignmentsService;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
 use Symfony\Component\HttpFoundation\Response;
 
 class BulkCreateUsersAssignmentsAction

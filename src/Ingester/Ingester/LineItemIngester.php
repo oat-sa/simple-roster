@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Ingester\Ingester;
+namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use App\Entity\EntityInterface;
-use App\Entity\LineItem;
 use DateTime;
 use Exception;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\LineItem;
 
 class LineItemIngester extends AbstractIngester
 {

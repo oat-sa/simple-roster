@@ -21,9 +21,9 @@
                     \League\Csv\Reader,
                     \Symfony\Component\HttpFoundation\JsonResponse,
                     \Symfony\Component\HttpFoundation\Request,
-                    \App\EventSubscriber\ErrorHandlerSubscriber,
-                    \App\EventSubscriber\OAuthSignatureValidationSubscriber,
-                    \App\EventSubscriber\RequestIdGeneratorSubscriber
+                    \OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber,
+                    \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
+                    \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber
                 </value>
             </property>
         </properties>
@@ -31,10 +31,6 @@
     <rule ref="rulesets/controversial.xml"/>
     <rule ref="rulesets/design.xml">
         <exclude name="CouplingBetweenObjects"/> <!--todo-->
-    </rule>
-    <rule ref="rulesets/naming.xml">
-        <exclude name="LongVariable"/>
-        <exclude name="ShortVariable"/>
     </rule>
     <rule ref="rulesets/naming.xml/ShortVariable">
         <properties>

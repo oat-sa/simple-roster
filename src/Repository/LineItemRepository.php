@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\LineItem;
-use App\Model\LineItemCollection;
 use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Model\LineItemCollection;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)

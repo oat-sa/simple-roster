@@ -20,21 +20,21 @@
 
 declare(strict_types=1);
 
-namespace App\Command\Ingester;
+namespace OAT\SimpleRoster\Command\Ingester;
 
-use App\Command\CommandProgressBarFormatterTrait;
-use App\DataTransferObject\AssignmentDto;
-use App\DataTransferObject\UserDto;
-use App\DataTransferObject\UserDtoCollection;
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\LineItemNotFoundException;
-use App\Ingester\Ingester\UserIngester;
-use App\Ingester\Registry\IngesterSourceRegistry;
-use App\Ingester\Source\IngesterSourceInterface;
-use App\Model\LineItemCollection;
-use App\Repository\LineItemRepository;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Ingester\Ingester\UserIngester;
+use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
+use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -57,7 +57,7 @@ class UserIngesterCommand extends Command
     private $ingesterSourceRegistry;
 
     /** @var UserIngester */
-    private $nativeUserIngester;
+    private $userIngester;
 
     /** @var LineItemRepository */
     private $lineItemRepository;
@@ -81,7 +81,7 @@ class UserIngesterCommand extends Command
         UserPasswordEncoderInterface $passwordEncoder
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
-        $this->nativeUserIngester = $nativeUserIngester;
+        $this->userIngester = $nativeUserIngester;
         $this->lineItemRepository = $lineItemRepository;
         $this->passwordEncoder = $passwordEncoder;
 
@@ -188,7 +188,7 @@ class UserIngesterCommand extends Command
 
                 if ($numberOfProcessedRows % $this->batchSize === 0) {
                     if (!$this->isDryRun) {
-                        $this->nativeUserIngester->ingest($userDtoCollection);
+                        $this->userIngester->ingest($userDtoCollection);
                     }
 
                     $userDtoCollection->clear();
@@ -199,7 +199,7 @@ class UserIngesterCommand extends Command
             }
 
             if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
-                $this->nativeUserIngester->ingest($userDtoCollection);
+                $this->userIngester->ingest($userDtoCollection);
             }
 
             $progressBar->finish();

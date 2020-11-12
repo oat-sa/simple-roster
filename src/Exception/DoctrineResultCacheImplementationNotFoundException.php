@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Exception;
+namespace OAT\SimpleRoster\Exception;
 
 use RuntimeException;
 

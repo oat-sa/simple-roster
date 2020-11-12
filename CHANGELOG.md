@@ -15,11 +15,15 @@
 - `REDIS_DOCTRINE_USER_CACHE_TTL` environment variable has been renamed to `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS`.
 - Renamed `.env.dist` to `.env` based on [Symfony recommendations](https://symfony.com/doc/current/configuration/dot-env-changes.html).
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
+- Changed the Application namespace to `OAT\SimpleRoster` instead of `App`
 
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
+
+### Fixed
+- Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files.
 
 ## 1.8.1 - 2020-10-27
 

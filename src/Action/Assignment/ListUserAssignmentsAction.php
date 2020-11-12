@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Action\Assignment;
+namespace OAT\SimpleRoster\Action\Assignment;
 
-use App\Entity\User;
-use App\Responder\SerializerResponder;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 

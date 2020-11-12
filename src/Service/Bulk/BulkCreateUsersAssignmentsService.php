@@ -20,18 +20,18 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Bulk;
+namespace OAT\SimpleRoster\Service\Bulk;
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
-use App\Bulk\Result\BulkResult;
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

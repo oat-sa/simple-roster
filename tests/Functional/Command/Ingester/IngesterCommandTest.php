@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Command\Ingester;
+namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
-use App\Command\Ingester\IngesterCommand;
-use App\Entity\LtiInstance;
-use App\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Command\Ingester\IngesterCommand;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -107,8 +107,11 @@ class IngesterCommandTest extends KernelTestCase
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
+        $errorMessage = 'Argument 5 passed to OAT\SimpleRoster\Entity\LtiInstance::__construct() '
+            . 'must be of the type string, null given';
+
         self::assertStringContainsString(
-            'Argument 5 passed to App\Entity\LtiInstance::__construct() must be of the type string, null given',
+            $errorMessage,
             $this->commandTester->getDisplay()
         );
 

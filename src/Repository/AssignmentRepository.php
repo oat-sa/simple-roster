@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace OAT\SimpleRoster\Repository;
 
-use App\Entity\Assignment;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\Assignment;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)

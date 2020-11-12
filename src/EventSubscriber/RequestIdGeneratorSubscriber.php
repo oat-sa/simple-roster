@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace OAT\SimpleRoster\EventSubscriber;
 
-use App\Request\RequestIdStorage;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

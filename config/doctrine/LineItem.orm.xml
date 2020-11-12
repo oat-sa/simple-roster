@@ -20,7 +20,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="App\Repository\LineItemRepository" name="App\Entity\LineItem" table="line_items">
+    <entity repository-class="OAT\SimpleRoster\Repository\LineItemRepository" name="OAT\SimpleRoster\Entity\LineItem" table="line_items">
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="line_items_id_seq" allocation-size="1" initial-value="1"/>

@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Request\ParamConverter;
+namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use PHPUnit\Framework\TestCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;

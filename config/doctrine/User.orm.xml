@@ -20,7 +20,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="App\Repository\UserRepository" name="App\Entity\User" table="users">
+    <entity repository-class="OAT\SimpleRoster\Repository\UserRepository" name="OAT\SimpleRoster\Entity\User" table="users">
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="users_id_seq" allocation-size="1" initial-value="1"/>
@@ -29,16 +29,16 @@
         <field name="password" column="password" length="255"/>
         <field name="roles" type="json_array" column="roles"/>
         <field name="groupId" column="group_id" length="255" nullable="true"/>
-        <one-to-many field="assignments" target-entity="App\Entity\Assignment" mapped-by="user" fetch="LAZY">
+        <one-to-many field="assignments" target-entity="OAT\SimpleRoster\Entity\Assignment" mapped-by="user" fetch="LAZY">
             <cascade>
                 <cascade-persist/>
             </cascade>
         </one-to-many>
         <entity-listeners>
-            <entity-listener class="App\EventListener\Doctrine\UserPasswordEncoderListener">
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener">
                 <lifecycle-callback type="prePersist" method="prePersist"/>
             </entity-listener>
-            <entity-listener class="App\EventListener\Doctrine\UserPasswordEncoderListener">
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener">
                 <lifecycle-callback type="preUpdate" method="preUpdate"/>
             </entity-listener>
         </entity-listeners>

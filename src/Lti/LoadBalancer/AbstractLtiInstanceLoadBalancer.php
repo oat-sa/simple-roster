@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Lti\LoadBalancer;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
-use App\Entity\LtiInstance;
-use App\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
 
 /**
  * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php

@@ -182,5 +182,5 @@ $ sudo -u www-data bin/console doctrine:cache:clear-result
 
 ## Application logs
 
-Application logs can be found in `var/log/[dev|prod].log` file.
+Application logs can be found in `var/log/` folder.
 

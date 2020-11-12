@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Bulk\Processor;
+namespace OAT\SimpleRoster\Bulk\Processor;
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Bulk\Result\BulkResult;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
 
 interface BulkOperationCollectionProcessorInterface
 {

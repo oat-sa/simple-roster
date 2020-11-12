@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Generator;
+namespace OAT\SimpleRoster\Tests\Unit\Generator;
 
-use App\Generator\NonceGenerator;
+use OAT\SimpleRoster\Generator\NonceGenerator;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
