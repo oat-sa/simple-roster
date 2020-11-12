@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class Lti1p1RequestFactory
+class Lti1p1RequestFactory implements LtiRequestFactoryInterface
 {
     /** @var OAuthSigner */
     private $signer;

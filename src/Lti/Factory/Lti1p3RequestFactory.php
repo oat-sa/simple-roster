@@ -30,7 +30,7 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
  *
  * @package OAT\SimpleRoster\Lti\Factory
  */
-class Lti1p3RequestFactory
+class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
     public function create(Assignment $assignment): LtiRequest
     {

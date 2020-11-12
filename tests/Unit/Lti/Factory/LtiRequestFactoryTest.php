@@ -55,20 +55,9 @@ class LtiRequestFactoryTest extends TestCase
             $this->lti1p3RequestFactory
         );
 
-        $assignment = new Assignment();
+        $result = $subject->__invoke();
 
-        $this->lti1p1RequestFactory
-            ->expects($this->once())
-            ->method('create')
-            ->with($assignment);
-
-        $this->lti1p3RequestFactory
-            ->expects($this->never())
-            ->method('create');
-
-        $result = $subject->create($assignment);
-
-        $this->assertTrue($result instanceof LtiRequest);
+        $this->assertTrue($result instanceof Lti1p1RequestFactory);
     }
 
     public function testShouldCreateLti1p3Request(): void
@@ -79,20 +68,9 @@ class LtiRequestFactoryTest extends TestCase
             $this->lti1p3RequestFactory
         );
 
-        $assignment = new Assignment();
+        $result = $subject->__invoke();
 
-        $this->lti1p1RequestFactory
-            ->expects($this->never())
-            ->method('create');
-
-        $this->lti1p3RequestFactory
-            ->expects($this->once())
-            ->method('create')
-            ->with($assignment);
-
-        $result = $subject->create($assignment);
-
-        $this->assertTrue($result instanceof LtiRequest);
+        $this->assertTrue($result instanceof Lti1p3RequestFactory);
     }
 
     public function testShouldThrowInvalidLtiVersionException()
@@ -106,6 +84,6 @@ class LtiRequestFactoryTest extends TestCase
             $this->lti1p3RequestFactory
         );
 
-        $subject->create(new Assignment());
+        $subject->__invoke();
     }
 }

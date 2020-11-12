@@ -50,13 +50,13 @@ class LtiRequestFactory
     /**
      * @throws InvalidLtiVersionException
      */
-    public function create(Assignment $assignment): LtiRequest
+    public function __invoke(): LtiRequestFactoryInterface
     {
         switch ($this->ltiVersion) {
             case LtiRequest::LTI_VERSION_1P1:
-                return $this->lti1p1RequestFactory->create($assignment);
+                return $this->lti1p1RequestFactory;
             case LtiRequest::LTI_VERSION_1P3:
-                return $this->lti1p3RequestFactory->create($assignment);
+                return $this->lti1p3RequestFactory;
             default:
                 throw new InvalidLtiVersionException('Invalid LTI Version specified: ' . $this->ltiVersion);
         }

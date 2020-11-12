@@ -24,15 +24,15 @@ namespace OAT\SimpleRoster\Lti\Service;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
-use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class GetUserAssignmentLtiRequestService
 {
-    /** @var LtiRequestFactory */
+    /** @var LtiRequestFactoryInterface */
     private $ltiRequestFactory;
 
-    public function __construct(LtiRequestFactory $ltiRequestFactory)
+    public function __construct(LtiRequestFactoryInterface $ltiRequestFactory)
     {
         $this->ltiRequestFactory = $ltiRequestFactory;
     }

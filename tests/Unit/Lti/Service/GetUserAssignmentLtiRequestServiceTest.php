@@ -26,7 +26,7 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
-use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
+use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use Carbon\Carbon;
@@ -38,14 +38,14 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
     /** @var GetUserAssignmentLtiRequestService */
     private $subject;
 
-    /** @var LtiRequestFactory|MockObject  */
+    /** @var Lti1p1RequestFactory|MockObject  */
     private $ltiRequestFactory;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ltiRequestFactory = $this->createMock(LtiRequestFactory::class);
+        $this->ltiRequestFactory = $this->createMock(Lti1p1RequestFactory::class);
 
         $this->subject = new GetUserAssignmentLtiRequestService($this->ltiRequestFactory);
     }

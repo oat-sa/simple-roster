@@ -106,6 +106,9 @@ services:
         arguments:
             - '%app.lti.load_balancing_strategy%'
 
+    OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
+        factory: '@OAT\SimpleRoster\Lti\Factory\LtiRequestFactory'
+
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
 
