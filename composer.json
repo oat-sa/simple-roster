@@ -16,6 +16,7 @@
         "league/csv": "^9.0",
         "nelmio/cors-bundle": "^2.0",
         "nesbot/carbon": "^2.11",
+        "oat-sa/bundle-lti1p3": "^3.0",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/apache-pack": "^1.0",

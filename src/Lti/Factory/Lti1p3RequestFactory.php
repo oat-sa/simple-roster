@@ -22,19 +22,60 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Factory;
 
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Exception\InvalidRegistrationException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
-/**
- * Lti1p3RequestFactory
- *
- * @package OAT\SimpleRoster\Lti\Factory
- */
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
+    /** @var RegistrationRepositoryInterface */
+    private $repository;
+
+    /** @var LtiResourceLinkLaunchRequestBuilder */
+    private $builder;
+
+    public function __construct(
+        RegistrationRepositoryInterface $repository,
+        LtiResourceLinkLaunchRequestBuilder $builder
+    ) {
+        $this->repository = $repository;
+        $this->builder = $builder;
+    }
+
     public function create(Assignment $assignment): LtiRequest
     {
-        $assignment->getState();
-        return new LtiRequest('link', LtiRequest::LTI_VERSION_1P3, []);
+        $registrationId = 'demo';
+        $resourceLink = new LtiResourceLink($assignment->getLineItem()->getUri());
+        $registration = $this->repository->find($registrationId);
+
+        if (!$registration) {
+            throw new InvalidRegistrationException(sprintf('Registration %s is invalid.', $registrationId));
+        }
+
+        $loginHint = $assignment->getUser()->getUsername();
+
+        $message = $this->builder->buildLtiResourceLinkLaunchRequest(
+            $resourceLink,
+            $registration,
+            $loginHint,
+            null,
+            [
+                LtiRequest::LTI_ROLE
+            ],
+            [
+                new ContextClaim(
+                    (string)$assignment->getId(),
+                    [],
+                    $assignment->getLineItem()->getSlug(),
+                    $assignment->getLineItem()->getLabel(),
+                )
+            ]
+        );
+
+        return new LtiRequest($message->toUrl(), LtiRequest::LTI_VERSION_1P3, []);
     }
 }

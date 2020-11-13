@@ -115,3 +115,6 @@ services:
     OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
             $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+
+    OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
+        class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
