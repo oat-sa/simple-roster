@@ -29,7 +29,7 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OutOfBoundsException;
 use Traversable;
 
-class LtiInstanceCollection implements Countable, IteratorAggregate
+class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
 {
     /** @var LtiInstance[] */
     private $ltiInstances = [];
