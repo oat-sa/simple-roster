@@ -218,7 +218,7 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             $context,
             'http://localhost/api/v1/lti/outcome',
             'POST',
-                $ltiInstance->getLtiSecret()
+            $ltiInstance->getLtiSecret()
         );
     }
 
