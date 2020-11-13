@@ -34,7 +34,7 @@ The application currently offers the following CLI commands:
 | Command                               | Description                                | Links                                                    |
 | --------------------------------------|:-------------------------------------------|:---------------------------------------------------------|
 | `roster:ingest`                       | Data ingestion (lti instances, line items) | [link](docs/cli/ingester-command.md)                     |
-| `roster:ingest:user`                  | Native user ingestion                      | [link](docs/cli/user-ingester-command.md)                |
+| `roster:ingest:user`                  | User ingestion                             | [link](docs/cli/user-ingester-command.md)                |
 | `roster:garbage-collector:assignment` | Assignment garbage collection              | [link](docs/cli/assignment-garbage-collector-command.md) |
 | `roster:cache:warmup`                 | Application cache warmer                   | [link](docs/cli/cache-warmer-command.md)                 | 
 | `roster:assignments:bulk-cancel`      | Assignment bulk cancellation               | [link](docs/cli/assignment-bulk-cancellation-command.md) |
