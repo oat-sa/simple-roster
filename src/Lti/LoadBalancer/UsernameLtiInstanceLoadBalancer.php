@@ -23,13 +23,14 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
-    public function getLtiInstanceUrl(User $user): string
+    public function getLtiInstance(User $user): LtiInstance
     {
-        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getUsername());
+        return $this->computeLtiInstanceByString((string)$user->getUsername());
     }
 
     public function getLtiRequestContextId(Assignment $assignment): string

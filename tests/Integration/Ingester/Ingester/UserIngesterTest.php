@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Ingester\Ingester;
 
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
 use OAT\SimpleRoster\Ingester\Ingester\LineItemIngester;
+use OAT\SimpleRoster\Ingester\Ingester\LtiInstanceIngester;
 use OAT\SimpleRoster\Ingester\Ingester\UserIngester;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
@@ -171,8 +171,8 @@ class UserIngesterTest extends KernelTestCase
 
     private function prepareIngestionContext(): void
     {
-        static::$container->get(InfrastructureIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv'),
+        static::$container->get(LtiInstanceIngester::class)->ingest(
+            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv'),
             false
         );
 

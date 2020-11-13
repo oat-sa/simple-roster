@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Model;
 
-use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 
 class LineItemCollection implements Countable, IteratorAggregate
 {

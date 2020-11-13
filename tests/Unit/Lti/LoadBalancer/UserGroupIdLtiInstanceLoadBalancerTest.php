@@ -23,7 +23,9 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
@@ -32,6 +34,9 @@ use PHPUnit\Framework\TestCase;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
+    /** @var UniqueLtiInstanceCollection */
+    private $ltiInstanceCollection;
+
     /** @var UserGroupIdLtiInstanceLoadBalancer */
     private $subject;
 
@@ -39,13 +44,15 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         parent::setUp();
 
-        $this->subject = new UserGroupIdLtiInstanceLoadBalancer([
-            'http://lb_infra_1',
-            'http://lb_infra_2',
-            'http://lb_infra_3',
-            'http://lb_infra_4',
-            'http://lb_infra_5',
-        ]);
+        $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
+        $this->ltiInstanceCollection
+            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
+            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
+            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
+            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
+            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+
+        $this->subject = new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
 
     public function testIfItIsLtiInstanceLoadBalancer(): void
@@ -57,37 +64,38 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiInstanceUrlException::class);
 
-        $this->subject->getLtiInstanceUrl(new User());
+        $this->subject->getLtiInstance(new User());
     }
 
     public function testItCanLoadBalanceByUsername(): void
     {
         $expectedResultsMap = [
-            'userGroupId_1' => 'http://lb_infra_4',
-            'userGroupId_2' => 'http://lb_infra_4',
-            'userGroupId_3' => 'http://lb_infra_3',
-            'userGroupId_4' => 'http://lb_infra_5',
-            'userGroupId_5' => 'http://lb_infra_2',
-            'userGroupId_6' => 'http://lb_infra_2',
-            'userGroupId_7' => 'http://lb_infra_1',
-            'userGroupId_8' => 'http://lb_infra_4',
-            'userGroupId_9' => 'http://lb_infra_2',
-            'userGroupId_10' => 'http://lb_infra_1',
+            'userGroupId_1' => $this->ltiInstanceCollection->getByIndex(3),
+            'userGroupId_2' => $this->ltiInstanceCollection->getByIndex(3),
+            'userGroupId_3' => $this->ltiInstanceCollection->getByIndex(2),
+            'userGroupId_4' => $this->ltiInstanceCollection->getByIndex(4),
+            'userGroupId_5' => $this->ltiInstanceCollection->getByIndex(1),
+            'userGroupId_6' => $this->ltiInstanceCollection->getByIndex(1),
+            'userGroupId_7' => $this->ltiInstanceCollection->getByIndex(0),
+            'userGroupId_8' => $this->ltiInstanceCollection->getByIndex(3),
+            'userGroupId_9' => $this->ltiInstanceCollection->getByIndex(1),
+            'userGroupId_10' => $this->ltiInstanceCollection->getByIndex(0),
         ];
 
-        foreach ($expectedResultsMap as $userGroupId => $expectedLtiInstanceUrl) {
+        /** @var LtiInstance $expectedLtiInstance */
+        foreach ($expectedResultsMap as $userGroupId => $expectedLtiInstance) {
             $user = (new User())->setGroupId($userGroupId);
 
-            $actualLtiInstanceUrl = $this->subject->getLtiInstanceUrl($user);
+            $actualLtiInstance = $this->subject->getLtiInstance($user);
 
             self::assertSame(
-                $expectedLtiInstanceUrl,
-                $actualLtiInstanceUrl,
+                $expectedLtiInstance,
+                $actualLtiInstance,
                 sprintf(
                     "Expected LTI instance url for user with username '%s' is '%s', '%s' received",
                     $userGroupId,
-                    $expectedLtiInstanceUrl,
-                    $actualLtiInstanceUrl
+                    $expectedLtiInstance->getLabel(),
+                    $actualLtiInstance->getLabel()
                 )
             );
         }

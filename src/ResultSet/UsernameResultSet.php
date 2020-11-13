@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\ResultSet;
 
-use OAT\SimpleRoster\Model\UsernameCollection;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Model\UsernameCollection;
 
 class UsernameResultSet implements Countable, IteratorAggregate
 {

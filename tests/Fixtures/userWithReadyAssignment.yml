@@ -1,13 +1,14 @@
-OAT\SimpleRoster\Entity\Infrastructure:
-    infrastructure1:
-        label: 'The first infrastructure'
-        ltiDirectorLink: 'http://lti-director.com'
-        ltiKey: 'myKey'
-        ltiSecret: 'mySecret'
+OAT\SimpleRoster\Entity\LtiInstance:
+    ltiInstance:
+        __construct:
+            id: 1
+            label: 'testLtiInstance'
+            ltiLink: 'https://lti-instance.taocolud.org'
+            ltiKey: 'testLtiKey'
+            ltiSecret: 'testLtiSecret'
 
 OAT\SimpleRoster\Entity\LineItem:
     lineItem1:
-        infrastructure: '@infrastructure1'
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug'

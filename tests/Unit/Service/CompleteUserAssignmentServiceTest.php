@@ -67,7 +67,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -104,7 +103,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -141,7 +139,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug');

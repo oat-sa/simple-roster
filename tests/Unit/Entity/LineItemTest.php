@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use OAT\SimpleRoster\Entity\LineItem;
 use DateTime;
+use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
 
 class LineItemTest extends TestCase

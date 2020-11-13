@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Ingester\Native;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
@@ -34,7 +35,6 @@ use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\LineItemRepository;
-use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -93,18 +93,19 @@ class NativeUserIngesterCommand extends Command
         $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
-            'source',
-            InputArgument::REQUIRED,
-            sprintf(
-                'Source type to ingest from, possible values: ["%s"]',
-                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
-            )
-        );
-
-        $this->addArgument(
             'path',
             InputArgument::REQUIRED,
             'Source path to ingest from'
+        );
+
+        $this->addArgument(
+            'source',
+            InputArgument::OPTIONAL,
+            sprintf(
+                'Source type to ingest from, possible values: ["%s"]',
+                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
+            ),
+            'local'
         );
 
         $this->addOption(
@@ -249,6 +250,6 @@ class NativeUserIngesterCommand extends Command
     {
         $lineItem = $lineItems->getBySlug($lineItemSlug);
 
-        return new AssignmentDto(Assignment::STATE_READY, $lineItem->getId(), 0);
+        return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), 0);
     }
 }

@@ -29,13 +29,14 @@ The main configuration file is `.env`, located in root folder.
 | APP_DEBUG | Application debug mode, [default: `false`] |
 | APP_SECRET | Application secret |
 | APP_API_KEY | Application API Key |
-| APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. For details, follow: [Applying custom route prefix](#applying-custom-route-prefix)
+| APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
 | DATABASE_URL | Database url |
-| REDIS_DOCTRINE_USER_CACHE_TTL | Doctrine User entity cache storage TTL [default: `3600`] |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
 | REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
 | REDIS_SESSION_CACHE_PORT | Redis port for sessions cache storage |
+| CACHE_TTL_GET_USER_WITH_ASSIGNMENTS | Cache TTL (in seconds) for get user with assignments [default: `3600`] |
+| CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list [default: `3600`] |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
   
@@ -45,21 +46,18 @@ The main configuration file is `.env`, located in root folder.
 | ------------- |:-------------|
 | AWS_REGION | AWS Region [default: `eu-west-1`] |
 | AWS_VERSION | AWS Version [default: `latest`] |
-| AWS_KEY | AWS Key |
-| AWS_SECRET | AWS Secret |
+| AWS_KEY | AWS Key (used only in `dev` environment) |
+| AWS_SECRET | AWS Secret (used only in `dev` environment) |
 | AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
      
 #### LTI related environment variables
 
 | Parameter | Description |
 | ------------- |:-------------|
-| LTI_ENABLE_INSTANCES_LOAD_BALANCER | Whether the LTI link should be load balanced or not [default: `false`] |
 | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
 | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
-| LTI_KEY | LTI consumer key for LTI launch |
-| LTI_SECRET | LTI consumer secret for LTI launch |
 
 #### Blackfire related environment variables
 
@@ -185,3 +183,4 @@ $ sudo -u www-data bin/console doctrine:cache:clear-result
 ## Application logs
 
 Application logs can be found in `var/log/` folder.
+

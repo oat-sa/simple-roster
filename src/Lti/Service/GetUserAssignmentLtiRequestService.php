@@ -22,14 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Service;
 
+use Carbon\Carbon;
+use JsonException;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
-use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -54,25 +57,13 @@ class GetUserAssignmentLtiRequestService
     /** @var string */
     private $ltiLaunchPresentationLocale;
 
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
-
-    /** @var string */
-    private $ltiKey;
-
-    /** @var string */
-    private $ltiSecret;
-
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
         RouterInterface $router,
         LtiInstanceLoadBalancerInterface $loadBalancer,
         string $ltiLaunchPresentationReturnUrl,
-        string $ltiLaunchPresentationLocale,
-        bool $ltiInstancesLoadBalancerEnabled,
-        string $ltiKey,
-        string $ltiSecret
+        string $ltiLaunchPresentationLocale
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
@@ -80,35 +71,35 @@ class GetUserAssignmentLtiRequestService
         $this->loadBalancer = $loadBalancer;
         $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
         $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
-        $this->ltiInstancesLoadBalancerEnabled = $ltiInstancesLoadBalancerEnabled;
-        $this->ltiKey = $ltiKey;
-        $this->ltiSecret = $ltiSecret;
     }
 
     /**
      * @throws AssignmentNotProcessableException
+     * @throws JsonException
      */
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
         $this->checkIfAssignmentCanBeProcessed($assignment);
 
+        $ltiInstance = $this->loadBalancer->getLtiInstance($assignment->getUser());
+
         $context = new OAuthContext(
             '',
-            $this->ltiKey,
+            $ltiInstance->getLtiKey(),
             $this->generator->generate(),
             OAuthContext::METHOD_MAC_SHA1,
             (string)Carbon::now()->getTimestamp(),
             OAuthContext::VERSION_1_0
         );
 
-        $ltiLink = $this->getAssignmentLtiLink($assignment);
+        $ltiLink = $this->getLtiLaunchLink($ltiInstance, $assignment->getLineItem());
         $ltiParameters = $this->getAssignmentLtiParameters($assignment);
 
         $signature = $this->signer->sign(
             $context,
             $ltiLink,
             Request::METHOD_POST,
-            $this->ltiSecret,
+            $ltiInstance->getLtiSecret(),
             $ltiParameters
         );
 
@@ -157,18 +148,14 @@ class GetUserAssignmentLtiRequestService
         }
     }
 
-    private function getAssignmentLtiLink(Assignment $assignment): string
+    private function getLtiLaunchLink(LtiInstance $ltiInstance, LineItem $lineItem): string
     {
-        $link = $this->ltiInstancesLoadBalancerEnabled
-            ? $this->loadBalancer->getLtiInstanceUrl($assignment->getUser())
-            : $assignment->getLineItem()->getInfrastructure()->getLtiDirectorLink();
-
         return sprintf(
-            '%s/%s',
-            $link,
+            '%s/ltiDeliveryProvider/DeliveryTool/launch/%s',
+            rtrim($ltiInstance->getLtiLink(), '/'),
             base64_encode(
                 json_encode(
-                    ['delivery' => $assignment->getLineItem()->getUri()],
+                    ['delivery' => $lineItem->getUri()],
                     JSON_THROW_ON_ERROR,
                     512
                 )

@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\DataTransferObject;
 
-use OAT\SimpleRoster\Exception\UserNotFoundException;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Exception\UserNotFoundException;
 
 class UserDtoCollection implements Countable, IteratorAggregate
 {

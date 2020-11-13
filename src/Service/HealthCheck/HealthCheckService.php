@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\HealthCheck;
 
+use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\HealthCheck\HealthCheckResult;
-use Doctrine\ORM\EntityManagerInterface;
 
 class HealthCheckService
 {

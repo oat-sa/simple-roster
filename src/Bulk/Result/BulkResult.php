@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Bulk\Result;
 
-use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use JsonSerializable;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 
 class BulkResult implements JsonSerializable
 {

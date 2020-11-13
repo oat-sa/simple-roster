@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester\Source;
 
-use OAT\SimpleRoster\Ingester\Registry\RegistryItemInterface;
 use Countable;
+use OAT\SimpleRoster\Ingester\Registry\RegistryItemInterface;
 use Traversable;
 
 interface IngesterSourceInterface extends RegistryItemInterface, Countable

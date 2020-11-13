@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester\Registry;
 
-use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 
 class IngesterSourceRegistry
 {

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
@@ -32,7 +33,7 @@ interface LtiInstanceLoadBalancerInterface
     /**
      * @throws IndeterminableLtiInstanceUrlException
      */
-    public function getLtiInstanceUrl(User $user): string;
+    public function getLtiInstance(User $user): LtiInstance;
 
     /**
      * @throws IndeterminableLtiRequestContextIdException

@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Model;
 
-use OAT\SimpleRoster\Model\UsernameCollection;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\Model\UsernameCollection;
 use PHPUnit\Framework\TestCase;
 
 class UsernameCollectionTest extends TestCase

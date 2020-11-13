@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Model;
 
+use Countable;
+use IteratorAggregate;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Model\LineItemCollection;
-use Countable;
-use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
 
 class LineItemCollectionTest extends TestCase

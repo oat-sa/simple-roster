@@ -22,39 +22,16 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester\Ingester;
 
-use OAT\SimpleRoster\Entity\EntityInterface;
-use OAT\SimpleRoster\Entity\Infrastructure;
-use OAT\SimpleRoster\Entity\LineItem;
 use DateTime;
 use Exception;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\LineItem;
 
 class LineItemIngester extends AbstractIngester
 {
-    /** @var Infrastructure[] */
-    private $infrastructureCollection;
-
     public function getRegistryItemName(): string
     {
         return 'line-item';
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function prepare(): void
-    {
-        /** @var Infrastructure[] $infrastructures */
-        $infrastructures = $this->managerRegistry->getRepository(Infrastructure::class)->findAll();
-
-        if (empty($infrastructures)) {
-            throw new Exception(
-                sprintf("Cannot ingest '%s' since infrastructure table is empty.", $this->getRegistryItemName())
-            );
-        }
-
-        foreach ($infrastructures as $infrastructure) {
-            $this->infrastructureCollection[$infrastructure->getLabel()] = $infrastructure;
-        }
     }
 
     /**
@@ -68,8 +45,7 @@ class LineItemIngester extends AbstractIngester
             ->setUri($data['uri'])
             ->setLabel($data['label'])
             ->setSlug($data['slug'])
-            ->setMaxAttempts((int)$data['maxAttempts'])
-            ->setInfrastructure($this->infrastructureCollection[$data['infrastructure']]);
+            ->setMaxAttempts((int)$data['maxAttempts']);
 
         if (isset($data['startTimestamp']) && $data['endTimestamp']) {
             $lineItem
