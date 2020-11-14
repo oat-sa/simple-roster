@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Lti\Exception;
 
 use LogicException;
 
-class InvalidRegistrationException extends LogicException
+class RegistrationNotFoundException extends LogicException
 {
 
 }

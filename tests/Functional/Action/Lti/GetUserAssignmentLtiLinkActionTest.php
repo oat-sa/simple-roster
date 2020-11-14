@@ -426,14 +426,31 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        self::assertSame(
-            [
-                'ltiLink' => 'link',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P3,
-                'ltiParams' => [],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+        $responseData = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertStringContainsString(
+            'iss=https://simple-roster.docker.localhost/platform',
+            urldecode($responseData['ltiLink'])
         );
+        self::assertStringContainsString(
+            'login_hint=user1',
+            urldecode($responseData['ltiLink'])
+        );
+        self::assertStringContainsString(
+            'target_link_uri=http://localhost:8888/tool/launch',
+            urldecode($responseData['ltiLink'])
+        );
+        self::assertStringContainsString(
+            'lti_deployment_id=1',
+            urldecode($responseData['ltiLink'])
+        );
+        self::assertStringContainsString(
+            'client_id=demo',
+            urldecode($responseData['ltiLink'])
+        );
+
+        self::assertSame(LtiRequest::LTI_VERSION_1P3, $responseData['ltiVersion']);
+        self::assertSame([], $responseData['ltiParams']);
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);

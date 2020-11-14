@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
-use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
@@ -47,7 +46,7 @@ class LtiRequestFactoryTest extends TestCase
         $this->lti1p3RequestFactory = $this->createMock(Lti1p3RequestFactory::class);
     }
 
-    public function testShouldCreateLti1p1Request(): void
+    public function testShouldReturnLti1p1RequestFactory(): void
     {
         $subject = new LtiRequestFactory(
             LtiRequest::LTI_VERSION_1P1,
@@ -60,7 +59,7 @@ class LtiRequestFactoryTest extends TestCase
         $this->assertTrue($result instanceof Lti1p1RequestFactory);
     }
 
-    public function testShouldCreateLti1p3Request(): void
+    public function testShouldReturnLti1p3RequestFactory(): void
     {
         $subject = new LtiRequestFactory(
             LtiRequest::LTI_VERSION_1P3,

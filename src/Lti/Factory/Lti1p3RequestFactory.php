@@ -27,7 +27,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Lti\Exception\InvalidRegistrationException;
+use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
@@ -53,7 +53,7 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
         $registration = $this->repository->find($registrationId);
 
         if (!$registration) {
-            throw new InvalidRegistrationException(sprintf('Registration %s is invalid.', $registrationId));
+            throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $registrationId));
         }
 
         $loginHint = $assignment->getUser()->getUsername();

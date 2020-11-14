@@ -45,7 +45,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
         /** @var User $user */
         $user = $this->userRepository->findOneBy(['username' => $loginHint]);
 
-        if (!$user) {
+        if ($user === null) {
             throw new UserNotFoundException('User not found based on hint: ' . $loginHint);
         }
 

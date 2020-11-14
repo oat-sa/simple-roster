@@ -22,12 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
+use Carbon\Carbon;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
-use Carbon\Carbon;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class Lti1p3RequestFactoryTest extends TestCase
@@ -35,11 +41,20 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var Lti1p3RequestFactory */
     private $subject;
 
+    /** @var LtiResourceLinkLaunchRequestBuilder|MockObject */
+    private $builder;
+
+    /** @var RegistrationRepositoryInterface|MockObject */
+    private $repository;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->subject = new Lti1p3RequestFactory();
+        $this->builder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
+        $this->repository = $this->createMock(RegistrationRepositoryInterface::class);
+
+        $this->subject = new Lti1p3RequestFactory($this->repository, $this->builder);
     }
 
     /**
@@ -52,24 +67,20 @@ class Lti1p3RequestFactoryTest extends TestCase
     ): void {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts)
-            ->setUri('http://test-delivery-uri.html');
+        $assignment = $this->createAssignmentMock($maxAttempts, $attemptsCount, $assignmentStatus);
 
-        $user = (new User())
-            ->setUsername('testUsername');
+        $this->createRegistrationMock();
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
+        $message = $this->createMock(LtiMessageInterface::class);
+        $message
+            ->expects($this->once())
+            ->method('toUrl')
+            ->willReturn('link');
 
-        $assignment
-            ->method('getId')
-            ->willReturn(5);
-
-        $assignment
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount($attemptsCount)
-            ->setState($assignmentStatus);
+        $this->builder
+            ->expects($this->once())
+            ->method('buildLtiResourceLinkLaunchRequest')
+            ->willReturn($message);
 
         self::assertSame(
             [
@@ -117,5 +128,51 @@ class Lti1p3RequestFactoryTest extends TestCase
                 'assignmentState' => Assignment::STATE_STARTED,
             ],
         ];
+    }
+
+    public function testShouldThrowRegistrationNotFoundException(): void
+    {
+        $this->expectException(RegistrationNotFoundException::class);
+        $this->expectExceptionMessage('Registration demo not found.');
+
+        $assignment = $this->createAssignmentMock(5, 1, Assignment::STATE_READY);
+
+        $this->subject->create($assignment);
+    }
+
+    private function createAssignmentMock(int $maxAttempts, int $attemptsCount, string $assignmentStatus): Assignment
+    {
+        $lineItem = (new LineItem())
+            ->setMaxAttempts($maxAttempts)
+            ->setUri('http://test-delivery-uri.html')
+            ->setSlug('slug')
+            ->setLabel('label');
+
+        $user = (new User())
+            ->setUsername('testUsername');
+
+        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
+
+        $assignment
+            ->method('getId')
+            ->willReturn(5);
+
+        $assignment
+            ->setLineItem($lineItem)
+            ->setUser($user)
+            ->setAttemptsCount($attemptsCount)
+            ->setState($assignmentStatus);
+
+        return $assignment;
+    }
+
+    private function createRegistrationMock(): void
+    {
+        $registration = $this->createMock(RegistrationInterface::class);
+
+        $this->repository
+            ->expects($this->once())
+            ->method('find')
+            ->willReturn($registration);
     }
 }
