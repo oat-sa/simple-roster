@@ -129,7 +129,7 @@ class BulkCancelUsersAssignmentsCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'source' => 'local',
-                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv',
+                'path' => __DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv',
             ],
             [
                 'capture_stderr_separately' => true,

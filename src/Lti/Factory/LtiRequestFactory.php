@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Factory;
 
-use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
@@ -53,7 +52,7 @@ class LtiRequestFactory
     public function __invoke(): LtiRequestFactoryInterface
     {
         switch ($this->ltiVersion) {
-            case LtiRequest::LTI_VERSION_1P1:
+            case LtiRequest::LTI_VERSION_1P0:
                 return $this->lti1p1RequestFactory;
             case LtiRequest::LTI_VERSION_1P3:
                 return $this->lti1p3RequestFactory;

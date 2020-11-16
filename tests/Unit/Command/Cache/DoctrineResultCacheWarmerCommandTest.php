@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Command\Cache;
 
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
@@ -46,9 +47,12 @@ class DoctrineResultCacheWarmerCommandTest extends TestCase
 
         new DoctrineResultCacheWarmerCommand(
             $this->createMock(UserRepository::class),
+            $this->createMock(LtiInstanceRepository::class),
             $this->createMock(UserCacheIdGenerator::class),
             $entityManager,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0,
+            0
         );
     }
 }

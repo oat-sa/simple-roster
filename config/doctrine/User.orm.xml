@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This program is free software; you can redistribute it and/or
+  ~  modify it under the terms of the GNU General Public License
+  ~  as published by the Free Software Foundation; under version 2
+  ~  of the License (non-upgradable).
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program; if not, write to the Free Software
+  ~  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+  ~
+  ~  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+  -->
+
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
@@ -7,10 +25,10 @@
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="users_id_seq" allocation-size="1" initial-value="1"/>
         </id>
-        <field name="username" type="string" column="username" length="255" unique="true" nullable="false"/>
-        <field name="password" type="string" column="password" length="255" nullable="false"/>
-        <field name="roles" type="json_array" column="roles" nullable="false"/>
-        <field name="groupId" type="string" column="group_id" length="255" nullable="true"/>
+        <field name="username" column="username" length="255" unique="true"/>
+        <field name="password" column="password" length="255"/>
+        <field name="roles" type="json_array" column="roles"/>
+        <field name="groupId" column="group_id" length="255" nullable="true"/>
         <one-to-many field="assignments" target-entity="OAT\SimpleRoster\Entity\Assignment" mapped-by="user" fetch="LAZY">
             <cascade>
                 <cascade-persist/>

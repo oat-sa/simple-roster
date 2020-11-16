@@ -30,14 +30,14 @@ class LocalCsvIngesterSourceTest extends TestCase
     public function testGetContentWithDefaultDelimiter(): void
     {
         $subject = new LocalCsvIngesterSource();
-        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $output = $subject->getContent();
 
         foreach ($output as $row) {
             self::assertCount(4, $row);
             self::assertStringContainsString('infra', $row['label']);
-            self::assertStringContainsString('http://infra', $row['ltiDirectorLink']);
+            self::assertStringContainsString('http://infra', $row['ltiLink']);
             self::assertStringContainsString('key', $row['ltiKey']);
             self::assertStringContainsString('secret', $row['ltiSecret']);
         }
@@ -47,7 +47,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     {
         $subject = new LocalCsvIngesterSource();
         $subject
-            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv')
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv')
             ->setDelimiter('|');
 
         $output = $subject->getContent();
@@ -61,7 +61,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     {
         $subject = new LocalCsvIngesterSource();
         $subject
-            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/UTF-16LE-infrastructures.csv')
+            ->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/UTF-16LE-lti-instances.csv')
             ->setCharset('UTF-16LE');
 
         $output = $subject->getContent();
@@ -69,7 +69,7 @@ class LocalCsvIngesterSourceTest extends TestCase
         foreach ($output as $row) {
             self::assertCount(4, $row);
             self::assertSame('ms', $row['label']);
-            self::assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiDirectorLink']);
+            self::assertSame('https://itinv01exp.invalsi.taocloud.org', $row['ltiLink']);
             self::assertSame('key', $row['ltiKey']);
             self::assertSame('secret', $row['ltiSecret']);
         }
@@ -78,7 +78,7 @@ class LocalCsvIngesterSourceTest extends TestCase
     public function testContentIsCountable(): void
     {
         $subject = new LocalCsvIngesterSource();
-        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $subject->setPath(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         self::assertCount(3, $subject);
     }

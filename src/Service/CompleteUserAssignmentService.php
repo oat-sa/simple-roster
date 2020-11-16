@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service;
 
+use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
-use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService

@@ -12,15 +12,15 @@
 
 ## Usage
 ```shell script
-$ sudo -u www-data bin/console roster:native-ingest:user <source> <path> [--batch=1000]
+$ sudo -u www-data bin/console roster:native-ingest:user <path> <source> [--batch=1000]
 ```
 
 ### Main arguments
 
-| Option | Description |
-| ------------- |:-------------|
-| source | Can be **local**, or **s3** |
-| path   |  Local or S3 path to ingest data from |
+| Argument | Description |
+| -------- |:-------------|
+| path   | Local or S3 path to ingest data from |
+| source | Can be **local**, or **s3** [default: `local`] |
 
 ### Main options
 
@@ -80,20 +80,20 @@ assignment creation for each user.
 
 Native ingesting users from a local CSV file:
 ```shell script
-$ sudo -u www-data bin/console roster:native-ingest:user local /path/to/file.csv --force
+$ sudo -u www-data bin/console roster:native-ingest:user /path/to/file.csv --force
 ```
 
 Native ingesting users from a local UTF-16LE encoded CSV file:
 ```shell script
-$ sudo -u www-data bin/console roster:native-ingest:user local /path/to/file.csv --charset="UTF-16LE" --force
+$ sudo -u www-data bin/console roster:native-ingest:user /path/to/file.csv --charset="UTF-16LE" --force
 ```
 
 Native ingesting users from a S3 bucket CSV file:
 ```shell script
-$ sudo -u www-data bin/console roster:native-ingest:user s3 bucket/path/to/file.csv --force
+$ sudo -u www-data bin/console roster:native-ingest:user bucket/path/to/file.csv s3 --force
 ```
 
 Native ingesting users from a S3 bucket CSV file with a different batch size:
 ```shell script
-$ sudo -u www-data bin/console roster:native-ingest:user s3 bucket/path/to/file.csv --batch=500 --force
+$ sudo -u www-data bin/console roster:native-ingest:user bucket/path/to/file.csv s3 --batch=500 --force
 ```

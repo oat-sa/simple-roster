@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
-use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface

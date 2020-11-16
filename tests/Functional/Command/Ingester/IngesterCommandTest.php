@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\IngesterCommand;
-use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -51,63 +51,63 @@ class IngesterCommandTest extends KernelTestCase
     public function testDryRunLocalIngestion(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
-            'path' => __DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv',
         ]);
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[OK] [DRY_RUN] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
+            "[OK] [DRY_RUN] Ingestion (type='lti-instance', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        self::assertEmpty($this->getRepository(Infrastructure::class)->findAll());
+        self::assertEmpty($this->getRepository(LtiInstance::class)->findAll());
     }
 
     public function testLocalIngestionSuccess(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
-            'path' => __DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv',
             '--force' => 'true' // Test if it gets casted properly
         ]);
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[OK] Ingestion (type='infrastructure', source='local'): 3 successes, 0 failures.",
+            "[OK] Ingestion (type='lti-instance', source='local'): 3 successes, 0 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        self::assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(3, $this->getRepository(LtiInstance::class)->findAll());
 
-        $user1 = $this->getRepository(Infrastructure::class)->find(1);
+        $user1 = $this->getRepository(LtiInstance::class)->find(1);
         self::assertSame('infra_1', $user1->getLabel());
 
-        $user2 = $this->getRepository(Infrastructure::class)->find(2);
+        $user2 = $this->getRepository(LtiInstance::class)->find(2);
         self::assertSame('infra_2', $user2->getLabel());
 
-        $user3 = $this->getRepository(Infrastructure::class)->find(3);
+        $user3 = $this->getRepository(LtiInstance::class)->find(3);
         self::assertSame('infra_3', $user3->getLabel());
     }
 
     public function testLocalIngestionFailure(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'local',
-            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv',
             '--force' => true,
         ]);
 
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            "[WARNING] Ingestion (type='infrastructure', source='local'): 1 successes, 1 failures.",
+            "[WARNING] Ingestion (type='lti-instance', source='local'): 1 successes, 1 failures.",
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        $errorMessage = 'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() '
+        $errorMessage = 'Argument 5 passed to OAT\SimpleRoster\Entity\LtiInstance::__construct() '
             . 'must be of the type string, null given';
 
         self::assertStringContainsString(
@@ -115,9 +115,9 @@ class IngesterCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
 
-        self::assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(1, $this->getRepository(LtiInstance::class)->findAll());
 
-        $user1 = $this->getRepository(Infrastructure::class)->find(1);
+        $user1 = $this->getRepository(LtiInstance::class)->find(1);
         self::assertSame('infra_1', $user1->getLabel());
     }
 
@@ -126,7 +126,7 @@ class IngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute([
             'type' => 'invalid',
             'source' => 'invalid',
-            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv',
             '--force' => true,
         ]);
 
@@ -140,9 +140,9 @@ class IngesterCommandTest extends KernelTestCase
     public function testInvalidSourceFailure(): void
     {
         $output = $this->commandTester->execute([
-            'type' => 'infrastructure',
+            'type' => 'lti-instance',
             'source' => 'invalid',
-            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv',
+            'path' => __DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv',
             '--force' => true,
         ]);
 

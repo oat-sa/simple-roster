@@ -73,18 +73,19 @@ class IngesterCommand extends Command
         );
 
         $this->addArgument(
-            'source',
-            InputArgument::REQUIRED,
-            sprintf(
-                'Source type to ingest from, possible values: ["%s"]',
-                implode('", "', array_keys($this->sourceRegistry->all()))
-            )
-        );
-
-        $this->addArgument(
             'path',
             InputArgument::REQUIRED,
             'Source path to ingest from'
+        );
+
+        $this->addArgument(
+            'source',
+            InputArgument::OPTIONAL,
+            sprintf(
+                'Source type to ingest from, possible values: ["%s"]',
+                implode('", "', array_keys($this->sourceRegistry->all()))
+            ),
+            'local'
         );
 
         $this->addOption(

@@ -22,18 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Ingester\Ingester;
 
-use OAT\SimpleRoster\Entity\Infrastructure;
-use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Ingester\Ingester\LtiInstanceIngester;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class InfrastructureIngesterTest extends KernelTestCase
+class LtiInstanceIngesterTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var InfrastructureIngester */
+    /** @var LtiInstanceIngester */
     private $subject;
 
     protected function setUp(): void
@@ -44,60 +44,60 @@ class InfrastructureIngesterTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = new InfrastructureIngester($this->getManagerRegistry());
+        $this->subject = new LtiInstanceIngester($this->getManagerRegistry());
     }
 
     public function testDryRunIngest(): void
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $output = $this->subject->ingest($source);
 
-        self::assertSame('infrastructure', $output->getIngesterType());
+        self::assertSame('lti-instance', $output->getIngesterType());
         self::assertTrue($output->isDryRun());
         self::assertSame(3, $output->getSuccessCount());
         self::assertFalse($output->hasFailures());
 
-        self::assertEmpty($this->getRepository(Infrastructure::class)->findAll());
+        self::assertEmpty($this->getRepository(LtiInstance::class)->findAll());
     }
 
     public function testIngestWithValidSource(): void
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv');
 
         $output = $this->subject->ingest($source, false);
 
-        self::assertSame('infrastructure', $output->getIngesterType());
+        self::assertSame('lti-instance', $output->getIngesterType());
         self::assertFalse($output->isDryRun());
         self::assertSame(3, $output->getSuccessCount());
         self::assertFalse($output->hasFailures());
 
-        self::assertCount(3, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(3, $this->getRepository(LtiInstance::class)->findAll());
 
-        $user1 = $this->getRepository(Infrastructure::class)->find(1);
+        $user1 = $this->getRepository(LtiInstance::class)->find(1);
         self::assertSame('infra_1', $user1->getLabel());
 
-        $user2 = $this->getRepository(Infrastructure::class)->find(2);
+        $user2 = $this->getRepository(LtiInstance::class)->find(2);
         self::assertSame('infra_2', $user2->getLabel());
 
-        $user3 = $this->getRepository(Infrastructure::class)->find(3);
+        $user3 = $this->getRepository(LtiInstance::class)->find(3);
         self::assertSame('infra_3', $user3->getLabel());
     }
 
     public function testIngestWithInvalidSource(): void
     {
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/infrastructures.csv');
+        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Invalid/lti-instances.csv');
 
         $output = $this->subject->ingest($source, false);
 
-        self::assertSame('infrastructure', $output->getIngesterType());
+        self::assertSame('lti-instance', $output->getIngesterType());
         self::assertFalse($output->isDryRun());
         self::assertSame(1, $output->getSuccessCount());
         self::assertTrue($output->hasFailures());
 
-        self::assertCount(1, $this->getRepository(Infrastructure::class)->findAll());
+        self::assertCount(1, $this->getRepository(LtiInstance::class)->findAll());
 
-        $user1 = $this->getRepository(Infrastructure::class)->find(1);
+        $user1 = $this->getRepository(LtiInstance::class)->find(1);
         self::assertSame('infra_1', $user1->getLabel());
 
         $failure = current($output->getFailures());
@@ -106,14 +106,14 @@ class InfrastructureIngesterTest extends KernelTestCase
         self::assertSame(
             [
                 'label' => 'infra_2',
-                'ltiDirectorLink' => 'http://infra_2.com',
+                'ltiLink' => 'http://infra_2.com',
                 'ltiKey' => 'key2',
-                'ltiSecret' => null
+                'ltiSecret' => null,
             ],
             $failure->getData()
         );
 
-        $errorMessage = 'Argument 1 passed to OAT\SimpleRoster\Entity\Infrastructure::setLtiSecret() '
+        $errorMessage = 'Argument 5 passed to OAT\SimpleRoster\Entity\LtiInstance::__construct() '
             . 'must be of the type string, null given';
 
         self::assertStringContainsString(

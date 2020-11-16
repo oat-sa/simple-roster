@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester\Ingester;
 
+use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\EntityInterface;
 use OAT\SimpleRoster\Ingester\Result\IngesterResult;
 use OAT\SimpleRoster\Ingester\Result\IngesterResultFailure;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
 
 abstract class AbstractIngester implements IngesterInterface

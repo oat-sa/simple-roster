@@ -24,13 +24,18 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
 
 class UsernameLtiInstanceLoadBalancerTest extends TestCase
 {
+    /** @var UniqueLtiInstanceCollection */
+    private $ltiInstanceCollection;
+
     /** @var UsernameLtiInstanceLoadBalancer */
     private $subject;
 
@@ -38,13 +43,15 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
     {
         parent::setUp();
 
-        $this->subject = new UsernameLtiInstanceLoadBalancer([
-            'http://lb_infra_1',
-            'http://lb_infra_2',
-            'http://lb_infra_3',
-            'http://lb_infra_4',
-            'http://lb_infra_5',
-        ]);
+        $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
+        $this->ltiInstanceCollection
+            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
+            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
+            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
+            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
+            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+
+        $this->subject = new UsernameLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
 
     public function testIfItIsLtiInstanceLoadBalancer(): void
@@ -54,32 +61,33 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanLoadBalanceByUsername(): void
     {
-        $expectedResultsMap = [
-            'user1' => 'http://lb_infra_3',
-            'user2' => 'http://lb_infra_5',
-            'user3' => 'http://lb_infra_4',
-            'user4' => 'http://lb_infra_2',
-            'user5' => 'http://lb_infra_5',
-            'user6' => 'http://lb_infra_2',
-            'user7' => 'http://lb_infra_3',
-            'user8' => 'http://lb_infra_4',
-            'user9' => 'http://lb_infra_3',
-            'user10' => 'http://lb_infra_1',
+        $expectedLtiInstanceMap = [
+            'user1' => $this->ltiInstanceCollection->getByIndex(2),
+            'user2' => $this->ltiInstanceCollection->getByIndex(4),
+            'user3' => $this->ltiInstanceCollection->getByIndex(3),
+            'user4' => $this->ltiInstanceCollection->getByIndex(1),
+            'user5' => $this->ltiInstanceCollection->getByIndex(4),
+            'user6' => $this->ltiInstanceCollection->getByIndex(1),
+            'user7' => $this->ltiInstanceCollection->getByIndex(2),
+            'user8' => $this->ltiInstanceCollection->getByIndex(3),
+            'user9' => $this->ltiInstanceCollection->getByIndex(2),
+            'user10' => $this->ltiInstanceCollection->getByIndex(0),
         ];
 
-        foreach ($expectedResultsMap as $username => $expectedLtiInstanceUrl) {
+        /** @var LtiInstance $expectedLtiInstance */
+        foreach ($expectedLtiInstanceMap as $username => $expectedLtiInstance) {
             $user = (new User())->setUsername($username);
 
-            $actualLtiInstanceUrl = $this->subject->getLtiInstanceUrl($user);
+            $actualLtiInstance = $this->subject->getLtiInstance($user);
 
             self::assertSame(
-                $expectedLtiInstanceUrl,
-                $actualLtiInstanceUrl,
+                $expectedLtiInstance,
+                $actualLtiInstance,
                 sprintf(
                     "Expected LTI instance url for user with username '%s' is '%s', '%s' received",
                     $username,
-                    $expectedLtiInstanceUrl,
-                    $actualLtiInstanceUrl
+                    $expectedLtiInstance->getLabel(),
+                    $actualLtiInstance->getLabel()
                 )
             );
         }
@@ -89,7 +97,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
     {
         $assignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
 
-        $this->assertSame('5', $this->subject->getLtiRequestContextId($assignment));
+        self::assertSame('5', $this->subject->getLtiRequestContextId($assignment));
     }
 
     private function getLineItemMock(int $lineItemId): LineItem

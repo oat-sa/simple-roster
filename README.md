@@ -33,7 +33,7 @@ The application currently offers the following CLI commands:
 
 | Command                               | Description                                         | Links                                                    |
 | --------------------------------------|:----------------------------------------------------|:---------------------------------------------------------|
-| `roster:ingest`                       | Data ingestion (infrastructures, line items, users) | [link](docs/cli/ingester-command.md)                     |
+| `roster:ingest`                       | Data ingestion (lti instances, line items, users)   | [link](docs/cli/ingester-command.md)                     |
 | `roster:native-ingest:user`           | Native user ingestion                               | [link](docs/cli/native-user-ingester-command.md)         |
 | `roster:garbage-collector:assignment` | Assignment garbage collection                       | [link](docs/cli/assignment-garbage-collector-command.md) |
 | `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer                        | [link](docs/cli/doctrine-result-cache-warmer-command.md) | 

@@ -184,7 +184,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -193,17 +193,19 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'nJ53rq9uMK05liB7JDmw0uX6Lgc=',
+                    'oauth_signature' => 'IiqrCaXlAfnoRYJNtJlH/xNXvhg=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -239,7 +241,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -248,17 +250,19 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'VVBB3LU2t+WOPR5mFodRve9Fbzw=',
+                    'oauth_signature' => 'KeYIIv6CwygCaWDBtNe+QU1vX7I=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
                     'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -286,11 +290,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
-        $initialLoadBalancerStatus = $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'];
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
-        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = true;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
@@ -304,24 +306,25 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
 
-        $_ENV['LTI_ENABLE_INSTANCES_LOAD_BALANCER'] = $initialLoadBalancerStatus;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         self::assertSame(
             [
-                'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
+                'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
+                    'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'hcXDusq1SxEn1mH9d/77LuwR3hk=',
+                    'oauth_signature' => 'uaEAaZX4pLE8hiP+86aRalNBO3w=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',

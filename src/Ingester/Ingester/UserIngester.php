@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester\Ingester;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\EntityInterface;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\LineItemRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 
 class UserIngester extends AbstractIngester
 {

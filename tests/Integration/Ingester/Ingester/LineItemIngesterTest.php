@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Ingester\Ingester;
 
 use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
 use OAT\SimpleRoster\Ingester\Ingester\LineItemIngester;
+use OAT\SimpleRoster\Ingester\Ingester\LtiInstanceIngester;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use OAT\SimpleRoster\Ingester\Source\LocalCsvIngesterSource;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -65,16 +65,6 @@ class LineItemIngesterTest extends KernelTestCase
         self::assertEmpty($this->getRepository(LineItem::class)->findAll());
     }
 
-    public function testIngestWithEmptyInfrastructures(): void
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Cannot ingest 'line-item' since infrastructure table is empty.");
-
-        $source = $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/line-items.csv.csv');
-
-        $this->subject->ingest($source, false);
-    }
-
     public function testIngestWithInvalidSource(): void
     {
         $this->prepareIngestionContext();
@@ -102,7 +92,6 @@ class LineItemIngesterTest extends KernelTestCase
                 'uri' => 'http://taoplatform.loc/delivery_2.rdf',
                 'label' => 'label2',
                 'slug' => 'gra13_ita_1',
-                'infrastructure' => 'infra_2',
                 'startTimestamp' => '1546682400',
                 'endTimestamp' => '1546713000',
                 'maxAttempts' => '0',
@@ -144,8 +133,8 @@ class LineItemIngesterTest extends KernelTestCase
 
     private function prepareIngestionContext(): void
     {
-        static::$container->get(InfrastructureIngester::class)->ingest(
-            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/infrastructures.csv'),
+        static::$container->get(LtiInstanceIngester::class)->ingest(
+            $this->createIngesterSource(__DIR__ . '/../../../Resources/Ingester/Valid/lti-instances.csv'),
             false
         );
     }

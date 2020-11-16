@@ -1,13 +1,5 @@
-OAT\SimpleRoster\Entity\Infrastructure:
-    infrastructure:
-        label: 'The first infrastructure'
-        ltiDirectorLink: 'http://lti-director.com'
-        ltiKey: 'myKey'
-        ltiSecret: 'mySecret'
-
 OAT\SimpleRoster\Entity\LineItem:
     lineItem:
-        infrastructure: '@infrastructure'
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug1'
@@ -15,7 +7,6 @@ OAT\SimpleRoster\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
     lineItem2:
-        infrastructure: '@infrastructure'
         label: 'The second line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug2'
@@ -23,7 +14,6 @@ OAT\SimpleRoster\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
     lineItem3:
-        infrastructure: '@infrastructure'
         label: 'The third line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug3'

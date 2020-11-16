@@ -23,21 +23,23 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Ingester\Ingester;
 
 use OAT\SimpleRoster\Entity\EntityInterface;
-use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Entity\LtiInstance;
 
-class InfrastructureIngester extends AbstractIngester
+class LtiInstanceIngester extends AbstractIngester
 {
     public function getRegistryItemName(): string
     {
-        return 'infrastructure';
+        return 'lti-instance';
     }
 
     protected function createEntity(array $data): EntityInterface
     {
-        return (new Infrastructure())
-            ->setLabel($data['label'])
-            ->setLtiDirectorLink($data['ltiDirectorLink'])
-            ->setLtiKey($data['ltiKey'])
-            ->setLtiSecret($data['ltiSecret']);
+        return new LtiInstance(
+            0,
+            $data['label'],
+            $data['ltiLink'],
+            $data['ltiKey'],
+            $data['ltiSecret']
+        );
     }
 }

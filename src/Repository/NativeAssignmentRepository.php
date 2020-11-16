@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
-use OAT\SimpleRoster\Entity\Assignment;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
+use OAT\SimpleRoster\Entity\Assignment;
 
 class NativeAssignmentRepository extends AbstractRepository
 {

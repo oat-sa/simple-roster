@@ -22,16 +22,16 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
+use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
-use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\Persistence\ManagerRegistry;
-use InvalidArgumentException;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -71,10 +71,9 @@ class UserRepository extends AbstractRepository
 
         $user = $this
             ->createQueryBuilder('u')
-            ->select('u, a, l, i')
+            ->select('u, a, l')
             ->innerJoin('u.assignments', 'a')
             ->innerJoin('a.lineItem', 'l')
-            ->innerJoin('l.infrastructure', 'i')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -126,7 +125,6 @@ class UserRepository extends AbstractRepository
             $queryBuilder
                 ->innerJoin('u.assignments', 'a')
                 ->innerJoin('a.lineItem', 'l')
-                ->innerJoin('l.infrastructure', 'i')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }
@@ -174,7 +172,6 @@ class UserRepository extends AbstractRepository
             $queryBuilder
                 ->leftJoin('u.assignments', 'a')
                 ->leftJoin('a.lineItem', 'l')
-                ->leftJoin('l.infrastructure', 'i')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }

@@ -12,10 +12,10 @@
 The application comes with a built-in containerized development environment built on top of [OAT Docker Stack](https://github.com/oat-sa/docker-stack). 
 In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
 
-Next step is to create your `.env` file in application root directory.
+Next step is to create your `.env.local` file in application root directory.
 
 ```shell script
-$ printf '%s\n%s\n' 'COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}' 'COMPOSER_HOME=~/.composer' >> .env
+$ printf '%s\n%s\n' 'COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}' 'COMPOSER_HOME=~/.composer' >> .env.local
 ```
 
 Then update your Composer settings such as path to your `COMPOSER_HOME` and `COMPOSER_AUTH` GitHub credentials.
@@ -30,7 +30,7 @@ COMPOSER_HOME=~/.composer
 The rest of the configuration is pre-configured with the `.env.docker` file, so next step is to set up the containers:
 
 ```shell script
-$ docker-compose up -d
+$ docker-compose --env-file .env.local up -d
 ```
 
 Then install application dependencies:

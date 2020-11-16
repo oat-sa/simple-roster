@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,23 +15,24 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Unit\Ingester\Ingester;
+namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use OAT\SimpleRoster\Ingester\Ingester\InfrastructureIngester;
-use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use PHPUnit\Framework\TestCase;
 
-class InfrastructureIngesterTest extends TestCase
+class LtiInstanceTest extends TestCase
 {
-    public function testRegistryItemName(): void
+    public function testItImplementsEntityInterface(): void
     {
-        $subject = new InfrastructureIngester($this->createMock(ManagerRegistry::class));
+        $subject = new LtiInstance(1, 'label', 'link', 'key', 'secret');
 
-        self::assertSame('infrastructure', $subject->getRegistryItemName());
+        self::assertInstanceOf(EntityInterface::class, $subject);
+        self::assertSame(1, $subject->getId());
     }
 }
