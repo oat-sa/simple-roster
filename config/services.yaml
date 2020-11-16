@@ -18,7 +18,6 @@ parameters:
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
-    app.aws.ingest_bucket: '%env(AWS_S3_INGEST_BUCKET)%'
 
 services:
     # default configuration for services in *this* file
