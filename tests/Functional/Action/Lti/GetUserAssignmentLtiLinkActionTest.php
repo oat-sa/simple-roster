@@ -62,13 +62,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->setUpTestLogHandler();
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-
-    }
-
     public function testItReturns401IfNotAuthenticated(): void
     {
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
