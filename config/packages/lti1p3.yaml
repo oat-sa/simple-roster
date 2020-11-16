@@ -2,12 +2,12 @@ lti1p3:
     key_chains:
         platformKey:
             key_set_name: "platformSet"
-            public_key: "file://%kernel.project_dir%/config/secrets/dev/public.key"
-            private_key: "file://%kernel.project_dir%/config/secrets/dev/private.key"
+            public_key: "file://%kernel.project_dir%/config/secrets/public.key"
+            private_key: "file://%kernel.project_dir%/config/secrets/private.key"
             private_key_passphrase: null
         demoKey:
             key_set_name: "demoSet"
-            public_key: "file://%kernel.project_dir%/config/secrets/dev/demo.key"
+            public_key: "file://%kernel.project_dir%/config/secrets/demo.key"
             private_key: null
             private_key_passphrase: null
     platforms:
