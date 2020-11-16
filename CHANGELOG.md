@@ -8,6 +8,10 @@
 - Added `usernames` and `line-item-slugs` input options to [roster:doctrine-result-cache:warmup](docs/cli/doctrine-result-cache-warmer-command.md) command.
 - Added default value (`local`) to `source` argument of [roster:ingest](docs/cli/ingester-command.md) command.
 - Added default value (`local`) to `source` argument of [roster:native-ingest:user](docs/cli/native-user-ingester-command.md) command.
+- Added environment variable to control LTI version on link generation
+- Added specific request factories, one per LTI version
+- Added `oat-sa/bundle-lti1p3` bundle for LTI 1.3 link creation
+- Added [Features documentation](docs/features.md)
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.

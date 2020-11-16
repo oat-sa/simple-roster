@@ -19,6 +19,7 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops-documentation.md)
 - [Continuous integration](docs/continuous-integration.md)
+- [Features](docs/features.md)
 
 ## OpenAPI documentation
 
