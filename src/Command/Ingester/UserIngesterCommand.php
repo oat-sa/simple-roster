@@ -23,186 +23,122 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Command\Ingester;
 
 use InvalidArgumentException;
-use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
-use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\Csv\CsvReaderBuilder;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
-use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\LineItemNotFoundException;
-use OAT\SimpleRoster\Ingester\Ingester\UserIngester;
-use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
-use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
-use OAT\SimpleRoster\Model\LineItemCollection;
-use OAT\SimpleRoster\Repository\LineItemRepository;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
+use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Throwable;
 
-class UserIngesterCommand extends Command
+class UserIngesterCommand extends AbstractCsvIngesterCommand
 {
-    use CommandProgressBarFormatterTrait;
-
     public const NAME = 'roster:ingest:user';
 
-    private const DEFAULT_BATCH_SIZE = 1000;
-
-    /** @var IngesterSourceRegistry */
-    private $ingesterSourceRegistry;
-
-    /** @var UserIngester */
-    private $userIngester;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
+    /** @var NativeUserRepository */
+    private $userRepository;
 
     /** @var UserPasswordEncoderInterface */
     private $passwordEncoder;
 
-    /** @var SymfonyStyle */
-    private $symfonyStyle;
-
-    /** @var bool */
-    private $isDryRun;
-
-    /** @var int */
-    private $batchSize;
-
     public function __construct(
-        IngesterSourceRegistry $ingesterSourceRegistry,
-        UserIngester $nativeUserIngester,
-        LineItemRepository $lineItemRepository,
+        CsvReaderBuilder $csvReaderBuilder,
+        StorageRegistry $storageRegistry,
+        NativeUserRepository $userRepository,
         UserPasswordEncoderInterface $passwordEncoder
     ) {
-        $this->ingesterSourceRegistry = $ingesterSourceRegistry;
-        $this->userIngester = $nativeUserIngester;
-        $this->lineItemRepository = $lineItemRepository;
-        $this->passwordEncoder = $passwordEncoder;
+        parent::__construct($csvReaderBuilder, $storageRegistry);
 
-        parent::__construct(self::NAME);
+        $this->userRepository = $userRepository;
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    protected function getIngesterCommandName(): string
+    {
+        return self::NAME;
     }
 
     protected function configure(): void
     {
-        $this->setDescription('Responsible for user ingesting from various sources (Local file, S3 bucket)');
+        parent::configure();
 
-        $this->addArgument(
-            'path',
-            InputArgument::REQUIRED,
-            'Source path to ingest from'
-        );
-
-        $this->addArgument(
-            'source',
-            InputArgument::OPTIONAL,
-            sprintf(
-                'Source type to ingest from, possible values: ["%s"]',
-                implode('", "', array_keys($this->ingesterSourceRegistry->all()))
-            ),
-            'local'
-        );
-
-        $this->addOption(
-            'delimiter',
-            'd',
-            InputOption::VALUE_REQUIRED,
-            'CSV delimiter',
-            IngesterSourceInterface::DEFAULT_CSV_DELIMITER
-        );
-
-        $this->addOption(
-            'charset',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'CSV source charset',
-            IngesterSourceInterface::DEFAULT_CSV_CHARSET
-        );
-
-        $this->addOption(
-            'batch',
-            'b',
-            InputOption::VALUE_REQUIRED,
-            'Batch size',
-            self::DEFAULT_BATCH_SIZE
-        );
-
-        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply actual database modifications or not');
+        $this->setDescription('User ingestion from various sources');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->symfonyStyle = new SymfonyStyle($input, $output);
-        $this->symfonyStyle->title('Simple Roster - Native User Ingester');
+        parent::initialize($input, $output);
 
-        $this->isDryRun = !(bool)$input->getOption('force');
-        $this->batchSize = (int)$input->getOption('batch');
+        $this->symfonyStyle->title('Simple Roster - User Ingester');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle->note('Starting user ingestion...');
-
-        $csvFilePath = (string)$input->getArgument('path');
-        $progressBar = $this->createNewFormattedProgressBar($output);
+        $this->symfonyStyle->text('Executing ingestion...');
+        $this->symfonyStyle->newLine();
 
         try {
-            $source = $this->ingesterSourceRegistry
-                ->get((string)$input->getArgument('source'))
-                ->setPath($csvFilePath)
-                ->setDelimiter((string)$input->getOption('delimiter'))
-                ->setCharset((string)$input->getOption('charset'));
-
-            $process = new Process(['wc', '-l', $csvFilePath]);
-            $process->run();
-
-            $progressBar->setMaxSteps((int)$process->getOutput() - 1);
-            $progressBar->start();
-
-            $lineItems = $this->lineItemRepository->findAllAsCollection();
-
-            if ($lineItems->isEmpty()) {
-                throw new LineItemNotFoundException("No line items were found in database.");
-            }
+            $this->progressBar->start();
 
             $userDtoCollection = new UserDtoCollection();
-            $numberOfProcessedRows = 1;
-            foreach ($source->getContent() as $rawUser) {
-                $this->validateRawUser($rawUser);
+            $numberOfProcessedRows = 0;
+            foreach ($this->csvReader->getRecords() as $rawUser) {
+                $this->validateRow($rawUser, 'username', 'password');
 
-                $username = $rawUser['username'];
+                $numberOfProcessedRows++;
 
-                $userDto = $userDtoCollection->containsUsername($username)
-                    ? $userDtoCollection->getByUsername($username)
-                    : $this->createUserDto($rawUser);
-
-                $assignmentDto = $this->createAssignmentDto($rawUser['slug'], $lineItems);
-
-                $userDto->addAssignment($assignmentDto);
-                $userDtoCollection->add($userDto);
+                $userDtoCollection->add($this->createUserDto($rawUser));
 
                 if ($numberOfProcessedRows % $this->batchSize === 0) {
                     if (!$this->isDryRun) {
-                        $this->userIngester->ingest($userDtoCollection);
+                        $this->userRepository->insertMultiple($userDtoCollection);
                     }
 
                     $userDtoCollection->clear();
-                    $progressBar->advance($this->batchSize);
+                    $this->progressBar->advance($this->batchSize);
                 }
-
-                $numberOfProcessedRows++;
             }
 
             if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
-                $this->userIngester->ingest($userDtoCollection);
+                $this->userRepository->insertMultiple($userDtoCollection);
             }
 
-            $progressBar->finish();
+            $this->progressBar->finish();
+
+            $this->symfonyStyle->newLine(2);
+
+            $verificationCommentMessage = sprintf(
+                'To verify you can run: <options=bold>%s</>',
+                'bin/console dbal:run-sql "SELECT COUNT(*) FROM users"'
+            );
+
+            if ($this->isDryRun) {
+                $this->symfonyStyle->warning(
+                    sprintf(
+                        '[DRY RUN] %s users have been successfully ingested.',
+                        number_format($numberOfProcessedRows)
+                    )
+                );
+
+                $this->symfonyStyle->comment($verificationCommentMessage);
+
+                return 0;
+            }
+
+            $this->symfonyStyle->success(
+                sprintf(
+                    '%s users have been successfully ingested.',
+                    number_format($numberOfProcessedRows)
+                )
+            );
+
+            $this->symfonyStyle->comment($verificationCommentMessage);
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
 
@@ -210,24 +146,6 @@ class UserIngesterCommand extends Command
         }
 
         return 0;
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function validateRawUser(array $rawUser): void
-    {
-        if (!isset($rawUser['username'])) {
-            throw new InvalidArgumentException("Column 'username' is not set in source file.");
-        }
-
-        if (!isset($rawUser['password'])) {
-            throw new InvalidArgumentException("Column 'password' is not set in source file.");
-        }
-
-        if (!isset($rawUser['slug'])) {
-            throw new InvalidArgumentException("Column 'slug' is not set in source file.");
-        }
     }
 
     /**
@@ -241,15 +159,5 @@ class UserIngesterCommand extends Command
             $this->passwordEncoder->encodePassword(new User(), $rawUser['password']),
             $rawUser['groupId'] ?? null
         );
-    }
-
-    /**
-     * @throws LineItemNotFoundException
-     */
-    private function createAssignmentDto(string $lineItemSlug, LineItemCollection $lineItems): AssignmentDto
-    {
-        $lineItem = $lineItems->getBySlug($lineItemSlug);
-
-        return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), 0);
     }
 }

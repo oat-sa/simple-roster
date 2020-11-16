@@ -5,95 +5,67 @@
 - [Usage](#usage)
     - [Main arguments](#main-arguments)
     - [Main options](#main-options)
-- [Use cases](#use-cases)
-    - [User ingestion with single assignments](#user-ingestion-with-single-assignments)
-    - [User ingestion with multiple assignments](#user-ingestion-with-multiple-assignments)
+- [CSV file format](#csv-file-format)
 - [Examples](#examples)
 
 ## Usage
 ```shell script
-$ sudo -u www-data bin/console roster:ingest:user <path> <source> [--batch=1000]
+$ sudo -u www-data bin/console roster:ingest:user <path> [--storage=local] [--delimiter=1000] [--batch=1000]
 ```
 
 ### Main arguments
 
-| Argument | Description |
-| -------- |:-------------|
-| path   | Local or S3 path to ingest data from |
-| source | Can be **local**, or **s3** [default: `local`] |
+| Argument | Description                                          |
+| ---------|:-----------------------------------------------------|
+| path     | Relative path to the file [example: `var/users.csv`] |
 
 ### Main options
 
-| Option | Description |
-| ------------- |:-------------|
-| -d, --delimiter | CSV delimiter [default: `,`] |
-| -c, --charset | CSV source charset [default: `UTF-8`] |
-| -b, --batch | Batch size [default: `1000`] |
-| -f, --force | To apply database modifications or not [default: `false`] |
+| Option          | Description                                                                                                 |
+| ----------------|:------------------------------------------------------------------------------------------------------------|
+| -s, --storage   | Filesystem storage identifier [default: `local`] ([Storage registry documentation](../storage-registry.md)) |
+| -d, --delimiter | CSV delimiter [default: `,`]                                                                                |
+| -b, --batch     | Batch size [default: `1000`]                                                                                |
+| -f, --force     | To apply database modifications or not [default: `false`]                                                   |
 
 For the full list of options please refer to the helper option:
 ```shell script
 $ sudo -u www-data bin/console roster:ingest:user -h
 ```
 
-## Use cases
-
-### User ingestion with single assignments
-
-This is basic use case, when every user is represented as a single row in the source CSV file. During ingestion for every user 
-a single assignment will be created based on the line item `slug` defined.
+## CSV file format
 
 Here is an example csv structure: 
 
-> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops-documentation.md#lti-load-balancing-strategy).
-
 ```csv
-username,password,slug,groupId
-user_1,password_1,lineItem_slug_1,group_1
-user_2,password_2,lineItem_slug_1,group_2
-user_3,password_3,lineItem_slug_2,group_2
-user_4,password_4,lineItem_slug_2,group_3
+username,password,groupId
+user_1,password_1,group_1
+user_2,password_2,group_2
+user_3,password_3,group_2
+user_4,password_4,group_3
 ```
 
-### User ingestion with multiple assignments
-
-It is also possible to create multiple assignments per user by slightly altering the input csv file.
-
-Here is an example csv structure:
-
-> Note: `groupId` column in optional depending of the chosen [LTI load balancing strategy](../devops-documentation.md#lti-load-balancing-strategy).
-
-```csv
-username,password,slug,groupId
-user_1,password_1,lineItem_slug_1,group_1
-user_1,password_1,lineItem_slug_2,group_1
-user_1,password_1,lineItem_slug_3,group_1
-user_2,password_2,lineItem_slug_2,group_1
-user_2,password_2,lineItem_slug_3,group_1
-```
-
-Despite the fact that the same users are represented multiple times in the file, only the first occurrence of each user 
-will be ingested. However the line item slugs will be taken into account for each and every row, resulting in multiple
-assignment creation for each user.
+| Column | Description |
+|--------|-------------|
+| `username` | Unique identifier of the user. |
+| `password` | Plain password of the user (will be encoded during ingestion). |
+| `groupId` | For logical grouping of the users (optional, depends on chosen [LTI load balancing strategy](../devops-documentation.md#lti-load-balancing-strategy).) |
 
 ## Examples
 
-Ingesting users from a local CSV file:
+Ingesting users from default (`local`) storage with custom batch size:
 ```shell script
-$ sudo -u www-data bin/console roster:ingest:user /path/to/file.csv --force
+$ sudo -u www-data bin/console roster:ingest:user /path/to/file.csv --batch=10000 --force
 ```
 
-Ingesting users from a local UTF-16LE encoded CSV file:
+Ingesting users from default (`local`) storage with custom column delimiter (`;`):
 ```shell script
-$ sudo -u www-data bin/console roster:ingest:user /path/to/file.csv --charset="UTF-16LE" --force
+$ sudo -u www-data bin/console roster:ingest:user /path/to/file.csv --delimiter=; --force
 ```
 
-Ingesting users from a S3 bucket CSV file:
+Ingesting users from a custom storage:
 ```shell script
-$ sudo -u www-data bin/console roster:ingest:user bucket/path/to/file.csv s3 --force
+$ sudo -u www-data bin/console roster:ingest:user /path/to/file.csv --storage=myCustomStorage --force
 ```
 
-Ingesting users from a S3 bucket CSV file with a different batch size:
-```shell script
-$ sudo -u www-data bin/console roster:ingest:user bucket/path/to/file.csv s3 --batch=500 --force
-```
+> For configuring custom storages, please check the [Storage registry documentation](../storage-registry.md).
