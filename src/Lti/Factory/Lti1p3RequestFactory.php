@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBu
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
+use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
@@ -56,12 +57,16 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
             throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $registrationId));
         }
 
-        $loginHint = $assignment->getUser()->getUsername();
+        $loginHint = new LoginHintDto(
+            $assignment->getUser()->getUsername(),
+            $assignment->getUser()->getGroupId(),
+            $assignment->getLineItem()->getSlug()
+        );
 
         $message = $this->builder->buildLtiResourceLinkLaunchRequest(
             $resourceLink,
             $registration,
-            $loginHint,
+            (string) $loginHint,
             null,
             [
                 LtiRequest::LTI_ROLE

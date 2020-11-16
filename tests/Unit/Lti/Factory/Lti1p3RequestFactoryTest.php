@@ -47,7 +47,7 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var RegistrationRepositoryInterface|MockObject */
     private $repository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -149,7 +149,8 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->setLabel('label');
 
         $user = (new User())
-            ->setUsername('testUsername');
+            ->setUsername('testUsername')
+            ->setGroupId('groupId');
 
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);
 

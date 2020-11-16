@@ -26,32 +26,26 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
-use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\UserNotFoundException;
-use OAT\SimpleRoster\Repository\UserRepository;
 
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
-    /** @var UserRepository */
-    private $userRepository;
+    public const UNDEFINED_USERNAME = 'Undefined Username';
 
-    public function __construct(UserRepository $userRepository)
+    /** @var LoginHintValidator */
+    private $loginHintValidator;
+
+    public function __construct(LoginHintValidator $loginHintValidator)
     {
-        $this->userRepository = $userRepository;
+        $this->loginHintValidator = $loginHintValidator;
     }
 
     public function authenticate(string $loginHint): UserAuthenticationResultInterface
     {
-        /** @var User $user */
-        $user = $this->userRepository->findOneBy(['username' => $loginHint]);
-
-        if ($user === null) {
-            throw new UserNotFoundException('User not found based on hint: ' . $loginHint);
-        }
+        $user = $this->loginHintValidator->validate($loginHint);
 
         return new UserAuthenticationResult(
             true,
-            new UserIdentity($user->getUsername())
+            new UserIdentity($user->getUsername() ?? self::UNDEFINED_USERNAME)
         );
     }
 }
