@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Ingester;
 
-use InvalidArgumentException;
 use OAT\SimpleRoster\Csv\CsvReaderBuilder;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -81,7 +80,7 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
             $numberOfProcessedRows = 0;
             $persisted = false;
             foreach ($this->csvReader->getRecords() as $rawLtiInstance) {
-                $this->validateRawLtiInstance($rawLtiInstance);
+                $this->validateRow($rawLtiInstance, 'label', 'ltiLink', 'ltiKey', 'ltiSecret');
 
                 $numberOfProcessedRows++;
                 $persisted = false;
@@ -148,27 +147,5 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
         }
 
         return 0;
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function validateRawLtiInstance(array $rawUser): void
-    {
-        if (!isset($rawUser['label'])) {
-            throw new InvalidArgumentException("Column 'label' is not set in source file.");
-        }
-
-        if (!isset($rawUser['ltiLink'])) {
-            throw new InvalidArgumentException("Column 'ltiLink' is not set in source file.");
-        }
-
-        if (!isset($rawUser['ltiKey'])) {
-            throw new InvalidArgumentException("Column 'ltiKey' is not set in source file.");
-        }
-
-        if (!isset($rawUser['ltiSecret'])) {
-            throw new InvalidArgumentException("Column 'ltiSecret' is not set in source file.");
-        }
     }
 }
