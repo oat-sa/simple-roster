@@ -55,35 +55,14 @@ class LoginHintDto
         return $this->username;
     }
 
-    public function setUsername(string $username): LoginHintDto
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
     public function getGroupId(): string
     {
         return $this->groupId;
     }
 
-    public function setGroupId(string $groupId): LoginHintDto
-    {
-        $this->groupId = $groupId;
-
-        return $this;
-    }
-
     public function getSlug(): string
     {
         return $this->slug;
-    }
-
-    public function setSlug(string $slug): LoginHintDto
-    {
-        $this->slug = $slug;
-
-        return $this;
     }
 
     public function __toString(): string
