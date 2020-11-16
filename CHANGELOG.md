@@ -27,6 +27,8 @@
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 - Removed `roster:ingest` command.
+- Removed `roster:assignments:bulk-create` command.
+- Removed `roster:assignments:bulk-cancel` command.
 
 ## 1.8.1 - 2020-10-27
 
