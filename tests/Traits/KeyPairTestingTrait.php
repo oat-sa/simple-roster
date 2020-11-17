@@ -40,8 +40,12 @@ trait KeyPairTestingTrait
 
     protected function removeKeyPairs(): void
     {
-        unlink('tests/Resources/secrets/private.key');
-        unlink('tests/Resources/secrets/public.key');
-        rmdir('tests/Resources/secrets');
+        $testKeyPairPath = 'tests/Resources/secrets';
+
+        if (is_dir($testKeyPairPath)) {
+            unlink($testKeyPairPath . '/private.key');
+            unlink($testKeyPairPath . '/public.key');
+            rmdir($testKeyPairPath);
+        }
     }
 }

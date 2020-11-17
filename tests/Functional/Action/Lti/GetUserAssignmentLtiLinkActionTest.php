@@ -62,6 +62,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->setUpTestLogHandler();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->removeKeyPairs();
+    }
+
     public function testItReturns401IfNotAuthenticated(): void
     {
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -436,7 +443,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $responseData = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertStringContainsString(
-            'iss=https://simple-roster.docker.localhost/platform',
+            'iss=https://simple-roster.localhost/platform',
             urldecode($responseData['ltiLink'])
         );
         self::assertStringContainsString(
@@ -465,7 +472,5 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(2, $assignment->getAttemptsCount());
 
         Carbon::setTestNow();
-
-        $this->removeKeyPairs();
     }
 }

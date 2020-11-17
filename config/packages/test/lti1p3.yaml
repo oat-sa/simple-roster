@@ -5,8 +5,4 @@ lti1p3:
             public_key: "file://%kernel.project_dir%/tests/Resources/secrets/public.key"
             private_key: "file://%kernel.project_dir%/tests/Resources/secrets//private.key"
             private_key_passphrase: null
-        demoKey:
-            key_set_name: "demoSet"
-            public_key: "file://%kernel.project_dir%/tests/Resources/secrets//demo.key"
-            private_key: null
-            private_key_passphrase: null
+
