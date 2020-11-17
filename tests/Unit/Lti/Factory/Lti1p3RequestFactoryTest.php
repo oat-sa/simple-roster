@@ -54,7 +54,13 @@ class Lti1p3RequestFactoryTest extends TestCase
         $this->builder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
         $this->repository = $this->createMock(RegistrationRepositoryInterface::class);
 
-        $this->subject = new Lti1p3RequestFactory($this->repository, $this->builder, 'registrationId');
+        $this->subject = new Lti1p3RequestFactory(
+            $this->repository,
+            $this->builder,
+            'registrationId',
+            'http://example.com/index.html',
+            'fr-FR'
+        );
     }
 
     /**

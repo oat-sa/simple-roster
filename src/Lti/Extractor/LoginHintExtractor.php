@@ -34,7 +34,7 @@ class LoginHintExtractor
     {
         $matches = [];
 
-        preg_match('/^(?P<username>.*)::(?P<groupId>.*)::(?P<slug>.*)$/', $loginHint, $matches);
+        preg_match('/^(?P<username>.*)::(?P<assignmentId>.*)$/', $loginHint, $matches);
 
         if (empty($matches)) {
             throw new LogicException('Invalid Login hint format.');
@@ -44,14 +44,13 @@ class LoginHintExtractor
             throw new LogicException('Missing username on login hint.');
         }
 
-        if (empty($matches['slug'])) {
-            throw new LogicException('Missing slug on login hint.');
+        if (empty($matches['assignmentId'])) {
+            throw new LogicException('Missing assignment ID on login hint.');
         }
 
         return new LoginHintDto(
             $matches['username'],
-            $matches['groupId'],
-            $matches['slug']
+            (int)$matches['assignmentId'],
         );
     }
 }

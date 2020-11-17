@@ -38,20 +38,14 @@ class LoginHintExtractorTest extends TestCase
         $this->subject = new LoginHintExtractor();
     }
 
-    /**
-     * @dataProvider provideValidLoginHints
-     */
-    public function testShouldExtractDataWhenLoginHintIsWellFormed(
-        string $loginHint,
-        string $user,
-        string $groupdId,
-        string $slug
-    ): void {
+    public function testShouldExtractDataWhenLoginHintIsWellFormed(): void
+    {
+        $loginHint = 'user::1';
+
         $loginHintDto = $this->subject->extract($loginHint);
 
-        self::assertSame($user, $loginHintDto->getUsername());
-        self::assertSame($groupdId, $loginHintDto->getGroupId());
-        self::assertSame($slug, $loginHintDto->getSlug());
+        self::assertSame('user', $loginHintDto->getUsername());
+        self::assertSame(1, $loginHintDto->getAssignmentId());
     }
 
     /**
@@ -65,43 +59,24 @@ class LoginHintExtractorTest extends TestCase
         $this->subject->extract($loginHint);
     }
 
-    public function provideValidLoginHints(): array
-    {
-        return [
-            'withCompleteInformation' => [
-                'loginHint' => 'user::groupId::slug',
-                'user' => 'user',
-                'groupId' => 'groupId',
-                'slug' => 'slug',
-
-            ],
-            'withoutGroup' => [
-                'loginHint' => 'user::::slug',
-                'user' => 'user',
-                'groupId' => '',
-                'slug' => 'slug',
-            ],
-        ];
-    }
-
     public function provideInvalidLoginHints(): array
     {
         return [
             'withoutSeparators' => [
-                'loginHint' => 'userGroupIdSlug',
+                'loginHint' => 'user11',
                 'message' => 'Invalid Login hint format.',
             ],
             'withWrongSeparators' => [
-                'loginHint' => 'user_groupId_slug',
+                'loginHint' => 'user1_1',
                 'message' => 'Invalid Login hint format.',
             ],
             'withoutUsername' => [
-                'loginHint' => '::groupId::slug',
+                'loginHint' => '::1',
                 'message' => 'Missing username on login hint.',
             ],
-            'withoutSlug' => [
+            'withoutAssignmentId' => [
                 'loginHint' => 'username::groupId::',
-                'message' => 'Missing slug on login hint.',
+                'message' => 'Missing assignment ID on login hint.',
             ],
         ];
     }

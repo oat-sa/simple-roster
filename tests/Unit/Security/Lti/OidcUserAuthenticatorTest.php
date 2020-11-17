@@ -24,8 +24,8 @@ namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\LineItemNotFoundException;
-use OAT\SimpleRoster\Lti\Exception\InvalidGroupException;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator;
@@ -63,8 +63,8 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 
     public function testAuthenticate(): void
     {
-        $loginHint = 'user1::group_1::lineItemSlug';
-        $loginHintDto = new LoginHintDto('user1', 'group_1', 'lineItemSlug');
+        $loginHint = 'user1::1';
+        $loginHintDto = new LoginHintDto('user1', 1);
 
         $user = $this->getRepository(User::class)->find(1);
 
@@ -85,40 +85,15 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         self::assertSame('user1', $result->getUserIdentity()->getIdentifier());
     }
 
-    public function testShouldThrowInvalidGroupExceptionIfLoginHintHasInvalidGroupId(): void
+    public function testShouldThrowAssignmentNotFoundExceptionWhenUserDoesNotHaveIt(): void
     {
-        $this->expectException(InvalidGroupException::class);
-        $this->expectExceptionMessage('User and group id are not matching.');
+        $this->expectException(AssignmentNotFoundException::class);
+        $this->expectExceptionMessage('Assignment with ID 2 not found for username user1.');
 
         $user = $this->getRepository(User::class)->find(1);
 
-        $loginHint = 'user1::invalidGroupId::lineItemSlug';
-        $loginHintDto = new LoginHintDto('user1', 'invalidGroupId', 'lineItemSlug');
-
-        $this->userRepository
-            ->expects(self::once())
-            ->method('findByUsernameWithAssignments')
-            ->with('user1')
-            ->willReturn($user);
-
-        $this->loginHintExtractor
-            ->expects(self::once())
-            ->method('extract')
-            ->with($loginHint)
-            ->willReturn($loginHintDto);
-
-        $this->subject->authenticate($loginHint);
-    }
-
-    public function testShouldThrowLineItemNotFoundExceptionIfNoLineItemsAreFoundWithSpecifiedSlug(): void
-    {
-        $this->expectException(LineItemNotFoundException::class);
-        $this->expectExceptionMessage('Line Item with slug invalidSlug not found for username user1');
-
-        $user = $this->getRepository(User::class)->find(1);
-
-        $loginHint = 'user1::invalidGroupId::invalidSlug';
-        $loginHintDto = new LoginHintDto('user1', 'group_1', 'invalidSlug');
+        $loginHint = 'user1::2';
+        $loginHintDto = new LoginHintDto('user1', 2);
 
         $this->userRepository
             ->expects(self::once())

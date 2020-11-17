@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Factory;
 
-use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
+use LogicException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class LtiRequestFactory
@@ -47,7 +47,7 @@ class LtiRequestFactory
     }
 
     /**
-     * @throws InvalidLtiVersionException
+     * @throws LogicException
      */
     public function __invoke(): LtiRequestFactoryInterface
     {
@@ -57,7 +57,7 @@ class LtiRequestFactory
             case LtiRequest::LTI_VERSION_1P3:
                 return $this->lti1p3RequestFactory;
             default:
-                throw new InvalidLtiVersionException('Invalid LTI Version specified: ' . $this->ltiVersion);
+                throw new LogicException('Invalid LTI Version specified: ' . $this->ltiVersion);
         }
     }
 }

@@ -26,28 +26,26 @@ use InvalidArgumentException;
 
 class LoginHintDto
 {
+    public const LOGIN_HINT_SEPARATOR = '::';
+
     /** @var string */
     private $username;
 
-    /** @var string */
-    private $groupId;
+    /** @var int */
+    private $assignmentId;
 
-    /** @var string */
-    private $slug;
-
-    public function __construct(string $username, string $groupId, string $slug)
+    public function __construct(string $username, int $assignmentId)
     {
         if (empty($username)) {
-            throw new InvalidArgumentException('Username cannot be empty');
+            throw new InvalidArgumentException('Username can\'t be empty.');
         }
 
-        if (empty($slug)) {
-            throw new InvalidArgumentException('Slug cannot be empty');
+        if ($assignmentId === 0) {
+            throw new InvalidArgumentException('Assignment ID can\'t be 0.');
         }
 
         $this->username = $username;
-        $this->groupId = $groupId;
-        $this->slug = $slug;
+        $this->assignmentId = $assignmentId;
     }
 
     public function getUsername(): string
@@ -55,18 +53,13 @@ class LoginHintDto
         return $this->username;
     }
 
-    public function getGroupId(): string
+    public function getAssignmentId(): int
     {
-        return $this->groupId;
-    }
-
-    public function getSlug(): string
-    {
-        return $this->slug;
+        return $this->assignmentId;
     }
 
     public function __toString(): string
     {
-        return implode('::', get_object_vars($this));
+        return implode(self::LOGIN_HINT_SEPARATOR, get_object_vars($this));
     }
 }

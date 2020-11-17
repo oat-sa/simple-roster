@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
-use OAT\SimpleRoster\Lti\Exception\InvalidLtiVersionException;
+use LogicException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Factory\LtiRequestFactory;
@@ -72,9 +72,9 @@ class LtiRequestFactoryTest extends TestCase
         self::assertTrue($result instanceof Lti1p3RequestFactory);
     }
 
-    public function testShouldThrowInvalidLtiVersionException(): void
+    public function testShouldThrowLogicExceptionWhenVersionIsInvalid(): void
     {
-        $this->expectException(InvalidLtiVersionException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Invalid LTI Version specified: InvalidVersion');
 
         $subject = new LtiRequestFactory(

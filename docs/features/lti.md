@@ -2,7 +2,7 @@
 
 >Learning Tools Interoperability (LTI) is an education technology specification developed by the IMS Global Learning Consortium. It specifies a method for a learning system to invoke and to communicate with external systems.
 
-Simple Roster is capable of generate links for the LTI versions `1.1.1` and `1.3.0`. In order configure which version you want to use, you need to set the `LTI_VERSION` environment variable. For a complete list of environment variable, please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
+Simple Roster is capable of generate links for the LTI versions `1.1.1` and `1.3.0`. Please check the configuration section for each version.
 
 ## Table of Contents
 - [LTI 1.1.1](#lti-111)
@@ -20,13 +20,7 @@ The full LTI 1.1.1 specification can be checked at [IMS Global](https://www.imsg
 
 #### LTI 1.1.1 Configuration
 
-Configure the following environment variables according to the tool you are connecting to simple roster:
-
-- LTI_LAUNCH_PRESENTATION_RETURN_URL
-- LTI_LAUNCH_PRESENTATION_LOCALE
-- LTI_INSTANCE_LOAD_BALANCING_STRATEGY
-- LTI_OUTCOME_XML_NAMESPACE
-- LTI_VERSION (need to be set to `1.1.1`)
+Configure environment variables according to the tool you are connecting to simple roster. For a complete list of environment variable, please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
 
 With environment variables configured, you should create your LTI Instances using the [CLI](cli/ingester-command.md#examples)
 
@@ -42,31 +36,31 @@ Considering Simple Roster was configured to generate LTI 1.1.1 Links, this shoul
 
 ```json
 {
-  "ltiVersion": "1.1.1",
-  "ltiLink": "http://infra_1.com",
-  "ltiParams": {
-    "oauth_body_hash": "string",
-    "oauth_consumer_key": "string",
-    "oauth_nonce": "string",
-    "oauth_signature": "string",
-    "oauth_signature_method": "string",
-    "oauth_timestamp": "string",
-    "oauth_version": "string",
-    "lti_message_type": "string",
-    "lti_version": "string",
-    "context_id": 0,
-    "context_label": "string",
-    "context_title": "string",
-    "context_type": "string",
-    "roles": "string",
-    "user_id": 0,
-    "lis_person_name_full": "string",
-    "resource_link_id": 0,
-    "lis_outcome_service_url": "string",
-    "lis_result_sourcedid": 0,
-    "launch_presentation_return_url": "string",
-    "launch_presentation_locale": "it-IT"
-  }
+	"ltiVersion": "1.1.1",
+		"ltiLink": "http://infra_1.com",
+		"ltiParams": {
+		"oauth_body_hash": "string",
+		"oauth_consumer_key": "string",
+		"oauth_nonce": "string",
+		"oauth_signature": "string",
+		"oauth_signature_method": "string",
+		"oauth_timestamp": "string",
+		"oauth_version": "string",
+		"lti_message_type": "string",
+		"lti_version": "string",
+		"context_id": 0,
+		"context_label": "string",
+		"context_title": "string",
+		"context_type": "string",
+		"roles": "string",
+		"user_id": 0,
+		"lis_person_name_full": "string",
+		"resource_link_id": 0,
+		"lis_outcome_service_url": "string",
+		"lis_result_sourcedid": 0,
+		"launch_presentation_return_url": "string",
+		"launch_presentation_locale": "it-IT"
+	}
 }
 ```
 
@@ -77,11 +71,7 @@ The full LTI 1.3 specification can be checked at [IMS Global](http://www.imsglob
 
 #### LTI 1.3.0 Configuration
 
-Configure the following environment variables:
-
-- LTI_VERSION (need to be set to `1.3.0`)
-- LTI1P3_SERVICE_ENCRYPTION_KEY
-- LTI1P3_REGISTRATION_ID (should match your registration on `config/packages/lti1p3.yaml`)
+Configure environment variables according to the tool you are connecting to simple roster. For a complete list of environment variable, please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
 
 Create your key pair running:
 
@@ -110,8 +100,8 @@ Considering Simple Roster was configured to generate LTI 1.3.0 Links, this shoul
 
 ```json
 {
-    "ltiLink": "http://tool-url/lti1p3/oidc/initiation?extensive-list-of-parameters",
-    "ltiVersion": "1.3.0",
-    "ltiParams": []
+	"ltiLink": "http://tool-url/lti1p3/oidc/initiation?extensive-list-of-parameters",
+	"ltiVersion": "1.3.0",
+	"ltiParams": []
 }
 ```

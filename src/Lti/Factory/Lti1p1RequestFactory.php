@@ -74,7 +74,6 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
     }
 
     /**
-     * @throws AssignmentNotProcessableException
      * @throws JsonException
      */
     public function create(Assignment $assignment): LtiRequest
@@ -127,8 +126,7 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
             base64_encode(
                 json_encode(
                     ['delivery' => $lineItem->getUri()],
-                    JSON_THROW_ON_ERROR,
-                    512
+                    JSON_THROW_ON_ERROR
                 )
             )
         );

@@ -25,11 +25,6 @@ namespace OAT\SimpleRoster\Lti\Factory;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
-/**
- * LtiRequestFactoryInterface
- *
- * @package OAT\SimpleRoster\Lti\Factory
- */
 interface LtiRequestFactoryInterface
 {
     public function create(Assignment $assignment): LtiRequest;

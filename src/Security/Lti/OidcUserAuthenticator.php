@@ -28,15 +28,12 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\LineItemNotFoundException;
-use OAT\SimpleRoster\Lti\Exception\InvalidGroupException;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
 
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
-    public const UNDEFINED_USERNAME = 'Undefined Username';
-
     /** @var LoginHintExtractor */
     private $loginHintExtractor;
 
@@ -62,26 +59,25 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
         );
     }
 
+    /**
+     * @throws AssignmentNotFoundException
+     */
     private function checkLoginHintConsistency(User $user, LoginHintDto $loginHintDto): void
     {
-        if ($user->getGroupId() !== $loginHintDto->getGroupId()) {
-            throw new InvalidGroupException('User and group id are not matching.');
-        }
-
-        $lineItemFound = false;
+        $assignmentFound = false;
 
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->getLineItem()->getSlug() === $loginHintDto->getSlug()) {
-                $lineItemFound = true;
+            if ($assignment->getId() === $loginHintDto->getAssignmentId()) {
+                $assignmentFound = true;
                 break;
             }
         }
 
-        if (!$lineItemFound) {
-            throw new LineItemNotFoundException(
+        if (!$assignmentFound) {
+            throw new AssignmentNotFoundException(
                 sprintf(
-                    'Line Item with slug %s not found for username %s',
-                    $loginHintDto->getSlug(),
+                    'Assignment with ID %s not found for username %s.',
+                    $loginHintDto->getAssignmentId(),
                     $loginHintDto->getUsername()
                 )
             );

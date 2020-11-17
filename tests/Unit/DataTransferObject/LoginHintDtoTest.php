@@ -31,25 +31,24 @@ class LoginHintDtoTest extends TestCase
     public function testItThrowsExceptionIfEmptyUsernameReceived(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Username cannot be empty');
+        $this->expectExceptionMessage('Username can\'t be empty.');
 
-        new LoginHintDto('', 'group', 'slug');
+        new LoginHintDto('', 1);
     }
 
     public function testItThrowsExceptionIfEmptySlugReceived(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Slug cannot be empty');
+        $this->expectExceptionMessage('Assignment ID can\'t be 0.');
 
-        new LoginHintDto('username', 'group', '');
+        new LoginHintDto('username', 0);
     }
 
     public function testLoginHintDtoCreation(): void
     {
-        $loginHintDto = new LoginHintDto('username', 'groupId', 'slug');
+        $loginHintDto = new LoginHintDto('username', 1);
 
         self::assertSame('username', $loginHintDto->getUsername());
-        self::assertSame('groupId', $loginHintDto->getGroupId());
-        self::assertSame('slug', $loginHintDto->getSlug());
+        self::assertSame(1, $loginHintDto->getAssignmentId());
     }
 }

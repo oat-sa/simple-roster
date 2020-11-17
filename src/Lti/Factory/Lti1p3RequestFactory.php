@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Lti\Factory;
 
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
@@ -34,40 +35,50 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
     /** @var RegistrationRepositoryInterface */
-    private $repository;
+    private $registrationRepository;
 
     /** @var LtiResourceLinkLaunchRequestBuilder */
-    private $builder;
+    private $ltiRequestBuilder;
 
     /** @var string */
     private $ltiRegistrationId;
 
+    /** @var string */
+    private $ltiLaunchPresentationReturnUrl;
+
+    /** @var string */
+    private $ltiLaunchPresentationLocale;
+
     public function __construct(
-        RegistrationRepositoryInterface $repository,
-        LtiResourceLinkLaunchRequestBuilder $builder,
-        string $ltiRegistrationId
+        RegistrationRepositoryInterface $registrationRepository,
+        LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder,
+        string $ltiRegistrationId,
+        string $ltiLaunchPresentationReturnUrl,
+        string $ltiLaunchPresentationLocale
     ) {
-        $this->repository = $repository;
-        $this->builder = $builder;
+        $this->registrationRepository = $registrationRepository;
+        $this->ltiRequestBuilder = $ltiRequestBuilder;
         $this->ltiRegistrationId = $ltiRegistrationId;
+        $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
+        $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
     }
 
     public function create(Assignment $assignment): LtiRequest
     {
-        $resourceLink = new LtiResourceLink($assignment->getLineItem()->getUri());
-        $registration = $this->repository->find($this->ltiRegistrationId);
+        $lineItem = $assignment->getLineItem();
+        $resourceLink = new LtiResourceLink($lineItem->getUri());
+        $registration = $this->registrationRepository->find($this->ltiRegistrationId);
 
         if (!$registration) {
             throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $this->ltiRegistrationId));
         }
 
         $loginHint = new LoginHintDto(
-            (string) $assignment->getUser()->getUsername(),
-            (string) $assignment->getUser()->getGroupId(),
-            $assignment->getLineItem()->getSlug()
+            (string)$assignment->getUser()->getUsername(),
+            (int)$assignment->getId(),
         );
 
-        $message = $this->builder->buildLtiResourceLinkLaunchRequest(
+        $message = $this->ltiRequestBuilder->buildLtiResourceLinkLaunchRequest(
             $resourceLink,
             $registration,
             (string) $loginHint,
@@ -76,11 +87,18 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
                 LtiRequest::LTI_ROLE
             ],
             [
+                new LaunchPresentationClaim(
+                    null,
+                    null,
+                    null,
+                    $this->ltiLaunchPresentationReturnUrl,
+                    $this->ltiLaunchPresentationLocale,
+                ),
                 new ContextClaim(
                     (string)$assignment->getId(),
                     [],
-                    $assignment->getLineItem()->getSlug(),
-                    $assignment->getLineItem()->getLabel(),
+                    $lineItem->getSlug(),
+                    $lineItem->getLabel(),
                 )
             ]
         );
