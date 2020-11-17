@@ -138,13 +138,13 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setState($assignmentStatus);
 
         $this->ltiRequestFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('create')
             ->with($assignment);
 
         $ltiRequest = $this->subject->getAssignmentLtiRequest($assignment);
 
-        $this->assertTrue($ltiRequest instanceof LtiRequest);
+        self::assertTrue($ltiRequest instanceof LtiRequest);
 
         Carbon::setTestNow();
     }

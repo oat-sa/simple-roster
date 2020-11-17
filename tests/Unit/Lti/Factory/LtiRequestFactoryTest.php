@@ -56,7 +56,7 @@ class LtiRequestFactoryTest extends TestCase
 
         $result = $subject->__invoke();
 
-        $this->assertTrue($result instanceof Lti1p1RequestFactory);
+        self::assertTrue($result instanceof Lti1p1RequestFactory);
     }
 
     public function testShouldReturnLti1p3RequestFactory(): void
@@ -69,7 +69,7 @@ class LtiRequestFactoryTest extends TestCase
 
         $result = $subject->__invoke();
 
-        $this->assertTrue($result instanceof Lti1p3RequestFactory);
+        self::assertTrue($result instanceof Lti1p3RequestFactory);
     }
 
     public function testShouldThrowInvalidLtiVersionException(): void

@@ -30,7 +30,6 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\KeyPairTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Carbon\Carbon;
@@ -45,7 +44,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
     use LoggerTestingTrait;
-    use KeyPairTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -60,13 +58,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->removeKeyPairs();
     }
 
     public function testItReturns401IfNotAuthenticated(): void
@@ -424,8 +415,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLti1p3Link(): void
     {
-        $this->generateKeyPairs();
-
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */

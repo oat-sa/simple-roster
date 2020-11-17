@@ -48,8 +48,8 @@ class LoginHintDtoTest extends TestCase
     {
         $loginHintDto = new LoginHintDto('username', 'groupId', 'slug');
 
-        $this->assertSame('username', $loginHintDto->getUsername());
-        $this->assertSame('groupId', $loginHintDto->getGroupId());
-        $this->assertSame('slug', $loginHintDto->getSlug());
+        self::assertSame('username', $loginHintDto->getUsername());
+        self::assertSame('groupId', $loginHintDto->getGroupId());
+        self::assertSame('slug', $loginHintDto->getSlug());
     }
 }

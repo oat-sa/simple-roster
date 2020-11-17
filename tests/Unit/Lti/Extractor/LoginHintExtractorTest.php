@@ -49,9 +49,9 @@ class LoginHintExtractorTest extends TestCase
     ): void {
         $loginHintDto = $this->subject->extract($loginHint);
 
-        $this->assertSame($user, $loginHintDto->getUsername());
-        $this->assertSame($groupdId, $loginHintDto->getGroupId());
-        $this->assertSame($slug, $loginHintDto->getSlug());
+        self::assertSame($user, $loginHintDto->getUsername());
+        self::assertSame($groupdId, $loginHintDto->getGroupId());
+        self::assertSame($slug, $loginHintDto->getSlug());
     }
 
     /**

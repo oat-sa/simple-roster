@@ -69,12 +69,12 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         $user = $this->getRepository(User::class)->find(1);
 
         $this->loginHintExtractor
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('extract')
             ->willReturn($loginHintDto);
 
         $this->userRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('findByUsernameWithAssignments')
             ->with('user1')
             ->willReturn($user);
@@ -82,7 +82,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         $result = $this->subject->authenticate($loginHint);
 
         /* @phpstan-ignore-next-line */
-        $this->assertSame('user1', $result->getUserIdentity()->getIdentifier());
+        self::assertSame('user1', $result->getUserIdentity()->getIdentifier());
     }
 
     public function testShouldThrowInvalidGroupExceptionIfLoginHintHasInvalidGroupId(): void
@@ -96,13 +96,13 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         $loginHintDto = new LoginHintDto('user1', 'invalidGroupId', 'lineItemSlug');
 
         $this->userRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('findByUsernameWithAssignments')
             ->with('user1')
             ->willReturn($user);
 
         $this->loginHintExtractor
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('extract')
             ->with($loginHint)
             ->willReturn($loginHintDto);
@@ -121,13 +121,13 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         $loginHintDto = new LoginHintDto('user1', 'group_1', 'invalidSlug');
 
         $this->userRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('findByUsernameWithAssignments')
             ->with('user1')
             ->willReturn($user);
 
         $this->loginHintExtractor
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('extract')
             ->with($loginHint)
             ->willReturn($loginHintDto);

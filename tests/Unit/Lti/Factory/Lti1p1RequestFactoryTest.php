@@ -50,7 +50,6 @@ class Lti1p1RequestFactoryTest extends TestCase
     /** @var string */
     private $ltiLaunchPresentationLocale;
 
-
     public function setUp(): void
     {
         parent::setUp();
@@ -69,9 +68,6 @@ class Lti1p1RequestFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideValidLineItemAssignmentCombinations
-     */
     /**
      * @dataProvider provideValidLineItemAssignmentCombinations
      */

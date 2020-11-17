@@ -73,12 +73,12 @@ class Lti1p3RequestFactoryTest extends TestCase
 
         $message = $this->createMock(LtiMessageInterface::class);
         $message
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toUrl')
             ->willReturn('link');
 
         $this->builder
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('buildLtiResourceLinkLaunchRequest')
             ->willReturn($message);
 
@@ -158,13 +158,11 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->method('getId')
             ->willReturn(5);
 
-        $assignment
+        return $assignment
             ->setLineItem($lineItem)
             ->setUser($user)
             ->setAttemptsCount($attemptsCount)
             ->setState($assignmentStatus);
-
-        return $assignment;
     }
 
     private function createRegistrationMock(): void
@@ -172,7 +170,7 @@ class Lti1p3RequestFactoryTest extends TestCase
         $registration = $this->createMock(RegistrationInterface::class);
 
         $this->repository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->willReturn($registration);
     }
