@@ -26,26 +26,65 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
+use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Lti\Exception\InvalidGroupException;
+use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
+use OAT\SimpleRoster\Repository\UserRepository;
 
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
     public const UNDEFINED_USERNAME = 'Undefined Username';
 
-    /** @var LoginHintValidator */
-    private $loginHintValidator;
+    /** @var LoginHintExtractor */
+    private $loginHintExtractor;
 
-    public function __construct(LoginHintValidator $loginHintValidator)
+    /** @var UserRepository */
+    private $userRepository;
+
+    public function __construct(LoginHintExtractor $loginHintExtractor, UserRepository $userRepository)
     {
-        $this->loginHintValidator = $loginHintValidator;
+        $this->loginHintExtractor = $loginHintExtractor;
+        $this->userRepository = $userRepository;
     }
 
     public function authenticate(string $loginHint): UserAuthenticationResultInterface
     {
-        $user = $this->loginHintValidator->validate($loginHint);
+        $loginHintDto = $this->loginHintExtractor->extract($loginHint);
+        $user = $this->userRepository->findByUsernameWithAssignments($loginHintDto->getUsername());
+
+        $this->checkLoginHintConsistency($user, $loginHintDto);
 
         return new UserAuthenticationResult(
             true,
-            new UserIdentity($user->getUsername() ?? self::UNDEFINED_USERNAME)
+            new UserIdentity($user->getUsername())
         );
+    }
+
+    private function checkLoginHintConsistency(User $user, LoginHintDto $loginHintDto): void
+    {
+        if ($user->getGroupId() !== $loginHintDto->getGroupId()) {
+            throw new InvalidGroupException('User and group id are not matching.');
+        }
+
+        $lineItemFound = false;
+
+        foreach ($user->getAssignments() as $assignment) {
+            if ($assignment->getLineItem()->getSlug() === $loginHintDto->getSlug()) {
+                $lineItemFound = true;
+                break;
+            }
+        }
+
+        if (!$lineItemFound) {
+            throw new LineItemNotFoundException(
+                sprintf(
+                    'Line Item with slug %s not found for username %s',
+                    $loginHintDto->getSlug(),
+                    $loginHintDto->getUsername()
+                )
+            );
+        }
     }
 }
