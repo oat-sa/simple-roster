@@ -1,28 +1,24 @@
-# Features
+# Learning Tools Interoperability (LTI)
+
+>Learning Tools Interoperability (LTI) is an education technology specification developed by the IMS Global Learning Consortium. It specifies a method for a learning system to invoke and to communicate with external systems.
+
+Simple Roster is capable of generate links for the LTI versions `1.1.1` and `1.3.0`. In order configure which version you want to use, you need to set the `LTI_VERSION` environment variable. For a complete list of environment variable, please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
 
 ## Table of Contents
-- [LTI](#lti)
-    - [LTI 1.1](#lti-11)
-        - [LTI 1.1 Configuration](#lti-11-configuration)
-        - [LTI 1.1 Link Generation](#lti-11-link-generation-and-response)
-    - [LTI 1.3](#lti-13)
-        - [LTI 1.3 Configuration](#lti-13-configuration)
-        - [LTI 1.3 Link Generation](#lti-13-link-generation-and-response)
+- [LTI 1.1.1](#lti-111)
+    - [LTI 1.1.1 Configuration](#lti-111-configuration)
+    - [LTI 1.1.1 Link Generation](#lti-111-link-generation-and-response)
+- [LTI 1.3.0](#lti-130)
+    - [LTI 1.3.0 Configuration](#lti-130-configuration)
+    - [LTI 1.3.0 Link Generation](#lti-130-link-generation-and-response)
 
-## LTI
+### LTI 1.1.1
 
-Learning Tools Interoperability (LTI) is an education technology specification developed by the IMS Global Learning Consortium. It specifies a method for a learning system to invoke and to communicate with external systems.
+LTI 1.1.1 was released in August 2014 to add the ability to the tools to pass grades back to the invoking system.
 
-Simple Roster is capable of generate links for the LTI versions `1.1` and `1.3`. In order configure which version you want to use, you need to set the `LTI_VERSION` environment variable. For a complete list of environment variable, please check please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
+The full LTI 1.1.1 specification can be checked at [IMS Global](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide) website.
 
-
-### LTI 1.1
-
-LTI 1.1 was released in August 2014 to add the ability to the tools to pass grades back to the invoking system.
-
-The full LTI 1.3 specification can be checked at [IMS Global](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide) website.
-
-#### LTI 1.1 Configuration
+#### LTI 1.1.1 Configuration
 
 Configure the following environment variables according to the tool you are connecting to simple roster:
 
@@ -32,9 +28,9 @@ Configure the following environment variables according to the tool you are conn
 - LTI_OUTCOME_XML_NAMESPACE
 - LTI_VERSION (need to be set to `1.1.1`)
 
-create your LTI Instances using the [CLI](cli/ingester-command.md#examples)
+With environment variables configured, you should create your LTI Instances using the [CLI](cli/ingester-command.md#examples)
 
-#### LTI 1.1 Link generation and Response
+#### LTI 1.1.1 Link generation and Response
 
 In order to get an LTI link, you need to execute the following request.
 
@@ -42,7 +38,7 @@ In order to get an LTI link, you need to execute the following request.
 GET {{simple-roster-url}}/api/v1/assignments/1/lti-link (Requires authentication)
 ```
 
-Considering Simple Roster was configured to generate LTI 1.1 Links, this should be the expected response.
+Considering Simple Roster was configured to generate LTI 1.1.1 Links, this should be the expected response.
 
 ```json
 {
@@ -74,12 +70,12 @@ Considering Simple Roster was configured to generate LTI 1.1 Links, this should 
 }
 ```
 
-### LTI 1.3
+### LTI 1.3.0
 
-The LTI 1.3 was created to solve some security flaws from its previous versions. With its creation, all other past versions are now considered deprecated.
+The LTI 1.3.0 was created to solve some security flaws from its previous versions. With its creation, all other past versions are now considered deprecated.
 The full LTI 1.3 specification can be checked at [IMS Global](http://www.imsglobal.org/spec/lti/v1p3/) website.
 
-#### LTI 1.3 Configuration
+#### LTI 1.3.0 Configuration
 
 Configure the following environment variables:
 
@@ -100,9 +96,9 @@ Configure the settings on `config/packages/lti1p3.yaml`.
 - Define the `tool` settings
 - Add a `registration`
 
-For more details about these settings, please check [LTI 1.3 Bundle documentation](https://github.com/oat-sa/bundle-lti1p3/blob/master/doc/quickstart/configuration.md)
+For more details about these settings, please check [LTI 1.3.0 Bundle documentation](https://github.com/oat-sa/bundle-lti1p3/blob/master/doc/quickstart/configuration.md)
 
-#### LTI 1.3 Link generation and Response
+#### LTI 1.3.0 Link generation and Response
 
  LTI link, you need to execute the following request.
 
@@ -110,7 +106,7 @@ For more details about these settings, please check [LTI 1.3 Bundle documentatio
 GET {{simple-roster-url}}/api/v1/assignments/1/lti-link (Requires authentication)
 ```
 
-Considering Simple Roster was configured to generate LTI 1.3 Links, this should be the expected response.
+Considering Simple Roster was configured to generate LTI 1.3.0 Links, this should be the expected response.
 
 ```json
 {

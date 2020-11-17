@@ -8,9 +8,10 @@
 - Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added default value (`local`) to `source` argument of [roster:ingest](docs/cli/ingester-command.md) command.
 - Added default value (`local`) to `source` argument of [roster:ingest:user](docs/cli/user-ingester-command.md) command.
-- Added environment variable to control LTI version on link generation
-- Added specific request factories, one per LTI version
-- Added `oat-sa/bundle-lti1p3` bundle for LTI 1.3 link creation
+- Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/)
+- Added LTI_VERSION, LTI1P3_SERVICE_ENCRYPTION_KEY and LTI1P3_REGISTRATION_ID environment variables.
+- Added `oat-sa/bundle-lti1p3` bundle for LTI 1.3 link creation.
+- Added specific request factories, one per LTI version.
 - Added [Features documentation](docs/features.md)
 
 ### Changed

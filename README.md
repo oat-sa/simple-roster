@@ -15,11 +15,17 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 
 - [Docker development](docs/docker-development.md)
 - [Local development](docs/local-development.md)
+- [Features](#features)
 - [OpenAPI documentation](#openapi-documentation)
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops-documentation.md)
 - [Continuous integration](docs/continuous-integration.md)
-- [Features](docs/features.md)
+
+## Features
+
+| Feature                | Description                     | Links                                |
+|------------------------|:--------------------------------|:-------------------------------------|
+| LTI                    | Learning Tools Interoperability | [link](docs/features/lti.md)         |
 
 ## OpenAPI documentation
 
