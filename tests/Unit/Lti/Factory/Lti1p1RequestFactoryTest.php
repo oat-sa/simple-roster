@@ -125,7 +125,7 @@ class Lti1p1RequestFactoryTest extends TestCase
             [
                 'ltiLink' => 'http://lti-infra.taocloud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => $expectedLtiInstance->getLtiKey(),
@@ -135,7 +135,7 @@ class Lti1p1RequestFactoryTest extends TestCase
                     'oauth_timestamp' => (string)Carbon::now()->timestamp,
                     'oauth_version' => '1.0',
                     'lti_message_type' => 'basic-lti-launch-request',
-                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => $expectedLtiContextId,
                     'roles' => 'Learner',
                     'user_id' => 'testUsername',

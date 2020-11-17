@@ -57,7 +57,7 @@ The main configuration file is `.env`, located in root folder.
 | LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
-| LTI_VERSION | Defines if application should generate `LTI-1p0` or `1.3.0` links [default: `LTI-1p0`]
+| LTI_VERSION | Defines if application should generate `1.1.1` or `1.3.0` links [default: `1.1.1`]
 | LTI1P3_SERVICE_ENCRYPTION_KEY | Key used for security signature (Only needed when LTI_VERSION is set to `1.3.0`)
 | LTI1P3_REGISTRATION_ID | ID used to find the configured registration (Only needed when LTI_VERSION is set to `1.3.0`)
 

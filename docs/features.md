@@ -30,7 +30,7 @@ Configure the following environment variables according to the tool you are conn
 - LTI_LAUNCH_PRESENTATION_LOCALE
 - LTI_INSTANCE_LOAD_BALANCING_STRATEGY
 - LTI_OUTCOME_XML_NAMESPACE
-- LTI_VERSION (need to be set to `LTI-1p0`)
+- LTI_VERSION (need to be set to `1.1.1`)
 
 create your LTI Instances using the [CLI](cli/ingester-command.md#examples)
 
@@ -46,7 +46,7 @@ Considering Simple Roster was configured to generate LTI 1.1 Links, this should 
 
 ```json
 {
-  "ltiVersion": "LTI-1p0",
+  "ltiVersion": "1.1.1",
   "ltiLink": "http://infra_1.com",
   "ltiParams": {
     "oauth_body_hash": "string",

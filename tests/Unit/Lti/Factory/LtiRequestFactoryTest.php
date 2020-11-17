@@ -49,7 +49,7 @@ class LtiRequestFactoryTest extends TestCase
     public function testShouldReturnLti1p1RequestFactory(): void
     {
         $subject = new LtiRequestFactory(
-            LtiRequest::LTI_VERSION_1P0,
+            LtiRequest::LTI_VERSION_1P1,
             $this->lti1p1RequestFactory,
             $this->lti1p3RequestFactory
         );

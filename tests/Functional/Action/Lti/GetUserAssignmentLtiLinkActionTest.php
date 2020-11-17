@@ -186,7 +186,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -197,17 +197,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'IiqrCaXlAfnoRYJNtJlH/xNXvhg=',
+                    'oauth_signature' => '/2ZSkskXDj5O4HKTWEDu1IBEm/Y=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -243,7 +243,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -254,17 +254,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'KeYIIv6CwygCaWDBtNe+QU1vX7I=',
+                    'oauth_signature' => 't0Ai0P6GJyXGNkBer/XrSdVns8U=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -294,7 +294,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P0;
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
@@ -316,17 +316,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P0,
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'uaEAaZX4pLE8hiP+86aRalNBO3w=',
+                    'oauth_signature' => 'Dr5RhRpvp2D21zwajcaG9kX6JrA=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION_1P0,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',

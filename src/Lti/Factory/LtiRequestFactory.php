@@ -52,7 +52,7 @@ class LtiRequestFactory
     public function __invoke(): LtiRequestFactoryInterface
     {
         switch ($this->ltiVersion) {
-            case LtiRequest::LTI_VERSION_1P0:
+            case LtiRequest::LTI_VERSION_1P1:
                 return $this->lti1p1RequestFactory;
             case LtiRequest::LTI_VERSION_1P3:
                 return $this->lti1p3RequestFactory;

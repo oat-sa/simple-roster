@@ -103,7 +103,7 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
 
         return new LtiRequest(
             $ltiLink,
-            LtiRequest::LTI_VERSION_1P0,
+            LtiRequest::LTI_VERSION_1P1,
             array_merge(
                 [
                     'oauth_body_hash' => $context->getBodyHash(),
@@ -138,7 +138,7 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
     {
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'lti_version' => LtiRequest::LTI_VERSION_1P0,
+            'lti_version' => LtiRequest::LTI_VERSION_1P1,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),

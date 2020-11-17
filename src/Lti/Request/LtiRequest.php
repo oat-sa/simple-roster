@@ -27,7 +27,7 @@ use JsonSerializable;
 class LtiRequest implements JsonSerializable
 {
     public const LTI_MESSAGE_TYPE = 'basic-lti-launch-request';
-    public const LTI_VERSION_1P0 = 'LTI-1p0';
+    public const LTI_VERSION_1P1 = '1.1.1';
     public const LTI_VERSION_1P3 = '1.3.0';
     public const LTI_ROLE = 'Learner';
 
