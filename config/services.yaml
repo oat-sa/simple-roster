@@ -114,15 +114,15 @@ services:
         arguments:
             - '%app.lti.load_balancing_strategy%'
 
-    OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
-        factory: '@OAT\SimpleRoster\Lti\Factory\LtiRequestFactory'
-
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
 
     OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
-            $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+            $xmlNamespace: '%app.lti.outcome_xml_namespace%'
+
+    OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
+        factory: '@OAT\SimpleRoster\Lti\Factory\LtiRequestFactory'
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
