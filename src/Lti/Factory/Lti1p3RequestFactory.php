@@ -39,22 +39,26 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
     /** @var LtiResourceLinkLaunchRequestBuilder */
     private $builder;
 
+    /** @var string */
+    private $ltiRegistrationId;
+
     public function __construct(
         RegistrationRepositoryInterface $repository,
-        LtiResourceLinkLaunchRequestBuilder $builder
+        LtiResourceLinkLaunchRequestBuilder $builder,
+        string $ltiRegistrationId
     ) {
         $this->repository = $repository;
         $this->builder = $builder;
+        $this->ltiRegistrationId = $ltiRegistrationId;
     }
 
     public function create(Assignment $assignment): LtiRequest
     {
-        $registrationId = 'demo';
         $resourceLink = new LtiResourceLink($assignment->getLineItem()->getUri());
-        $registration = $this->repository->find($registrationId);
+        $registration = $this->repository->find($this->ltiRegistrationId);
 
         if (!$registration) {
-            throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $registrationId));
+            throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $this->ltiRegistrationId));
         }
 
         $loginHint = new LoginHintDto(

@@ -59,6 +59,7 @@ The main configuration file is `.env`, located in root folder.
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
 | LTI_VERSION | Defines if application should generate `LTI-1p0` or `1.3.0` links [default: `LTI-1p0`]
 | LTI1P3_SERVICE_ENCRYPTION_KEY | Key used for security signature (Only needed when LTI_VERSION is set to `1.3.0`)
+| LTI1P3_REGISTRATION_ID | ID used to find the configured registration (Only needed when LTI_VERSION is set to `1.3.0`)
 
 #### Blackfire related environment variables
 

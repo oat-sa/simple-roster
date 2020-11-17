@@ -54,7 +54,7 @@ class Lti1p3RequestFactoryTest extends TestCase
         $this->builder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
         $this->repository = $this->createMock(RegistrationRepositoryInterface::class);
 
-        $this->subject = new Lti1p3RequestFactory($this->repository, $this->builder);
+        $this->subject = new Lti1p3RequestFactory($this->repository, $this->builder, 'registrationId');
     }
 
     /**
@@ -133,7 +133,7 @@ class Lti1p3RequestFactoryTest extends TestCase
     public function testShouldThrowRegistrationNotFoundException(): void
     {
         $this->expectException(RegistrationNotFoundException::class);
-        $this->expectExceptionMessage('Registration demo not found.');
+        $this->expectExceptionMessage('Registration registrationId not found.');
 
         $assignment = $this->createAssignmentMock(5, 1, Assignment::STATE_READY);
 

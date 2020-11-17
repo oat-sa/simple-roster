@@ -16,6 +16,7 @@ parameters:
     app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
     app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti.version: '%env(resolve:LTI_VERSION)%'
+    app.lti.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
@@ -37,6 +38,7 @@ services:
             $ltiInstancesCacheTtl: '%app.cache.ttl.lti_instance_list%'
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
+            $ltiRegistrationId: '%app.lti.registration_id%'
 
     _instanceof:
         OAT\SimpleRoster\Ingester\Ingester\IngesterInterface:

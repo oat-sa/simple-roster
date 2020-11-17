@@ -85,6 +85,7 @@ Configure the following environment variables:
 
 - LTI_VERSION (need to be set to `1.3.0`)
 - LTI1P3_SERVICE_ENCRYPTION_KEY
+- LTI1P3_REGISTRATION_ID (should match your registration on `config/packages/lti1p3.yaml`)
 
 Create your key pair running:
 
