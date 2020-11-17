@@ -31,11 +31,11 @@ Please use [Swagger editor](https://editor.swagger.io/) to visualize it.
 
 The application currently offers the following CLI commands:
 
-| Command                               | Description                                         | Links                                                    |
-| --------------------------------------|:----------------------------------------------------|:---------------------------------------------------------|
-| `roster:ingest`                       | Data ingestion (lti instances, line items, users)   | [link](docs/cli/ingester-command.md)                     |
-| `roster:native-ingest:user`           | Native user ingestion                               | [link](docs/cli/native-user-ingester-command.md)         |
-| `roster:garbage-collector:assignment` | Assignment garbage collection                       | [link](docs/cli/assignment-garbage-collector-command.md) |
-| `roster:doctrine-result-cache:warmup` | Doctrine result cache warmer                        | [link](docs/cli/doctrine-result-cache-warmer-command.md) | 
-| `roster:assignments:bulk-cancel`      | Assignment bulk cancellation                        | [link](docs/cli/assignment-bulk-cancellation-command.md) |
-| `roster:assignments:bulk-create`      | Assignment bulk creation                            | [link](docs/cli/assignment-bulk-creation-command.md)     |
+| Command                               | Description                                | Links                                                    |
+| --------------------------------------|:-------------------------------------------|:---------------------------------------------------------|
+| `roster:ingest`                       | Data ingestion (lti instances, line items) | [link](docs/cli/ingester-command.md)                     |
+| `roster:ingest:user`                  | User ingestion                             | [link](docs/cli/user-ingester-command.md)                |
+| `roster:garbage-collector:assignment` | Assignment garbage collection              | [link](docs/cli/assignment-garbage-collector-command.md) |
+| `roster:cache:warmup`                 | Application cache warmer                   | [link](docs/cli/cache-warmer-command.md)                 | 
+| `roster:assignments:bulk-cancel`      | Assignment bulk cancellation               | [link](docs/cli/assignment-bulk-cancellation-command.md) |
+| `roster:assignments:bulk-create`      | Assignment bulk creation                   | [link](docs/cli/assignment-bulk-creation-command.md)     |

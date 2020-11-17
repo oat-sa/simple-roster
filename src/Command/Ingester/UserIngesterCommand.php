@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,12 +15,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Command\Ingester\Native;
+namespace OAT\SimpleRoster\Command\Ingester;
 
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
@@ -30,7 +30,7 @@ use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
-use OAT\SimpleRoster\Ingester\Ingester\NativeUserIngester;
+use OAT\SimpleRoster\Ingester\Ingester\UserIngester;
 use OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry;
 use OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface;
 use OAT\SimpleRoster\Model\LineItemCollection;
@@ -45,19 +45,19 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Throwable;
 
-class NativeUserIngesterCommand extends Command
+class UserIngesterCommand extends Command
 {
     use CommandProgressBarFormatterTrait;
 
-    public const NAME = 'roster:native-ingest:user';
+    public const NAME = 'roster:ingest:user';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
     /** @var IngesterSourceRegistry */
     private $ingesterSourceRegistry;
 
-    /** @var NativeUserIngester */
-    private $nativeUserIngester;
+    /** @var UserIngester */
+    private $userIngester;
 
     /** @var LineItemRepository */
     private $lineItemRepository;
@@ -76,12 +76,12 @@ class NativeUserIngesterCommand extends Command
 
     public function __construct(
         IngesterSourceRegistry $ingesterSourceRegistry,
-        NativeUserIngester $nativeUserIngester,
+        UserIngester $nativeUserIngester,
         LineItemRepository $lineItemRepository,
         UserPasswordEncoderInterface $passwordEncoder
     ) {
         $this->ingesterSourceRegistry = $ingesterSourceRegistry;
-        $this->nativeUserIngester = $nativeUserIngester;
+        $this->userIngester = $nativeUserIngester;
         $this->lineItemRepository = $lineItemRepository;
         $this->passwordEncoder = $passwordEncoder;
 
@@ -90,7 +90,7 @@ class NativeUserIngesterCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Responsible for native user ingesting from various sources (Local file, S3 bucket)');
+        $this->setDescription('Responsible for user ingesting from various sources (Local file, S3 bucket)');
 
         $this->addArgument(
             'path',
@@ -188,7 +188,7 @@ class NativeUserIngesterCommand extends Command
 
                 if ($numberOfProcessedRows % $this->batchSize === 0) {
                     if (!$this->isDryRun) {
-                        $this->nativeUserIngester->ingest($userDtoCollection);
+                        $this->userIngester->ingest($userDtoCollection);
                     }
 
                     $userDtoCollection->clear();
@@ -199,7 +199,7 @@ class NativeUserIngesterCommand extends Command
             }
 
             if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
-                $this->nativeUserIngester->ingest($userDtoCollection);
+                $this->userIngester->ingest($userDtoCollection);
             }
 
             $progressBar->finish();
