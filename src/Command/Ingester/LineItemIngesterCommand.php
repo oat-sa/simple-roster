@@ -57,7 +57,7 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
     {
         parent::configure();
 
-        $this->setDescription('Line item ingestion from various sources');
+        $this->setDescription('Line item data ingestion');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

@@ -65,7 +65,7 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
     {
         parent::configure();
 
-        $this->setDescription('User ingestion from various sources');
+        $this->setDescription('User data ingestion');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

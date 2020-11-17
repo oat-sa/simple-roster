@@ -67,7 +67,7 @@ class AssignmentDtoCollection implements Countable, IteratorAggregate
 
     public function isEmpty(): bool
     {
-        return count($this) === 0;
+        return $this->count() === 0;
     }
 
     /**

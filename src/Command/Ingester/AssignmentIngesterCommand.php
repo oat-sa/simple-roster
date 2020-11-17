@@ -67,7 +67,7 @@ class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
     {
         parent::configure();
 
-        $this->setDescription('Assignment ingestion from various sources');
+        $this->setDescription('Assignment data ingestion');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

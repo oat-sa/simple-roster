@@ -56,7 +56,7 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
     {
         parent::configure();
 
-        $this->setDescription('LTI instance ingestion from various sources');
+        $this->setDescription('LTI instance data ingestion');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
@@ -85,15 +85,7 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
                 $numberOfProcessedRows++;
                 $persisted = false;
 
-                $ltiInstance = new LtiInstance(
-                    0,
-                    $rawLtiInstance['label'],
-                    $rawLtiInstance['ltiLink'],
-                    $rawLtiInstance['ltiKey'],
-                    $rawLtiInstance['ltiSecret']
-                );
-
-                $this->ltiInstanceRepository->persist($ltiInstance);
+                $this->ltiInstanceRepository->persist($this->createLtiInstance($rawLtiInstance));
 
                 if ($numberOfProcessedRows % $this->batchSize === 0) {
                     if (!$this->isDryRun) {
@@ -147,5 +139,16 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
         }
 
         return 0;
+    }
+
+    private function createLtiInstance(array $rawLtiInstance): LtiInstance
+    {
+        return new LtiInstance(
+            0,
+            $rawLtiInstance['label'],
+            $rawLtiInstance['ltiLink'],
+            $rawLtiInstance['ltiKey'],
+            $rawLtiInstance['ltiSecret']
+        );
     }
 }
