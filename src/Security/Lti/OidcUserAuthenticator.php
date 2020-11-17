@@ -58,7 +58,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
 
         return new UserAuthenticationResult(
             true,
-            new UserIdentity($user->getUsername())
+            new UserIdentity((string) $user->getUsername())
         );
     }
 

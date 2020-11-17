@@ -28,7 +28,6 @@ use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Lti\Exception\InvalidGroupException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Security\Lti\LoginHintValidator;
 use OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -80,8 +79,9 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->with('user1')
             ->willReturn($user);
 
-        $result = $this->subject->authenticate('loginHint');
+        $result = $this->subject->authenticate($loginHint);
 
+        /* @phpstan-ignore-next-line */
         $this->assertSame('user1', $result->getUserIdentity()->getIdentifier());
     }
 

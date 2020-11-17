@@ -62,8 +62,8 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
         }
 
         $loginHint = new LoginHintDto(
-            $assignment->getUser()->getUsername(),
-            $assignment->getUser()->getGroupId(),
+            (string) $assignment->getUser()->getUsername(),
+            (string) $assignment->getUser()->getGroupId(),
             $assignment->getLineItem()->getSlug()
         );
 
