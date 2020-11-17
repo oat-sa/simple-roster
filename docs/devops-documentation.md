@@ -161,7 +161,7 @@ $ sudo -u www-data bin/console cache:clear [--env=dev|prod]
 - Warm-up Doctrine cache
 
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
+$ sudo -u www-data bin/console roster:cache:warmup
 ```
 
 - Refresh Doctrine metadata cache

@@ -1,8 +1,6 @@
-# Doctrine Result Cache Warmer
+# Cache warmer command
 
 [DoctrineResultCacheWarmerCommand](../../src/Command/Cache/DoctrineResultCacheWarmerCommand.php) is responsible for refreshing the result cache of Doctrine.
-
-Currently we use result cache for `findByUsernameWithAssignments()` method in `UserRepository`.
 
 - [Basic usage](#basic-usage)
     - [Main options](#main-options)
@@ -13,7 +11,7 @@ Currently we use result cache for `findByUsernameWithAssignments()` method in `U
 
 ## Basic usage
 ```bash
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
+$ sudo -u www-data bin/console roster:cache:warmup
 ```
 ### Main options
 
@@ -25,7 +23,7 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup
 
 For the full list of options please refer to the helper option:
 ```bash
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup -h
+$ sudo -u www-data bin/console roster:cache:warmup -h
 ```
 
 ### Examples
@@ -33,17 +31,17 @@ $ sudo -u www-data bin/console roster:doctrine-result-cache:warmup -h
 Warming up all result cache entries in batch of 10.000:
 
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --batch-size=10000
+$ sudo -u www-data bin/console roster:cache:warmup --batch-size=10000
 ```
 
 Warming up result cache entries for specific users:
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --usernames=user1,user2,user3,user4
+$ sudo -u www-data bin/console roster:cache:warmup --usernames=user1,user2,user3,user4
 ```
 
 Warming up result cache entries for specific line items:
 ```shell script
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --line-item-slugs=slug1,slug2,slug3
+$ sudo -u www-data bin/console roster:cache:warmup --line-item-slugs=slug1,slug2,slug3
 ```
 
 ## Advanced usage
@@ -67,7 +65,7 @@ First let's warmup the cache for all users where `ID % 4 === 0`.
 
 ```shell script
 $ screen -S cache-warmup-0
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --remainder=0
+$ sudo -u www-data bin/console roster:cache:warmup --modulo=4 --remainder=0
 ```
 
 Exit from screen `cache-warmup-0` by pressing `CTRL+A` then `CTRL+D`.
@@ -76,7 +74,7 @@ Now let's warmup the cache for all users where `ID % 4 === 1`.
 
 ```shell script
 $ screen -S cache-warmup-1
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --remainder=1
+$ sudo -u www-data bin/console roster:cache:warmup --modulo=4 --remainder=1
 ```
 
 Exit from screen `cache-warmup-1` by pressing `CTRL+A` then `CTRL+D`.
@@ -85,7 +83,7 @@ Now let's warmup the cache for all users where `ID % 4 === 2`.
 
 ```shell script
 $ screen -S cache-warmup-2
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --remainder=2
+$ sudo -u www-data bin/console roster:cache:warmup --modulo=4 --remainder=2
 ```
 
 Exit from screen `cache-warmup-2` by pressing `CTRL+A` then `CTRL+D`.
@@ -94,7 +92,7 @@ Now let's warmup the cache for all users where `ID % 4 === 3`.
 
 ```shell script
 $ screen -S cache-warmup-3
-$ sudo -u www-data bin/console roster:doctrine-result-cache:warmup --modulo=4 --remainder=3
+$ sudo -u www-data bin/console roster:cache:warmup --modulo=4 --remainder=3
 ```
 
 Exit from screen `cache-warmup-3` by pressing `CTRL+A` then `CTRL+D`.
