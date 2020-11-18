@@ -15,17 +15,17 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2019-2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
-use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface
@@ -147,14 +147,9 @@ class User implements UserInterface, EntityInterface
     public function getAvailableAssignments(): array
     {
         $availableAssignments = [];
-        $now = Carbon::now()->toDateTime();
 
         foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->isCancelled()) {
-                continue;
-            }
-
-            if (!$assignment->getLineItem()->isAvailableForDate($now)) {
+            if (!$assignment->isAvailable()) {
                 continue;
             }
 
@@ -163,20 +158,37 @@ class User implements UserInterface, EntityInterface
 
         return $availableAssignments;
     }
-
+    
     /**
      * @throws AssignmentNotFoundException
      */
-    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    public function getAssignmentById(int $assignmentId): Assignment
     {
-        foreach ($this->getAvailableAssignments() as $assignment) {
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->getId() === $assignmentId) {
                 return $assignment;
             }
         }
-
+    
         throw new AssignmentNotFoundException(
             sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+        );
+    }
+
+    /**
+     * @throws AssignmentNotFoundException
+     * @throws AssignmentUnavailableException
+     */
+    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    {
+        $assignment = $this->getAssignmentById($assignmentId);
+        
+        if ($assignment->isAvailable()) {
+            return $assignment;
+        }
+        
+        throw new AssignmentUnavailableException(
+            sprintf("Assignment with id '%s' for user '%s' is unavailable.", $assignmentId, $this->getUsername())
         );
     }
 
