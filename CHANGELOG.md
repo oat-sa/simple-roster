@@ -18,6 +18,7 @@
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Native user ingestion command has changed from `roster:native-ingest:user` to `roster:ingest:user`.
 - Cache warmer command has changed from `roster:doctrine-result-cache:warmup` to `roster:cache:warmup`.
+- `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
