@@ -27,6 +27,7 @@
 
 ### Fixed
 - Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files.
+- Fixed HTTP code returned in case assignment exists but unavailable
 
 ## 1.8.1 - 2020-10-27
 
