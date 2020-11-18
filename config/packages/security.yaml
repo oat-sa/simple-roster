@@ -16,7 +16,7 @@ security:
 
         api_key:
             anonymous: ~
-            pattern: '^%app.route_prefix%/bulk'
+            pattern: '^%app.route_prefix%/v1/bulk'
             guard:
                 authenticators:
                     - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
@@ -24,7 +24,7 @@ security:
 
         api:
             anonymous: ~
-            pattern: '^%app.route_prefix%'
+            pattern: '^%app.route_prefix%/v1'
             logout:
                 path: logout
                 success_handler: OAT\SimpleRoster\Security\Handler\LogoutSuccessHandler
@@ -39,6 +39,6 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: '^%app.route_prefix%/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%', roles: ROLE_USER }
+        - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }
