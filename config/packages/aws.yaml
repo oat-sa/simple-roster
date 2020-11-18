@@ -1,3 +1,0 @@
-aws:
-    region: '%env(AWS_REGION)%'
-    version: '%env(AWS_VERSION)%'

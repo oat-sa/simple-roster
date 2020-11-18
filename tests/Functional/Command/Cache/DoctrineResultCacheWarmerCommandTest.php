@@ -22,13 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
-use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
-use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
-use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\VoidCache;
 use Doctrine\ORM\Configuration;
@@ -37,6 +30,14 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
 use LogicException;
 use Monolog\Logger;
+use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -45,6 +46,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -558,14 +560,5 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
                 'remainder' => 5,
             ],
         ];
-    }
-
-    /**
-     * Without this tests asserting the command display are failing with plain phpunit (so NOT with bin/phpunit)
-     * due to new line/tab characters. This modification does NOT affect bin/phpunit usage.
-     */
-    private function normalizeDisplay(string $commandDisplay): string
-    {
-        return trim((string)preg_replace('/\s+/', ' ', $commandDisplay));
     }
 }

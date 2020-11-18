@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
-use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
@@ -56,11 +54,8 @@ class NativeUserRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleUsers(): void
     {
-        $assignment1 = new AssignmentDto('test', 1, 1);
-        $user1 = new UserDto('test1', 'test', null, new AssignmentDtoCollection($assignment1));
-
-        $assignment2 = new AssignmentDto('test', 2, 2);
-        $user2 = new UserDto('test2', 'test', null, new AssignmentDtoCollection($assignment2));
+        $user1 = new UserDto('test1', 'test');
+        $user2 = new UserDto('test2', 'test');
 
         $userCollection = (new UserDtoCollection())
             ->add($user1)

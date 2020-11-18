@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\DataTransferObject;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use OAT\SimpleRoster\Exception\UserNotFoundException;
 
 class UserDtoCollection implements Countable, IteratorAggregate
 {
@@ -34,18 +33,7 @@ class UserDtoCollection implements Countable, IteratorAggregate
 
     public function add(UserDto $user): self
     {
-        if (!$this->containsUsername($user->getUsername())) {
-            $this->users[$user->getUsername()] = $user;
-        }
-
-        return $this;
-    }
-
-    public function remove(UserDto $user): self
-    {
-        if ($this->containsUsername($user->getUsername())) {
-            unset($this->users[$user->getUsername()]);
-        }
+        $this->users[$user->getUsername()] = $user;
 
         return $this;
     }
@@ -73,31 +61,5 @@ class UserDtoCollection implements Countable, IteratorAggregate
     public function isEmpty(): bool
     {
         return count($this) === 0;
-    }
-
-    public function getByUsername(string $username): UserDto
-    {
-        if (!$this->containsUsername($username)) {
-            throw new UserNotFoundException(
-                sprintf("User with username '%s' is not found.", $username)
-            );
-        }
-
-        return $this->users[$username];
-    }
-
-    public function containsUsername(string $username): bool
-    {
-        return isset($this->users[$username]);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllUsernames(): array
-    {
-        return array_map(static function (UserDto $user) {
-            return $user->getUsername();
-        }, $this->users);
     }
 }

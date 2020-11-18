@@ -33,9 +33,6 @@ class BulkOperation
     /** @var string */
     private $type;
 
-    /** @var bool */
-    private $isDryRun = false;
-
     /** @var string[] */
     private $attributes;
 
@@ -54,18 +51,6 @@ class BulkOperation
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function isDryRun(): bool
-    {
-        return $this->isDryRun;
-    }
-
-    public function setIsDryRun(bool $isDryRun): self
-    {
-        $this->isDryRun = $isDryRun;
-
-        return $this;
     }
 
     public function getAttributes(): array

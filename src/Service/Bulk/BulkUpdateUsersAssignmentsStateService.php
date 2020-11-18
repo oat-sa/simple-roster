@@ -118,9 +118,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 continue;
             }
 
-            if (!$operation->isDryRun()) {
-                $assignment->setState(Assignment::STATE_CANCELLED);
-            }
+            $assignment->setState(Assignment::STATE_CANCELLED);
 
             $this->logBuffer[] = [
                 'message' => sprintf(

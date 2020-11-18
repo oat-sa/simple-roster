@@ -5,7 +5,6 @@
 ## Table of Contents
 - [Environment variables](#environment-variables)
     - [Application related environment variables](#application-related-environment-variables)
-    - [AWS related environment variables](#aws-related-environment-variables)
     - [LTI related environment variables](#lti-related-environment-variables)
     - [Blackfire related environment variables](#blackfire-related-environment-variables)
 - [Application setup steps](#application-setup-steps)
@@ -39,17 +38,7 @@ The main configuration file is `.env`, located in root folder.
 | CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list [default: `3600`] |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-  
-#### AWS related environment variables
-
-| Parameter | Description |
-| ------------- |:-------------|
-| AWS_REGION | AWS Region [default: `eu-west-1`] |
-| AWS_VERSION | AWS Version [default: `latest`] |
-| AWS_KEY | AWS Key (used only in `dev` environment) |
-| AWS_SECRET | AWS Secret (used only in `dev` environment) |
-| AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
-     
+       
 #### LTI related environment variables
 
 | Parameter | Description |
