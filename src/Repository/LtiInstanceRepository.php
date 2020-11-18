@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Repository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 
 /**
  * @method LtiInstance|null   find($id, $lockMode = null, $lockVersion = null)
@@ -47,7 +47,7 @@ class LtiInstanceRepository extends AbstractRepository
         $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
     }
 
-    public function findAllAsCollection(): LtiInstanceCollection
+    public function findAllAsCollection(): UniqueLtiInstanceCollection
     {
         $ltiInstances = $this->createQueryBuilder('l')
             ->select('l')
@@ -55,7 +55,7 @@ class LtiInstanceRepository extends AbstractRepository
             ->enableResultCache($this->ltiInstancesCacheTtl, self::CACHE_ID_ALL_LTI_INSTANCES)
             ->getResult();
 
-        return new LtiInstanceCollection(...$ltiInstances);
+        return new UniqueLtiInstanceCollection(...$ltiInstances);
     }
 
     /**

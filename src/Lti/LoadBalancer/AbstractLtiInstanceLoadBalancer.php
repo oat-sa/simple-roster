@@ -23,17 +23,17 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 
 /**
  * @see https://github.com/oat-sa/extension-tao-operations/blob/master/model/OperationUtils.php
  */
 abstract class AbstractLtiInstanceLoadBalancer implements LtiInstanceLoadBalancerInterface
 {
-    /** @var LtiInstanceCollection */
+    /** @var UniqueLtiInstanceCollection */
     private $ltiInstanceCollection;
 
-    public function __construct(LtiInstanceCollection $ltiInstanceCollection)
+    public function __construct(UniqueLtiInstanceCollection $ltiInstanceCollection)
     {
         $this->ltiInstanceCollection = $ltiInstanceCollection;
     }

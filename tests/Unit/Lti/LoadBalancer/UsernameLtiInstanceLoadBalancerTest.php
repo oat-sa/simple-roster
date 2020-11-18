@@ -26,14 +26,14 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
 
 class UsernameLtiInstanceLoadBalancerTest extends TestCase
 {
-    /** @var LtiInstanceCollection */
+    /** @var UniqueLtiInstanceCollection */
     private $ltiInstanceCollection;
 
     /** @var UsernameLtiInstanceLoadBalancer */
@@ -43,7 +43,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
     {
         parent::setUp();
 
-        $this->ltiInstanceCollection = new LtiInstanceCollection();
+        $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
             ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
             ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))

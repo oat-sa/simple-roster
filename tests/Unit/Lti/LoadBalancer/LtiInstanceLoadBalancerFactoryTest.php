@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
 use LogicException;
-use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
@@ -49,7 +49,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
 
     public function testItCanResolveUsernameLtiInstanceLoadBalancerStrategy(): void
     {
-        $expectedCollectionToPass = new LtiInstanceCollection();
+        $expectedCollectionToPass = new UniqueLtiInstanceCollection();
         $this->ltiInstanceRepository
             ->expects(self::once())
             ->method('findAllAsCollection')
@@ -63,7 +63,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
 
     public function testItCanResolveUserGroupIdLtiInstanceLoadBalancerStrategy(): void
     {
-        $expectedCollectionToPass = new LtiInstanceCollection();
+        $expectedCollectionToPass = new UniqueLtiInstanceCollection();
         $this->ltiInstanceRepository
             ->expects(self::once())
             ->method('findAllAsCollection')

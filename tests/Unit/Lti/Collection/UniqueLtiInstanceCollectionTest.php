@@ -23,11 +23,11 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Collection;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Lti\Collection\LtiInstanceCollection;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
-class LtiInstanceCollectionTest extends TestCase
+class UniqueLtiInstanceCollectionTest extends TestCase
 {
     public function testItThrowsExceptionIfInvalidIndexReceived(): void
     {
@@ -39,7 +39,7 @@ class LtiInstanceCollectionTest extends TestCase
             new LtiInstance(5, 'instance_5', 'link', 'key', 'secret'),
         ];
 
-        $subject = new LtiInstanceCollection(...$ltiInstances);
+        $subject = new UniqueLtiInstanceCollection(...$ltiInstances);
 
         foreach ([-2, -1, 5, 6] as $invalidIndex) {
             try {
@@ -57,7 +57,7 @@ class LtiInstanceCollectionTest extends TestCase
     public function testIfLtiInstanceWithSameLabelCannotBeAddedTwice(): void
     {
         $ltiInstance = new LtiInstance(1, 'instance_1', 'link', 'key', 'secret');
-        $subject = new LtiInstanceCollection($ltiInstance, $ltiInstance);
+        $subject = new UniqueLtiInstanceCollection($ltiInstance, $ltiInstance);
 
         self::assertCount(1, $subject);
 
