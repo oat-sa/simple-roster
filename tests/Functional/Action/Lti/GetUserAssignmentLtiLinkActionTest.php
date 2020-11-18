@@ -143,7 +143,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         self::assertSame(
-            "Assignment id '1' not found for user 'user1'.",
+            "Assignment with id '1' for user 'user1' is unavailable.",
             $decodedResponse['error']['message']
         );
 
