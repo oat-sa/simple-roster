@@ -30,6 +30,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
@@ -42,24 +43,26 @@ class Lti1p3RequestFactoryTest extends TestCase
     private $subject;
 
     /** @var LtiResourceLinkLaunchRequestBuilder|MockObject */
-    private $builder;
+    private $ltiRequestBuilder;
 
     /** @var RegistrationRepositoryInterface|MockObject */
-    private $repository;
+    private $registrationRepository;
+
+    /** @var LtiConfiguration|MockObject */
+    private $ltiConfiguration;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->builder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
-        $this->repository = $this->createMock(RegistrationRepositoryInterface::class);
+        $this->ltiRequestBuilder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
+        $this->registrationRepository = $this->createMock(RegistrationRepositoryInterface::class);
+        $this->ltiConfiguration = $this->createMock(LtiConfiguration::class);
 
         $this->subject = new Lti1p3RequestFactory(
-            $this->repository,
-            $this->builder,
-            'registrationId',
-            'http://example.com/index.html',
-            'fr-FR'
+            $this->registrationRepository,
+            $this->ltiRequestBuilder,
+            $this->ltiConfiguration
         );
     }
 
@@ -83,10 +86,25 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->method('toUrl')
             ->willReturn('link');
 
-        $this->builder
+        $this->ltiRequestBuilder
             ->expects(self::once())
             ->method('buildLtiResourceLinkLaunchRequest')
             ->willReturn($message);
+
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiRegistrationId')
+            ->willReturn('registrationId');
+
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiLaunchPresentationReturnUrl')
+            ->willReturn('http://example.com/index.html');
+
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiLaunchPresentationLocale')
+            ->willReturn('fr-FR');
 
         self::assertSame(
             [
@@ -138,6 +156,11 @@ class Lti1p3RequestFactoryTest extends TestCase
 
     public function testShouldThrowRegistrationNotFoundException(): void
     {
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiRegistrationId')
+            ->willReturn('registrationId');
+
         $this->expectException(RegistrationNotFoundException::class);
         $this->expectExceptionMessage('Registration registrationId not found.');
 
@@ -175,7 +198,7 @@ class Lti1p3RequestFactoryTest extends TestCase
     {
         $registration = $this->createMock(RegistrationInterface::class);
 
-        $this->repository
+        $this->registrationRepository
             ->expects(self::once())
             ->method('find')
             ->willReturn($registration);

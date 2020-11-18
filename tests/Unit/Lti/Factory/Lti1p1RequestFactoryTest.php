@@ -27,6 +27,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
@@ -44,27 +45,22 @@ class Lti1p1RequestFactoryTest extends TestCase
     /** @var LtiInstanceLoadBalancerInterface|MockObject */
     private $loadBalancer;
 
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
+    /** @var LtiConfiguration|MockObject */
+    private $ltiConfiguration;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ltiLaunchPresentationReturnUrl = 'http://example.com/index.html';
-        $this->ltiLaunchPresentationLocale = 'fr-FR';
         $this->loadBalancer = $this->createMock(LtiInstanceLoadBalancerInterface::class);
+        $this->ltiConfiguration = $this->createMock(LtiConfiguration::class);
 
         $this->subject = new Lti1p1RequestFactory(
             $this->createMock(OAuthSigner::class),
             $this->createMock(NonceGenerator::class),
             $this->createMock(RouterInterface::class),
             $this->loadBalancer,
-            $this->ltiLaunchPresentationReturnUrl,
-            $this->ltiLaunchPresentationLocale,
+            $this->ltiConfiguration
         );
     }
 
@@ -117,6 +113,16 @@ class Lti1p1RequestFactoryTest extends TestCase
             ->with($user)
             ->willReturn($expectedLtiInstance);
 
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiLaunchPresentationReturnUrl')
+            ->willReturn('http://example.com/index.html');
+
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiLaunchPresentationLocale')
+            ->willReturn('fr-FR');
+
         self::assertSame(
             [
                 'ltiLink' => 'http://lti-infra.taocloud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
@@ -139,8 +145,8 @@ class Lti1p1RequestFactoryTest extends TestCase
                     'resource_link_id' => 5,
                     'lis_outcome_service_url' => null,
                     'lis_result_sourcedid' => 5,
-                    'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
-                    'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
+                    'launch_presentation_return_url' => 'http://example.com/index.html',
+                    'launch_presentation_locale' => 'fr-FR',
                 ],
             ],
             $this->subject->create($assignment)->jsonSerialize()

@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Generator\NonceGenerator;
+use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
@@ -51,26 +52,21 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
     /** @var LtiInstanceLoadBalancerInterface */
     private $loadBalancer;
 
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
+    /** @var LtiConfiguration */
+    private $ltiConfiguration;
 
     public function __construct(
         OAuthSigner $signer,
         NonceGenerator $generator,
         RouterInterface $router,
         LtiInstanceLoadBalancerInterface $loadBalancer,
-        string $ltiLaunchPresentationReturnUrl,
-        string $ltiLaunchPresentationLocale
+        LtiConfiguration $ltiConfiguration
     ) {
         $this->signer = $signer;
         $this->generator = $generator;
         $this->router = $router;
         $this->loadBalancer = $loadBalancer;
-        $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
-        $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
+        $this->ltiConfiguration = $ltiConfiguration;
     }
 
     /**
@@ -148,8 +144,8 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
             'lis_result_sourcedid' => $assignment->getId(),
-            'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
-            'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
+            'launch_presentation_return_url' => $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
+            'launch_presentation_locale' => $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
         ];
     }
 }

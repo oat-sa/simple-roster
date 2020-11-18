@@ -29,6 +29,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
@@ -40,37 +41,28 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
     /** @var LtiResourceLinkLaunchRequestBuilder */
     private $ltiRequestBuilder;
 
-    /** @var string */
-    private $ltiRegistrationId;
-
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
+    /** @var LtiConfiguration */
+    private $ltiConfiguration;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder,
-        string $ltiRegistrationId,
-        string $ltiLaunchPresentationReturnUrl,
-        string $ltiLaunchPresentationLocale
+        LtiConfiguration $ltiConfiguration
     ) {
         $this->registrationRepository = $registrationRepository;
         $this->ltiRequestBuilder = $ltiRequestBuilder;
-        $this->ltiRegistrationId = $ltiRegistrationId;
-        $this->ltiLaunchPresentationReturnUrl = $ltiLaunchPresentationReturnUrl;
-        $this->ltiLaunchPresentationLocale = $ltiLaunchPresentationLocale;
+        $this->ltiConfiguration = $ltiConfiguration;
     }
 
     public function create(Assignment $assignment): LtiRequest
     {
         $lineItem = $assignment->getLineItem();
         $resourceLink = new LtiResourceLink($lineItem->getUri());
-        $registration = $this->registrationRepository->find($this->ltiRegistrationId);
+        $ltiRegistrationId = $this->ltiConfiguration->getLtiRegistrationId();
+        $registration = $this->registrationRepository->find($ltiRegistrationId);
 
         if (!$registration) {
-            throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $this->ltiRegistrationId));
+            throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $ltiRegistrationId));
         }
 
         $loginHint = new LoginHintDto(
@@ -91,8 +83,8 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
                     null,
                     null,
                     null,
-                    $this->ltiLaunchPresentationReturnUrl,
-                    $this->ltiLaunchPresentationLocale,
+                    $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
+                    $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
                 ),
                 new ContextClaim(
                     (string)$assignment->getId(),
