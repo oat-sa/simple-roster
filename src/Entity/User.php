@@ -158,7 +158,7 @@ class User implements UserInterface, EntityInterface
 
         return $availableAssignments;
     }
-    
+
     /**
      * @throws AssignmentNotFoundException
      */
@@ -169,7 +169,7 @@ class User implements UserInterface, EntityInterface
                 return $assignment;
             }
         }
-    
+
         throw new AssignmentNotFoundException(
             sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
         );
@@ -182,11 +182,11 @@ class User implements UserInterface, EntityInterface
     public function getAvailableAssignmentById(int $assignmentId): Assignment
     {
         $assignment = $this->getAssignmentById($assignmentId);
-        
+
         if ($assignment->isAvailable()) {
             return $assignment;
         }
-        
+
         throw new AssignmentUnavailableException(
             sprintf("Assignment with id '%s' for user '%s' is unavailable.", $assignmentId, $this->getUsername())
         );
