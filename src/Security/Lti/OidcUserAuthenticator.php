@@ -31,6 +31,8 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
@@ -40,23 +42,49 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
     /** @var UserRepository */
     private $userRepository;
 
-    public function __construct(LoginHintExtractor $loginHintExtractor, UserRepository $userRepository)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        LoginHintExtractor $loginHintExtractor,
+        UserRepository $userRepository,
+        LoggerInterface $logger
+    ) {
         $this->loginHintExtractor = $loginHintExtractor;
         $this->userRepository = $userRepository;
+        $this->logger = $logger;
     }
 
     public function authenticate(string $loginHint): UserAuthenticationResultInterface
     {
-        $loginHintDto = $this->loginHintExtractor->extract($loginHint);
-        $user = $this->userRepository->findByUsernameWithAssignments($loginHintDto->getUsername());
+        try {
+            $loginHintDto = $this->loginHintExtractor->extract($loginHint);
+            $user = $this->userRepository->findByUsernameWithAssignments($loginHintDto->getUsername());
 
-        $this->checkLoginHintConsistency($user, $loginHintDto);
+            $this->checkLoginHintConsistency($user, $loginHintDto);
 
-        return new UserAuthenticationResult(
-            true,
-            new UserIdentity((string) $user->getUsername())
-        );
+            $this->logger->info(
+                sprintf('OIDC authentication was successful with login hint %s', $loginHint),
+                [
+                    'username' => $loginHintDto->getUsername(),
+                    'assignmentId' => $loginHintDto->getAssignmentId(),
+                ]
+            );
+
+            return new UserAuthenticationResult(
+                true,
+                new UserIdentity((string) $user->getUsername())
+            );
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                sprintf('OIDC authentication has failed with login hint %s', $loginHint)
+            );
+
+            return new UserAuthenticationResult(
+                false,
+                null
+            );
+        }
     }
 
     /**

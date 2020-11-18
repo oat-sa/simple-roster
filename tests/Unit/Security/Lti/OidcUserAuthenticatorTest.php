@@ -24,13 +24,12 @@ namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
-use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class OidcUserAuthenticatorTest extends KernelTestCase
@@ -46,6 +45,9 @@ class OidcUserAuthenticatorTest extends KernelTestCase
     /** @var UserRepository|MockObject */
     private $userRepository;
 
+    /** @var LoggerInterface|MockObject */
+    private $logger;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,14 +56,19 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 
         $this->loginHintExtractor = $this->createMock(LoginHintExtractor::class);
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->subject = new OidcUserAuthenticator($this->loginHintExtractor, $this->userRepository);
+        $this->subject = new OidcUserAuthenticator(
+            $this->loginHintExtractor,
+            $this->userRepository,
+            $this->logger,
+        );
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 
-    public function testAuthenticate(): void
+    public function testAuthenticateSuccessfully(): void
     {
         $loginHint = 'user1::1';
         $loginHintDto = new LoginHintDto('user1', 1);
@@ -79,17 +86,26 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->with('user1')
             ->willReturn($user);
 
+        $this->logger
+            ->expects(self::once())
+            ->method('info')
+            ->with(
+                'OIDC authentication was successful with login hint user1::1',
+                [
+                    'username' => $loginHintDto->getUsername(),
+                    'assignmentId' => $loginHintDto->getAssignmentId(),
+                ]
+            );
+
         $result = $this->subject->authenticate($loginHint);
 
         /* @phpstan-ignore-next-line */
         self::assertSame('user1', $result->getUserIdentity()->getIdentifier());
+        self::assertTrue($result->isSuccess());
     }
 
-    public function testShouldThrowAssignmentNotFoundExceptionWhenUserDoesNotHaveIt(): void
+    public function testAuthenticateShouldFailIfAssignmentIsNotFound(): void
     {
-        $this->expectException(AssignmentNotFoundException::class);
-        $this->expectExceptionMessage('Assignment with ID 2 not found for username user1.');
-
         $user = $this->getRepository(User::class)->find(1);
 
         $loginHint = 'user1::2';
@@ -107,6 +123,14 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->with($loginHint)
             ->willReturn($loginHintDto);
 
-        $this->subject->authenticate($loginHint);
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with('OIDC authentication has failed with login hint user1::2');
+
+        $result = $this->subject->authenticate($loginHint);
+
+        self::assertNull($result->getUserIdentity());
+        self::assertFalse($result->isSuccess());
     }
 }
