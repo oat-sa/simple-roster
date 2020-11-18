@@ -92,7 +92,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
         $lastAssignment = $user->getLastAssignment();
 
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->isCancellable() && !$operation->isDryRun()) {
+            if ($assignment->isCancellable()) {
                 $assignment->setState(Assignment::STATE_CANCELLED);
             }
         }
@@ -101,10 +101,8 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
             ->setState(Assignment::STATE_READY)
             ->setLineItem($lastAssignment->getLineItem());
 
-        if (!$operation->isDryRun()) {
-            $user->addAssignment($newAssignment);
-            $this->entityManager->persist($newAssignment);
-        }
+        $user->addAssignment($newAssignment);
+        $this->entityManager->persist($newAssignment);
 
         $result->addBulkOperationSuccess($operation);
 

@@ -31,7 +31,6 @@ class BulkOperationCollection implements IteratorAggregate, Countable
     /** @var BulkOperation[] */
     private $operations = [];
 
-
     public function add(BulkOperation $operation): self
     {
         $this->operations[$operation->getIdentifier()] = $operation;
@@ -39,21 +38,9 @@ class BulkOperationCollection implements IteratorAggregate, Countable
         return $this;
     }
 
-    public function clear(): self
-    {
-        $this->operations = [];
-
-        return $this;
-    }
-
     public function count(): int
     {
         return count($this->operations);
-    }
-
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
     }
 
     /**

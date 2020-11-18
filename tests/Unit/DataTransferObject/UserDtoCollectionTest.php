@@ -22,19 +22,40 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
+use Countable;
+use IteratorAggregate;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
-use OAT\SimpleRoster\Exception\UserNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class UserDtoCollectionTest extends TestCase
 {
-    public function testItThrowsExceptionIfUserCannotBeFoundByUsername(): void
+    public function testItImplementsCountable(): void
     {
-        $this->expectException(UserNotFoundException::class);
-        $this->expectExceptionMessage("User with username 'nonExistingUser' is not found.");
+        self::assertInstanceOf(Countable::class, new UserDtoCollection());
+    }
 
+    public function testItImplementsIteratorAggregate(): void
+    {
+        self::assertInstanceOf(IteratorAggregate::class, new UserDtoCollection());
+    }
+
+    public function testIfUsersCanBeAdded(): void
+    {
         $subject = new UserDtoCollection();
+        self::assertCount(0, $subject);
+        self::assertTrue($subject->isEmpty());
 
-        $subject->getByUsername('nonExistingUser');
+        $user1 = new UserDto('user1', 'password1');
+        $subject->add($user1);
+
+        self::assertCount(1, $subject);
+        self::assertFalse($subject->isEmpty());
+
+        $user2 = new UserDto('user2', 'password2');
+        $subject->add($user2);
+
+        self::assertCount(2, $subject);
+        self::assertFalse($subject->isEmpty());
     }
 }

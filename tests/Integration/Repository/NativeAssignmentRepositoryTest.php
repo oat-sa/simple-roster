@@ -55,9 +55,9 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleAssignments(): void
     {
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1, 1);
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1, 1);
-        $assignment3 = new AssignmentDto(Assignment::STATE_READY, 1, 1);
+        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1, 'user1', 1);
+        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1, 'user2', 1);
+        $assignment3 = new AssignmentDto(Assignment::STATE_READY, 1, 'user3', 1);
 
         $assignmentCollection = (new AssignmentDtoCollection())
             ->add($assignment1)
