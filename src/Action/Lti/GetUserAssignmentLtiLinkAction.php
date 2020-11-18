@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2019-2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -27,6 +27,7 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Psr\Log\LoggerInterface;
@@ -90,6 +91,8 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
+        } catch (AssignmentUnavailableException $exception) {
+            throw new ConflictHttpException($exception->getMessage());
         } catch (AssignmentNotProcessableException $exception) {
             throw new ConflictHttpException($exception->getMessage());
         }
