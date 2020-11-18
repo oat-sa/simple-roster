@@ -34,8 +34,11 @@ trait CsvIngestionTestingTrait
     /**
      * @throws LogicException
      */
-    public function writeCsv(string $relativePath, array $csvContent, string $storageId = 'test'): void
-    {
+    public function writeCsv(
+        string $relativePath,
+        array $csvContent,
+        string $storageId = StorageRegistry::DEFAULT_STORAGE
+    ): void {
         try {
             /** @var StorageRegistry $storageRegistry */
             $storageRegistry = static::$container->get(StorageRegistry::class);
@@ -60,7 +63,6 @@ trait CsvIngestionTestingTrait
             return (new CommandTester($application->find($commandName)))->execute(
                 [
                     'path' => $relativePath,
-                    '--storage' => 'test',
                     '--force' => true,
                 ]
             );

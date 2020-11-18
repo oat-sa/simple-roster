@@ -77,7 +77,6 @@ class UserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'users.csv',
-                '--storage' => 'test',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -116,7 +115,6 @@ class UserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'users.csv',
-                '--storage' => 'test',
                 '--batch' => 4,
                 '--force' => true,
             ],
@@ -143,7 +141,6 @@ class UserIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => $filename,
-                '--storage' => 'test',
                 '--batch' => 3,
                 '--force' => true,
             ],

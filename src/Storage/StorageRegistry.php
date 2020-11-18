@@ -28,7 +28,7 @@ use OAT\SimpleRoster\Storage\Exception\StorageNotFoundException;
 
 class StorageRegistry
 {
-    public const DEFAULT_STORAGE = 'local';
+    public const DEFAULT_STORAGE = 'default';
 
     /** @var iterable|Storage[] */
     private $storages;
@@ -50,7 +50,7 @@ class StorageRegistry
     /**
      * @throws StorageNotFoundException
      */
-    public function getFilesystem(string $storageId): Filesystem
+    public function getFilesystem(string $storageId = self::DEFAULT_STORAGE): Filesystem
     {
         foreach ($this->storages as $storage) {
             if ($storageId === $storage->getId()) {

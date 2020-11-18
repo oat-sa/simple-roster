@@ -148,4 +148,9 @@ abstract class AbstractCsvIngesterCommand extends Command
             }
         }
     }
+
+    protected function batchProcessable(int $numberOfProcessedRows): bool
+    {
+        return $numberOfProcessedRows % $this->batchSize === 0;
+    }
 }

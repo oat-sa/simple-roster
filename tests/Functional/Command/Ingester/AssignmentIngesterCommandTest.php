@@ -91,7 +91,6 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'assignments.csv',
-                '--storage' => 'test',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -141,7 +140,6 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'assignments.csv',
-                '--storage' => 'test',
                 '--batch' => 4,
                 '--force' => true,
             ],
@@ -190,7 +188,6 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => $filename,
-                '--storage' => 'test',
                 '--batch' => 3,
                 '--force' => true,
             ],
@@ -217,7 +214,6 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'assignments.csv',
-                '--storage' => 'test',
                 '--batch' => 1,
                 '--force' => true,
             ],
@@ -248,7 +244,6 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'assignments.csv',
-                '--storage' => 'test',
                 '--batch' => 1,
                 '--force' => true,
             ],

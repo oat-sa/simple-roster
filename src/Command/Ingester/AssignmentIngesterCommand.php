@@ -108,7 +108,7 @@ class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
 
                 $assignmentDtoCollection->add($assignmentDto);
 
-                if ($numberOfProcessedRows % $this->batchSize === 0) {
+                if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
                         $this->ingester->ingest($assignmentDtoCollection);
                     }

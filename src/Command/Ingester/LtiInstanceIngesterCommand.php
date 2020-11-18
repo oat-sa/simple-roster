@@ -87,7 +87,7 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
 
                 $this->ltiInstanceRepository->persist($this->createLtiInstance($rawLtiInstance));
 
-                if ($numberOfProcessedRows % $this->batchSize === 0) {
+                if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
                         $this->ltiInstanceRepository->flush();
                     }

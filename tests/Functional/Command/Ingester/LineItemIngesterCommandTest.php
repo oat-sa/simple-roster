@@ -73,7 +73,6 @@ class LineItemIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'line-items.csv',
-                '--storage' => 'test',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -108,7 +107,6 @@ class LineItemIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'line-items.csv',
-                '--storage' => 'test',
                 '--batch' => 4,
                 '--force' => true,
             ],
@@ -135,7 +133,6 @@ class LineItemIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => $filename,
-                '--storage' => 'test',
                 '--batch' => 3,
                 '--force' => true,
             ],

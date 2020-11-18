@@ -96,7 +96,7 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
 
                 $this->lineItemRepository->persist($this->createLineItem($rawLineItem));
 
-                if ($numberOfProcessedRows % $this->batchSize === 0) {
+                if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
                         $this->lineItemRepository->flush();
                     }

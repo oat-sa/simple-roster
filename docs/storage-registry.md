@@ -10,12 +10,13 @@ in order to be able to utilize usage of multiple different filesystem instances 
 
 ## Default configuration (local storage)
 
-By default there is only one storage enabled in `config/packages/flysystem.yaml` file, the `local` storage:
+By default there is only one storage enabled in `config/packages/flysystem.yaml` file, the `default` storage and it's using
+the local filesystem:
 
 ```yaml
 flysystem:
     storages:
-        local.storage:
+        default.storage:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%'

@@ -95,7 +95,7 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
 
                 $userDtoCollection->add($this->createUserDto($rawUser));
 
-                if ($numberOfProcessedRows % $this->batchSize === 0) {
+                if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
                         $this->userRepository->insertMultiple($userDtoCollection);
                     }

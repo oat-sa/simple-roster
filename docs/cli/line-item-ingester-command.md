@@ -21,12 +21,12 @@ $ sudo -u www-data bin/console roster:ingest:line-item <path> [--storage=local] 
 
 ### Main options
 
-| Option          | Description                                                                                                 |
-| ----------------|:------------------------------------------------------------------------------------------------------------|
-| -s, --storage   | Filesystem storage identifier [default: `local`] ([Storage registry documentation](../storage-registry.md)) |
-| -d, --delimiter | CSV delimiter [default: `,`]                                                                                |
-| -b, --batch     | Batch size [default: `1000`]                                                                                |
-| -f, --force     | To apply database modifications or not [default: `false`]                                                   |
+| Option          | Description                                                                                                   |
+| ----------------|:--------------------------------------------------------------------------------------------------------------|
+| -s, --storage   | Filesystem storage identifier [default: `default`] ([Storage registry documentation](../storage-registry.md)) |
+| -d, --delimiter | CSV delimiter [default: `,`]                                                                                  |
+| -b, --batch     | Batch size [default: `1000`]                                                                                  |
+| -f, --force     | To apply database modifications or not [default: `false`]                                                     |
 
 For the full list of options please refer to the helper option:
 ```shell script

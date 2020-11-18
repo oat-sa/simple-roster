@@ -72,7 +72,6 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'lti-instances.csv',
-                '--storage' => 'test',
             ],
             [
                 'capture_stderr_separately' => true,
@@ -106,7 +105,6 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => 'lti-instances.csv',
-                '--storage' => 'test',
                 '--batch' => 2,
                 '--force' => true,
             ],
@@ -133,7 +131,6 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         $output = $this->commandTester->execute(
             [
                 'path' => $filename,
-                '--storage' => 'test',
                 '--batch' => 2,
                 '--force' => true,
             ],
