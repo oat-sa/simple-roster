@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Lti;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
@@ -55,6 +56,9 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @throws LtiException
+     */
     public function authenticate(string $loginHint): UserAuthenticationResultInterface
     {
         try {
@@ -76,14 +80,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
                 new UserIdentity((string) $user->getUsername())
             );
         } catch (Throwable $exception) {
-            $this->logger->error(
-                sprintf('OIDC authentication has failed with login hint %s', $loginHint)
-            );
-
-            return new UserAuthenticationResult(
-                false,
-                null
-            );
+            throw new LtiException($exception->getMessage());
         }
     }
 

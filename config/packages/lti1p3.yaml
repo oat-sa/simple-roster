@@ -28,4 +28,4 @@ lti1p3:
             platform_key_chain: "platformKey"
             tool_key_chain: null
             platform_jwks_url: null
-            tool_jwks_url: null
+            tool_jwks_url: "http://localhost:8888/lti1p3/.well-known/jwks/toolSet.json"

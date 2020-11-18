@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "172522c8efe19aac05df5db9fac11e64",
+    "content-hash": "83bc72126c3e5116ca2a2649510da724",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2546,16 +2546,16 @@
         },
         {
             "name": "oat-sa/bundle-lti1p3",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/bundle-lti1p3.git",
-                "reference": "a4b53d209a498e2e788ce2b3dea06b155703986e"
+                "reference": "81517266e1fc6b617a576aaada4a2b56d283a247"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/bundle-lti1p3/zipball/a4b53d209a498e2e788ce2b3dea06b155703986e",
-                "reference": "a4b53d209a498e2e788ce2b3dea06b155703986e",
+                "url": "https://api.github.com/repos/oat-sa/bundle-lti1p3/zipball/81517266e1fc6b617a576aaada4a2b56d283a247",
+                "reference": "81517266e1fc6b617a576aaada4a2b56d283a247",
                 "shasum": ""
             },
             "require": {
@@ -2593,9 +2593,9 @@
             ],
             "support": {
                 "issues": "https://github.com/oat-sa/bundle-lti1p3/issues",
-                "source": "https://github.com/oat-sa/bundle-lti1p3/tree/3.1.0"
+                "source": "https://github.com/oat-sa/bundle-lti1p3/tree/3.2.0"
             },
-            "time": "2020-11-09T08:21:53+00:00"
+            "time": "2020-11-18T12:29:36+00:00"
         },
         {
             "name": "oat-sa/lib-lti1p3-core",
@@ -10576,9 +10576,9 @@
     "platform": {
         "php": "^7.3",
         "ext-ctype": "*",
-        "ext-redis": "*",
         "ext-iconv": "*",
         "ext-json": "*",
+        "ext-redis": "*",
         "ext-simplexml": "*"
     },
     "platform-dev": {

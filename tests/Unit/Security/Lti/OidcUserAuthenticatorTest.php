@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
@@ -106,6 +107,9 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 
     public function testAuthenticateShouldFailIfAssignmentIsNotFound(): void
     {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Assignment with ID 2 not found for username user1.');
+
         $user = $this->getRepository(User::class)->find(1);
 
         $loginHint = 'user1::2';
@@ -123,14 +127,6 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->with($loginHint)
             ->willReturn($loginHintDto);
 
-        $this->logger
-            ->expects(self::once())
-            ->method('error')
-            ->with('OIDC authentication has failed with login hint user1::2');
-
-        $result = $this->subject->authenticate($loginHint);
-
-        self::assertNull($result->getUserIdentity());
-        self::assertFalse($result->isSuccess());
+        $this->subject->authenticate($loginHint);
     }
 }
