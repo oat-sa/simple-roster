@@ -28,7 +28,7 @@ The main configuration file is `.env`, located in root folder.
 | APP_DEBUG | Application debug mode, [default: `false`] |
 | APP_SECRET | Application secret |
 | APP_API_KEY | Application API Key |
-| APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
+| APP_ROUTE_PREFIX | Application route prefix, [default: `/api` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
 | DATABASE_URL | Database url |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
@@ -122,7 +122,7 @@ If you do so, please make sure to include the leading slash character, but *NO* 
 Example:
 
 ```dotenv
-APP_ROUTE_PREFIX=/api/v1
+APP_ROUTE_PREFIX=/api
 ```
 
 To apply the changes, you need to clear the application cache:
