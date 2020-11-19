@@ -127,7 +127,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function isCancelled(): bool
+    private function isCancelled(): bool
     {
         return $this->state === self::STATE_CANCELLED;
     }
@@ -135,6 +135,16 @@ class Assignment implements JsonSerializable, EntityInterface
     public function isCancellable(): bool
     {
         return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
+    }
+
+    private function isAvailableForDate(): bool
+    {
+        return $this->getLineItem()->isAvailableForDate(Carbon::now()->toDateTime());
+    }
+
+    public function isAvailable(): bool
+    {
+        return !$this->isCancelled() && $this->isAvailableForDate();
     }
 
     public function getAttemptsCount(): int
