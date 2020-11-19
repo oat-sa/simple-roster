@@ -23,7 +23,9 @@
                     \Symfony\Component\HttpFoundation\Request,
                     \OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber,
                     \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
-                    \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber
+                    \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber,
+                    \League\Csv\Reader,
+                    \League\Csv\Writer
                 </value>
             </property>
         </properties>

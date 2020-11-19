@@ -18,7 +18,6 @@ parameters:
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
-    app.aws.ingest_bucket: '%env(AWS_S3_INGEST_BUCKET)%'
 
 services:
     # default configuration for services in *this* file
@@ -37,10 +36,6 @@ services:
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
 
     _instanceof:
-        OAT\SimpleRoster\Ingester\Ingester\IngesterInterface:
-            tags: ['app.ingester']
-        OAT\SimpleRoster\Ingester\Source\IngesterSourceInterface:
-            tags: ['app.ingester_source']
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
             tags: ['doctrine.orm.entity_listener']
 
@@ -75,17 +70,6 @@ services:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    OAT\SimpleRoster\Ingester\Registry\IngesterRegistry:
-        arguments: [!tagged 'app.ingester']
-
-    OAT\SimpleRoster\Ingester\Registry\IngesterSourceRegistry:
-        arguments: [!tagged 'app.ingester_source']
-
-    OAT\SimpleRoster\Ingester\Source\S3CsvIngesterSource:
-        arguments:
-            $client: '@aws.s3'
-            $bucket: '%app.aws.ingest_bucket%'
-
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
         tags: ['doctrine.event_subscriber']
 
@@ -112,9 +96,13 @@ services:
         arguments:
             - '%app.lti.load_balancing_strategy%'
 
-    Ramsey\Uuid\UuidFactoryInterface:
-        class: Ramsey\Uuid\UuidFactory
-
     OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
             $xmlNamespace: '%app.lti.outcome_xml_namespace%'
+
+    OAT\SimpleRoster\Storage\StorageRegistry:
+        public: true
+        arguments: [!tagged 'app.storage']
+
+    Ramsey\Uuid\UuidFactoryInterface:
+        class: Ramsey\Uuid\UuidFactory

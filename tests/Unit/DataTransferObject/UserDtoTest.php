@@ -54,18 +54,4 @@ class UserDtoTest extends TestCase
 
         new UserDto('username', 'password', '');
     }
-
-    public function testIfUserIdCanBeAssignedToEveryAssignments(): void
-    {
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1);
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1);
-
-        $user = new UserDto('username', 'password', null, new AssignmentDtoCollection($assignment1, $assignment2));
-
-        $user->assignUserIdForAssignments(3);
-
-        foreach ($user->getAssignments() as $assignment) {
-            self::assertSame(3, $assignment->getUserId());
-        }
-    }
 }

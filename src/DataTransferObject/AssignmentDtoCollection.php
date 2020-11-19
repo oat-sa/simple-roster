@@ -29,27 +29,45 @@ use IteratorAggregate;
 class AssignmentDtoCollection implements Countable, IteratorAggregate
 {
     /** @var AssignmentDto[] */
-    private $collection;
+    private $assignments;
 
     public function __construct(AssignmentDto ...$assignments)
     {
-        $this->collection = $assignments;
+        $this->assignments = $assignments;
     }
 
     public function add(AssignmentDto $dto): self
     {
-        $this->collection[] = $dto;
+        $this->assignments[] = $dto;
 
         return $this;
     }
 
-    public function merge(AssignmentDtoCollection $assignments): self
+    public function clear(): self
     {
-        foreach ($assignments as $assignment) {
-            $this->add($assignment);
-        }
+        $this->assignments = [];
 
         return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllUsernames(): array
+    {
+        return array_unique(
+            array_map(
+                static function (AssignmentDto $assignmentDto): string {
+                    return $assignmentDto->getUsername();
+                },
+                $this->assignments
+            )
+        );
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
     }
 
     /**
@@ -57,11 +75,11 @@ class AssignmentDtoCollection implements Countable, IteratorAggregate
      */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->collection);
+        return new ArrayIterator($this->assignments);
     }
 
     public function count(): int
     {
-        return count($this->collection);
+        return count($this->assignments);
     }
 }

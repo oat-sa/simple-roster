@@ -5,7 +5,6 @@
 ## Table of Contents
 - [Environment variables](#environment-variables)
     - [Application related environment variables](#application-related-environment-variables)
-    - [AWS related environment variables](#aws-related-environment-variables)
     - [LTI related environment variables](#lti-related-environment-variables)
     - [Blackfire related environment variables](#blackfire-related-environment-variables)
 - [Application setup steps](#application-setup-steps)
@@ -29,7 +28,7 @@ The main configuration file is `.env`, located in root folder.
 | APP_DEBUG | Application debug mode, [default: `false`] |
 | APP_SECRET | Application secret |
 | APP_API_KEY | Application API Key |
-| APP_ROUTE_PREFIX | Application route prefix, [default: `/api/v1` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
+| APP_ROUTE_PREFIX | Application route prefix, [default: `/api` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
 | DATABASE_URL | Database url |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
@@ -39,17 +38,7 @@ The main configuration file is `.env`, located in root folder.
 | CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list [default: `3600`] |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-  
-#### AWS related environment variables
-
-| Parameter | Description |
-| ------------- |:-------------|
-| AWS_REGION | AWS Region [default: `eu-west-1`] |
-| AWS_VERSION | AWS Version [default: `latest`] |
-| AWS_KEY | AWS Key (used only in `dev` environment) |
-| AWS_SECRET | AWS Secret (used only in `dev` environment) |
-| AWS_S3_INGEST_BUCKET | AWS S3 bucket used for ingestion |
-     
+       
 #### LTI related environment variables
 
 | Parameter | Description |
@@ -133,7 +122,7 @@ If you do so, please make sure to include the leading slash character, but *NO* 
 Example:
 
 ```dotenv
-APP_ROUTE_PREFIX=/api/v1
+APP_ROUTE_PREFIX=/api
 ```
 
 To apply the changes, you need to clear the application cache:

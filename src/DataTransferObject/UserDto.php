@@ -35,15 +35,8 @@ class UserDto
     /** @var string|null */
     private $groupId;
 
-    /** @var AssignmentDtoCollection */
-    private $assignments;
-
-    public function __construct(
-        string $username,
-        string $password,
-        string $groupId = null,
-        AssignmentDtoCollection $assignments = null
-    ) {
+    public function __construct(string $username, string $password, string $groupId = null)
+    {
         if (empty($username)) {
             throw new InvalidArgumentException('Username cannot be empty');
         }
@@ -59,7 +52,6 @@ class UserDto
         $this->username = $username;
         $this->password = $password;
         $this->groupId = $groupId;
-        $this->assignments = $assignments ?? new AssignmentDtoCollection();
     }
 
     public function getUsername(): string
@@ -75,26 +67,5 @@ class UserDto
     public function getGroupId(): ?string
     {
         return $this->groupId;
-    }
-
-    public function getAssignments(): AssignmentDtoCollection
-    {
-        return $this->assignments;
-    }
-
-    public function addAssignment(AssignmentDto $assignmentDto): self
-    {
-        $this->assignments->add($assignmentDto);
-
-        return $this;
-    }
-
-    public function assignUserIdForAssignments(int $userId): self
-    {
-        foreach ($this->assignments as $assignment) {
-            $assignment->setUserId($userId);
-        }
-
-        return $this;
     }
 }
