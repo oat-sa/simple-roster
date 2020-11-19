@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
-use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
-use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use Countable;
 use IteratorAggregate;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use PHPUnit\Framework\TestCase;
 
 class AssignmentDtoCollectionTest extends TestCase
@@ -42,7 +42,7 @@ class AssignmentDtoCollectionTest extends TestCase
 
     public function testIfAssignmentCanBeAdded(): void
     {
-        $assignment = new AssignmentDto('test', 1, 1);
+        $assignment = new AssignmentDto('test', 1, 'testUsername', 1);
         $subject = (new AssignmentDtoCollection())->add($assignment);
 
         self::assertCount(1, $subject);
