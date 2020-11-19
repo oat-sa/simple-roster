@@ -5,10 +5,10 @@ info:
     version: v1
 
 servers:
-    -   url: https://localhost/api/v1
+    -   url: https://localhost/api
 
 paths:
-    /healthcheck:
+    /v1/healthcheck:
         get:
             summary: Health check
             tags:
@@ -26,7 +26,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /auth/login:
+    /v1/auth/login:
         post:
             summary: User login
             tags:
@@ -61,7 +61,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /auth/logout:
+    /v1/auth/logout:
         post:
             summary: User logout
             tags:
@@ -78,7 +78,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /assignments:
+    /v1/assignments:
         get:
             summary: List user assignments
             description: List current authenticated user assignments
@@ -108,7 +108,7 @@ paths:
                     $ref: '#/components/responses/ConflictResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
-    /bulk/assignments:
+    /v1/bulk/assignments:
         post:
             summary: Bulk create users assignments
             description: Bulk create users assignments
@@ -176,7 +176,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /assignments/{assignmentId}/lti-link:
+    /v1/assignments/{assignmentId}/lti-link:
         get:
             summary: Gets LTI link for the given assignment
             tags:
@@ -206,7 +206,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /lti/outcome:
+    /v1/lti/outcome:
         post:
             summary: LTI Basic Outcomes Service
             tags:
