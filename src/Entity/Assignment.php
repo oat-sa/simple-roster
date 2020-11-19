@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019-2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -139,9 +139,7 @@ class Assignment implements JsonSerializable, EntityInterface
 
     public function isAvailableForDate(): bool
     {
-        $now = Carbon::now()->toDateTime();
-
-        return $this->getLineItem()->isAvailableForDate($now);
+        return $this->getLineItem()->isAvailableForDate(Carbon::now()->toDateTime());
     }
 
     public function isAvailable(): bool
