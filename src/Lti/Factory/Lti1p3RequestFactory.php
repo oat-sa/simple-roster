@@ -22,9 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Factory;
 
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
@@ -54,10 +57,11 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
         $this->ltiConfiguration = $ltiConfiguration;
     }
 
+    /**
+     * @throws LtiExceptionInterface
+     */
     public function create(Assignment $assignment): LtiRequest
     {
-        $lineItem = $assignment->getLineItem();
-        $resourceLink = new LtiResourceLink($lineItem->getUri());
         $ltiRegistrationId = $this->ltiConfiguration->getLtiRegistrationId();
         $registration = $this->registrationRepository->find($ltiRegistrationId);
 
@@ -70,13 +74,29 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
             (int)$assignment->getId(),
         );
 
-        $message = $this->ltiRequestBuilder->buildLtiResourceLinkLaunchRequest(
+        $message = $this->buildLtiMessage($registration, $loginHint, $assignment);
+
+        return new LtiRequest($message->toUrl(), LtiRequest::LTI_VERSION_1P3, []);
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    private function buildLtiMessage(
+        RegistrationInterface $registration,
+        LoginHintDto $loginHint,
+        Assignment $assignment
+    ): LtiMessageInterface {
+        $lineItem = $assignment->getLineItem();
+        $resourceLink = new LtiResourceLink($lineItem->getUri());
+
+        return $this->ltiRequestBuilder->buildLtiResourceLinkLaunchRequest(
             $resourceLink,
             $registration,
-            (string) $loginHint,
+            (string)$loginHint,
             null,
             [
-                LtiRequest::LTI_ROLE
+                LtiRequest::LTI_ROLE,
             ],
             [
                 new LaunchPresentationClaim(
@@ -91,10 +111,8 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
                     [],
                     $lineItem->getSlug(),
                     $lineItem->getLabel(),
-                )
+                ),
             ]
         );
-
-        return new LtiRequest($message->toUrl(), LtiRequest::LTI_VERSION_1P3, []);
     }
 }

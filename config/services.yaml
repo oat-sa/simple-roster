@@ -14,11 +14,11 @@ parameters:
     app.cache.session.port: '%env(int:REDIS_SESSION_CACHE_PORT)%'
     app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
     app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
-    app.lti.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti.version: '%env(resolve:LTI_VERSION)%'
-    app.lti.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
+    app.lti1p1.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+    app.lti1p3.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
 
 services:
@@ -37,7 +37,7 @@ services:
             $ltiInstancesCacheTtl: '%app.cache.ttl.lti_instance_list%'
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
-            $ltiRegistrationId: '%app.lti.registration_id%'
+            $ltiRegistrationId: '%app.lti1p3.registration_id%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -98,7 +98,7 @@ services:
     OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
         factory: '@OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
-            - '%app.lti.load_balancing_strategy%'
+            - '%app.lti1p1.load_balancing_strategy%'
 
     OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
         arguments:
@@ -112,7 +112,7 @@ services:
         class: Ramsey\Uuid\UuidFactory
 
     OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
-        factory: '@OAT\SimpleRoster\Lti\Factory\LtiRequestFactory'
+        factory: '@OAT\SimpleRoster\Lti\Builder\LtiRequestFactoryBuilder'
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator

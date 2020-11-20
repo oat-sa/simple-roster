@@ -70,7 +70,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setState($nonSuitableAssignmentStatus);
 
         $this->ltiRequestFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('create');
 
         $this->subject->getAssignmentLtiRequest($assignment);
@@ -102,7 +102,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setAttemptsCount($attemptsCount);
 
         $this->ltiRequestFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('create');
 
         $this->subject->getAssignmentLtiRequest($assignment);
@@ -144,7 +144,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
 
         $ltiRequest = $this->subject->getAssignmentLtiRequest($assignment);
 
-        self::assertTrue($ltiRequest instanceof LtiRequest);
+        self::assertInstanceOf(LtiRequest::class, $ltiRequest);
 
         Carbon::setTestNow();
     }

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
@@ -100,7 +101,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 
         $result = $this->subject->authenticate($loginHint);
 
-        /* @phpstan-ignore-next-line */
+        self::assertInstanceOf(UserIdentityInterface::class, $result->getUserIdentity());
         self::assertSame('user1', $result->getUserIdentity()->getIdentifier());
         self::assertTrue($result->isSuccess());
     }

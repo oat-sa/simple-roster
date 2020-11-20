@@ -31,7 +31,7 @@ class LoginHintDtoTest extends TestCase
     public function testItThrowsExceptionIfEmptyUsernameReceived(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Username can\'t be empty.');
+        $this->expectExceptionMessage("Username can't be empty.");
 
         new LoginHintDto('', 1);
     }
@@ -39,7 +39,7 @@ class LoginHintDtoTest extends TestCase
     public function testItThrowsExceptionIfEmptySlugReceived(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Assignment ID can\'t be 0.');
+        $this->expectExceptionMessage("Assignment ID can't be 0.");
 
         new LoginHintDto('username', 0);
     }

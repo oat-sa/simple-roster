@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
+use Carbon\Carbon;
+use DateTimeZone;
+use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
@@ -32,9 +35,6 @@ use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
-use Carbon\Carbon;
-use DateTimeZone;
-use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -429,31 +429,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $responseData = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $decodedLtiLink = urldecode($response['ltiLink']);
 
-        self::assertStringContainsString(
-            'iss=https://simple-roster.localhost/platform',
-            urldecode($responseData['ltiLink'])
-        );
-        self::assertStringContainsString(
-            'login_hint=user1',
-            urldecode($responseData['ltiLink'])
-        );
-        self::assertStringContainsString(
-            'target_link_uri=http://localhost:8888/tool/launch',
-            urldecode($responseData['ltiLink'])
-        );
-        self::assertStringContainsString(
-            'lti_deployment_id=1',
-            urldecode($responseData['ltiLink'])
-        );
-        self::assertStringContainsString(
-            'client_id=demo',
-            urldecode($responseData['ltiLink'])
-        );
+        self::assertStringContainsString('iss=https://simple-roster.localhost/platform', $decodedLtiLink);
+        self::assertStringContainsString('login_hint=user1', $decodedLtiLink);
+        self::assertStringContainsString('target_link_uri=http://localhost:8888/tool/launch', $decodedLtiLink);
+        self::assertStringContainsString('lti_deployment_id=1', $decodedLtiLink);
+        self::assertStringContainsString('client_id=demo', $decodedLtiLink);
 
-        self::assertSame(LtiRequest::LTI_VERSION_1P3, $responseData['ltiVersion']);
-        self::assertSame([], $responseData['ltiParams']);
+        self::assertSame(LtiRequest::LTI_VERSION_1P3, $response['ltiVersion']);
+        self::assertSame([], $response['ltiParams']);
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);

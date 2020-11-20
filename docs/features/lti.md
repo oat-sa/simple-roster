@@ -22,7 +22,7 @@ The full LTI 1.1.1 specification can be checked at [IMS Global](https://www.imsg
 
 Configure environment variables according to the tool you are connecting to simple roster. For a complete list of environment variable, please check [DevOps documentation - Lti Related Environment Variables](devops-documentation.md#lti-related-environment-variables).
 
-With environment variables configured, you should create your LTI Instances using the [CLI](cli/ingester-command.md#examples)
+With environment variables configured, you should create your LTI Instances using the [LTI instance ingester command](../cli/lti-instance-ingester-command.md).
 
 #### LTI 1.1.1 Link generation and Response
 
