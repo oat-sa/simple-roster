@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\LtiInstanceIngesterCommand;
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -35,7 +34,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 class LtiInstanceIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CommandDisplayNormalizerTrait;
     use CsvIngestionTestingTrait;
 
     /** @var CommandTester */
@@ -80,9 +78,14 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(LtiInstance::class)->findAll());
+
+        $display = $this->commandTester->getDisplay(true);
+
+        self::assertStringContainsString('Simple Roster - LTI Instance Ingester', $display);
+        self::assertStringContainsString('Executing ingestion...', $display);
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 5 LTI instances have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $display
         );
     }
 
@@ -117,7 +120,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         self::assertCount(5, $this->getRepository(LtiInstance::class)->findAll());
         self::assertStringContainsString(
             '[OK] 5 LTI instances have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -140,7 +143,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         );
 
         self::assertSame(1, $output);
-        self::assertStringContainsString($expectedOutput, $this->normalizeDisplay($this->commandTester->getDisplay()));
+        self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
     public function provideInvalidSourceFiles(): array

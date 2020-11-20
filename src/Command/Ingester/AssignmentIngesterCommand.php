@@ -82,7 +82,7 @@ class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle->text('Starting ingestion...');
+        $this->symfonyStyle->text('Executing ingestion...');
         $this->symfonyStyle->newLine();
 
         try {

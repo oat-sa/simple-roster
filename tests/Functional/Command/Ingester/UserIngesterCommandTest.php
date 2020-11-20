@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -35,7 +34,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 class UserIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CommandDisplayNormalizerTrait;
     use CsvIngestionTestingTrait;
 
     /** @var CommandTester */
@@ -85,10 +83,12 @@ class UserIngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(User::class)->findAll());
-        self::assertStringContainsString(
-            '[WARNING] [DRY RUN] 10 users have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
+
+        $display = $this->commandTester->getDisplay(true);
+
+        self::assertStringContainsString('Simple Roster - User Ingester', $display);
+        self::assertStringContainsString('Executing ingestion...', $display);
+        self::assertStringContainsString('[WARNING] [DRY RUN] 10 users have been successfully ingested.', $display);
     }
 
     /**
@@ -127,7 +127,7 @@ class UserIngesterCommandTest extends KernelTestCase
         self::assertCount(10, $this->getRepository(User::class)->findAll());
         self::assertStringContainsString(
             '[OK] 10 users have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -150,7 +150,7 @@ class UserIngesterCommandTest extends KernelTestCase
         );
 
         self::assertSame(1, $output);
-        self::assertStringContainsString($expectedOutput, $this->normalizeDisplay($this->commandTester->getDisplay()));
+        self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
     public function provideInvalidSourceFiles(): array

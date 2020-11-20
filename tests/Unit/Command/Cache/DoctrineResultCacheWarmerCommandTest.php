@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Command\Cache;
 
-use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
