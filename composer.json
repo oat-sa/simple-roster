@@ -52,7 +52,7 @@
     "require-dev": {
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
-        "ergebnis/composer-normalize": "^2.0",
+        "ergebnis/composer-normalize": "2.9",
         "hautelook/alice-bundle": "^2.3",
         "infection/infection": "^0.15",
         "league/flysystem-memory": "^1.0",
