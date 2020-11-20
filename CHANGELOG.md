@@ -6,13 +6,13 @@
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 - Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
-- Added default value (`local`) to `source` argument of [roster:ingest](docs/cli/ingester-command.md) command.
-- Added default value (`local`) to `source` argument of [roster:ingest:user](docs/cli/user-ingester-command.md) command.
+- Added [roster:ingest:lti-instance](docs/cli/lti-instance-ingester-command.md) command.
+- Added [roster:ingest:line-item](docs/cli/line-item-ingester-command.md) command.
+- Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
+- Added [roster:ingest:assignment](docs/cli/assignment-ingester-command.md) command.
+- Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
 - Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/)
-- Added LTI_VERSION, LTI1P3_SERVICE_ENCRYPTION_KEY and LTI1P3_REGISTRATION_ID environment variables.
-- Added `oat-sa/bundle-lti1p3` bundle for LTI 1.3 link creation.
-- Added specific request factories, one per LTI version.
-- Added [Features documentation](docs/features.md)
+- Added `LTI_VERSION`, `LTI1P3_SERVICE_ENCRYPTION_KEY` and `LTI1P3_REGISTRATION_ID` environment variables.
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.
@@ -21,17 +21,21 @@
 - Renamed `.env.dist` to `.env` based on [Symfony recommendations](https://symfony.com/doc/current/configuration/dot-env-changes.html).
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
-- Native user ingestion command has changed from `roster:native-ingest:user` to `roster:ingest:user`.
+- Native user ingestion command has changed from `roster:native-ingest:user` to [roster:ingest:user](docs/cli/user-ingester-command.md).
 - Cache warmer command has changed from `roster:doctrine-result-cache:warmup` to `roster:cache:warmup`.
+- Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
+- Removed `roster:ingest` command.
+- Removed `roster:assignments:bulk-create` command.
+- Removed `roster:assignments:bulk-cancel` command.
 - User ingester command has been removed.
 
 ### Fixed
-- Fixed Code Style issues in `InfrastructureIngesterTest` and `IngesterCommandTest` files.
+- Fixed HTTP code returned in case assignment exists but unavailable for `getUserAssignmentLtiLink` endpoint.
 
 ## 1.8.1 - 2020-10-27
 

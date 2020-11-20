@@ -38,11 +38,11 @@ Please use [Swagger editor](https://editor.swagger.io/) to visualize it.
 
 The application currently offers the following CLI commands:
 
-| Command                               | Description                                | Links                                                    |
-| --------------------------------------|:-------------------------------------------|:---------------------------------------------------------|
-| `roster:ingest`                       | Data ingestion (lti instances, line items) | [link](docs/cli/ingester-command.md)                     |
-| `roster:ingest:user`                  | User ingestion                             | [link](docs/cli/user-ingester-command.md)                |
-| `roster:garbage-collector:assignment` | Assignment garbage collection              | [link](docs/cli/assignment-garbage-collector-command.md) |
-| `roster:cache:warmup`                 | Application cache warmer                   | [link](docs/cli/cache-warmer-command.md)                 | 
-| `roster:assignments:bulk-cancel`      | Assignment bulk cancellation               | [link](docs/cli/assignment-bulk-cancellation-command.md) |
-| `roster:assignments:bulk-create`      | Assignment bulk creation                   | [link](docs/cli/assignment-bulk-creation-command.md)     |
+| Command                               | Description                   | Links                                                    |
+| --------------------------------------|:------------------------------|:---------------------------------------------------------|
+| `roster:ingest:lti-instance`          | LTI instance ingestion        | [link](docs/cli/lti-instance-ingester-command.md)        |
+| `roster:ingest:line-item`             | Line item instance ingestion  | [link](docs/cli/line-item-ingester-command.md)           |
+| `roster:ingest:user`                  | User ingestion                | [link](docs/cli/user-ingester-command.md)                |
+| `roster:ingest:assignment`            | Assignment ingestion          | [link](docs/cli/assignment-ingester-command.md)          |
+| `roster:cache:warmup`                 | Application cache warming     | [link](docs/cli/cache-warmer-command.md)                 |
+| `roster:garbage-collector:assignment` | Assignment garbage collection | [link](docs/cli/assignment-garbage-collector-command.md) |

@@ -1,38 +1,38 @@
 healthCheck:
-  path: '%app.route_prefix%/healthcheck'
+  path: '%app.route_prefix%/v1/healthcheck'
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\HealthCheck\HealthCheckAction }
 
 login:
-  path: '%app.route_prefix%/auth/login'
+  path: '%app.route_prefix%/v1/auth/login'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Security\LoginAction }
 
 logout:
-  path: '%app.route_prefix%/auth/logout'
+  path: '%app.route_prefix%/v1/auth/logout'
 
 bulkCreateUsersAssignments:
-  path: '%app.route_prefix%/bulk/assignments'
+  path: '%app.route_prefix%/v1/bulk/assignments'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Bulk\BulkCreateUsersAssignmentsAction }
 
 bulkUpdateUsersAssignmentsState:
-  path: '%app.route_prefix%/bulk/assignments'
+  path: '%app.route_prefix%/v1/bulk/assignments'
   methods: PATCH
   defaults: { _controller: OAT\SimpleRoster\Action\Bulk\BulkUpdateUsersAssignmentsStateAction }
 
 getUserAssignments:
-  path: '%app.route_prefix%/assignments'
+  path: '%app.route_prefix%/v1/assignments'
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\Assignment\ListUserAssignmentsAction }
 
 getUserAssignmentLtiLink:
-  path: '%app.route_prefix%/assignments/{assignmentId}/lti-link'
+  path: '%app.route_prefix%/v1/assignments/{assignmentId}/lti-link'
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\GetUserAssignmentLtiLinkAction }
 
 updateLtiOutcome:
-  path: '%app.route_prefix%/lti/outcome'
+  path: '%app.route_prefix%/v1/lti/outcome'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLtiOutcomeAction }
 

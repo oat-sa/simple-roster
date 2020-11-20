@@ -30,6 +30,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
+use Throwable;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -55,10 +56,6 @@ class NativeUserRepository extends AbstractRepository
      */
     public function insertMultiple(UserDtoCollection $users): void
     {
-        if ($users->isEmpty()) {
-            return;
-        }
-
         $queryParts = [];
         $userIndex = $this->findNextAvailableUserIndex();
 
@@ -70,8 +67,6 @@ class NativeUserRepository extends AbstractRepository
                 $user->getPassword(),
                 $user->getGroupId()
             );
-
-            $user->assignUserIdForAssignments($userIndex);
 
             $userIndex++;
         }
@@ -89,8 +84,7 @@ class NativeUserRepository extends AbstractRepository
     /**
      * @param string[] $usernames
      *
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Throwable
      */
     public function findUsernames(array $usernames): array
     {

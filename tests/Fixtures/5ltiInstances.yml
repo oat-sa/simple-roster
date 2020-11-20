@@ -3,34 +3,34 @@ OAT\SimpleRoster\Entity\LtiInstance:
         __construct:
             id: 1
             label: 'cluster_w2n'
-            ltiLink: 'https://depp20.depp.taocloud.fr/__n/w2n/'
+            ltiLink: 'https://test.taocloud.fr/__n/w2n/'
             ltiKey: 'ltiKey_w2n'
             ltiSecret: 'ltiSecret_w2n'
     cluster_4eb:
         __construct:
             id: 2
             label: 'cluster_4eb'
-            ltiLink: 'https://depp20.depp.taocloud.fr/__n/4eb/'
+            ltiLink: 'https://test.taocloud.fr/__n/4eb/'
             ltiKey: 'ltiKey_4eb'
             ltiSecret: 'ltiSecret_4eb'
     cluster_qqy:
         __construct:
             id: 3
             label: 'cluster_qqy'
-            ltiLink: 'https://depp20.depp.taocloud.fr/__n/qqy/'
+            ltiLink: 'https://test.taocloud.fr/__n/qqy/'
             ltiKey: 'ltiKey_qqy'
             ltiSecret: 'ltiSecret_qqy'
     cluster_awr:
         __construct:
             id: 4
             label: 'cluster_awr'
-            ltiLink: 'https://depp20.depp.taocloud.fr/__n/awr/'
+            ltiLink: 'https://test.taocloud.fr/__n/awr/'
             ltiKey: 'ltiKey_awr'
             ltiSecret: 'ltiSecret_awr'
     cluster_zoi:
         __construct:
             id: 5
             label: 'cluster_zoi'
-            ltiLink: 'https://depp20.depp.taocloud.fr/__n/zoi/'
+            ltiLink: 'https://test.taocloud.fr/__n/zoi/'
             ltiKey: 'ltiKey_zoi'
             ltiSecret: 'ltiSecret_zoi'
