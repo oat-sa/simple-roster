@@ -1,0 +1,31 @@
+lti1p3:
+    key_chains:
+        platformKey:
+            key_set_name: "platformSet"
+            public_key: "file://%kernel.project_dir%/config/secrets/public.key"
+            private_key: "file://%kernel.project_dir%/config/secrets/private.key"
+            private_key_passphrase: null
+    platforms:
+        localPlatform:
+            name: "Local platform"
+            audience: "https://simple-roster.localhost/platform"
+            oidc_authentication_url: "https://simple-roster/lti1p3/oidc/authentication"
+            oauth2_access_token_url: "http://simple-roster/lti1p3/auth/platformKey/token"
+    tools:
+        demoTool:
+            name: "Demo tool"
+            audience: "http://localhost:8888/tool"
+            oidc_initiation_url: "http://localhost:8888/lti1p3/oidc/initiation"
+            launch_url: "http://localhost:8888/tool/launch"
+            deep_linking_url: null
+    registrations:
+        demo:
+            client_id: "demo"
+            platform: "localPlatform"
+            tool: "demoTool"
+            deployment_ids:
+                - "1"
+            platform_key_chain: "platformKey"
+            tool_key_chain: null
+            platform_jwks_url: null
+            tool_jwks_url: "http://localhost:8888/lti1p3/.well-known/jwks/toolSet.json"

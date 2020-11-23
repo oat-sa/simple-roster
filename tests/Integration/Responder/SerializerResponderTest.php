@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Responder;
 
-use OAT\SimpleRoster\Responder\SerializerResponder;
 use Exception;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -32,7 +32,7 @@ use Throwable;
 
 class SerializerResponderTest extends KernelTestCase
 {
-    /** @var bool|null  */
+    /** @var bool|null */
     private $debug = true;
 
     public function setUp(): void
