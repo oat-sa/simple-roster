@@ -115,6 +115,6 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
         $user = (new User())->setGroupId('group_5');
         $assignment = (new Assignment())->setUser($user);
 
-        $this->assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
+        self::assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
     }
 }
