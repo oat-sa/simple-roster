@@ -1,15 +1,5 @@
-parameters:
-    # Adds a fallback DATABASE_URL if the env var is not set.
-    # This allows you to run cache:warmup even if your
-    # environment variables are not available yet.
-    # You should not need to change this value.
-    env(DATABASE_URL): ''
-
 doctrine:
     dbal:
-        # configure these for your database server
-        driver: 'pdo_pgsql'
-        charset: utf8
         url: '%env(resolve:DATABASE_URL)%'
 
         # IMPORTANT: You MUST configure your server version,
@@ -19,15 +9,6 @@ doctrine:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
-        metadata_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
-        query_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
-        result_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
         mappings:
             OAT\SimpleRoster:
                 type: xml
