@@ -30,6 +30,10 @@
 - Removed `roster:ingest` command.
 - Removed `roster:assignments:bulk-create` command.
 - Removed `roster:assignments:bulk-cancel` command.
+- User ingester command has been removed.
+
+### Fixed
+- Fixed HTTP code returned in case assignment exists but unavailable for `getUserAssignmentLtiLink` endpoint.
 
 ## 1.8.1 - 2020-10-27
 

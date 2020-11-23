@@ -17,7 +17,7 @@
         "MethodCallRemoval": {
             "ignore": [
                 "Symfony\\Component\\Console\\Helper\\ProgressBar",
-                "OAT\\SimpleRoster\\Repository\\LtiInstanceRepository::flush",
+                "OAT\\SimpleRoster\\Repository\\AbstractRepository::flush",
                 "Symfony\\Component\\Console\\Style\\SymfonyStyle::newLine"
             ]
         },

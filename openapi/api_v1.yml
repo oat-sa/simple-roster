@@ -203,6 +203,8 @@ paths:
                     $ref: '#/components/responses/AssignmentNotFoundResponse'
                 405:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
+                409:
+                    $ref: '#/components/responses/ConflictResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 

@@ -51,7 +51,7 @@
     "require-dev": {
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
-        "ergebnis/composer-normalize": "^2.11",
+        "ergebnis/composer-normalize": "2.9",
         "hautelook/alice-bundle": "^2.3",
         "infection/infection": "^0.18",
         "league/flysystem-memory": "^1.0",
@@ -66,8 +66,7 @@
         "symfony/debug-bundle": "^5.0",
         "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
-        "symfony/var-dumper": "^5.0",
-        "symfony/web-server-bundle": "^4.0"
+        "symfony/var-dumper": "^5.0"
     },
     "config": {
         "preferred-install": {
