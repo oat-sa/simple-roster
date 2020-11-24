@@ -78,13 +78,10 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
             $this->progressBar->start();
 
             $numberOfProcessedRows = 0;
-            $persisted = false;
             foreach ($this->csvReader->getRecords() as $rawLtiInstance) {
                 $this->validateRow($rawLtiInstance, 'label', 'ltiLink', 'ltiKey', 'ltiSecret');
 
                 $numberOfProcessedRows++;
-                $persisted = false;
-
                 $this->ltiInstanceRepository->persist($this->createLtiInstance($rawLtiInstance));
 
                 if ($this->batchProcessable($numberOfProcessedRows)) {
@@ -92,13 +89,11 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
                         $this->ltiInstanceRepository->flush();
                     }
 
-                    $persisted = true;
-
                     $this->progressBar->advance($this->batchSize);
                 }
             }
 
-            if (!$this->isDryRun && !$persisted) {
+            if (!$this->isDryRun) {
                 $this->ltiInstanceRepository->flush();
             }
 

@@ -134,6 +134,15 @@
             "ref": "71822522faf7ed2792d86b7f94ce73443358ccb9"
         }
     },
+    "infection/abstract-testframework-adapter": {
+        "version": "0.3.1"
+    },
+    "infection/extension-installer": {
+        "version": "0.1.1"
+    },
+    "infection/include-interceptor": {
+        "version": "0.2.4"
+    },
     "infection/infection": {
         "version": "0.12.0"
     },
@@ -250,6 +259,9 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
+    "ondram/ci-detector": {
+        "version": "3.5.1"
+    },
     "pdepend/pdepend": {
         "version": "2.7.1"
     },
@@ -280,9 +292,6 @@
     "phpstan/phpstan-symfony": {
         "version": "0.11.1"
     },
-    "pimple/pimple": {
-        "version": "v3.2.3"
-    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -309,6 +318,9 @@
     },
     "ramsey/uuid": {
         "version": "3.8.0"
+    },
+    "sanmai/pipeline": {
+        "version": "v5.1.0"
     },
     "sebastian/comparator": {
         "version": "3.0.2"

@@ -7,15 +7,25 @@
             "Kernel.php"
         ]
     },
-    "timeout": 10,
+    "timeout": 1000,
     "logs": {
         "text": "var/log/infection/infection.log",
-        "summary": "var/log/infection/summary.log",
         "perMutator": "var/log/infection/per-mutator.md"
     },
     "mutators": {
         "@default": true,
-        "@removal": false
+        "MethodCallRemoval": {
+            "ignore": [
+                "Symfony\\Component\\Console\\Helper\\ProgressBar",
+                "OAT\\SimpleRoster\\Repository\\AbstractRepository::flush",
+                "Symfony\\Component\\Console\\Style\\SymfonyStyle::newLine"
+            ]
+        },
+        "LogicalNot": {
+            "ignoreSourceCodeByRegex": [
+                "\\!$this->isDryRun*"
+            ]
+        }
     },
     "phpUnit": {
         "customPath": "bin/phpunit"

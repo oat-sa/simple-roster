@@ -126,14 +126,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentIsNotAvailable(): void
     {
-        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
+        Carbon::setTestNow(Carbon::now()->add(3, 'year'));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
-        $this->getEntityManager()->flush();
 
         $this->logInAs($user, $this->kernelBrowser);
 
@@ -146,8 +143,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             "Assignment with id '1' for user 'user1' is unavailable.",
             $decodedResponse['error']['message']
         );
-
-        Carbon::setTestNow();
     }
 
     public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void

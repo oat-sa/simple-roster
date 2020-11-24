@@ -79,7 +79,6 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
             $this->progressBar->start();
 
             $numberOfProcessedRows = 0;
-            $persisted = false;
             foreach ($this->csvReader->getRecords() as $rawLineItem) {
                 $this->validateRow(
                     $rawLineItem,
@@ -92,7 +91,6 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
                 );
 
                 $numberOfProcessedRows++;
-                $persisted = false;
 
                 $this->lineItemRepository->persist($this->createLineItem($rawLineItem));
 
@@ -101,13 +99,11 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
                         $this->lineItemRepository->flush();
                     }
 
-                    $persisted = true;
-
                     $this->progressBar->advance($this->batchSize);
                 }
             }
 
-            if (!$this->isDryRun && !$persisted) {
+            if (!$this->isDryRun) {
                 $this->lineItemRepository->flush();
             }
 

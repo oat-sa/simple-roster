@@ -27,7 +27,6 @@ use OAT\SimpleRoster\Command\Ingester\LineItemIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -38,7 +37,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 class AssignmentIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CommandDisplayNormalizerTrait;
     use CsvIngestionTestingTrait;
 
     /** @var CommandTester */
@@ -99,9 +97,14 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
+
+        $display = $this->commandTester->getDisplay(true);
+
+        self::assertStringContainsString('Simple Roster - Assignment Ingester', $display);
+        self::assertStringContainsString('Executing ingestion...', $display);
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 18 assignments have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $display
         );
     }
 
@@ -152,7 +155,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertCount(18, $this->getRepository(Assignment::class)->findAll());
         self::assertStringContainsString(
             '[OK] 18 assignments have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
 
         $expectedAssignmentCounts = [
@@ -197,7 +200,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         );
 
         self::assertSame(1, $output);
-        self::assertStringContainsString($expectedOutput, $this->normalizeDisplay($this->commandTester->getDisplay()));
+        self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
     public function testItThrowsExceptionIfNoUsersAreFound(): void
@@ -226,7 +229,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
         self::assertStringContainsString(
             "[ERROR] User with username 'user_1' cannot not found.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -254,10 +257,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
         self::assertSame(1, $output);
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
-        self::assertStringContainsString(
-            '[ERROR] No line items were found in database.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
-        );
+        self::assertStringContainsString('[ERROR] No line items were found in database.', $this->commandTester->getDisplay(true));
     }
 
     public function provideInvalidSourceFiles(): array
@@ -278,7 +278,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
                     ['user_1'],
                 ],
                 'expectedOutput' => "[ERROR] Column 'lineItemSlug' is not set in source file.",
-            ]
+            ],
         ];
     }
 

@@ -35,7 +35,6 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -46,7 +45,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
-    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -135,7 +133,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 5 LTI instances has been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -186,7 +184,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 100 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -244,7 +242,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 10 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -277,7 +275,7 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 60 users have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
