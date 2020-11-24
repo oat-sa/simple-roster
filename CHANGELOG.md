@@ -11,6 +11,8 @@
 - Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Added [roster:ingest:assignment](docs/cli/assignment-ingester-command.md) command.
 - Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
+- Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/)
+- Added `LTI_VERSION`, `LTI1P3_SERVICE_ENCRYPTION_KEY` and `LTI1P3_REGISTRATION_ID` environment variables.
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.

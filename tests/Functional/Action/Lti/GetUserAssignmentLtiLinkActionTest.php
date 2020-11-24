@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
+use Carbon\Carbon;
+use DateTimeZone;
+use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
@@ -32,9 +35,6 @@ use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
-use Carbon\Carbon;
-use DateTimeZone;
-use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -179,6 +179,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -189,16 +190,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'IiqrCaXlAfnoRYJNtJlH/xNXvhg=',
+                    'oauth_signature' => '/2ZSkskXDj5O4HKTWEDu1IBEm/Y=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -217,6 +219,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     /**
@@ -232,6 +236,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
@@ -242,16 +247,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'KeYIIv6CwygCaWDBtNe+QU1vX7I=',
+                    'oauth_signature' => 't0Ai0P6GJyXGNkBer/XrSdVns8U=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => 'group_1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -270,6 +276,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     /**
@@ -279,6 +287,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
@@ -300,16 +309,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'uaEAaZX4pLE8hiP+86aRalNBO3w=',
+                    'oauth_signature' => 'Dr5RhRpvp2D21zwajcaG9kX6JrA=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
                     'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-                    'lti_version' => LtiRequest::LTI_VERSION,
+                    'lti_version' => LtiRequest::LTI_VERSION_1P1,
                     'context_id' => '1',
                     'roles' => LtiRequest::LTI_ROLE,
                     'user_id' => 'user1',
@@ -353,6 +363,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $assignment = $this->getRepository(Assignment::class)->find(1);
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(1, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
@@ -389,5 +401,46 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             },
             Logger::INFO
         );
+
+        Carbon::setTestNow();
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItReturnsLti1p3Link(): void
+    {
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P3;
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $decodedLtiLink = urldecode($response['ltiLink']);
+
+        self::assertStringContainsString('iss=https://simple-roster.localhost/platform', $decodedLtiLink);
+        self::assertStringContainsString('login_hint=user1', $decodedLtiLink);
+        self::assertStringContainsString('target_link_uri=http://localhost:8888/tool/launch', $decodedLtiLink);
+        self::assertStringContainsString('lti_deployment_id=1', $decodedLtiLink);
+        self::assertStringContainsString('client_id=demo', $decodedLtiLink);
+
+        self::assertSame(LtiRequest::LTI_VERSION_1P3, $response['ltiVersion']);
+        self::assertSame([], $response['ltiParams']);
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(2, $assignment->getAttemptsCount());
+
+        Carbon::setTestNow();
     }
 }
