@@ -59,7 +59,10 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws InvalidUsernameException
+     * @param string $username
+     *
+     * @return User
+     *
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
@@ -69,11 +72,11 @@ class UserRepository extends AbstractRepository
             throw new InvalidUsernameException('Empty username received.');
         }
 
+        /** @var User $user */
         $user = $this
             ->createQueryBuilder('u')
-            ->select('u, a, l')
+            ->select('u, a')
             ->innerJoin('u.assignments', 'a')
-            ->innerJoin('a.lineItem', 'l')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()

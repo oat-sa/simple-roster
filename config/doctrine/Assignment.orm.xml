@@ -32,6 +32,7 @@
                 <option name="default">0</option>
             </options>
         </field>
+        <field name="lineItemId" type="integer" column="line_item_id" precision="0" scale="0" nullable="false"/>
         <many-to-one field="user" target-entity="OAT\SimpleRoster\Entity\User" inversed-by="assignments" fetch="LAZY">
             <cascade>
                 <cascade-persist/>
@@ -40,7 +41,7 @@
                 <join-column name="user_id" referenced-column-name="id"/>
             </join-columns>
         </many-to-one>
-        <many-to-one field="lineItem" target-entity="OAT\SimpleRoster\Entity\LineItem" fetch="EAGER">
+        <many-to-one field="lineItem" target-entity="OAT\SimpleRoster\Entity\LineItem" fetch="LAZY">
             <join-columns>
                 <join-column name="line_item_id" referenced-column-name="id"/>
             </join-columns>
@@ -48,5 +49,10 @@
         <lifecycle-callbacks>
             <lifecycle-callback type="preUpdate" method="refreshUpdatedAt"/>
         </lifecycle-callbacks>
+        <entity-listeners>
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\LineItemsLoaderListener">
+                <lifecycle-callback type="postLoad" method="postLoad"/>
+            </entity-listener>
+        </entity-listeners>
     </entity>
 </doctrine-mapping>

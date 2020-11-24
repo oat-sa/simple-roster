@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Model\LineItemCollection;
 
 /**
@@ -33,9 +34,20 @@ use OAT\SimpleRoster\Model\LineItemCollection;
  */
 class LineItemRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    /** @var int */
+    private $cacheTtl;
+
+    /** @var LineItemCacheIdGenerator */
+    private $cacheIdGenerator;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        LineItemCacheIdGenerator $cacheIdGenerator,
+        int $cacheTtl = 3600
+    ) {
         parent::__construct($registry, LineItem::class);
+        $this->cacheIdGenerator = $cacheIdGenerator;
+        $this->cacheTtl = $cacheTtl;
     }
 
     public function findAllAsCollection(): LineItemCollection
@@ -47,5 +59,17 @@ class LineItemRepository extends AbstractRepository
         }
 
         return $collection;
+    }
+
+    public function findById(int $id): ?LineItem
+    {
+        return  $this
+            ->createQueryBuilder('l')
+            ->select('l')
+            ->where('l.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->enableResultCache($this->cacheTtl, $this->cacheIdGenerator->generate($id))
+            ->getOneOrNullResult();
     }
 }

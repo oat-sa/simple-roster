@@ -27,10 +27,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
@@ -51,6 +54,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
     private const CACHE_POOL_USER = 'user';
     private const CACHE_POOL_LTI_INSTANCE = 'lti-instance';
+    private const CACHE_POOL_LINE_ITEM = 'line-item';
 
     private const OPTION_USERNAMES = 'usernames';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
@@ -105,6 +109,12 @@ class DoctrineResultCacheWarmerCommand extends Command
     /** @var int */
     private $userWithAssignmentsCacheTtl;
 
+    /** @var LineItemRepository */
+    private $lineItemRepository;
+
+    /** @var LineItemCacheIdGenerator */
+    private $lineItemCacheIdGenerator;
+
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
      */
@@ -113,6 +123,8 @@ class DoctrineResultCacheWarmerCommand extends Command
         LtiInstanceRepository $ltiInstanceRepository,
         UserCacheIdGenerator $userCacheIdGenerator,
         EntityManagerInterface $entityManager,
+        LineItemRepository $lineItemRepository,
+        LineItemCacheIdGenerator $lineItemCacheIdGenerator,
         LoggerInterface $logger,
         int $ltiInstancesCacheTtl,
         int $userWithAssignmentsCacheTtl
@@ -135,6 +147,8 @@ class DoctrineResultCacheWarmerCommand extends Command
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
         $this->userWithAssignmentsCacheTtl = $userWithAssignmentsCacheTtl;
+        $this->lineItemRepository = $lineItemRepository;
+        $this->lineItemCacheIdGenerator = $lineItemCacheIdGenerator;
     }
 
     protected function configure(): void
@@ -148,7 +162,7 @@ class DoctrineResultCacheWarmerCommand extends Command
             InputArgument::OPTIONAL,
             sprintf(
                 'Result cache pool to warmup [Possible values: %s] ',
-                implode(', ', [self::CACHE_POOL_USER, self::CACHE_POOL_LTI_INSTANCE])
+                implode(', ', [self::CACHE_POOL_USER, self::CACHE_POOL_LTI_INSTANCE, self::CACHE_POOL_LINE_ITEM])
             ),
             self::CACHE_POOL_USER
         );
@@ -204,7 +218,7 @@ class DoctrineResultCacheWarmerCommand extends Command
 
         $this->cachePool = (string)$input->getArgument(self::ARGUMENT_CACHE_POOL);
 
-        if (!in_array($this->cachePool, [self::CACHE_POOL_LTI_INSTANCE, self::CACHE_POOL_USER])) {
+        if (!in_array($this->cachePool, [self::CACHE_POOL_LTI_INSTANCE, self::CACHE_POOL_USER, self::CACHE_POOL_LINE_ITEM])) {
             throw new InvalidArgumentException('Invalid cache pool received.');
         }
 
@@ -244,6 +258,10 @@ class DoctrineResultCacheWarmerCommand extends Command
     {
         if ($this->cachePool === self::CACHE_POOL_LTI_INSTANCE) {
             return $this->executeLtiInstanceCacheWarmup();
+        }
+
+        if ($this->cachePool === self::CACHE_POOL_LINE_ITEM) {
+            return $this->executeLineItemCacheWarmup();
         }
 
         $numberOfWarmedUpCacheEntries = 0;
@@ -477,5 +495,32 @@ class DoctrineResultCacheWarmerCommand extends Command
         }
 
         $this->remainder = $remainder;
+    }
+
+    private function executeLineItemCacheWarmup(): int
+    {
+        $lineItemCollection = $this->lineItemRepository->findAllAsCollection();
+
+        /** @var LineItem $lineItem */
+        foreach ($lineItemCollection as $lineItem) {
+            $this->resultCacheImplementation->delete($this->lineItemCacheIdGenerator->generate($lineItem->getId()));
+            $this->lineItemRepository->findById($lineItem->getId());
+        }
+
+        if (!count($lineItemCollection)) {
+            $this->symfonyStyle->warning('There are no Line Items found in the database.');
+
+            return 0;
+        }
+
+        $this->symfonyStyle->success(
+            sprintf(
+                'Result cache for %d Line Items has been successfully warmed up. [TTL: %s seconds]',
+                count($lineItemCollection),
+                number_format($this->ltiInstancesCacheTtl)
+            )
+        );
+
+        return 0;
     }
 }
