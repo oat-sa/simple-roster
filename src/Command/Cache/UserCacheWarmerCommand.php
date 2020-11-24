@@ -212,8 +212,6 @@ class UserCacheWarmerCommand extends Command
                 $message = new RefreshUserCacheMessage($username);
                 $this->messageBus->dispatch(new Envelope($message));
 
-                // TODO logging
-
                 $numberOfWarmedUpCacheEntries++;
 
                 if ($numberOfWarmedUpCacheEntries === 100) {

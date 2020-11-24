@@ -7,7 +7,8 @@ framework:
                 dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
                 serializer: messenger.transport.symfony_serializer
                 options:
-                    account: 060438242623
+                    access_key: AKIAJZKXN3JCZVCUSL4Q
+                    secret_key: 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
 
         routing:
             'OAT\SimpleRoster\Message\RefreshUserCacheMessage': cache-warmup
