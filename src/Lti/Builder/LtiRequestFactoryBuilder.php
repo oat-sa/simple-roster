@@ -94,6 +94,7 @@ class LtiRequestFactoryBuilder
                 return new Lti1p3RequestFactory(
                     $this->registrationRepository,
                     $this->ltiRequestBuilder,
+                    $this->router,
                     $this->ltiConfiguration
                 );
             default:

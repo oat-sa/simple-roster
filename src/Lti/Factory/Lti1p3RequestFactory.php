@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Lti\Factory;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
@@ -35,6 +36,8 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
@@ -44,17 +47,22 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
     /** @var LtiResourceLinkLaunchRequestBuilder */
     private $ltiRequestBuilder;
 
+    /** @var RouterInterface */
+    private $router;
+
     /** @var LtiConfiguration */
     private $ltiConfiguration;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder,
+        RouterInterface $router,
         LtiConfiguration $ltiConfiguration
     ) {
         $this->registrationRepository = $registrationRepository;
-        $this->ltiRequestBuilder = $ltiRequestBuilder;
         $this->ltiConfiguration = $ltiConfiguration;
+        $this->ltiRequestBuilder = $ltiRequestBuilder;
+        $this->router = $router;
     }
 
     /**
@@ -99,6 +107,14 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
                 LtiRequest::LTI_ROLE,
             ],
             [
+                new BasicOutcomeClaim(
+                    (string) $assignment->getId(),
+                    $this->router->generate(
+                        'updateLtiOutcome',
+                        [],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                ),
                 new LaunchPresentationClaim(
                     null,
                     null,

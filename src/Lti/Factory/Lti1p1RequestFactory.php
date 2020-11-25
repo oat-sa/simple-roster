@@ -27,7 +27,6 @@ use JsonException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;

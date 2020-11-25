@@ -36,6 +36,7 @@ use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactoryTest extends TestCase
 {
@@ -48,6 +49,9 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var RegistrationRepositoryInterface|MockObject */
     private $registrationRepository;
 
+    /** @var RouterInterface|MockObject */
+    private $router;
+
     /** @var LtiConfiguration|MockObject */
     private $ltiConfiguration;
 
@@ -57,11 +61,13 @@ class Lti1p3RequestFactoryTest extends TestCase
 
         $this->ltiRequestBuilder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
         $this->registrationRepository = $this->createMock(RegistrationRepositoryInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
         $this->ltiConfiguration = $this->createMock(LtiConfiguration::class);
 
         $this->subject = new Lti1p3RequestFactory(
             $this->registrationRepository,
             $this->ltiRequestBuilder,
+            $this->router,
             $this->ltiConfiguration
         );
     }
@@ -90,6 +96,11 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->expects(self::once())
             ->method('buildLtiResourceLinkLaunchRequest')
             ->willReturn($message);
+
+        $this->router
+            ->expects(self::once())
+            ->method('generate')
+            ->willReturn('ltiOutcomeUri');
 
         $this->ltiConfiguration
             ->expects(self::once())
