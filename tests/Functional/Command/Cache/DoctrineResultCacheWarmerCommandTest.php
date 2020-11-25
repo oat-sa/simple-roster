@@ -83,7 +83,6 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler('cache_warmup');
-        $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
     public function testItThrowsExceptionIfInvalidCachePoolArgumentGiven(): void
@@ -118,8 +117,71 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
+    public function testItWarnsIfThereAreNoLineItemInstancesFoundInDatabase(): void
+    {
+        self::assertSame(0, $this->commandTester->execute(
+            [
+                'cache-pool' => 'line-item',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertStringContainsString(
+            '[WARNING] There are no Line Items found in the database.',
+            $this->commandTester->getDisplay()
+        );
+    }
+
+    public function testItCanWarmLineItemsResultCache(): void
+    {
+        $this->loadFixtureByFilename('3LineItems.yml');
+
+        self::assertSame(0, $this->commandTester->execute(
+            [
+                'cache-pool' => 'line-item',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        ));
+
+        self::assertTrue($this->resultCacheImplementation->contains('line_item_1'));
+        self::assertTrue($this->resultCacheImplementation->contains('line_item_2'));
+        self::assertTrue($this->resultCacheImplementation->contains('line_item_3'));
+
+        $object = $this->resultCacheImplementation->fetch('line_item_2');
+        self::assertEquals(
+            [
+                [
+                    'label_0' => 'line_item_2',
+                    'uri_1' => 'https://test.taocloud.fr/__n/2/',
+                    'slug_2' => 'slug-2',
+                    'id_6' => '2',
+                    'start_at_3' => null,
+                    'end_at_4' => null,
+                    'max_attempts_5' => '0'
+                ]
+            ],
+            current($object)
+        );
+
+        $object = $this->resultCacheImplementation->fetch('line_item_3');
+        self::assertNotNull(current($object)[0]['start_at_3']);
+        self::assertNotNull(current($object)[0]['end_at_4']);
+        self::assertEquals(3, current($object)[0]['max_attempts_5']);
+
+        self::assertStringContainsString(
+            '[OK] Result cache for 3 Line Items has been successfully warmed up. [TTL: 3,600 seconds]',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+    }
+
     public function testItCanWarmLtiInstanceResultCache(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->loadFixtureByFilename('5ltiInstances.yml');
 
         self::assertSame(0, $this->commandTester->execute(
@@ -141,6 +203,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItLogsIfUserCacheWarmupWasUnsuccessful(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->ormConfiguration->setResultCacheImpl(new VoidCache());
 
         self::assertEquals(0, $this->commandTester->execute(
@@ -167,6 +231,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmResultCacheForAllUsers(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(0, $this->commandTester->execute(
             [
                 'cache-pool' => 'user',
@@ -192,6 +258,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanRefreshAlreadyExistingResultCache(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->getEntityManager()
             ->createNativeQuery("UPDATE line_items SET label = 'expected label'", new ResultSetMapping())
             ->execute();
@@ -217,6 +285,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpResultCacheByListOfUsernames(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(0, $this->commandTester->execute(
             [
                 'cache-pool' => 'user',
@@ -250,6 +320,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpResultCacheByListOfLineItemSlugs(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(0, $this->commandTester->execute(
             [
                 'cache-pool' => 'user',
@@ -283,6 +355,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItStopsExecutionIfCriteriaDoNotMatchAnyCacheEntries(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(0, $this->commandTester->execute(
             [
                 'cache-pool' => 'user',
@@ -301,6 +375,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItThrowsExceptionIfBothLineItemIdAndUserIdFiltersAreSpecified(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             "'usernames' and 'line-item-slugs' are exclusive options, please specify only one of them"
@@ -321,6 +397,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItThrowsExceptionIfInvalidBatchSizeOptionReceived(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'batch-size' option received.");
 
@@ -340,6 +418,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
      */
     public function testItThrowsExceptionIfInvalidUserIdsOptionReceived(string $invalidOptionValue): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'usernames' option received.");
 
@@ -359,6 +439,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
      */
     public function testItThrowsExceptionIfInvalidLineItemIdsOptionReceived(string $invalidOptionValue): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'line-item-slugs' option received.");
 
@@ -384,6 +466,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
         $modulo = null,
         $remainder = null
     ): void {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
@@ -409,6 +493,8 @@ class DoctrineResultCacheWarmerCommandTest extends KernelTestCase
 
     public function testItCanWarmUpUsersInParallelUsingModuloAndRemainderOptions(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(0, $this->commandTester->execute(
             [
                 '--modulo' => 6,
