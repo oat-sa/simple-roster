@@ -235,7 +235,36 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
-
+    /v1/web-hooks/update-line-items:
+        post:
+            summary: Notify Api about new Delivery URIs to be updated
+            tags:
+                - web-hook
+            security: []
+            parameters:
+                -   name: Authorization
+                    description: OAuth authorization header, including OAuth parameters
+                    in: header
+                    schema:
+                        type: string
+                        example: Oauth realm="SimpleRoster", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateLineItemWebHook'
+            responses:
+                202:
+                    description: Accepted
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
 components:
     securitySchemes:
         cookieAuth:
@@ -313,6 +342,34 @@ components:
                     items: {}
                     description: Operation attributes
                     example: ["state": "cancelled"]
+        UpdateLineItemWebHook:
+            type: object
+            properties:
+                source:
+                    type: string
+                    format: uri
+                events:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            eventData:
+                                type: object
+                                properties:
+                                    alias:
+                                        type: string
+                                        description: This data should match with the line item slug on the simple roster context
+                                    deliveryURI:
+                                        type: string
+                                        description: Based on the match between alias and slug, this field will be the new uri on the matched line item
+                                required:
+                                    - alias
+                                    - deliveryURI
+                        required:
+                            - eventData
+                    minItems: 1
+            required:
+                - events
         BulkResult:
             type: object
             properties:
