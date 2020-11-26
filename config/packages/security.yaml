@@ -22,6 +22,11 @@ security:
                     - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
+        secured_service_area:
+            pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
+            stateless: true
+            lti1p3_service: { scopes: [ 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome' ] }
+
         api:
             anonymous: ~
             pattern: '^%app.route_prefix%/v1'
@@ -41,4 +46,5 @@ security:
     access_control:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }

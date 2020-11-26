@@ -36,3 +36,7 @@ updateLtiOutcome:
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLtiOutcomeAction }
 
+updateLti1p3Outcome:
+  path: '%app.route_prefix%/v1/lti1p3/outcome'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLti1p3OutcomeAction }
