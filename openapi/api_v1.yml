@@ -353,6 +353,12 @@ components:
                     items:
                         type: object
                         properties:
+                            eventId:
+                                type: string
+                            eventName:
+                                type: string
+                            triggeredTimestamp:
+                                type: integer
                             eventData:
                                 type: object
                                 properties:
@@ -363,9 +369,11 @@ components:
                                         type: string
                                         description: Based on the match between alias and slug, this field will be the new uri on the matched line item
                                 required:
-                                    - alias
                                     - deliveryURI
                         required:
+                            - eventId
+                            - eventName
+                            - triggeredTimestamp
                             - eventData
                     minItems: 1
             required:
