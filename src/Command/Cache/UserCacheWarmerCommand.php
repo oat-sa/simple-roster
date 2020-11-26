@@ -89,6 +89,7 @@ class UserCacheWarmerCommand extends Command
         parent::configure();
 
         $this->setDescription('User cache warmup');
+        // @codingStandardsIgnoreStart
         $this->setHelp(<<<'EOF'
 The <info>%command.name%</info> command warms up the cache for users.
 
@@ -109,8 +110,10 @@ Use the --line-item-slugs option to warm up the cache for users having assignmen
 Use the --modulo and --remainder options for parallelized cache warmup:
 
     <info>php %command.full_name% --modulo=4 --remainder=1</info>
-    <comment>(Documentation: https://github.com/oat-sa/simple-roster/blob/develop/docs/cli/user-cache-warmer-command.md#synchronous-cache-warmup-parallelization)</comment>
+    <comment>(Documentation: https://github.com/oat-sa/simple-roster/blob/develop/docs/cli/user-cache-warmer-command.md#synchronous-cache-warmup-parallelization)
+    </comment>
 EOF
+        // @codingStandardsIgnoreEnd
         );
 
         $this->addBlackfireProfilingOption();
