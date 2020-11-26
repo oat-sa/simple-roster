@@ -22,14 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 
-use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
+use Doctrine\Common\Cache\CacheProvider;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use Carbon\Carbon;
-use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,11 +40,17 @@ class UpdateLineItemsActionTest extends WebTestCase
     /** @var KernelBrowser */
     private $kernelBrowser;
 
+    /** @var CacheProvider */
+    private $resultCacheImplementation;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+
+        $ormConfiguration = $this->getEntityManager()->getConfiguration();
+        $this->resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -59,9 +62,13 @@ class UpdateLineItemsActionTest extends WebTestCase
      * @dataProvider provideWrongRequestBodies
      */
     public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(
-        string $requestBody,
+        ?array $requestBody,
         string $expectedMessage
     ): void {
+        if (null !== $requestBody) {
+            $requestBody = json_encode($requestBody);
+        }
+
         $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/web-hooks/update-line-items',
@@ -86,7 +93,7 @@ class UpdateLineItemsActionTest extends WebTestCase
         );
     }
 
-    public function testItAccepstLineItemsToBeUpdated(): void
+    public function testItAcceptLineItemsToBeUpdated(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -104,6 +111,28 @@ class UpdateLineItemsActionTest extends WebTestCase
             true,
             512,
             JSON_THROW_ON_ERROR
+        );
+
+        /** @var LineItemRepository $lineItemRepository */
+        $lineItemRepository = $this->getRepository(LineItem::class);
+
+        /** @var LineItem $lineItem */
+        $lineItem = $lineItemRepository->findOneBy(
+            [
+                'slug' => 'lineItemSlug'
+            ]
+        );
+
+        $lineItemCache = $this->resultCacheImplementation->fetch('line_item_1');
+
+        self::assertEquals(
+            'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
+            $lineItem->getUri()
+        );
+
+        self::assertEquals(
+            'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
+            current($lineItemCache)[0]['uri_1']
         );
 
         self::assertSame(
@@ -169,92 +198,102 @@ class UpdateLineItemsActionTest extends WebTestCase
 
         return [
             'empty' => [
-                'requestBody' => '',
+                'requestBody' => null,
                 'expectedMessage' => 'Invalid JSON request body received. Error: Syntax error.',
             ],
             'emptyObject' => [
-                'requestBody' => '{}',
+                'requestBody' => [],
                 'expectedMessage' => 'Invalid Request Body: [events] -> This field is missing.',
             ],
             'IncompleteEventName' => [
-                'requestBody' => '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-                            "eventId":"52a3de8dd0f270fd193f9f4bff05232f",
-                            "triggeredTimestamp":1565602371,
-                            "eventData":{
-                                "alias":"qti-interactions-delivery",
-                                "deliveryURI":"https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF"
-                            }
-                        }
-                    ]
-                }',
+                'requestBody' => [
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' =>
+                        [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' =>
+                                    [
+                                        'alias' => 'qti-interactions-delivery',
+                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                                    ],
+                            ],
+                        ],
+                ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventName] -> This field is missing.',
             ],
             'IncompleteEventId' => [
-                'requestBody' => '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-			                "eventName":"RemoteDeliveryPublicationFinishesssd",
-                            "triggeredTimestamp":1565602371,
-                            "eventData":{
-                                "alias":"qti-interactions-delivery",
-                                "deliveryURI":"https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF"
-                            }
-                        }
-                    ]
-                }',
+                'requestBody' => [
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' =>
+                        [
+                            [
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' =>
+                                    [
+                                        'alias' => 'qti-interactions-delivery',
+                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                                    ],
+                            ],
+                        ],
+                ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventId] -> This field is missing.',
             ],
             'IncompleteEventTriggeredTimeStamp' => [
-                'requestBody' => '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-                            "eventId":"52a3de8dd0f270fd193f9f4bff05232f",
-		                	"eventName":"RemoteDeliveryPublicationFinishesssd",
-                            "eventData":{
-                                "alias":"qti-interactions-delivery",
-                                "deliveryURI":"https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF"
-                            }
-                        }
-                    ]
-                }',
+                'requestBody' => [
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' =>
+                        [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'eventData' =>
+                                    [
+                                        'alias' => 'qti-interactions-delivery',
+                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                                    ],
+                            ],
+                        ],
+                ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][triggeredTimestamp] -> This field is missing.',
             ],
 
             'IncompleteEventDeliveryUri' => [
-                'requestBody' => '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-                            "eventId":"52a3de8dd0f270fd193f9f4bff05232f",
-                			"eventName":"RemoteDeliveryPublicationFinishesssd",
-                            "triggeredTimestamp":1565602371,
-                            "eventData":{
-                                "alias":"qti-interactions-delivery"
-                            }
-                        }
-                    ]
-                }',
+                'requestBody' => [
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' =>
+                        [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' =>
+                                    [
+                                        'alias' => 'qti-interactions-delivery',
+                                    ],
+                            ],
+                        ],
+                ],
                 'expectedMessage' => $missingDeliveryUri,
             ],
             'aliasWrongType' => [
-                'requestBody' => '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-                            "eventId":"52a3de8dd0f270fd193f9f4bff05232f",
-                            "triggeredTimestamp":1565602371,
-                            "eventData":{
-                                "alias":123,
-                                "deliveryURI":"https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF"
-                            }
-                        }
-                    ]
-                }',
+                'requestBody' => [
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' =>
+                        [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' =>
+                                    [
+                                        'alias' => 123,
+                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                                    ],
+                            ],
+                        ],
+                ],
                 'expectedMessage' => $invalidAliasTypeMessage,
             ],
         ];
@@ -298,7 +337,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602390,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
                     ],
                 ],
             ],
