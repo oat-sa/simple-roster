@@ -17,6 +17,7 @@
  *
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
  */
+
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\WebHook;
@@ -81,7 +82,7 @@ class UpdateLineItemDto implements JsonSerializable
         return $this->lineItemUri;
     }
 
-        public function setStatus(?string $status): self
+    public function setStatus(?string $status): self
     {
         $this->status = $status;
 

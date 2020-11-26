@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use DateTime;
+use DateTimeImmutable;
 use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
@@ -53,7 +53,7 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
                 (string)$event['eventId'],
                 (string)$event['eventName'],
                 (string)$event['eventData']['deliveryURI'],
-                DateTime::createFromFormat('U', (string)$event['triggeredTimestamp']),
+                (new DateTimeImmutable())->setTimestamp($event['triggeredTimestamp']),
                 $event['eventData']['alias'] ?? null
             );
         }

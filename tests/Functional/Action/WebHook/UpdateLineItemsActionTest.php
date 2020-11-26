@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 
 use Doctrine\Common\Cache\CacheProvider;
+use JsonException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -60,6 +61,9 @@ class UpdateLineItemsActionTest extends WebTestCase
 
     /**
      * @dataProvider provideWrongRequestBodies
+     * @param array|null $requestBody
+     * @param string $expectedMessage
+     * @throws JsonException
      */
     public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(
         ?array $requestBody,
@@ -126,12 +130,12 @@ class UpdateLineItemsActionTest extends WebTestCase
         $lineItemCache = $this->resultCacheImplementation->fetch('line_item_1');
 
         self::assertEquals(
-            'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
+            'https://docker.localhost/ontologies/tao.rdf#RightOne',
             $lineItem->getUri()
         );
 
         self::assertEquals(
-            'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
+            'https://docker.localhost/ontologies/tao.rdf#RightOne',
             current($lineItemCache)[0]['uri_1']
         );
 
@@ -208,91 +212,80 @@ class UpdateLineItemsActionTest extends WebTestCase
             'IncompleteEventName' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
-                    'events' =>
+                    'events' => [
                         [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' =>
-                                    [
-                                        'alias' => 'qti-interactions-delivery',
-                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
-                                    ],
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
+                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
+                    ],
                 ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventName] -> This field is missing.',
             ],
             'IncompleteEventId' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
-                    'events' =>
+                    'events' => [
                         [
-                            [
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' =>
-                                    [
-                                        'alias' => 'qti-interactions-delivery',
-                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
-                                    ],
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
+                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
+                    ],
                 ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventId] -> This field is missing.',
             ],
             'IncompleteEventTriggeredTimeStamp' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
-                    'events' =>
+                    'events' => [
                         [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'eventData' =>
-                                    [
-                                        'alias' => 'qti-interactions-delivery',
-                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
-                                    ],
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
+                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
+                    ],
                 ],
                 'expectedMessage' => 'Invalid Request Body: [events][0][triggeredTimestamp] -> This field is missing.',
             ],
-
             'IncompleteEventDeliveryUri' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
-                    'events' =>
+                    'events' => [
                         [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' =>
-                                    [
-                                        'alias' => 'qti-interactions-delivery',
-                                    ],
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
                             ],
                         ],
+                    ],
                 ],
                 'expectedMessage' => $missingDeliveryUri,
             ],
             'aliasWrongType' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
-                    'events' =>
+                    'events' => [
                         [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' =>
-                                    [
-                                        'alias' => 123,
-                                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
-                                    ],
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 123,
+                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
+                    ],
                 ],
                 'expectedMessage' => $invalidAliasTypeMessage,
             ],
@@ -310,7 +303,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'qti-interactions-delivery',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
                 [
@@ -319,7 +312,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'wrong-alias',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
                 [
@@ -328,7 +321,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602380,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
                 [
@@ -337,7 +330,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602390,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#RightOne',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
                     ],
                 ],
             ],
@@ -355,7 +348,7 @@ class UpdateLineItemsActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'qti-interactions-delivery',
-                        'deliveryURI' => 'https://delivery-invalsi.docker.localhost/ontologies/tao.rdf#FFF',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
             ]
