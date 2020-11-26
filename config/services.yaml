@@ -81,10 +81,6 @@ services:
         arguments:
             $cleanUpInterval: '%app.assignment_state_interval_threshold%'
 
-    OAT\SimpleRoster\Command\Cache\DoctrineResultCacheWarmerCommand:
-        tags:
-            - { name: monolog.logger, channel: cache_warmup }
-
     OAT\SimpleRoster\Logger\UserRequestSessionLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
@@ -110,6 +106,12 @@ services:
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
+
+    OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory:
+        lazy: true
+
+    OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory:
+        lazy: true
 
     OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
         factory: '@OAT\SimpleRoster\Lti\Builder\LtiRequestFactoryBuilder'

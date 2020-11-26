@@ -24,14 +24,18 @@ namespace OAT\SimpleRoster\MessageHandler;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
+use OAT\SimpleRoster\Exception\CacheWarmupException;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
-use OAT\SimpleRoster\Message\RefreshUserCacheMessage;
+use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Throwable;
 
-class RefreshUserCacheMessageHandler implements MessageHandlerInterface
+class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -46,7 +50,13 @@ class RefreshUserCacheMessageHandler implements MessageHandlerInterface
     private $resultCacheImplementation;
 
     /** @var LoggerInterface */
-    private $logger;
+    private $messengerLogger;
+
+    /** @var LoggerInterface */
+    private $cacheWarmupLogger;
+
+    /** @var int */
+    private $cacheTtl;
 
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException
@@ -55,12 +65,16 @@ class RefreshUserCacheMessageHandler implements MessageHandlerInterface
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
         UserCacheIdGenerator $cacheIdGenerator,
-        LoggerInterface $logger
+        LoggerInterface $messengerLogger,
+        LoggerInterface $cacheWarmupLogger,
+        int $userWithAssignmentsCacheTtl
     ) {
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
         $this->cacheIdGenerator = $cacheIdGenerator;
-        $this->logger = $logger;
+        $this->messengerLogger = $messengerLogger;
+        $this->cacheWarmupLogger = $cacheWarmupLogger;
+        $this->cacheTtl = $userWithAssignmentsCacheTtl;
 
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
@@ -73,24 +87,60 @@ class RefreshUserCacheMessageHandler implements MessageHandlerInterface
         $this->resultCacheImplementation = $resultCacheImplementation;
     }
 
-    public function __invoke(RefreshUserCacheMessage $message): void
+    /**
+     * @throws Throwable
+     */
+    public function __invoke(WarmUpGroupedUserCacheMessage $message): void
     {
-        $username = $message->getUsername();
-        $resultCacheId = $this->cacheIdGenerator->generate($message->getUsername());
+        foreach ($message->getUsernames() as $username) {
+            try {
+                $this->refreshCacheForUsername($username);
+            } catch (Throwable $exception) {
+                $errorLog = sprintf(
+                    "Unsuccessful cache warmup for user '%s'. Error: %s",
+                    $username,
+                    $exception->getMessage()
+                );
+
+                $this->messengerLogger->error($errorLog);
+                $this->cacheWarmupLogger->error($errorLog);
+
+                throw $exception;
+            } finally {
+                $this->entityManager->clear();
+            }
+        }
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     * @throws CacheWarmupException
+     */
+    private function refreshCacheForUsername(string $username): void
+    {
+        $resultCacheId = $this->cacheIdGenerator->generate($username);
         $this->resultCacheImplementation->delete($resultCacheId);
 
         // Refresh by query
         $this->userRepository->findByUsernameWithAssignments($username);
-        $this->entityManager->clear();
 
         if (!$this->resultCacheImplementation->contains($resultCacheId)) {
-            $this->logger->error( // TODO: log channel!
+            throw new CacheWarmupException(
                 sprintf(
-                    "Unsuccessful cache warmup for user '%s' (cache id: '%s')",
-                    $username,
+                    "Result cache does not contain key '%s' after warmup.",
                     $resultCacheId
                 )
             );
         }
+
+        $logMessage = sprintf("Result cache for user '%s' was successfully warmed up", $username);
+        $logContext = [
+            'cacheKey' => $resultCacheId,
+            'cacheTtl' => $this->cacheTtl,
+        ];
+
+        $this->messengerLogger->info($logMessage, $logContext);
+        $this->cacheWarmupLogger->info($logMessage, $logContext);
     }
 }

@@ -2,13 +2,7 @@ framework:
     messenger:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            # cache-warmup: 'sync://'
-            cache-warmup:
-                dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
-                serializer: messenger.transport.symfony_serializer
-                options:
-                    access_key: AKIAJZKXN3JCZVCUSL4Q
-                    secret_key: 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
+            cache-warmup: 'sync://'
 
         routing:
-            'OAT\SimpleRoster\Message\RefreshUserCacheMessage': cache-warmup
+            'OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage': cache-warmup

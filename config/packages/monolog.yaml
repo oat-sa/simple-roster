@@ -1,4 +1,5 @@
 monolog:
+    channels: ["cache_warmup"]
     handlers:
         main:
             type: stream

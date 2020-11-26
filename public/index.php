@@ -20,6 +20,8 @@
 
 declare(strict_types=1);
 
+use Blackfire\Client;
+use Blackfire\ClientConfiguration;
 use OAT\SimpleRoster\Kernel;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
@@ -51,6 +53,22 @@ if ($trustedHosts = $_SERVER['TRUSTED_HOSTS'] ?? false) {
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
+
+$isBlackfireProfilingRequested = $request->headers->has('X-Blackfire');
+
+if ($isBlackfireProfilingRequested) {
+    $config = new ClientConfiguration(
+        $_ENV['BLACKFIRE_CLIENT_ID'],
+        $_ENV['BLACKFIRE_CLIENT_TOKEN']
+    );
+    $blackfire = new Client($config);
+    $probe = $blackfire->createProbe();
+}
+
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
+
+if ($isBlackfireProfilingRequested) {
+    $blackfire->endProbe($probe);
+}

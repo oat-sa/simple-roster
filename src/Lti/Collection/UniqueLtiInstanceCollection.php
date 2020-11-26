@@ -78,6 +78,11 @@ class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
         return count($this->ltiInstances);
     }
 
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
+    }
+
     private function contains(LtiInstance $ltiInstance): bool
     {
         /** @var LtiInstance $instance */

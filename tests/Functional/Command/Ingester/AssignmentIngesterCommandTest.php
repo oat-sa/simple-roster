@@ -257,7 +257,10 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
         self::assertSame(1, $output);
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
-        self::assertStringContainsString('[ERROR] No line items were found in database.', $this->commandTester->getDisplay(true));
+        self::assertStringContainsString(
+            '[ERROR] No line items were found in database.',
+            $this->commandTester->getDisplay(true)
+        );
     }
 
     public function provideInvalidSourceFiles(): array

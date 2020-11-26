@@ -22,14 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
-use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
@@ -42,8 +40,8 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var Lti1p3RequestFactory */
     private $subject;
 
-    /** @var LtiResourceLinkLaunchRequestBuilder|MockObject */
-    private $ltiRequestBuilder;
+    /** @var Lti1p3MessageBuilder */
+    private $ltiMessageBuilder;
 
     /** @var RegistrationRepositoryInterface|MockObject */
     private $registrationRepository;
@@ -55,152 +53,65 @@ class Lti1p3RequestFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->ltiRequestBuilder = $this->createMock(LtiResourceLinkLaunchRequestBuilder::class);
+        $this->ltiMessageBuilder = $this->createMock(Lti1p3MessageBuilder::class);
         $this->registrationRepository = $this->createMock(RegistrationRepositoryInterface::class);
         $this->ltiConfiguration = $this->createMock(LtiConfiguration::class);
 
         $this->subject = new Lti1p3RequestFactory(
             $this->registrationRepository,
-            $this->ltiRequestBuilder,
+            $this->ltiMessageBuilder,
             $this->ltiConfiguration
         );
     }
 
-    /**
-     * @dataProvider provideValidLineItemAssignmentCombinations
-     */
-    public function testItReturnsAssignmentLtiRequest(
-        int $maxAttempts,
-        int $attemptsCount,
-        string $assignmentStatus
-    ): void {
-        Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
-
-        $assignment = $this->createAssignmentMock($maxAttempts, $attemptsCount, $assignmentStatus);
-
-        $this->createRegistrationMock();
-
-        $message = $this->createMock(LtiMessageInterface::class);
-        $message
-            ->expects(self::once())
-            ->method('toUrl')
-            ->willReturn('link');
-
-        $this->ltiRequestBuilder
-            ->expects(self::once())
-            ->method('buildLtiResourceLinkLaunchRequest')
-            ->willReturn($message);
-
-        $this->ltiConfiguration
-            ->expects(self::once())
-            ->method('getLtiRegistrationId')
-            ->willReturn('registrationId');
-
-        $this->ltiConfiguration
-            ->expects(self::once())
-            ->method('getLtiLaunchPresentationReturnUrl')
-            ->willReturn('http://example.com/index.html');
-
-        $this->ltiConfiguration
-            ->expects(self::once())
-            ->method('getLtiLaunchPresentationLocale')
-            ->willReturn('fr-FR');
-
-        self::assertSame(
-            [
-                'ltiLink' => 'link',
-                'ltiVersion' => LtiRequest::LTI_VERSION_1P3,
-                'ltiParams' => [],
-            ],
-            $this->subject->create($assignment)->jsonSerialize()
-        );
-
-        Carbon::setTestNow();
-    }
-
-    public function provideValidLineItemAssignmentCombinations(): array
-    {
-        return [
-            'withMaxAttemptsSpecifiedAndAvailableAttemptsAndReadyStatus' => [
-                'maxAttempts' => 2,
-                'attemptsCount' => 1,
-                'assignmentState' => Assignment::STATE_READY,
-            ],
-            'withMaxAttemptsSpecifiedAndAvailableAttemptsAndStartedStatus' => [
-                'maxAttempts' => 2,
-                'attemptsCount' => 1,
-                'assignmentState' => Assignment::STATE_STARTED,
-            ],
-            'withMaxAttemptsSpecifiedAndLastAttemptStartedAndStartedStatus' => [
-                'maxAttempts' => 3,
-                'attemptsCount' => 3,
-                'assignmentState' => Assignment::STATE_STARTED,
-            ],
-            'withNoMaxAttemptsSpecifiedAndNoAttemptsTakenAndReadyStatus' => [
-                'maxAttempts' => 0,
-                'attemptsCount' => 0,
-                'assignmentState' => Assignment::STATE_READY,
-            ],
-            'withNoMaxAttemptsSpecifiedAndSomeAttemptsTakenAndReadyStatus' => [
-                'maxAttempts' => 0,
-                'attemptsCount' => 4,
-                'assignmentState' => Assignment::STATE_READY,
-            ],
-            'withNoMaxAttemptsSpecifiedAndSomeAttemptsTakenAndStartedStatus' => [
-                'maxAttempts' => 0,
-                'attemptsCount' => 4,
-                'assignmentState' => Assignment::STATE_STARTED,
-            ],
-        ];
-    }
-
     public function testShouldThrowRegistrationNotFoundException(): void
     {
-        $this->ltiConfiguration
-            ->expects(self::once())
-            ->method('getLtiRegistrationId')
-            ->willReturn('registrationId');
-
         $this->expectException(RegistrationNotFoundException::class);
         $this->expectExceptionMessage('Registration registrationId not found.');
 
-        $assignment = $this->createAssignmentMock(5, 1, Assignment::STATE_READY);
-
-        $this->subject->create($assignment);
-    }
-
-    private function createAssignmentMock(int $maxAttempts, int $attemptsCount, string $assignmentStatus): Assignment
-    {
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts)
-            ->setUri('http://test-delivery-uri.html')
-            ->setSlug('slug')
-            ->setLabel('label');
-
-        $user = (new User())
-            ->setUsername('testUsername')
-            ->setGroupId('groupId');
-
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-
-        $assignment
-            ->method('getId')
-            ->willReturn(5);
-
-        return $assignment
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount($attemptsCount)
-            ->setState($assignmentStatus);
-    }
-
-    private function createRegistrationMock(): void
-    {
-        $registration = $this->createMock(RegistrationInterface::class);
+        $this->ltiConfiguration
+            ->expects(self::once())
+            ->method('getLtiRegistrationId')
+            ->willReturn('registrationId');
 
         $this->registrationRepository
             ->expects(self::once())
             ->method('find')
-            ->willReturn($registration);
+            ->with('registrationId')
+            ->willReturn(null);
+
+        $this->subject->create(new Assignment());
+    }
+
+    public function testItReturnsAssignmentLtiRequest(): void
+    {
+        $expectedLtiLinkUrl = 'http://expected.url';
+
+        $ltiMessage = $this->createMock(LtiMessageInterface::class);
+        $ltiMessage
+            ->method('toUrl')
+            ->willReturn($expectedLtiLinkUrl);
+
+        $this->ltiMessageBuilder
+            ->expects(self::once())
+            ->method('build')
+            ->willReturn($ltiMessage);
+
+        $this->registrationRepository
+            ->method('find')
+            ->willReturn($this->createMock(Registration::class));
+
+        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
+        $assignment
+            ->method('getId')
+            ->willReturn(1);
+
+        $assignment->setUser((new User())->setUsername('testUser'));
+
+        $request = $this->subject->create($assignment);
+
+        self::assertSame($expectedLtiLinkUrl, $request->getLink());
+        self::assertSame(LtiRequest::LTI_VERSION_1P3, $request->getVersion());
+        self::assertSame([], $request->getParameters());
     }
 }

@@ -24,42 +24,39 @@ namespace OAT\SimpleRoster\Command\Cache;
 
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
-use OAT\SimpleRoster\Message\RefreshUserCacheMessage;
 use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
+use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Throwable;
 
 class UserCacheWarmerCommand extends Command
 {
     use CommandProgressBarFormatterTrait;
+    use BlackfireProfilerTrait;
 
     public const NAME = 'roster:cache-warmup:user';
 
     private const OPTION_USERNAMES = 'usernames';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
-    private const OPTION_BATCH_SIZE = 'batch-size';
+    private const OPTION_BATCH = 'batch';
     private const OPTION_MODULO = 'modulo';
     private const OPTION_REMAINDER = 'remainder';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
-    /** @var MessageBusInterface */
-    private $messageBus;
+    /** @var UserCacheWarmerService */
+    private $userCacheWarmerService;
 
     /** @var UserRepository */
     private $userRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
 
     /** @var SymfonyStyle */
     private $symfonyStyle;
@@ -79,19 +76,10 @@ class UserCacheWarmerCommand extends Command
     /** @var int|null */
     private $remainder;
 
-    /** @var int */
-    private $userWithAssignmentsCacheTtl;
-
-    public function __construct(
-        MessageBusInterface $messageBus,
-        UserRepository $userRepository,
-        LoggerInterface $logger,
-        int $userWithAssignmentsCacheTtl
-    ) {
-        $this->messageBus = $messageBus;
+    public function __construct(UserCacheWarmerService $userCacheWarmerService, UserRepository $userRepository)
+    {
+        $this->userCacheWarmerService = $userCacheWarmerService;
         $this->userRepository = $userRepository;
-        $this->logger = $logger;
-        $this->userWithAssignmentsCacheTtl = $userWithAssignmentsCacheTtl;
 
         parent::__construct(self::NAME);
     }
@@ -101,9 +89,34 @@ class UserCacheWarmerCommand extends Command
         parent::configure();
 
         $this->setDescription('User cache warmup');
+        $this->setHelp(<<<'EOF'
+The <info>%command.name%</info> command warms up the cache for users.
+
+    <info>php %command.full_name%</info>
+
+Use the --batch option to warm up the cache in batches:
+
+    <info>php %command.full_name% --batch=10000</info>
+
+Use the --usernames option to warm up the cache for specific users:
+
+    <info>php %command.full_name% --usernames=username_1,username_2,username_3</info>
+
+Use the --line-item-slugs option to warm up the cache for users having assignments for specific line items:
+
+    <info>php %command.full_name% --line-item-slugs=slug_1,slug_2,slug_3</info>
+
+Use the --modulo and --remainder options for parallelized cache warmup:
+
+    <info>php %command.full_name% --modulo=4 --remainder=1</info>
+    <comment>(Documentation: https://github.com/oat-sa/simple-roster/blob/develop/docs/cli/user-cache-warmer-command.md#synchronous-cache-warmup-parallelization)</comment>
+EOF
+        );
+
+        $this->addBlackfireProfilingOption();
 
         $this->addOption(
-            self::OPTION_BATCH_SIZE,
+            self::OPTION_BATCH,
             'b',
             InputOption::VALUE_REQUIRED,
             'Number of cache entries to process per batch',
@@ -156,13 +169,13 @@ class UserCacheWarmerCommand extends Command
         }
 
         if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS)) {
-            $this->initializeLineItemIdsOption($input);
+            $this->initializeLineItemSlugsOption($input);
         }
 
         if (!empty($this->usernames) && !empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "'%s' and '%s' are exclusive options, please specify only one of them",
+                    "Option '%s' and '%s' are exclusive options.",
                     self::OPTION_USERNAMES,
                     self::OPTION_LINE_ITEM_SLUGS
                 )
@@ -191,50 +204,47 @@ class UserCacheWarmerCommand extends Command
         $numberOfTotalUsers = $this->userRepository->countByCriteria($criteria);
 
         if ($numberOfTotalUsers === 0) {
-            $this->symfonyStyle->success('No matching cache entries, exiting.');
+            $this->symfonyStyle->warning('There are no users found in the database.');
 
             return 0;
         }
 
         $this->symfonyStyle->note('Warming up doctrine result cache...');
 
-        $progressBar = $this->createNewFormattedProgressBar($output);
+        $progressBar = $this->createFormattedProgressBar($output);
 
         $progressBar->setMaxSteps($numberOfTotalUsers);
         $progressBar->start();
 
         $lastUserId = null;
         $numberOfWarmedUpCacheEntries = 0;
-        do {
-            $resultSet = $this->userRepository->findAllUsernamesPaged($this->batchSize, $lastUserId, $criteria);
 
-            foreach ($resultSet as $username) {
-                $message = new RefreshUserCacheMessage($username);
-                $this->messageBus->dispatch(new Envelope($message));
-
-                $numberOfWarmedUpCacheEntries++;
-
-                if ($numberOfWarmedUpCacheEntries === 100) {
-                    return 0; // FIXME
+        try {
+            do {
+                $resultSet = $this->userRepository->findAllUsernamesPaged($this->batchSize, $lastUserId, $criteria);
+                if (!$resultSet->isEmpty()) {
+                    $this->userCacheWarmerService->process($resultSet->getUsernameCollection());
                 }
-            }
 
-            if ($numberOfWarmedUpCacheEntries % $this->batchSize === 0) {
                 $progressBar->advance($this->batchSize);
-            }
+                $numberOfWarmedUpCacheEntries += $resultSet->count();
 
-            $lastUserId = $resultSet->getLastUserId();
-        } while ($resultSet->hasMore());
+                $lastUserId = $resultSet->getLastUserId();
+            } while ($resultSet->hasMore());
 
-        $progressBar->finish();
+            $progressBar->finish();
 
-        $this->symfonyStyle->success(
-            sprintf(
-                'Result cache for %d users have been successfully warmed up. [TTL: %s seconds]', // TODO
-                $numberOfWarmedUpCacheEntries,
-                number_format($this->userWithAssignmentsCacheTtl)
-            )
-        );
+            $this->symfonyStyle->success(
+                sprintf(
+                    'Cache warmup for %d users was successfully initiated.',
+                    $numberOfWarmedUpCacheEntries,
+                )
+            );
+        } catch (Throwable $exception) {
+            $this->symfonyStyle->error(sprintf('An unexpected error occurred: %s', $exception->getMessage()));
+
+            return 1;
+        }
 
         return 0;
     }
@@ -244,10 +254,10 @@ class UserCacheWarmerCommand extends Command
      */
     private function initializeBatchSizeOption(InputInterface $input): void
     {
-        $this->batchSize = (int)$input->getOption(self::OPTION_BATCH_SIZE);
+        $this->batchSize = (int)$input->getOption(self::OPTION_BATCH);
         if ($this->batchSize < 1) {
             throw new InvalidArgumentException(
-                sprintf("Invalid '%s' option received.", self::OPTION_BATCH_SIZE)
+                sprintf("Invalid '%s' option received.", self::OPTION_BATCH)
             );
         }
     }
@@ -255,12 +265,12 @@ class UserCacheWarmerCommand extends Command
     /**
      * @throws InvalidArgumentException
      */
-    private function initializeLineItemIdsOption(InputInterface $input): void
+    private function initializeLineItemSlugsOption(InputInterface $input): void
     {
         $this->lineItemSlugs = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_SLUGS)),
             static function ($value): bool {
-                return !empty($value) && is_string($value);
+                return !empty($value) && is_string($value) && mb_strlen($value) > 1;
             }
         );
 
@@ -279,7 +289,7 @@ class UserCacheWarmerCommand extends Command
         $this->usernames = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_USERNAMES)),
             static function ($value): bool {
-                return !empty($value) && is_string($value);
+                return !empty($value) && is_string($value) && mb_strlen($value) > 1;
             }
         );
 
@@ -297,14 +307,14 @@ class UserCacheWarmerCommand extends Command
     {
         if ($input->getOption(self::OPTION_REMAINDER) === null) {
             throw new InvalidArgumentException(
-                sprintf("Command option '%s' is expected to be specified.", self::OPTION_REMAINDER)
+                sprintf("Option '%s' is expected to be specified.", self::OPTION_REMAINDER)
             );
         }
 
         if (!is_numeric($input->getOption(self::OPTION_MODULO))) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "Command option '%s' is expected to be numeric.",
+                    "Option '%s' is expected to be numeric.",
                     self::OPTION_MODULO
                 )
             );
@@ -332,14 +342,14 @@ class UserCacheWarmerCommand extends Command
     {
         if (!$input->getOption(self::OPTION_MODULO)) {
             throw new InvalidArgumentException(
-                sprintf("Command option '%s' is expected to be specified.", self::OPTION_MODULO)
+                sprintf("Option '%s' is expected to be specified.", self::OPTION_MODULO)
             );
         }
 
         if (!is_numeric($input->getOption(self::OPTION_REMAINDER))) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "Command option '%s' is expected to be numeric.",
+                    "Option '%s' is expected to be numeric.",
                     self::OPTION_REMAINDER
                 )
             );

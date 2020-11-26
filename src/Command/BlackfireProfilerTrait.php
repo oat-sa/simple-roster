@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,28 +15,24 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command;
 
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
-trait CommandProgressBarFormatterTrait
+trait BlackfireProfilerTrait
 {
-    /** @var string */
-    protected $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | ' .
-    ' <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
-
-    public function createFormattedProgressBar(OutputInterface $output): ProgressBar
+    protected function addBlackfireProfilingOption(): void
     {
-        $progressBar = new ProgressBar($output);
-
-        $progressBar->setFormat($this->format);
-
-        return $progressBar;
+        $this->addOption(
+            'blackfire',
+            null,
+            InputOption::VALUE_NONE,
+            'To enable profiling with Blackfire'
+        );
     }
 }

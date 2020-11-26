@@ -94,6 +94,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
 
     private function warmUserCache(User $user, EntityManager $entityManager): void
     {
+        // TODO: dispatch event
         if ($entityManager->getUnitOfWork()->isInIdentityMap($user)) {
             // Repository must be instantiated here because lazy loading is not available for doctrine event
             // subscribers. Injecting it in constructor leads to circular reference in DI container.

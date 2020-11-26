@@ -20,20 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Message;
+namespace OAT\SimpleRoster\Exception;
 
-class RefreshUserCacheMessage
+use RuntimeException;
+
+class CacheWarmupException extends RuntimeException
 {
-    /** @var string */
-    private $username;
 
-    public function __construct(string $username)
-    {
-        $this->username = $username;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
 }

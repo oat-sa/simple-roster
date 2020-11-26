@@ -24,8 +24,10 @@ namespace OAT\SimpleRoster\Command\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,6 +36,8 @@ use Throwable;
 
 class LtiInstanceCacheWarmerCommand extends Command
 {
+    use BlackfireProfilerTrait;
+
     public const NAME = 'roster:cache-warmup:lti-instance';
 
     /** @var LtiInstanceRepository */
@@ -45,15 +49,20 @@ class LtiInstanceCacheWarmerCommand extends Command
     /** @var CacheProvider */
     private $resultCacheImplementation;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var int */
     private $ltiInstancesCacheTtl;
 
     public function __construct(
         LtiInstanceRepository $ltiInstanceRepository,
         EntityManagerInterface $entityManager,
+        LoggerInterface $cacheWarmupCacheWarmupLogger,
         int $ltiInstancesCacheTtl
     ) {
         $this->ltiInstanceRepository = $ltiInstanceRepository;
+        $this->logger = $cacheWarmupCacheWarmupLogger;
         $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
 
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
@@ -73,6 +82,8 @@ class LtiInstanceCacheWarmerCommand extends Command
     {
         parent::configure();
 
+        $this->addBlackfireProfilingOption();
+
         $this->setDescription('LTI instance cache warmup');
     }
 
@@ -88,16 +99,26 @@ class LtiInstanceCacheWarmerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
+            $this->symfonyStyle->comment('Executing cache warmup...');
+
             $this->resultCacheImplementation->delete(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
 
             // Refresh by query
             $ltiInstances = $this->ltiInstanceRepository->findAllAsCollection();
 
-            if (!count($ltiInstances)) {
+            if ($ltiInstances->isEmpty()) {
                 $this->symfonyStyle->warning('There are no LTI instances found in the database.');
 
                 return 0;
             }
+
+            $this->logger->info(
+                sprintf('Result cache for %d LTI instances have been successfully warmed up.', count($ltiInstances)),
+                [
+                    'cacheKey' => LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES,
+                    'cacheTtl' => number_format($this->ltiInstancesCacheTtl),
+                ]
+            );
 
             $this->symfonyStyle->success(
                 sprintf(

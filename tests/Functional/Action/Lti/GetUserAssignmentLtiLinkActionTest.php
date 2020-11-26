@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTimeZone;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
@@ -126,7 +127,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentIsNotAvailable(): void
     {
-        Carbon::setTestNow(Carbon::now()->add(3, 'year'));
+        Carbon::setTestNow(Carbon::now()->add(new DateInterval('P3Y')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
