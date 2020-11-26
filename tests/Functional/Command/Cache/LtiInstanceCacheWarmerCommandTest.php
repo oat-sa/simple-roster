@@ -111,7 +111,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 5 LTI instances have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay()
+            $this->commandTester->getDisplay(true)
         );
 
         self::assertTrue($this->resultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
