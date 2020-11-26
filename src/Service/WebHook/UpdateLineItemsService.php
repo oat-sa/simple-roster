@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\WebHook;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
@@ -31,9 +33,13 @@ class UpdateLineItemsService
     /** @var LineItemRepository */
     private $lineItemRepository;
 
-    public function __construct(LineItemRepository $lineItemRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(LineItemRepository $lineItemRepository, EntityManagerInterface $entityManager)
     {
         $this->lineItemRepository = $lineItemRepository;
+        $this->entityManager = $entityManager;
     }
 
     public function handleUpdates(UpdateLineItemCollection $collection): UpdateLineItemCollection
@@ -64,21 +70,23 @@ class UpdateLineItemsService
         );
 
         foreach ($lineItems as $lineItem) {
-                $dto = $knownUpdates
+            $duplicatedEvents = $knownUpdates
                 ->filter(
                     function (UpdateLineItemDto $dto) use ($lineItem): bool {
                         return $dto->getSlug() === $lineItem->getSlug();
                     }
-                )
-                ->setStatus(UpdateLineItemDto::STATUS_IGNORED)
-                ->findLastByTriggeredTime();
+                );
 
-            //TODO add on the queue
+            $dto = $duplicatedEvents->findLastByTriggeredTime();
+
             $lineItem->setUri($dto->getLineItemUri());
-            //TODO add on the queue
+            $this->entityManager->persist($lineItem);
 
+            $duplicatedEvents->setStatus(UpdateLineItemDto::STATUS_IGNORED);
             $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
         }
+
+        $this->entityManager->flush();
 
         return $collection;
     }

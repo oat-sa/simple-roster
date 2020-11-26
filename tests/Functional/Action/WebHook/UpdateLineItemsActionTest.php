@@ -97,7 +97,7 @@ class UpdateLineItemsActionTest extends WebTestCase
             json_encode($this->getSuccessRequestBody())
         );
 
-        self::assertSame(Response::HTTP_ACCEPTED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -141,7 +141,7 @@ class UpdateLineItemsActionTest extends WebTestCase
             json_encode($this->getRequestBodyUnknownEvent())
         );
 
-        self::assertSame(Response::HTTP_ACCEPTED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),

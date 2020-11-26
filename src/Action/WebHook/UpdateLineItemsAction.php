@@ -45,7 +45,7 @@ class UpdateLineItemsAction
     {
         return $this->responder->createJsonResponse(
             $this->service->handleUpdates($collection),
-            Response::HTTP_ACCEPTED
+            Response::HTTP_OK
         );
     }
 }
