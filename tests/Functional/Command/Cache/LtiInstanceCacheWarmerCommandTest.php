@@ -28,6 +28,7 @@ use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\Cache\LtiInstanceCacheWarmerCommand;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -38,6 +39,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -111,7 +113,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             '[OK] Result cache for 5 LTI instances have been successfully warmed up. [TTL: 3,600 seconds]',
-            $this->commandTester->getDisplay(true)
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
         self::assertTrue($this->resultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
