@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Repository;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
@@ -91,7 +92,11 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @param int $limit
+     * @param int|null $lastUserId
+     * @param FindUserCriteria|null $criteria
+     * @return UsernameResultSet
+     * @throws Exception
      */
     public function findAllUsernamesPaged(
         int $limit,
