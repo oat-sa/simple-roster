@@ -64,7 +64,7 @@ class UpdateLineItemsService
         );
 
         foreach ($lineItems as $lineItem) {
-            $dto = $knownUpdates
+                $dto = $knownUpdates
                 ->filter(
                     function (UpdateLineItemDto $dto) use ($lineItem): bool {
                         return $dto->getSlug() === $lineItem->getSlug();

@@ -44,7 +44,8 @@ class UpdateLineItemsAction
     public function __invoke(UpdateLineItemCollection $collection): Response
     {
         return $this->responder->createJsonResponse(
-            $this->service->handleUpdates($collection)
+            $this->service->handleUpdates($collection),
+            Response::HTTP_ACCEPTED
         );
     }
 }

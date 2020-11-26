@@ -66,12 +66,6 @@ class UpdateLineItemDto implements JsonSerializable
         $this->status = $status;
     }
 
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -87,12 +81,7 @@ class UpdateLineItemDto implements JsonSerializable
         return $this->lineItemUri;
     }
 
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(?string $status): self
+        public function setStatus(?string $status): self
     {
         $this->status = $status;
 

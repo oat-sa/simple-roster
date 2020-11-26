@@ -46,7 +46,7 @@ class UpdateLineItemValidator
         } catch (Throwable $jsonException) {
             throw new BadRequestHttpException(
                 sprintf(
-                    'Invalid JSON request body received. Error: %s',
+                    'Invalid JSON request body received. Error: %s.',
                     $jsonException->getMessage()
                 ),
                 $jsonException
@@ -71,7 +71,7 @@ class UpdateLineItemValidator
 
         throw new BadRequestHttpException(
             sprintf(
-                'Invalid Response Body: %s',
+                'Invalid Request Body: %s',
                 implode(
                     " ",
                     $errorsRaw
@@ -89,7 +89,7 @@ class UpdateLineItemValidator
             [
                 'fields' => [
                     'source' => new Assert\Optional([new Assert\Type('string')]),
-                    'events' => new Assert\Optional(
+                    'events' => new Assert\Sequentially(
                         [
                             new Assert\Type('array'),
                             new Assert\Count(['min' => 1]),
@@ -119,7 +119,7 @@ class UpdateLineItemValidator
                                         ]
                                     )
                                 ]
-                            ),
+                            )
                         ]
                     )
                 ],
