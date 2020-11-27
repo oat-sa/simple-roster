@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\EventListener\Doctrine;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
@@ -44,14 +45,23 @@ class WarmUpLineItemListener implements EntityListenerInterface
         EntityManagerInterface $entityManager,
         LineItemCacheIdGenerator $lineItemCacheIdGenerator
     ) {
-        $this->cacheProvider = $entityManager->getConfiguration()->getResultCacheImpl();
+        $cacheProvider = $entityManager->getConfiguration()->getResultCacheImpl();
+
+        if (!$cacheProvider instanceof CacheProvider) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $this->cacheProvider = $cacheProvider;
         $this->lineItemCacheIdGenerator = $lineItemCacheIdGenerator;
         $this->lineItemRepository = $lineItemRepository;
     }
 
     public function postUpdate(LineItem $lineItem): void
     {
-        $this->cacheProvider->delete($this->lineItemCacheIdGenerator->generate($lineItem->getId()));
-        $this->lineItemRepository->findById($lineItem->getId());
+        $id = (int)$lineItem->getId();
+        $this->cacheProvider->delete($this->lineItemCacheIdGenerator->generate($id));
+        $this->lineItemRepository->findById($id);
     }
 }

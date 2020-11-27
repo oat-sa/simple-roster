@@ -65,7 +65,7 @@ class UpdateLineItemCollection implements IteratorAggregate
             }
         }
 
-        return new static(...$results);
+        return new self(...$results);
     }
 
     public function findLastByTriggeredTime(): ?UpdateLineItemDto

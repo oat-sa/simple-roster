@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\WebHook;
 
+use _HumbugBoxf99c1794c57d\Symfony\Component\Console\Exception\LogicException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -55,11 +56,11 @@ class UpdateLineItemsService
         $slugs = $knownUpdates
             ->map(
                 function (UpdateLineItemDto $dto): string {
-                    return $dto->getSlug();
+                    return (string)$dto->getSlug();
                 }
             );
 
-        if (count($slugs) < 1) {
+        if (count((array)$slugs) < 1) {
             return $collection;
         }
 
@@ -79,11 +80,13 @@ class UpdateLineItemsService
 
             $dto = $duplicatedEvents->findLastByTriggeredTime();
 
-            $lineItem->setUri($dto->getLineItemUri());
-            $this->entityManager->persist($lineItem);
+            if (null !== $dto) {
+                $lineItem->setUri($dto->getLineItemUri());
+                $this->entityManager->persist($lineItem);
 
-            $duplicatedEvents->setStatus(UpdateLineItemDto::STATUS_IGNORED);
-            $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
+                $duplicatedEvents->setStatus(UpdateLineItemDto::STATUS_IGNORED);
+                $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
+            }
         }
 
         $this->entityManager->flush();

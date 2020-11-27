@@ -114,8 +114,9 @@ class LineItemCacheWarmerCommand extends Command
 
             /** @var LineItem $lineItem */
             foreach ($lineItemCollection as $lineItem) {
-                $this->resultCacheImplementation->delete($this->lineItemCacheIdGenerator->generate($lineItem->getId()));
-                $this->lineItemRepository->findById($lineItem->getId());
+                $id = (int)$lineItem->getId();
+                $this->resultCacheImplementation->delete($this->lineItemCacheIdGenerator->generate($id));
+                $this->lineItemRepository->findById($id);
             }
 
             if ($lineItemCollection->isEmpty()) {

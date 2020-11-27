@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 use Doctrine\Common\Cache\CacheProvider;
 use JsonException;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
@@ -51,8 +52,15 @@ class UpdateLineItemsActionTest extends WebTestCase
         $this->kernelBrowser = self::createClient();
 
         $ormConfiguration = $this->getEntityManager()->getConfiguration();
-        $this->resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
+        $resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
 
+        if (!$resultCacheImplementation instanceof CacheProvider) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
+
+        $this->resultCacheImplementation = $resultCacheImplementation;
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
@@ -70,7 +78,7 @@ class UpdateLineItemsActionTest extends WebTestCase
         string $expectedMessage
     ): void {
         if (null !== $requestBody) {
-            $requestBody = json_encode($requestBody);
+            $requestBody = (string)json_encode($requestBody);
         }
 
         $this->kernelBrowser->request(
@@ -105,7 +113,7 @@ class UpdateLineItemsActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode($this->getSuccessRequestBody())
+            (string)json_encode($this->getSuccessRequestBody())
         );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -171,7 +179,7 @@ class UpdateLineItemsActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode($this->getRequestBodyUnknownEvent())
+            (string)json_encode($this->getRequestBodyUnknownEvent())
         );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());

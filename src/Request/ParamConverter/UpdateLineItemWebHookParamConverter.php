@@ -40,7 +40,7 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
         $this->updateLineItemValidator = $updateLineItemValidator;
     }
 
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
         $this->updateLineItemValidator->validate($request);
 
@@ -59,6 +59,8 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
         }
 
         $request->attributes->set($configuration->getName(), new UpdateLineItemCollection(...$events));
+
+        return true;
     }
 
     public function supports(ParamConverter $configuration): bool

@@ -73,7 +73,7 @@ class UserRepository extends AbstractRepository
             throw new InvalidUsernameException('Empty username received.');
         }
 
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this
             ->createQueryBuilder('u')
             ->select('u, a')
