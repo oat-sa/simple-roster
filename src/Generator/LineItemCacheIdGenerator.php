@@ -24,8 +24,10 @@ namespace OAT\SimpleRoster\Generator;
 
 class LineItemCacheIdGenerator
 {
+    public const CACHE_KEY_PATTERN = 'line_item_%d';
+
     public function generate(int $id): string
     {
-        return sprintf('line_item_%d', $id);
+        return sprintf(self::CACHE_KEY_PATTERN, $id);
     }
 }

@@ -35,7 +35,7 @@ use OAT\SimpleRoster\Model\LineItemCollection;
 class LineItemRepository extends AbstractRepository
 {
     /** @var int */
-    private $cacheTtl;
+    private $lineItemCacheTtl;
 
     /** @var LineItemCacheIdGenerator */
     private $cacheIdGenerator;
@@ -43,11 +43,11 @@ class LineItemRepository extends AbstractRepository
     public function __construct(
         ManagerRegistry $registry,
         LineItemCacheIdGenerator $cacheIdGenerator,
-        int $cacheTtl = 3600
+        int $lineItemCacheTtl = 3600
     ) {
         parent::__construct($registry, LineItem::class);
         $this->cacheIdGenerator = $cacheIdGenerator;
-        $this->cacheTtl = $cacheTtl;
+        $this->lineItemCacheTtl = $lineItemCacheTtl;
     }
 
     public function findAllAsCollection(): LineItemCollection
@@ -69,7 +69,7 @@ class LineItemRepository extends AbstractRepository
             ->where('l.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->enableResultCache($this->cacheTtl, $this->cacheIdGenerator->generate($id))
+            ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
             ->getOneOrNullResult();
     }
 }

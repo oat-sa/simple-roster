@@ -13,12 +13,6 @@
 ```bash
 $ sudo -u www-data bin/console roster:cache:warmup
 ```
-### Arguments
-
-| Argument | Description |
-| ------------- |:-------------|
-| cache-pool  | Specify what's the target that you want to warmup the cache. [Possible values: user, lti-instance, line-item]  [default: "user"] |
-
 ### Main options
 
 | Option | Description |
@@ -45,20 +39,11 @@ Warming up result cache entries for specific users:
 $ sudo -u www-data bin/console roster:cache:warmup --usernames=user1,user2,user3,user4
 ```
 
-Warming up user result cache entries for specific line items:
+Warming up result cache entries for specific line items:
 ```shell script
 $ sudo -u www-data bin/console roster:cache:warmup --line-item-slugs=slug1,slug2,slug3
 ```
 
-Warming up line-items result cache entries
-```shell script
-$ sudo -u www-data bin/console roster:cache:warmup line-item
-```
-
-Warming up lti-instance result cache entries
-```shell script
-$ sudo -u www-data bin/console roster:cache:warmup lti-instance
-```
 ## Advanced usage
 
 Sometimes it can be necessary to parallelize the cache warmup process due to the huge amount of users in the system. This

@@ -2,5 +2,8 @@ services:
     _defaults:
         public: true
 
+    test.line_item_repository:
+        alias: OAT\SimpleRoster\Repository\LineItemRepository
+        public: true
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\ArrayCache
