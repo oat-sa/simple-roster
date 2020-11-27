@@ -104,7 +104,8 @@ class AssignmentIngesterCommandTest extends KernelTestCase
             'Simple Roster - Assignment Ingester',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
-        self::assertStringContainsString('Executing ingestion...',
+        self::assertStringContainsString(
+            'Executing ingestion...',
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
         self::assertStringContainsString(
