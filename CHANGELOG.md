@@ -3,16 +3,17 @@
 ## 2.0.0 - TODO: To be released
 
 ### Added
-- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
-- Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
-- Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added [roster:ingest:lti-instance](docs/cli/lti-instance-ingester-command.md) command.
 - Added [roster:ingest:line-item](docs/cli/line-item-ingester-command.md) command.
 - Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Added [roster:ingest:assignment](docs/cli/assignment-ingester-command.md) command.
+- Added [roster:cache-warmup:user](docs/cli/user-cache-warmer-command.md) command.
+- Added [roster:cache-warmup:lti-instance](docs/cli/lti-instance-cache-warmer-command.md) command.
 - Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
-- Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/)
+- Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/).
 - Added `LTI_VERSION`, `LTI1P3_SERVICE_ENCRYPTION_KEY` and `LTI1P3_REGISTRATION_ID` environment variables.
+- Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
+- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.
@@ -26,7 +27,7 @@
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 
 ### Removed
-- Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
+- Removed `roster:cache:warmup` command.
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 - Removed `roster:ingest` command.
@@ -40,18 +41,18 @@
 ## 1.8.1 - 2020-10-27
 
 ### Changed
-- Switched from offset based pagination to cursor based in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command for better performance.
+- Switched from offset based pagination to cursor based in `roster:cache:warmup` command for better performance.
 - Switched from ORM to native queries in [roster:ingest:user](docs/cli/user-ingester-command.md) command for better performance.
 
 ### Fixed
-- Fixed bug in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed bug in `roster:cache:warmup` command where lack of order by clause caused wrong pagination with PostgreSQL.
 - Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
 
 ## 1.8.0 - 2020-10-08
 
 ### Added
 - Added possibility to specify LTI key and secret through environment variables.
-- Added `modulo` and `remainder` options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command for parallelized cache warmups. More info [here](docs/cli/cache-warmer-command.md#advanced-usage).
+- Added `modulo` and `remainder` options to `roster:cache:warmup` command for parallelized cache warmups. More info [here](docs/cli/cache-warmer-command.md#advanced-usage).
 - Added separate log channel for cache warmup for better trackability of failed cache warmups.
 - Added possibility to ingest multiple assignments per user with [roster:ingest:user](docs/cli/user-ingester-command.md) command. More details [here](docs/cli/user-ingester-command.md#user-ingestion-with-multiple-assignments).
 
@@ -153,7 +154,7 @@
 
 ### Added
 - Added `groupId` property to `User` entity for logical grouping of users.
-- Added possibility to warm up result cache by line item ids or user ids in [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
+- Added possibility to warm up result cache by line item ids or user ids in `roster:cache:warmup` command.
 - Introduced LTI load balancing interface, implemented `User` group id based LTI load balancing strategy.
 
 ### Changed
