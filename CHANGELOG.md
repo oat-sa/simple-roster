@@ -22,18 +22,17 @@
 - Renamed `.env.dist` to `.env` based on [Symfony recommendations](https://symfony.com/doc/current/configuration/dot-env-changes.html).
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
-- Native user ingestion command has changed from `roster:native-ingest:user` to [roster:ingest:user](docs/cli/user-ingester-command.md).
-- Cache warmer command has changed from `roster:doctrine-result-cache:warmup` to `roster:cache:warmup`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 
 ### Removed
-- Removed `roster:cache:warmup` command.
-- Removed `lti_instances.yaml` configuration file.
-- Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 - Removed `roster:ingest` command.
+- Removed `roster:native-ingest:user` command.
+- Removed `roster:cache:warmup` command.
 - Removed `roster:assignments:bulk-create` command.
 - Removed `roster:assignments:bulk-cancel` command.
-- User ingester command has been removed.
+- Removed `lti_instances.yaml` configuration file.
+- Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
+
 
 ### Fixed
 - Fixed HTTP code returned in case assignment exists but unavailable for `getUserAssignmentLtiLink` endpoint.
