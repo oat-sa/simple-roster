@@ -102,15 +102,15 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             'Simple Roster - Assignment Ingester',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'Executing ingestion...',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 18 assignments have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM assignments"',

@@ -84,15 +84,15 @@ class LineItemIngesterCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             'Simple Roster - Line Item Ingester',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'Executing ingestion...',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 6 line items have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM line_items"',

@@ -88,15 +88,15 @@ class UserIngesterCommandTest extends KernelTestCase
 
         self::assertStringContainsString(
             'Simple Roster - User Ingester',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'Executing ingestion...',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 10 users have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
             'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM users"',
