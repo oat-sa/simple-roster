@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UpdateLtiOutcomeAction implements OAuthSignatureValidatedActionInterface
+class UpdateLti1p1OutcomeAction implements OAuthSignatureValidatedActionInterface
 {
     /** @var ReplaceResultSourceIdExtractor */
     private $replaceResultSourceIdExtractor;

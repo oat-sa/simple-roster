@@ -138,7 +138,7 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
             'resource_link_id' => $assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate(
-                'updateLtiOutcome',
+                'updateLti1p1Outcome',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
