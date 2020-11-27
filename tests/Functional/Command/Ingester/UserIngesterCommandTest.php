@@ -86,10 +86,14 @@ class UserIngesterCommandTest extends KernelTestCase
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(User::class)->findAll());
 
-        $display = $this->commandTester->getDisplay(true);
-
-        self::assertStringContainsString('Simple Roster - User Ingester', $display);
-        self::assertStringContainsString('Executing ingestion...', $display);
+        self::assertStringContainsString(
+            'Simple Roster - User Ingester',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+        self::assertStringContainsString(
+            'Executing ingestion...',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 10 users have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay())

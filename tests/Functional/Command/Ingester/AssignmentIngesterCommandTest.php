@@ -100,10 +100,13 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
 
-        $display = $this->commandTester->getDisplay(true);
-
-        self::assertStringContainsString('Simple Roster - Assignment Ingester', $display);
-        self::assertStringContainsString('Executing ingestion...', $display);
+        self::assertStringContainsString(
+            'Simple Roster - Assignment Ingester',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+        self::assertStringContainsString('Executing ingestion...',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 18 assignments have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay())

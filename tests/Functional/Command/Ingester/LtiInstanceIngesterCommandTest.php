@@ -81,10 +81,13 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(LtiInstance::class)->findAll());
 
-        $display = $this->commandTester->getDisplay(true);
-
-        self::assertStringContainsString('Simple Roster - LTI Instance Ingester', $display);
-        self::assertStringContainsString('Executing ingestion...', $display);
+        self::assertStringContainsString(
+            'Simple Roster - LTI Instance Ingester',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
+        self::assertStringContainsString('Executing ingestion...',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 5 LTI instances have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay())
