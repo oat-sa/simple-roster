@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\LtiInstanceIngesterCommand;
 use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -35,6 +36,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use CsvIngestionTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -86,6 +88,10 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 5 LTI instances have been successfully ingested.',
             $display
+        );
+        self::assertStringContainsString(
+            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM lti_instances"',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
     }
 

@@ -20,19 +20,28 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
+namespace OAT\SimpleRoster\Tests\Unit\Http\Exception;
 
 use Exception;
-use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\Http\Exception\RequestEntityTooLargeHttpException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
-class FindUserCriteriaTest extends TestCase
+class RequestEntityTooLargeHttpExceptionTest extends TestCase
 {
-    public function testItThrowsExceptionIfUndefinedCriterionIsRequested(): void
+    public function testItIsException(): void
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Criterion is not defined.');
+        self::assertInstanceOf(RuntimeException::class, new RequestEntityTooLargeHttpException());
+    }
 
-        (new FindUserCriteria())->getEuclideanDivisionCriterion();
+    public function testDefaultValues(): void
+    {
+        $previousException = new Exception();
+        $subject = new RequestEntityTooLargeHttpException('Custom error message', $previousException);
+
+        self::assertSame(413, $subject->getStatusCode());
+        self::assertSame(0, $subject->getCode());
+        self::assertSame('Custom error message', $subject->getMessage());
+        self::assertSame($previousException, $subject->getPrevious());
     }
 }

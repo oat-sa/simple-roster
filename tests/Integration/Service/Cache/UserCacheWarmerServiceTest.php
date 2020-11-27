@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class UserCacheWarmerServiceTest extends KernelTestCase
 {
@@ -43,7 +43,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
     /** @var UserCacheWarmerService */
     private $subject;
 
-    /** @var InMemoryTransport */
+    /** @var TransportInterface */
     private $cacheWarmupTransport;
 
     protected function setUp(): void

@@ -28,7 +28,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
-// TODO Rename?
 class UserCacheWarmerService
 {
     private const MESSAGE_SIZE = 100;

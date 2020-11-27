@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Command\Cache;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Command\Cache\LtiInstanceCacheWarmerCommand;
@@ -30,9 +29,6 @@ use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundExceptio
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Input\Input;
-use Symfony\Component\Console\Output\Output;
 
 class LtiInstanceCacheWarmerCommandTest extends TestCase
 {

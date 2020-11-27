@@ -14,16 +14,24 @@
     },
     "mutators": {
         "@default": true,
+        "CastString": false,
+        "CastBool": false,
+        "CastInt": false,
+        "DecrementInteger": false,
+        "global-ignoreSourceCodeByRegex": [
+            "\\$this->symfonyStyle->newLine.*",
+            ".*$this->isDryRun.*"
+        ],
         "MethodCallRemoval": {
-            "ignore": [
-                "Symfony\\Component\\Console\\Helper\\ProgressBar",
-                "OAT\\SimpleRoster\\Repository\\AbstractRepository::flush",
-                "Symfony\\Component\\Console\\Style\\SymfonyStyle::newLine"
+            "ignoreSourceCodeByRegex": [
+                "\\$this->progressBar->.*",
+                "\\$this->symfonyStyle->title.*",
+                ".*$->flush.*"
             ]
         },
-        "LogicalNot": {
-            "ignoreSourceCodeByRegex": [
-                "\\!$this->isDryRun*"
+        "OneZeroInteger": {
+            "ignore": [
+                "OAT\\SimpleRoster\\Repository\\NativeAssignmentRepository::insertMultiple"
             ]
         }
     },

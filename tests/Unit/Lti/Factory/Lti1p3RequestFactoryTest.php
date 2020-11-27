@@ -40,7 +40,7 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var Lti1p3RequestFactory */
     private $subject;
 
-    /** @var Lti1p3MessageBuilder */
+    /** @var Lti1p3MessageBuilder|MockObject */
     private $ltiMessageBuilder;
 
     /** @var RegistrationRepositoryInterface|MockObject */

@@ -23,11 +23,12 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Lti\Builder;
 
 use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Token;
 use OAT\Bundle\Lti1p3Bundle\Repository\RegistrationRepository;
+use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -55,13 +56,14 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
         /** @var RegistrationRepository $registrationRepository */
         $registrationRepository = self::$container->get(RegistrationRepository::class);
+        /** @var Registration $registration */
         $registration = $registrationRepository->find('demo');
 
         /** @var User $user */
         $user = $this->getRepository(User::class)->find(1);
         $assignment = $user->getLastAssignment();
 
-        $loginHint = new LoginHintDto($user->getUsername(), (int)$assignment->getId());
+        $loginHint = new LoginHintDto((string)$user->getUsername(), (int)$assignment->getId());
 
         $ltiMessage = $this->subject->build($registration, $loginHint, $assignment);
         $ltiParameters = $ltiMessage->getParameters();
@@ -75,11 +77,11 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
         /** @var Parser $tokenParser */
         $tokenParser = self::$container->get('test.jwt_parser');
-
-        /** @var Token $token */
         $token = $tokenParser->parse($ltiParameters['lti_message_hint']);
 
         self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/launch_presentation'));
         self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/context'));
+        self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/roles'));
+        self::assertSame([LtiRequest::LTI_ROLE], $token->getClaim('https://purl.imsglobal.org/spec/lti/claim/roles'));
     }
 }

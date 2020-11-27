@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -35,6 +36,7 @@ class UserIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use CsvIngestionTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -89,6 +91,10 @@ class UserIngesterCommandTest extends KernelTestCase
         self::assertStringContainsString('Simple Roster - User Ingester', $display);
         self::assertStringContainsString('Executing ingestion...', $display);
         self::assertStringContainsString('[WARNING] [DRY RUN] 10 users have been successfully ingested.', $display);
+        self::assertStringContainsString(
+            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM users"',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
     }
 
     /**

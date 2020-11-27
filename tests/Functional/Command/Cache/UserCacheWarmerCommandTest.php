@@ -36,7 +36,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class UserCacheWarmerCommandTest extends KernelTestCase
 {
@@ -46,7 +46,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    /** @var InMemoryTransport */
+    /** @var TransportInterface */
     private $cacheWarmupTransport;
 
     protected function setUp(): void
@@ -148,7 +148,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         self::assertInstanceOf(WarmUpGroupedUserCacheMessage::class, $message);
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return $user->getUsername();
+            return (string)$user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $message->getUsernames());
@@ -183,7 +183,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         }
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return $user->getUsername();
+            return (string)$user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $processedUsernames);

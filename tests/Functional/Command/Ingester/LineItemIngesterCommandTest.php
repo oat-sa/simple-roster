@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\LineItemIngesterCommand;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use ReflectionException;
@@ -35,6 +36,7 @@ class LineItemIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use CsvIngestionTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -85,6 +87,10 @@ class LineItemIngesterCommandTest extends KernelTestCase
         self::assertStringContainsString('Simple Roster - Line Item Ingester', $display);
         self::assertStringContainsString('Executing ingestion...', $display);
         self::assertStringContainsString('[WARNING] [DRY RUN] 6 line items have been successfully ingested.', $display);
+        self::assertStringContainsString(
+            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM line_items"',
+            $this->normalizeDisplay($this->commandTester->getDisplay())
+        );
     }
 
     /**

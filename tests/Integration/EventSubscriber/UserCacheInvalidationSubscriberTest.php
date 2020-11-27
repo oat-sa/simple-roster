@@ -34,14 +34,14 @@ use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class UserCacheInvalidationSubscriberTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var InMemoryTransport */
+    /** @var TransportInterface */
     private $cacheWarmupTransport;
 
     /** @var CacheProvider */
@@ -98,8 +98,6 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
     public function testItInvalidatesCacheUponAssignmentEntityUpdate(): void
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
-
-        $this->cacheWarmupTransport->reset();
 
         $username = 'user1';
         $cacheId = $this->userCacheIdGenerator->generate($username);

@@ -55,12 +55,14 @@ class AssignmentDtoCollection implements Countable, IteratorAggregate
      */
     public function getAllUsernames(): array
     {
-        return array_unique(
-            array_map(
-                static function (AssignmentDto $assignmentDto): string {
-                    return $assignmentDto->getUsername();
-                },
-                $this->assignments
+        return array_values(
+            array_unique(
+                array_map(
+                    static function (AssignmentDto $assignmentDto): string {
+                        return $assignmentDto->getUsername();
+                    },
+                    $this->assignments
+                )
             )
         );
     }

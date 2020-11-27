@@ -9,6 +9,8 @@
 - [Synchronous cache warmup parallelization](#synchronous-cache-warmup-parallelization)
     - [Example](#example)
 - [Asynchronous cache warmup with Amazon SQS](#asynchronous-cache-warmup-with-amazon-sqs)
+    - [Setting up the worker](#setting-up-the-worker)
+    - [Deploying to production](#deploying-to-production)
     
 ## Usage
 
@@ -152,8 +154,8 @@ You’ll want one or more “workers” running at all times. To do that, use a 
 - __Don’t Let Workers Run Forever__
 
 Some services (like Doctrine’s EntityManager) will consume more memory over time. So, instead of allowing your worker to run forever, 
-use a flag like `messenger:consume --limit=10` to tell your worker to only handle 10 messages before exiting (then Supervisor will create a new process). 
-There are also other options like `--memory-limit=128M` and `--time-limit=3600`.
+use a flag like `messenger:consume --limit=10` to tell your worker to only handle 10 messages before exiting 
+(then Supervisor will create a new process). There are also other options like `--memory-limit=128M` and `--time-limit=3600`.
 
 - __Restart Workers on Deploy__
 
