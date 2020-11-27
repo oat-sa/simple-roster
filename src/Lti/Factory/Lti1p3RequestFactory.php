@@ -110,7 +110,7 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
                 new BasicOutcomeClaim(
                     (string) $assignment->getId(),
                     $this->router->generate(
-                        'updateLtiOutcome',
+                        'updateLti1p3Outcome',
                         [],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     )
