@@ -73,4 +73,3 @@ class LineItemRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 }
-
