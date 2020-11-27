@@ -87,7 +87,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         self::assertStringContainsString('Executing ingestion...', $display);
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 5 LTI instances have been successfully ingested.',
-            $display
+            $this->normalizeDisplay($this->commandTester->getDisplay())
         );
         self::assertStringContainsString(
             'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM lti_instances"',
