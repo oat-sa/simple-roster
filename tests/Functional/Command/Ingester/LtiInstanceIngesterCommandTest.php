@@ -93,10 +93,6 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
             '[WARNING] [DRY RUN] 5 LTI instances have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
-        self::assertStringContainsString(
-            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM lti_instances"',
-            $this->normalizeDisplay($this->commandTester->getDisplay(true))
-        );
     }
 
     /**

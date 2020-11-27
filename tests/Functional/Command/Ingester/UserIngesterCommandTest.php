@@ -98,10 +98,6 @@ class UserIngesterCommandTest extends KernelTestCase
             '[WARNING] [DRY RUN] 10 users have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
-        self::assertStringContainsString(
-            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM users"',
-            $this->normalizeDisplay($this->commandTester->getDisplay(true))
-        );
     }
 
     /**

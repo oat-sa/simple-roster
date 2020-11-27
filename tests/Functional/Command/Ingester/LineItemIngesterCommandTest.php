@@ -94,10 +94,6 @@ class LineItemIngesterCommandTest extends KernelTestCase
             '[WARNING] [DRY RUN] 6 line items have been successfully ingested.',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
-        self::assertStringContainsString(
-            'To verify you can run: bin/console dbal:run-sql "SELECT COUNT(*) FROM line_items"',
-            $this->normalizeDisplay($this->commandTester->getDisplay(true))
-        );
     }
 
     /**
