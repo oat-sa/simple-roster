@@ -29,11 +29,14 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactoryInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLtiOutcomeActionTest extends WebTestCase
+class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
 
@@ -90,8 +93,17 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($ltiInstance, (string)$time);
 
-        /** @var string $xmlBody * */
-        $xmlBody = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
+        $this->setUuid4Values('e36f227c-2946-11e8-b467-0ed5f89f718b');
+
+        /** @var string $xmlRequestBody */
+        $xmlRequestBody = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml'
+        );
+
+        /** @var string $xmlResponseBody */
+        $xmlResponseBody = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
+        );
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
@@ -111,10 +123,11 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $xmlBody
+            $xmlRequestBody
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
 
         self::assertEquals(
             Assignment::STATE_READY,
@@ -244,5 +257,26 @@ class UpdateLtiOutcomeActionTest extends WebTestCase
         self::assertInstanceOf(Assignment::class, $assignment);
 
         return $assignment;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function setUuid4Values(string $uuid): void
+    {
+        $inter = $this->createMock(UuidInterface::class);
+
+        $factory = $this->createMock(UuidFactoryInterface::class);
+        $factory
+            ->expects(self::once())
+            ->method('uuid4')
+            ->willReturn($inter);
+
+        $inter
+            ->expects(self::once())
+            ->method('toString')
+            ->willReturn($uuid);
+
+        Uuid::setFactory($factory);
     }
 }
