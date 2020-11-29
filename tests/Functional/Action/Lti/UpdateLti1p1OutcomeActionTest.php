@@ -93,7 +93,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $time = time();
         $signature = $this->generateSignature($ltiInstance, (string)$time);
 
-        $this->setUuid4Values('e36f227c-2946-11e8-b467-0ed5f89f718b');
+        $this->setUuid4Value('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         /** @var string $xmlRequestBody */
         $xmlRequestBody = file_get_contents(
@@ -262,17 +262,17 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private function setUuid4Values(string $uuid): void
+    private function setUuid4Value(string $uuid): void
     {
-        $inter = $this->createMock(UuidInterface::class);
+        $uuidInterface = $this->createMock(UuidInterface::class);
 
         $factory = $this->createMock(UuidFactoryInterface::class);
         $factory
             ->expects(self::once())
             ->method('uuid4')
-            ->willReturn($inter);
+            ->willReturn($uuidInterface);
 
-        $inter
+        $uuidInterface
             ->expects(self::once())
             ->method('toString')
             ->willReturn($uuid);

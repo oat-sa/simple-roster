@@ -20,14 +20,25 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Generator;
+namespace OAT\SimpleRoster\Tests\Unit\Generator;
 
-use Ramsey\Uuid\Uuid;
+use OAT\SimpleRoster\Generator\MessageIdentifierGenerator;
+use PHPUnit\Framework\TestCase;
 
-class MessageIdentifierGenerator
+class MessageIdentifierGeneratorTest extends TestCase
 {
-    public function generate(): string
+    public function testGenerate(): void
     {
-        return Uuid::uuid4()->toString();
+        $subject = new MessageIdentifierGenerator();
+
+        $identifiers = [
+            $subject->generate(),
+            $subject->generate(),
+            $subject->generate(),
+            $subject->generate(),
+            $subject->generate(),
+        ];
+
+        self::assertEquals(count($identifiers), count(array_unique($identifiers)));
     }
 }
