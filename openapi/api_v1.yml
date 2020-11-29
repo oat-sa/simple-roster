@@ -210,7 +210,7 @@ paths:
 
     /v1/lti/outcome:
         post:
-            summary: LTI Basic Outcomes Service
+            summary: LTI 1.1 Basic Outcomes Service
             tags:
                 - LTI
             security: []
@@ -235,6 +235,34 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
+    /v1/lti1p3/outcome:
+        post:
+            summary: LTI 1.3 Basic Outcomes Service
+            tags:
+                - LTI
+            security:
+                -   bearerAuth: [ ]
+            parameters:
+                -   name: Authorization
+                    description: OAuth authorization header
+                    in: header
+                    schema:
+                        type: string
+                        example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJ.eyJhdWQiOiJkZW1vIiwianRpI.BraFieX8LLYfAu5Pz5vpvzxTd
+            requestBody:
+                content:
+                    application/xml: { }
+            responses:
+                204:
+                    description: Success
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
 
 components:
     securitySchemes:
@@ -245,6 +273,10 @@ components:
         apiKeyAuth:
             type: http
             scheme: bearer
+        bearerAuth: # arbitrary name for the security scheme
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
     schemas:
         Assignment:
             type: object
