@@ -107,6 +107,14 @@ Once all the commands have finished, the result cache should be warmed up for al
 
 ## Asynchronous cache warmup with Amazon SQS
 
+For cache warmup a [Standard Queue](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html) type is recommended to setup.
+
+It provides:
+
+- __Unlimited Throughput:__ Standard queues support a nearly unlimited number of transactions per second (TPS) per API action.
+- __At-Least-Once Delivery:__ A message is delivered at least once, but occasionally more than one copy of a message is delivered. For cache warmup this is acceptable.
+- __Best-Effort Ordering:__ Occasionally, messages might be delivered in an order different from which they were sent. For cache warmup order of messages is not relevant.
+
 Amazon SQS queue setup can be done by setting up the `MESSENGER_TRANSPORT_DSN` environment variable in your `.env.local` file:
 
 Here is an example:
@@ -136,6 +144,8 @@ For the full list of options please refer to the official documentation: [https:
 ### Setting up the worker
 
 To consume cache warmup messages asynchronously you can use the following command:
+
+> You can also start any number of workers in parallel.
 
 ```shell script
 $ sudo -u www-data bin/console messenger:consume cache-warmup

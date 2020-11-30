@@ -236,6 +236,7 @@ EOF
             } while ($resultSet->hasMore());
 
             $progressBar->finish();
+            $this->symfonyStyle->newLine(2);
 
             $this->symfonyStyle->success(
                 sprintf(
