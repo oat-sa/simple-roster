@@ -14,6 +14,7 @@
         "aws/aws-sdk-php-symfony": "^2.0",
         "doctrine/annotations": "^1.6",
         "doctrine/doctrine-bundle": "^2.0",
+        "doctrine/orm": "^2.7",
         "league/csv": "^9.0",
         "league/flysystem-aws-s3-v3": "1.0.27",
         "league/flysystem-bundle": "^1.5",
