@@ -50,7 +50,7 @@ class XmlResponderTest extends TestCase
         $this->subject = new XmlResponder($this->twig, $this->messageIdentifierGenerator);
     }
 
-    public function testCreateReplaceResultResponse()
+    public function testCreateReplaceResultResponse(): void
     {
         $this->twig
             ->expects(self::once())
