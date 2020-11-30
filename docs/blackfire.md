@@ -9,10 +9,12 @@
 
 ## Configuration
 
-Blackfire probe is coming out-of-the-box with docker configuration, all you have to do is to set up your credentials in the `.env.local` file:
+Blackfire probe is coming out-of-the-box with docker configuration, all you have to do is to enable it and to set up 
+your credentials in the `.env.local` file:
 
 | Environment variable | Description |
 |----------------------|-------------|
+| `BLACKFIRE_ENABLED` | To enable blackfire profiling `[default: false]` |
 | `BLACKFIRE_SERVER_ID` | Blackfire server ID. |
 | `BLACKFIRE_SERVER_TOKEN` | Blackfire server token. |
 | `BLACKFIRE_CLIENT_ID` | Sets the client ID from the Client ID/Client Token credentials pair. |

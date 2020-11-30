@@ -42,7 +42,9 @@ if ($_SERVER['APP_DEBUG']) {
     }
 }
 
-$isBlackfireProfilingRequested = $input->hasParameterOption('--blackfire', true);
+$isBlackfireProfilingRequested =
+    $_ENV['BLACKFIRE_ENABLED'] == true
+    && $input->hasParameterOption('--blackfire', true);
 
 if ($isBlackfireProfilingRequested) {
     $config = new ClientConfiguration(

@@ -54,7 +54,9 @@ if ($trustedHosts = $_SERVER['TRUSTED_HOSTS'] ?? false) {
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
 
-$isBlackfireProfilingRequested = $request->headers->has('X-Blackfire');
+$isBlackfireProfilingRequested =
+    $_ENV['BLACKFIRE_ENABLED'] == true
+    && $request->headers->has('X-Blackfire');
 
 if ($isBlackfireProfilingRequested) {
     $config = new ClientConfiguration(
