@@ -13,7 +13,7 @@
 - Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
 - Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/)
 - Added `LTI_VERSION`, `LTI1P3_SERVICE_ENCRYPTION_KEY` and `LTI1P3_REGISTRATION_ID` environment variables.
-- Added possibility to process a `basic outcome replaceReplace` request using LTI 1.3 flow.
+- Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.
@@ -25,7 +25,8 @@
 - Native user ingestion command has changed from `roster:native-ingest:user` to [roster:ingest:user](docs/cli/user-ingester-command.md).
 - Cache warmer command has changed from `roster:doctrine-result-cache:warmup` to `roster:cache:warmup`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
-- Changed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction`
+- Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
+- Changed response on `UpdateLti1p1OutcomeAction` to return valid XML.
 
 ### Removed
 - Removed `user-ids` and `line-item-ids` input options of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
