@@ -10,11 +10,11 @@ pipeline {
         HOME = '.'
     }
     stages {
-        environment {
-            APP_ENV=test
-            APP_DEBUG=true
-        }
         stage('Tests') {
+            environment {
+                APP_ENV=test
+                APP_DEBUG=true
+            }
             options {
                 skipDefaultCheckout()
             }
