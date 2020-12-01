@@ -69,15 +69,7 @@ class UpdateLineItemValidator
             );
         }
 
-        throw new BadRequestHttpException(
-            sprintf(
-                'Invalid Request Body: %s',
-                implode(
-                    " ",
-                    $errorsRaw
-                )
-            )
-        );
+        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $errorsRaw)));
     }
 
     /**
