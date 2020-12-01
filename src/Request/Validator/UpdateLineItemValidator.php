@@ -59,17 +59,17 @@ class UpdateLineItemValidator
             return;
         }
 
-        $errorsRaw = [];
+        $rawErrors = [];
         /** @var ConstraintViolationInterface $error */
         foreach ($errors as $error) {
-            $errorsRaw[] = sprintf(
+            $rawErrors[] = sprintf(
                 "%s -> %s",
                 $error->getPropertyPath(),
                 $error->getMessage()
             );
         }
 
-        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $errorsRaw)));
+        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $rawErrors)));
     }
 
     /**

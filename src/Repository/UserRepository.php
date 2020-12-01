@@ -60,10 +60,6 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @param string $username
-     *
-     * @return User
-     *
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
@@ -92,10 +88,6 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @param int $limit
-     * @param int|null $lastUserId
-     * @param FindUserCriteria|null $criteria
-     * @return UsernameResultSet
      * @throws Exception
      */
     public function findAllUsernamesPaged(
