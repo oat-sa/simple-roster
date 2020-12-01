@@ -22,6 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
+use Carbon\Carbon;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -35,9 +41,13 @@ use Symfony\Component\HttpFoundation\Response;
 class UpdateLti1p3OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
+    use SecurityTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
+
+    /** @var RegistrationInterface */
+    private $registration;
 
     protected function setUp(): void
     {
@@ -46,17 +56,26 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $this->kernelBrowser = self::createClient();
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
+        $this->registration = static::$container
+            ->get(RegistrationRepositoryInterface::class)
+            ->find('testRegistration');
     }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $this->kernelBrowser->request('POST', '/api/v1/lti/outcome');
+        $this->kernelBrowser->request('POST', '/api/v1/lti1p3/outcome');
 
         self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
+        $credentials = $this->generateCredentials(
+            $this->registration,
+            ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
+        );
+
         $this->setUuid4Value('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         /** @var string $xmlRequestBody */
@@ -76,18 +95,133 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'text/xml',
-                'Authorization' => $this->getValidToken()
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
             ],
             $xmlRequestBody
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
+    }
 
-        self::assertEquals(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
+    public function testItReturns401IfWithInvalidScope(): void
+    {
+        $credentials = $this->generateCredentials(
+            $this->registration,
+            ['invalid']
         );
+
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+            ],
+            ''
+        );
+
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertStringContainsString(
+            'JWT access token scopes are invalid',
+            (string)$this->kernelBrowser->getResponse()->getContent()
+        );
+    }
+
+    public function testItReturnsUnauthorizedResponseWithoutBearer(): void
+    {
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+            ],
+            ''
+        );
+
+        $response = $this->kernelBrowser->getResponse();
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        $this->assertStringContainsString(
+            'A Token was not found in the TokenStorage',
+            (string)$response->getContent()
+        );
+    }
+
+    public function testItReturnsUnauthorizedResponseWithInvalidToken(): void
+    {
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+                'HTTP_AUTHORIZATION' => 'Bearer invalid'
+            ],
+            ''
+        );
+
+        $response = $this->kernelBrowser->getResponse();
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        $this->assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
+    }
+
+    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
+    {
+        $credentials = $this->generateCredentials(
+            $this->registration,
+            ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
+        );
+
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+            ],
+            'invalidXml'
+        );
+
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
+    }
+
+    public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
+    {
+        $credentials = $this->generateCredentials(
+            $this->registration,
+            ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
+        );
+
+        /** @var string $xmlBody */
+        $xmlBody = file_get_contents(
+            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml'
+        );
+
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'text/xml',
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+            ],
+            $xmlBody
+        );
+
+        self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     private function getAssignment(): Assignment
@@ -100,11 +234,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         self::assertInstanceOf(Assignment::class, $assignment);
 
         return $assignment;
-    }
-
-    private function getValidToken(): string
-    {
-        return 'Bearer token';
     }
 
     /**
@@ -126,5 +255,21 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ->willReturn($uuid);
 
         Uuid::setFactory($factory);
+    }
+
+    private function generateCredentials(
+        RegistrationInterface $registration,
+        array $scopes = ['allowed-scope']
+    ): string {
+        $now = Carbon::now();
+
+        return (new Builder())
+            ->permittedFor($audience ?? $registration->getClientId())
+            ->identifiedBy(uniqid())
+            ->issuedAt($now->getTimestamp())
+            ->expiresAt($now->addSeconds(3600)->getTimestamp())
+            ->withClaim('scopes', $scopes)
+            ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey())
+            ->__toString();
     }
 }
