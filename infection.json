@@ -26,6 +26,7 @@
             "ignoreSourceCodeByRegex": [
                 "\\$this->progressBar->.*",
                 "\\$this->symfonyStyle->title.*",
+                "\\$this->symfonyStyle->comment*",
                 ".*$->flush.*"
             ]
         },
