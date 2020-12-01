@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\WebHook;
 
-use _HumbugBoxf99c1794c57d\Symfony\Component\Console\Exception\LogicException;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
