@@ -1,6 +1,7 @@
 FROM php:7.3-fpm-alpine
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
+ENV XDEBUG_MODE=off
 
 RUN apk update \
     	&& apk upgrade \

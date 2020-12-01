@@ -25,7 +25,6 @@ services:
             context: ./docker/phpfpm
         environment:
             COMPOSER_AUTH: $COMPOSER_AUTH
-            XDEBUG_MODE: "off"
         expose:
             - 9000
         networks:
