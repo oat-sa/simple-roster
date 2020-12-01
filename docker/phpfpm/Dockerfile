@@ -5,12 +5,12 @@ ENV XDEBUG_MODE=off
 
 RUN apk update \
     	&& apk upgrade \
-    	&& apk add zip unzip libpng-dev jpeg-dev libpq wget sqlite sqlite-dev php7-sqlite3 libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql postgresql-dev zstd-dev bash
+    	&& apk add zip unzip libpng-dev jpeg-dev libpq wget sqlite-dev php7-sqlite3 libsodium-dev \
+    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
+RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
 RUN yes | pecl install igbinary apcu xdebug redis
 
