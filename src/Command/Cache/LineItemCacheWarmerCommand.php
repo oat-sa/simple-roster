@@ -99,6 +99,9 @@ class LineItemCacheWarmerCommand extends Command
         $this->symfonyStyle->title('Simple Roster - Line Item Cache Warmer');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
