@@ -5,7 +5,7 @@ ENV XDEBUG_MODE=off
 
 RUN apk update \
     	&& apk upgrade \
-    	&& apk add zip unzip libpng-dev jpeg-dev libpq wget sqlite-dev php7-sqlite3 libsodium-dev \
+    	&& apk add zip unzip libpng-dev jpeg-dev libpq wget sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
