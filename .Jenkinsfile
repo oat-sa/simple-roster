@@ -2,7 +2,7 @@ pipeline {
     agent {
         dockerfile {
             filename 'Dockerfile'
-            dir 'docker/jenkins'
+            dir 'docker/phpfpm'
             label 'builder'
         }
     }
@@ -10,6 +10,10 @@ pipeline {
         HOME = '.'
     }
     stages {
+        environment {
+            APP_ENV=test
+            APP_DEBUG=true
+        }
         stage('Tests') {
             options {
                 skipDefaultCheckout()
@@ -39,7 +43,7 @@ pipeline {
                 )
                 sh(
                     label: 'Running testing suite - PHPUnit & Infection',
-                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                    script: 'XDEBUG_MODE=coverage && ./vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
                 sh(
                     label: 'Checking test coverage - PHPUnit',

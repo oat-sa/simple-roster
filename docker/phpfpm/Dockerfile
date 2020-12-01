@@ -1,18 +1,17 @@
-FROM php:7.3-fpm
+FROM php:7.3-fpm-alpine
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 
-RUN apt-get update && \
-    apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libsodium-dev zlib1g-dev libicu-dev g++ libzip-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update \
+    	&& apk upgrade \
+    	&& apk add zip unzip libpng-dev jpeg-dev libpq wget sqlite sqlite-dev php7-sqlite3 libsodium-dev \
+    	zlib-dev icu-dev g++ libzip-dev postgresql postgresql-dev zstd-dev bash
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
-RUN yes | pecl install igbinary apcu xdebug
-RUN pecl install redis
+RUN yes | pecl install igbinary apcu xdebug redis
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install pdo_mysql && \
