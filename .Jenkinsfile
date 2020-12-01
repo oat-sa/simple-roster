@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('Tests') {
             environment {
-                APP_ENV=test
-                APP_DEBUG=true
+                APP_ENV="test"
+                APP_DEBUG="true"
             }
             options {
                 skipDefaultCheckout()
