@@ -55,7 +55,7 @@ class UpdateLineItemValidator
 
         $errors = $this->validator->validate($responseBody, $this->getConstraints());
 
-        if ($errors->count() < 1) {
+        if ($errors->count() === 0) {
             return;
         }
 
