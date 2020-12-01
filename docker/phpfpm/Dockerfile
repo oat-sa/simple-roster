@@ -59,4 +59,6 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
 RUN rm -rf /var/www/html \
-    && chmod 0777 /tmp/
+    && chmod 0777 /tmp/ \
+    && rm -rf /tmp/* \
+    && rm -rf /var/cache/apk/*
