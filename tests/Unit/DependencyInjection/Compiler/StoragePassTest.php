@@ -37,13 +37,15 @@ class StoragePassTest extends TestCase
             ->method('findTaggedServiceIds')
             ->with('flysystem.storage')
             ->willReturn([
-                'testService1' => ['testTag'],
-                'testService2' => ['testTag'],
-                'testService3' => ['testTag'],
+                'testService1.storage' => ['testTag'],
+                'testService2.storage' => ['testTag'],
+                'testService3.storage' => ['testTag'],
             ]);
 
         $assertDefinitionCallback = static function (Definition $definition): bool {
-            return $definition->hasTag('app.storage');
+            return
+                $definition->hasTag('app.storage') &&
+                count($definition->getArguments()) === 2;
         };
 
         $containerBuilder

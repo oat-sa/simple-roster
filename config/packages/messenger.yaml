@@ -1,0 +1,8 @@
+framework:
+    messenger:
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            cache-warmup: 'sync://'
+
+        routing:
+            'OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage': cache-warmup

@@ -17,7 +17,8 @@
         <properties>
             <property name="exceptions">
                 <value>
-                    \Monolog\Logger,Carbon\Carbon,
+                    \Monolog\Logger,
+                    \Carbon\Carbon,
                     \League\Csv\Reader,
                     \Symfony\Component\HttpFoundation\JsonResponse,
                     \Symfony\Component\HttpFoundation\Request,
@@ -31,9 +32,7 @@
         </properties>
     </rule>
     <rule ref="rulesets/controversial.xml"/>
-    <rule ref="rulesets/design.xml">
-        <exclude name="CouplingBetweenObjects"/> <!--todo-->
-    </rule>
+    <rule ref="rulesets/design.xml"/>
     <rule ref="rulesets/naming.xml/ShortVariable">
         <properties>
             <property name="exceptions" value="id"/>

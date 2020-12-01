@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service\Bulk;
 
+use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Entity\Assignment;
@@ -29,10 +30,10 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
@@ -83,6 +84,14 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Bulk assignments create error: wrong type.',
+                ['operation' => $expectedFailingOperation],
+            );
+
         self::assertSame([
             'data' => [
                 'applied' => false,
@@ -94,14 +103,43 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
     }
 
-    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    public function testItLogsUnexpectedException(): void
     {
         $this->userRepository
             ->method('findByUsernameWithAssignments')
-            ->willReturnCallback(static function (string $username) {
+            ->willThrowException(new RuntimeException('Something unexpected happened'));
+
+        $expectedOperation = new BulkOperation('testUser', BulkOperation::TYPE_CREATE);
+        $bulkOperationCollection = (new BulkOperationCollection())->add($expectedOperation);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Bulk assignments create error: Something unexpected happened',
+                ['operation' => $expectedOperation]
+            );
+
+        self::assertSame([
+            'data' => [
+                'applied' => false,
+                'results' => [
+                    'testUser' => false,
+                ],
+            ],
+        ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
+    }
+
+    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    {
+        $expectedLineItem = new LineItem();
+
+        $this->userRepository
+            ->method('findByUsernameWithAssignments')
+            ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
                 return (new User())
                     ->setUsername($username)
-                    ->addAssignment((new Assignment())->setLineItem(new LineItem()));
+                    ->addAssignment((new Assignment())->setLineItem($expectedLineItem));
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -112,6 +150,24 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         $this->entityManager
             ->expects(self::once())
             ->method('flush');
+
+        $this->logger
+            ->expects(self::exactly(3))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    "Successful assignment creation (username = 'test').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment creation (username = 'test1').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment creation (username = 'test2').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+            );
 
         $this->subject->process($bulkOperationCollection);
     }
