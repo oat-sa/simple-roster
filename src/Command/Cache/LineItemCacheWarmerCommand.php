@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Command\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
@@ -37,7 +38,7 @@ use Throwable;
 
 class LineItemCacheWarmerCommand extends Command
 {
-//    use BlackfireProfilerTrait;
+    use BlackfireProfilerTrait;
 
     public const NAME = 'roster:cache-warmup:line-item';
 
@@ -88,7 +89,7 @@ class LineItemCacheWarmerCommand extends Command
     {
         parent::configure();
 
-//        $this->addBlackfireProfilingOption();
+        $this->addBlackfireProfilingOption();
 
         $this->setDescription('Line Item cache warmup');
     }
