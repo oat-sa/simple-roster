@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\WebHook\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
@@ -49,6 +50,9 @@ class UpdateLineItemsService
         $this->logger = $logger;
     }
 
+    /**
+     * @throws ORMException
+     */
     public function handleUpdates(UpdateLineItemCollection $collection): UpdateLineItemCollection
     {
         $knownUpdates = $collection
@@ -107,7 +111,7 @@ class UpdateLineItemsService
                 ]
             );
 
-            $this->entityManager->persist($lineItem);
+            $this->lineItemRepository->save($lineItem);
 
             $duplicatedUpdates->setStatus(UpdateLineItemDto::STATUS_IGNORED);
             $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);

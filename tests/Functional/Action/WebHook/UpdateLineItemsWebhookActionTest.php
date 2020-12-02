@@ -69,8 +69,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
     /**
      * @dataProvider provideWrongRequestBodies
-     * @param array|null $requestBody
-     * @param string $expectedMessage
+     *
      * @throws JsonException
      */
     public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(
@@ -281,7 +280,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ],
                 'expectedMessage' => $missingDeliveryUri,
             ],
-            'aliasWrongType' => [
+            'WrongAliasType' => [
                 'requestBody' => [
                     'source' => 'https://someinstance.taocloud.org/',
                     'events' => [

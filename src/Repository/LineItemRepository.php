@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
@@ -71,5 +72,13 @@ class LineItemRepository extends AbstractRepository
             ->getQuery()
             ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function save(LineItem $lineItem): void
+    {
+        $this->_em->persist($lineItem);
     }
 }
