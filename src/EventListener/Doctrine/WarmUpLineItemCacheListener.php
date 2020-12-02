@@ -62,6 +62,8 @@ class WarmUpLineItemCacheListener implements EntityListenerInterface
     {
         $id = (int)$lineItem->getId();
         $this->cacheProvider->delete($this->lineItemCacheIdGenerator->generate($id));
+
+        // Refresh the cache by query
         $this->lineItemRepository->findById($id);
     }
 }
