@@ -2,5 +2,17 @@ services:
     _defaults:
         public: true
 
+    test.lti_repository:
+        alias: OAT\SimpleRoster\Repository\LtiInstanceRepository
+        public: true
+
+    test.user_repository:
+        alias: OAT\SimpleRoster\Repository\UserRepository
+        public: true
+
+    test.jwt_parser:
+        alias: Lcobucci\JWT\Parser
+        public: true
+
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\ArrayCache

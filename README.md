@@ -15,12 +15,13 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 
 - [Docker development](docs/docker-development.md)
 - [Local development](docs/local-development.md)
-- Features
+- [Features](#)
     - [Learning Tools Interoperability](docs/features/lti.md)
 - [OpenAPI documentation](#openapi-documentation)
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops-documentation.md)
 - [Continuous integration](docs/continuous-integration.md)
+- [Profiling with Blackfire](docs/blackfire.md)
 
 ## OpenAPI documentation
 
@@ -35,9 +36,10 @@ The application currently offers the following CLI commands:
 
 | Command                               | Description                   | Links                                                    |
 | --------------------------------------|:------------------------------|:---------------------------------------------------------|
+| `roster:cache-warmup:lti-instance`    | LTI instance cache warming    | [link](docs/cli/lti-instance-cache-warmer-command.md)    |
+| `roster:cache-warmup:user`            | User cache warming            | [link](docs/cli/user-cache-warmer-command.md)            |
+| `roster:garbage-collector:assignment` | Assignment garbage collection | [link](docs/cli/assignment-garbage-collector-command.md) |
 | `roster:ingest:lti-instance`          | LTI instance ingestion        | [link](docs/cli/lti-instance-ingester-command.md)        |
 | `roster:ingest:line-item`             | Line item instance ingestion  | [link](docs/cli/line-item-ingester-command.md)           |
 | `roster:ingest:user`                  | User ingestion                | [link](docs/cli/user-ingester-command.md)                |
 | `roster:ingest:assignment`            | Assignment ingestion          | [link](docs/cli/assignment-ingester-command.md)          |
-| `roster:cache:warmup`                 | Application cache warming     | [link](docs/cli/cache-warmer-command.md)                 |
-| `roster:garbage-collector:assignment` | Assignment garbage collection | [link](docs/cli/assignment-garbage-collector-command.md) |

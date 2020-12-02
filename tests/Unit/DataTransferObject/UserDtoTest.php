@@ -22,11 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 
-use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
-use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
-use OAT\SimpleRoster\DataTransferObject\UserDto;
-use OAT\SimpleRoster\Entity\Assignment;
 use InvalidArgumentException;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
 use PHPUnit\Framework\TestCase;
 
 class UserDtoTest extends TestCase

@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
 
-use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use PHPUnit\Framework\TestCase;
 
 class EuclideanDivisionCriterionTest extends TestCase

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTimeZone;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
@@ -98,6 +99,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
     {
+        Carbon::setTestNow();
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
@@ -126,14 +129,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentIsNotAvailable(): void
     {
-        Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
+        Carbon::setTestNow(Carbon::now()->add(new DateInterval('P3Y')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
-        $this->getEntityManager()->flush();
 
         $this->logInAs($user, $this->kernelBrowser);
 

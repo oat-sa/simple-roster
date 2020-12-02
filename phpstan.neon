@@ -12,9 +12,6 @@ parameters:
   doctrine:
     repositoryClass: OAT\SimpleRoster\Repository\AbstractRepository
   ignoreErrors:
-    # Symfony issue: https://github.com/phpstan/phpstan-symfony/issues/4
-    - message: '#^Service "[^"]+" is private.$#'
-      path: tests
     # In tests we control the JSON content, it will be always a valid string
     - message: '#^(.+) of function json_decode expects string, string\|false given.$#'
       path: tests

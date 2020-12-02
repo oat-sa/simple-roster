@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
 
-use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use Exception;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use PHPUnit\Framework\TestCase;
 
 class FindUserCriteriaTest extends TestCase

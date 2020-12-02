@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request;
 
-use OAT\SimpleRoster\Request\RequestIdStorage;
 use LogicException;
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\TestCase;
 
 class RequestIdStorageTest extends TestCase
