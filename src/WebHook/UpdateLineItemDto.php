@@ -67,6 +67,11 @@ class UpdateLineItemDto implements JsonSerializable
         $this->status = $status;
     }
 
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -100,5 +105,10 @@ class UpdateLineItemDto implements JsonSerializable
     public function getTriggeredTime(): DateTimeInterface
     {
         return $this->triggeredTime;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
     }
 }

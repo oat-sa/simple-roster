@@ -26,6 +26,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
+use Psr\Log\LoggerInterface;
 
 class UpdateLineItemsService
 {
@@ -35,10 +36,17 @@ class UpdateLineItemsService
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    public function __construct(LineItemRepository $lineItemRepository, EntityManagerInterface $entityManager)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        LineItemRepository $lineItemRepository,
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger
+    ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     public function handleUpdates(UpdateLineItemCollection $collection): UpdateLineItemCollection
@@ -69,21 +77,51 @@ class UpdateLineItemsService
         );
 
         foreach ($lineItems as $lineItem) {
-            $duplicatedEvents = $knownUpdates
+            $duplicatedUpdates = $knownUpdates
                 ->filter(
                     function (UpdateLineItemDto $dto) use ($lineItem): bool {
                         return $dto->getSlug() === $lineItem->getSlug();
                     }
                 );
 
-            $dto = $duplicatedEvents->findLastByTriggeredTime();
+            $dto = $duplicatedUpdates->findLastByTriggeredTime();
 
-            if (null !== $dto) {
-                $lineItem->setUri($dto->getLineItemUri());
-                $this->entityManager->persist($lineItem);
+            if (count((array)$duplicatedUpdates) > 1) {
+                $this->logger->warning(
+                    sprintf(
+                        'There are duplicated updates on the request. All of them will be ignore except update id %s. ',
+                        $dto->getId()
+                    ),
+                    [
+                        'uri' => $dto->getLineItemUri()
+                    ]
+                );
+            }
 
-                $duplicatedEvents->setStatus(UpdateLineItemDto::STATUS_IGNORED);
-                $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
+            $lineItem->setUri($dto->getLineItemUri());
+
+            $this->logger->info(
+                sprintf('The line item id %d was updated', $lineItem->getId()),
+                [
+                    'uri' => $dto->getLineItemUri()
+                ]
+            );
+
+            $this->entityManager->persist($lineItem);
+
+            $duplicatedUpdates->setStatus(UpdateLineItemDto::STATUS_IGNORED);
+            $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
+        }
+
+        /** @var UpdateLineItemDto $knownUpdate */
+        foreach ($knownUpdates as $knownUpdate) {
+            if ($knownUpdate->getStatus() === UpdateLineItemDto::STATUS_ERROR) {
+                $this->logger->error(
+                    sprintf('Impossible to update the line item. The slug %s does not exist.', $knownUpdate->getSlug()),
+                    [
+                        'updateId' => $knownUpdate->getId()
+                    ]
+                );
             }
         }
 
