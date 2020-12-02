@@ -44,7 +44,7 @@ class LineItemRepository extends AbstractRepository
     public function __construct(
         ManagerRegistry $registry,
         LineItemCacheIdGenerator $cacheIdGenerator,
-        int $lineItemCacheTtl = 3600
+        int $lineItemCacheTtl
     ) {
         parent::__construct($registry, LineItem::class);
         $this->cacheIdGenerator = $cacheIdGenerator;

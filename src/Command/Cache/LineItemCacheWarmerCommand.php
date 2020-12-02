@@ -65,7 +65,7 @@ class LineItemCacheWarmerCommand extends Command
         LineItemCacheIdGenerator $lineItemCacheIdGenerator,
         EntityManagerInterface $entityManager,
         LoggerInterface $cacheWarmupLogger,
-        int $lineItemCacheTtl = 3600
+        int $lineItemCacheTtl
     ) {
         parent::__construct(self::NAME);
 
