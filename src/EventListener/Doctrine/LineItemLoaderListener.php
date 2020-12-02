@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\EventListener\Doctrine;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
-class LineItemsLoaderListener implements EntityListenerInterface
+class LineItemLoaderListener implements EntityListenerInterface
 {
     /** @var LineItemRepository */
     private $lineItemRepository;

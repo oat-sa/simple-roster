@@ -50,7 +50,7 @@
             <lifecycle-callback type="preUpdate" method="refreshUpdatedAt"/>
         </lifecycle-callbacks>
         <entity-listeners>
-            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\LineItemsLoaderListener">
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\LineItemLoaderListener">
                 <lifecycle-callback type="postLoad" method="postLoad"/>
             </entity-listener>
         </entity-listeners>
