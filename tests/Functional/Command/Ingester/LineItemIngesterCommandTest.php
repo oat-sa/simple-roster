@@ -35,8 +35,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 class LineItemIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CommandDisplayNormalizerTrait;
     use CsvIngestionTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -81,9 +81,18 @@ class LineItemIngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(LineItem::class)->findAll());
+
+        self::assertStringContainsString(
+            'Simple Roster - Line Item Ingester',
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
+        );
+        self::assertStringContainsString(
+            'Executing ingestion...',
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
+        );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 6 line items have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
     }
 
@@ -119,7 +128,7 @@ class LineItemIngesterCommandTest extends KernelTestCase
         self::assertCount(6, $this->getRepository(LineItem::class)->findAll());
         self::assertStringContainsString(
             '[OK] 6 line items have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -142,7 +151,7 @@ class LineItemIngesterCommandTest extends KernelTestCase
         );
 
         self::assertSame(1, $output);
-        self::assertStringContainsString($expectedOutput, $this->normalizeDisplay($this->commandTester->getDisplay()));
+        self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
     public function provideInvalidSourceFiles(): array

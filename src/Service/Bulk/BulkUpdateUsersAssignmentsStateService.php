@@ -71,10 +71,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             try {
                 $this->processOperation($operation, $result);
             } catch (Throwable $exception) {
-                $this->logger->error(
-                    'Bulk assignments cancellation error: ' . $exception->getMessage(),
-                    ['operation' => serialize($operation)]
-                );
+                $this->logger->error('Bulk assignments cancellation error: ' . $exception->getMessage());
                 $result->addBulkOperationFailure($operation);
             }
         }

@@ -15,12 +15,13 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 
 - [Docker development](docs/docker-development.md)
 - [Local development](docs/local-development.md)
-- Features
+- [Features](#)
     - [Learning Tools Interoperability](docs/features/lti.md)
 - [OpenAPI documentation](#openapi-documentation)
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops-documentation.md)
 - [Continuous integration](docs/continuous-integration.md)
+- [Profiling with Blackfire](docs/blackfire.md)
 
 ## OpenAPI documentation
 
