@@ -27,10 +27,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
-use OAT\SimpleRoster\Command\Cache\LtiInstanceCacheWarmerCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
-use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
@@ -98,7 +96,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
-    public function testItDisplaysWarningIfThereAreNoLtiInstancesIngested(): void
+    public function testItDisplaysWarningIfThereAreNoLineItemsIngested(): void
     {
         self::assertSame(0, $this->commandTester->execute([], ['capture_stderr_separately' => true]));
 
