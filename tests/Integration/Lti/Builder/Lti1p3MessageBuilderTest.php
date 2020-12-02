@@ -24,6 +24,9 @@ namespace OAT\SimpleRoster\Tests\Integration\Lti\Builder;
 
 use Lcobucci\JWT\Parser;
 use OAT\Bundle\Lti1p3Bundle\Repository\RegistrationRepository;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
@@ -63,9 +66,12 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $user = $this->getRepository(User::class)->find(1);
         $assignment = $user->getLastAssignment();
 
-        $loginHint = new LoginHintDto((string)$user->getUsername(), (int)$assignment->getId());
+        $this->subject
+            ->withMessagePayloadClaim(new LaunchPresentationClaim())
+            ->withMessagePayloadClaim(new ContextClaim('id'))
+            ->withMessagePayloadClaim(new BasicOutcomeClaim('id', 'uri'));
 
-        $ltiMessage = $this->subject->build($registration, $loginHint, $assignment);
+        $ltiMessage = $this->subject->build($registration, $assignment);
         $ltiParameters = $ltiMessage->getParameters();
 
         self::assertSame('http://localhost:8888/lti1p3/oidc/initiation', $ltiMessage->getUrl());

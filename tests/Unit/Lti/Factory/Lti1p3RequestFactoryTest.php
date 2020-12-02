@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
@@ -34,6 +35,7 @@ use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactoryTest extends TestCase
 {
@@ -49,6 +51,9 @@ class Lti1p3RequestFactoryTest extends TestCase
     /** @var LtiConfiguration|MockObject */
     private $ltiConfiguration;
 
+    /** @var RouterInterface|MockObject */
+    private $router;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -56,11 +61,13 @@ class Lti1p3RequestFactoryTest extends TestCase
         $this->ltiMessageBuilder = $this->createMock(Lti1p3MessageBuilder::class);
         $this->registrationRepository = $this->createMock(RegistrationRepositoryInterface::class);
         $this->ltiConfiguration = $this->createMock(LtiConfiguration::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $this->subject = new Lti1p3RequestFactory(
             $this->registrationRepository,
             $this->ltiMessageBuilder,
-            $this->ltiConfiguration
+            $this->ltiConfiguration,
+            $this->router
         );
     }
 
@@ -87,26 +94,33 @@ class Lti1p3RequestFactoryTest extends TestCase
     {
         $expectedLtiLinkUrl = 'http://expected.url';
 
-        $ltiMessage = $this->createMock(LtiMessageInterface::class);
-        $ltiMessage
-            ->method('toUrl')
-            ->willReturn($expectedLtiLinkUrl);
-
-        $this->ltiMessageBuilder
-            ->expects(self::once())
-            ->method('build')
-            ->willReturn($ltiMessage);
-
         $this->registrationRepository
             ->method('find')
             ->willReturn($this->createMock(Registration::class));
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-        $assignment
-            ->method('getId')
-            ->willReturn(1);
 
-        $assignment->setUser((new User())->setUsername('testUser'));
+        $assignment = $this->createMock(Assignment::class);
+
+        $message = $this->createMock(LtiMessageInterface::class);
+        $message
+            ->expects(self::once())
+            ->method('toUrl')
+            ->willReturn($expectedLtiLinkUrl);
+
+        $this->ltiMessageBuilder
+            ->expects(self::exactly(3))
+            ->method('withMessagePayloadClaim')
+            ->willReturn($this->ltiMessageBuilder);
+
+        $this->ltiMessageBuilder
+            ->expects(self::once())
+            ->method('build')
+            ->willReturn($message);
+
+        $this->router
+            ->expects(self::once())
+            ->method('generate')
+            ->willReturn($expectedLtiLinkUrl);
 
         $request = $this->subject->create($assignment);
 

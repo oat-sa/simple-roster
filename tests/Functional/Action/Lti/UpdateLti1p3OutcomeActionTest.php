@@ -54,6 +54,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
+        /** @phpstan-ignore-next-line */
         $this->registration = static::$container
             ->get(RegistrationRepositoryInterface::class)
             ->find('testRegistration');
