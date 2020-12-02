@@ -96,10 +96,7 @@ class UpdateLineItemsService
                     sprintf(
                         'There are duplicated updates on the request. All of them will be ignore except update id %s. ',
                         $dto->getId()
-                    ),
-                    [
-                        'uri' => $dto->getLineItemUri()
-                    ]
+                    )
                 );
             }
 

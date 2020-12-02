@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 
 use Doctrine\Common\Cache\CacheProvider;
 use JsonException;
+use Monolog\Logger;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -135,6 +136,36 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         );
 
         $lineItemCache = $this->resultCacheImplementation->fetch('line_item_1');
+
+        $this->assertHasLogRecord(
+            [
+                'message' => 'Impossible to update the line item. The slug wrong-alias does not exist.',
+                'context' => [
+                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f'
+                ],
+            ],
+            Logger::ERROR
+        );
+
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The line item id 1 was updated',
+                'context' => [
+                    'uri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne'
+                ],
+            ],
+            Logger::INFO
+        );
+
+        $infoLog = 'There are duplicated updates on the request. '
+            . 'All of them will be ignore except update id lastDuplicatedEvent. ';
+
+        $this->assertHasLogRecord(
+            [
+                'message' => $infoLog,
+            ],
+            Logger::WARNING
+        );
 
         self::assertEquals(
             'https://docker.localhost/ontologies/tao.rdf#RightOne',
