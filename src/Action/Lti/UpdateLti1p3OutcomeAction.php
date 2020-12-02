@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use OAT\SimpleRoster\Responder\XmlResponder;
+use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,17 +40,17 @@ class UpdateLti1p3OutcomeAction
     /** @var CompleteUserAssignmentService */
     private $completeUserAssignmentService;
 
-    /** @var XmlResponder */
-    private $xmlResponder;
+    /** @var LtiOutcomeResponder */
+    private $ltiOutcomeResponder;
 
     public function __construct(
         ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor,
         CompleteUserAssignmentService $completeUserAssignmentService,
-        XmlResponder $xmlResponder
+        LtiOutcomeResponder $ltiOutcomeResponder
     ) {
         $this->replaceResultSourceIdExtractor = $replaceResultSourceIdExtractor;
         $this->completeUserAssignmentService = $completeUserAssignmentService;
-        $this->xmlResponder = $xmlResponder;
+        $this->ltiOutcomeResponder = $ltiOutcomeResponder;
     }
 
     public function __invoke(Request $request): Response
@@ -65,6 +65,6 @@ class UpdateLti1p3OutcomeAction
             throw new BadRequestHttpException($exception->getMessage());
         }
 
-        return $this->xmlResponder->createReplaceResultResponse($assignmentId);
+        return $this->ltiOutcomeResponder->createXmlResponse($assignmentId);
     }
 }

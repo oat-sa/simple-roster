@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Responder;
 use OAT\SimpleRoster\Generator\MessageIdentifierGenerator;
 use Twig\Environment;
 
-class XmlResponder
+class LtiOutcomeResponder
 {
     /** @var Environment */
     private $twig;
@@ -39,7 +39,7 @@ class XmlResponder
         $this->messageIdentifierGenerator = $messageIdentifierGenerator;
     }
 
-    public function createReplaceResultResponse(int $assignmentId): XmlResponse
+    public function createXmlResponse(int $assignmentId): XmlResponse
     {
         $xml = $this->twig->render(
             'basic-outcome/replace-result-response.xml.twig',

@@ -23,13 +23,13 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Responder;
 
 use OAT\SimpleRoster\Generator\MessageIdentifierGenerator;
-use OAT\SimpleRoster\Responder\XmlResponder;
+use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Responder\XmlResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class XmlResponderTest extends TestCase
+class LtiOutcomeResponderTest extends TestCase
 {
     /** @var MockObject|Environment */
     private $twig;
@@ -37,7 +37,7 @@ class XmlResponderTest extends TestCase
     /** @var MessageIdentifierGenerator|MockObject */
     private $messageIdentifierGenerator;
 
-    /** @var XmlResponder */
+    /** @var LtiOutcomeResponder */
     private $subject;
 
     protected function setUp(): void
@@ -47,7 +47,7 @@ class XmlResponderTest extends TestCase
         $this->twig = $this->createMock(Environment::class);
         $this->messageIdentifierGenerator = $this->createMock(MessageIdentifierGenerator::class);
 
-        $this->subject = new XmlResponder($this->twig, $this->messageIdentifierGenerator);
+        $this->subject = new LtiOutcomeResponder($this->twig, $this->messageIdentifierGenerator);
     }
 
     public function testCreateReplaceResultResponse(): void
@@ -58,7 +58,7 @@ class XmlResponderTest extends TestCase
             ->with('basic-outcome/replace-result-response.xml.twig')
             ->willReturn('templateWithValues');
 
-        $response = $this->subject->createReplaceResultResponse(1);
+        $response = $this->subject->createXmlResponse(1);
 
         $this->assertEquals(new XmlResponse('templateWithValues'), $response);
     }
