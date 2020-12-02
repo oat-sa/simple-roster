@@ -72,9 +72,6 @@ class UpdateLineItemValidator
         throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $rawErrors)));
     }
 
-    /**
-     * @return Assert\Collection
-     */
     private function getConstraints(): Assert\Collection
     {
         return new Assert\Collection(
