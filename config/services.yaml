@@ -20,6 +20,11 @@ parameters:
     app.lti1p1.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti1p3.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+    app.jwt.private_key_path: '%env(resolve:JWT_SECRET_KEY)%'
+    app.jwt.public_key_path: '%env(resolve:JWT_PUBLIC_KEY)%'
+    app.jwt.passphrase: '%env(resolve:JWT_PASSPHRASE)%'
+    app.jwt.access_token_ttl: '%env(int:JWT_ACCESS_TOKEN_TTL)%'
+    app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
 
 services:
     # default configuration for services in *this* file
@@ -38,6 +43,11 @@ services:
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
             $ltiRegistrationId: '%app.lti1p3.registration_id%'
+            $privateKeyPath: '%app.jwt.private_key_path%'
+            $publicKeyPath: '%app.jwt.public_key_path%'
+            $passphrase: '%app.jwt.passphrase%'
+            $accessTokenTtl: '%app.jwt.access_token_ttl%'
+            $refreshTokenTtl: '%app.jwt.refresh_token_ttl%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -116,3 +126,15 @@ services:
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
+
+    OAT\SimpleRoster\Service\JWT\JWTManager:
+        class: OAT\SimpleRoster\Service\JWT\JWTManager
+
+    OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator:
+        class: OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
+
+    OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier:
+        class: OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier
+
+    OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler:
+        class: OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler

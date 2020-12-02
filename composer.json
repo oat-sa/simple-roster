@@ -10,6 +10,7 @@
         "ext-json": "*",
         "ext-redis": "*",
         "ext-simplexml": "*",
+        "ext-openssl": "*",
         "aws/aws-sdk-php": "^3.81",
         "aws/aws-sdk-php-symfony": "^2.0",
         "doctrine/annotations": "^1.6",
@@ -68,7 +69,8 @@
         "symfony/debug-bundle": "^5.0",
         "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
-        "symfony/var-dumper": "^5.0"
+        "symfony/var-dumper": "^5.0",
+        "symfony/web-server-bundle": "4.4"
     },
     "config": {
         "preferred-install": {
