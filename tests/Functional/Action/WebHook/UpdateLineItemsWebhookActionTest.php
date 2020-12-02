@@ -157,12 +157,12 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'status' => 'error'
                 ],
                 [
-                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232c',
-                    'status' => 'ignored'
+                    'eventId' => 'lastDuplicatedEvent',
+                    'status' => 'accepted'
                 ],
                 [
-                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232c',
-                    'status' => 'accepted'
+                    'eventId' => 'duplicated',
+                    'status' => 'ignored'
                 ]
             ],
             $decodedResponse
@@ -323,21 +323,21 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     ],
                 ],
                 [
-                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232c',
-                    'eventName' => 'RemoteDeliveryPublicationFinished',
-                    'triggeredTimestamp' => 1565602380,
-                    'eventData' => [
-                        'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
-                    ],
-                ],
-                [
-                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232c',
+                    'eventId' => 'lastDuplicatedEvent',
                     'eventName' => 'RemoteDeliveryPublicationFinished',
                     'triggeredTimestamp' => 1565602390,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
                         'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
+                    ],
+                ],
+                [
+                    'eventId' => 'duplicated',
+                    'eventName' => 'RemoteDeliveryPublicationFinished',
+                    'triggeredTimestamp' => 1565602380,
+                    'eventData' => [
+                        'alias' => 'lineItemSlug',
+                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
             ],

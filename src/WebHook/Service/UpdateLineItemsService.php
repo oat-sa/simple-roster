@@ -88,9 +88,10 @@ class UpdateLineItemsService
                     }
                 );
 
+            // @phpstan-ignore-next-line
             $dto = $duplicatedUpdates->findLastByTriggeredTime();
 
-            if (count((array)$duplicatedUpdates) > 1) {
+            if ($duplicatedUpdates->count() > 1) {
                 $this->logger->warning(
                     sprintf(
                         'There are duplicated updates on the request. All of them will be ignore except update id %s. ',

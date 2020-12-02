@@ -24,10 +24,11 @@ namespace OAT\SimpleRoster\WebHook;
 
 use ArrayIterator;
 use Closure;
+use Countable;
 use Iterator;
 use IteratorAggregate;
 
-class UpdateLineItemCollection implements IteratorAggregate
+class UpdateLineItemCollection implements IteratorAggregate, Countable
 {
     /** @var UpdateLineItemDto[] */
     private $updateLineItemsDto;
@@ -92,5 +93,10 @@ class UpdateLineItemCollection implements IteratorAggregate
         }
 
         return $this;
+    }
+
+    public function count(): int
+    {
+        return count($this->updateLineItemsDto);
     }
 }
