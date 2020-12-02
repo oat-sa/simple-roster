@@ -72,7 +72,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
      *
      * @throws JsonException
      */
-    public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(
+    public function testItThrowsBadRequestIfRequestIsInvalid(
         ?array $requestBody,
         string $expectedMessage
     ): void {
