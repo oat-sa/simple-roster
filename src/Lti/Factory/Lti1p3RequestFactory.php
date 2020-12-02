@@ -23,46 +23,33 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Factory;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
     /** @var RegistrationRepositoryInterface */
     private $registrationRepository;
 
-    /** @var LtiResourceLinkLaunchRequestBuilder */
-    private $ltiRequestBuilder;
-
-    /** @var RouterInterface */
-    private $router;
+    /** @var Lti1p3MessageBuilder */
+    private $ltiMessageBuilder;
 
     /** @var LtiConfiguration */
     private $ltiConfiguration;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
-        LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder,
-        RouterInterface $router,
+        Lti1p3MessageBuilder $ltiMessageBuilder,
         LtiConfiguration $ltiConfiguration
     ) {
         $this->registrationRepository = $registrationRepository;
+        $this->ltiMessageBuilder = $ltiMessageBuilder;
         $this->ltiConfiguration = $ltiConfiguration;
-        $this->ltiRequestBuilder = $ltiRequestBuilder;
-        $this->router = $router;
     }
 
     /**
@@ -82,53 +69,8 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
             (int)$assignment->getId(),
         );
 
-        $message = $this->buildLtiMessage($registration, $loginHint, $assignment);
+        $message = $this->ltiMessageBuilder->build($registration, $loginHint, $assignment);
 
         return new LtiRequest($message->toUrl(), LtiRequest::LTI_VERSION_1P3, []);
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function buildLtiMessage(
-        RegistrationInterface $registration,
-        LoginHintDto $loginHint,
-        Assignment $assignment
-    ): LtiMessageInterface {
-        $lineItem = $assignment->getLineItem();
-        $resourceLink = new LtiResourceLink($lineItem->getUri());
-
-        return $this->ltiRequestBuilder->buildLtiResourceLinkLaunchRequest(
-            $resourceLink,
-            $registration,
-            (string)$loginHint,
-            null,
-            [
-                LtiRequest::LTI_ROLE,
-            ],
-            [
-                new BasicOutcomeClaim(
-                    (string) $assignment->getId(),
-                    $this->router->generate(
-                        'updateLti1p3Outcome',
-                        [],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    )
-                ),
-                new LaunchPresentationClaim(
-                    null,
-                    null,
-                    null,
-                    $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
-                    $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
-                ),
-                new ContextClaim(
-                    (string)$assignment->getId(),
-                    [],
-                    $lineItem->getSlug(),
-                    $lineItem->getLabel(),
-                ),
-            ]
-        );
     }
 }

@@ -31,7 +31,7 @@ trait CommandProgressBarFormatterTrait
     protected $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | ' .
     ' <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
 
-    public function createNewFormattedProgressBar(OutputInterface $output): ProgressBar
+    public function createFormattedProgressBar(OutputInterface $output): ProgressBar
     {
         $progressBar = new ProgressBar($output);
 

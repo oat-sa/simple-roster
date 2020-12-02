@@ -25,47 +25,38 @@ namespace OAT\SimpleRoster\Lti\Factory;
 use Carbon\Carbon;
 use JsonException;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Generator\NonceGenerator;
-use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
+use OAT\SimpleRoster\Lti\Builder\Lti1p1LaunchUrlBuilder;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p1RequestFactory implements LtiRequestFactoryInterface
 {
+    /** @var Lti1p1LaunchUrlBuilder */
+    private $launchUrlBuilder;
+
     /** @var OAuthSigner */
     private $signer;
 
     /** @var NonceGenerator */
     private $generator;
 
-    /** @var RouterInterface */
-    private $router;
-
     /** @var LtiInstanceLoadBalancerInterface */
     private $loadBalancer;
 
-    /** @var LtiConfiguration */
-    private $ltiConfiguration;
-
     public function __construct(
+        Lti1p1LaunchUrlBuilder $launchUrlBuilder,
         OAuthSigner $signer,
         NonceGenerator $generator,
-        RouterInterface $router,
-        LtiInstanceLoadBalancerInterface $loadBalancer,
-        LtiConfiguration $ltiConfiguration
+        LtiInstanceLoadBalancerInterface $loadBalancer
     ) {
+        $this->launchUrlBuilder = $launchUrlBuilder;
         $this->signer = $signer;
         $this->generator = $generator;
-        $this->router = $router;
         $this->loadBalancer = $loadBalancer;
-        $this->ltiConfiguration = $ltiConfiguration;
     }
 
     /**
@@ -84,8 +75,9 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
             OAuthContext::VERSION_1_0
         );
 
-        $ltiLink = $this->getLtiLaunchLink($ltiInstance, $assignment->getLineItem());
-        $ltiParameters = $this->getAssignmentLtiParameters($assignment);
+        $ltiLaunchUrl = $this->launchUrlBuilder->build($ltiInstance, $assignment);
+        $ltiLink = $ltiLaunchUrl->getLtiLink();
+        $ltiParameters = $ltiLaunchUrl->getLtiParameters();
 
         $signature = $this->signer->sign(
             $context,
@@ -111,40 +103,5 @@ class Lti1p1RequestFactory implements LtiRequestFactoryInterface
                 $ltiParameters
             )
         );
-    }
-
-    private function getLtiLaunchLink(LtiInstance $ltiInstance, LineItem $lineItem): string
-    {
-        return sprintf(
-            '%s/ltiDeliveryProvider/DeliveryTool/launch/%s',
-            rtrim($ltiInstance->getLtiLink(), '/'),
-            base64_encode(
-                json_encode(
-                    ['delivery' => $lineItem->getUri()],
-                    JSON_THROW_ON_ERROR
-                )
-            )
-        );
-    }
-
-    private function getAssignmentLtiParameters(Assignment $assignment): array
-    {
-        return [
-            'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'lti_version' => LtiRequest::LTI_VERSION_1P1,
-            'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
-            'roles' => LtiRequest::LTI_ROLE,
-            'user_id' => $assignment->getUser()->getUsername(),
-            'lis_person_name_full' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => $assignment->getId(),
-            'lis_outcome_service_url' => $this->router->generate(
-                'updateLti1p1Outcome',
-                [],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
-            'lis_result_sourcedid' => $assignment->getId(),
-            'launch_presentation_return_url' => $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
-            'launch_presentation_locale' => $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
-        ];
     }
 }

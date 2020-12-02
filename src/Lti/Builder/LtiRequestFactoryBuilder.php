@@ -23,57 +23,34 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Builder;
 
 use LogicException;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory;
 use OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface;
-use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
-use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
-use Symfony\Component\Routing\RouterInterface;
 
 class LtiRequestFactoryBuilder
 {
+    /** @var Lti1p1RequestFactory */
+    private $lti1p1RequestFactory;
+
+    /** @var Lti1p3RequestFactory */
+    private $lti1p3RequestFactory;
+
     /** @var LtiConfiguration */
     private $ltiConfiguration;
 
-    /** @var OAuthSigner */
-    private $signer;
-
-    /** @var NonceGenerator */
-    private $generator;
-
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var LtiInstanceLoadBalancerInterface */
-    private $loadBalancer;
-
-    /** @var RegistrationRepositoryInterface */
-    private $registrationRepository;
-
-    /** @var LtiResourceLinkLaunchRequestBuilder */
-    private $ltiRequestBuilder;
-
+    /**
+     * Factories are in fact proxy classes using lazy service loading
+     */
     public function __construct(
-        LtiConfiguration $ltiConfiguration,
-        OAuthSigner $signer,
-        NonceGenerator $generator,
-        RouterInterface $router,
-        LtiInstanceLoadBalancerInterface $loadBalancer,
-        RegistrationRepositoryInterface $registrationRepository,
-        LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder
+        Lti1p1RequestFactory $lti1p1RequestFactory,
+        Lti1p3RequestFactory $lti1p3RequestFactory,
+        LtiConfiguration $ltiConfiguration
     ) {
+        $this->lti1p1RequestFactory = $lti1p1RequestFactory;
+        $this->lti1p3RequestFactory = $lti1p3RequestFactory;
         $this->ltiConfiguration = $ltiConfiguration;
-        $this->signer = $signer;
-        $this->generator = $generator;
-        $this->router = $router;
-        $this->loadBalancer = $loadBalancer;
-        $this->registrationRepository = $registrationRepository;
-        $this->ltiRequestBuilder = $ltiRequestBuilder;
     }
 
     /**
@@ -83,20 +60,9 @@ class LtiRequestFactoryBuilder
     {
         switch ($this->ltiConfiguration->getLtiVersion()) {
             case LtiRequest::LTI_VERSION_1P1:
-                return new Lti1p1RequestFactory(
-                    $this->signer,
-                    $this->generator,
-                    $this->router,
-                    $this->loadBalancer,
-                    $this->ltiConfiguration
-                );
+                return $this->lti1p1RequestFactory;
             case LtiRequest::LTI_VERSION_1P3:
-                return new Lti1p3RequestFactory(
-                    $this->registrationRepository,
-                    $this->ltiRequestBuilder,
-                    $this->router,
-                    $this->ltiConfiguration
-                );
+                return $this->lti1p3RequestFactory;
             default:
                 throw new LogicException(
                     'Invalid LTI Version specified: ' . $this->ltiConfiguration->getLtiVersion()

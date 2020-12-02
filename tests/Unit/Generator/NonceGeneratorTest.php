@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Generator;
 
-use OAT\SimpleRoster\Generator\NonceGenerator;
 use Carbon\Carbon;
+use OAT\SimpleRoster\Generator\NonceGenerator;
 use PHPUnit\Framework\TestCase;
 
 class NonceGeneratorTest extends TestCase

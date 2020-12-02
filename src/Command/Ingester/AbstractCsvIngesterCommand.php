@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Command\Ingester;
 
 use InvalidArgumentException;
 use League\Csv\Reader;
+use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
 use OAT\SimpleRoster\Csv\CsvReaderBuilder;
 use OAT\SimpleRoster\Storage\StorageRegistry;
@@ -39,6 +40,7 @@ use Symfony\Component\Process\Process;
 abstract class AbstractCsvIngesterCommand extends Command
 {
     use CommandProgressBarFormatterTrait;
+    use BlackfireProfilerTrait;
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
@@ -75,6 +77,8 @@ abstract class AbstractCsvIngesterCommand extends Command
 
     protected function configure(): void
     {
+        $this->addBlackfireProfilingOption();
+
         $this->addArgument(
             'path',
             InputArgument::REQUIRED,
@@ -108,7 +112,7 @@ abstract class AbstractCsvIngesterCommand extends Command
             self::DEFAULT_BATCH_SIZE
         );
 
-        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply actual database modifications or not');
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'To apply changes on database');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
@@ -117,7 +121,7 @@ abstract class AbstractCsvIngesterCommand extends Command
 
         $this->isDryRun = !(bool)$input->getOption('force');
         $this->batchSize = (int)$input->getOption('batch');
-        $this->progressBar = $this->createNewFormattedProgressBar($output);
+        $this->progressBar = $this->createFormattedProgressBar($output);
 
         $this->csvReader = $this->csvReaderBuilder
             ->setDelimiter((string)$input->getOption('delimiter'))
