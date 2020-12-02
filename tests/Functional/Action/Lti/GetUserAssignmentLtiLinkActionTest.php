@@ -432,11 +432,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $decodedLtiLink = urldecode($response['ltiLink']);
 
-        self::assertStringContainsString('iss=https://simple-roster.localhost/platform', $decodedLtiLink);
+        self::assertStringContainsString('iss=https://localhost/platform', $decodedLtiLink);
         self::assertStringContainsString('login_hint=user1', $decodedLtiLink);
-        self::assertStringContainsString('target_link_uri=http://localhost:8888/tool/launch', $decodedLtiLink);
+        self::assertStringContainsString('target_link_uri=http://localhost/tool/launch', $decodedLtiLink);
         self::assertStringContainsString('lti_deployment_id=1', $decodedLtiLink);
-        self::assertStringContainsString('client_id=demo', $decodedLtiLink);
+        self::assertStringContainsString('client_id=test', $decodedLtiLink);
 
         self::assertSame(LtiRequest::LTI_VERSION_1P3, $response['ltiVersion']);
         self::assertSame([], $response['ltiParams']);

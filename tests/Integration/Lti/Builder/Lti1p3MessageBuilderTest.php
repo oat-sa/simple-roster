@@ -28,7 +28,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\Registration;
-use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
@@ -60,7 +59,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         /** @var RegistrationRepository $registrationRepository */
         $registrationRepository = self::$container->get(RegistrationRepository::class);
         /** @var Registration $registration */
-        $registration = $registrationRepository->find('demo');
+        $registration = $registrationRepository->find('testRegistration');
 
         /** @var User $user */
         $user = $this->getRepository(User::class)->find(1);
@@ -74,12 +73,12 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $ltiMessage = $this->subject->build($registration, $assignment);
         $ltiParameters = $ltiMessage->getParameters();
 
-        self::assertSame('http://localhost:8888/lti1p3/oidc/initiation', $ltiMessage->getUrl());
-        self::assertSame('https://simple-roster.localhost/platform', $ltiParameters['iss']);
+        self::assertSame('http://localhost/lti1p3/oidc/initiation', $ltiMessage->getUrl());
+        self::assertSame('https://localhost/platform', $ltiParameters['iss']);
         self::assertSame('user1::1', $ltiParameters['login_hint']);
-        self::assertSame('http://localhost:8888/tool/launch', $ltiParameters['target_link_uri']);
+        self::assertSame('http://localhost/tool/launch', $ltiParameters['target_link_uri']);
         self::assertSame('1', $ltiParameters['lti_deployment_id']);
-        self::assertSame('demo', $ltiParameters['client_id']);
+        self::assertSame('test', $ltiParameters['client_id']);
 
         /** @var Parser $tokenParser */
         $tokenParser = self::$container->get('test.jwt_parser');
