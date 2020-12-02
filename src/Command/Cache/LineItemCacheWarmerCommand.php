@@ -64,12 +64,12 @@ class LineItemCacheWarmerCommand extends Command
         LineItemRepository $lineItemRepository,
         LineItemCacheIdGenerator $lineItemCacheIdGenerator,
         EntityManagerInterface $entityManager,
-        LoggerInterface $cacheWarmupCacheWarmupLogger,
+        LoggerInterface $cacheWarmupLogger,
         int $lineItemCacheTtl = 3600
     ) {
         parent::__construct(self::NAME);
 
-        $this->logger = $cacheWarmupCacheWarmupLogger;
+        $this->logger = $cacheWarmupLogger;
         $this->lineItemCacheTtl = $lineItemCacheTtl;
 
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
