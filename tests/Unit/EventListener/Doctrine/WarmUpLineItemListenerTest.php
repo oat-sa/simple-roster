@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
-use OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemListener;
+use OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -44,7 +44,7 @@ class WarmUpLineItemListenerTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
-        new WarmUpLineItemListener(
+        new WarmUpLineItemCacheListener(
             $this->createMock(LineItemRepository::class),
             $entityManager,
             $this->createMock(LineItemCacheIdGenerator::class)

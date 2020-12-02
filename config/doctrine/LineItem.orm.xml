@@ -36,7 +36,7 @@
             </options>
         </field>
         <entity-listeners>
-            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemListener">
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener">
                 <lifecycle-callback type="postUpdate" method="postUpdate"/>
             </entity-listener>
         </entity-listeners>

@@ -29,7 +29,7 @@ use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundExceptio
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
-class WarmUpLineItemListener implements EntityListenerInterface
+class WarmUpLineItemCacheListener implements EntityListenerInterface
 {
     /** @var CacheProvider */
     private $cacheProvider;
