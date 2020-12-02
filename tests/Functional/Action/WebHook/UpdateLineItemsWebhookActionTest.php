@@ -170,7 +170,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     }
 
 
-    public function testItAcceptsRequestButIgnoreUnknownsEvents(): void
+    public function testItAcceptsRequestButIgnoreUnknownEvents(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
