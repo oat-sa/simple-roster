@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\WebHook;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Service\WebHook\UpdateLineItemsService;
+use OAT\SimpleRoster\WebHook\Service\UpdateLineItemsService;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use Symfony\Component\HttpFoundation\Response;
 

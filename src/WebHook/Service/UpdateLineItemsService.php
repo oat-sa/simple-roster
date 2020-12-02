@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Service\WebHook;
+namespace OAT\SimpleRoster\WebHook\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
