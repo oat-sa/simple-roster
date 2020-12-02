@@ -113,8 +113,18 @@ class LineItemCacheWarmerCommand extends Command
             /** @var LineItem $lineItem */
             foreach ($lineItemCollection as $lineItem) {
                 $id = (int)$lineItem->getId();
-                $this->resultCacheImplementation->delete($this->lineItemCacheIdGenerator->generate($id));
+                $lineItemCacheKey = $this->lineItemCacheIdGenerator->generate($id);
+
+                $this->resultCacheImplementation->delete($lineItemCacheKey);
                 $this->lineItemRepository->findById($id);
+
+                $this->logger->info(
+                    sprintf('Result cache for Line Item Id %d have been successfully warmed up.', $id),
+                    [
+                        'cacheKey' => $lineItemCacheKey,
+                        'cacheTtl' => number_format($this->lineItemCacheTtl),
+                    ]
+                );
             }
 
             if ($lineItemCollection->isEmpty()) {
@@ -123,20 +133,10 @@ class LineItemCacheWarmerCommand extends Command
                 return 0;
             }
 
-            $lineItemsTotal = count($lineItemCollection);
-
-            $this->logger->info(
-                sprintf('Result cache for %d Line Items have been successfully warmed up.', $lineItemsTotal),
-                [
-                    'cacheKeyPattern' => LineItemCacheIdGenerator::CACHE_KEY_PATTERN,
-                    'cacheTtl' => number_format($this->lineItemCacheTtl),
-                ]
-            );
-
             $this->symfonyStyle->success(
                 sprintf(
                     'Result cache for %d Line Items have been successfully warmed up. [TTL: %s seconds]',
-                    $lineItemsTotal,
+                    count($lineItemCollection),
                     number_format($this->lineItemCacheTtl)
                 )
             );

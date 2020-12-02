@@ -136,12 +136,37 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute([], ['capture_stderr_separately' => true]));
 
-        $this->assertHasLogRecord([
-            'message' => 'Result cache for 3 Line Items have been successfully warmed up.',
-            'context' => [
-                'cacheKeyPattern' => LineItemCacheIdGenerator::CACHE_KEY_PATTERN,
-                'cacheTtl' => '3,600',
+        $this->assertHasLogRecord(
+            [
+                'message' => 'Result cache for Line Item Id 1 have been successfully warmed up.',
+                'context' => [
+                    'cacheKey' => 'line_item_1',
+                    'cacheTtl' => '3,600',
+                ],
             ],
-        ], Logger::INFO);
+            Logger::INFO
+        );
+
+        $this->assertHasLogRecord(
+            [
+                'message' => 'Result cache for Line Item Id 2 have been successfully warmed up.',
+                'context' => [
+                    'cacheKey' => 'line_item_2',
+                    'cacheTtl' => '3,600',
+                ],
+            ],
+            Logger::INFO
+        );
+
+        $this->assertHasLogRecord(
+            [
+                'message' => 'Result cache for Line Item Id 3 have been successfully warmed up.',
+                'context' => [
+                    'cacheKey' => 'line_item_3',
+                    'cacheTtl' => '3,600',
+                ],
+            ],
+            Logger::INFO
+        );
     }
 }
