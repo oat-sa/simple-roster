@@ -22,9 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -71,7 +68,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $credentials = $this->generateCredentials(
+        $credentials = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
@@ -107,7 +104,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns401IfWithInvalidScope(): void
     {
-        $credentials = $this->generateCredentials(
+        $credentials = $this->createTestClientAccessToken(
             $this->registration,
             ['invalid']
         );
@@ -175,7 +172,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $credentials = $this->generateCredentials(
+        $credentials = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
@@ -198,7 +195,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $credentials = $this->generateCredentials(
+        $credentials = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
@@ -255,21 +252,5 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ->willReturn($uuid);
 
         Uuid::setFactory($factory);
-    }
-
-    private function generateCredentials(
-        RegistrationInterface $registration,
-        array $scopes = ['allowed-scope']
-    ): string {
-        $now = Carbon::now();
-
-        return (new Builder())
-            ->permittedFor($audience ?? $registration->getClientId())
-            ->identifiedBy(uniqid())
-            ->issuedAt($now->getTimestamp())
-            ->expiresAt($now->addSeconds(3600)->getTimestamp())
-            ->withClaim('scopes', $scopes)
-            ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey())
-            ->__toString();
     }
 }
