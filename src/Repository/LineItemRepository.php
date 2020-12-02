@@ -63,7 +63,7 @@ class LineItemRepository extends AbstractRepository
 
     public function findById(int $id): ?LineItem
     {
-        return  $this
+        return $this
             ->createQueryBuilder('l')
             ->select('l')
             ->where('l.id = :id')
