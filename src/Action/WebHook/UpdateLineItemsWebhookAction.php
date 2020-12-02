@@ -27,7 +27,7 @@ use OAT\SimpleRoster\Service\WebHook\UpdateLineItemsService;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLineItemsAction
+class UpdateLineItemsWebhookAction
 {
     /** @var SerializerResponder */
     private $responder;

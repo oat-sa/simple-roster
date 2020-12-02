@@ -34,7 +34,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLineItemsActionTest extends WebTestCase
+class UpdateLineItemsWebhookActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
