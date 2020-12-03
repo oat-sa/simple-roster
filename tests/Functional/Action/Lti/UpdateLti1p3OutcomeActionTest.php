@@ -74,7 +74,12 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
 
-        $this->setUuid4Value('e36f227c-2946-11e8-b467-0ed5f89f718b');
+        $uidGenerator = $this->createMock(UuidFactoryInterface::class);
+        self::$container->set('test.uid_generator', $uidGenerator);
+
+        $uidGenerator
+            ->method('uuid4')
+            ->willReturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         /** @var string $xmlRequestBody */
         $xmlRequestBody = file_get_contents(
@@ -232,26 +237,5 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         self::assertInstanceOf(Assignment::class, $assignment);
 
         return $assignment;
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    private function setUuid4Value(string $uuid): void
-    {
-        $uuidInterface = $this->createMock(UuidInterface::class);
-
-        $factory = $this->createMock(UuidFactoryInterface::class);
-        $factory
-            ->expects(self::once())
-            ->method('uuid4')
-            ->willReturn($uuidInterface);
-
-        $uuidInterface
-            ->expects(self::once())
-            ->method('toString')
-            ->willReturn($uuid);
-
-        Uuid::setFactory($factory);
     }
 }

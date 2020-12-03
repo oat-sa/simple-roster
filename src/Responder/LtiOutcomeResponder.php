@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Responder;
 
-use OAT\SimpleRoster\Generator\MessageIdentifierGenerator;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Twig\Environment;
 
 class LtiOutcomeResponder
@@ -30,13 +30,13 @@ class LtiOutcomeResponder
     /** @var Environment */
     private $twig;
 
-    /** @var MessageIdentifierGenerator */
-    private $messageIdentifierGenerator;
+    /** @var UuidFactoryInterface */
+    private $uuidFactory;
 
-    public function __construct(Environment $twig, MessageIdentifierGenerator $messageIdentifierGenerator)
+    public function __construct(Environment $twig, UuidFactoryInterface $uuidFactory)
     {
         $this->twig = $twig;
-        $this->messageIdentifierGenerator = $messageIdentifierGenerator;
+        $this->uuidFactory = $uuidFactory;
     }
 
     public function createXmlResponse(int $assignmentId): XmlResponse
@@ -44,7 +44,7 @@ class LtiOutcomeResponder
         $xml = $this->twig->render(
             'basic-outcome/replace-result-response.xml.twig',
             [
-                'messageIdentifier' => $this->messageIdentifierGenerator->generate(),
+                'messageIdentifier' => $this->uuidFactory->uuid4(),
                 'messageRefIdentifier' => $assignmentId,
                 'description' => sprintf('Assignment with Id %s was updated', $assignmentId),
             ]

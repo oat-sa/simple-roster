@@ -27,15 +27,16 @@ use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Responder\XmlResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Twig\Environment;
 
 class LtiOutcomeResponderTest extends TestCase
 {
-    /** @var MockObject|Environment */
+    /** @var Environment|MockObject */
     private $twig;
 
-    /** @var MessageIdentifierGenerator|MockObject */
-    private $messageIdentifierGenerator;
+    /** @var UuidFactoryInterface|MockObject */
+    private $uuidFactory;
 
     /** @var LtiOutcomeResponder */
     private $subject;
@@ -45,9 +46,9 @@ class LtiOutcomeResponderTest extends TestCase
         parent::setUp();
 
         $this->twig = $this->createMock(Environment::class);
-        $this->messageIdentifierGenerator = $this->createMock(MessageIdentifierGenerator::class);
+        $this->uuidFactory = $this->createMock(UuidFactoryInterface::class);
 
-        $this->subject = new LtiOutcomeResponder($this->twig, $this->messageIdentifierGenerator);
+        $this->subject = new LtiOutcomeResponder($this->twig, $this->uuidFactory);
     }
 
     public function testCreateReplaceResultResponse(): void
