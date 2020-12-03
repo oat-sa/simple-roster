@@ -61,6 +61,27 @@ class UpdateLineItemCollectionTest extends TestCase
         $this->assertEquals('22', $dto->getId());
     }
 
+    public function testItFindsLastByTriggeredTimeDuplicatedTime(): void
+    {
+        $collection = new UpdateLineItemCollection(
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                (new DateTimeImmutable())->setTimestamp(1565602380)
+            ),
+            new UpdateLineItemDto(
+                '22',
+                'test',
+                'http://i.o',
+                (new DateTimeImmutable())->setTimestamp(1565602380)
+            )
+        );
+
+        $dto = $collection->findLastByTriggeredTimeOrFail();
+        $this->assertEquals('22', $dto->getId());
+    }
+
     public function testAccessors(): void
     {
         $collection = new UpdateLineItemCollection();

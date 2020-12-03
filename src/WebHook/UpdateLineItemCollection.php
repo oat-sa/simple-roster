@@ -22,11 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\WebHook;
 
-use Exception;
 use ArrayIterator;
 use Closure;
 use Countable;
-use Iterator;
+use Exception;
 use IteratorAggregate;
 
 class UpdateLineItemCollection implements IteratorAggregate, Countable
@@ -39,7 +38,7 @@ class UpdateLineItemCollection implements IteratorAggregate, Countable
         $this->updateLineItemsDto = $updateLineItemsDto;
     }
 
-    public function getIterator(): Iterator
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->updateLineItemsDto);
     }
@@ -75,19 +74,19 @@ class UpdateLineItemCollection implements IteratorAggregate, Countable
      */
     public function findLastByTriggeredTimeOrFail(): UpdateLineItemDto
     {
-        if ($this->count() === 0) {
-            throw new Exception("Fail to find dto. Collection is null");
-        }
 
         /** @var UpdateLineItemDto $dto */
         foreach ($this as $dto) {
             $timestampDto = $dto->getTriggeredTime()->getTimestamp();
-            if (!isset($result) || $timestampDto > $result->getTriggeredTime()->getTimestamp()) {
+            if (!isset($result) || $timestampDto >= $result->getTriggeredTime()->getTimestamp()) {
                 $result = $dto;
             }
         }
 
-        /** @noinspection PhpUndefinedVariableInspection */
+        if (!isset($result)) {
+            throw new Exception("Fail to find dto. Collection is null");
+        }
+
         return $result;
     }
 

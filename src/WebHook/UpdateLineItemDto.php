@@ -45,7 +45,7 @@ class UpdateLineItemDto implements JsonSerializable
     /** @var string */
     private $lineItemUri;
 
-    /** @var string|null */
+    /** @var string */
     private $status;
 
     /** @var DateTimeInterface */

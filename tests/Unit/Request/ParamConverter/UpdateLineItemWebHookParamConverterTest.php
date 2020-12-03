@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
+use ArrayIterator;
 use OAT\SimpleRoster\Request\ParamConverter\UpdateLineItemWebHookParamConverter;
 use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
@@ -35,10 +36,10 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UpdateLineItemWebHookParamConverterTest extends TestCase
 {
-    /** @var UpdateLineItemWebHookParamConverter|MockObject */
+    /** @var UpdateLineItemWebHookParamConverter */
     private $sut;
 
-    /** @var UpdateLineItemValidator|MockObject */
+    /** @var MockObject|UpdateLineItemValidator */
     private $updateLineItemValidator;
 
     protected function setUp(): void
@@ -95,12 +96,11 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
 
         $this->assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
 
-        /** @var UpdateLineItemDto $updateLineItemDto */
-        $updateLineItemDto = $request->attributes->get('collection')->getIterator()[0];
-        $this->assertInstanceOf(
-            UpdateLineItemDto::class,
-            $updateLineItemDto
-        );
+        /** @var ArrayIterator $iterator */
+        $iterator = $request->attributes->get('collection')->getIterator();
+        $updateLineItemDto = $iterator[0];
+
+        $this->assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
 
         $this->assertEquals("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
         $this->assertEquals("RemoteDeliveryPublicationFinished", $updateLineItemDto->getName());
