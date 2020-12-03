@@ -81,12 +81,13 @@ class JWTManager
         //Issued at claim
         $payload[self::ISSUEDAT_CLAIM] = $now;
         //Expiration time claim
-        $payload[self::EXPIRATION_CLAIM] = $now + $ttl;
+        $expiration = $now + $ttl;
+        $payload[self::EXPIRATION_CLAIM] = $expiration;
 
         $generatedToken = $this->generateJWTString($payload);
 
         if ($isRefresh) {
-            $this->storeTokenInCache($generatedToken);
+            $this->storeTokenInCache($generatedToken, $expiration);
         }
 
         return $generatedToken;

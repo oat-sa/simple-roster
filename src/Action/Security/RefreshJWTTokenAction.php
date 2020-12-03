@@ -95,7 +95,7 @@ class RefreshJWTTokenAction
         try {
             $user = $this->userRepository->findOneByUsername($username);
         } catch (UsernameNotFoundException $exception) {
-            throw new ConflictHttpException('Expired token.');
+            throw new UnauthorizedHttpException('Invalid user in token.');
         }
 
         $accessToken = $this->manager->create($user, $this->accessTokenTtl);
