@@ -7,15 +7,34 @@
             "Kernel.php"
         ]
     },
-    "timeout": 10,
+    "timeout": 1000,
     "logs": {
         "text": "var/log/infection/infection.log",
-        "summary": "var/log/infection/summary.log",
         "perMutator": "var/log/infection/per-mutator.md"
     },
     "mutators": {
         "@default": true,
-        "@removal": false
+        "CastString": false,
+        "CastBool": false,
+        "CastInt": false,
+        "DecrementInteger": false,
+        "global-ignoreSourceCodeByRegex": [
+            "\\$this->symfonyStyle->newLine.*",
+            ".*$this->isDryRun.*"
+        ],
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "\\$this->progressBar->.*",
+                "\\$this->symfonyStyle->title.*",
+                "\\$this->symfonyStyle->comment*",
+                ".*$->flush.*"
+            ]
+        },
+        "OneZeroInteger": {
+            "ignore": [
+                "OAT\\SimpleRoster\\Repository\\NativeAssignmentRepository::insertMultiple"
+            ]
+        }
     },
     "phpUnit": {
         "customPath": "bin/phpunit"

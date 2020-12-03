@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service\Bulk;
 
+use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Entity\Assignment;
@@ -29,8 +31,6 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
-use Doctrine\ORM\EntityManagerInterface;
-use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -91,6 +91,14 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Bulk assignments cancel error: wrong type.',
+                ['operation' => $expectedFailingOperation],
+            );
+
         self::assertSame([
             'data' => [
                 'applied' => false,
@@ -104,9 +112,19 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
+        $expectedLineItem = new LineItem();
+
         $this->userRepository
             ->method('findByUsernameWithAssignments')
-            ->willReturn(new User());
+            ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
+                return (new User())
+                    ->setUsername($username)
+                    ->addAssignment(
+                        (new Assignment())
+                            ->setState(Assignment::STATE_STARTED)
+                            ->setLineItem($expectedLineItem)
+                    );
+            });
 
         $bulkOperationCollection = (new BulkOperationCollection())
             ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
@@ -116,6 +134,24 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $this->entityManager
             ->expects(self::once())
             ->method('flush');
+
+        $this->logger
+            ->expects(self::exactly(3))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    "Successful assignment cancellation (assignmentId = '', username = 'test').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment cancellation (assignmentId = '', username = 'test1').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment cancellation (assignmentId = '', username = 'test2').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+            );
 
         $this->subject->process($bulkOperationCollection);
     }

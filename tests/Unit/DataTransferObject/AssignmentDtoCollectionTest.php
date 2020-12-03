@@ -48,4 +48,27 @@ class AssignmentDtoCollectionTest extends TestCase
         self::assertCount(1, $subject);
         self::assertSame($assignment, $subject->getIterator()->current());
     }
+
+    public function testEmptiness(): void
+    {
+        $subject = new AssignmentDtoCollection();
+        self::assertTrue($subject->isEmpty());
+
+        $subject->add(new AssignmentDto('test', 1, 'testUsername', 1));
+        self::assertFalse($subject->isEmpty());
+    }
+
+    public function testItReturnsUniqueUsernames(): void
+    {
+        $assignment1 = new AssignmentDto('test', 1, 'testUsername', 1);
+        $assignment2 = new AssignmentDto('test', 1, 'testUsername', 1);
+        $assignment3 = new AssignmentDto('test', 1, 'testUsername_2', 1);
+
+        $subject = (new AssignmentDtoCollection())
+            ->add($assignment1)
+            ->add($assignment2)
+            ->add($assignment3);
+
+        self::assertSame(['testUsername', 'testUsername_2'], $subject->getAllUsernames());
+    }
 }

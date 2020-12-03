@@ -55,6 +55,11 @@ class UsernameResultSet implements Countable, IteratorAggregate
         return $this->lastUserId;
     }
 
+    public function getUsernameCollection(): UsernameCollection
+    {
+        return $this->collection;
+    }
+
     public function getIterator(): ArrayIterator
     {
         return $this->collection->getIterator();
@@ -63,5 +68,10 @@ class UsernameResultSet implements Countable, IteratorAggregate
     public function count(): int
     {
         return count($this->collection);
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
     }
 }

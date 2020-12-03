@@ -99,12 +99,8 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
 
     private function getBulkOperationTypeFromRequest(Request $request): string
     {
-        switch ($request->getMethod()) {
-            case Request::METHOD_PUT:
-            case Request::METHOD_PATCH:
-                return BulkOperation::TYPE_UPDATE;
-            default:
-                return BulkOperation::TYPE_CREATE;
-        }
+        return $request->getMethod() === Request::METHOD_PATCH
+            ? BulkOperation::TYPE_UPDATE
+            : BulkOperation::TYPE_CREATE;
     }
 }

@@ -38,8 +38,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 class AssignmentIngesterCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CommandDisplayNormalizerTrait;
     use CsvIngestionTestingTrait;
+    use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -99,9 +99,18 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
         self::assertSame(0, $output);
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
+
+        self::assertStringContainsString(
+            'Simple Roster - Assignment Ingester',
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
+        );
+        self::assertStringContainsString(
+            'Executing ingestion...',
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
+        );
         self::assertStringContainsString(
             '[WARNING] [DRY RUN] 18 assignments have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
     }
 
@@ -152,7 +161,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertCount(18, $this->getRepository(Assignment::class)->findAll());
         self::assertStringContainsString(
             '[OK] 18 assignments have been successfully ingested.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
 
         $expectedAssignmentCounts = [
@@ -197,7 +206,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         );
 
         self::assertSame(1, $output);
-        self::assertStringContainsString($expectedOutput, $this->normalizeDisplay($this->commandTester->getDisplay()));
+        self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
     public function testItThrowsExceptionIfNoUsersAreFound(): void
@@ -226,7 +235,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
         self::assertStringContainsString(
             "[ERROR] User with username 'user_1' cannot not found.",
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -256,7 +265,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         self::assertCount(0, $this->getRepository(Assignment::class)->findAll());
         self::assertStringContainsString(
             '[ERROR] No line items were found in database.',
-            $this->normalizeDisplay($this->commandTester->getDisplay())
+            $this->commandTester->getDisplay(true)
         );
     }
 
@@ -278,7 +287,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
                     ['user_1'],
                 ],
                 'expectedOutput' => "[ERROR] Column 'lineItemSlug' is not set in source file.",
-            ]
+            ],
         ];
     }
 

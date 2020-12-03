@@ -39,7 +39,7 @@ pipeline {
                 )
                 sh(
                     label: 'Running testing suite - PHPUnit & Infection',
-                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=99 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
                 sh(
                     label: 'Checking test coverage - PHPUnit',
