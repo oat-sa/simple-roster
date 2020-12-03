@@ -87,7 +87,7 @@ class UpdateLineItemDto implements JsonSerializable
         return $this->lineItemUri;
     }
 
-    public function setStatus(?string $status): self
+    public function setStatus(string $status): self
     {
         $this->status = $status;
 
