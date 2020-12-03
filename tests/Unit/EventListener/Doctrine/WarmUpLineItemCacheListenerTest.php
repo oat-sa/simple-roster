@@ -30,7 +30,7 @@ use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use PHPUnit\Framework\TestCase;
 
-class WarmUpLineItemListenerTest extends TestCase
+class WarmUpLineItemCacheListenerTest extends TestCase
 {
     public function testItThrowsExceptionIfDoctrineResultCacheImplementationIsNotConfigured(): void
     {
