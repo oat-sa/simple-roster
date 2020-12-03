@@ -87,4 +87,24 @@ class LoginActionTest extends WebTestCase
 
         self::assertArrayHasKey('accessToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
     }
+
+    public function testItLogsInProperlyTheUserAndReturnsRefreshToken(): void
+    {
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/auth/login',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
+        );
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        self::assertArrayHasKey('accessToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+
+        self::assertArrayHasKey('refreshToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+    }
 }
