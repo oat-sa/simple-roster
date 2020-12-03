@@ -1,6 +1,6 @@
 # Update Line Items Webhook
 
-This endpoint is intended to receive requests coming for TAO Platform whenever a new delivery publication is done.
+This endpoint is intended to receive requests coming from TAO Platform whenever a new delivery publication is done.
 
 ## Table of Contents
 - [Request Example](#request-example)
@@ -12,7 +12,7 @@ This endpoint is intended to receive requests coming for TAO Platform whenever a
 
 ### Request Example
 
-Here you can find and example about how to update the line-item via curl command:
+Here you can find an example about how to update the line-item via curl command:
 
 ```
 curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web-hooks/update-line-items' \
@@ -37,7 +37,7 @@ curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web
 
 | Attribute                 | Description                                                                                                                                                                                                                 |
 | --------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| eventId                   | The event identifier. The format is described in the diagram. It is used by the simple list only to return it in the webhook response.                                                                                      |
+| eventId                   | The event identifier. The format is described in the json schema. It is used by the Simple Roster only to return it in the webhook response.                                                                                      |
 | eventName                 | The name of the event. Only `RemoteDeliveryPublicationFinished` will be handled by Simple Roster. Any other events will be ignored.                                                                                         |
 | triggeredTimestamp        | A timestamp that represents when the event happened. In case of duplicate events, Simple Roster will assume the latter based on this attribute. The other events will be ignored.                                           |
 | eventData.alias           | The delivery URI alias for the new publication. This value must match the slug in the line items that need to be updated. If the line items are not found, the event is not accepted and is considered an error.            |
@@ -46,11 +46,11 @@ curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web
 
 ### Endpoint Descriptions
 
-You can find the endpoint description by accessing the open [api specification](../../openapi/api_v1.yml)
+You can find the endpoint description by accessing the [open api specification](../../openapi/api_v1.yml)
 
 ### WebHook Payload Schema Definition
 
-These are the request and schema definitions for the related webhook:
+These are the request and response schema definitions for the related webhook:
 
 #### Request
 ```
