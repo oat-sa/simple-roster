@@ -27,10 +27,24 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class JWTManager
 {
+    //REGISTERED CLAIMS
+    private const IDENTIFIEDBY_CLAIM = 'jti';
+    private const ISSUEDAT_CLAIM = 'iat';
+    private const EXPIRATION_CLAIM = 'exp';
+
+    //CUSTOM CLAIMS
+    private const IDENTIFIER_CLAIM = 'username';
+    private const ROLES_CLAIM = 'roles';
+
+
+    /** @var CacheItemPoolInterface */
+    private $tokenStore;
+
     /** @var string */
     private $privateKeyPath;
 
@@ -41,32 +55,40 @@ class JWTManager
     private $passphrase;
 
     public function __construct(
+        CacheItemPoolInterface $cache,
         string $privateKeyPath,
         string $publicKeyPath,
         string $passphrase
     ) {
+        $this->tokenStore = $cache;
         $this->privateKeyPath = $privateKeyPath;
         $this->publicKeyPath = $publicKeyPath;
         $this->passphrase = $passphrase;
     }
 
-    public function create(UserInterface $user, int $ttl = 0): Token
+    public function create(UserInterface $user, int $ttl = 0, bool $isRefresh = false): Token
     {
         $payload = [];
 
-        $payload['roles'] = $user->getRoles();
-        $payload['username'] = $user->getUsername();
+        $payload[self::IDENTIFIER_CLAIM] = $user->getUsername();
+        $payload[self::ROLES_CLAIM] = $user->getRoles();
 
         //Identified by claim
-        $payload['jti'] = $user->getUsername();
+        $payload[self::IDENTIFIEDBY_CLAIM] = $user->getUsername();
 
         $now = Carbon::now()->unix();
         //Issued at claim
-        $payload['iat'] = $now;
+        $payload[self::ISSUEDAT_CLAIM] = $now;
         //Expiration time claim
-        $payload['exp'] = $now + $ttl;
+        $payload[self::EXPIRATION_CLAIM] = $now + $ttl;
 
-        return $this->generateJWTString($payload);
+        $generatedToken = $this->generateJWTString($payload);
+
+        if ($isRefresh) {
+            $this->storeTokenInCache($generatedToken);
+        }
+
+        return $generatedToken;
     }
 
     private function generateJWTString(array $payload): Token
@@ -85,5 +107,25 @@ class JWTManager
                 $this->passphrase
             )
         );
+    }
+
+    private function storeTokenInCache(Token $token, int $ttl = 0): void
+    {
+        $idBase = $token->getClaim(self::IDENTIFIEDBY_CLAIM);
+
+        $cacheId = $this->generateCacheId($idBase);
+
+        $cacheItem = $this->tokenStore->getItem($cacheId);
+
+        $cacheItem
+            ->set((string)$token)
+            ->expiresAfter($ttl);
+
+        $this->tokenStore->save($cacheItem);
+    }
+
+    private function generateCacheId(string $identifier): string
+    {
+        return sprintf('jwt-token.%s', $identifier);
     }
 }

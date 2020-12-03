@@ -23,14 +23,31 @@ security:
             stateless: true
 
         api:
-            anonymous: ~
-            pattern: '^%app.route_prefix%/v1'
+            pattern:  '^%app.route_prefix%/v1'
+            stateless: true
+            anonymous: true
+            guard:
+                authenticators:
+                    - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
+            json_login:
+                check_path:               api_login
+                remember_me:              false
+                success_handler:          OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler
+#                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
             logout:
                 path: logout
                 success_handler: OAT\SimpleRoster\Security\Handler\LogoutSuccessHandler
-            json_login:
-                check_path: login
-                remember_me: false
+
+#        api:
+#            anonymous: ~
+#            stateless: true
+#            pattern: '^%app.route_prefix%/v1'
+#            guard:
+#                authenticators:
+#                    - lexik_jwt_authentication.jwt_token_authenticator
+#            json_login:
+#                check_path: '%app.route_prefix%/v1/auth/login'
+#                remember_me: false
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
@@ -41,4 +58,6 @@ security:
     access_control:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }
+        - { path: '^%app.route_prefix%/v1/auth/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/auth/token/refresh', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1', roles: IS_AUTHENTICATED_FULLY }
