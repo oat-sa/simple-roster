@@ -83,12 +83,8 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
         );
 
-        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        self::assertArrayHasKey('set-cookie', $this->kernelBrowser->getResponse()->headers->all());
-
-        $session = $this->kernelBrowser->getContainer()->get('session');
-
-        self::assertNotEmpty($session->all());
+        self::assertArrayHasKey('accessToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
     }
 }

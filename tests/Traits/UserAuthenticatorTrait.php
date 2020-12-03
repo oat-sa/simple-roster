@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Traits;
 
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use OAT\SimpleRoster\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
@@ -30,19 +31,24 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 trait UserAuthenticatorTrait
 {
-    protected function logInAs(User $user, KernelBrowser $kernelBrowser): void
+    protected function logInAs(User $user, KernelBrowser &$kernelBrowser): KernelBrowser
     {
-        /** @var Session $session */
-        $session = $kernelBrowser->getContainer()->get('session');
+        $kernelBrowser->request(
+            'POST',
+            '/api/v1/auth/login',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array(
+                'username' => $user->getUsername(),
+                'password' => $user->getPlainPassword(),
+            ))
+        );
 
-        // the firewall context defaults to the firewall name
-        $firewallContext = 'api';
+        $data = json_decode($kernelBrowser->getResponse()->getContent(), true);
 
-        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
-        $session->set('_security_' . $firewallContext, serialize($token));
-        $session->save();
+        $kernelBrowser->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['accessToken']));
 
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $kernelBrowser->getCookieJar()->set($cookie);
+        return $kernelBrowser;
     }
 }

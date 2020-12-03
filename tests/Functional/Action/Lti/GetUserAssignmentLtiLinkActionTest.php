@@ -394,6 +394,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
 
         self::assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+
         $this->assertHasRecordThatPasses(
             static function (array $record) use ($assignment, $ltiRequestInResponse) {
                 /** @var LtiRequest $ltiRequest */
