@@ -27,6 +27,7 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -89,6 +90,13 @@ class JWTManager
         }
 
         return $generatedToken;
+    }
+
+    public function getStoredToken(string $identifier): CacheItemInterface
+    {
+        $identifier = $this->generateCacheId($identifier);
+
+        return $this->tokenStore->getItem($identifier);
     }
 
     private function generateJWTString(array $payload): Token

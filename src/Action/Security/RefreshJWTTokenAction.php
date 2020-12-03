@@ -30,18 +30,14 @@ use OAT\SimpleRoster\Service\JWT\JWTManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class RefreshJWTTokenAction
 {
     /** @var JWTManager */
     private $manager;
-
-//    /** @var CacheItemPoolInterface */
-//    private $tokenCache;
-//
-//    /** @var TokenCacheIdGeneratorInterface */
-//    private $tokenCacheIdGenerator;
 
     /** @var UserRepository */
     private $userRepository;
@@ -57,16 +53,12 @@ class RefreshJWTTokenAction
 
     public function __construct(
         JWTManager $manager,
-//        CacheItemPoolInterface $tokenCache,
-//        TokenCacheIdGeneratorInterface $tokenCacheIdGenerator,
         UserRepository $userRepository,
         JwtTokenVerifierInterface $tokenVerifier,
         SerializerResponder $responder,
         int $accessTokenTtl
     ) {
         $this->manager = $manager;
-//        $this->tokenCache = $tokenCache;
-//        $this->tokenCacheIdGenerator = $tokenCacheIdGenerator;
         $this->userRepository = $userRepository;
         $this->tokenVerifier = $tokenVerifier;
         $this->responder = $responder;
@@ -84,27 +76,26 @@ class RefreshJWTTokenAction
             $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
             $username = $refreshToken->getClaim('username');
         } catch (\Throwable $exception) {
-            throw new BadRequestHttpException('Invalid token.');
+            throw new ConflictHttpException('Invalid token.');
         }
 
-//        $refreshTokenCacheId = $this->tokenCacheIdGenerator->generate($username);
-//        $refreshTokenCacheItem = $this->tokenCache->getItem($refreshTokenCacheId);
+        $cachedToken = $this->manager->getStoredToken($username);
 
-//        if (
-//            !$refreshTokenCacheItem->isHit()
-//            || $refreshTokenCacheItem->get() !== (string)$refreshToken
-//        ) {
-//            throw new UnauthorizedHttpException('', 'Expired token.');
-//        }
+        if (
+            !$cachedToken->isHit()
+            || $cachedToken->get() !== (string)$refreshToken
+        ) {
+            throw new UnauthorizedHttpException('', 'Expired token.');
+        }
 
         if (!$this->tokenVerifier->isValid($refreshToken)) {
-            throw new BadRequestHttpException('Invalid token.');
+            throw new ConflictHttpException('Invalid token.');
         }
 
         try {
             $user = $this->userRepository->findOneByUsername($username);
         } catch (UsernameNotFoundException $exception) {
-            throw new BadRequestHttpException('Expired token.');
+            throw new ConflictHttpException('Expired token.');
         }
 
         $accessToken = $this->manager->create($user, $this->accessTokenTtl);
