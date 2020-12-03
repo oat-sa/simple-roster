@@ -72,7 +72,7 @@ class UpdateLineItemsService
                 }
             );
 
-        if (count((array)$slugs) < 1) {
+        if (count($slugs) < 1) {
             return $collection;
         }
 

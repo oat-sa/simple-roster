@@ -44,7 +44,7 @@ class UpdateLineItemCollection implements IteratorAggregate, Countable
         return new ArrayIterator($this->updateLineItemsDto);
     }
 
-    public function map(Closure $callback): Iterator
+    public function map(Closure $callback): array
     {
         $results = [];
 
@@ -53,7 +53,7 @@ class UpdateLineItemCollection implements IteratorAggregate, Countable
             $results[] = $callback($dto);
         }
 
-        return new ArrayIterator($results);
+        return $results;
     }
 
     public function filter(Closure $callback): self
