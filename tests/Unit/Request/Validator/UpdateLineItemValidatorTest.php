@@ -28,7 +28,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -59,7 +58,7 @@ class UpdateLineItemValidatorTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with([], $this->getConstraints())
+            ->with([])
             ->willReturn(
                 new ArrayIterator()
             );
@@ -87,7 +86,7 @@ class UpdateLineItemValidatorTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with([], $this->getConstraints())
+            ->with([])
             ->willReturn(
                 new ArrayIterator(
                     [
@@ -115,50 +114,5 @@ class UpdateLineItemValidatorTest extends TestCase
             ->method('validate');
 
         $this->sut->validate($request);
-    }
-
-    private function getConstraints(): Assert\Collection
-    {
-        return new Assert\Collection(
-            [
-                'fields' => [
-                    'source' => new Assert\Optional([new Assert\Type('string')]),
-                    'events' => new Assert\Sequentially(
-                        [
-                            new Assert\Type('array'),
-                            new Assert\Count(['min' => 1]),
-                            new Assert\All(
-                                [
-                                    new Assert\Collection(
-                                        [
-                                            'fields' => [
-                                                'eventId' => new Assert\Type('string'),
-                                                'eventName' => new Assert\Type('string'),
-                                                'triggeredTimestamp' => new Assert\Type('int'),
-                                                'eventData' => new Assert\Collection(
-                                                    [
-                                                        'fields' => [
-                                                            "alias" => new Assert\Optional(
-                                                                [
-                                                                    new Assert\Type('string'),
-                                                                ]
-                                                            ),
-                                                            "deliveryURI" => new Assert\Type('string'),
-                                                        ],
-                                                        'allowExtraFields' => true,
-                                                    ]
-                                                ),
-                                            ],
-                                            'allowExtraFields' => true,
-                                        ]
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                ],
-                'allowExtraFields' => true,
-            ],
-        );
     }
 }
