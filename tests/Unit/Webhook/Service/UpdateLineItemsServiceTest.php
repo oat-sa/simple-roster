@@ -206,7 +206,6 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->assertSame('ignored', $updateLineItemDtoDuplicated->getStatus());
     }
 
-
     public function testErrorForUpdatesWithNotFoundSlug(): void
     {
         $this->lineItemRepository->expects($this->once())

@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\WebHook\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
+use Exception;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
@@ -52,6 +53,7 @@ class UpdateLineItemsService
 
     /**
      * @throws ORMException
+     * @throws Exception
      */
     public function handleUpdates(UpdateLineItemCollection $collection): UpdateLineItemCollection
     {
@@ -88,8 +90,7 @@ class UpdateLineItemsService
                     }
                 );
 
-            // @phpstan-ignore-next-line
-            $dto = $duplicatedUpdates->findLastByTriggeredTime();
+            $dto = $duplicatedUpdates->findLastByTriggeredTimeOrFail();
 
             if ($duplicatedUpdates->count() > 1) {
                 $this->logger->warning(
