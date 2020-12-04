@@ -41,9 +41,7 @@ class LineItemLoaderListener implements EntityListenerInterface
 
         //we're forcing the doctrine to load the line item by using cache instead of database query
         if (null !== $lineItem) {
-            $assignment->setLineItem(
-                $lineItem
-            );
+            $assignment->setLineItem($lineItem);
         }
     }
 }
