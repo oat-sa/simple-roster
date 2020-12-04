@@ -113,9 +113,8 @@ class LineItemCacheWarmerCommand extends Command
             if ($lineItemCollection->isEmpty()) {
                 $this->symfonyStyle->warning('There are no Line Items found in the database.');
 
-                x    return 0;
+                return 0;
             }
-
             /** @var LineItem $lineItem */
             foreach ($lineItemCollection as $lineItem) {
                 $id = (int)$lineItem->getId();
