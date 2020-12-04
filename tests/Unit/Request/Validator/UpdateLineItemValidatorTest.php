@@ -37,14 +37,14 @@ class UpdateLineItemValidatorTest extends TestCase
     private $validator;
 
     /** @var UpdateLineItemValidator */
-    private $sut;
+    private $subject;
 
     protected function setUp(): void
     {
         $this->validator = $this->createMock(
             ValidatorInterface::class
         );
-        $this->sut = new UpdateLineItemValidator(
+        $this->subject = new UpdateLineItemValidator(
             $this->validator
         );
     }
@@ -63,7 +63,7 @@ class UpdateLineItemValidatorTest extends TestCase
                 new ArrayIterator()
             );
 
-        $this->sut->validate($request);
+        $this->subject->validate($request);
     }
 
     public function testItThrowsExceptionDuringValidation(): void
@@ -95,7 +95,7 @@ class UpdateLineItemValidatorTest extends TestCase
                 )
             );
 
-        $this->sut->validate($request);
+        $this->subject->validate($request);
     }
 
 
@@ -113,6 +113,6 @@ class UpdateLineItemValidatorTest extends TestCase
         $this->validator->expects($this->never())
             ->method('validate');
 
-        $this->sut->validate($request);
+        $this->subject->validate($request);
     }
 }

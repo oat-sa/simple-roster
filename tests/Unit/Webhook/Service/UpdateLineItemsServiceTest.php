@@ -45,7 +45,7 @@ class UpdateLineItemsServiceTest extends TestCase
     private $logger;
 
     /** @var UpdateLineItemsService */
-    private $sut;
+    private $subject;
 
     protected function setUp(): void
     {
@@ -61,7 +61,7 @@ class UpdateLineItemsServiceTest extends TestCase
             LoggerInterface::class
         );
 
-        $this->sut = new UpdateLineItemsService(
+        $this->subject = new UpdateLineItemsService(
             $this->lineItemRepository,
             $this->entityManager,
             $this->logger
@@ -83,7 +83,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
         );
 
-        $result = $this->sut->handleUpdates($updateLineItemCollection);
+        $result = $this->subject->handleUpdates($updateLineItemCollection);
 
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
@@ -130,7 +130,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
         );
 
-        $result = $this->sut->handleUpdates($updateLineItemCollection);
+        $result = $this->subject->handleUpdates($updateLineItemCollection);
 
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
@@ -194,7 +194,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
         );
 
-        $result = $this->sut->handleUpdates($updateLineItemCollection);
+        $result = $this->subject->handleUpdates($updateLineItemCollection);
 
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
@@ -240,7 +240,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
         );
 
-        $result = $this->sut->handleUpdates($updateLineItemCollection);
+        $result = $this->subject->handleUpdates($updateLineItemCollection);
 
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];

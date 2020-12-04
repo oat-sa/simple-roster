@@ -37,7 +37,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class UpdateLineItemWebHookParamConverterTest extends TestCase
 {
     /** @var UpdateLineItemWebHookParamConverter */
-    private $sut;
+    private $subject;
 
     /** @var MockObject|UpdateLineItemValidator */
     private $updateLineItemValidator;
@@ -48,7 +48,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             UpdateLineItemValidator::class
         );
 
-        $this->sut = new UpdateLineItemWebHookParamConverter(
+        $this->subject = new UpdateLineItemWebHookParamConverter(
             $this->updateLineItemValidator
         );
     }
@@ -92,7 +92,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             ->method('getName')
             ->willReturn('collection');
 
-        $this->sut->apply($request, $configuration);
+        $this->subject->apply($request, $configuration);
 
         $this->assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
 
@@ -125,6 +125,6 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             ->with($request)
             ->willThrowException(new BadRequestHttpException());
 
-        $this->sut->apply($request, $this->createMock(ParamConverter::class));
+        $this->subject->apply($request, $this->createMock(ParamConverter::class));
     }
 }
