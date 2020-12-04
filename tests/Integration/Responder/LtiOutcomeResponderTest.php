@@ -20,47 +20,39 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Unit\Responder;
+namespace OAT\SimpleRoster\Tests\Integration\Responder;
 
-use OAT\SimpleRoster\Generator\MessageIdentifierGenerator;
 use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
-use OAT\SimpleRoster\Responder\XmlResponse;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactoryInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class LtiOutcomeResponderTest extends TestCase
+class LtiOutcomeResponderTest extends KernelTestCase
 {
-    /** @var Environment|MockObject */
-    private $twig;
-
-    /** @var UuidFactoryInterface|MockObject */
-    private $uuidFactory;
-
-    /** @var LtiOutcomeResponder */
-    private $subject;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->twig = $this->createMock(Environment::class);
-        $this->uuidFactory = $this->createMock(UuidFactoryInterface::class);
-
-        $this->subject = new LtiOutcomeResponder($this->twig, $this->uuidFactory);
+        self::bootKernel();
     }
 
-    public function testCreateReplaceResultResponse(): void
+    public function testCreateReplaceResultResponse2(): void
     {
-        $this->twig
-            ->expects(self::once())
-            ->method('render')
-            ->with('basic-outcome/replace-result-response.xml.twig')
-            ->willReturn('templateWithValues');
+        $twig = static::$container->get(Environment::class);
+        $uuidFactory = $this->createMock(UuidFactoryInterface::class);
+        $uuidFactory
+            ->method('uuid4')
+            ->willreturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
-        $response = $this->subject->createXmlResponse(1);
+        $xmlResponse = (string)file_get_contents(
+            __DIR__ . '/../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
+        );
 
-        $this->assertEquals(new XmlResponse('templateWithValues'), $response);
+        $subject = new LtiOutcomeResponder($twig, $uuidFactory);
+
+        $response = $subject->createXmlResponse(1);
+
+        self::assertEquals(trim($xmlResponse), $response->getContent());
     }
 }

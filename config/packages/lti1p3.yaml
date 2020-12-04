@@ -30,4 +30,4 @@ lti1p3:
             platform_key_chain: "platformKey"
             tool_key_chain: null
             platform_jwks_url: null
-            tool_jwks_url: "http://demo_lti1p3_nginx/lti1p3/.well-known/jwks/toolSet.json"
+            tool_jwks_url: "http://simple-roster.localhost/lti1p3/.well-known/jwks/toolSet.json"

@@ -1,11 +1,11 @@
 lti1p3:
     key_chains:
-        kid1:
+        platformKey:
             key_set_name: "platformSet"
             public_key: "file://%kernel.project_dir%/config/secrets/test/public.key"
             private_key: "file://%kernel.project_dir%/config/secrets/test/private.key"
             private_key_passphrase: ~
-        kid2:
+        toolKey:
             key_set_name: "toolSet"
             public_key: "file://%kernel.project_dir%/config/secrets/test/public.key"
             private_key: "file://%kernel.project_dir%/config/secrets/test/private.key"
@@ -30,7 +30,7 @@ lti1p3:
             tool: "testTool"
             deployment_ids:
                 - "1"
-            platform_key_chain: "kid1"
-            tool_key_chain: "kid2"
+            platform_key_chain: "platformKey"
+            tool_key_chain: "toolKey"
             platform_jwks_url: ~
             tool_jwks_url: ~

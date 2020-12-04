@@ -28,9 +28,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,7 +102,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals(trim($xmlResponseBody), $this->kernelBrowser->getResponse()->getContent());
         self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
@@ -128,7 +126,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             'JWT access token scopes are invalid',
             (string)$this->kernelBrowser->getResponse()->getContent()
         );
@@ -148,9 +146,9 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         $response = $this->kernelBrowser->getResponse();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
-        $this->assertStringContainsString(
+        self::assertInstanceOf(Response::class, $response);
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        self::assertStringContainsString(
             'A Token was not found in the TokenStorage',
             (string)$response->getContent()
         );
@@ -171,9 +169,9 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         $response = $this->kernelBrowser->getResponse();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
-        $this->assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
+        self::assertInstanceOf(Response::class, $response);
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        self::assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void

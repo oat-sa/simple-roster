@@ -5,3 +5,6 @@ lti1p3:
             audience: "https://simple-roster.docker.localhost/platform"
             oidc_authentication_url: "https://simple-roster.docker.localhost/lti1p3/oidc/authentication"
             oauth2_access_token_url: "http://simple-roster-nginx/lti1p3/auth/platformKey/token"
+    registrations:
+        demo:
+            tool_jwks_url: "http://demo_lti1p3_nginx/lti1p3/.well-known/jwks/toolSet.json"

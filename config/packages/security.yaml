@@ -22,7 +22,7 @@ security:
                     - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
-        secured_service_area:
+        lti1p3:
             pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
             stateless: true
             lti1p3_service: { scopes: [ 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome' ] }

@@ -29,9 +29,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -133,7 +131,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertSame(trim($xmlResponseBody), $this->kernelBrowser->getResponse()->getContent());
 
         self::assertEquals(
             Assignment::STATE_READY,

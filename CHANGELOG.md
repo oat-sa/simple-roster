@@ -25,7 +25,6 @@
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 - Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
-- Changed response on `UpdateLti1p1OutcomeAction` to return valid XML.
 
 ### Removed
 - Removed `roster:ingest` command.
@@ -36,9 +35,9 @@
 - Removed `lti_instances.yaml` configuration file.
 - Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
 
-
 ### Fixed
 - Fixed HTTP code returned in case assignment exists but unavailable for `getUserAssignmentLtiLink` endpoint.
+- Fixed response on `UpdateLti1p1OutcomeAction` to return valid XML on success.
 
 ## 1.8.1 - 2020-10-27
 
