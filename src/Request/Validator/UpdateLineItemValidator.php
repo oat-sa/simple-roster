@@ -106,11 +106,11 @@ class UpdateLineItemValidator
                                             ],
                                             'allowExtraFields' => true,
                                         ],
-                                    )
+                                    ),
                                 ],
-                            )
+                            ),
                         ],
-                    )
+                    ),
                 ],
                 'allowExtraFields' => true,
             ],
