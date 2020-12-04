@@ -96,20 +96,20 @@ class UpdateLineItemValidator
                                                             "alias" => new Assert\Optional(
                                                                 [
                                                                     new Assert\Type('string'),
-                                                                ]
+                                                                ],
                                                             ),
                                                             "deliveryURI" => new Assert\Type('string'),
                                                         ],
                                                         'allowExtraFields' => true,
-                                                    ]
+                                                    ],
                                                 ),
                                             ],
                                             'allowExtraFields' => true,
-                                        ]
+                                        ],
                                     )
-                                ]
+                                ],
                             )
-                        ]
+                        ],
                     )
                 ],
                 'allowExtraFields' => true,
