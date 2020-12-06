@@ -22,33 +22,25 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Traits;
 
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Service\JWT\JWTManager;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 trait UserAuthenticatorTrait
 {
-    protected function logInAs(User $user, KernelBrowser &$kernelBrowser): KernelBrowser
+    protected function logInAs(User $user, KernelBrowser $kernelBrowser): string
     {
-        $kernelBrowser->request(
-            'POST',
-            '/api/v1/auth/login',
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array(
-                'username' => $user->getUsername(),
-                'password' => $user->getPlainPassword(),
-            ))
-        );
+        $ttl = static::$container->getParameter('app.jwt.access_token_ttl');
+        $refreshTtl = static::$container->getParameter('app.jwt.refresh_token_ttl');
 
-        $data = json_decode($kernelBrowser->getResponse()->getContent(), true);
+        /** @var JWTManager $jwt */
+        $jwt = static::$container->get(JWTManager::class);
 
-        $kernelBrowser->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['accessToken']));
+        $accessToken = $jwt->create($user, $ttl);
+        $refreshToken = $jwt->create($user, $refreshTtl, true);
 
-        return $kernelBrowser;
+        $kernelBrowser->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $accessToken));
+
+        return (string)$refreshToken;
     }
 }
