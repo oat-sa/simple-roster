@@ -100,6 +100,11 @@ class JWTManager
         return $this->tokenStore->getItem($identifier);
     }
 
+    public function generateCacheId(string $identifier): string
+    {
+        return sprintf('jwt-token.%s', $identifier);
+    }
+
     private function generateJWTString(array $payload): Token
     {
 
@@ -131,10 +136,5 @@ class JWTManager
             ->expiresAfter($ttl);
 
         $this->tokenStore->save($cacheItem);
-    }
-
-    private function generateCacheId(string $identifier): string
-    {
-        return sprintf('jwt-token.%s', $identifier);
     }
 }
