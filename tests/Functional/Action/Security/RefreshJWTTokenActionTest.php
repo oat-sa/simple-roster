@@ -68,7 +68,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItStoresRefreshTokensInCache(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -91,7 +91,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItThrows400WithNoToken(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -131,7 +131,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItThrows409WithIncorrectToken(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -169,7 +169,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItThrows401WithExpiredToken(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
