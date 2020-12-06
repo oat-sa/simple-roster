@@ -128,15 +128,3 @@ services:
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
-
-    OAT\SimpleRoster\Service\JWT\JWTManager:
-        class: OAT\SimpleRoster\Service\JWT\JWTManager
-
-    OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator:
-        class: OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
-
-    OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier:
-        class: OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier
-
-    OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler:
-        class: OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler
