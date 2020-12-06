@@ -22,7 +22,7 @@ class JwtTokenVerifierTest extends KernelTestCase
 
         $token = $tokenManager->create($user);
 
-        $subject = new JwtTokenVerifier('file://' . __DIR__ . '/../../../../tests/Resources/jwt/public.pem');
+        $subject = new JwtTokenVerifier('file://' . __DIR__ . '/../../../../config/secrets/test/jwt_public.pem');
 
         $this->assertTrue($subject->isValid($token));
     }
