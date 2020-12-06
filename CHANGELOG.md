@@ -23,6 +23,7 @@
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
+- Changed security flow to use JWT for api endpoints
 
 ### Removed
 - Removed `roster:ingest` command.
