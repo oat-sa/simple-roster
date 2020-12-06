@@ -33,7 +33,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItReturnsRefreshTokenAndItCanBeUsed(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new \DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
