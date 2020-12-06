@@ -29,6 +29,11 @@ The main configuration file is `.env`, located in root folder.
 | APP_SECRET | Application secret |
 | APP_API_KEY | Application API Key |
 | APP_ROUTE_PREFIX | Application route prefix, [default: `/api` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
+| JWT_SECRET_KEY | Path to RSA private key for JWT Auth flow |
+| JWT_PUBLIC_KEY | Path to RSA public key for JWT Auth flow |
+| JWT_PASSPHRASE | Passphrase for JWT keypair |
+| JWT_ACCESS_TOKEN_TTL | TTL for JWT access token |
+| JWT_REFRESH_TOKEN_TTL | TTL for JWT refresh token |
 | DATABASE_URL | Database url |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
@@ -91,6 +96,20 @@ $ sudo -u www-data bin/console doctrine:schema:update --force
 ```shell script
 $ sudo -u www-data bin/console doctrine:schema:drop --force
 ```
+
+- Generate private/public keypair for JWT auth flow to work
+    1. create directory to store keypair
+        ```shell
+        $ mkdir -p config/secrets/prod
+        ```
+    2. generate private key
+        ```shell
+        $ openssl genpkey -out config/secrets/prod/jwt_private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+        ```
+    3. generate public key
+        ```shell
+        $ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
+        ```
 
 ## LTI
 
