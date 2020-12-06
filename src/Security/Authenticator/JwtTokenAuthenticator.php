@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -58,17 +59,26 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     }
 
     /**
-     * @inheritdoc
+     * @param AuthorizationHeaderTokenExtractor $extractor
      */
-    public function supports(Request $request)
+    public function setExtractor(AuthorizationHeaderTokenExtractor $extractor): void
     {
-        return $request->headers->has('Authorization');
+        $this->tokenExtractor = $extractor;
+    }
+
+    /**
+     * @inheritdoc
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function supports(Request $request): bool
+    {
+        return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
     }
 
     /**
      * @inheritdoc
      */
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): ?string
     {
         return $this->tokenExtractor->extract($request);
     }
