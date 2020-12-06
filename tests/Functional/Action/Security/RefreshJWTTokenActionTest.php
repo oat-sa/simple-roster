@@ -3,7 +3,6 @@
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use Carbon\Carbon;
-use \DateTimeZone;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\JWT\JWTManager;
@@ -34,7 +33,7 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItReturnsRefreshTokenAndItCanBeUsed(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new \DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
