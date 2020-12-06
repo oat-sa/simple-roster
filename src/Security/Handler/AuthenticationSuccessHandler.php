@@ -60,6 +60,8 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
      * @param Request $request
      * @param TokenInterface $token
      * @return Response
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
