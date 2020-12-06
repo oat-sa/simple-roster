@@ -2,7 +2,14 @@
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
+use Carbon\Carbon;
+use \DateTimeZone;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\JWT\JWTManager;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RefreshJWTTokenActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
+    use UserAuthenticatorTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -26,28 +34,16 @@ class RefreshJWTTokenActionTest extends WebTestCase
 
     public function testItReturnsRefreshTokenAndItCanBeUsed(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/login',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
-        $response = $this->kernelBrowser->getResponse();
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
 
-        $decodedResponse = json_decode($response->getContent(), true);
-
-        self::assertArrayHasKey('accessToken', $decodedResponse);
-
-        self::assertArrayHasKey('refreshToken', $decodedResponse);
-
-        $refreshToken = $decodedResponse['refreshToken'];
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -67,30 +63,45 @@ class RefreshJWTTokenActionTest extends WebTestCase
         $decodedResponse = json_decode($response->getContent(), true);
 
         self::assertArrayHasKey('accessToken', $decodedResponse);
+
+        Carbon::setTestNow();
+    }
+
+    public function testItStoresRefreshTokensInCache(): void
+    {
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
+
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
+
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
+
+        $manager = static::$container->get(JWTManager::class);
+        $cachePool = static::$container->get(CacheItemPoolInterface::class);
+
+        $refreshTokenCacheId = $manager->generateCacheId('user1');
+
+        $this->assertSame($refreshToken, $cachePool->getItem($refreshTokenCacheId)->get());
+
+        Carbon::setTestNow();
     }
 
     public function testItThrows400WithNoToken(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/login',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
-        $response = $this->kernelBrowser->getResponse();
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
 
-        $decodedResponse = json_decode($response->getContent(), true);
-
-        self::assertArrayHasKey('accessToken', $decodedResponse);
-
-        self::assertArrayHasKey('refreshToken', $decodedResponse);
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -115,30 +126,22 @@ class RefreshJWTTokenActionTest extends WebTestCase
             'Missing \'refreshToken\' in request body.',
             $decodedResponse['error']['message']
         );
+
+        Carbon::setTestNow();
     }
 
     public function testItThrows409WithIncorrectToken(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/login',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
-        $response = $this->kernelBrowser->getResponse();
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
 
-        $decodedResponse = json_decode($response->getContent(), true);
-
-        self::assertArrayHasKey('accessToken', $decodedResponse);
-
-        self::assertArrayHasKey('refreshToken', $decodedResponse);
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -161,31 +164,24 @@ class RefreshJWTTokenActionTest extends WebTestCase
             'Invalid token.',
             $decodedResponse['error']['message']
         );
+
+        Carbon::setTestNow();
     }
 
-    //TODO: override env variable in there
     public function testItThrows401WithExpiredToken(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/login',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
-        $response = $this->kernelBrowser->getResponse();
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
 
-        $decodedResponse = json_decode($response->getContent(), true);
+        Carbon::setTestNow();
 
-        self::assertArrayHasKey('accessToken', $decodedResponse);
-
-        self::assertArrayHasKey('refreshToken', $decodedResponse);
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -195,17 +191,17 @@ class RefreshJWTTokenActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['refreshToken' => $decodedResponse['refreshToken']], JSON_THROW_ON_ERROR, 512)
+            json_encode(['refreshToken' => $refreshToken], JSON_THROW_ON_ERROR, 512)
         );
 
         $response = $this->kernelBrowser->getResponse();
 
-        self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
 
         $decodedResponse = json_decode($response->getContent(), true);
 
         self::assertSame(
-            'Invalid token.',
+            'Expired token.',
             $decodedResponse['error']['message']
         );
     }
