@@ -86,7 +86,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             $requestBody
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -95,7 +95,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame(
+        self::assertEquals(
             $expectedMessage,
             $decodedResponse['error']['message']
         );
@@ -112,24 +112,13 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getSuccessRequestBody())
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
+        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         /** @var LineItemRepository $lineItemRepository */
         $lineItemRepository = $this->getRepository(LineItem::class);
 
         /** @var LineItem $lineItem */
-        $lineItem = $lineItemRepository->findOneBy(
-            [
-                'slug' => 'lineItemSlug'
-            ]
-        );
+        $lineItem = $lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
         $lineItemCache = $this->resultCacheImplementation->fetch('line_item_1');
 
@@ -154,17 +143,14 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             Logger::INFO
         );
 
-        self::assertEquals(
-            'https://docker.localhost/ontologies/tao.rdf#RightOne',
-            $lineItem->getUri()
-        );
+        self::assertEquals('https://docker.localhost/ontologies/tao.rdf#RightOne', $lineItem->getUri());
 
         self::assertEquals(
             'https://docker.localhost/ontologies/tao.rdf#RightOne',
             current($lineItemCache)[0]['uri_1']
         );
 
-        self::assertSame(
+        self::assertEquals(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
@@ -183,10 +169,14 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'status' => 'ignored'
                 ]
             ],
-            $decodedResponse
+            json_decode(
+                $this->kernelBrowser->getResponse()->getContent(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            )
         );
     }
-
 
     public function testItAcceptsRequestButIgnoreUnknownEvents(): void
     {
@@ -199,23 +189,21 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getRequestBodyUnknownEvent())
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
+        self::assertEquals(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
                     'status' => 'ignored'
                 ]
             ],
-            $decodedResponse
+            json_decode(
+                $this->kernelBrowser->getResponse()->getContent(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            )
         );
     }
 

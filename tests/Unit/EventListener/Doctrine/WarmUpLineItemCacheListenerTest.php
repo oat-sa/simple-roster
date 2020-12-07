@@ -22,32 +22,102 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface;
 use OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class WarmUpLineItemCacheListenerTest extends TestCase
 {
+    /** @var Configuration|MockObject */
+    private $doctrineConfiguration;
+
+    /** @var EntityManagerInterface|MockObject */
+    private $entityManager;
+
+    /** @var LineItemRepository|MockObject */
+    private $lineItemRepository;
+
+    /** @var LineItemCacheIdGenerator|MockObject */
+    private $lineItemCacheIdGenerator;
+
+    protected function setUp(): void
+    {
+        $this->doctrineConfiguration = $this->createMock(Configuration::class);
+
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager->method('getConfiguration')
+            ->willReturn($this->doctrineConfiguration);
+
+        $this->lineItemCacheIdGenerator = $this->createMock(LineItemCacheIdGenerator::class);
+        $this->lineItemRepository = $this->createMock(LineItemRepository::class);
+    }
+
     public function testItThrowsExceptionIfDoctrineResultCacheImplementationIsNotConfigured(): void
     {
         $this->expectException(DoctrineResultCacheImplementationNotFoundException::class);
         $this->expectExceptionMessage('Doctrine result cache implementation is not configured.');
 
-        $doctrineConfiguration = $this->createMock(Configuration::class);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-
-        $entityManager
-            ->method('getConfiguration')
-            ->willReturn($doctrineConfiguration);
-
         new WarmUpLineItemCacheListener(
-            $this->createMock(LineItemRepository::class),
-            $entityManager,
-            $this->createMock(LineItemCacheIdGenerator::class)
+            $this->lineItemRepository,
+            $this->entityManager,
+            $this->lineItemCacheIdGenerator
         );
+    }
+
+    public function testItIsDoctrineEntityListener(): void
+    {
+        $this->doctrineConfiguration->expects(self::once())
+            ->method('getResultCacheImpl')
+            ->willReturn($this->createMock(CacheProvider::class));
+
+        $subject = new WarmUpLineItemCacheListener(
+            $this->lineItemRepository,
+            $this->entityManager,
+            $this->lineItemCacheIdGenerator
+        );
+
+        $this->assertInstanceOf(EntityListenerInterface::class, $subject);
+    }
+
+    public function testItWarmsUpCacheDuringPostUpdate(): void
+    {
+        $this->lineItemRepository->expects(self::once())
+            ->method('findById')
+            ->with(1);
+
+        $cacheProvider = $this->createMock(CacheProvider::class);
+        $cacheProvider->expects(self::once())
+            ->method('delete')
+            ->with('line_item_1');
+
+        $this->doctrineConfiguration->expects(self::once())
+            ->method('getResultCacheImpl')
+            ->willReturn($cacheProvider);
+
+        $this->lineItemCacheIdGenerator->expects($this->once())
+            ->method('generate')
+            ->with(1)
+            ->willReturn('line_item_1');
+
+        $subject = new WarmUpLineItemCacheListener(
+            $this->lineItemRepository,
+            $this->entityManager,
+            $this->lineItemCacheIdGenerator
+        );
+
+        $lineItem = $this->createMock(LineItem::class);
+        $lineItem->expects(self::once())
+            ->method('getId')
+            ->willReturn(1);
+
+        $subject->postUpdate($lineItem);
     }
 }
