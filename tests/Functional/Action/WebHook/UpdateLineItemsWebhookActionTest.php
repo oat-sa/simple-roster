@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -74,13 +74,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
      * @throws JsonException
      */
     public function testItThrowsBadRequestIfRequestIsInvalid(
-        ?array $requestBody,
+        string $requestBody,
         string $expectedMessage
     ): void {
-        if (null !== $requestBody) {
-            $requestBody = (string)json_encode($requestBody);
-        }
-
         $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/web-hooks/update-line-items',
@@ -223,6 +219,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function provideWrongRequestBodies(): array
     {
         $missingDeliveryUri = 'Invalid Request Body: [events][0][eventData][deliveryURI] -> This field is missing.';
@@ -231,91 +230,103 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         return [
             'empty' => [
-                'requestBody' => null,
+                'requestBody' => '',
                 'expectedMessage' => 'Invalid JSON request body received. Error: Syntax error.',
             ],
             'emptyObject' => [
-                'requestBody' => [],
+                'requestBody' => json_encode([]),
                 'expectedMessage' => 'Invalid Request Body: [events] -> This field is missing.',
             ],
-            'IncompleteEventName' => [
-                'requestBody' => [
-                    'source' => 'https://someinstance.taocloud.org/',
-                    'events' => [
+            'IncompleteEventName' =>
+                [
+                    'requestBody' => json_encode(
                         [
-                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                            'triggeredTimestamp' => 1565602371,
-                            'eventData' => [
-                                'alias' => 'qti-interactions-delivery',
-                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                            'source' => 'https://someinstance.taocloud.org/',
+                            'events' => [
+                                [
+                                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                    'triggeredTimestamp' => 1565602371,
+                                    'eventData' => [
+                                        'alias' => 'qti-interactions-delivery',
+                                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                    ],
+                                ],
                             ],
-                        ],
-                    ],
-                ],
-                'expectedMessage' => 'Invalid Request Body: [events][0][eventName] -> This field is missing.',
-            ],
+                        ]
+                    ),
+                    'expectedMessage' => 'Invalid Request Body: [events][0][eventName] -> This field is missing.',
+                ]
+            ,
             'IncompleteEventId' => [
-                'requestBody' => [
-                    'source' => 'https://someinstance.taocloud.org/',
-                    'events' => [
-                        [
-                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                            'triggeredTimestamp' => 1565602371,
-                            'eventData' => [
-                                'alias' => 'qti-interactions-delivery',
-                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [
+                            [
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' => [
+                                    'alias' => 'qti-interactions-delivery',
+                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                ],
                             ],
                         ],
-                    ],
-                ],
+                    ]
+                ),
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventId] -> This field is missing.',
             ],
             'IncompleteEventTriggeredTimeStamp' => [
-                'requestBody' => [
-                    'source' => 'https://someinstance.taocloud.org/',
-                    'events' => [
-                        [
-                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                            'eventData' => [
-                                'alias' => 'qti-interactions-delivery',
-                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'eventData' => [
+                                    'alias' => 'qti-interactions-delivery',
+                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                ],
                             ],
                         ],
-                    ],
-                ],
+                    ]
+                ),
                 'expectedMessage' => 'Invalid Request Body: [events][0][triggeredTimestamp] -> This field is missing.',
             ],
             'IncompleteEventDeliveryUri' => [
-                'requestBody' => [
-                    'source' => 'https://someinstance.taocloud.org/',
-                    'events' => [
-                        [
-                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                            'triggeredTimestamp' => 1565602371,
-                            'eventData' => [
-                                'alias' => 'qti-interactions-delivery',
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' => [
+                                    'alias' => 'qti-interactions-delivery',
+                                ],
                             ],
                         ],
-                    ],
-                ],
+                    ]
+                ),
                 'expectedMessage' => $missingDeliveryUri,
             ],
             'WrongAliasType' => [
-                'requestBody' => [
-                    'source' => 'https://someinstance.taocloud.org/',
-                    'events' => [
-                        [
-                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                            'triggeredTimestamp' => 1565602371,
-                            'eventData' => [
-                                'alias' => 123,
-                                'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' => [
+                                    'alias' => 123,
+                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                ],
                             ],
                         ],
-                    ],
-                ],
+                    ]
+                ),
                 'expectedMessage' => $invalidAliasTypeMessage,
             ],
         ];
