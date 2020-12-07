@@ -35,11 +35,11 @@ use Psr\Log\LoggerInterface;
 
 class UpdateLineItemsServiceTest extends TestCase
 {
-    /** @var LineItemRepository|MockObject */
-    private $lineItemRepository;
-
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
+
+    /** @var LineItemRepository|MockObject */
+    private $lineItemRepository;
 
     /** @var MockObject|LoggerInterface */
     private $logger;
@@ -49,17 +49,9 @@ class UpdateLineItemsServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->lineItemRepository = $this->createMock(
-            LineItemRepository::class
-        );
-
-        $this->entityManager = $this->createMock(
-            EntityManagerInterface::class
-        );
-
-        $this->logger = $this->createMock(
-            LoggerInterface::class
-        );
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->lineItemRepository = $this->createMock(LineItemRepository::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->subject = new UpdateLineItemsService(
             $this->lineItemRepository,
@@ -70,8 +62,10 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testItIgnoresUnknownUpdates(): void
     {
-        $this->lineItemRepository->expects(self::never())->method('findBy');
-        $this->entityManager->expects(self::never())->method('persist');
+        $this->lineItemRepository->expects(self::never())
+            ->method('findBy');
+        $this->entityManager->expects(self::never())
+            ->method('persist');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -88,7 +82,7 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        $this->assertSame('ignored', $updateLineItemDto->getStatus());
+        self::assertEquals('ignored', $updateLineItemDto->getStatus());
     }
 
     public function testItAcceptsUpdate(): void
@@ -108,7 +102,8 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->entityManager->expects(self::once())->method('persist');
+        $this->entityManager->expects(self::once())
+            ->method('persist');
 
         $this->logger->expects(self::once())
             ->method('info')
@@ -120,7 +115,8 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->entityManager->expects(self::once())->method('flush');
+        $this->entityManager->expects(self::once())
+            ->method('flush');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -137,7 +133,7 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        $this->assertSame('accepted', $updateLineItemDto->getStatus());
+        self::assertEquals('accepted', $updateLineItemDto->getStatus());
     }
 
     public function testItIgnoresDuplicatedUpdates(): void
@@ -149,7 +145,7 @@ class UpdateLineItemsServiceTest extends TestCase
             ->method('findBy')
             ->with(
                 [
-                    'slug' => ['qti-interactions-delivery','qti-interactions-delivery']
+                    'slug' => ['qti-interactions-delivery', 'qti-interactions-delivery']
                 ]
             )
             ->willReturn(
@@ -201,8 +197,8 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDtoDuplicated = $result->getIterator()[1];
 
-        $this->assertSame('accepted', $updateLineItemDto->getStatus());
-        $this->assertSame('ignored', $updateLineItemDtoDuplicated->getStatus());
+        self::assertEquals('accepted', $updateLineItemDto->getStatus());
+        self::assertEquals('ignored', $updateLineItemDtoDuplicated->getStatus());
     }
 
     public function testErrorForUpdatesWithNotFoundSlug(): void
@@ -244,6 +240,6 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        $this->assertSame('error', $updateLineItemDto->getStatus());
+        self::assertEquals('error', $updateLineItemDto->getStatus());
     }
 }

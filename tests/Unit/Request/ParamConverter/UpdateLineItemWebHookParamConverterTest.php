@@ -94,13 +94,13 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
 
         $this->subject->apply($request, $configuration);
 
-        $this->assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
+        self::assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
 
         /** @var ArrayIterator $iterator */
         $iterator = $request->attributes->get('collection')->getIterator();
         $updateLineItemDto = $iterator[0];
 
-        $this->assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
+        self::assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
 
         self::assertEquals("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
         self::assertEquals("RemoteDeliveryPublicationFinished", $updateLineItemDto->getName());

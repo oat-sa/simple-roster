@@ -85,7 +85,7 @@ class UpdateLineItemCollectionTest extends TestCase
     public function testAccessors(): void
     {
         $collection = new UpdateLineItemCollection();
-        $this->assertInstanceOf(Iterator::class, $collection->getIterator());
+        self::assertInstanceOf(Iterator::class, $collection->getIterator());
     }
 
     public function testItMaps(): void

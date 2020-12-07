@@ -84,7 +84,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
             $this->lineItemCacheIdGenerator
         );
 
-        $this->assertInstanceOf(EntityListenerInterface::class, $subject);
+        self::assertInstanceOf(EntityListenerInterface::class, $subject);
     }
 
     public function testItWarmsUpCacheDuringPostUpdate(): void
@@ -102,7 +102,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
             ->method('getResultCacheImpl')
             ->willReturn($cacheProvider);
 
-        $this->lineItemCacheIdGenerator->expects($this->once())
+        $this->lineItemCacheIdGenerator->expects(self::once())
             ->method('generate')
             ->with(1)
             ->willReturn('line_item_1');
