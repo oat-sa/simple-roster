@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
 
 class UpdateLineItemCollectionTest extends TestCase
 {
-    public function testItThrowsExceptionWhenEmptyCollection(): void
+    public function testItThrowsExceptionWhenEmptyCollectionIsFilteredByTriggeredTime(): void
     {
         $this->expectException(Exception::class);
 
