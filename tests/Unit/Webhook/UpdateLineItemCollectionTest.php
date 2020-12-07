@@ -44,16 +44,16 @@ class UpdateLineItemCollectionTest extends TestCase
     {
         $collection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
-                '11',
-                'test',
-                'http://i.o',
-                (new DateTimeImmutable())->setTimestamp(1565602371)
-            ),
-            new UpdateLineItemDto(
                 '22',
                 'test',
                 'http://i.o',
                 (new DateTimeImmutable())->setTimestamp(1565602380)
+            ),
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                (new DateTimeImmutable())->setTimestamp(1565602371)
             )
         );
 
