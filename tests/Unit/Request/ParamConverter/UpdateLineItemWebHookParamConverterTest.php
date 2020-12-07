@@ -102,11 +102,11 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
 
         $this->assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
 
-        $this->assertEquals("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
-        $this->assertEquals("RemoteDeliveryPublicationFinished", $updateLineItemDto->getName());
-        $this->assertEquals("1565602390", $updateLineItemDto->getTriggeredTime()->getTimestamp());
-        $this->assertEquals("qti-interactions-delivery", $updateLineItemDto->getSlug());
-        $this->assertEquals(
+        self::assertEquals("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
+        self::assertEquals("RemoteDeliveryPublicationFinished", $updateLineItemDto->getName());
+        self::assertEquals("1565602390", $updateLineItemDto->getTriggeredTime()->getTimestamp());
+        self::assertEquals("qti-interactions-delivery", $updateLineItemDto->getSlug());
+        self::assertEquals(
             "https://tao.instance/ontologies/tao.rdf#kkkkzk",
             $updateLineItemDto->getLineItemUri()
         );
