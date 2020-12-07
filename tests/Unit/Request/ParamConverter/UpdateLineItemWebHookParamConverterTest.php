@@ -59,7 +59,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             Request::class
         );
 
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('getContent')
             ->willReturn(
                 '{
@@ -80,7 +80,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
 
         $request->attributes = new ParameterBag();
 
-        $this->updateLineItemValidator->expects($this->once())
+        $this->updateLineItemValidator->expects(self::once())
             ->method('validate')
             ->with($request);
 
@@ -88,7 +88,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             ParamConverter::class
         );
 
-        $configuration->expects($this->once())
+        $configuration->expects(self::once())
             ->method('getName')
             ->willReturn('collection');
 
@@ -120,7 +120,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             Request::class
         );
 
-        $this->updateLineItemValidator->expects($this->once())
+        $this->updateLineItemValidator->expects(self::once())
             ->method('validate')
             ->with($request)
             ->willThrowException(new BadRequestHttpException());

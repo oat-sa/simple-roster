@@ -41,22 +41,18 @@ class UpdateLineItemValidatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = $this->createMock(
-            ValidatorInterface::class
-        );
-        $this->subject = new UpdateLineItemValidator(
-            $this->validator
-        );
+        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->subject = new UpdateLineItemValidator($this->validator);
     }
 
-    public function testItValidatesSuccessfull(): void
+    public function testItValidatesSuccessfully(): void
     {
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('getContent')
             ->willReturn('{}');
 
-        $this->validator->expects($this->once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
             ->willReturn(
@@ -72,19 +68,19 @@ class UpdateLineItemValidatorTest extends TestCase
         $this->expectExceptionMessage('Invalid Request Body: eventId -> empty');
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('getContent')
             ->willReturn('{}');
 
         $error = $this->createMock(ConstraintViolationInterface::class);
-        $error->expects($this->once())
+        $error->expects(self::once())
             ->method('getPropertyPath')
             ->willReturn('eventId');
-        $error->expects($this->once())
+        $error->expects(self::once())
             ->method('getMessage')
             ->willReturn('empty');
 
-        $this->validator->expects($this->once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
             ->willReturn(
@@ -107,10 +103,10 @@ class UpdateLineItemValidatorTest extends TestCase
         );
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('getContent');
 
-        $this->validator->expects($this->never())
+        $this->validator->expects(self::never())
             ->method('validate');
 
         $this->subject->validate($request);

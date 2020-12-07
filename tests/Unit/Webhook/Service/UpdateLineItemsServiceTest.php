@@ -70,8 +70,8 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testItIgnoresUnknownUpdates(): void
     {
-        $this->lineItemRepository->expects($this->never())->method('findBy');
-        $this->lineItemRepository->expects($this->never())->method('save');
+        $this->lineItemRepository->expects(self::never())->method('findBy');
+        $this->lineItemRepository->expects(self::never())->method('save');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -93,7 +93,7 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testItAcceptsUpdate(): void
     {
-        $this->lineItemRepository->expects($this->once())
+        $this->lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(
                 [
@@ -107,9 +107,9 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->lineItemRepository->expects($this->once())->method('save');
+        $this->lineItemRepository->expects(self::once())->method('save');
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'The line item id 0 was updated',
@@ -118,7 +118,7 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects(self::once())->method('flush');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -143,7 +143,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $lineItem = (new LineItem())
             ->setSlug('qti-interactions-delivery');
 
-        $this->lineItemRepository->expects($this->once())
+        $this->lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(
                 [
@@ -156,17 +156,17 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->lineItemRepository->expects($this->once())
+        $this->lineItemRepository->expects(self::once())
             ->method('save')
             ->with(
                 $lineItem->setUri('https://tao.instance/ontologies/tao.rdf#i5fb5')
             );
 
-        $this->logger->expects($this->at(0))
+        $this->logger->expects(self::at(0))
             ->method('warning')
             ->with('There are duplicated updates on the request. All of them will be ignore except update id 111. ');
 
-        $this->logger->expects($this->at(1))
+        $this->logger->expects(self::at(1))
         ->method('info')
         ->with(
             'The line item id 0 was updated',
@@ -175,7 +175,7 @@ class UpdateLineItemsServiceTest extends TestCase
             ]
         );
 
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects(self::once())->method('flush');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -208,7 +208,7 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testErrorForUpdatesWithNotFoundSlug(): void
     {
-        $this->lineItemRepository->expects($this->once())
+        $this->lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(
                 [
@@ -217,9 +217,9 @@ class UpdateLineItemsServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->lineItemRepository->expects($this->never())->method('save');
+        $this->lineItemRepository->expects(self::never())->method('save');
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Impossible to update the line item. The slug qti-interactions-delivery does not exist.',
@@ -228,7 +228,7 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects(self::once())->method('flush');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
