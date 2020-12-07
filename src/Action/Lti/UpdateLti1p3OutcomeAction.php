@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
+use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

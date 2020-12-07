@@ -20,10 +20,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Integration\Responder;
+namespace OAT\SimpleRoster\Tests\Integration\Lti\Responder;
 
-use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
-use PHPUnit\Framework\MockObject\MockObject;
+use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
@@ -37,22 +36,24 @@ class LtiOutcomeResponderTest extends KernelTestCase
         self::bootKernel();
     }
 
-    public function testCreateReplaceResultResponse2(): void
+    public function testCreateReplaceResultResponse(): void
     {
+        /** @var Environment $twig */
         $twig = static::$container->get(Environment::class);
+
         $uuidFactory = $this->createMock(UuidFactoryInterface::class);
         $uuidFactory
             ->method('uuid4')
             ->willreturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         $xmlResponse = (string)file_get_contents(
-            __DIR__ . '/../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
+            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
         );
 
         $subject = new LtiOutcomeResponder($twig, $uuidFactory);
 
         $response = $subject->createXmlResponse(1);
 
-        self::assertEquals(trim($xmlResponse), $response->getContent());
+        self::assertEquals($xmlResponse, $response->getContent());
     }
 }

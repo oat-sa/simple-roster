@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -67,15 +67,16 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
     {
-        $credentials = $this->createTestClientAccessToken(
+        $accessToken = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
+        $authorization = sprintf('Bearer %s', $accessToken);
 
-        $uidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::$container->set('test.uid_generator', $uidGenerator);
+        $uuidGenerator = $this->createMock(UuidFactoryInterface::class);
+        self::$container->set('test.uid_generator', $uuidGenerator);
 
-        $uidGenerator
+        $uuidGenerator
             ->method('uuid4')
             ->willReturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
@@ -96,22 +97,20 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'text/xml',
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+                'HTTP_AUTHORIZATION' => $authorization
             ],
             $xmlRequestBody
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals(trim($xmlResponseBody), $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
         self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     public function testItReturns401IfWithInvalidScope(): void
     {
-        $credentials = $this->createTestClientAccessToken(
-            $this->registration,
-            ['invalid']
-        );
+        $accessToken = $this->createTestClientAccessToken($this->registration, ['invalid']);
+        $authorization = sprintf('Bearer %s', $accessToken);
 
         $this->kernelBrowser->request(
             'POST',
@@ -120,7 +119,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'text/xml',
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+                'HTTP_AUTHORIZATION' => $authorization
             ],
             ''
         );
@@ -176,10 +175,11 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
-        $credentials = $this->createTestClientAccessToken(
+        $accessToken = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
+        $authorization = sprintf('Bearer %s', $accessToken);
 
         $this->kernelBrowser->request(
             'POST',
@@ -188,7 +188,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'text/xml',
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+                'HTTP_AUTHORIZATION' => $authorization
             ],
             'invalidXml'
         );
@@ -199,10 +199,11 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
     {
-        $credentials = $this->createTestClientAccessToken(
+        $accessToken = $this->createTestClientAccessToken(
             $this->registration,
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
+        $authorization = sprintf('Bearer %s', $accessToken);
 
         /** @var string $xmlBody */
         $xmlBody = file_get_contents(
@@ -216,7 +217,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'text/xml',
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $credentials)
+                'HTTP_AUTHORIZATION' => $authorization
             ],
             $xmlBody
         );

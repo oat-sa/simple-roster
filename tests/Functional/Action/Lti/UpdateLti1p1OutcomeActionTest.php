@@ -52,7 +52,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $this->kernelBrowser->request('POST', '/api/v1/lti/outcome');
+        $this->kernelBrowser->request('POST', '/api/v1/lti1p1/outcome');
 
         self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
@@ -73,7 +73,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome?' . $queryParameters,
+            '/api/v1/lti1p1/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -90,7 +90,6 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $time = time();
         $signature = $this->generateSignature($ltiInstance, (string)$time);
-
 
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
         self::$container->set('test.uid_generator', $uidGenerator);
@@ -121,7 +120,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome?' . $queryParameters,
+            '/api/v1/lti1p1/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -131,12 +130,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(trim($xmlResponseBody), $this->kernelBrowser->getResponse()->getContent());
-
-        self::assertEquals(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
-        );
+        self::assertEquals($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
@@ -160,7 +155,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome?' . $queryParameters,
+            '/api/v1/lti1p1/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -170,11 +165,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertEquals(
-            Assignment::STATE_READY,
-            $this->getAssignment()->getState()
-        );
+        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -201,7 +192,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->kernelBrowser->request(
             'POST',
-            '/api/v1/lti/outcome?' . $queryParameters,
+            '/api/v1/lti1p1/outcome?' . $queryParameters,
             [],
             [],
             [
@@ -233,7 +224,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         return $oauthSigner->sign(
             $context,
-            'http://localhost/api/v1/lti/outcome',
+            'http://localhost/api/v1/lti1p1/outcome',
             'POST',
             $ltiInstance->getLtiSecret()
         );

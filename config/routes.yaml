@@ -32,7 +32,7 @@ getUserAssignmentLtiLink:
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\GetUserAssignmentLtiLinkAction }
 
 updateLti1p1Outcome:
-  path: '%app.route_prefix%/v1/lti/outcome'
+  path: '%app.route_prefix%/v1/lti1p1/outcome'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLti1p1OutcomeAction }
 

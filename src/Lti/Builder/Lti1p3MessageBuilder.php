@@ -48,6 +48,7 @@ class Lti1p3MessageBuilder
     public function withMessagePayloadClaim(MessagePayloadClaimInterface $messagePayloadClaim): self
     {
         $this->claims[] = $messagePayloadClaim;
+
         return $this;
     }
 

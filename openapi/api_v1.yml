@@ -223,10 +223,12 @@ paths:
                         example: Oauth realm="SimpleRoster", oauth_version="1.0", oauth_nonce="29f90c047a44b2ece73d00a09364d49b", oauth_timestamp="1313350943", oauth_consumer_key="lmsng.school.edu", oauth_body_hash="v%2BxFnmDSHV%2Fj29qhxLwkFILrtPo%3D",oauth_signature_method="HMAC-SHA1",oauth_signature="8auRpRdPY2KRXUrOyz3HKCs92y8%3D"
             requestBody:
                 content:
-                    application/xml: {}
+                    application/xml:
+                        schema:
+                            $ref: '#/components/schemas/LtiOutcomeRequest'
             responses:
                 204:
-                    description: Success
+                    $ref: '#/components/responses/UpdateOutcomeSuccessful'
                 400:
                     $ref: '#/components/responses/BadRequestResponse'
                 401:
@@ -251,10 +253,12 @@ paths:
                         example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJ.eyJhdWQiOiJkZW1vIiwianRpI.BraFieX8LLYfAu5Pz5vpvzxTd
             requestBody:
                 content:
-                    application/xml: { }
+                    application/xml:
+                        schema:
+                            $ref: '#/components/schemas/LtiOutcomeRequest'
             responses:
                 204:
-                    description: Success
+                    $ref: '#/components/responses/UpdateOutcomeSuccessful'
                 400:
                     $ref: '#/components/responses/BadRequestResponse'
                 401:
@@ -273,7 +277,7 @@ components:
         apiKeyAuth:
             type: http
             scheme: bearer
-        bearerAuth: # arbitrary name for the security scheme
+        bearerAuth:
             type: http
             scheme: bearer
             bearerFormat: JWT
@@ -422,6 +426,89 @@ components:
                 isDoctrineCacheAvailable:
                     type: boolean
                     description: Wether the doctrine cache is available or not
+        LtiOutcomeRequest:
+            type: object
+            properties:
+                imsx_POXHeader:
+                    type: object
+                    properties:
+                        imsx_POXRequestHeaderInfo:
+                            type: object
+                            properties:
+                                imsx_version:
+                                    type: string
+                                    example: 'V1.0'
+                                imsx_messageIdentifier:
+                                    type: string
+                                    example: 'message id'
+                imsx_POXBody:
+                    type: object
+                    properties:
+                        replaceResultRequest:
+                            type: object
+                            properties:
+                                resultRecord:
+                                    type: object
+                                    properties:
+                                        sourcedGUID:
+                                            type: object
+                                            properties:
+                                                sourcedId:
+                                                    type: string
+                                                    example: '1'
+                                        result:
+                                            type: object
+                                            properties:
+                                                resultScore:
+                                                    type: object
+                                                    properties:
+                                                        language:
+                                                            type: string
+                                                            example: 'en-us'
+                                                        textString:
+                                                            type: string
+                                                            example: '0.5'
+            xml:
+                name: 'imsx_POXEnvelopeRequest'
+                namespace: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+        LtiOutcomeResponse:
+            type: object
+            properties:
+                imsx_POXHeader:
+                    type: object
+                    properties:
+                        imsx_version:
+                            type: string
+                            example: 'V1.0'
+                        imsx_messageIdentifier:
+                            type: string
+                            example: 'message id'
+                        imsx_statusInfo:
+                            type: object
+                            properties:
+                                imsx_codeMajor:
+                                    type: string
+                                    example: 'success'
+                                imsx_severity:
+                                    type: string
+                                    example: 'status'
+                                imsx_description:
+                                    type: string
+                                    example: 'Assignment with Id 1 was updated'
+                                imsx_messageRefIdentifier:
+                                    type: string
+                                    example: '1'
+                                imsx_operationRefIdentifier:
+                                    type: string
+                                    example: 'replaceResult'
+                imsx_POXBody:
+                    type: object
+                    properties:
+                        replaceResultResponse:
+                            type: object
+            xml:
+                name: 'imsx_POXEnvelopeResponse'
+                namespace: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
         Error:
             type: object
             properties:
@@ -485,3 +572,9 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Error'
+        UpdateOutcomeSuccessful:
+            description: Update Outcome Successful
+            content:
+                application/xml:
+                    schema:
+                        $ref: '#/components/schemas/LtiOutcomeResponse'

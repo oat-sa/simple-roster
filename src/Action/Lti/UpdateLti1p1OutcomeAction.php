@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use OAT\SimpleRoster\Responder\LtiOutcomeResponder;
+use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;

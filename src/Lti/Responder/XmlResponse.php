@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Responder;
+namespace OAT\SimpleRoster\Lti\Responder;
 
 use Symfony\Component\HttpFoundation\Response;
 

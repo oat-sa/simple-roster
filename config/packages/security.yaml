@@ -45,6 +45,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }
