@@ -78,7 +78,7 @@ class UpdateLineItemsService
 
         $lineItems = $this->lineItemRepository->findBy(
             [
-                'slug' => (array)$slugs
+                'slug' => $slugs
             ]
         );
 
