@@ -92,25 +92,19 @@ class UpdateLineItemsService
 
             $dto = $duplicatedUpdates->findLastByTriggeredTimeOrFail();
 
-            if ($duplicatedUpdates->count() > 1) {
-                $this->logger->warning(
-                    sprintf(
-                        'There are duplicated updates on the request. All of them will be ignore except update id %s. ',
-                        $dto->getId()
-                    )
-                );
-            }
+            $oldUri = $lineItem->getUri();
 
             $lineItem->setUri($dto->getLineItemUri());
+
+            $this->entityManager->persist($lineItem);
 
             $this->logger->info(
                 sprintf('The line item id %d was updated', $lineItem->getId()),
                 [
-                    'uri' => $dto->getLineItemUri()
+                    'oldUri' => $oldUri,
+                    'newUri' => $dto->getLineItemUri(),
                 ]
             );
-
-            $this->lineItemRepository->save($lineItem);
 
             $duplicatedUpdates->setStatus(UpdateLineItemDto::STATUS_IGNORED);
             $dto->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);

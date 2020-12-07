@@ -151,20 +151,11 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [
                 'message' => 'The line item id 1 was updated',
                 'context' => [
-                    'uri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne'
+                    'oldUri' => 'http://lineitemuri.com',
+                    'newUri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
                 ],
             ],
             Logger::INFO
-        );
-
-        $infoLog = 'There are duplicated updates on the request. '
-            . 'All of them will be ignore except update id lastDuplicatedEvent. ';
-
-        $this->assertHasLogRecord(
-            [
-                'message' => $infoLog,
-            ],
-            Logger::WARNING
         );
 
         self::assertEquals(

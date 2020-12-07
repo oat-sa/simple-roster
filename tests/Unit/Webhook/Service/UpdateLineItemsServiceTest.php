@@ -71,7 +71,7 @@ class UpdateLineItemsServiceTest extends TestCase
     public function testItIgnoresUnknownUpdates(): void
     {
         $this->lineItemRepository->expects(self::never())->method('findBy');
-        $this->lineItemRepository->expects(self::never())->method('save');
+        $this->entityManager->expects(self::never())->method('persist');
 
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
@@ -104,17 +104,19 @@ class UpdateLineItemsServiceTest extends TestCase
                 [
                     (new LineItem())
                         ->setSlug('qti-interactions-delivery')
+                        ->setUri('http://lineitemuri.com')
                 ]
             );
 
-        $this->lineItemRepository->expects(self::once())->method('save');
+        $this->entityManager->expects(self::once())->method('persist');
 
         $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'The line item id 0 was updated',
                 [
-                    'uri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
+                    'oldUri' => 'http://lineitemuri.com',
+                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
                 ]
             );
 
@@ -156,24 +158,21 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             );
 
-        $this->lineItemRepository->expects(self::once())
-            ->method('save')
+        $this->entityManager->expects(self::once())
+            ->method('persist')
             ->with(
                 $lineItem->setUri('https://tao.instance/ontologies/tao.rdf#i5fb5')
             );
 
         $this->logger->expects(self::at(0))
-            ->method('warning')
-            ->with('There are duplicated updates on the request. All of them will be ignore except update id 111. ');
-
-        $this->logger->expects(self::at(1))
-        ->method('info')
-        ->with(
-            'The line item id 0 was updated',
-            [
-                'uri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
-            ]
-        );
+            ->method('info')
+            ->with(
+                'The line item id 0 was updated',
+                [
+                    'oldUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
+                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
+                ]
+            );
 
         $this->entityManager->expects(self::once())->method('flush');
 
@@ -217,7 +216,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->lineItemRepository->expects(self::never())->method('save');
+        $this->entityManager->expects(self::never())->method('persist');
 
         $this->logger->expects(self::once())
             ->method('error')

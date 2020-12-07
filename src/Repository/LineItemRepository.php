@@ -73,12 +73,4 @@ class LineItemRepository extends AbstractRepository
             ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
             ->getOneOrNullResult();
     }
-
-    /**
-     * @throws ORMException
-     */
-    public function save(LineItem $lineItem): void
-    {
-        $this->_em->persist($lineItem);
-    }
 }
