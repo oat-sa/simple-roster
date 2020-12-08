@@ -127,9 +127,9 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     /**
      * @inheritdoc
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): void
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
-        // do nothing, let the controller handle the request
+        return null;
     }
 
     /**
