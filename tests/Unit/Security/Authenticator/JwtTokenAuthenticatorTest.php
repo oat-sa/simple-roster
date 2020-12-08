@@ -79,7 +79,12 @@ class JwtTokenAuthenticatorTest extends TestCase
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token. Unable to parse or no username claim.');
 
-        $subject->getUser('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlciI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.MqMn8PLjkMH_0pAmkVXg6FolaiaKyZZ_Bqnt-xS50CM', $userProviderMock);
+        // @codingStandardsIgnoreStart
+        $subject->getUser(
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlciI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.MqMn8PLjkMH_0pAmkVXg6FolaiaKyZZ_Bqnt-xS50CM',
+            $userProviderMock
+        );
+        // @codingStandardsIgnoreEnd
     }
 
     public function testItThrowsExceptionOnInvalidToken(): void
@@ -101,6 +106,8 @@ class JwtTokenAuthenticatorTest extends TestCase
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
 
+        // @codingStandardsIgnoreStart
         $subject->getUser('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOiJ1c2VyMSIsImlhdCI6MTUxNjIzOTAyMn0.Fc59qPPNFvtlvwXdTyWTe8Uz6uu-EnQncjGow1RooHM', $userProviderMock);
+        // @codingStandardsIgnoreEnd
     }
 }
