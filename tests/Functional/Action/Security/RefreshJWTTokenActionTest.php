@@ -204,4 +204,44 @@ class RefreshJWTTokenActionTest extends WebTestCase
             $decodedResponse['error']['message']
         );
     }
+
+    public function testItThrows409WithMissingToken(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
+
+        $refreshToken = $this->logInAs($user, $this->kernelBrowser);
+
+        self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
+        self::assertNotNull($refreshToken);
+
+        /** @var CacheItemPoolInterface $manager */
+        $manager = self::$container->get(CacheItemPoolInterface::class);
+        $id = 'jwt-token.user1';
+
+        $manager->deleteItem($id);
+
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/auth/token/refresh',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode(['refreshToken' => $refreshToken], JSON_THROW_ON_ERROR, 512)
+        );
+
+        $response = $this->kernelBrowser->getResponse();
+
+        self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
+
+        $decodedResponse = json_decode($response->getContent(), true);
+
+        self::assertSame(
+            'Refresh token is incorrect.',
+            $decodedResponse['error']['message']
+        );
+    }
 }

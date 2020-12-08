@@ -67,7 +67,7 @@ class JWTManager
         $this->passphrase = $passphrase;
     }
 
-    public function create(UserInterface $user, int $ttl = 0, bool $isRefresh = false): Token
+    public function create(UserInterface $user, int $ttl): Token
     {
         $payload = [];
 
@@ -86,11 +86,22 @@ class JWTManager
 
         $generatedToken = $this->generateJWTString($payload);
 
-        if ($isRefresh) {
-            $this->storeTokenInCache($generatedToken, $expiration);
-        }
-
         return $generatedToken;
+    }
+
+    public function storeTokenInCache(Token $token, int $ttl): void
+    {
+        $idBase = $token->getClaim(self::IDENTIFIEDBY_CLAIM);
+
+        $cacheId = $this->generateCacheId($idBase);
+
+        $cacheItem = $this->tokenStore->getItem($cacheId);
+
+        $cacheItem
+            ->set((string)$token)
+            ->expiresAfter($ttl);
+
+        $this->tokenStore->save($cacheItem);
     }
 
     public function getStoredToken(string $identifier): CacheItemInterface
@@ -121,20 +132,5 @@ class JWTManager
                 $this->passphrase
             )
         );
-    }
-
-    private function storeTokenInCache(Token $token, int $ttl = 0): void
-    {
-        $idBase = $token->getClaim(self::IDENTIFIEDBY_CLAIM);
-
-        $cacheId = $this->generateCacheId($idBase);
-
-        $cacheItem = $this->tokenStore->getItem($cacheId);
-
-        $cacheItem
-            ->set((string)$token)
-            ->expiresAfter($ttl);
-
-        $this->tokenStore->save($cacheItem);
     }
 }

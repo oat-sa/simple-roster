@@ -74,7 +74,10 @@ class RefreshJWTTokenAction
 
         try {
             $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
+            $this->tokenVerifier->isValid($refreshToken);
+
             $username = $refreshToken->getClaim('username');
+            $user = $this->userRepository->findOneByUsername($username);
         } catch (\Throwable $exception) {
             throw new ConflictHttpException('Invalid token.');
         }
@@ -85,17 +88,7 @@ class RefreshJWTTokenAction
             !$cachedToken->isHit()
             || $cachedToken->get() !== (string)$refreshToken
         ) {
-            throw new UnauthorizedHttpException('', 'Expired token.');
-        }
-
-        if (!$this->tokenVerifier->isValid($refreshToken)) {
-            throw new ConflictHttpException('Invalid token.');
-        }
-
-        try {
-            $user = $this->userRepository->findOneByUsername($username);
-        } catch (UsernameNotFoundException $exception) {
-            throw new UnauthorizedHttpException('Invalid user in token.');
+            throw new ConflictHttpException('Refresh token is incorrect.');
         }
 
         $accessToken = $this->manager->create($user, $this->accessTokenTtl);

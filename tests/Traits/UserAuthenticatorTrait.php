@@ -37,7 +37,9 @@ trait UserAuthenticatorTrait
         $jwt = static::$container->get(JWTManager::class);
 
         $accessToken = $jwt->create($user, $ttl);
-        $refreshToken = $jwt->create($user, $refreshTtl, true);
+
+        $refreshToken = $jwt->create($user, $refreshTtl);
+        $jwt->storeTokenInCache($refreshToken, $refreshTtl);
 
         $kernelBrowser->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $accessToken));
 

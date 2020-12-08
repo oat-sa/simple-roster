@@ -68,7 +68,9 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         /** @var UserInterface $user */
         $user = $token->getUser();
         $accessToken = $this->jwtTokenGenerator->create($user, $this->accessTokenTtl);
-        $refreshToken = $this->jwtTokenGenerator->create($user, $this->refreshTokenTtl, true);
+
+        $refreshToken = $this->jwtTokenGenerator->create($user, $this->refreshTokenTtl);
+        $this->jwtTokenGenerator->storeTokenInCache($refreshToken, $this->refreshTokenTtl);
 
         return $this->responder->createJsonResponse([
             'accessToken' => (string)$accessToken,
