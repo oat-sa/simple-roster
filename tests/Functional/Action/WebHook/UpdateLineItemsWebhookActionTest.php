@@ -213,8 +213,11 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     public function provideWrongRequestBodies(): array
     {
         $missingDeliveryUri = 'Invalid Request Body: [events][0][eventData][deliveryURI] -> This field is missing.';
-        $invalidAliasTypeMessage = 'Invalid Request Body: [events][0][eventName] -> This field is missing.'
+
+        $invalidAliasType = 'Invalid Request Body: [events][0][eventName] -> This field is missing.'
             . ' [events][0][eventData][alias] -> This value should be of type string.';
+
+        $eventsEmpty = 'Invalid Request Body: [events] -> This collection should contain 1 element or more.';
 
         return [
             'empty' => [
@@ -315,7 +318,25 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                         ],
                     ]
                 ),
-                'expectedMessage' => $invalidAliasTypeMessage,
+                'expectedMessage' => $invalidAliasType,
+            ],
+            'EventsEmpty' => [
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [],
+                    ]
+                ),
+                'expectedMessage' => $eventsEmpty,
+            ],
+            'EventsAsString' => [
+                'requestBody' => json_encode(
+                    [
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => 'string',
+                    ]
+                ),
+                'expectedMessage' => 'Invalid Request Body: [events] -> This value should be of type array.',
             ],
         ];
     }
@@ -324,6 +345,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     {
         return [
             'source' => 'https://someinstance.taocloud.org/',
+            'withExtraFields' => true,
             'events' => [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
@@ -332,7 +354,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'eventData' => [
                         'alias' => 'qti-interactions-delivery',
                         'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                        'withExtraFields' => true,
                     ],
+                    'withExtraFields' => true,
                 ],
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
