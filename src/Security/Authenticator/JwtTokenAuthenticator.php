@@ -91,7 +91,10 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
             $token = (new Parser())->parse($credentials);
             $username = $token->getClaim('username');
         } catch (Throwable $exception) {
-            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
+            throw new AuthenticationException(
+                'Invalid token. Unable to parse or no username claim.',
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         if (!$this->tokenVerifier->isValid($token)) {

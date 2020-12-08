@@ -77,7 +77,7 @@ class JwtTokenAuthenticatorTest extends TestCase
             ->getMock();
 
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Invalid token.');
+        $this->expectExceptionMessage('Invalid token. Unable to parse or no username claim.');
 
         $subject->getUser('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlciI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.MqMn8PLjkMH_0pAmkVXg6FolaiaKyZZ_Bqnt-xS50CM', $userProviderMock);
     }
