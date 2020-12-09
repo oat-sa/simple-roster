@@ -121,7 +121,7 @@ class LineItemCacheWarmerCommand extends Command
                 $lineItemCacheKey = $this->lineItemCacheIdGenerator->generate($id);
 
                 $this->resultCacheImplementation->delete($lineItemCacheKey);
-                $this->lineItemRepository->findById($id);
+                $this->lineItemRepository->findOneById($id);
 
                 $this->logger->info(
                     sprintf('Result cache for Line Item Id %d have been successfully warmed up.', $id),

@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
@@ -62,15 +62,23 @@ class LineItemRepository extends AbstractRepository
         return $collection;
     }
 
-    public function findById(int $id): ?LineItem
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOneById(int $id): LineItem
     {
-        return $this
-            ->createQueryBuilder('l')
+        $lineItem = $this->createQueryBuilder('l')
             ->select('l')
             ->where('l.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
             ->getOneOrNullResult();
+
+        if (null === $lineItem) {
+            throw new EntityNotFoundException(sprintf("LineItem with id = '%d' cannot be found.", $id));
+        }
+
+        return $lineItem;
     }
 }
