@@ -74,6 +74,8 @@ class UpdateLineItemDatesCommand extends Command
     {
         parent::configure();
 
+        $this->addBlackfireProfilingOption();
+
         $this->setDescription('Updates the start and end dates of line item(s).');
 
         $this->addOption(
@@ -203,7 +205,6 @@ class UpdateLineItemDatesCommand extends Command
 
     /**
      * @throws InvalidArgumentException
-     * @throws Exception
      */
     private function initializeDates(InputInterface $input): void
     {
@@ -211,16 +212,24 @@ class UpdateLineItemDatesCommand extends Command
         $inputEndDate = $input->getOption(self::OPTION_END_DATE);
 
         if ($inputStartDate !== null) {
-            $this->startDate = new DateTime($inputStartDate);
+            try {
+                $this->startDate = new DateTime($inputStartDate);
+            } catch (Exception $e) {
+                throw new InvalidArgumentException(sprintf('%s is an invalid start date.', $inputStartDate));
+            }
         }
 
         if ($inputEndDate !== null) {
-            $this->endDate = new DateTime($inputEndDate);
+            try {
+                $this->endDate = new DateTime($inputEndDate);
+            } catch (Exception $e) {
+                throw new InvalidArgumentException(sprintf('%s is an invalid end date.', $inputEndDate));
+            }
         }
 
         if ($this->startDate !== null && $this->endDate !== null && $this->startDate > $this->endDate) {
             $message = sprintf(
-                'End date should be later than start date. Start Date: %s End Date: %s',
+                'End date should be later than start date. Start Date: %s End Date: %s.',
                 $inputStartDate,
                 $inputEndDate
             );
