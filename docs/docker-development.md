@@ -39,6 +39,20 @@ Then install application dependencies:
 $ docker container exec -it simple-roster-phpfpm composer install
 ```
 
+This application uses JWT auth flow for API endpoints. So, in order to use it, you must generate private/public keypair for JWT auth flow to work
+1. create directory to store keypair
+    ```shell
+    $ mkdir -p config/secrets/dev
+    ```
+2. generate private key
+    ```shell
+    $ docker container exec -it simple-roster-phpfpm openssl genpkey -out config/secrets/docker/jwt_private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+    ```
+3. generate public key
+    ```shell
+    $ docker container exec -it simple-roster-phpfpm openssl pkey -in config/secrets/docker/jwt_private.pem -out config/secrets/docker/jwt_public.pem -pubout
+    ```
+
 The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
 In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
 

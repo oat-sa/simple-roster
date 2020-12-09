@@ -32,6 +32,20 @@ To install dependencies run:
 $ composer install
 ```
 
+This application uses JWT auth flow for API endpoints. So, in order to use it, you must generate private/public keypair for JWT auth flow to work
+1. create directory to store keypair
+    ```shell
+    $ mkdir -p config/secrets/dev
+    ```
+2. generate private key
+    ```shell
+    $ openssl genpkey -out config/secrets/dev/jwt_private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+    ```
+3. generate public key
+    ```shell
+    $ openssl pkey -in config/secrets/dev/jwt_private.pem -out config/secrets/dev/jwt_public.pem -pubout
+    ```
+
 ## Testing
 
 ### PHPUnit
