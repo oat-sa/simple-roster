@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class RefreshJWTTokenActionTest extends WebTestCase
+class RefreshAccessTokenActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;

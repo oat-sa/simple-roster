@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
-class RefreshJWTTokenAction
+class RefreshAccessTokenAction
 {
     /** @var JWTManager */
     private $manager;

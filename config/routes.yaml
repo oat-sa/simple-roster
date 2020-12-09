@@ -9,7 +9,7 @@ getAccessToken:
 refreshAccessToken:
   path: '%app.route_prefix%/v1/auth/token/refresh'
   methods: POST
-  defaults: { _controller: OAT\SimpleRoster\Action\Security\RefreshJWTTokenAction }
+  defaults: { _controller: OAT\SimpleRoster\Action\Security\RefreshAccessTokenAction }
 
 logout:
   path: '%app.route_prefix%/v1/auth/logout'

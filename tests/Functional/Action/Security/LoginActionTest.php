@@ -49,7 +49,7 @@ class LoginActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth/login',
+            '/api/v1/auth/token',
             [],
             [],
             [
@@ -74,7 +74,7 @@ class LoginActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth/login',
+            '/api/v1/auth/token',
             [],
             [],
             [
@@ -92,7 +92,7 @@ class LoginActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth/login',
+            '/api/v1/auth/token',
             [],
             [],
             [
