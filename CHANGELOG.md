@@ -24,6 +24,7 @@
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 - Changed security flow to use JWT for api endpoints
+- Changed login endpoint for JWT auth. Now it is not `^%app.route_prefix%/v1/auth/login`, but `^%app.route_prefix%/v1/auth/token`
 
 ### Removed
 - Removed `roster:ingest` command.

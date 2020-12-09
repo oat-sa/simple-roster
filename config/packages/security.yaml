@@ -30,7 +30,7 @@ security:
                 authenticators:
                     - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
             json_login:
-                check_path:               api_login
+                check_path:               getAccessToken
                 remember_me:              false
                 success_handler:          OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler
             logout:
@@ -42,6 +42,6 @@ security:
     access_control:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1/auth/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/auth/token', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/auth/token/refresh', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1', roles: IS_AUTHENTICATED_FULLY }
