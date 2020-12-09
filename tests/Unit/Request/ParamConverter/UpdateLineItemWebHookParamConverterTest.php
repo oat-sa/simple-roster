@@ -29,6 +29,7 @@ use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,14 +43,22 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
     /** @var MockObject|UpdateLineItemValidator */
     private $updateLineItemValidator;
 
+    /** @var MockObject|LoggerInterface */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->updateLineItemValidator = $this->createMock(
             UpdateLineItemValidator::class
         );
 
+        $this->logger = $this->createMock(
+            LoggerInterface::class
+        );
+
         $this->subject = new UpdateLineItemWebHookParamConverter(
-            $this->updateLineItemValidator
+            $this->updateLineItemValidator,
+            $this->logger
         );
     }
 
@@ -59,10 +68,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             Request::class
         );
 
-        $request->expects(self::once())
-            ->method('getContent')
-            ->willReturn(
-                '{
+        $payload = '{
                     "source":"https://someinstance.taocloud.org/",
                     "events":[
                         {
@@ -75,8 +81,11 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
                             }
                         }
                     ]
-                }'
-            );
+                }';
+
+        $request->expects(self::once())
+            ->method('getContent')
+            ->willReturn($payload);
 
         $request->attributes = new ParameterBag();
 
@@ -91,6 +100,10 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
         $configuration->expects(self::once())
             ->method('getName')
             ->willReturn('collection');
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with('UpdateLineItems payload.', json_decode($payload, true));
 
         $this->subject->apply($request, $configuration);
 

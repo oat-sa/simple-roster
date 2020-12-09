@@ -26,6 +26,7 @@ use DateTimeImmutable;
 use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,9 +36,13 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
     /** @var UpdateLineItemValidator */
     private $updateLineItemValidator;
 
-    public function __construct(UpdateLineItemValidator $updateLineItemValidator)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(UpdateLineItemValidator $updateLineItemValidator, LoggerInterface $requestLogger)
     {
         $this->updateLineItemValidator = $updateLineItemValidator;
+        $this->logger = $requestLogger;
     }
 
     public function apply(Request $request, ParamConverter $configuration): bool
@@ -47,6 +52,8 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
         $responseBody = json_decode($request->getContent(), true);
         $eventsRaw = $responseBody['events'];
         $events = [];
+
+        $this->logger->info('UpdateLineItems payload.', $responseBody);
 
         foreach ($eventsRaw as $event) {
             $events[] = new UpdateLineItemDto(
