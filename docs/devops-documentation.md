@@ -32,8 +32,8 @@ The main configuration file is `.env`, located in root folder.
 | JWT_SECRET_KEY | Path to RSA private key for JWT Auth flow |
 | JWT_PUBLIC_KEY | Path to RSA public key for JWT Auth flow |
 | JWT_PASSPHRASE | Passphrase for JWT keypair |
-| JWT_ACCESS_TOKEN_TTL | TTL for JWT access token |
-| JWT_REFRESH_TOKEN_TTL | TTL for JWT refresh token |
+| JWT_ACCESS_TOKEN_TTL | TTL for JWT access token in seconds |
+| JWT_REFRESH_TOKEN_TTL | TTL for JWT refresh token in seconds |
 | DATABASE_URL | Database url |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
