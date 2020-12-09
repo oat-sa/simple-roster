@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventListener\Doctrine;
 
+use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
@@ -35,13 +36,14 @@ class LineItemLoaderListener implements EntityListenerInterface
         $this->lineItemRepository = $lineItemRepository;
     }
 
+    /**
+     * @throws EntityNotFoundException
+     */
     public function postLoad(Assignment $assignment): void
     {
-        $lineItem = $this->lineItemRepository->findOneById($assignment->getLineItemId());
-
         //we're forcing the doctrine to load the line item by using cache instead of database query
-        if (null !== $lineItem) {
-            $assignment->setLineItem($lineItem);
-        }
+        $assignment->setLineItem(
+            $this->lineItemRepository->findOneById($assignment->getLineItemId())
+        );
     }
 }
