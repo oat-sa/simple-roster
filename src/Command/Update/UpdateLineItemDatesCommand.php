@@ -22,10 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Update;
 
+use DateTime;
+use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,6 +59,12 @@ class UpdateLineItemDatesCommand extends Command
     /** @var int[] */
     private $lineItemIds;
 
+    /** @var DateTime|null */
+    private $startDate;
+
+    /** @var DateTime|null */
+    private $endDate;
+
     public function __construct()
     {
         parent::__construct(self::NAME);
@@ -84,14 +93,14 @@ class UpdateLineItemDatesCommand extends Command
         $this->addOption(
             self::OPTION_START_DATE,
             '',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Start date for the line item(s)',
         );
 
         $this->addOption(
             self::OPTION_END_DATE,
             '',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'End date for the line item(s)',
         );
 
@@ -119,7 +128,21 @@ class UpdateLineItemDatesCommand extends Command
             $this->initializeLineItemSlugsOption($input);
         }
 
+        if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Option '%s' and '%s' are exclusive options.",
+                    self::OPTION_LINE_ITEM_IDS,
+                    self::OPTION_LINE_ITEM_SLUGS
+                )
+            );
+        }
+
+        $this->initializeDates($input);
+
         $this->isDryRun = !(bool)$input->getOption(self::OPTION_FORCE);
+
+        dd($this->lineItemIds, $this->lineItemSlugs, $this->startDate, $this->endDate, $this->isDryRun);
     }
 
     /**
@@ -130,10 +153,8 @@ class UpdateLineItemDatesCommand extends Command
         try {
             $this->symfonyStyle->note('Checking line items to be updated...');
 
-            dd($this->lineItemIds, $this->isDryRun);
-
-            //$command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
-            //$command->run($input, $output);
+            $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
+            $command->run(new ArrayInput([]), $output);
 
             return 0;
         } catch (Throwable $exception) {
@@ -177,6 +198,34 @@ class UpdateLineItemDatesCommand extends Command
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_SLUGS)
             );
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws Exception
+     */
+    private function initializeDates(InputInterface $input): void
+    {
+        $inputStartDate = $input->getOption(self::OPTION_START_DATE);
+        $inputEndDate = $input->getOption(self::OPTION_END_DATE);
+
+        if ($inputStartDate !== null) {
+            $this->startDate = new DateTime($inputStartDate);
+        }
+
+        if ($inputEndDate !== null) {
+            $this->endDate = new DateTime($inputEndDate);
+        }
+
+        if ($this->startDate !== null && $this->endDate !== null && $this->startDate > $this->endDate) {
+            $message = sprintf(
+                'End date should be later than start date. Start Date: %s End Date: %s',
+                $inputStartDate,
+                $inputEndDate
+            );
+
+            throw new InvalidArgumentException($message);
         }
     }
 }
