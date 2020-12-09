@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Responder;
 
 use Exception;
+use OAT\SimpleRoster\Kernel;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,7 @@ use Throwable;
 
 class SerializerResponderTest extends KernelTestCase
 {
-    /** @var bool|null */
+    /** @var bool */
     private $debug = true;
 
     public function setUp(): void
@@ -170,8 +171,7 @@ class SerializerResponderTest extends KernelTestCase
 
     public function testCreate5xxHttpErrorJsonResponse(): void
     {
-        // To test with default debug parameter value, assuming `false`
-        $this->debug = null;
+        $this->debug = false;
 
         $exception = $this->createHttpException('custom error message', Response::HTTP_INTERNAL_SERVER_ERROR);
 
@@ -206,9 +206,9 @@ class SerializerResponderTest extends KernelTestCase
 
     private function createResponderInstance(): SerializerResponder
     {
-        return null !== $this->debug
-            ? new SerializerResponder(static::$container->get(SerializerInterface::class), $this->debug)
-            : new SerializerResponder(static::$container->get(SerializerInterface::class));
+        $kernel = new Kernel('test', $this->debug);
+
+        return new SerializerResponder(static::$container->get(SerializerInterface::class), $kernel);
     }
 
     private function createHttpException(string $message, int $statusCode): Throwable
