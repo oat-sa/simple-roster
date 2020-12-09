@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -37,6 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
 class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
+    use XmlTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -116,7 +118,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $this->getValidReplaceResultXml()
+            $this->getValidReplaceResultRequestXml()
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -186,7 +188,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $this->getInvalidReplaceResultXmlWithWrongAssignment()
+            $this->getValidReplaceResultRequestXmlWithWrongAssignment()
         );
 
         self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -240,92 +242,5 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         self::assertInstanceOf(Assignment::class, $assignment);
 
         return $assignment;
-    }
-
-    private function getValidReplaceResultXml(): string
-    {
-        return <<<XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-    <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>5c592d046d5c6</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultRequest>
-            <resultRecord>
-                <sourcedGUID>
-                    <sourcedId>1</sourcedId>
-                </sourcedGUID>
-                <result>
-                    <resultScore>
-                        <language>en-us</language>
-                        <textString>0.11111111111111</textString>
-                    </resultScore>
-                </result>
-            </resultRecord>
-        </replaceResultRequest>
-    </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-XML;
-    }
-
-    private function getValidReplaceResultResponseXml(): string
-    {
-        return <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<imsx_POXEnvelopeResponse xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-    <imsx_POXHeader>
-        <imsx_POXResponseHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>e36f227c-2946-11e8-b467-0ed5f89f718b</imsx_messageIdentifier>
-            <imsx_statusInfo>
-                <imsx_codeMajor>success</imsx_codeMajor>
-                <imsx_severity>status</imsx_severity>
-                <imsx_description>Assignment with Id 1 was updated</imsx_description>
-                <imsx_messageRefIdentifier>1</imsx_messageRefIdentifier>
-                <imsx_operationRefIdentifier>replaceResult</imsx_operationRefIdentifier>
-            </imsx_statusInfo>
-        </imsx_POXResponseHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultResponse />
-    </imsx_POXBody>
-</imsx_POXEnvelopeResponse>
-
-XML;
-    }
-
-    private function getInvalidReplaceResultXmlWithWrongAssignment(): string
-    {
-        return <<<XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-    <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>5c592d046d5c6</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultRequest>
-            <resultRecord>
-                <sourcedGUID>
-                    <sourcedId>1000000000</sourcedId>
-                </sourcedGUID>
-                <result>
-                    <resultScore>
-                        <language>en-us</language>
-                        <textString>0.11111111111111</textString>
-                    </resultScore>
-                </result>
-            </resultRecord>
-        </replaceResultRequest>
-    </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-
-XML;
     }
 }

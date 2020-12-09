@@ -28,6 +28,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -37,6 +38,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use SecurityTestingTrait;
+    use XmlTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -80,16 +82,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ->method('uuid4')
             ->willReturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
-        /** @var string $xmlRequestBody */
-        $xmlRequestBody = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml'
-        );
-
-        /** @var string $xmlResponseBody */
-        $xmlResponseBody = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
-        );
-
         $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti1p3/outcome',
@@ -99,11 +91,14 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            $xmlRequestBody
+            $this->getValidReplaceResultRequestXml()
         );
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals($xmlResponseBody, $this->kernelBrowser->getResponse()->getContent());
+        self::assertEquals(
+            $this->getValidReplaceResultResponseXml(),
+            $this->kernelBrowser->getResponse()->getContent()
+        );
         self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
     }
 
@@ -121,7 +116,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            ''
+            $this->getValidReplaceResultRequestXml()
         );
 
         self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -141,7 +136,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            ''
+            $this->getValidReplaceResultRequestXml()
         );
 
         $response = $this->kernelBrowser->getResponse();
@@ -164,7 +159,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => 'Bearer invalid'
             ],
-            ''
+            $this->getValidReplaceResultRequestXml()
         );
 
         $response = $this->kernelBrowser->getResponse();
@@ -205,11 +200,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
         $authorization = sprintf('Bearer %s', $accessToken);
 
-        /** @var string $xmlBody */
-        $xmlBody = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_wrong_assignment.xml'
-        );
-
         $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti1p3/outcome',
@@ -219,7 +209,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            $xmlBody
+            $this->getValidReplaceResultRequestXmlWithWrongAssignment()
         );
 
         self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());

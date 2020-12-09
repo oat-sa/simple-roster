@@ -23,12 +23,15 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Lti\Responder;
 
 use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
+use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
 class LtiOutcomeResponderTest extends KernelTestCase
 {
+    use XmlTestingTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -46,14 +49,10 @@ class LtiOutcomeResponderTest extends KernelTestCase
             ->method('uuid4')
             ->willreturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
-        $xmlResponse = (string)file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_response_body.xml'
-        );
-
         $subject = new LtiOutcomeResponder($twig, $uuidFactory);
 
         $response = $subject->createXmlResponse(1);
 
-        self::assertEquals($xmlResponse, $response->getContent());
+        self::assertEquals($this->getValidReplaceResultResponseXml(), $response->getContent());
     }
 }

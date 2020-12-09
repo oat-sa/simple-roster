@@ -24,10 +24,13 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\Extractor;
 
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
+use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {
+    use XmlTestingTrait;
+
     private const LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0';
     private const OLD_LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/lis/oms1p0/pox';
 
@@ -35,13 +38,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
-        /** @var string $xmlContent */
-        $xmlContent = file_get_contents(
-            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
-            . 'Resources/LtiOutcome/valid_replace_result_body.xml'
-        );
-
-        self::assertSame(1, $subject->extractSourceId($xmlContent));
+        self::assertSame(1, $subject->extractSourceId($this->getValidReplaceResultRequestXml()));
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlContent(): void
@@ -59,13 +56,7 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
-        /** @var string $xmlContent */
-        $xmlContent = file_get_contents(
-            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
-            . 'Resources/LtiOutcome/invalid_replace_result_body_wrong_namespace.xml'
-        );
-
-        $subject->extractSourceId($xmlContent);
+        $subject->extractSourceId($this->getValidReplaceResultRequestXmlWithWrongNamespace());
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnMissingId(): void
@@ -74,12 +65,6 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
 
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
-        /** @var string $xmlContent */
-        $xmlContent = file_get_contents(
-            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
-            . 'Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
-        );
-
-        $subject->extractSourceId($xmlContent);
+        $subject->extractSourceId($this->getValidReplaceResultRequestXmlWithoutId());
     }
 }
