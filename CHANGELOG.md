@@ -3,19 +3,26 @@
 ## 2.0.0 - TODO: To be released
 
 ### Added
+- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
+- Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
+- Added possibility to warm up Line Items cache separately.
+- Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added [roster:ingest:lti-instance](docs/cli/lti-instance-ingester-command.md) command.
 - Added [roster:ingest:line-item](docs/cli/line-item-ingester-command.md) command.
 - Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Added [roster:ingest:assignment](docs/cli/assignment-ingester-command.md) command.
-- Added [roster:cache-warmup:user](docs/cli/user-cache-warmer-command.md) command.
 - Added [roster:cache-warmup:lti-instance](docs/cli/lti-instance-cache-warmer-command.md) command.
+- Added [roster:cache-warmup:line-item](docs/cli/line-item-cache-warmer-command.md) command.
+- Added [roster:cache-warmup:user](docs/cli/user-cache-warmer-command.md) command.
 - Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
 - Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/).
 - Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
 - Added `LTI_VERSION` environment variable to control version we are working (1.1.1 or 1.3.0).
+- Added `CACHE_TTL_LINE_ITEM` environment.
 - Added environment variables specific for [LTI 1.3](docs/devops-documentation.md) 
 - Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
+- Added possibility to update line items via WebHook Endpoint: `/v1/web-hooks/update-line-items`
 
 ### Changed
 - Raised minimum required PHP version from `7.2` to `7.3`.

@@ -49,4 +49,5 @@ security:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/web-hooks/update-line-items', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }

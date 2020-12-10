@@ -35,5 +35,10 @@
                 <option name="default">0</option>
             </options>
         </field>
+        <entity-listeners>
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener">
+                <lifecycle-callback type="postUpdate" method="postUpdate"/>
+            </entity-listener>
+        </entity-listeners>
     </entity>
 </doctrine-mapping>
