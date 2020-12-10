@@ -26,7 +26,7 @@ use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
@@ -39,6 +39,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use SecurityTestingTrait;
     use XmlTestingTrait;
+    use AssignmentStatusTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -78,9 +79,11 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $uuidGenerator = $this->createMock(UuidFactoryInterface::class);
         self::$container->set('test.uid_generator', $uuidGenerator);
 
+        $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
+
         $uuidGenerator
             ->method('uuid4')
-            ->willReturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
+            ->willReturn($messageIdentifier);
 
         $this->kernelBrowser->request(
             'POST',
@@ -96,10 +99,10 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
         self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertEquals(
-            $this->getValidReplaceResultResponseXml(),
+            $this->getValidReplaceResultResponseXml($messageIdentifier),
             $this->kernelBrowser->getResponse()->getContent()
         );
-        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
+        $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
     public function testItReturns401IfWithInvalidScope(): void
@@ -189,7 +192,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
+        $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -213,18 +216,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals(Assignment::STATE_READY, $this->getAssignment()->getState());
-    }
-
-    private function getAssignment(): Assignment
-    {
-        /** @var AssignmentRepository $repository */
-        $repository = $this->getRepository(Assignment::class);
-
-        $assignment = $repository->find(1);
-
-        self::assertInstanceOf(Assignment::class, $assignment);
-
-        return $assignment;
+        $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 }

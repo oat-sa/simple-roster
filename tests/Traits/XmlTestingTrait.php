@@ -26,35 +26,37 @@ trait XmlTestingTrait
 {
     public function getValidReplaceResultRequestXml(): string
     {
-        return <<<XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-    <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>5c592d046d5c6</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultRequest>
-            <resultRecord>
-                <sourcedGUID>
-                    <sourcedId>1</sourcedId>
-                </sourcedGUID>
-                <result>
-                    <resultScore>
-                        <language>en-us</language>
-                        <textString>0.11111111111111</textString>
-                    </resultScore>
-                </result>
-            </resultRecord>
-        </replaceResultRequest>
-    </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-XML;
+        return $this->getXmlRequestTemplate(
+            1,
+            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+        );
     }
 
-    public function getValidReplaceResultResponseXml(): string
+    public function getValidReplaceResultRequestXmlWithWrongAssignment(): string
+    {
+        return $this->getXmlRequestTemplate(
+            100000000,
+            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+        );
+    }
+
+    public function getValidReplaceResultRequestXmlWithWrongNamespace(): string
+    {
+        return $this->getXmlRequestTemplate(
+            1,
+            'ttp://www.imsglobal.org/lis/oms1p0/pox'
+        );
+    }
+
+    public function getValidReplaceResultRequestXmlWithoutId(): string
+    {
+        return $this->getXmlRequestTemplate(
+            null,
+            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+        );
+    }
+
+    public function getValidReplaceResultResponseXml(string $messageIdentifier): string
     {
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -62,7 +64,7 @@ XML;
     <imsx_POXHeader>
         <imsx_POXResponseHeaderInfo>
             <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>e36f227c-2946-11e8-b467-0ed5f89f718b</imsx_messageIdentifier>
+            <imsx_messageIdentifier>$messageIdentifier</imsx_messageIdentifier>
             <imsx_statusInfo>
                 <imsx_codeMajor>success</imsx_codeMajor>
                 <imsx_severity>status</imsx_severity>
@@ -80,71 +82,21 @@ XML;
 XML;
     }
 
-    public function getValidReplaceResultRequestXmlWithWrongAssignment(): string
+    private function getXmlRequestTemplate(?int $assignmentId, string $namespace): string
     {
-        return <<<XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-    <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>5c592d046d5c6</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultRequest>
-            <resultRecord>
-                <sourcedGUID>
-                    <sourcedId>1000000000</sourcedId>
-                </sourcedGUID>
-                <result>
-                    <resultScore>
-                        <language>en-us</language>
-                        <textString>0.11111111111111</textString>
-                    </resultScore>
-                </result>
-            </resultRecord>
-        </replaceResultRequest>
-    </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-XML;
-    }
+        $assignmentIdBlock = '';
 
-    public function getValidReplaceResultRequestXmlWithWrongNamespace(): string
-    {
-        return <<<XML
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "ttp://www.imsglobal.org/lis/oms1p0/pox">
-    <imsx_POXHeader>
-        <imsx_POXRequestHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier>5c592d046d5c6</imsx_messageIdentifier>
-        </imsx_POXRequestHeaderInfo>
-    </imsx_POXHeader>
-    <imsx_POXBody>
-        <replaceResultRequest>
-            <resultRecord>
-                <sourcedGUID>
-                    <sourcedId>1</sourcedId>
-                </sourcedGUID>
-                <result>
-                    <resultScore>
-                        <language>en-us</language>
-                        <textString>0.11111111111111</textString>
-                    </resultScore>
-                </result>
-            </resultRecord>
-        </replaceResultRequest>
-    </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-XML;
-    }
+        if ($assignmentId !== null) {
+            $assignmentIdBlock = <<<sourceGUID
+<sourcedGUID>
+    <sourcedId>$assignmentId</sourcedId>
+</sourcedGUID>
+sourceGUID;
+        }
 
-    public function getValidReplaceResultRequestXmlWithoutId(): string
-    {
         return <<<XML
 <?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+<imsx_POXEnvelopeRequest xmlns = "$namespace">
     <imsx_POXHeader>
         <imsx_POXRequestHeaderInfo>
             <imsx_version>V1.0</imsx_version>
@@ -154,6 +106,7 @@ XML;
     <imsx_POXBody>
         <replaceResultRequest>
             <resultRecord>
+                $assignmentIdBlock
                 <result>
                     <resultScore>
                         <language>en-us</language>

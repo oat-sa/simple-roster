@@ -44,15 +44,17 @@ class LtiOutcomeResponderTest extends KernelTestCase
         /** @var Environment $twig */
         $twig = static::$container->get(Environment::class);
 
+        $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
+
         $uuidFactory = $this->createMock(UuidFactoryInterface::class);
         $uuidFactory
             ->method('uuid4')
-            ->willreturn('e36f227c-2946-11e8-b467-0ed5f89f718b');
+            ->willreturn($messageIdentifier);
 
         $subject = new LtiOutcomeResponder($twig, $uuidFactory);
 
         $response = $subject->createXmlResponse(1);
 
-        self::assertEquals($this->getValidReplaceResultResponseXml(), $response->getContent());
+        self::assertEquals($this->getValidReplaceResultResponseXml($messageIdentifier), $response->getContent());
     }
 }

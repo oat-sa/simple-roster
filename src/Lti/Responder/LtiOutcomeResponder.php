@@ -46,7 +46,7 @@ class LtiOutcomeResponder
             [
                 'messageIdentifier' => $this->uuidFactory->uuid4(),
                 'messageRefIdentifier' => $assignmentId,
-                'description' => sprintf('Assignment with Id %s was updated', $assignmentId),
+                'description' => sprintf('Assignment with Id %d was updated', $assignmentId),
             ]
         );
 

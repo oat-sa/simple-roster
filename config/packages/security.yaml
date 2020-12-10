@@ -25,7 +25,9 @@ security:
         lti1p3:
             pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
             stateless: true
-            lti1p3_service: { scopes: [ 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome' ] }
+            lti1p3_service:
+                scopes:
+                    - 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
 
         api:
             anonymous: ~

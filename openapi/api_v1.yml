@@ -454,8 +454,8 @@ components:
                                             type: object
                                             properties:
                                                 sourcedId:
-                                                    type: string
-                                                    example: '1'
+                                                    type: integer
+                                                    example: 1
                                         result:
                                             type: object
                                             properties:
@@ -496,8 +496,8 @@ components:
                                     type: string
                                     example: 'Assignment with Id 1 was updated'
                                 imsx_messageRefIdentifier:
-                                    type: string
-                                    example: '1'
+                                    type: integer
+                                    example: 1
                                 imsx_operationRefIdentifier:
                                     type: string
                                     example: 'replaceResult'
