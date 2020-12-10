@@ -33,7 +33,6 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $kernelDebug: '%kernel.debug%'
             $kernelEnvironment: '%kernel.environment%'
             $ltiLaunchPresentationReturnUrl: '%app.lti.launch_presentation_return_url%'
             $ltiLaunchPresentationLocale: '%app.lti.launch_presentation_locale%'
