@@ -36,3 +36,7 @@ updateLtiOutcome:
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLtiOutcomeAction }
 
+updateLineItems:
+  path: '%app.route_prefix%/v1/web-hooks/update-line-items'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\WebHook\UpdateLineItemsWebhookAction }

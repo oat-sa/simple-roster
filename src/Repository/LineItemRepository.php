@@ -22,8 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Model\LineItemCollection;
 
 /**
@@ -33,9 +35,20 @@ use OAT\SimpleRoster\Model\LineItemCollection;
  */
 class LineItemRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    /** @var int */
+    private $lineItemCacheTtl;
+
+    /** @var LineItemCacheIdGenerator */
+    private $cacheIdGenerator;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        LineItemCacheIdGenerator $cacheIdGenerator,
+        int $lineItemCacheTtl
+    ) {
         parent::__construct($registry, LineItem::class);
+        $this->cacheIdGenerator = $cacheIdGenerator;
+        $this->lineItemCacheTtl = $lineItemCacheTtl;
     }
 
     public function findAllAsCollection(): LineItemCollection
@@ -47,5 +60,25 @@ class LineItemRepository extends AbstractRepository
         }
 
         return $collection;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOneById(int $id): LineItem
+    {
+        $lineItem = $this->createQueryBuilder('l')
+            ->select('l')
+            ->where('l.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
+            ->getOneOrNullResult();
+
+        if (null === $lineItem) {
+            throw new EntityNotFoundException(sprintf("LineItem with id = '%d' cannot be found.", $id));
+        }
+
+        return $lineItem;
     }
 }

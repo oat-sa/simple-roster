@@ -17,6 +17,7 @@ To learn more about *IMS OneRoster*, please refer to the official specification 
 - [Local development](docs/local-development.md)
 - [Features](#)
     - [Learning Tools Interoperability](docs/features/lti.md)
+    - [Update Line Items Webhook](docs/features/update-line-items-webhook.md)
 - [OpenAPI documentation](#openapi-documentation)
 - [CLI documentation](#cli-documentation)
 - [DevOps documentation](docs/devops-documentation.md)
@@ -37,6 +38,7 @@ The application currently offers the following CLI commands:
 | Command                               | Description                   | Links                                                    |
 | --------------------------------------|:------------------------------|:---------------------------------------------------------|
 | `roster:cache-warmup:lti-instance`    | LTI instance cache warming    | [link](docs/cli/lti-instance-cache-warmer-command.md)    |
+| `roster:cache-warmup:line-item`       | Line Item cache warming       | [link](docs/cli/line-item-cache-warmer-command.md)       |
 | `roster:cache-warmup:user`            | User cache warming            | [link](docs/cli/user-cache-warmer-command.md)            |
 | `roster:garbage-collector:assignment` | Assignment garbage collection | [link](docs/cli/assignment-garbage-collector-command.md) |
 | `roster:ingest:lti-instance`          | LTI instance ingestion        | [link](docs/cli/lti-instance-ingester-command.md)        |
