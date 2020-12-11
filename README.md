@@ -37,6 +37,7 @@ The application currently offers the following CLI commands:
 
 | Command                               | Description                   | Links                                                    |
 | --------------------------------------|:------------------------------|:---------------------------------------------------------|
+| `roster:activate:line-item`           | Activate/Deactivate line items| [link](docs/cli/line-item-activator-command.md)             |
 | `roster:cache-warmup:lti-instance`    | LTI instance cache warming    | [link](docs/cli/lti-instance-cache-warmer-command.md)    |
 | `roster:cache-warmup:line-item`       | Line Item cache warming       | [link](docs/cli/line-item-cache-warmer-command.md)       |
 | `roster:cache-warmup:user`            | User cache warming            | [link](docs/cli/user-cache-warmer-command.md)            |

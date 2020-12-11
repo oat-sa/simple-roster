@@ -113,7 +113,7 @@ EOF
         $this->addArgument(
             'toggle',
             InputArgument::REQUIRED,
-            'Accepted two values "activate" to activate a line item. "deactivate to deactivate a line item."'
+            'Accepted two values "activate" to activate a line item. "deactivate" to deactivate a line item.'
         );
 
         $fieldQueryDescription = 'How do you want to query the line items that you want to activate/deactivate. '
