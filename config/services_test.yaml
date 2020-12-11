@@ -19,3 +19,7 @@ services:
 
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\ArrayCache
+
+    test.uid_generator:
+        alias: Ramsey\Uuid\UuidFactoryInterface
+        public: true

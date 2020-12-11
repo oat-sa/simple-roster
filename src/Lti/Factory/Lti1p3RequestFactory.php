@@ -23,13 +23,17 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Factory;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
@@ -42,14 +46,19 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
     /** @var LtiConfiguration */
     private $ltiConfiguration;
 
+    /** @var RouterInterface */
+    private $router;
+
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         Lti1p3MessageBuilder $ltiMessageBuilder,
-        LtiConfiguration $ltiConfiguration
+        LtiConfiguration $ltiConfiguration,
+        RouterInterface $router
     ) {
         $this->registrationRepository = $registrationRepository;
         $this->ltiMessageBuilder = $ltiMessageBuilder;
         $this->ltiConfiguration = $ltiConfiguration;
+        $this->router = $router;
     }
 
     /**
@@ -64,12 +73,35 @@ class Lti1p3RequestFactory implements LtiRequestFactoryInterface
             throw new RegistrationNotFoundException(sprintf('Registration %s not found.', $ltiRegistrationId));
         }
 
-        $loginHint = new LoginHintDto(
-            (string)$assignment->getUser()->getUsername(),
-            (int)$assignment->getId(),
-        );
-
-        $message = $this->ltiMessageBuilder->build($registration, $loginHint, $assignment);
+        $message = $this->ltiMessageBuilder
+            ->withMessagePayloadClaim(
+                new BasicOutcomeClaim(
+                    (string)$assignment->getId(),
+                    $this->router->generate(
+                        'updateLti1p3Outcome',
+                        [],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                )
+            )
+            ->withMessagePayloadClaim(
+                new LaunchPresentationClaim(
+                    null,
+                    null,
+                    null,
+                    $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
+                    $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
+                )
+            )
+            ->withMessagePayloadClaim(
+                new ContextClaim(
+                    (string)$assignment->getId(),
+                    [],
+                    $assignment->getLineItem()->getSlug(),
+                    $assignment->getLineItem()->getLabel(),
+                )
+            )
+            ->build($registration, $assignment);
 
         return new LtiRequest($message->toUrl(), LtiRequest::LTI_VERSION_1P3, []);
     }
