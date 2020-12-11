@@ -148,15 +148,15 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle->comment('Executing Activation...');
-
         $toggle = (string)$input->getArgument('toggle');
         $queryField = (string)$input->getArgument('query-field');
         $queryValue = $input->getArgument('query-value');
 
+        $this->validateToggleArgument($toggle);
+        $this->validateQueryFieldArgument($queryField);
+
         try {
-            $this->validateToggleArgument($toggle);
-            $this->validateQueryFieldArgument($queryField);
+            $this->symfonyStyle->comment(sprintf('Executing %s...', ucfirst($toggle)));
 
             /** @var ArrayCollection $lineItems */
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
@@ -166,16 +166,16 @@ EOF
 
                 $this->logger->info(
                     sprintf(
-                        'The operation: %s was executed for Line Item with id: "%d"',
+                        'The operation: "%s" was executed for Line Item with id: "%d"',
                         $toggle,
                         $lineItem->getId()
                     ),
-                    ['slug' => $lineItem->getSlug(), 'url' => $lineItem->getUri()]
+                    ['slug' => $lineItem->getSlug(), 'uri' => $lineItem->getUri()]
                 );
             }
 
             $this->symfonyStyle->success(
-                sprintf('The operation: %s was executed for "%d" Line Item(s).', $toggle, count($lineItems))
+                sprintf('The operation: "%s" was executed for "%d" Line Item(s).', $toggle, count($lineItems))
             );
 
             $this->lineItemRepository->flush();

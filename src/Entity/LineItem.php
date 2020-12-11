@@ -49,7 +49,7 @@ class LineItem implements JsonSerializable, EntityInterface
     private $maxAttempts = 0;
 
     /** @var bool */
-    private $isActive;
+    private $isActive = true;
 
     public function getId(): ?int
     {
