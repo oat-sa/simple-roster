@@ -90,7 +90,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
     public function testItWarmsUpCacheDuringPostUpdate(): void
     {
         $this->lineItemRepository->expects(self::once())
-            ->method('findById')
+            ->method('findOneById')
             ->with(1);
 
         $cacheProvider = $this->createMock(CacheProvider::class);

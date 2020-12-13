@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Responder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
@@ -35,13 +36,13 @@ class SerializerResponder
     /** @var SerializerInterface */
     private $serializer;
 
-    /** @var bool */
-    private $kernelDebug;
+    /** @var KernelInterface */
+    private $kernel;
 
-    public function __construct(SerializerInterface $serializer, bool $kernelDebug = false)
+    public function __construct(SerializerInterface $serializer, KernelInterface $kernel)
     {
         $this->serializer = $serializer;
-        $this->kernelDebug = $kernelDebug;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -67,7 +68,7 @@ class SerializerResponder
             'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE,
         ];
 
-        if ($this->kernelDebug) {
+        if ($this->kernel->isDebug()) {
             $content['message'] = $exception->getMessage();
             $content['trace'] = $exception->getTraceAsString();
         }

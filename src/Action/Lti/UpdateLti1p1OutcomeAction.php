@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
-use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
 use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UpdateLtiOutcomeAction implements OAuthSignatureValidatedActionInterface
+class UpdateLti1p1OutcomeAction implements OAuthSignatureValidatedActionInterface
 {
     /** @var ReplaceResultSourceIdExtractor */
     private $replaceResultSourceIdExtractor;
@@ -41,17 +41,17 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedActionInterface
     /** @var CompleteUserAssignmentService */
     private $completeUserAssignmentService;
 
-    /** @var SerializerResponder */
-    private $serializerResponder;
+    /** @var LtiOutcomeResponder */
+    private $ltiOutcomeResponder;
 
     public function __construct(
         ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor,
         CompleteUserAssignmentService $completeUserAssignmentService,
-        SerializerResponder $serializerResponder
+        LtiOutcomeResponder $ltiOutcomeResponder
     ) {
         $this->replaceResultSourceIdExtractor = $replaceResultSourceIdExtractor;
         $this->completeUserAssignmentService = $completeUserAssignmentService;
-        $this->serializerResponder = $serializerResponder;
+        $this->ltiOutcomeResponder = $ltiOutcomeResponder;
     }
 
     public function __invoke(Request $request): Response
@@ -66,6 +66,6 @@ class UpdateLtiOutcomeAction implements OAuthSignatureValidatedActionInterface
             throw new BadRequestHttpException($exception->getMessage());
         }
 
-        return $this->serializerResponder->createJsonResponse(null);
+        return $this->ltiOutcomeResponder->createXmlResponse($assignmentId);
     }
 }

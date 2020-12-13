@@ -128,6 +128,10 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->with($loginHint)
             ->willReturn($loginHintDto);
 
+        $this->logger
+            ->expects(self::never())
+            ->method('info');
+
         $this->subject->authenticate($loginHint);
     }
 }
