@@ -27,6 +27,8 @@ use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,9 +67,14 @@ class UpdateLineItemDatesCommand extends Command
     /** @var DateTime|null */
     private $endDate;
 
-    public function __construct()
+    /** @var LineItemRepository */
+    private $lineItemRepository;
+
+    public function __construct(LineItemRepository $lineItemRepository)
     {
         parent::__construct(self::NAME);
+
+        $this->lineItemRepository = $lineItemRepository;
     }
 
     protected function configure(): void
@@ -143,8 +150,6 @@ class UpdateLineItemDatesCommand extends Command
         $this->initializeDates($input);
 
         $this->isDryRun = !(bool)$input->getOption(self::OPTION_FORCE);
-
-        dd($this->lineItemIds, $this->lineItemSlugs, $this->startDate, $this->endDate, $this->isDryRun);
     }
 
     /**
@@ -154,6 +159,8 @@ class UpdateLineItemDatesCommand extends Command
     {
         try {
             $this->symfonyStyle->note('Checking line items to be updated...');
+
+            $criteria = $this->getFindLineItemCriteria();
 
             $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
             $command->run(new ArrayInput([]), $output);
@@ -250,5 +257,20 @@ class UpdateLineItemDatesCommand extends Command
 
             throw new InvalidArgumentException($message);
         }
+    }
+
+    private function getFindLineItemCriteria(): FindLineItemCriteria
+    {
+        $criteria = new FindLineItemCriteria();
+
+        if (!empty($this->lineItemIds)) {
+            $criteria->addLineItemIdsCriteria(...$this->lineItemIds);
+        }
+
+        if (!empty($this->lineItemSlugs)) {
+            $criteria->addLineItemSlugsCriteria(...$this->lineItemSlugs);
+        }
+
+        return $criteria;
     }
 }
