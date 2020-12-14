@@ -149,14 +149,17 @@ class LineItem implements JsonSerializable, EntityInterface
 
     public function deactivate(): self
     {
-        $this->isActive = false;
-
-        return $this;
+        return $this->setIsActive(false);
     }
 
     public function activate(): self
     {
-        $this->isActive = true;
+        return $this->setIsActive(true);
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

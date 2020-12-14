@@ -27,12 +27,10 @@ use DateInterval;
 use DateTimeZone;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
-use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -158,37 +156,27 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         Carbon::setTestNow();
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.Superglobals)
-     */
     public function testItReturns409IfLineItemIsNotAvailable(): void
     {
         Carbon::setTestNow(
             Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
         );
 
+        $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        /** @var LineItemRepository $lineItemRepository */
-        $lineItemRepository = $this->getRepository(LineItem::class);
-        $lineItemRepository->findOneById(1)
-            ->deactivate();
-        $lineItemRepository->flush();
+        $user = $userRepository->findByUsernameWithAssignments('username');
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
-        $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
-
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
 
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
         self::assertSame(
-            "Assignment with id '1' for user 'user1' is unavailable.",
+            "Assignment with id '2' for user 'username' is unavailable.",
             $decodedResponse['error']['message']
         );
 
