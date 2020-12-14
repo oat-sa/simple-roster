@@ -178,13 +178,11 @@ class UpdateLineItemDatesCommand extends Command
                 $this->lineItemRepository->persist($lineItem);
             }
 
-            $this->symfonyStyle->info(
-                sprintf(
-                    '%s%d line item(s) have been updated.',
-                    '[DRY RUN] ',
-                    $lineItemsCollection->count()
-                )
-            );
+            $messageTemplate = $this->isDryRun
+                ? '[DRY RUN] %d line item(s) have been updated.'
+                : '%d line item(s) have been updated.';
+
+            $this->symfonyStyle->success(sprintf($messageTemplate, $lineItemsCollection->count()));
 
             if (!$this->isDryRun) {
                 $this->lineItemRepository->flush();

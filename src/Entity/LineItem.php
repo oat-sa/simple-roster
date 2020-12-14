@@ -94,7 +94,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt;
     }
 
-    public function setStartAt(DateTimeInterface $startAt): self
+    public function setStartAt(?DateTimeInterface $startAt): self
     {
         $this->startAt = $startAt;
 
@@ -106,7 +106,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->endAt;
     }
 
-    public function setEndAt(DateTimeInterface $endAt): self
+    public function setEndAt(?DateTimeInterface $endAt): self
     {
         $this->endAt = $endAt;
 
