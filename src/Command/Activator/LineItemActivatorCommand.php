@@ -162,7 +162,7 @@ EOF
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
             foreach ($lineItems as $lineItem) {
-                call_user_func([$lineItem, $toggle]);
+                $lineItem->setIsActive($toggle === self::TOGGLE_ACTIVATE);
 
                 $this->logger->info(
                     sprintf(
