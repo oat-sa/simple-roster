@@ -27,6 +27,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)
@@ -80,5 +81,31 @@ class LineItemRepository extends AbstractRepository
         }
 
         return $lineItem;
+    }
+
+    public function findLineItemsByCriteria(FindLineItemCriteria $criteria): LineItemCollection
+    {
+        $queryBuilder = $this->createQueryBuilder('l')
+            ->select('l');
+
+        if ($criteria->hasLineItemIdsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.id IN (:ids)')
+                ->setParameter('ids', $criteria->getLineItemIdsCriteria());
+        }
+
+        if ($criteria->hasLineItemSlugsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.slug IN (:slugs)')
+                ->setParameter('slugs', $criteria->getLineItemSlugsCriteria());
+        }
+
+        $lineItemsCollection = new LineItemCollection();
+        $result = $queryBuilder->getQuery()->getResult();
+        foreach ($result as $row) {
+            $lineItemsCollection->add($row);
+        }
+
+        return $lineItemsCollection;
     }
 }

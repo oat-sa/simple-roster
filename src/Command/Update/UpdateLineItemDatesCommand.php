@@ -27,6 +27,7 @@ use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Symfony\Component\Console\Command\Command;
@@ -161,6 +162,13 @@ class UpdateLineItemDatesCommand extends Command
             $this->symfonyStyle->note('Checking line items to be updated...');
 
             $criteria = $this->getFindLineItemCriteria();
+            $lineItemsCollection = $this->lineItemRepository->findLineItemsByCriteria($criteria);
+
+            if ($lineItemsCollection->isEmpty()) {
+                $this->symfonyStyle->warning('No line items found with specified criteria.');
+
+                return 0;
+            }
 
             $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
             $command->run(new ArrayInput([]), $output);
