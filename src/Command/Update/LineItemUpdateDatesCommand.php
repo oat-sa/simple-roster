@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Update;
 
+use Carbon\Carbon;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
@@ -38,7 +39,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-class UpdateLineItemDatesCommand extends Command
+class LineItemUpdateDatesCommand extends Command
 {
     use BlackfireProfilerTrait;
 
@@ -136,6 +137,16 @@ class UpdateLineItemDatesCommand extends Command
 
         if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS)) {
             $this->initializeLineItemSlugsOption($input);
+        }
+
+        if (empty($this->lineItemIds) && empty($this->lineItemSlugs)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "You need to specify %s or %s option.",
+                    self::OPTION_LINE_ITEM_IDS,
+                    self::OPTION_LINE_ITEM_SLUGS
+                )
+            );
         }
 
         if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs)) {
@@ -248,11 +259,10 @@ class UpdateLineItemDatesCommand extends Command
             try {
                 $this->startDate = new DateTime($inputStartDate);
             } catch (Exception $e) {
-                $expectedFormat = (new DateTime())->format(DateTime::ATOM);
                 $message = sprintf(
                     '%s is an invalid start date. Expected format: %s',
                     $inputStartDate,
-                    $expectedFormat
+                    Carbon::now()->format(Carbon::ISO8601)
                 );
 
                 throw new InvalidArgumentException($message);
@@ -263,11 +273,10 @@ class UpdateLineItemDatesCommand extends Command
             try {
                 $this->endDate = new DateTime($inputEndDate);
             } catch (Exception $e) {
-                $expectedFormat = (new DateTime())->format(DateTime::ATOM);
                 $message = sprintf(
                     '%s is an invalid end date. Expected format: %s',
                     $inputEndDate,
-                    $expectedFormat
+                    Carbon::now()->format(Carbon::ISO8601)
                 );
 
                 throw new InvalidArgumentException($message);

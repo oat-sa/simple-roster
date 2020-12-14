@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Repository\Criteria;
 
 class FindLineItemCriteria
 {
-    /** @var string[] */
+    /** @var int[] */
     private $lineItemIds = [];
 
     /** @var string[] */
