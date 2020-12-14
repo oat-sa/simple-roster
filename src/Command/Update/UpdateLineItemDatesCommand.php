@@ -170,8 +170,28 @@ class UpdateLineItemDatesCommand extends Command
                 return 0;
             }
 
-            $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
-            $command->run(new ArrayInput([]), $output);
+            /** @var LineItem $lineItem */
+            foreach ($lineItemsCollection as $lineItem) {
+                $lineItem->setStartAt($this->startDate);
+                $lineItem->setEndAt($this->endDate);
+
+                $this->lineItemRepository->persist($lineItem);
+            }
+
+            $this->symfonyStyle->info(
+                sprintf(
+                    '%s%d line item(s) have been updated.',
+                    '[DRY RUN] ',
+                    $lineItemsCollection->count()
+                )
+            );
+
+            if (!$this->isDryRun) {
+                $this->lineItemRepository->flush();
+
+                $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
+                $command->run(new ArrayInput([]), $output);
+            }
 
             return 0;
         } catch (Throwable $exception) {
