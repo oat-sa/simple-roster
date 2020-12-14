@@ -184,7 +184,7 @@ class LineItemActivatorCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $lineItemRepository = $this->createMock(LineItemRepository::class);
-        $lineItemRepository->expects($this->once())
+        $lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(['id' => 1])
             ->willThrowException(new Exception('Database Error'));
