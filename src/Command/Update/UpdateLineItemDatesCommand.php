@@ -215,7 +215,14 @@ class UpdateLineItemDatesCommand extends Command
             try {
                 $this->startDate = new DateTime($inputStartDate);
             } catch (Exception $e) {
-                throw new InvalidArgumentException(sprintf('%s is an invalid start date.', $inputStartDate));
+                $expectedFormat = (new DateTime())->format(DateTime::ATOM);
+                $message = sprintf(
+                    '%s is an invalid start date. Expected format: %s',
+                    $inputStartDate,
+                    $expectedFormat
+                );
+
+                throw new InvalidArgumentException($message);
             }
         }
 
@@ -223,7 +230,14 @@ class UpdateLineItemDatesCommand extends Command
             try {
                 $this->endDate = new DateTime($inputEndDate);
             } catch (Exception $e) {
-                throw new InvalidArgumentException(sprintf('%s is an invalid end date.', $inputEndDate));
+                $expectedFormat = (new DateTime())->format(DateTime::ATOM);
+                $message = sprintf(
+                    '%s is an invalid end date. Expected format: %s',
+                    $inputEndDate,
+                    $expectedFormat
+                );
+
+                throw new InvalidArgumentException($message);
             }
         }
 
