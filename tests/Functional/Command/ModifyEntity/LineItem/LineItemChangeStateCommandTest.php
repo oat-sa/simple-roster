@@ -226,12 +226,12 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                 'query-value' => ['1', '3'],
             ],
             'byUri' => [
-                'line-item-ids' => [1, 2, 3],
+                'line-item-ids' => [1, 2],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com'],
             ],
             'byMultipleUris' => [
-                'line-item-ids' => [1, 2, 3, 4],
+                'line-item-ids' => [1, 2, 3],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
             ],
