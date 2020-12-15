@@ -14,6 +14,7 @@
 - Added [roster:cache-warmup:lti-instance](docs/cli/lti-instance-cache-warmer-command.md) command.
 - Added [roster:cache-warmup:line-item](docs/cli/line-item-cache-warmer-command.md) command.
 - Added [roster:cache-warmup:user](docs/cli/user-cache-warmer-command.md) command.
+- Added [roster:update-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command.
 - Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
 - Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/).
 - Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
