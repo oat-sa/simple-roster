@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\ModifyEntity\LineItem;
 
-use Carbon\Carbon;
-use DateTimeZone;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
@@ -81,8 +79,6 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
      */
     public function testItThrowsExceptionForIfInvalidParametersReceived(array $input, string $expectedOutput): void
     {
-        Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedOutput);
 
@@ -190,13 +186,11 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
     public function provideInvalidParameters(): array
     {
-        $longText = 'End date should be later than start date. Start Date: 2020-01-02 End Date: 2020-01-01.';
-
         return [
             'noLineItemIdsOrSlugs' => [
                 'input' => [
-                    '--start-date' => '2020-01-01',
-                    '--end-date' => '2020-01-10',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'expectedOutput' => 'You need to specify line-item-ids or line-item-slugs option.',
             ],
@@ -217,22 +211,22 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-i' => '1,2,3',
                     '--start-date' => '2020-13-01',
                 ],
-                'expectedOutput' => '2020-13-01 is an invalid start date. Expected format: 2020-01-01T00:00:00+0000',
+                'expectedOutput' => '2020-13-01 is an invalid start date.',
             ],
             'invalidEndDate' => [
                 'input' => [
                     '-i' => '1,2,3',
                     '--end-date' => '2020-13-01',
                 ],
-                'expectedOutput' => '2020-13-01 is an invalid end date. Expected format: 2020-01-01T00:00:00+0000',
+                'expectedOutput' => '2020-13-01 is an invalid end date.',
             ],
             'endDateBeforeStartDate' => [
                 'input' => [
                     '-i' => '1,2,3',
-                    '--start-date' => '2020-01-02',
-                    '--end-date' => '2020-01-01',
+                    '--start-date' => '2020-01-02T00:00:00+0000',
+                    '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
-                'expectedOutput' => $longText,
+                'expectedOutput' => 'End date should be later than start date.',
             ],
             'informedBothSlugsAndIds' => [
                 'input' => [
@@ -250,15 +244,15 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             'usingIdsAndDates' => [
                 'input' => [
                     '-i' => '1,2,3',
-                    '--start-date' => '2020-01-01',
-                    '--end-date' => '2020-01-10',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingSlugsAndDates' => [
                 'input' => [
                     '-s' => 'slug1,slug2,slug3',
-                    '--start-date' => '2020-01-01',
-                    '--end-date' => '2020-01-10',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
         ];
@@ -270,8 +264,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             'usingIdsAndDates' => [
                 'input' => [
                     '-i' => '4,5,6',
-                    '--start-date' => '2020-01-01',
-                    '--end-date' => '2020-01-10',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingIdsWithoutDates' => [
@@ -282,20 +276,20 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             'usingIdsAndStartDateOnly' => [
                 'input' => [
                     '-i' => '4,5,6',
-                    '--start-date' => '2020-01-01',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingIdsAndEndDateOnly' => [
                 'input' => [
                     '-i' => '4,5,6',
-                    '--end-date' => '2020-01-01',
+                    '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingSlugsAndDates' => [
                 'input' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
-                    '--start-date' => '2020-01-01',
-                    '--end-date' => '2020-01-10',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingSlugsWithoutDates' => [
@@ -306,13 +300,13 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             'usingSlugsAndStartDateOnly' => [
                 'input' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
-                    '--start-date' => '2020-01-01',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingSlugsAndEndDateOnly' => [
                 'input' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
-                    '--end-date' => '2020-01-01',
+                    '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
         ];

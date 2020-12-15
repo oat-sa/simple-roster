@@ -20,11 +20,11 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-state <togg
 ## Examples
 - Updating dates of line items using IDs
 ```shell script
-$ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -i 1,2,3 --start-date 2020-01-01T00:00:00 --end-date 2020-01-01T00:00:00 --force
+$ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -i 1,2,3 --start-date . Expected format: format: 2020-01-01T00:00:00+0000 --end-date . Expected format: format: 2020-01-01T00:00:00+0000 --force
 ```
 - Updating dates of line items using Slugs
 ```shell script
-$ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00 --end-date 2020-01-01T00:00:00 --force
+$ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date . Expected format: format: 2020-01-01T00:00:00+0000 --end-date . Expected format: format: 2020-01-01T00:00:00+0000 --force
 ```
 - Nullifying dates of a line item by line item
 ```shell script

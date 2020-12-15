@@ -87,15 +87,14 @@ class LineItemChangeDatesCommand extends Command
         $this->setHelp(<<<'EOF'
 The <info>%command.name%</info> command changes the dates for specific line items.
 
-To change both start and end date of a line item using IDs:
-    <comment>Not specifying a start-date or end-date option will nullify it</comment>
+<comment>Not specifying a start-date or end-date option will nullify the value for the column.</comment>
+<comment>Dates are expected to be in the format: 2020-01-01T00:00:00+0000</comment>
 
+To change both start and end date of a line item using IDs:
     <info>php %command.full_name% -i 1,2,3 --start-date <date> --end-date <date></info>
     <info>php %command.full_name% --line-item-ids 1,2,3 --start-date <date> --end-date <date></info>
 
 To change both start and end date of a line item using slugs:
-    <comment>Not specifying a start-date or end-date option will nullify it</comment>
-
     <info>php %command.full_name% -s slug1,slug2,slug3 --start-date <date> --end-date <date></info>
     <info>php %command.full_name% --line-item-slugs slug1,slug2,slug3 --start-date <date> --end-date <date></info>
 EOF
@@ -119,14 +118,14 @@ EOF
             self::OPTION_START_DATE,
             '',
             InputOption::VALUE_OPTIONAL,
-            'Start date for the line item(s)',
+            'Start date for the line item(s). Expected format: 2020-01-01T00:00:00+0000',
         );
 
         $this->addOption(
             self::OPTION_END_DATE,
             '',
             InputOption::VALUE_OPTIONAL,
-            'End date for the line item(s)',
+            'End date for the line item(s). Expected format: 2020-01-01T00:00:00+0000',
         );
 
         $this->addOption(
@@ -260,53 +259,6 @@ EOF
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function initializeDates(InputInterface $input): void
-    {
-        $inputStartDate = (string)$input->getOption(self::OPTION_START_DATE);
-        $inputEndDate = (string)$input->getOption(self::OPTION_END_DATE);
-
-        if (!empty($inputStartDate)) {
-            try {
-                $this->startDate = new DateTime($inputStartDate);
-            } catch (Throwable $e) {
-                $message = sprintf(
-                    '%s is an invalid start date. Expected format: %s',
-                    $inputStartDate,
-                    Carbon::now()->format(Carbon::ISO8601)
-                );
-
-                throw new InvalidArgumentException($message);
-            }
-        }
-
-        if (!empty($inputEndDate)) {
-            try {
-                $this->endDate = new DateTime($inputEndDate);
-            } catch (Throwable $e) {
-                $message = sprintf(
-                    '%s is an invalid end date. Expected format: %s',
-                    $inputEndDate,
-                    Carbon::now()->format(Carbon::ISO8601)
-                );
-
-                throw new InvalidArgumentException($message);
-            }
-        }
-
-        if ($this->startDate !== null && $this->endDate !== null && $this->startDate > $this->endDate) {
-            $message = sprintf(
-                'End date should be later than start date. Start Date: %s End Date: %s.',
-                $inputStartDate,
-                $inputEndDate
-            );
-
-            throw new InvalidArgumentException($message);
-        }
-    }
-
     private function getFindLineItemCriteria(): FindLineItemCriteria
     {
         $criteria = new FindLineItemCriteria();
@@ -320,5 +272,67 @@ EOF
         }
 
         return $criteria;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeDates(InputInterface $input): void
+    {
+        $inputStartDate = (string)$input->getOption(self::OPTION_START_DATE);
+        $inputEndDate = (string)$input->getOption(self::OPTION_END_DATE);
+
+        $this->initializeStartDate($inputStartDate);
+        $this->initializeEndDate($inputEndDate);
+
+        if ($this->startDate !== null && $this->endDate !== null && $this->startDate > $this->endDate) {
+            $message = sprintf(
+                'End date should be later than start date. Start Date: %s End Date: %s.',
+                $inputStartDate,
+                $inputEndDate
+            );
+
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeStartDate(string $startDate): void
+    {
+        if (!empty($startDate)) {
+            try {
+                $date = Carbon::createFromFormat(Carbon::ISO8601, $startDate);
+                $this->startDate = $date ? $date->toDateTime() : null;
+            } catch (Throwable $e) {
+                $message = sprintf(
+                    '%s is an invalid start date. Expected format: 2020-01-01T00:00:00+0000',
+                    $startDate
+                );
+
+                throw new InvalidArgumentException($message);
+            }
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function initializeEndDate(string $endDate): void
+    {
+        if (!empty($endDate)) {
+            try {
+                $date = Carbon::createFromFormat(Carbon::ISO8601, $endDate);
+                $this->endDate = $date ? $date->toDateTime() : null;
+            } catch (Throwable $e) {
+                $message = sprintf(
+                    '%s is an invalid end date. Expected format: 2020-01-01T00:00:00+0000',
+                    $endDate
+                );
+
+                throw new InvalidArgumentException($message);
+            }
+        }
     }
 }
