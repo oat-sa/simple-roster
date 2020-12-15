@@ -1,11 +1,11 @@
-# Line Item activator command
+# Line Item change state command
 
-[LineItemActivatorCommand](../../src/Command/Activator/LineItemActivatorCommand.php) is responsible for Activate 
+[LineItemChangeStateCommand](../../src/Command/ModifyEntity/LineItem/LineItemChangeStateCommand.php) is responsible for Activate 
 or Deactivate `Line Items` after [ingesting](line-item-ingester-command.md).
     
 ## Usage
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item <toggle> <query-field> <query-value>
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state <toggle> <query-field> <query-value>
 ```
 ### Arguments
 
@@ -18,28 +18,28 @@ $ sudo -u www-data bin/console roster:activate:line-item <toggle> <query-field> 
 ## Examples
 - Activating a line item by line item uri
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item activate uri https://i.o#i5fb54d6ecd2839a3192238deb544fe
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activate uri https://i.o#i5fb54d6ecd2839a3192238deb544fe
 ```
 - Activating a line item by line item id
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item activate id 4
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activate id 4
 ```
 - Activating a line item by line item slug
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item activate slug my-line-item
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activate slug my-line-item
 ```
 
 - Deactivating a line item by line item uri
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item deactivate uri https://i.o#i5fb54d6ecd2839a3192238deb544fe
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate uri https://i.o#i5fb54d6ecd2839a3192238deb544fe
 ```
 - Deactivating a line item by line item id
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item deactivate id 4
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate id 4
 ```
 - Deactivating a line item by line item slug
 ```shell script
-$ sudo -u www-data bin/console roster:activate:line-item deactivate slug my-line-item
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate slug my-line-item
 ```
 
 > **NOTE** There is no need to warmup the cache for the affected line-items when you run this command. 

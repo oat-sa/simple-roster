@@ -2,7 +2,7 @@
 
 [LineItemIngesterCommand](../../src/Command/Ingester/LineItemIngesterCommand.php) is responsible for ingesting 
 `line item` data into the application. One important thing is that ingested line items are activated by default.
-To deactivate a line item, please check the [line item activator command](line-item-activator-command.md)
+To deactivate a line item, please check the [line item change state command](modify-entity-line-item-change-state-command.md)
 
 - [Usage](#usage)
     - [Main arguments](#main-arguments)

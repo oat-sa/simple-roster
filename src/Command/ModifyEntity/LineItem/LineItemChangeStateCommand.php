@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Command\Activator;
+namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use InvalidArgumentException;
@@ -33,9 +33,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-class LineItemActivatorCommand extends Command
+class LineItemChangeStateCommand extends Command
 {
-    public const NAME = 'roster:activate:line-item';
+    public const NAME = 'roster:modify-entity:line-item:change-state';
 
     private const AVAILABLE_FIELD_QUERIES = [
         self::FIELD_ID,

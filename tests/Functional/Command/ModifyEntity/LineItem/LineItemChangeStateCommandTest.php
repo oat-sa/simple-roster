@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Functional\Command\Activator;
+namespace OAT\SimpleRoster\Tests\Functional\Command\ModifyEntity\LineItem;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use LogicException;
 use Monolog\Logger;
-use OAT\SimpleRoster\Command\Activator\LineItemActivatorCommand;
+use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -37,7 +37,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LineItemActivatorCommandTest extends KernelTestCase
+class LineItemChangeStateCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -62,7 +62,7 @@ class LineItemActivatorCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(LineItemActivatorCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -192,7 +192,7 @@ class LineItemActivatorCommandTest extends KernelTestCase
         self::$container->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
-        $commandTester = new CommandTester($application->find(LineItemActivatorCommand::NAME));
+        $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
 
         $commandTester->execute(
             ['toggle' => 'deactivate', 'query-field' => 'id', 'query-value' => '1'],

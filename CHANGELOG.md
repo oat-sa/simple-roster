@@ -7,7 +7,7 @@
 - Added possibility to warm up LTI instance cache separately via `cache-pool` argument of [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
 - Added possibility to warm up Line Items cache separately.
 - Added `usernames` and `line-item-slugs` input options to [roster:cache:warmup](docs/cli/cache-warmer-command.md) command.
-- Added [roster:activate:line-item](docs/cli/line-item-activator-command.md) command.
+- Added [roster:modify-entity:line-item:change-state](docs/cli/modify-entity-line-item-change-state-command.md) command.
 - Added [roster:ingest:lti-instance](docs/cli/lti-instance-ingester-command.md) command.
 - Added [roster:ingest:line-item](docs/cli/line-item-ingester-command.md) command.
 - Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
