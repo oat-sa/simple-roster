@@ -84,7 +84,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItDeactivatesLineItem(array $lineItemIds, string $queryField, string $queryValue): void
+    public function testItDeactivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
@@ -113,7 +113,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItActivatesLineItem(array $lineItemIds, string $queryField, string $queryValue): void
+    public function testItActivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         $this->commandTester->execute(
             [
@@ -208,17 +208,32 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             'bySlug' => [
                 'line-item-ids' => [2],
                 'query-field' => 'slug',
-                'query-value' => 'lineItemSlug2',
+                'query-value' => ['lineItemSlug2'],
+            ],
+            'byMultipleSlugs' => [
+                'line-item-ids' => [2, 1],
+                'query-field' => 'slug',
+                'query-value' => ['lineItemSlug2', 'lineItemSlug1'],
             ],
             'byId' => [
                 'line-item-ids' => [1],
                 'query-field' => 'id',
-                'query-value' => '1',
+                'query-value' => ['1'],
+            ],
+            'byMultipleIds' => [
+                'line-item-ids' => [1, 3],
+                'query-field' => 'id',
+                'query-value' => ['1', '3'],
             ],
             'byUri' => [
                 'line-item-ids' => [1, 2, 3],
                 'query-field' => 'uri',
-                'query-value' => 'http://lineitemuri.com',
+                'query-value' => ['http://lineitemuri.com'],
+            ],
+            'byMultipleUris' => [
+                'line-item-ids' => [1, 2, 3, 4],
+                'query-field' => 'uri',
+                'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
             ],
         ];
     }
@@ -290,7 +305,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                     ),
                     'context' => [
                         'slug' => sprintf('lineItemSlug%d', $lineItemId),
-                        'uri' => 'http://lineitemuri.com',
+                        'uri' => $this->getContextUriByLineItemId($lineItemId),
                     ],
                 ],
                 Logger::INFO
@@ -305,5 +320,17 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             );
             self::assertEquals((int)$isActive, $cache['is_active_3']);
         }
+    }
+
+    private function getContextUriByLineItemId(int $lineItemId): string
+    {
+        $contextUris = [
+            1 => 'http://lineitemuri.com',
+            2 => 'http://lineitemuri.com',
+            3 => 'http://lineitemuri.com',
+            4 => 'http://different-lineitemuri.com',
+        ];
+
+        return $contextUris[$lineItemId];
     }
 }

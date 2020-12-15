@@ -29,6 +29,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
@@ -89,6 +90,10 @@ To Activate a line item by slug:
 
     <info>php %command.full_name% activate slug {line-item-slug}</info>
     
+To Activate a line item by multiple slugs:
+
+    <info>php %command.full_name% activate slug {line-item-slug1} {line-item-slug2}</info>
+
 To Activate a line item by id:
 
     <info>php %command.full_name% activate id {line-item-id}</info>
@@ -124,12 +129,13 @@ EOF
             sprintf($fieldQueryDescription, implode(', ', self::AVAILABLE_QUERY_FIELDS))
         );
 
-        $fieldValueDescription = 'The value that should match based on the query field. Example: given that the query'
-            . ' field is "slug" and the query value is "test" then all the line items '
-            . 'with slug equals to test will be updated';
+        $fieldValueDescription = 'The value that should match based on the query field. it can be one value or a list'
+            . ' of values split by space. Example: given that the query'
+            . ' field is "slug" and the query value is "test1 test2" then all the line items '
+            . 'with slug equals to test1 or test2 will be updated';
         $this->addArgument(
             'query-value',
-            InputArgument::REQUIRED,
+            InputArgument::REQUIRED | InputArgument::IS_ARRAY,
             $fieldValueDescription
         );
     }
