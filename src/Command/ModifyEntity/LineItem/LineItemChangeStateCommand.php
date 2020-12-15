@@ -37,7 +37,7 @@ class LineItemChangeStateCommand extends Command
 {
     public const NAME = 'roster:modify-entity:line-item:change-state';
 
-    private const AVAILABLE_FIELD_QUERIES = [
+    private const AVAILABLE_QUERY_FIELDS = [
         self::FIELD_ID,
         self::FIELD_SLUG,
         self::FIELD_URI,
@@ -80,7 +80,7 @@ class LineItemChangeStateCommand extends Command
 
         $this->setDescription('Activate/Deactivate line items into the application');
         $this->setHelp(
-            <<<'EOF'
+            <<<EOF
 The <info>%command.name%</info> command Activate/Deactivate line items into the application.
 
     <info>php %command.full_name% <path></info>
@@ -121,7 +121,7 @@ EOF
         $this->addArgument(
             'query-field',
             InputArgument::REQUIRED,
-            sprintf($fieldQueryDescription, implode(', ', self::AVAILABLE_FIELD_QUERIES))
+            sprintf($fieldQueryDescription, implode(', ', self::AVAILABLE_QUERY_FIELDS))
         );
 
         $fieldValueDescription = 'The value that should match based on the query field. Example: given that the query'
@@ -207,14 +207,14 @@ EOF
      */
     private function validateQueryFieldArgument(string $queryField): void
     {
-        if (in_array($queryField, self::AVAILABLE_FIELD_QUERIES)) {
+        if (in_array($queryField, self::AVAILABLE_QUERY_FIELDS)) {
             return;
         }
 
         throw new InvalidArgumentException(
             sprintf(
                 'Invalid query-field argument. Please use: %s',
-                implode(', ', self::AVAILABLE_FIELD_QUERIES)
+                implode(', ', self::AVAILABLE_QUERY_FIELDS)
             )
         );
     }
