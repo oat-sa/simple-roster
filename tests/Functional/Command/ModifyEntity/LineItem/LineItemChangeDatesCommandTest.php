@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Functional\Command\Update;
+namespace OAT\SimpleRoster\Tests\Functional\Command\ModifyEntity\LineItem;
 
 use Carbon\Carbon;
 use DateTimeZone;
@@ -29,7 +29,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use LogicException;
-use OAT\SimpleRoster\Command\Update\LineItemUpdateDatesCommand;
+use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -38,7 +38,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LineItemUpdateDatesCommandTest extends KernelTestCase
+class LineItemChangeDatesCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use CommandDisplayNormalizerTrait;
@@ -59,7 +59,7 @@ class LineItemUpdateDatesCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(LineItemUpdateDatesCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -108,7 +108,7 @@ class LineItemUpdateDatesCommandTest extends KernelTestCase
         self::$container->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
-        $commandTester = new CommandTester($application->find(LineItemUpdateDatesCommand::NAME));
+        $commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
         $input = [
             '-i' => '4,5,6',
             '-f' => null,

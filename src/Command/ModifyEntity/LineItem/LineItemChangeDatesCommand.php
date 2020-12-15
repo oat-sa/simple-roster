@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Command\Update;
+namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 
 use Carbon\Carbon;
 use DateTime;
@@ -37,11 +37,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-class LineItemUpdateDatesCommand extends Command
+class LineItemChangeDatesCommand extends Command
 {
     use BlackfireProfilerTrait;
 
-    public const NAME = 'roster:update:line-item-dates';
+    public const NAME = 'roster:modify-entity:line-item:change-dates';
 
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
