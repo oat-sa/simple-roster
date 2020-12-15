@@ -257,7 +257,7 @@ class LineItemUpdateDatesCommand extends Command
 
         if ($inputStartDate !== null) {
             try {
-                $this->startDate = new DateTime($inputStartDate);
+                $this->startDate = new DateTime((string)$inputStartDate);
             } catch (Exception $e) {
                 $message = sprintf(
                     '%s is an invalid start date. Expected format: %s',
@@ -271,7 +271,7 @@ class LineItemUpdateDatesCommand extends Command
 
         if ($inputEndDate !== null) {
             try {
-                $this->endDate = new DateTime($inputEndDate);
+                $this->endDate = new DateTime((string)$inputEndDate);
             } catch (Exception $e) {
                 $message = sprintf(
                     '%s is an invalid end date. Expected format: %s',

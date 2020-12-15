@@ -39,10 +39,10 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var string */
     private $slug;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $startAt;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $endAt;
 
     /** @var int */
