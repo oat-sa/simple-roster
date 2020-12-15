@@ -24,11 +24,9 @@ namespace OAT\SimpleRoster\Command\Update;
 
 use Carbon\Carbon;
 use DateTime;
-use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Symfony\Component\Console\Command\Command;
@@ -181,7 +179,6 @@ class LineItemUpdateDatesCommand extends Command
                 return 0;
             }
 
-            /** @var LineItem $lineItem */
             foreach ($lineItemsCollection as $lineItem) {
                 $lineItem->setStartAt($this->startDate);
                 $lineItem->setEndAt($this->endDate);
@@ -195,7 +192,7 @@ class LineItemUpdateDatesCommand extends Command
 
             $this->symfonyStyle->success(sprintf($messageTemplate, $lineItemsCollection->count()));
 
-            if (!$this->isDryRun) {
+            if (!$this->isDryRun && $this->getApplication() !== null) {
                 $this->lineItemRepository->flush();
 
                 $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
@@ -212,20 +209,20 @@ class LineItemUpdateDatesCommand extends Command
 
     private function initializeLineItemIdsOption(InputInterface $input): void
     {
-        $this->lineItemIds = array_filter(
+        $lineItemIds = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
             static function ($value): bool {
                 return !empty($value) && (int)$value > 0;
             }
         );
 
-        if (empty($this->lineItemIds)) {
+        if (empty($lineItemIds)) {
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
             );
         }
 
-        $this->lineItemIds = array_map('intval', $this->lineItemIds);
+        $this->lineItemIds = array_map('intval', $lineItemIds);
     }
 
     /**
@@ -252,13 +249,13 @@ class LineItemUpdateDatesCommand extends Command
      */
     private function initializeDates(InputInterface $input): void
     {
-        $inputStartDate = $input->getOption(self::OPTION_START_DATE);
-        $inputEndDate = $input->getOption(self::OPTION_END_DATE);
+        $inputStartDate = (string)$input->getOption(self::OPTION_START_DATE);
+        $inputEndDate = (string)$input->getOption(self::OPTION_END_DATE);
 
-        if ($inputStartDate !== null) {
+        if (!empty($inputStartDate)) {
             try {
-                $this->startDate = new DateTime((string)$inputStartDate);
-            } catch (Exception $e) {
+                $this->startDate = new DateTime($inputStartDate);
+            } catch (Throwable $e) {
                 $message = sprintf(
                     '%s is an invalid start date. Expected format: %s',
                     $inputStartDate,
@@ -269,10 +266,10 @@ class LineItemUpdateDatesCommand extends Command
             }
         }
 
-        if ($inputEndDate !== null) {
+        if (!empty($inputEndDate)) {
             try {
-                $this->endDate = new DateTime((string)$inputEndDate);
-            } catch (Exception $e) {
+                $this->endDate = new DateTime($inputEndDate);
+            } catch (Throwable $e) {
                 $message = sprintf(
                     '%s is an invalid end date. Expected format: %s',
                     $inputEndDate,
