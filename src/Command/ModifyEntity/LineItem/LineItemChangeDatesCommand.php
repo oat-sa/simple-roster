@@ -84,6 +84,22 @@ class LineItemChangeDatesCommand extends Command
         $this->addBlackfireProfilingOption();
 
         $this->setDescription('Updates the start and end dates of line item(s).');
+        $this->setHelp(<<<'EOF'
+The <info>%command.name%</info> command changes the dates for specific line items.
+
+To change both start and end date of a line item using IDs:
+    <comment>Not specifying a start-date or end-date option will nullify it</comment>
+
+    <info>php %command.full_name% -i 1,2,3 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% --line-item-ids 1,2,3 --start-date <date> --end-date <date></info>
+
+To change both start and end date of a line item using slugs:
+    <comment>Not specifying a start-date or end-date option will nullify it</comment>
+
+    <info>php %command.full_name% -s slug1,slug2,slug3 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% --line-item-slugs slug1,slug2,slug3 --start-date <date> --end-date <date></info>
+EOF
+        );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
