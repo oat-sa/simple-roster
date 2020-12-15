@@ -327,8 +327,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $contextUris = [
             1 => 'http://lineitemuri.com',
             2 => 'http://lineitemuri.com',
-            3 => 'http://lineitemuri.com',
-            4 => 'http://different-lineitemuri.com',
+            3 => 'http://different-lineitemuri.com',
         ];
 
         return $contextUris[$lineItemId];

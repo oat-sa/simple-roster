@@ -15,15 +15,8 @@ OAT\SimpleRoster\Entity\LineItem:
         maxAttempts: 1
     lineItem3:
         label: 'The third line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug3'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
-    lineItem4:
-        label: 'The fourth line item'
         uri: 'http://different-lineitemuri.com'
-        slug: 'lineItemSlug4'
+        slug: 'lineItemSlug3'
         startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
