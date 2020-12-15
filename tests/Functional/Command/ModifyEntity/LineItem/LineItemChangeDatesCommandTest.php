@@ -117,7 +117,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertSame(1, $commandTester->execute($input, ['capture_stderr_separately' => true]));
         self::assertStringContainsString(
             '[ERROR] An unexpected error occurred: ErrorMessage',
-            $commandTester->getDisplay()
+            $this->normalizeDisplay($commandTester->getDisplay())
         );
     }
 
@@ -134,14 +134,10 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
 
-        self::assertStringContainsString(
-            '[NOTE] Checking line items to be updated...',
-            $this->commandTester->getDisplay()
-        );
-        self::assertStringContainsString(
-            '[OK] [DRY RUN] 3 line item(s) have been updated.',
-            $this->commandTester->getDisplay()
-        );
+        $display = $this->normalizeDisplay($this->commandTester->getDisplay());
+
+        self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
+        self::assertStringContainsString('[OK] [DRY RUN] 3 line item(s) have been updated.', $display);
 
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(4)));
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
@@ -162,7 +158,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $input['-f'] = null;
         self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
 
-        $display = $this->commandTester->getDisplay();
+        $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
         self::assertStringContainsString('[OK] 3 line item(s) have been updated.', $display);
@@ -186,14 +182,10 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
 
-        self::assertStringContainsString(
-            '[NOTE] Checking line items to be updated...',
-            $this->commandTester->getDisplay()
-        );
-        self::assertStringContainsString(
-            '[WARNING] No line items found with specified criteria.',
-            $this->commandTester->getDisplay()
-        );
+        $display = $this->normalizeDisplay($this->commandTester->getDisplay());
+
+        self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
+        self::assertStringContainsString('[WARNING] No line items found with specified criteria.', $display);
     }
 
     public function provideInvalidParameters(): array
