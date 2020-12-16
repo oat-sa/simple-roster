@@ -37,23 +37,23 @@ class LineItemChangeStateCommand extends Command
 {
     public const NAME = 'roster:modify-entity:line-item:change-state';
 
+    private const FIELD_ID = 'id';
+    private const FIELD_SLUG = 'slug';
+    private const FIELD_URI = 'uri';
+
     private const AVAILABLE_QUERY_FIELDS = [
         self::FIELD_ID,
         self::FIELD_SLUG,
         self::FIELD_URI,
     ];
 
-    private const FIELD_ID = 'id';
-    private const FIELD_SLUG = 'slug';
-    private const FIELD_URI = 'uri';
+    private const TOGGLE_ACTIVATE = 'activate';
+    private const TOGGLE_DEACTIVATE = 'deactivate';
 
     private const TOGGLE_OPERATIONS = [
         self::TOGGLE_ACTIVATE,
         self::TOGGLE_DEACTIVATE
     ];
-
-    private const TOGGLE_ACTIVATE = 'activate';
-    private const TOGGLE_DEACTIVATE = 'deactivate';
 
     /** @var LineItemRepository */
     private $lineItemRepository;
