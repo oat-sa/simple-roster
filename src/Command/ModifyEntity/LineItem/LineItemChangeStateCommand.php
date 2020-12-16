@@ -179,11 +179,11 @@ EOF
                 );
             }
 
+            $this->lineItemRepository->flush();
+
             $this->symfonyStyle->success(
                 sprintf('The operation: "%s" was executed for "%d" Line Item(s).', $toggle, count($lineItems))
             );
-
-            $this->lineItemRepository->flush();
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
 
