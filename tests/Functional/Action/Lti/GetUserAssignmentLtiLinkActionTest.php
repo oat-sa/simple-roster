@@ -72,10 +72,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('POST', '/api/v1/assignments/1/lti-link');
 
-        self::assertSame(
-            Response::HTTP_METHOD_NOT_ALLOWED,
-            $this->kernelBrowser->getResponse()->getStatusCode()
-        );
+        self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
@@ -97,10 +94,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame(
-            "Assignment id '2' not found for user 'user1'.",
-            $decodedResponse['error']['message']
-        );
+        self::assertSame("Assignment id '2' not found for user 'user1'.", $decodedResponse['error']['message']);
     }
 
     public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
@@ -209,9 +203,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -252,7 +244,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -268,9 +260,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -311,7 +301,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'en-EN',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -333,9 +323,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -375,7 +363,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_locale' => 'it-IT',
                 ],
             ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true)
+            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         /** @var Assignment $assignment */
@@ -391,9 +379,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->getEntityManager()->flush();
 
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -415,9 +401,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
     {
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -458,9 +442,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLti1p3Link(): void
     {
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -474,12 +456,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $response = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
+        $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $decodedLtiLink = urldecode($response['ltiLink']);
 
         self::assertStringContainsString('iss=https://simple-roster.localhost/platform', $decodedLtiLink);
