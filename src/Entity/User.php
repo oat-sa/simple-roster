@@ -183,7 +183,7 @@ class User implements UserInterface, EntityInterface
     {
         $assignment = $this->getAssignmentById($assignmentId);
 
-        if ($assignment->getLineItem()->isActive() && $assignment->isAvailable()) {
+        if ($assignment->isAvailable()) {
             return $assignment;
         }
 
