@@ -48,6 +48,9 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var int */
     private $maxAttempts = 0;
 
+    /** @var bool */
+    private $isActive = true;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,11 +142,24 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->maxAttempts !== 0;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
+            'isActive' => $this->isActive(),
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'maxAttempts' => $this->getMaxAttempts(),

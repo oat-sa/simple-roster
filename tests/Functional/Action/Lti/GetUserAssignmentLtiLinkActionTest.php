@@ -150,6 +150,33 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         Carbon::setTestNow();
     }
 
+    public function testItReturns409IfLineItemIsNotAvailable(): void
+    {
+        Carbon::setTestNow(
+            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
+        );
+
+        $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getRepository(User::class);
+        $user = $userRepository->findByUsernameWithAssignments('username');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
+
+        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        self::assertSame(
+            "Assignment with id '2' for user 'username' is unavailable.",
+            $decodedResponse['error']['message']
+        );
+
+        Carbon::setTestNow();
+    }
+
     public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
     {
         $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
