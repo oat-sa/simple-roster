@@ -84,7 +84,7 @@ class LineItemChangeDatesCommand extends Command
         $this->addBlackfireProfilingOption();
 
         $this->setDescription('Updates the start and end dates of line item(s).');
-        $this->setHelp(<<<'EOF'
+        $this->setHelp(<<<EOF
 The <info>%command.name%</info> command changes the dates for specific line items.
 
 <comment>Not specifying a start-date or end-date option will nullify the value for the column.</comment>
@@ -116,14 +116,14 @@ EOF
 
         $this->addOption(
             self::OPTION_START_DATE,
-            '',
+            null,
             InputOption::VALUE_OPTIONAL,
             'Start date for the line item(s). Expected format: 2020-01-01T00:00:00+0000',
         );
 
         $this->addOption(
             self::OPTION_END_DATE,
-            '',
+            null,
             InputOption::VALUE_OPTIONAL,
             'End date for the line item(s). Expected format: 2020-01-01T00:00:00+0000',
         );
@@ -226,7 +226,7 @@ EOF
     {
         $lineItemIds = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
-            static function ($value): bool {
+            static function (string $value): bool {
                 return !empty($value) && (int)$value > 0;
             }
         );
@@ -264,11 +264,11 @@ EOF
         $criteria = new FindLineItemCriteria();
 
         if (!empty($this->lineItemIds)) {
-            $criteria->addLineItemIdsCriteria(...$this->lineItemIds);
+            $criteria->addLineItemIds(...$this->lineItemIds);
         }
 
         if (!empty($this->lineItemSlugs)) {
-            $criteria->addLineItemSlugsCriteria(...$this->lineItemSlugs);
+            $criteria->addLineItemSlugs(...$this->lineItemSlugs);
         }
 
         return $criteria;

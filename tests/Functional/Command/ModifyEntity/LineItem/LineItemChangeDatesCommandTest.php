@@ -77,13 +77,15 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     /**
      * @dataProvider provideInvalidParameters
      */
-    public function testItThrowsExceptionForIfInvalidParametersReceived(array $input, string $expectedOutput): void
-    {
+    public function testItThrowsExceptionForEachInvalidParametersReceived(
+        array $parameters,
+        string $expectedOutput
+    ): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedOutput);
 
         self::assertSame(0, $this->commandTester->execute(
-            $input,
+            $parameters,
             [
                 'capture_stderr_separately' => true,
             ]
@@ -92,7 +94,10 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay());
     }
 
-    public function testItEncapsulatesAnyUnexpectedExceptions(): void
+    /**
+     * @dataProvider provideValidParametersWithExistingLineItems
+     */
+    public function testItEncapsulatesAnyUnexpectedExceptions(array $parameters): void
     {
         $kernel = self::bootKernel();
 
@@ -105,12 +110,10 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
-        $input = [
-            '-i' => '4,5,6',
-            '-f' => null,
-        ];
 
-        self::assertSame(1, $commandTester->execute($input, ['capture_stderr_separately' => true]));
+        $parameters['-f'] = null;
+
+        self::assertSame(1, $commandTester->execute($parameters, ['capture_stderr_separately' => true]));
         self::assertStringContainsString(
             '[ERROR] An unexpected error occurred: ErrorMessage',
             $this->normalizeDisplay($commandTester->getDisplay())
@@ -118,9 +121,9 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider getValidParametersWithLineItems
+     * @dataProvider provideValidParametersWithExistingLineItems
      */
-    public function testItUpdateLineItemsWithoutRealUpdatesAndCacheStillTheSame(array $input): void
+    public function testItUpdateLineItemsWithoutRealUpdatesAndCacheStillTheSame(array $parameters): void
     {
         $this->loadFixtureByFilename('3LineItems.yml');
 
@@ -128,7 +131,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
 
-        self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
+        self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
@@ -141,9 +144,9 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider getValidParametersWithLineItems
+     * @dataProvider provideValidParametersWithExistingLineItems
      */
-    public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $input): void
+    public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $parameters): void
     {
         $this->loadFixtureByFilename('3LineItems.yml');
 
@@ -151,8 +154,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
         self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
 
-        $input['-f'] = null;
-        self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
+        $parameters['-f'] = null;
+        self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
@@ -170,13 +173,13 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider getValidParametersWithoutLineItems
+     * @dataProvider provideValidParametersWithNonExistingLineItems
      */
-    public function testItWarnsIfNoLineItemWasFound(array $input): void
+    public function testItWarnsIfNoLineItemWasFound(array $parameters): void
     {
         $this->loadFixtureByFilename('3LineItems.yml');
 
-        self::assertSame(0, $this->commandTester->execute($input, ['capture_stderr_separately' => true]));
+        self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
@@ -188,40 +191,40 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     {
         return [
             'noLineItemIdsOrSlugs' => [
-                'input' => [
+                'parameters' => [
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'expectedOutput' => 'You need to specify line-item-ids or line-item-slugs option.',
             ],
             'invalidLineItemIds' => [
-                'input' => [
+                'parameters' => [
                     '-i' => 'a,b,c',
                 ],
                 'expectedOutput' => 'Invalid \'line-item-ids\' option received.',
             ],
             'invalidLineItemSlugs' => [
-                'input' => [
+                'parameters' => [
                     '-s' => '1,2,3',
                 ],
                 'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
             ],
             'invalidStartDate' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '1,2,3',
                     '--start-date' => '2020-13-01',
                 ],
                 'expectedOutput' => '2020-13-01 is an invalid start date.',
             ],
             'invalidEndDate' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '1,2,3',
                     '--end-date' => '2020-13-01',
                 ],
                 'expectedOutput' => '2020-13-01 is an invalid end date.',
             ],
             'endDateBeforeStartDate' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '1,2,3',
                     '--start-date' => '2020-01-02T00:00:00+0000',
                     '--end-date' => '2020-01-01T00:00:00+0000',
@@ -229,7 +232,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                 'expectedOutput' => 'End date should be later than start date.',
             ],
             'informedBothSlugsAndIds' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '1,2,3',
                     '-s' => 'slug1,slug2,slug3',
                 ],
@@ -238,19 +241,33 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         ];
     }
 
-    public function getValidParametersWithoutLineItems(): array
+    public function provideValidParametersWithNonExistingLineItems(): array
     {
         return [
-            'usingIdsAndDates' => [
-                'input' => [
+            'usingShortIdsParameterAndDates' => [
+                'parameters' => [
                     '-i' => '1,2,3',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
-            'usingSlugsAndDates' => [
-                'input' => [
+            'usingLongIdParameterAndDates' => [
+                'parameters' => [
+                    '--line-item-ids' => '1,2,3',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+            ],
+            'usingShortSlugsParameterAndDates' => [
+                'parameters' => [
                     '-s' => 'slug1,slug2,slug3',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+            ],
+            'usingLongSlugsParameterAndDates' => [
+                'parameters' => [
+                    '--line-item-slugs' => 'slug1,slug2,slug3',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
@@ -258,53 +275,53 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         ];
     }
 
-    public function getValidParametersWithLineItems(): array
+    public function provideValidParametersWithExistingLineItems(): array
     {
         return [
             'usingIdsAndDates' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingIdsWithoutDates' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '4,5,6'
                 ],
             ],
             'usingIdsAndStartDateOnly' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingIdsAndEndDateOnly' => [
-                'input' => [
+                'parameters' => [
                     '-i' => '4,5,6',
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingSlugsAndDates' => [
-                'input' => [
+                'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingSlugsWithoutDates' => [
-                'input' => [
+                'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                 ],
             ],
             'usingSlugsAndStartDateOnly' => [
-                'input' => [
+                'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
             ],
             'usingSlugsAndEndDateOnly' => [
-                'input' => [
+                'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],

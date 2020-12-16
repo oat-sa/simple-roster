@@ -91,13 +91,13 @@ class LineItemRepository extends AbstractRepository
         if ($criteria->hasLineItemIdsCriteria()) {
             $queryBuilder
                 ->andWhere('l.id IN (:ids)')
-                ->setParameter('ids', $criteria->getLineItemIdsCriteria());
+                ->setParameter('ids', $criteria->getLineItemIds());
         }
 
         if ($criteria->hasLineItemSlugsCriteria()) {
             $queryBuilder
                 ->andWhere('l.slug IN (:slugs)')
-                ->setParameter('slugs', $criteria->getLineItemSlugsCriteria());
+                ->setParameter('slugs', $criteria->getLineItemSlugs());
         }
 
         $lineItemsCollection = new LineItemCollection();

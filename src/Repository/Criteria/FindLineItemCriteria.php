@@ -30,26 +30,26 @@ class FindLineItemCriteria
     /** @var string[] */
     private $lineItemSlugs = [];
 
-    public function addLineItemIdsCriteria(int ...$lineItemIds): self
+    public function addLineItemIds(int ...$lineItemIds): self
     {
         $this->lineItemIds = $lineItemIds;
 
         return $this;
     }
 
-    public function addLineItemSlugsCriteria(string ...$lineItemSlugs): self
+    public function addLineItemSlugs(string ...$lineItemSlugs): self
     {
         $this->lineItemSlugs = $lineItemSlugs;
 
         return $this;
     }
 
-    public function getLineItemIdsCriteria(): array
+    public function getLineItemIds(): array
     {
         return $this->lineItemIds;
     }
 
-    public function getLineItemSlugsCriteria(): array
+    public function getLineItemSlugs(): array
     {
         return $this->lineItemSlugs;
     }

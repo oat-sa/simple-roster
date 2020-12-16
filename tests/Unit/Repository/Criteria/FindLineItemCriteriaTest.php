@@ -27,23 +27,20 @@ use PHPUnit\Framework\TestCase;
 
 class FindLineItemCriteriaTest extends TestCase
 {
-    public function testLineItemIdsCriteria(): void
+    public function testFindLineItemCriteria(): void
     {
         $subject = new FindLineItemCriteria();
-        $subject->addLineItemIdsCriteria(1, 2, 3);
+
+        self::assertFalse($subject->hasLineItemSlugsCriteria());
+        self::assertFalse($subject->hasLineItemIdsCriteria());
+
+        $subject->addLineItemSlugs('slug1', 'slug2', 'slug3');
+        $subject->addLineItemIds(1, 2, 3);
 
         self::assertTrue($subject->hasLineItemIdsCriteria());
-        self::assertFalse($subject->hasLineItemSlugsCriteria());
-        self::assertSame([1, 2, 3], $subject->getLineItemIdsCriteria());
-    }
-
-    public function testLineItemSlugsCriteria(): void
-    {
-        $subject = new FindLineItemCriteria();
-        $subject->addLineItemSlugsCriteria('slug1', 'slug2', 'slug3');
+        self::assertSame([1, 2, 3], $subject->getLineItemIds());
 
         self::assertTrue($subject->hasLineItemSlugsCriteria());
-        self::assertFalse($subject->hasLineItemIdsCriteria());
-        self::assertSame(['slug1', 'slug2', 'slug3'], $subject->getLineItemSlugsCriteria());
+        self::assertSame(['slug1', 'slug2', 'slug3'], $subject->getLineItemSlugs());
     }
 }

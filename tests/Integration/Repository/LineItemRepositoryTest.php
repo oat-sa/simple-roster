@@ -77,7 +77,7 @@ class LineItemRepositoryTest extends KernelTestCase
     public function testItCanFindLineItemsByIdsUsingCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemIdsCriteria(1, 2, 3);
+        $criteria->addLineItemIds(1, 2, 3);
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
@@ -90,7 +90,7 @@ class LineItemRepositoryTest extends KernelTestCase
     public function testItCanFindLineItemsBySlugUsingCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemSlugsCriteria('lineItemSlug1', 'lineItemSlug2', 'lineItemSlug3');
+        $criteria->addLineItemSlugs('lineItemSlug1', 'lineItemSlug2', 'lineItemSlug3');
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
@@ -103,7 +103,7 @@ class LineItemRepositoryTest extends KernelTestCase
     public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingIdsCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemIdsCriteria(1000, 1001);
+        $criteria->addLineItemIds(1000, 1001);
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
@@ -113,7 +113,7 @@ class LineItemRepositoryTest extends KernelTestCase
     public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingSlugsCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemSlugsCriteria('wrongSlug1', 'wrongSlug2');
+        $criteria->addLineItemSlugs('wrongSlug1', 'wrongSlug2');
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 

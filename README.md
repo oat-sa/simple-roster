@@ -45,5 +45,5 @@ The application currently offers the following CLI commands:
 | `roster:ingest:line-item`                     | Line item instance ingestion        | [link](docs/cli/line-item-ingester-command.md)                  |
 | `roster:ingest:user`                          | User ingestion                      | [link](docs/cli/user-ingester-command.md)                       |
 | `roster:ingest:assignment`                    | Assignment ingestion                | [link](docs/cli/assignment-ingester-command.md)                 |
-| `roster:modify-entity:line-item:change-state` | Activate/Deactivate line items      | [link](docs/cli/modify-entity-line-item-change-state-command.md)|
 | `roster:modify-entity:line-item:change-dates` | Change line-item(s) start/end dates | [link](docs/cli/modify-entity-line-item-change-dates-command.md)|
+| `roster:modify-entity:line-item:change-state` | Activate/Deactivate line items      | [link](docs/cli/modify-entity-line-item-change-state-command.md)|
