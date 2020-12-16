@@ -227,7 +227,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => '/2ZSkskXDj5O4HKTWEDu1IBEm/Y=',
+                    'oauth_signature' => 'hQF/spzJlWW/8b6W8NxdBmXziWc=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -238,7 +238,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
-                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
+                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti1p1/outcome',
                     'lis_result_sourcedid' => 1,
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'en-EN',
@@ -284,7 +284,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 't0Ai0P6GJyXGNkBer/XrSdVns8U=',
+                    'oauth_signature' => '5KYN42BiXP9LqFIK0YknnxbSMoM=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -295,7 +295,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
-                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
+                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti1p1/outcome',
                     'lis_result_sourcedid' => 1,
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'en-EN',
@@ -346,7 +346,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'Dr5RhRpvp2D21zwajcaG9kX6JrA=',
+                    'oauth_signature' => '4FmtcaSOQHjZBZRlbJ/PdUxba0g=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -357,7 +357,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'user_id' => 'user1',
                     'lis_person_name_full' => 'user1',
                     'resource_link_id' => 1,
-                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti/outcome',
+                    'lis_outcome_service_url' => 'http://localhost/api/v1/lti1p1/outcome',
                     'lis_result_sourcedid' => 1,
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'it-IT',
@@ -459,11 +459,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $decodedLtiLink = urldecode($response['ltiLink']);
 
-        self::assertStringContainsString('iss=https://simple-roster.localhost/platform', $decodedLtiLink);
+        self::assertStringContainsString('iss=https://localhost/platform', $decodedLtiLink);
         self::assertStringContainsString('login_hint=user1', $decodedLtiLink);
-        self::assertStringContainsString('target_link_uri=http://localhost:8888/tool/launch', $decodedLtiLink);
+        self::assertStringContainsString('target_link_uri=http://localhost/tool/launch', $decodedLtiLink);
         self::assertStringContainsString('lti_deployment_id=1', $decodedLtiLink);
-        self::assertStringContainsString('client_id=demo', $decodedLtiLink);
+        self::assertStringContainsString('client_id=test', $decodedLtiLink);
 
         self::assertSame(LtiRequest::LTI_VERSION_1P3, $response['ltiVersion']);
         self::assertSame([], $response['ltiParams']);

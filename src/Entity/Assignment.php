@@ -104,6 +104,13 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->lineItemId;
     }
 
+    public function setLineItemId(int $lineItemId): self
+    {
+        $this->lineItemId = $lineItemId;
+
+        return $this;
+    }
+
     public function getLineItem(): LineItem
     {
         return $this->lineItem;
