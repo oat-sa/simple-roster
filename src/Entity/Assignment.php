@@ -159,7 +159,7 @@ class Assignment implements JsonSerializable, EntityInterface
 
     public function isAvailable(): bool
     {
-        return !$this->isCancelled() && $this->isAvailableForDate();
+        return $this->getLineItem()->isActive() && !$this->isCancelled() && $this->isAvailableForDate();
     }
 
     public function getAttemptsCount(): int
