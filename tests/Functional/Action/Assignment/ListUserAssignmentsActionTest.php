@@ -89,33 +89,24 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $endDate = $lineItem->getEndAt();
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(
-            [
-                'assignments' => [
-                    [
-                        'id' => $user->getLastAssignment()->getId(),
-                        'username' => $user->getUsername(),
-                        'state' => Assignment::STATE_READY,
-                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
-                        'lineItem' => [
-                            'uri' => $lineItem->getUri(),
-                            'label' => $lineItem->getLabel(),
-                            'isActive' => $lineItem->isActive(),
-                            'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp(
-                            ) : '',
-                            'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
-                            'maxAttempts' => $lineItem->getMaxAttempts(),
-                        ],
+        self::assertSame([
+            'assignments' => [
+                [
+                    'id' => $user->getLastAssignment()->getId(),
+                    'username' => $user->getUsername(),
+                    'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    'lineItem' => [
+                        'uri' => $lineItem->getUri(),
+                        'label' => $lineItem->getLabel(),
+                        'isActive' => $lineItem->isActive(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
                 ],
             ],
-            json_decode(
-                $this->kernelBrowser->getResponse()->getContent(),
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            )
-        );
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 
     public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
@@ -136,32 +127,23 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $endDate = $lineItem->getEndAt();
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(
-            [
-                'assignments' => [
-                    [
-                        'id' => $user->getLastAssignment()->getId(),
-                        'username' => $user->getUsername(),
-                        'state' => Assignment::STATE_READY,
-                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
-                        'lineItem' => [
-                            'uri' => $lineItem->getUri(),
-                            'label' => $lineItem->getLabel(),
-                            'isActive' => $lineItem->isActive(),
-                            'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp(
-                            ) : '',
-                            'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
-                            'maxAttempts' => $lineItem->getMaxAttempts(),
-                        ],
+        self::assertSame([
+            'assignments' => [
+                [
+                    'id' => $user->getLastAssignment()->getId(),
+                    'username' => $user->getUsername(),
+                    'state' => Assignment::STATE_READY,
+                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                    'lineItem' => [
+                        'uri' => $lineItem->getUri(),
+                        'label' => $lineItem->getLabel(),
+                        'isActive' => $lineItem->isActive(),
+                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
+                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                        'maxAttempts' => $lineItem->getMaxAttempts(),
                     ],
                 ],
             ],
-            json_decode(
-                $this->kernelBrowser->getResponse()->getContent(),
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            )
-        );
+        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 }
