@@ -25,12 +25,10 @@ namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 use Carbon\Carbon;
 use DateTime;
 use InvalidArgumentException;
-use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
-use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,8 +37,6 @@ use Throwable;
 
 class LineItemChangeDatesCommand extends Command
 {
-    use BlackfireProfilerTrait;
-
     public const NAME = 'roster:modify-entity:line-item:change-dates';
 
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
@@ -70,18 +66,20 @@ class LineItemChangeDatesCommand extends Command
     /** @var LineItemRepository */
     private $lineItemRepository;
 
-    public function __construct(LineItemRepository $lineItemRepository)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(LineItemRepository $lineItemRepository, LoggerInterface $logger)
     {
         parent::__construct(self::NAME);
 
         $this->lineItemRepository = $lineItemRepository;
+        $this->logger = $logger;
     }
 
     protected function configure(): void
     {
         parent::configure();
-
-        $this->addBlackfireProfilingOption();
 
         $this->setDescription('Updates the start and end dates of line item(s).');
         $this->setHelp(<<<EOF
@@ -199,6 +197,14 @@ EOF
                 $lineItem->setEndAt($this->endDate);
 
                 $this->lineItemRepository->persist($lineItem);
+
+                $this->logger->info(
+                    sprintf(
+                        'New dates were set for line item with: "%d"',
+                        $lineItem->getId()
+                    ),
+                    $lineItem->jsonSerialize()
+                );
             }
 
             $messageTemplate = $this->isDryRun
@@ -209,9 +215,6 @@ EOF
 
             if (!$this->isDryRun && $this->getApplication() !== null) {
                 $this->lineItemRepository->flush();
-
-                $command = $this->getApplication()->find(LineItemCacheWarmerCommand::NAME);
-                $command->run(new ArrayInput([]), $output);
             }
 
             return 0;
