@@ -41,7 +41,8 @@ $ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -i 1,
 $ sudo -u www-data bin/console roster:update-entity:line-item:change-dates -i 1,2,3 --start-date 2020-01-01T00:00:00+0000 --force
 ```
 
-> **NOTE:** The cache warm up for line-items is automatically called after updating dates into the database.
+> **NOTE:** There is no need to warmup the cache manually for the affected line-items when you run this command,
+>this is done automatically.
 
 ## Help
 For the full list of options please refer to the helper option:

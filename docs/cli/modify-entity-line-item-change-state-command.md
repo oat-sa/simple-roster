@@ -49,8 +49,8 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deact
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate uri https://i.o#i5fb54d6ecd
 ```
 
-> **NOTE** There is no need to warmup the cache for the affected line-items when you run this command. 
->meaning this is done automatically.
+> **NOTE:** There is no need to warmup the cache manually for the affected line-items when you run this command,
+>this is done automatically.
 
 
 ## Help
