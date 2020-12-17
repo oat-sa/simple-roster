@@ -27,19 +27,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use LogicException;
+use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class LineItemChangeDatesCommandTest extends KernelTestCase
 {
-    use DatabaseTestingTrait;
     use CommandDisplayNormalizerTrait;
+    use DatabaseTestingTrait;
+    use LoggerTestingTrait;
 
     /** @var CommandTester */
     private $commandTester;
@@ -49,6 +52,9 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
     /** @var LineItemCacheIdGenerator */
     private $lineItemCacheIdGenerator;
+
+    /** @var LineItemRepository */
+    private $lineItemRepository;
 
     protected function setUp(): void
     {
@@ -69,8 +75,10 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         $this->resultCache = $resultCacheImplementation;
         $this->lineItemCacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
+        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
 
         $this->setUpDatabase();
+        $this->setUpTestLogHandler();
         $this->loadFixtureByFilename('3LineItems.yml');
     }
 
@@ -123,36 +131,37 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     /**
      * @dataProvider provideValidParametersWithExistingLineItems
      */
-    public function testItUpdateLineItemsWithoutRealUpdatesAndCacheStillTheSame(array $parameters): void
-    {
-        $this->loadFixtureByFilename('3LineItems.yml');
+    public function testDryRunModeAndCacheStillTheSame(
+        array $parameters,
+        array $persistedData
+    ): void {
+        $lineItemIds = $persistedData['lineItemIds'];
 
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(4)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
+        $this->loadFixtureByFilename('3LineItems.yml');
+        $this->assertCacheDoesNotExist($lineItemIds);
 
         self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
-        self::assertStringContainsString('[OK] [DRY RUN] 3 line item(s) have been updated.', $display);
+        self::assertStringContainsString(
+            sprintf('[OK] [DRY RUN] %d line item(s) have been updated.', count($lineItemIds)),
+            $display
+        );
 
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(4)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
+        $this->assertCacheDoesNotExist($lineItemIds);
     }
 
     /**
      * @dataProvider provideValidParametersWithExistingLineItems
      */
-    public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $parameters): void
+    public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $parameters, array $persistedData): void
     {
-        $this->loadFixtureByFilename('3LineItems.yml');
+        $lineItemIds = $persistedData['lineItemIds'];
 
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(4)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
+        $this->loadFixtureByFilename('3LineItems.yml');
+        $this->assertCacheDoesNotExist($lineItemIds);
 
         $parameters['-f'] = null;
         self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
@@ -160,16 +169,12 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
-        self::assertStringContainsString('[OK] 3 line item(s) have been updated.', $display);
-        self::assertStringContainsString('Executing cache warmup...', $display);
         self::assertStringContainsString(
-            '[OK] Result cache for 3 Line Items have been successfully warmed up. [TTL: 3,600 seconds]',
+            sprintf('[OK] %d line item(s) have been updated.', count($lineItemIds)),
             $display
         );
 
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(4)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(5)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(6)));
+        $this->assertLineItems($persistedData);
     }
 
     /**
@@ -185,6 +190,31 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
         self::assertStringContainsString('[WARNING] No line items found with specified criteria.', $display);
+    }
+
+    private function assertLineItems(array $persistedData): void
+    {
+        foreach ($persistedData['lineItemIds'] as $lineItemId) {
+            $lineItem = $this->lineItemRepository->findOneById($lineItemId);
+
+            $this->assertHasLogRecord(
+                [
+                    'message' => sprintf(
+                        'New dates were set for line item with: "%d"',
+                        $lineItemId
+                    ),
+                    'context' => $lineItem->jsonSerialize(),
+                ],
+                Logger::INFO
+            );
+
+            $lineItemCacheId = $this->lineItemCacheIdGenerator->generate($lineItemId);
+            $lineItemCache = current(current($this->resultCache->fetch($lineItemCacheId)));
+
+            self::assertTrue($this->resultCache->contains($lineItemCacheId));
+            self::assertEquals($persistedData['start_at'], $lineItemCache['start_at_4']);
+            self::assertEquals($persistedData['end_at'], $lineItemCache['end_at_5']);
+        }
     }
 
     public function provideInvalidParameters(): array
@@ -275,19 +305,63 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         ];
     }
 
+    private function assertCacheDoesNotExist(array $lineItemIds): void
+    {
+        foreach ($lineItemIds as $lineItemId) {
+            $lineItemCacheId = $this->lineItemCacheIdGenerator->generate($lineItemId);
+
+            self::assertFalse($this->resultCache->fetch($lineItemCacheId));
+        }
+    }
+
+    /**
+     * * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function provideValidParametersWithExistingLineItems(): array
     {
         return [
-            'usingIdsAndDates' => [
+            'usingSingleIdAndDates' => [
+                'parameters' => [
+                    '-i' => '4',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
+            ],
+            'usingSingleIdsWithoutDates' => [
+                'parameters' => [
+                    '-i' => '4'
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4],
+                    'start_at' => null,
+                    'end_at' => null,
+                ],
+            ],
+            'usingMultipleIdsAndDates' => [
                 'parameters' => [
                     '-i' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
             ],
-            'usingIdsWithoutDates' => [
+            'usingMultipleIdsWithoutDates' => [
                 'parameters' => [
                     '-i' => '4,5,6'
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => null,
+                    'end_at' => null,
                 ],
             ],
             'usingIdsAndStartDateOnly' => [
@@ -295,23 +369,65 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-i' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => null,
+                ],
             ],
             'usingIdsAndEndDateOnly' => [
                 'parameters' => [
                     '-i' => '4,5,6',
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => null,
+                    'end_at' => '2020-01-01 00:00:00',
+                ],
             ],
-            'usingSlugsAndDates' => [
+            'usingSingleSlugAndDates' => [
+                'parameters' => [
+                    '-s' => 'slug-1',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
+            ],
+            'usingSingleSlugWithoutDates' => [
+                'parameters' => [
+                    '-s' => 'slug-1',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4],
+                    'start_at' => null,
+                    'end_at' => null,
+                ],
+            ],
+            'usingMultipleSlugsAndDates' => [
                 'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
             ],
-            'usingSlugsWithoutDates' => [
+            'usingMultipleSlugsWithoutDates' => [
                 'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => null,
+                    'end_at' => null,
                 ],
             ],
             'usingSlugsAndStartDateOnly' => [
@@ -319,11 +435,21 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => null,
+                ],
             ],
             'usingSlugsAndEndDateOnly' => [
                 'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
                     '--end-date' => '2020-01-01T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4, 5, 6],
+                    'start_at' => null,
+                    'end_at' => '2020-01-01 00:00:00',
                 ],
             ],
         ];
