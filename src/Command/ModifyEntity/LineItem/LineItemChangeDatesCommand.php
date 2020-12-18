@@ -299,9 +299,7 @@ EOF
         $this->endDate = $this->initializeDate($inputEndDate);
 
         if (
-            ($this->endDate !== null && $this->startDate > $this->endDate)
-            ||
-            ($this->startDate !== null && $this->startDate < $this->endDate)
+            $this->endDate !== null && $this->endDate < $this->startDate
         ) {
             $message = sprintf(
                 'End date should be later than start date. Start Date: %s End Date: %s.',

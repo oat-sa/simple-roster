@@ -239,19 +239,20 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                 ],
                 'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
             ],
-            'invalidStartDate' => [
+            'invalidDate' => [
                 'parameters' => [
                     '-i' => '1,2,3',
                     '--start-date' => '2020-13-01',
                 ],
-                'expectedOutput' => '2020-13-01 is an invalid start date.',
+                'expectedOutput' => '2020-13-01 is an invalid date. Expected format: 2020-01-01T00:00:00+0000',
             ],
             'invalidEndDate' => [
                 'parameters' => [
                     '-i' => '1,2,3',
-                    '--end-date' => '2020-13-01',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date'   => '2019-12-31T23:59:00+0000',
                 ],
-                'expectedOutput' => '2020-13-01 is an invalid end date.',
+                'expectedOutput' => 'End date should be later than start date.',
             ],
             'endDateBeforeStartDate' => [
                 'parameters' => [
