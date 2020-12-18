@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -71,6 +72,52 @@ class LineItemRepositoryTest extends KernelTestCase
         $lineItem = $this->subject->findOneById(1);
 
         self::assertSame(1, $lineItem->getId());
+    }
+
+    public function testItCanFindLineItemsByIdsUsingCriteria(): void
+    {
+        $criteria = new FindLineItemCriteria();
+        $criteria->addLineItemIds(1, 2, 3);
+
+        $collection = $this->subject->findLineItemsByCriteria($criteria);
+
+        self::assertCount(3, $collection);
+        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
+        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
+        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+    }
+
+    public function testItCanFindLineItemsBySlugUsingCriteria(): void
+    {
+        $criteria = new FindLineItemCriteria();
+        $criteria->addLineItemSlugs('lineItemSlug1', 'lineItemSlug2', 'lineItemSlug3');
+
+        $collection = $this->subject->findLineItemsByCriteria($criteria);
+
+        self::assertCount(3, $collection);
+        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
+        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
+        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+    }
+
+    public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingIdsCriteria(): void
+    {
+        $criteria = new FindLineItemCriteria();
+        $criteria->addLineItemIds(1000, 1001);
+
+        $collection = $this->subject->findLineItemsByCriteria($criteria);
+
+        self::assertTrue($collection->isEmpty());
+    }
+
+    public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingSlugsCriteria(): void
+    {
+        $criteria = new FindLineItemCriteria();
+        $criteria->addLineItemSlugs('wrongSlug1', 'wrongSlug2');
+
+        $collection = $this->subject->findLineItemsByCriteria($criteria);
+
+        self::assertTrue($collection->isEmpty());
     }
 
     public function testItUsesResultCacheImplementationForFindingLineItemById(): void
