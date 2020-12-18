@@ -207,15 +207,25 @@ EOF
                 );
             }
 
-            $messageTemplate = $this->isDryRun
-                ? '[DRY RUN] %d line item(s) have been updated.'
-                : '%d line item(s) have been updated.';
+            if ($this->isDryRun) {
+                $this->symfonyStyle->success(
+                    sprintf(
+                        '[DRY RUN] %d line item(s) have been updated.',
+                        $lineItemsCollection->count()
+                    )
+                );
 
-            $this->symfonyStyle->success(sprintf($messageTemplate, $lineItemsCollection->count()));
-
-            if (!$this->isDryRun && $this->getApplication() !== null) {
-                $this->lineItemRepository->flush();
+                return 0;
             }
+
+            $this->symfonyStyle->success(
+                sprintf(
+                    '%d line item(s) have been updated.',
+                    $lineItemsCollection->count()
+                )
+            );
+
+            $this->lineItemRepository->flush();
 
             return 0;
         } catch (Throwable $exception) {
@@ -250,8 +260,8 @@ EOF
     {
         $this->lineItemSlugs = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_SLUGS)),
-            static function ($value): bool {
-                return !empty($value) && is_string($value) && mb_strlen($value) > 1;
+            static function (string $value): bool {
+                return !empty($value);
             }
         );
 

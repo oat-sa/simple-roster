@@ -235,7 +235,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             ],
             'invalidLineItemSlugs' => [
                 'parameters' => [
-                    '-s' => '1,2,3',
+                    '-s' => ',',
                 ],
                 'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
             ],
