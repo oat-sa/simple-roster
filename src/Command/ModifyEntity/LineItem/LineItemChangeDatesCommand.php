@@ -170,7 +170,7 @@ EOF
             );
         }
 
-        $this->initializeDates($input);
+        $this->validateAndSetDates($input);
 
         $this->isDryRun = !(bool)$input->getOption(self::OPTION_FORCE);
     }
@@ -290,15 +290,19 @@ EOF
     /**
      * @throws InvalidArgumentException
      */
-    private function initializeDates(InputInterface $input): void
+    private function validateAndSetDates(InputInterface $input): void
     {
         $inputStartDate = (string)$input->getOption(self::OPTION_START_DATE);
         $inputEndDate = (string)$input->getOption(self::OPTION_END_DATE);
 
-        $this->initializeStartDate($inputStartDate);
-        $this->initializeEndDate($inputEndDate);
+        $this->startDate = $this->initializeDate($inputStartDate);
+        $this->endDate = $this->initializeDate($inputEndDate);
 
-        if ($this->startDate !== null && $this->endDate !== null && $this->startDate > $this->endDate) {
+        if (
+            ($this->endDate !== null && $this->startDate > $this->endDate)
+            ||
+            ($this->startDate !== null && $this->startDate < $this->endDate)
+        ) {
             $message = sprintf(
                 'End date should be later than start date. Start Date: %s End Date: %s.',
                 $inputStartDate,
@@ -309,43 +313,23 @@ EOF
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function initializeStartDate(string $startDate): void
+    private function initializeDate(string $dateString): ?DateTime
     {
-        if (!empty($startDate)) {
+        $dateObj = null;
+        if (!empty($dateString)) {
             try {
-                $date = Carbon::createFromFormat(Carbon::ISO8601, $startDate);
-                $this->startDate = $date ? $date->toDateTime() : null;
+                $date = Carbon::createFromFormat(Carbon::ISO8601, $dateString);
+                $dateObj = $date ? $date->toDateTime() : null;
             } catch (Throwable $e) {
                 $message = sprintf(
-                    '%s is an invalid start date. Expected format: 2020-01-01T00:00:00+0000',
-                    $startDate
+                    '%s is an invalid date. Expected format: 2020-01-01T00:00:00+0000',
+                    $dateString
                 );
 
                 throw new InvalidArgumentException($message);
             }
         }
-    }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function initializeEndDate(string $endDate): void
-    {
-        if (!empty($endDate)) {
-            try {
-                $date = Carbon::createFromFormat(Carbon::ISO8601, $endDate);
-                $this->endDate = $date ? $date->toDateTime() : null;
-            } catch (Throwable $e) {
-                $message = sprintf(
-                    '%s is an invalid end date. Expected format: 2020-01-01T00:00:00+0000',
-                    $endDate
-                );
-
-                throw new InvalidArgumentException($message);
-            }
-        }
+        return $dateObj;
     }
 }
