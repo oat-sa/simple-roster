@@ -12,8 +12,8 @@ security:
         webhook_user_provider:
             memory:
                 users:
-                    webhook:
-                        password: 'pass'
+                    '%env(WEBHOOK_USERNAME)%':
+                        password: '%env(WEBHOOK_PASSWORD)%'
                         roles:
                             - ROLE_USER
 
