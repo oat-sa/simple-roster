@@ -68,6 +68,37 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         $this->setUpTestLogHandler();
     }
 
+    public function testItReturns401IfNotAuthenticated(): void
+    {
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/web-hooks/update-line-items',
+            [],
+            [],
+            [],
+            ''
+        );
+
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+    }
+
+    public function testItReturns401IfWrongAuthentication(): void
+    {
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/web-hooks/update-line-items',
+            [],
+            [],
+            [
+                'PHP_AUTH_USER' => 'wrongUsername',
+                'PHP_AUTH_PW' => 'wrongPassword'
+            ],
+            ''
+        );
+
+        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+    }
+
     /**
      * @dataProvider provideWrongRequestBodies
      *
@@ -82,7 +113,10 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             '/api/v1/web-hooks/update-line-items',
             [],
             [],
-            [],
+            [
+                'PHP_AUTH_USER' => 'testUsername',
+                'PHP_AUTH_PW' => 'testPassword'
+            ],
             $requestBody
         );
 
@@ -108,7 +142,10 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             '/api/v1/web-hooks/update-line-items',
             [],
             [],
-            [],
+            [
+                'PHP_AUTH_USER' => 'testUsername',
+                'PHP_AUTH_PW' => 'testPassword'
+            ],
             (string)json_encode($this->getSuccessRequestBody())
         );
 
@@ -185,7 +222,10 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             '/api/v1/web-hooks/update-line-items',
             [],
             [],
-            [],
+            [
+                'PHP_AUTH_USER' => 'testUsername',
+                'PHP_AUTH_PW' => 'testPassword'
+            ],
             (string)json_encode($this->getRequestBodyUnknownEvent())
         );
 
