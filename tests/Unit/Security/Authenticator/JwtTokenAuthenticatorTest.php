@@ -37,9 +37,7 @@ class JwtTokenAuthenticatorTest extends TestCase
 
         $extractor = new AuthorizationHeaderTokenExtractor();
 
-        $request = $this->getMockBuilder(Request::class)
-            ->getMock();
-        ;
+        $request = $this->createMock(Request::class);
 
         $headerBag = $this->getMockBuilder(HeaderBag::class)
             ->setConstructorArgs([
@@ -62,52 +60,41 @@ class JwtTokenAuthenticatorTest extends TestCase
 
     public function testItThrowsExceptionOnNoUsernameClaimInToken(): void
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid token. Unable to parse or no username claim.');
+
         $subject = new JwtTokenAuthenticator(
             $this->createMock(AuthorizationHeaderTokenExtractor::class),
             $this->createMock(JwtTokenVerifier::class),
             $this->createMock(SerializerResponder::class)
         );
 
-        $tokenMock = $this->getMockBuilder(Token::class)
-            ->getMock();
+        $userProviderMock = $this->createMock(UserProviderInterface::class);
 
-        $tokenMock->expects($this->any())->method('verify')->willReturn(false);
-
-        $userProviderMock = $this->getMockBuilder(UserProviderInterface::class)
-            ->getMock();
-
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Invalid token. Unable to parse or no username claim.');
-
-        // @codingStandardsIgnoreStart
         $subject->getUser(
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlciI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.MqMn8PLjkMH_0pAmkVXg6FolaiaKyZZ_Bqnt-xS50CM',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkw' .
+            'IiwidXNlciI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.MqMn8PLjkMH_0pAmkVXg6FolaiaKyZZ_Bqnt-xS50CM',
             $userProviderMock
         );
-        // @codingStandardsIgnoreEnd
     }
 
     public function testItThrowsExceptionOnInvalidToken(): void
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid token.');
+
         $subject = new JwtTokenAuthenticator(
             $this->createMock(AuthorizationHeaderTokenExtractor::class),
             $this->createMock(JwtTokenVerifier::class),
             $this->createMock(SerializerResponder::class)
         );
 
-        $tokenMock = $this->getMockBuilder(Token::class)
-            ->getMock();
+        $userProviderMock = $this->createMock(UserProviderInterface::class);
 
-        $tokenMock->expects($this->any())->method('verify')->willReturn(false);
-
-        $userProviderMock = $this->getMockBuilder(UserProviderInterface::class)
-            ->getMock();
-
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Invalid token.');
-
-        // @codingStandardsIgnoreStart
-        $subject->getUser('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOiJ1c2VyMSIsImlhdCI6MTUxNjIzOTAyMn0.Fc59qPPNFvtlvwXdTyWTe8Uz6uu-EnQncjGow1RooHM', $userProviderMock);
-        // @codingStandardsIgnoreEnd
+        $subject->getUser(
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkw' .
+            'IiwidXNlcm5hbWUiOiJ1c2VyMSIsImlhdCI6MTUxNjIzOTAyMn0Fc59qPPNFvtlvwXdTyWTe8Uz6uu-EnQncjGow1RooHM',
+            $userProviderMock
+        );
     }
 }
