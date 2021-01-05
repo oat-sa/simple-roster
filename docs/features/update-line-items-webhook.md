@@ -36,8 +36,8 @@ curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web
 
 #### Authentication
 
-To use this endpoint, basic authentication should be used based on `WEBHOOK_USERNAME` and `WEBHOOK_USERNAME` configured 
-on environment settings.
+To use this endpoint, the `Authorization` header should be defined as the sample above.
+The credentials should match the ones defined on `BASIC_AUTH_USERNAME` and `BASIC_AUTH_USERNAME` environment variables.
 
 #### Attribute Descriptions
 

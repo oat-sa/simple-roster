@@ -38,8 +38,8 @@ The main configuration file is `.env`, located in root folder.
 | CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list [default: `3600`] |
 | CORS_ALLOW_ORIGIN | Allowed CORS origin |
 | ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-| WEBHOOK_USERNAME | Webhook endpoint username |
-| WEBHOOK_PASSWORD | Webhook endpoint password |
+| BASIC_AUTH_USERNAME | Basic auth username |
+| BASIC_AUTH_PASSWORD | basic auth password |
        
 #### LTI related environment variables
 

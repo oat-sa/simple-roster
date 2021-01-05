@@ -68,7 +68,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         $this->setUpTestLogHandler();
     }
 
-    public function testItReturns401IfNotAuthenticated(): void
+    public function testItReturns401IfNoCredentialsInformed(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -82,7 +82,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
-    public function testItReturns401IfWrongAuthentication(): void
+    public function testItReturns401IfWrongCredentialsInformed(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,

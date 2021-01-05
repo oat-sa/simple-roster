@@ -9,11 +9,11 @@ security:
     providers:
         app_user_provider:
             id: OAT\SimpleRoster\Security\Provider\UserProvider
-        webhook_user_provider:
+        basic_auth_provider:
             memory:
                 users:
-                    '%env(WEBHOOK_USERNAME)%':
-                        password: '%env(WEBHOOK_PASSWORD)%'
+                    '%env(BASIC_AUTH_USERNAME)%':
+                        password: '%env(BASIC_AUTH_PASSWORD)%'
                         roles:
                             - ROLE_USER
 
@@ -42,7 +42,7 @@ security:
         webhooks:
             pattern: '^%app.route_prefix%/v1/web-hooks'
             stateless: true
-            provider: webhook_user_provider
+            provider: basic_auth_provider
             http_basic:
                 realm: 'Secured Webhooks'
 
