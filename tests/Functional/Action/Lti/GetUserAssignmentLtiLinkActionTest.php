@@ -383,7 +383,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
+        $this->kernelBrowser->insulate(true);
         $this->logInAs($user, $this->kernelBrowser);
+        $this->kernelBrowser->insulate(false);
+        //This trick with insulation switchOn/switchOff above is needed to have
+        //log test handler not missing between requests
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
         $ltiRequestInResponse = json_decode(

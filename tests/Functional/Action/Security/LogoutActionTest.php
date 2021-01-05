@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -55,12 +56,26 @@ class LogoutActionTest extends WebTestCase
 
         $this->logInAs($user, $this->kernelBrowser);
 
-        $session = $this->kernelBrowser->getContainer()->get('session');
+        $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
+
+        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+    }
+
+    public function testItRemovesTokenOnLogout(): void
+    {
+        $userRepository = self::$container->get(UserRepository::class);
+        $user = $userRepository->findByUsernameWithAssignments('user1');
+
+        $this->logInAs($user, $this->kernelBrowser);
+
+        $cachePool = self::$container->get(TokenStorage::class);
+
+        self::assertNotNull($cachePool->getStoredToken('user1')->get());
 
         $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/logout');
 
         self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        self::assertEmpty($session->all());
+        self::assertNull($cachePool->getStoredToken('user1')->get());
     }
 }

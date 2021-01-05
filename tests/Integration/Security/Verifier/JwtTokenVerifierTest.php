@@ -6,7 +6,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Security\Verifier;
 
 use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
-use OAT\SimpleRoster\Service\JWT\JWTManager;
+use OAT\SimpleRoster\Service\JWT\TokenGenerator;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\User\User;
 
@@ -16,16 +16,16 @@ class JwtTokenVerifierTest extends KernelTestCase
     {
         self::bootKernel();
 
-        /** @var JWTManager $tokenManager */
-        $tokenManager = self::$container->get(JWTManager::class);
+        /** @var TokenGenerator $tokenGenerator */
+        $tokenGenerator = self::$container->get(TokenGenerator::class);
 
         $tokenTtl = self::$container->getParameter('app.jwt.access_token_ttl');
 
         $user = new User('username', null);
 
-        $tokenManager->create($user, $tokenTtl);
+        $tokenGenerator->create($user, $tokenTtl);
 
-        $subject = new JwtTokenVerifier('file://' . __DIR__ . '/../../../../config/secrets/test/jwt_public.pem');
+        $subject = new JwtTokenVerifier(self::$container->getParameter('app.jwt.public_key_path'));
 
         $this->expectException(\BadMethodCallException::class);
 
@@ -36,16 +36,16 @@ class JwtTokenVerifierTest extends KernelTestCase
     {
         self::bootKernel();
 
-        /** @var JWTManager $tokenManager */
-        $tokenManager = self::$container->get(JWTManager::class);
+        /** @var TokenGenerator $tokenGenerator */
+        $tokenGenerator = self::$container->get(TokenGenerator::class);
 
         $tokenTtl = self::$container->getParameter('app.jwt.access_token_ttl');
 
         $user = new User('username', null);
 
-        $token = $tokenManager->create($user, $tokenTtl);
+        $token = $tokenGenerator->create($user, $tokenTtl);
 
-        $subject = new JwtTokenVerifier('file://' . __DIR__ . '/../../../../config/secrets/test/jwt_public.pem');
+        $subject = new JwtTokenVerifier(self::$container->getParameter('app.jwt.public_key_path'));
 
         $this->assertTrue($subject->isValid($token));
     }

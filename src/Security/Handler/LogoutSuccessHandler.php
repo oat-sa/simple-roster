@@ -22,26 +22,46 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Handler;
 
+use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
+    /** @var AuthorizationHeaderTokenExtractor $tokenExtractor */
+    private $tokenExtractor;
+
+    /** @var TokenStorage $tokenStorage */
+    private $tokenStorage;
+
     /** @var SerializerResponder */
     private $serializerResponder;
 
-    public function __construct(SerializerResponder $serializerResponder)
-    {
+    public function __construct(
+        AuthorizationHeaderTokenExtractor $tokenExtractor,
+        TokenStorage $jwtStorage,
+        SerializerResponder $serializerResponder
+    ) {
+        $this->tokenExtractor = $tokenExtractor;
+        $this->tokenStorage = $jwtStorage;
         $this->serializerResponder = $serializerResponder;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
     public function onLogoutSuccess(Request $request)
     {
+        $credentials = $this->tokenExtractor->extract($request);
+
+        $token = (new Parser())->parse($credentials);
+
+        $username = $token->getClaim('username');
+
+        $this->tokenStorage->removeStoredToken($username);
+
         return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 }

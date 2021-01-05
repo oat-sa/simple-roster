@@ -24,6 +24,8 @@ namespace OAT\SimpleRoster\Security\Handler;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\JWT\JWTManager;
+use OAT\SimpleRoster\Service\JWT\TokenGenerator;
+use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -32,8 +34,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    /** @var JWTManager */
+    /** @var TokenGenerator */
     private $jwtTokenGenerator;
+
+    /** @var TokenStorage $jwtStorage */
+    private $jwtStorage;
 
     /** @var SerializerResponder */
     private $responder;
@@ -45,12 +50,14 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private $refreshTokenTtl;
 
     public function __construct(
-        JWTManager $jwtTokenGenerator,
+        TokenGenerator $jwtTokenGenerator,
+        TokenStorage $storage,
         SerializerResponder $responder,
         int $accessTokenTtl,
         int $refreshTokenTtl
     ) {
         $this->jwtTokenGenerator = $jwtTokenGenerator;
+        $this->jwtStorage = $storage;
         $this->responder = $responder;
         $this->accessTokenTtl = $accessTokenTtl;
         $this->refreshTokenTtl = $refreshTokenTtl;
@@ -70,7 +77,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         $accessToken = $this->jwtTokenGenerator->create($user, $this->accessTokenTtl);
 
         $refreshToken = $this->jwtTokenGenerator->create($user, $this->refreshTokenTtl);
-        $this->jwtTokenGenerator->storeTokenInCache($refreshToken, $this->refreshTokenTtl);
+        $this->jwtStorage->storeTokenInCache($refreshToken, $this->refreshTokenTtl);
 
         return $this->responder->createJsonResponse([
             'accessToken' => (string)$accessToken,

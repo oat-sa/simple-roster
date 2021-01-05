@@ -27,6 +27,8 @@ use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifierInterface;
 use OAT\SimpleRoster\Service\JWT\JWTManager;
+use OAT\SimpleRoster\Service\JWT\TokenGenerator;
+use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -36,8 +38,11 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class RefreshAccessTokenAction
 {
-    /** @var JWTManager */
-    private $manager;
+    /** @var TokenGenerator $generator */
+    private $generator;
+
+    /** @var TokenStorage $storage */
+    private $storage;
 
     /** @var UserRepository */
     private $userRepository;
@@ -52,13 +57,15 @@ class RefreshAccessTokenAction
     private $accessTokenTtl;
 
     public function __construct(
-        JWTManager $manager,
+        TokenGenerator $generator,
+        TokenStorage $storage,
         UserRepository $userRepository,
         JwtTokenVerifierInterface $tokenVerifier,
         SerializerResponder $responder,
         int $accessTokenTtl
     ) {
-        $this->manager = $manager;
+        $this->generator = $generator;
+        $this->storage = $storage;
         $this->userRepository = $userRepository;
         $this->tokenVerifier = $tokenVerifier;
         $this->responder = $responder;
@@ -82,7 +89,7 @@ class RefreshAccessTokenAction
             throw new ConflictHttpException('Invalid token.');
         }
 
-        $cachedToken = $this->manager->getStoredToken($username);
+        $cachedToken = $this->storage->getStoredToken($username);
 
         if (
             !$cachedToken->isHit()
@@ -91,7 +98,7 @@ class RefreshAccessTokenAction
             throw new ConflictHttpException('Refresh token is incorrect.');
         }
 
-        $accessToken = $this->manager->create($user, $this->accessTokenTtl);
+        $accessToken = $this->generator->create($user, $this->accessTokenTtl);
 
         return $this->responder->createJsonResponse(['accessToken' => (string)$accessToken]);
     }

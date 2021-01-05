@@ -5,10 +5,9 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Service\JWT\JWTManager;
+use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,12 +78,9 @@ class RefreshAccessTokenActionTest extends WebTestCase
         self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
         self::assertNotNull($refreshToken);
 
-        $manager = static::$container->get(JWTManager::class);
-        $cachePool = static::$container->get(CacheItemPoolInterface::class);
+        $cachePool = static::$container->get(TokenStorage::class);
 
-        $refreshTokenCacheId = $manager->generateCacheId('user1');
-
-        $this->assertSame($refreshToken, $cachePool->getItem($refreshTokenCacheId)->get());
+        $this->assertSame($refreshToken, $cachePool->getStoredToken('user1')->get());
 
         Carbon::setTestNow();
     }
@@ -216,11 +212,8 @@ class RefreshAccessTokenActionTest extends WebTestCase
         self::assertNotEmpty($this->kernelBrowser->getServerParameter('HTTP_Authorization'));
         self::assertNotNull($refreshToken);
 
-        /** @var CacheItemPoolInterface $manager */
-        $manager = self::$container->get(CacheItemPoolInterface::class);
-        $id = 'jwt-token.user1';
-
-        $manager->deleteItem($id);
+        $cachePool = static::$container->get(TokenStorage::class);
+        $cachePool->removeStoredToken('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,

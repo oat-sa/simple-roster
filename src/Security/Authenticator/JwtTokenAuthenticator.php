@@ -77,7 +77,7 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     /**
      * @inheritdoc
      */
-    public function getCredentials(Request $request): ?string
+    public function getCredentials(Request $request): string
     {
         return $this->tokenExtractor->extract($request);
     }
