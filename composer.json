@@ -23,7 +23,7 @@
         "league/flysystem-bundle": "^1.5",
         "nelmio/cors-bundle": "^2.0",
         "nesbot/carbon": "^2.11",
-        "oat-sa/bundle-lti1p3": "^3.2",
+        "oat-sa/bundle-lti1p3": "^3.3",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/amazon-sqs-messenger": "^5.0",
@@ -42,8 +42,10 @@
         "symfony/security-bundle": "^5.0",
         "symfony/serializer": "^5.0",
         "symfony/stopwatch": "^5.0",
+        "symfony/twig-bundle": "^5.2",
         "symfony/validator": "^5.0",
-        "symfony/yaml": "^5.0"
+        "symfony/yaml": "^5.0",
+        "twig/twig": "^3.0"
     },
     "replace": {
         "paragonie/random_compat": "2.*",

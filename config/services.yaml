@@ -12,6 +12,7 @@ parameters:
     app.cache.port: '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
     app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
     app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
+    app.cache.ttl.get_line_item_by_id: '%env(int:CACHE_TTL_LINE_ITEM)%'
     app.lti.version: '%env(resolve:LTI_VERSION)%'
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
@@ -47,6 +48,7 @@ services:
             $passphrase: '%app.jwt.passphrase%'
             $accessTokenTtl: '%app.jwt.access_token_ttl%'
             $refreshTokenTtl: '%app.jwt.refresh_token_ttl%'
+            $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:

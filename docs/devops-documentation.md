@@ -46,6 +46,8 @@ The main configuration file is `.env`, located in root folder.
        
 #### LTI related environment variables
 
+**Note**: Environments variable prefixed with `LTI1P3` are only needed when LTI_VERSION is set to `1.3.0`.
+
 | Parameter | Description |
 | ------------- |:-------------|
 | LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
@@ -53,8 +55,16 @@ The main configuration file is `.env`, located in root folder.
 | LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
 | LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
 | LTI_VERSION | Defines if application should generate `1.1.1` or `1.3.0` links [default: `1.1.1`]
-| LTI1P3_SERVICE_ENCRYPTION_KEY | Key used for security signature (Only needed when LTI_VERSION is set to `1.3.0`)
-| LTI1P3_REGISTRATION_ID | ID used to find the configured registration (Only needed when LTI_VERSION is set to `1.3.0`)
+| LTI1P3_SERVICE_ENCRYPTION_KEY | Key used for security signature |
+| LTI1P3_REGISTRATION_ID | ID used to find the configured registration |
+| LTI1P3_PLATFORM_AUDIENCE | Platform Audience |
+| LTI1P3_PLATFORM_OIDC_AUTHENTICATION_URL | Platform OIDC authentication URL |
+| LTI1P3_PLATFORM_OAUTH2_ACCESS_TOKEN_URL | Platform OAUTH2 access token generation URL |
+| LTI1P3_TOOL_AUDIENCE | Tool Audience |
+| LTI1P3_TOOL_OIDC_INITIATION_URL | Tool OIDC initiation URL |
+| LTI1P3_TOOL_LAUNCH_URL | Tool launch URL |
+| LTI1P3_TOOL_CLIENT_ID | Tool Client Id |
+| LTI1P3_TOOL_JWKS_URL | Tool JWKS (JSON Web Key Sets) URL |
 
 #### Blackfire related environment variables
 
