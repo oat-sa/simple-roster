@@ -47,11 +47,11 @@ class TokenGenerator
     private $passphrase;
 
     public function __construct(
-        string $privateKeyPath,
-        string $passphrase
+        string $jwtPrivateKeyPath,
+        string $jwtPassphrase
     ) {
-        $this->privateKeyPath = $privateKeyPath;
-        $this->passphrase = $passphrase;
+        $this->privateKeyPath = $jwtPrivateKeyPath;
+        $this->passphrase = $jwtPassphrase;
     }
 
     public function create(UserInterface $user, int $ttl): Token

@@ -26,7 +26,7 @@ parameters:
       path: src/Command
     # Doctrine dynamic method call error, findOneByXXX methods do not exist, but processed via _call
     - message: '#^Call to an undefined method OAT\\SimpleRoster\\Repository\\UserRepository\:\:findOneByUsername\(\).$#'
-      path: src/Action/Security/RefreshJWTTokenAction.php
+      path: src/Action/Security/RefreshAccessTokenAction.php
     # Authentication doesn't seem to be Throwable to phpstan
     - message: '#^Parameter \#1 \$exception of method OAT\\SimpleRoster\\Responder\\SerializerResponder\:\:createErrorJsonResponse\(\) expects Throwable, Symfony\\Component\\Security\\Core\\Exception\\AuthenticationException\|null given.$#'
       path: src/Security/Authenticator/JwtTokenAuthenticator.php

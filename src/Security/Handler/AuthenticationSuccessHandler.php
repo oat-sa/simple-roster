@@ -52,14 +52,14 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         TokenGenerator $jwtTokenGenerator,
         TokenStorage $storage,
         SerializerResponder $responder,
-        int $accessTokenTtl,
-        int $refreshTokenTtl
+        int $jwtAccessTokenTtl,
+        int $jwtRefreshTokenTtl
     ) {
         $this->jwtTokenGenerator = $jwtTokenGenerator;
         $this->jwtStorage = $storage;
         $this->responder = $responder;
-        $this->accessTokenTtl = $accessTokenTtl;
-        $this->refreshTokenTtl = $refreshTokenTtl;
+        $this->accessTokenTtl = $jwtAccessTokenTtl;
+        $this->refreshTokenTtl = $jwtRefreshTokenTtl;
     }
 
     /**

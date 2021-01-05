@@ -59,14 +59,14 @@ class RefreshAccessTokenAction
         UserRepository $userRepository,
         JwtTokenVerifierInterface $tokenVerifier,
         SerializerResponder $responder,
-        int $accessTokenTtl
+        int $jwtAccessTokenTtl
     ) {
         $this->generator = $generator;
         $this->storage = $storage;
         $this->userRepository = $userRepository;
         $this->tokenVerifier = $tokenVerifier;
         $this->responder = $responder;
-        $this->accessTokenTtl = $accessTokenTtl;
+        $this->accessTokenTtl = $jwtAccessTokenTtl;
     }
 
     public function __invoke(Request $request): Response

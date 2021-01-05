@@ -31,9 +31,9 @@ class JwtTokenVerifier implements JwtTokenVerifierInterface
     /** @var string */
     private $publicKeyPath;
 
-    public function __construct(string $publicKeyPath)
+    public function __construct(string $jwtPublicKeyPath)
     {
-        $this->publicKeyPath = $publicKeyPath;
+        $this->publicKeyPath = $jwtPublicKeyPath;
     }
 
     public function isValid(Token $token): bool

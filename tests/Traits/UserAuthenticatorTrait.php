@@ -23,22 +23,24 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Traits;
 
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Service\JWT\TokenIdGenerator;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait UserAuthenticatorTrait
 {
     protected function logInAs(User $user, KernelBrowser $kernelBrowser): string
     {
+        $encodedParams = json_encode(array(
+            'username' => $user->getUsername(),
+            'password' => $user->getPlainPassword(),
+        ));
         $kernelBrowser->request(
             'POST',
             '/api/v1/auth/token',
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array(
-                'username' => $user->getUsername(),
-                'password' => $user->getPlainPassword(),
-            ))
+            $encodedParams ?: null
         );
 
         $data = json_decode($kernelBrowser->getResponse()->getContent(), true);
