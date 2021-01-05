@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Handler;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Service\JWT\JWTManager;
 use OAT\SimpleRoster\Service\JWT\TokenGenerator;
 use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use Symfony\Component\HttpFoundation\Request;

@@ -26,15 +26,12 @@ use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifierInterface;
-use OAT\SimpleRoster\Service\JWT\JWTManager;
 use OAT\SimpleRoster\Service\JWT\TokenGenerator;
 use OAT\SimpleRoster\Service\JWT\TokenStorage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class RefreshAccessTokenAction
 {
