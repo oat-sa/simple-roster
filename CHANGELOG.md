@@ -34,7 +34,7 @@
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
-- Changed security flow to use JWT for api endpoints
+- Changed security flow to use JWT for api endpoints. Everything under `^%app.route_prefix%/v1/` except `healthcheck` and `bulk` endpoints is affected
 - Changed login endpoint for JWT auth. Now it is not `^%app.route_prefix%/v1/auth/login`, but `^%app.route_prefix%/v1/auth/token`
 - Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
 
