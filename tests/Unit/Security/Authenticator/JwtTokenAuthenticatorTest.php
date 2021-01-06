@@ -83,9 +83,13 @@ class JwtTokenAuthenticatorTest extends TestCase
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
 
+        $tokenVerifierMock = $this->createMock(JwtTokenVerifier::class);
+
+        $tokenVerifierMock->expects(self::any())->method('isValid')->willReturn(false);
+
         $subject = new JwtTokenAuthenticator(
             $this->createMock(AuthorizationHeaderTokenExtractor::class),
-            $this->createMock(JwtTokenVerifier::class),
+            $tokenVerifierMock,
             $this->createMock(SerializerResponder::class)
         );
 
@@ -93,7 +97,7 @@ class JwtTokenAuthenticatorTest extends TestCase
 
         $subject->getUser(
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkw' .
-            'IiwidXNlcm5hbWUiOiJ1c2VyMSIsImlhdCI6MTUxNjIzOTAyMn0Fc59qPPNFvtlvwXdTyWTe8Uz6uu-EnQncjGow1RooHM',
+            'IiwidXNlcm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.p5Csu2THYW5zJys2CWdbGM8GaWjpY6lOQpdLoP4D7V4',
             $userProviderMock
         );
     }

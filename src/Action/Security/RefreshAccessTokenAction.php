@@ -78,9 +78,9 @@ class RefreshAccessTokenAction
             throw new ConflictHttpException('Invalid token. User claim is missing');
         }
 
-        try {
-            $user = $this->userRepository->findOneByUsername($username);
-        } catch (\Throwable $exception) {
+        $user = $this->userRepository->findOneByUsername($username);
+
+        if (is_null($user)) {
             throw new ConflictHttpException('Invalid token. User not found');
         }
 

@@ -76,7 +76,7 @@ class TokenGenerator
         return $generatedToken;
     }
 
-    private function generateJWTString(array $payload): Token
+    public function generateJWTString(array $payload): Token
     {
         $tokenObject = (new Builder());
 
