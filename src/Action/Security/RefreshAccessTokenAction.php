@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\Security;
 
 use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifierInterface;
@@ -69,21 +70,18 @@ class RefreshAccessTokenAction
         $this->accessTokenTtl = $jwtAccessTokenTtl;
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Token $refreshToken): Response
     {
-        $decodedRequestBody = json_decode($request->getContent(), true);
-        if (!isset($decodedRequestBody['refreshToken'])) {
-            throw new BadRequestHttpException("Missing 'refreshToken' in request body.");
+        try {
+            $username = $refreshToken->getClaim('username');
+        } catch (\Throwable $exception) {
+            throw new ConflictHttpException('Invalid token. User claim is missing');
         }
 
         try {
-            $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
-            $this->tokenVerifier->isValid($refreshToken);
-
-            $username = $refreshToken->getClaim('username');
             $user = $this->userRepository->findOneByUsername($username);
         } catch (\Throwable $exception) {
-            throw new ConflictHttpException('Invalid token.');
+            throw new ConflictHttpException('Invalid token. User not found');
         }
 
         $cachedToken = $this->storage->getStoredToken($username);
