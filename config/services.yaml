@@ -14,6 +14,7 @@ parameters:
     app.cache.session.port: '%env(int:REDIS_SESSION_CACHE_PORT)%'
     app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
     app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
+    app.cache.ttl.get_line_item_by_id: '%env(int:CACHE_TTL_LINE_ITEM)%'
     app.lti.version: '%env(resolve:LTI_VERSION)%'
     app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
     app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
@@ -28,7 +29,6 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $kernelDebug: '%kernel.debug%'
             $kernelEnvironment: '%kernel.environment%'
             $ltiLaunchPresentationReturnUrl: '%app.lti.launch_presentation_return_url%'
             $ltiLaunchPresentationLocale: '%app.lti.launch_presentation_locale%'
@@ -38,6 +38,7 @@ services:
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
             $ltiRegistrationId: '%app.lti1p3.registration_id%'
+            $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:

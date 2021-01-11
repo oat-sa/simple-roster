@@ -39,14 +39,17 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var string */
     private $slug;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $startAt;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $endAt;
 
     /** @var int */
     private $maxAttempts = 0;
+
+    /** @var bool */
+    private $isActive = true;
 
     public function getId(): ?int
     {
@@ -94,7 +97,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt;
     }
 
-    public function setStartAt(DateTimeInterface $startAt): self
+    public function setStartAt(?DateTimeInterface $startAt): self
     {
         $this->startAt = $startAt;
 
@@ -106,7 +109,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->endAt;
     }
 
-    public function setEndAt(DateTimeInterface $endAt): self
+    public function setEndAt(?DateTimeInterface $endAt): self
     {
         $this->endAt = $endAt;
 
@@ -139,11 +142,24 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->maxAttempts !== 0;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
+            'isActive' => $this->isActive(),
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'maxAttempts' => $this->getMaxAttempts(),

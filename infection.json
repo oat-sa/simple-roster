@@ -20,7 +20,7 @@
         "DecrementInteger": false,
         "global-ignoreSourceCodeByRegex": [
             "\\$this->symfonyStyle->newLine.*",
-            ".*$this->isDryRun.*"
+            ".*->isDryRun.*"
         ],
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [

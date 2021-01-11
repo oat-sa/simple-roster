@@ -31,8 +31,17 @@ getUserAssignmentLtiLink:
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\Lti\GetUserAssignmentLtiLinkAction }
 
-updateLtiOutcome:
-  path: '%app.route_prefix%/v1/lti/outcome'
+updateLti1p1Outcome:
+  path: '%app.route_prefix%/v1/lti1p1/outcome'
   methods: POST
-  defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLtiOutcomeAction }
+  defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLti1p1OutcomeAction }
 
+updateLti1p3Outcome:
+  path: '%app.route_prefix%/v1/lti1p3/outcome'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\Lti\UpdateLti1p3OutcomeAction }
+
+updateLineItems:
+  path: '%app.route_prefix%/v1/web-hooks/update-line-items'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\WebHook\UpdateLineItemsWebhookAction }

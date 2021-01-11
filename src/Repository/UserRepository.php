@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Repository;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
@@ -59,7 +60,6 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws InvalidUsernameException
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
@@ -69,11 +69,11 @@ class UserRepository extends AbstractRepository
             throw new InvalidUsernameException('Empty username received.');
         }
 
+        /** @var User|null $user */
         $user = $this
             ->createQueryBuilder('u')
-            ->select('u, a, l')
+            ->select('u, a')
             ->innerJoin('u.assignments', 'a')
-            ->innerJoin('a.lineItem', 'l')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -88,7 +88,7 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function findAllUsernamesPaged(
         int $limit,
