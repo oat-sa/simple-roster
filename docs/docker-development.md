@@ -27,6 +27,20 @@ COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}
 COMPOSER_HOME=~/.composer
 ```
 
+The application uses JWT tokens for API authentication. You must generate your private/public keypair to make it work.
+
+To generate private key:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm openssl genpkey -aes-256-cbc -algorithm RSA -pass pass:devpassphrase -out config/secrets/docker/jwt_private.pem
+```
+
+To generate public key:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm openssl pkey -in config/secrets/docker/jwt_private.pem -passin pass:devpassphrase -out config/secrets/docker/jwt_public.pem -pubout
+```
+
 The rest of the configuration is pre-configured with the `.env.docker` file, so next step is to set up the containers:
 
 ```shell script
@@ -38,20 +52,6 @@ Then install application dependencies:
 ```shell script
 $ docker container exec -it simple-roster-phpfpm composer install
 ```
-
-This application uses JWT auth flow for API endpoints. So, in order to use it, you must generate private/public keypair for JWT auth flow to work
-1. create directory to store keypair
-    ```shell
-    $ mkdir -p config/secrets/dev
-    ```
-2. generate private key
-    ```shell
-    $ docker container exec -it simple-roster-phpfpm openssl genpkey -out config/secrets/docker/jwt_private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
-    ```
-3. generate public key
-    ```shell
-    $ docker container exec -it simple-roster-phpfpm openssl pkey -in config/secrets/docker/jwt_private.pem -out config/secrets/docker/jwt_public.pem -pubout
-    ```
 
 The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
 In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.

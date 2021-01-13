@@ -22,34 +22,41 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
+use Lcobucci\JWT\Parser;
+use Monolog\Logger;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
-class LoginActionTest extends WebTestCase
+class AuthenticationActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
+    use LoggerTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->kernelBrowser = self::createClient();
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        parent::setUp();
+        $this->setUpTestLogHandler('security');
     }
 
     public function testItFailsWithWrongCredentials(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth/token',
+            '/api/v1/auth',
             [],
             [],
             [
@@ -70,11 +77,11 @@ class LoginActionTest extends WebTestCase
         self::assertSame('Invalid credentials.', $decodedResponse['error']);
     }
 
-    public function testItLogsInProperlyTheUser(): void
+    public function testSuccessfulAuthentication(): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth/token',
+            '/api/v1/auth',
             [],
             [],
             [
@@ -85,26 +92,36 @@ class LoginActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        self::assertArrayHasKey('accessToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
-    }
+        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
 
-    public function testItLogsInProperlyTheUserAndReturnsRefreshToken(): void
-    {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/token',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        self::assertArrayHasKey('accessToken', $decodedResponse);
+        self::assertArrayHasKey('refreshToken', $decodedResponse);
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $jwtParser = new Parser();
 
-        self::assertArrayHasKey('accessToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+        try {
+            $accessToken = $jwtParser->parse($decodedResponse['accessToken']);
+            $refreshToken = $jwtParser->parse($decodedResponse['refreshToken']);
 
-        self::assertArrayHasKey('refreshToken', json_decode($this->kernelBrowser->getResponse()->getContent(), true));
+            $this->assertHasLogRecord([
+                'message' => sprintf(
+                    "Token 'accessToken' with id '%s' has been generated for user 'user1'.",
+                    $accessToken->getClaim('jti')
+                ),
+            ], Logger::INFO);
+
+            $this->assertHasLogRecord([
+                'message' => sprintf(
+                    "Token 'refreshToken' with id '%s' has been generated for user 'user1'.",
+                    $refreshToken->getClaim('jti')
+                ),
+                'context' => [
+                    'cacheId' => 'jwt.refreshToken.user1',
+                    'cacheTtl' => 86400,
+                ]
+            ], Logger::INFO);
+        } catch (Throwable $throwable) {
+            self::fail('JWT token parsing error: ' . $throwable->getMessage());
+        }
     }
 }

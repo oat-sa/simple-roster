@@ -1,52 +1,63 @@
 <?php
 
+/**
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; under version 2
+ *  of the License (non-upgradable).
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
+ */
+
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Security\Verifier;
 
 use Lcobucci\JWT\Token;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
-use OAT\SimpleRoster\Service\JWT\TokenGenerator;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\HttpFoundation\Request;
 
 class JwtTokenVerifierTest extends KernelTestCase
 {
-    public function testItThrowsExceptionOnInvalidToken(): void
+    /** @var JwtTokenVerifier */
+    private $subject;
+
+    /** @var JwtTokenGenerator */
+    private $tokenGenerator;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
         self::bootKernel();
 
-        /** @var TokenGenerator $tokenGenerator */
-        $tokenGenerator = self::$container->get(TokenGenerator::class);
-
-        $tokenTtl = self::$container->getParameter('app.jwt.access_token_ttl');
-
-        $user = new User('username', null);
-
-        $tokenGenerator->create($user, $tokenTtl);
-
-        $subject = new JwtTokenVerifier(self::$container->getParameter('app.jwt.public_key_path'));
-
-        $this->expectException(\BadMethodCallException::class);
-
-        $subject->isValid(new Token(['alg' => 'invalidAlg']));
+        $this->subject = static::$container->get(JwtTokenVerifier::class);
+        $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
     }
 
-    public function testItCanVerifyToken(): void
+    public function testSuccessfulVerification(): void
     {
-        self::bootKernel();
+        $user = (new User())->setUsername('testUser');
 
-        /** @var TokenGenerator $tokenGenerator */
-        $tokenGenerator = self::$container->get(TokenGenerator::class);
+        $token = $this->tokenGenerator->create($user, Request::create('/test'), 'testSubject', 100);
 
-        $tokenTtl = self::$container->getParameter('app.jwt.access_token_ttl');
+        self::assertTrue($this->subject->isValid($token));
+    }
 
-        $user = new User('username', null);
-
-        $token = $tokenGenerator->create($user, $tokenTtl);
-
-        $subject = new JwtTokenVerifier(self::$container->getParameter('app.jwt.public_key_path'));
-
-        $this->assertTrue($subject->isValid($token));
+    public function testUnsuccessfulVerification(): void
+    {
+        self::assertFalse($this->subject->isValid($this->createMock(Token::class)));
     }
 }

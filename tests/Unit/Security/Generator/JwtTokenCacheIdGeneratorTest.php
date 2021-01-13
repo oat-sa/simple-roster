@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -20,29 +20,26 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Security\Verifier;
+namespace OAT\SimpleRoster\Tests\Unit\Security\Generator;
 
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
-use Throwable;
+use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use PHPUnit\Framework\TestCase;
 
-class JwtTokenVerifier implements JwtTokenVerifierInterface
+class JwtTokenCacheIdGeneratorTest extends TestCase
 {
-    /** @var string */
-    private $publicKeyPath;
-
-    public function __construct(string $jwtPublicKeyPath)
+    public function testCacheIdGeneration(): void
     {
-        $this->publicKeyPath = $jwtPublicKeyPath;
-    }
+        $subject = new JwtTokenCacheIdGenerator();
 
-    public function isValid(Token $token): bool
-    {
-        try {
-            return $token->verify(new Sha256(), new Key($this->publicKeyPath));
-        } catch (Throwable $throwable) {
-            return false;
-        }
+        $token = $this->createMock(Token::class);
+
+        $token
+            ->expects(self::exactly(2))
+            ->method('getClaim')
+            ->withConsecutive(['sub'], ['aud'])
+            ->willReturnOnConsecutiveCalls('testSubject', 'testUsername');
+
+        self::assertSame('jwt.testSubject.testUsername', $subject->generate($token));
     }
 }

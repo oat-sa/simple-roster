@@ -43,6 +43,7 @@ services:
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
             $ltiRegistrationId: '%app.lti1p3.registration_id%'
+            $jwtTokenCache: '@app.jwt_cache.adapter'
             $jwtPrivateKeyPath: '%app.jwt.private_key_path%'
             $jwtPublicKeyPath: '%app.jwt.public_key_path%'
             $jwtPassphrase: '%app.jwt.passphrase%'
@@ -134,7 +135,3 @@ services:
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
-
-    OAT\SimpleRoster\Service\JWT\TokenStorage:
-        arguments:
-            - '@app.jwt_cache.adapter'

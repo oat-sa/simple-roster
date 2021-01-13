@@ -22,3 +22,4 @@
 
 config/secrets/prod/*
 config/secrets/dev/*
+config/secrets/docker/*

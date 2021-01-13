@@ -5,6 +5,7 @@ services:
     test.line_item_repository:
         alias: OAT\SimpleRoster\Repository\LineItemRepository
         public: true
+
     test.lti_repository:
         alias: OAT\SimpleRoster\Repository\LtiInstanceRepository
         public: true
