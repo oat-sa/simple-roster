@@ -37,7 +37,7 @@ security:
                 authenticators:
                     - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
             json_login:
-                check_path: authentication
+                check_path: login
                 remember_me: false
                 success_handler: OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler
             logout:

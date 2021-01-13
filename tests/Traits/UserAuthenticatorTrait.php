@@ -32,7 +32,7 @@ trait UserAuthenticatorTrait
     {
         $kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth',
+            '/api/v1/auth/login',
             [],
             [],
             [
@@ -42,25 +42,5 @@ trait UserAuthenticatorTrait
         );
 
         return (array)json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-
-//        $encodedParams = json_encode([
-//            'username' => $user->getUsername(),
-//            'password' => $user->getPlainPassword(),
-//        ]);
-//
-//        $kernelBrowser->request(
-//            'POST',
-//            '/api/v1/auth',
-//            [],
-//            [],
-//            ['CONTENT_TYPE' => 'application/json'],
-//            $encodedParams ?: null
-//        );
-//
-//        $data = json_decode($kernelBrowser->getResponse()->getContent(), true);
-//
-//        $kernelBrowser->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['accessToken']));
-//
-//        return (string)$data['refreshToken'];
     }
 }

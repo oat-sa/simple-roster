@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class AuthenticationActionTest extends WebTestCase
+class LoginActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -56,7 +56,7 @@ class AuthenticationActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth',
+            '/api/v1/auth/login',
             [],
             [],
             [
@@ -81,7 +81,7 @@ class AuthenticationActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
-            '/api/v1/auth',
+            '/api/v1/auth/login',
             [],
             [],
             [
