@@ -42,4 +42,22 @@ class JwtTokenCacheIdGeneratorTest extends TestCase
 
         self::assertSame('jwt.testSubject.testUsername', $subject->generate($token));
     }
+
+    public function testIfSubjectClaimCanBeForced(): void
+    {
+        $subject = new JwtTokenCacheIdGenerator();
+
+        $token = $this->createMock(Token::class);
+
+        $token
+            ->expects(self::once())
+            ->method('getClaim')
+            ->with('aud')
+            ->willReturn('testUsername');
+
+        self::assertSame(
+            'jwt.expectedSubject.testUsername',
+            $subject->generate($token, 'expectedSubject')
+        );
+    }
 }
