@@ -27,7 +27,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
 use Throwable;
 
-class JwtTokenVerifier implements JwtTokenVerifierInterface
+class JwtTokenVerifier
 {
     /** @var string */
     private $publicKeyPath;

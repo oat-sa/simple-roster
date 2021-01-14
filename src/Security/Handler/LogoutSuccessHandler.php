@@ -34,7 +34,7 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
-    /** @var AuthorizationHeaderTokenExtractor $tokenExtractor */
+    /** @var AuthorizationHeaderTokenExtractor */
     private $tokenExtractor;
 
     /** @var CacheItemPoolInterface */
