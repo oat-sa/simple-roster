@@ -20,7 +20,7 @@
 - Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/).
 - Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
 - Added `LTI_VERSION` environment variable to control version we are working (1.1.1 or 1.3.0).
-- Added `CACHE_TTL_LINE_ITEM` environment.
+- Added `CACHE_TTL_LINE_ITEM` environment variable.
 - Added environment variables specific for [LTI 1.3](docs/devops-documentation.md) 
 - Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
@@ -35,6 +35,7 @@
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
 - Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
+- Moved health check endpoint to API root.
 
 ### Removed
 - Removed `roster:ingest` command.

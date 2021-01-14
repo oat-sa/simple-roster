@@ -1,5 +1,5 @@
 healthCheck:
-  path: '%app.route_prefix%/v1/healthcheck'
+  path: '%app.route_prefix%/v1'
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\HealthCheck\HealthCheckAction }
 

@@ -32,7 +32,7 @@ class HealthCheckActionTest extends WebTestCase
     {
         $kernelBrowser = self::createClient();
 
-        $kernelBrowser->request(Request::METHOD_GET, '/api/v1/healthcheck');
+        $kernelBrowser->request(Request::METHOD_GET, '/api/v1');
 
         self::assertSame(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
 
@@ -49,7 +49,7 @@ class HealthCheckActionTest extends WebTestCase
     {
         $kernelBrowser = self::createClient();
 
-        $kernelBrowser->request(Request::METHOD_POST, '/api/v1/healthcheck');
+        $kernelBrowser->request(Request::METHOD_POST, '/api/v1');
 
         self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
     }
