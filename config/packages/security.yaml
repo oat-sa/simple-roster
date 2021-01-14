@@ -12,8 +12,8 @@ security:
         basic_auth_provider:
             memory:
                 users:
-                    '%env(BASIC_AUTH_USERNAME)%':
-                        password: '%env(BASIC_AUTH_PASSWORD)%'
+                    '%env(WEBHOOK_BASIC_AUTH_USERNAME)%':
+                        password: '%env(WEBHOOK_BASIC_AUTH_PASSWORD)%'
                         roles:
                             - ROLE_USER
 

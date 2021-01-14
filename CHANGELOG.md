@@ -22,7 +22,7 @@
 - Added `LTI_VERSION` environment variable to control version we are working (1.1.1 or 1.3.0).
 - Added `CACHE_TTL_LINE_ITEM` environment variable.
 - Added environment variables specific for [LTI 1.3](docs/devops-documentation.md).
-- Added `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` environment variables.
+- Added `WEBHOOK_BASIC_AUTH_USERNAME` and `WEBHOOK_BASIC_AUTH_PASSWORD` environment variables.
 - Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 - Added possibility to update line items via WebHook Endpoint: `/v1/web-hooks/update-line-items`
