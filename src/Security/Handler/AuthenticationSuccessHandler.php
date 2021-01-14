@@ -22,9 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Handler;
 
+use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Service\JWT\TokenGenerator;
-use OAT\SimpleRoster\Service\JWT\TokenStorage;
+use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -33,11 +36,17 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    /** @var TokenGenerator */
+    /** @var JwtTokenGenerator */
     private $jwtTokenGenerator;
 
-    /** @var TokenStorage $jwtStorage */
-    private $jwtStorage;
+    /** @var JwtTokenCacheIdGenerator */
+    private $jwtTokenIdGenerator;
+
+    /** @var CacheItemPoolInterface */
+    private $jwtTokenCache;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var SerializerResponder */
     private $responder;
@@ -49,38 +58,64 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private $refreshTokenTtl;
 
     public function __construct(
-        TokenGenerator $jwtTokenGenerator,
-        TokenStorage $storage,
+        JwtTokenGenerator $jwtTokenGenerator,
+        JwtTokenCacheIdGenerator $jwtTokenIdGenerator,
+        CacheItemPoolInterface $jwtTokenCache,
+        LoggerInterface $securityLogger,
         SerializerResponder $responder,
         int $jwtAccessTokenTtl,
         int $jwtRefreshTokenTtl
     ) {
         $this->jwtTokenGenerator = $jwtTokenGenerator;
-        $this->jwtStorage = $storage;
+        $this->jwtTokenIdGenerator = $jwtTokenIdGenerator;
+        $this->jwtTokenCache = $jwtTokenCache;
+        $this->logger = $securityLogger;
         $this->responder = $responder;
         $this->accessTokenTtl = $jwtAccessTokenTtl;
         $this->refreshTokenTtl = $jwtRefreshTokenTtl;
     }
 
-    /**
-     * @param Request $request
-     * @param TokenInterface $token
-     * @return Response
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
         /** @var UserInterface $user */
         $user = $token->getUser();
-        $accessToken = $this->jwtTokenGenerator->create($user, $this->accessTokenTtl);
+        $accessToken = $this->jwtTokenGenerator->create($user, $request, 'accessToken', $this->accessTokenTtl);
+        $refreshToken = $this->jwtTokenGenerator->create($user, $request, 'refreshToken', $this->refreshTokenTtl);
 
-        $refreshToken = $this->jwtTokenGenerator->create($user, $this->refreshTokenTtl);
-        $this->jwtStorage->storeTokenInCache($refreshToken, $this->refreshTokenTtl);
+        $refreshTokenCacheId = $this->jwtTokenIdGenerator->generate($refreshToken);
+
+        $cacheItem = $this->jwtTokenCache->getItem($refreshTokenCacheId);
+
+        $cacheItem
+            ->set((string)$refreshToken)
+            ->expiresAfter($refreshToken->getClaim('exp'));
+
+        $this->jwtTokenCache->save($cacheItem);
+
+        $refreshTokenLogContext = [
+            'cacheId' => $refreshTokenCacheId,
+            'cacheTtl' => $this->refreshTokenTtl,
+        ];
+
+        $this->logTokenGeneration($accessToken);
+        $this->logTokenGeneration($refreshToken, $refreshTokenLogContext);
 
         return $this->responder->createJsonResponse([
             'accessToken' => (string)$accessToken,
             'refreshToken' => (string)$refreshToken,
         ]);
+    }
+
+    private function logTokenGeneration(Token $token, array $logContext = []): void
+    {
+        $this->logger->info(
+            sprintf(
+                "Token '%s' with id '%s' has been generated for user '%s'.",
+                $token->getClaim('sub'),
+                $token->getClaim('jti'),
+                $token->getClaim('aud'),
+            ),
+            $logContext
+        );
     }
 }

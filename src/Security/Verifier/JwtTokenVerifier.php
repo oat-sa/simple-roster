@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Security\Verifier;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
+use Throwable;
 
 class JwtTokenVerifier implements JwtTokenVerifierInterface
 {
@@ -38,6 +39,10 @@ class JwtTokenVerifier implements JwtTokenVerifierInterface
 
     public function isValid(Token $token): bool
     {
-        return $token->verify(new Sha256(), new Key($this->publicKeyPath));
+        try {
+            return $token->verify(new Sha256(), new Key($this->publicKeyPath));
+        } catch (Throwable $throwable) {
+            return false;
+        }
     }
 }

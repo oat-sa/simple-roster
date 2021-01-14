@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,17 +15,21 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Service\JWT;
+namespace OAT\SimpleRoster\Security\Generator;
 
-class TokenIdGenerator
+use Lcobucci\JWT\Token;
+
+class JwtTokenCacheIdGenerator
 {
-    public function generateCacheId(string $identifier): string
+    public function generate(Token $token, string $subject = null): string
     {
-        return sprintf('jwt-token.%s', $identifier);
+        $subjectClaim = $subject ?? $token->getClaim('sub');
+
+        return sprintf('jwt.%s.%s', $subjectClaim, $token->getClaim('aud'));
     }
 }

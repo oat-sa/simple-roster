@@ -23,7 +23,7 @@ Currently, the following checks are included:
 | Tool      | Metric                   | Threshold |
 | --------- |:-------------------------|:----------|
 | PHPUnit   | Code coverage            | 100%      |
-| Infection | Mutation score indicator | 95%       |
+| Infection | Mutation score indicator | 99%       |
 
 To run phpunit and infection together with clover coverage report generated:
 

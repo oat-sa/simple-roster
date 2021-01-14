@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -58,16 +58,7 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     }
 
     /**
-     * @param AuthorizationHeaderTokenExtractor $extractor
-     */
-    public function setExtractor(AuthorizationHeaderTokenExtractor $extractor): void
-    {
-        $this->tokenExtractor = $extractor;
-    }
-
-    /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function supports(Request $request): bool
     {
@@ -89,23 +80,23 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $token = (new Parser())->parse($credentials);
-            $username = $token->getClaim('username');
         } catch (Throwable $exception) {
-            throw new AuthenticationException(
-                'Invalid token. Unable to parse or no username claim.',
-                Response::HTTP_BAD_REQUEST
-            );
+            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$this->tokenVerifier->isValid($token)) {
+        if (!$this->tokenVerifier->isValid($token) || !$token->hasClaim('aud')) {
+            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$token->hasClaim('sub') || $token->getClaim('sub') !== 'accessToken') {
             throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }
 
         if ($token->isExpired(Carbon::now())) {
-            throw new AuthenticationException('Expired token.', Response::HTTP_UNAUTHORIZED);
+            throw new AuthenticationException('Expired token.', Response::HTTP_FORBIDDEN);
         }
 
-        return $userProvider->loadUserByUsername($username);
+        return $userProvider->loadUserByUsername((string)$token->getClaim('aud'));
     }
 
     /**
@@ -145,6 +136,9 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
-        return $this->responder->createErrorJsonResponse($authException, Response::HTTP_UNAUTHORIZED);
+        return $this->responder->createJsonResponse(
+            'Full authentication is required to access this resource.',
+            Response::HTTP_UNAUTHORIZED
+        );
     }
 }

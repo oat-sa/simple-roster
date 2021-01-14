@@ -71,14 +71,16 @@ paths:
                     description: Logout success
                 401:
                     $ref: '#/components/responses/UnauthorizedResponse'
+                403:
+                    $ref: '#/components/responses/AccessDeniedResponse'
                 405:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/auth/token/refresh:
+    /v1/auth/refresh-token:
         post:
-            summary: Refresh JWT Token
+            summary: Refresh JWT access token
             tags:
                 - Authentication
             security: []
@@ -93,6 +95,8 @@ paths:
                     $ref: '#/components/responses/BadRequestResponse'
                 401:
                     $ref: '#/components/responses/InvalidCredentialsResponse'
+                403:
+                    $ref: '#/components/responses/AccessDeniedResponse'
                 405:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
@@ -628,6 +632,12 @@ components:
                         $ref: '#/components/schemas/Error'
         UnauthorizedResponse:
             description: Unauthorized
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        AccessDeniedResponse:
+            description: Access denied
             content:
                 application/json:
                     schema:

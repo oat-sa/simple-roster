@@ -15,85 +15,95 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\Security;
 
-use Lcobucci\JWT\Parser;
+use Carbon\Carbon;
 use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifierInterface;
-use OAT\SimpleRoster\Service\JWT\TokenGenerator;
-use OAT\SimpleRoster\Service\JWT\TokenStorage;
+use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 class RefreshAccessTokenAction
 {
-    /** @var TokenGenerator $generator */
+    /** @var JwtTokenGenerator */
     private $generator;
-
-    /** @var TokenStorage $storage */
-    private $storage;
 
     /** @var UserRepository */
     private $userRepository;
 
-    /** @var JwtTokenVerifierInterface */
-    private $tokenVerifier;
+    /** @var CacheItemPoolInterface */
+    private $tokenCache;
+
+    /** @var JwtTokenCacheIdGenerator */
+    private $tokenCacheIdGenerator;
 
     /** @var SerializerResponder */
     private $responder;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var int */
     private $accessTokenTtl;
 
     public function __construct(
-        TokenGenerator $generator,
-        TokenStorage $storage,
+        JwtTokenGenerator $generator,
         UserRepository $userRepository,
-        JwtTokenVerifierInterface $tokenVerifier,
+        CacheItemPoolInterface $jwtTokenCache,
+        JwtTokenCacheIdGenerator $jwtTokenCacheIdGenerator,
         SerializerResponder $responder,
+        LoggerInterface $securityLogger,
         int $jwtAccessTokenTtl
     ) {
         $this->generator = $generator;
-        $this->storage = $storage;
         $this->userRepository = $userRepository;
-        $this->tokenVerifier = $tokenVerifier;
+        $this->tokenCache = $jwtTokenCache;
+        $this->tokenCacheIdGenerator = $jwtTokenCacheIdGenerator;
         $this->responder = $responder;
+        $this->logger = $securityLogger;
         $this->accessTokenTtl = $jwtAccessTokenTtl;
     }
 
-    public function __invoke(Token $refreshToken): Response
+    public function __invoke(Request $request, Token $refreshToken): Response
     {
         try {
-            $username = $refreshToken->getClaim('username');
-        } catch (\Throwable $exception) {
-            throw new ConflictHttpException('Invalid token. User claim is missing');
+            $user = $this->userRepository->findByUsernameWithAssignments($refreshToken->getClaim('aud'));
+        } catch (Throwable $exception) {
+            throw new AccessDeniedHttpException('Invalid token.');
         }
 
-        $user = $this->userRepository->findOneByUsername($username);
-
-        if (is_null($user)) {
-            throw new ConflictHttpException('Invalid token. User not found');
-        }
-
-        $cachedToken = $this->storage->getStoredToken($username);
+        $cacheId = $this->tokenCacheIdGenerator->generate($refreshToken);
+        $refreshTokenCacheItem = $this->tokenCache->getItem($cacheId);
 
         if (
-            !$cachedToken->isHit()
-            || $cachedToken->get() !== (string)$refreshToken
+            !$refreshTokenCacheItem->isHit()
+            || $refreshTokenCacheItem->get() !== (string)$refreshToken
+            || $refreshToken->isExpired(Carbon::now())
         ) {
-            throw new ConflictHttpException('Refresh token is incorrect.');
+            throw new AccessDeniedHttpException('Expired token.');
         }
 
-        $accessToken = $this->generator->create($user, $this->accessTokenTtl);
+        $accessToken = $this->generator->create($user, $request, 'accessToken', $this->accessTokenTtl);
+
+        $this->logger->info(
+            sprintf(
+                "Access token has been refreshed for user '%s'. (token id = '%s')",
+                $accessToken->getClaim('aud'),
+                $accessToken->getClaim('jti'),
+            )
+        );
 
         return $this->responder->createJsonResponse(['accessToken' => (string)$accessToken]);
     }

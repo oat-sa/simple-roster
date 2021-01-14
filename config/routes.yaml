@@ -7,7 +7,7 @@ getAccessToken:
   path: '%app.route_prefix%/v1/auth/token'
 
 refreshAccessToken:
-  path: '%app.route_prefix%/v1/auth/token/refresh'
+  path: '%app.route_prefix%/v1/auth/refresh-token'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Security\RefreshAccessTokenAction }
 
