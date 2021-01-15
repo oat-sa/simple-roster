@@ -8,7 +8,7 @@ servers:
     -   url: https://localhost/api
 
 paths:
-    /v1/healthcheck:
+    /v1:
         get:
             summary: Health check
             tags:

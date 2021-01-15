@@ -39,6 +39,7 @@
 - Changed login endpoint for JWT auth. Now it is not `^%app.route_prefix%/v1/auth/login`, but `^%app.route_prefix%/v1/auth/token`
 - Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
 - Changed security settings to use basic authentication on webhook endpoint.
+- Moved health check endpoint to API root.
 
 ### Removed
 - Removed `roster:ingest` command.

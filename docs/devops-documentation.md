@@ -4,113 +4,121 @@
 
 ## Table of Contents
 - [Environment variables](#environment-variables)
-    - [Application related environment variables](#application-related-environment-variables)
-    - [LTI related environment variables](#lti-related-environment-variables)
-    - [Blackfire related environment variables](#blackfire-related-environment-variables)
-- [Application setup steps](#application-setup-steps)
-    - [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
-- [LTI](#lti)
-    - [LTI load balancer configuration](#lti-load-balancer-configuration)
-    - [LTI load balancing strategy](#lti-load-balancing-strategy)
+- [Application setup steps (production)](#application-setup-steps-production)
+- [Performance checklist (production)](https://symfony.com/doc/current/performance.html)
+- [LTI configuration](features/lti.md)
+- [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
 - [Applying custom route prefix](#applying-custom-route-prefix)
-- [Useful commands](#useful-commands)
-- [Application logs](#application-logs)
-- [Production environment - checklist](https://symfony.com/doc/current/performance.html)
+- [Activate/Deactivate line items](cli/modify-entity-line-item-change-state-command.md)
+- [Change line item availability dates](cli/modify-entity-line-item-change-dates-command.md)
+- [Configuring line item updater webhook](features/update-line-items-webhook.md)
+- [Profiling with Blackfire](blackfire.md)
 
 ## Environment variables
 
 The main configuration file is `.env`, located in root folder.
 
-#### Application related environment variables
+| Variable | Description |
+| -------- |:------------|
+| `APP_ENV` | Application environment [Values: `dev`, `docker`, `test`, `prod`] |
+| `APP_DEBUG` | Application debug mode [Values: `true`, `false`] |
+| `APP_SECRET` | Application secret (use a secure random value, not a passphrase) |
+| `APP_ROUTE_PREFIX` | To apply custom API route prefix [default: `/api` ]. More information [here](#applying-custom-route-prefix). |
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
+| `JWT_SECRET_KEY` | Path to RSA private key for JWT authentication flow |
+| `JWT_PUBLIC_KEY` | Path to RSA public key for JWT authentication flow |
+| `JWT_PASSPHRASE` | Passphrase for JWT keypair |
+| `JWT_ACCESS_TOKEN_TTL` | TTL for JWT access token in seconds |
+| `JWT_REFRESH_TOKEN_TTL` | TTL for JWT refresh token in seconds |
+| `CORS_ALLOW_ORIGIN` | Allowed origin domain for cross-origin resource sharing. Example: `^https?://test-taker-portal.com$` |
+| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
+| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
+| `REDIS_SESSION_CACHE_HOST` | Redis host for sessions cache storage. |
+| `REDIS_SESSION_CACHE_PORT` | Redis port for sessions cache storage. |
+| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
+| `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching collection of LTI instances. |
+| `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items. |
+| `WEBHOOK_BASIC_AUTH_USERNAME` | Basic auth username for [webhook](features/update-line-items-webhook.md). |
+| `WEBHOOK_BASIC_AUTH_PASSWORD` | Basic auth password for [webhook](features/update-line-items-webhook.md). |
+| `APP_API_KEY` | API key used by [Lambda Assignment Manager](https://github.com/oat-sa/lambda-assignment-manager) to access bulk API endpoints. |
+| `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` | Threshold for assignment garbage collection. [Example: `P1D`] Supported formats can be found [here](http://php.net/manual/en/dateinterval.format.php). |
 
-| Parameter | Description |
-| ------------- |:-------------|
-| APP_ENV | Application environment, `dev`, `prod` or `test` [default: `prod`] |
-| APP_DEBUG | Application debug mode, [default: `false`] |
-| APP_SECRET | Application secret |
-| APP_API_KEY | Application API Key |
-| APP_ROUTE_PREFIX | Application route prefix, [default: `/api` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
-| JWT_SECRET_KEY | Path to RSA private key for JWT authentication flow |
-| JWT_PUBLIC_KEY | Path to RSA public key for JWT authentication flow |
-| JWT_PASSPHRASE | Passphrase for JWT keypair |
-| JWT_ACCESS_TOKEN_TTL | TTL for JWT access token in seconds |
-| JWT_REFRESH_TOKEN_TTL | TTL for JWT refresh token in seconds |
-| DATABASE_URL | Database url |
-| REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
-| REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
-| REDIS_SESSION_CACHE_HOST | Redis host for sessions cache storage |
-| REDIS_SESSION_CACHE_PORT | Redis port for sessions cache storage |
-| CACHE_TTL_GET_USER_WITH_ASSIGNMENTS | Cache TTL (in seconds) for get user with assignments [default: `3600`] |
-| CACHE_TTL_LTI_INSTANCES | Cache TTL (in seconds) for LTI instance list [default: `3600`] |
-| CORS_ALLOW_ORIGIN | Allowed CORS origin |
-| ASSIGNMENT_STATE_INTERVAL_THRESHOLD | Threshold for assignment garbage collection [default: `P1D`] |
-| WEBHOOK_BASIC_AUTH_USERNAME | Basic auth username for webhook |
-| WEBHOOK_BASIC_AUTH_PASSWORD | basic auth password for webhook |
+**Note: LTI specific variables can be found [here](features/lti.md).**
        
-#### LTI related environment variables
+## Application setup steps (production)
 
-**Note**: Environments variable prefixed with `LTI1P3` are only needed when LTI_VERSION is set to `1.3.0`.
+1. Configure all application related environment variables in `.env` file described [here](#environment-variables).
 
-| Parameter | Description |
-| ------------- |:-------------|
-| LTI_LAUNCH_PRESENTATION_RETURN_URL | Frontend LTI return link |
-| LTI_LAUNCH_PRESENTATION_LOCALE | Defines the localisation of TAO instance [default: `en-EN`] |
-| LTI_INSTANCE_LOAD_BALANCING_STRATEGY | Defines the [LTI load balancing strategy](#lti-load-balancing-strategy) [default: `username`] |
-| LTI_OUTCOME_XML_NAMESPACE | Defines the LTI outcome XML namespace [default: `http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0`] |
-| LTI_VERSION | Defines if application should generate `1.1.1` or `1.3.0` links [default: `1.1.1`]
-| LTI1P3_SERVICE_ENCRYPTION_KEY | Key used for security signature |
-| LTI1P3_REGISTRATION_ID | ID used to find the configured registration |
-| LTI1P3_PLATFORM_AUDIENCE | Platform Audience |
-| LTI1P3_PLATFORM_OIDC_AUTHENTICATION_URL | Platform OIDC authentication URL |
-| LTI1P3_PLATFORM_OAUTH2_ACCESS_TOKEN_URL | Platform OAUTH2 access token generation URL |
-| LTI1P3_TOOL_AUDIENCE | Tool Audience |
-| LTI1P3_TOOL_OIDC_INITIATION_URL | Tool OIDC initiation URL |
-| LTI1P3_TOOL_LAUNCH_URL | Tool launch URL |
-| LTI1P3_TOOL_CLIENT_ID | Tool Client Id |
-| LTI1P3_TOOL_JWKS_URL | Tool JWKS (JSON Web Key Sets) URL |
+1. Configure all LTI related environment variables in `.env` file described [here](features/lti.md).
 
-#### Blackfire related environment variables
+1. Optimize configuration file with [Composer](https://getcomposer.org/):
 
-If you need to use blackfire, you can simply edit the `.env` file settings with your blackfire credentials.
+    ```shell script
+    $ sudo -u www-data composer dump-env prod
+    ```
 
-```dotenv
-BLACKFIRE_SERVER_ID=<your_backfire_id>
-BLACKFIRE_SERVER_TOKEN=<your_backfire_secret>
-```
+1. Install application dependencies:
 
-## Application setup steps
+    ```shell script
+    $ sudo -u www-data composer install --no-dev --no-scripts --optimize-autoloader
+    ```
 
-- Install dependencies with Composer
+1. Clear application cache:
 
-```shell script
-$ sudo -u www-data composer install --optimize-autoloader
-```
+    ```shell script
+    $ sudo -u www-data bin/console clear:cache
+    ```
 
-- Optimize composer autoloader
+1. Generate RSA keys for JWT authentication flow
 
-```shell script
-$ sudo -u www-data composer dump-autoload --optimize --no-dev --classmap-authoritative
-```
+    Please refer to [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow) section of this document. 
 
-- Create database with Doctrine
+1. Verify application and PHP settings:
 
-```shell script
-$ sudo -u www-data bin/console doctrine:database:create
-``` 
+    ```shell script
+    $ sudo -u www-data bin/console about
+    ```
 
-- Create database schema with Doctrine
+1. Clear Doctrine caches:
 
-```shell script
-$ sudo -u www-data bin/console doctrine:schema:update --force
-```
+    ```shell script
+    $ sudo -u www-data bin/console doctrine:cache:clear-metadata
+    $ sudo -u www-data bin/console doctrine:cache:clear-query
+    $ sudo -u www-data bin/console doctrine:cache:clear-result
+    ```
 
-- If needed, drop database schema with Doctrine
+1. Ensure production settings:
 
-```shell script
-$ sudo -u www-data bin/console doctrine:schema:drop --force
-```
+    ```shell script
+    $ sudo -u www-data bin/console doctrine:ensure-production-settings
+    ```
 
-### Generate RSA keypair for JWT authentication flow
+1. Create database schema:
+
+    ```shell script
+    $ sudo -u www-data bin/console doctrine:database:create
+    ``` 
+
+1. Ensure application is healthy by calling the healthcheck API endpoint:
+
+    ```shell script
+    $ curl -sb -H http://{APPLICATION_URL}/api/v1
+    ```
+   
+   Response should be something like this:
+   
+   ```json
+    {
+       "isDoctrineConnectionAvailable": true,
+       "isDoctrineCacheAvailable": true
+    }
+    ```
+   
+ 1. Start ingestion process ([CLI documentation](cli-documentation.md#ingestion-related-commands)).
+ 
+ 2. Warm up cache ([CLI documentation](cli-documentation.md#cache-warmup-related-commands)).
+
+## Generate RSA keypair for JWT authentication flow
 
 To generate private key:
 
@@ -126,35 +134,11 @@ To generate public key:
 $ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
 ```
 
-## LTI
-
-#### LTI load balancer configuration
-
-The default map of load balancer for LTI instances is located in `config/packages/lti_instances.yaml`.
-
-It can be overridden per instance (dev, prod) by dropping this file in `config/packages/<env>/lti_instances.yaml`.
-
-The list of related environment variables can be found [here](#lti-related-environment-variables).
-
-#### LTI load balancing strategy
-
-There are two different load balancing strategies that can be applied. It's configurable through the 
-`LTI_INSTANCE_LOAD_BALANCING_STRATEGY` environment variable in the `.env` file.
-
-| Strategy | Description | LTI context id |
-| -------------|-------------|-----------|
-| username | Username based strategy (default)| `id` of `LineItem` of current `Assignment`|
-| userGroupId | User group ID based strategy | `groupId` of `User` |
-
-> **Note:** In order to apply the `userGroupId` strategy, the users must be ingested with `groupId` column specified, 
-otherwise the ingestion will fail.
-
-> **Note 2:** The `contextId` LTI request parameter is automatically adjusted based on the active load balancing strategy.
-
 ## Applying custom route prefix
 
 Custom route prefix can be defined via `APP_ROUTE_PREFIX` application environment. 
-If you do so, please make sure to include the leading slash character, but *NO* trailing slash.
+
+**Please make sure to include the leading slash character, but _NO_ trailing slash.**
 
 Example:
 
@@ -165,48 +149,11 @@ APP_ROUTE_PREFIX=/api
 To apply the changes, you need to clear the application cache:
 
 ```shell script
-$ sudo -u www-data bin/console cache:clear [--env=dev|prod]
+$ sudo -u www-data bin/console cache:clear
 ```
 
 To verify the changes:
 
 ```shell script
-$ sudo -u www-data bin/console debug:router [--env=dev|prod]
+$ sudo -u www-data bin/console debug:router
 ```
-
-## Useful commands
-
-- Clear application cache
-
-```shell script
-$ sudo -u www-data bin/console cache:clear [--env=dev|prod]
-```
-
-- Warm-up Doctrine cache
-
-```shell script
-$ sudo -u www-data bin/console roster:cache:warmup
-```
-
-- Refresh Doctrine metadata cache
-
-```shell script
-$ sudo -u www-data bin/console doctrine:cache:clear-metadata
-```
-
-- Refresh Doctrine query cache
-
-```shell script
-$ sudo -u www-data bin/console doctrine:cache:clear-query
-```
-
-- Refresh Doctrine result cache
-
-```shell script
-$ sudo -u www-data bin/console doctrine:cache:clear-result
-```
-
-## Application logs
-
-Application logs can be found in `var/log/` folder.
-
