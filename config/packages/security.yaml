@@ -1,6 +1,7 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
         OAT\SimpleRoster\Entity\User:
             algorithm: auto
             memory_cost: 1024
@@ -8,6 +9,13 @@ security:
     providers:
         app_user_provider:
             id: OAT\SimpleRoster\Security\Provider\UserProvider
+        basic_auth_provider:
+            memory:
+                users:
+                    '%env(WEBHOOK_BASIC_AUTH_USERNAME)%':
+                        password: '%env(WEBHOOK_BASIC_AUTH_PASSWORD)%'
+                        roles:
+                            - ROLE_USER
 
     firewalls:
         dev:
@@ -17,6 +25,7 @@ security:
         api_key:
             anonymous: ~
             pattern: '^%app.route_prefix%/v1/bulk'
+            provider: app_user_provider
             guard:
                 authenticators:
                     - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
@@ -25,14 +34,23 @@ security:
         lti1p3:
             pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
             stateless: true
+            provider: app_user_provider
             lti1p3_service:
                 scopes:
                     - 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
+
+        webhooks:
+            pattern: '^%app.route_prefix%/v1/web-hooks'
+            stateless: true
+            provider: basic_auth_provider
+            http_basic:
+                realm: 'Secured Webhooks'
 
         api:
             pattern:  '^%app.route_prefix%/v1'
             stateless: true
             anonymous: true
+            provider: app_user_provider
             guard:
                 authenticators:
                     - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
@@ -50,6 +68,6 @@ security:
         - { path: '^%app.route_prefix%/v1/healthcheck', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1/web-hooks/update-line-items', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/web-hooks/update-line-items', roles: ROLE_USER }
         - { path: '^%app.route_prefix%/v1/auth/refresh-token', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1', roles: IS_AUTHENTICATED_FULLY }

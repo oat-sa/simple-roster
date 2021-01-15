@@ -29,12 +29,12 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
+use OAT\SimpleRoster\Security\Provider\UserProvider;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class JwtTokenAuthenticatorTest extends KernelTestCase
 {
@@ -46,7 +46,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     /** @var JwtTokenGenerator */
     private $tokenGenerator;
 
-    /** @var UserProviderInterface */
+    /** @var UserProvider */
     private $userProvider;
 
     /** @var string */
@@ -66,7 +66,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->subject = static::$container->get(JwtTokenAuthenticator::class);
 
         $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
-        $this->userProvider = static::$container->get(UserProviderInterface::class);
+        $this->userProvider = static::$container->get(UserProvider::class);
         $this->jwtPrivateKeyPath = static::$container->getParameter('app.jwt.private_key_path');
         $this->jwtPassphrase = static::$container->getParameter('app.jwt.passphrase');
     }
