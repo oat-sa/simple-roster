@@ -101,7 +101,7 @@ class UpdateLineItemCollectionTest extends TestCase
             }
         );
 
-        self::assertEquals(2, count($ids));
+        self::assertCount(2, $ids);
 
         self::assertEquals('11', $ids[0]);
         self::assertEquals('22', $ids[1]);

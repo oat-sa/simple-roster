@@ -67,7 +67,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         self::assertSame(
             'Full authentication is required to access this resource.',
-            $decodedResponse['error']['message']
+            $decodedResponse
         );
     }
 
@@ -79,9 +79,15 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 
@@ -117,9 +123,15 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
 

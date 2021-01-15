@@ -24,10 +24,8 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
 use Carbon\Carbon;
 use DateInterval;
-use DateTimeZone;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
@@ -38,6 +36,7 @@ use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetUserAssignmentLtiLinkActionTest extends WebTestCase
@@ -77,13 +76,18 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/2/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -101,16 +105,21 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow();
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
         $this->getEntityManager()->flush();
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -131,13 +140,18 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::now()->add(new DateInterval('P3Y')));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -153,18 +167,23 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     public function testItReturns409IfLineItemIsNotAvailable(): void
     {
         Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC'))
+            Carbon::create(2019, 1, 1, 0, 0, 0)
         );
 
         $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('username');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/2/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -181,13 +200,18 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/2/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/2/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -203,18 +227,23 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -260,18 +289,23 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -323,15 +357,20 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
@@ -379,15 +418,20 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->getEntityManager()->flush();
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -401,18 +445,28 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $this->kernelBrowser->insulate(true);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $this->kernelBrowser->insulate(false);
+        //This trick with insulation switchOn/switchOff above is needed to have
+        //log test handler not missing between requests
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
+
         $ltiRequestInResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
             true,
@@ -421,6 +475,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         );
 
         self::assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+
         $this->assertHasRecordThatPasses(
             static function (array $record) use ($assignment, $ltiRequestInResponse) {
                 /** @var LtiRequest $ltiRequest */
@@ -442,17 +497,22 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLti1p3Link(): void
     {
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0, new DateTimeZone('UTC')));
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
+        $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
-        $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P3;
 
-        $this->kernelBrowser->request('GET', '/api/v1/assignments/1/lti-link');
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/assignments/1/lti-link',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+        );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 

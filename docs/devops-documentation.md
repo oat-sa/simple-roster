@@ -8,6 +8,7 @@
     - [LTI related environment variables](#lti-related-environment-variables)
     - [Blackfire related environment variables](#blackfire-related-environment-variables)
 - [Application setup steps](#application-setup-steps)
+    - [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
 - [LTI](#lti)
     - [LTI load balancer configuration](#lti-load-balancer-configuration)
     - [LTI load balancing strategy](#lti-load-balancing-strategy)
@@ -29,6 +30,11 @@ The main configuration file is `.env`, located in root folder.
 | APP_SECRET | Application secret |
 | APP_API_KEY | Application API Key |
 | APP_ROUTE_PREFIX | Application route prefix, [default: `/api` ]. Details: [Applying custom route prefix](#applying-custom-route-prefix)
+| JWT_SECRET_KEY | Path to RSA private key for JWT authentication flow |
+| JWT_PUBLIC_KEY | Path to RSA public key for JWT authentication flow |
+| JWT_PASSPHRASE | Passphrase for JWT keypair |
+| JWT_ACCESS_TOKEN_TTL | TTL for JWT access token in seconds |
+| JWT_REFRESH_TOKEN_TTL | TTL for JWT refresh token in seconds |
 | DATABASE_URL | Database url |
 | REDIS_DOCTRINE_CACHE_HOST | Redis host for doctrine cache storage |
 | REDIS_DOCTRINE_CACHE_PORT | Redis port for doctrine cache storage |
@@ -102,6 +108,22 @@ $ sudo -u www-data bin/console doctrine:schema:update --force
 
 ```shell script
 $ sudo -u www-data bin/console doctrine:schema:drop --force
+```
+
+### Generate RSA keypair for JWT authentication flow
+
+To generate private key:
+
+```shell script
+$ openssl genpkey -aes-256-cbc -algorithm RSA -out config/secrets/prod/jwt_private.pem
+```
+
+Make sure you update the `JWT_PASSPHRASE` environment variable with the passphrase of your choice.
+
+To generate public key:
+
+```shell script
+$ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
 ```
 
 ## LTI

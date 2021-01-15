@@ -23,25 +23,21 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Logger;
 
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Logger\UserRequestSessionLogProcessor;
+use OAT\SimpleRoster\Logger\UserRequestLogProcessor;
 use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
-class UserRequestSessionLogProcessorTest extends TestCase
+class UserRequestLogProcessorTest extends TestCase
 {
     /** @var Security|MockObject */
     private $security;
 
-    /** @var SessionInterface|MockObject */
-    private $session;
-
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
-    /** @var UserRequestSessionLogProcessor */
+    /** @var UserRequestLogProcessor */
     private $subject;
 
     protected function setUp(): void
@@ -49,10 +45,9 @@ class UserRequestSessionLogProcessorTest extends TestCase
         parent::setUp();
 
         $this->security = $this->createMock(Security::class);
-        $this->session = $this->createMock(SessionInterface::class);
         $this->requestIdStorage = new RequestIdStorage();
 
-        $this->subject = new UserRequestSessionLogProcessor($this->security, $this->session, $this->requestIdStorage);
+        $this->subject = new UserRequestLogProcessor($this->security, $this->requestIdStorage);
     }
 
     public function testItExtendsLogRecordWithRequestId(): void
@@ -64,20 +59,6 @@ class UserRequestSessionLogProcessorTest extends TestCase
         self::assertArrayHasKey('extra', $logRecord);
         self::assertArrayHasKey('requestId', $logRecord['extra']);
         self::assertSame('expectedRequestId', $logRecord['extra']['requestId']);
-    }
-
-    public function testItExtendsLogRecordWithSessionId(): void
-    {
-        $this->session
-            ->expects(self::once())
-            ->method('getId')
-            ->willReturn('expectedSessionId');
-
-        $logRecord = call_user_func($this->subject, ['logRecord']);
-
-        self::assertArrayHasKey('extra', $logRecord);
-        self::assertArrayHasKey('sessionId', $logRecord['extra']);
-        self::assertSame('expectedSessionId', $logRecord['extra']['sessionId']);
     }
 
     public function testItExtendsLogRecordWithUsername(): void

@@ -18,6 +18,22 @@ $ cp .env.dist .env
 then to define the environment variables according to your local environment, such as redis DNS, database url, etc. 
 To see the full list of available environment variables please refer to the [devops documentation](devops-documentation.md).
 
+The application uses JWT tokens for API authentication. You must generate your private/public keypair to make it work.
+
+To generate private key:
+
+```shell script
+$ openssl genpkey -out config/secrets/dev/jwt_private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+```
+
+Make sure you update the `JWT_PASSPHRASE` environment variable in your `.env.local` file with the passphrase of your choice.
+
+To generate public key:
+
+```shell script
+$ openssl pkey -in config/secrets/dev/jwt_private.pem -out config/secrets/dev/jwt_public.pem -pubout
+```
+
 To run the application with Symfony's built-in web-server just launch:
 
 ```shell script

@@ -47,19 +47,20 @@ security:
                 realm: 'Secured Webhooks'
 
         api:
-            anonymous: ~
-            pattern: '^%app.route_prefix%/v1'
+            pattern:  '^%app.route_prefix%/v1'
+            stateless: true
+            anonymous: true
             provider: app_user_provider
+            guard:
+                authenticators:
+                    - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
+            json_login:
+                check_path: getAccessToken
+                remember_me: false
+                success_handler: OAT\SimpleRoster\Security\Handler\AuthenticationSuccessHandler
             logout:
                 path: logout
                 success_handler: OAT\SimpleRoster\Security\Handler\LogoutSuccessHandler
-            json_login:
-                check_path: login
-                remember_me: false
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-            # NOTE: the built-in "logout" mechanism is not usable here because it intercepts the request at the very beginning so no authorization happens
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -68,4 +69,5 @@ security:
         - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: '^%app.route_prefix%/v1/web-hooks/update-line-items', roles: ROLE_USER }
-        - { path: '^%app.route_prefix%/v1', roles: ROLE_USER }
+        - { path: '^%app.route_prefix%/v1/auth/refresh-token', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1', roles: IS_AUTHENTICATED_FULLY }

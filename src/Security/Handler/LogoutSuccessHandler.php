@@ -22,26 +22,66 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Handler;
 
+use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
+    /** @var AuthorizationHeaderTokenExtractor */
+    private $tokenExtractor;
+
+    /** @var CacheItemPoolInterface */
+    private $tokenCache;
+
+    /** @var JwtTokenCacheIdGenerator */
+    private $tokenCacheIdGenerator;
+
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var SerializerResponder */
     private $serializerResponder;
 
-    public function __construct(SerializerResponder $serializerResponder)
-    {
+    public function __construct(
+        AuthorizationHeaderTokenExtractor $tokenExtractor,
+        CacheItemPoolInterface $jwtTokenCache,
+        JwtTokenCacheIdGenerator $tokenCacheIdGenerator,
+        LoggerInterface $securityLogger,
+        SerializerResponder $serializerResponder
+    ) {
+        $this->tokenExtractor = $tokenExtractor;
+        $this->tokenCache = $jwtTokenCache;
+        $this->tokenCacheIdGenerator = $tokenCacheIdGenerator;
+        $this->logger = $securityLogger;
         $this->serializerResponder = $serializerResponder;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
     public function onLogoutSuccess(Request $request)
     {
+        $accessToken = $this->tokenExtractor->extract($request);
+        $parsedToken = (new Parser())->parse($accessToken);
+
+        $refreshTokenCacheId = $this->tokenCacheIdGenerator->generate($parsedToken, 'refreshToken');
+        $cacheItem = $this->tokenCache->getItem($refreshTokenCacheId);
+
+        if ($cacheItem->isHit()) {
+            $this->tokenCache->deleteItem($refreshTokenCacheId);
+
+            $this->logger->info(
+                sprintf("Refresh token for user '%s' has been invalidated.", $parsedToken->getClaim('aud')),
+                [
+                    'cacheId' => $refreshTokenCacheId,
+                ]
+            );
+        }
+
         return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 }

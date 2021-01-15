@@ -29,7 +29,7 @@ Profiling HTTP calls can be done just by adding `X-Blackfire` header to your API
 Here is an example of how to profile the `login` endpoint:
 
 ```text
-curl --location --request POST 'https://simple-roster.docker.localhost/api/v1/auth/login' \
+curl --location --request POST 'https://simple-roster.docker.localhost/api/v1/auth/token' \
     --header 'Content-Type: application/json' \
     --header 'X-Blackfire: ' \
     --header 'Cookie: PHPSESSID=<your-session-id>' \
