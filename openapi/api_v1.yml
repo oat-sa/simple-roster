@@ -272,14 +272,8 @@ paths:
             summary: Notify Api about new Delivery URIs to be updated
             tags:
                 - web-hook
-            security: []
-            parameters:
-                -   name: Authorization
-                    description: OAuth authorization header, including OAuth parameters
-                    in: header
-                    schema:
-                        type: string
-                        example: To be Defined
+            security:
+                -   basicAuth: [ ]
             requestBody:
                 required: true
                 content:
@@ -310,6 +304,9 @@ components:
             type: http
             scheme: bearer
             bearerFormat: JWT
+        basicAuth:
+            type: http
+            scheme: basic
     schemas:
         Assignment:
             type: object

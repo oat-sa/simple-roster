@@ -17,6 +17,7 @@ Here you can find an example about how to update the line-item via curl command:
 ```shell script
 curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web-hooks/update-line-items' \
 --header 'Content-Type: application/json' \
+--header 'Authorization: Basic d2ViaG9vazpjQ1ZNeGRYOGhmY3REZWZr' \
 --data-raw '{
 	"source":"https://someinstance.taocloud.org/",
 	"events":[
@@ -32,6 +33,11 @@ curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web
 	]
 }'
 ```
+
+#### Authentication
+
+To use this endpoint, the `Authorization` header should be defined as the sample above.
+The credentials should match the ones defined on `BASIC_AUTH_USERNAME` and `BASIC_AUTH_USERNAME` environment variables.
 
 #### Attribute Descriptions
 
