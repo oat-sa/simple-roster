@@ -7,6 +7,7 @@
 - [Application setup steps (production)](#application-setup-steps-production)
 - [Performance checklist (production)](https://symfony.com/doc/current/performance.html)
 - [LTI configuration](features/lti.md)
+- [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
 - [Applying custom route prefix](#applying-custom-route-prefix)
 - [Activate/Deactivate line items](cli/modify-entity-line-item-change-state-command.md)
 - [Change line item availability dates](cli/modify-entity-line-item-change-dates-command.md)
@@ -24,6 +25,11 @@ The main configuration file is `.env`, located in root folder.
 | `APP_SECRET` | Application secret (use a secure random value, not a passphrase) |
 | `APP_ROUTE_PREFIX` | To apply custom API route prefix [default: `/api` ]. More information [here](#applying-custom-route-prefix). |
 | `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
+| `JWT_SECRET_KEY` | Path to RSA private key for JWT authentication flow |
+| `JWT_PUBLIC_KEY` | Path to RSA public key for JWT authentication flow |
+| `JWT_PASSPHRASE` | Passphrase for JWT keypair |
+| `JWT_ACCESS_TOKEN_TTL` | TTL for JWT access token in seconds |
+| `JWT_REFRESH_TOKEN_TTL` | TTL for JWT refresh token in seconds |
 | `CORS_ALLOW_ORIGIN` | Allowed origin domain for cross-origin resource sharing. Example: `^https?://test-taker-portal.com$` |
 | `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
 | `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
@@ -32,6 +38,8 @@ The main configuration file is `.env`, located in root folder.
 | `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
 | `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching collection of LTI instances. |
 | `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items. |
+| `WEBHOOK_BASIC_AUTH_USERNAME` | Basic auth username for [webhook](features/update-line-items-webhook.md). |
+| `WEBHOOK_BASIC_AUTH_PASSWORD` | Basic auth password for [webhook](features/update-line-items-webhook.md). |
 | `APP_API_KEY` | API key used by [Lambda Assignment Manager](https://github.com/oat-sa/lambda-assignment-manager) to access bulk API endpoints. |
 | `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` | Threshold for assignment garbage collection. [Example: `P1D`] Supported formats can be found [here](http://php.net/manual/en/dateinterval.format.php). |
 
@@ -60,6 +68,10 @@ The main configuration file is `.env`, located in root folder.
     ```shell script
     $ sudo -u www-data bin/console clear:cache
     ```
+
+1. Generate RSA keys for JWT authentication flow
+
+    Please refer to [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow) section of this document. 
 
 1. Verify application and PHP settings:
 
@@ -105,6 +117,22 @@ The main configuration file is `.env`, located in root folder.
  1. Start ingestion process ([CLI documentation](cli-documentation.md#ingestion-related-commands)).
  
  2. Warm up cache ([CLI documentation](cli-documentation.md#cache-warmup-related-commands)).
+
+## Generate RSA keypair for JWT authentication flow
+
+To generate private key:
+
+```shell script
+$ openssl genpkey -aes-256-cbc -algorithm RSA -out config/secrets/prod/jwt_private.pem
+```
+
+Make sure you update the `JWT_PASSPHRASE` environment variable with the passphrase of your choice.
+
+To generate public key:
+
+```shell script
+$ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
+```
 
 ## Applying custom route prefix
 

@@ -49,7 +49,7 @@ services:
 
     simple-roster-postgres:
         container_name: simple-roster-postgres
-        image: postgres:9.5.15
+        image: postgres
         networks:
             - simple-roster
         ports:

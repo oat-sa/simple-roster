@@ -27,6 +27,20 @@ COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}
 COMPOSER_HOME=~/.composer
 ```
 
+The application uses JWT tokens for API authentication. You must generate your private/public keypair to make it work.
+
+To generate private key:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm openssl genpkey -aes-256-cbc -algorithm RSA -pass pass:devpassphrase -out config/secrets/docker/jwt_private.pem
+```
+
+To generate public key:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm openssl pkey -in config/secrets/docker/jwt_private.pem -passin pass:devpassphrase -out config/secrets/docker/jwt_public.pem -pubout
+```
+
 The rest of the configuration is pre-configured with the `.env.docker` file, so next step is to set up the containers:
 
 ```shell script
@@ -72,7 +86,7 @@ and execute the command again.
 To run infection suite execute:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc)"
+$ docker container exec -it simple-roster-phpfpm bash -c "XDEBUG_MODE=coverage && source .env.test && vendor/bin/infection --threads=$(nproc)"
 ```
 
 If you receive an error message about not finding the bootstrap files:

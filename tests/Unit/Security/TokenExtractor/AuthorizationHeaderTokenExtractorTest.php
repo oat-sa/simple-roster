@@ -42,14 +42,14 @@ class AuthorizationHeaderTokenExtractorTest extends TestCase
     {
         $request = new Request();
 
-        self::assertNull($this->subject->extract($request));
+        self::assertEmpty($this->subject->extract($request));
     }
 
     public function testExtractWithInvalidAuthorizationHeader(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'invalid']);
 
-        self::assertNull($this->subject->extract($request));
+        self::assertEmpty($this->subject->extract($request));
     }
 
     public function testExtractWithValidAuthorizationHeader(): void

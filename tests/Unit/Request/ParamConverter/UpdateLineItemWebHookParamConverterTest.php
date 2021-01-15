@@ -101,7 +101,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             ->method('getName')
             ->willReturn('collection');
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with('UpdateLineItems payload.', json_decode($payload, true));
 

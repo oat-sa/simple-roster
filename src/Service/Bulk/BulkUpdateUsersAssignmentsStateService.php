@@ -110,11 +110,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $userRepository = $this->entityManager->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
-        foreach ($user->getAssignments() as $assignment) {
-            if (!$assignment->isCancellable()) {
-                continue;
-            }
-
+        foreach ($user->getCancellableAssignments() as $assignment) {
             $assignment->setState(Assignment::STATE_CANCELLED);
 
             $this->logBuffer[] = [

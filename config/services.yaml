@@ -10,8 +10,6 @@ parameters:
     app.assignment_state_interval_threshold: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
     app.cache.host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
     app.cache.port: '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
-    app.cache.session.host: '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
-    app.cache.session.port: '%env(int:REDIS_SESSION_CACHE_PORT)%'
     app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
     app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
     app.cache.ttl.get_line_item_by_id: '%env(int:CACHE_TTL_LINE_ITEM)%'
@@ -21,6 +19,13 @@ parameters:
     app.lti1p1.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
     app.lti1p3.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
     app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+    app.jwt.private_key_path: '%env(resolve:JWT_SECRET_KEY)%'
+    app.jwt.public_key_path: '%env(resolve:JWT_PUBLIC_KEY)%'
+    app.jwt.passphrase: '%env(resolve:JWT_PASSPHRASE)%'
+    app.jwt.access_token_ttl: '%env(int:JWT_ACCESS_TOKEN_TTL)%'
+    app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
+    app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
+    app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
 
 services:
     # default configuration for services in *this* file
@@ -38,19 +43,30 @@ services:
             $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
             $ltiVersion: '%app.lti.version%'
             $ltiRegistrationId: '%app.lti1p3.registration_id%'
+            $jwtTokenCache: '@app.jwt_cache.adapter'
+            $jwtPrivateKeyPath: '%app.jwt.private_key_path%'
+            $jwtPublicKeyPath: '%app.jwt.public_key_path%'
+            $jwtPassphrase: '%app.jwt.passphrase%'
+            $jwtAccessTokenTtl: '%app.jwt.access_token_ttl%'
+            $jwtRefreshTokenTtl: '%app.jwt.refresh_token_ttl%'
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
             tags: ['doctrine.orm.entity_listener']
 
-    app.session_storage.connection:
+    app.jwt_cache.connection:
         class: Redis
         calls:
-            -   method: connect
-                arguments:
-                    - '%app.cache.session.host%'
-                    - '%app.cache.session.port%'
+            - method: connect
+              arguments:
+                  - '%app.jwt.cache.host%'
+                  - '%app.jwt.cache.port%'
+
+    app.jwt_cache.adapter:
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            $redisClient: '@app.jwt_cache.connection'
 
     app.doctrine_cache.connection:
         class: Redis
@@ -82,7 +98,7 @@ services:
         arguments:
             $cleanUpInterval: '%app.assignment_state_interval_threshold%'
 
-    OAT\SimpleRoster\Logger\UserRequestSessionLogProcessor:
+    OAT\SimpleRoster\Logger\UserRequestLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
             - { name: 'monolog.processor', channel: 'app' }

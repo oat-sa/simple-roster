@@ -21,7 +21,8 @@
 - Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
 - Added `LTI_VERSION` environment variable to control version we are working (1.1.1 or 1.3.0).
 - Added `CACHE_TTL_LINE_ITEM` environment variable.
-- Added environment variables specific for [LTI 1.3](docs/devops-documentation.md) 
+- Added environment variables specific for [LTI 1.3](docs/devops-documentation.md).
+- Added `WEBHOOK_BASIC_AUTH_USERNAME` and `WEBHOOK_BASIC_AUTH_PASSWORD` environment variables.
 - Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
 - Added possibility to update line items via WebHook Endpoint: `/v1/web-hooks/update-line-items`
@@ -34,7 +35,10 @@
 - Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
 - Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
 - Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
+- Changed security flow to use JWT for api endpoints. Everything under `^%app.route_prefix%/v1/` except `healthcheck` and `bulk` endpoints is affected
+- Changed login endpoint for JWT auth. Now it is not `^%app.route_prefix%/v1/auth/login`, but `^%app.route_prefix%/v1/auth/token`
 - Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
+- Changed security settings to use basic authentication on webhook endpoint.
 - Moved health check endpoint to API root.
 
 ### Removed

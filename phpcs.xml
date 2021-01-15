@@ -15,4 +15,7 @@
     <file>src/</file>
     <file>tests/</file>
 
+    <!--Excluding config/bundles.php to avoid jenkins build failing-->
+    <exclude-pattern>config/bundles\.php</exclude-pattern>
+
 </ruleset>

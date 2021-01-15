@@ -23,34 +23,27 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Logger;
 
 use OAT\SimpleRoster\Request\RequestIdStorage;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 
-class UserRequestSessionLogProcessor
+class UserRequestLogProcessor
 {
     /** @var Security */
     private $security;
-
-    /** @var SessionInterface */
-    private $session;
 
     /** @var RequestIdStorage */
     private $requestIdStorage;
 
     public function __construct(
         Security $security,
-        SessionInterface $session,
         RequestIdStorage $requestIdStorage
     ) {
         $this->security = $security;
-        $this->session = $session;
         $this->requestIdStorage = $requestIdStorage;
     }
 
     public function __invoke(array $record): array
     {
         $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
-        $record['extra']['sessionId'] = $this->session->getId();
         $record['extra']['username'] = $this->security->getUser() !== null
             ? $this->security->getUser()->getUsername()
             : 'guest';
