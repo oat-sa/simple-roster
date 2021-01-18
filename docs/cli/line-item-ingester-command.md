@@ -8,6 +8,7 @@ To deactivate a line item, please check the [line item change state command](mod
     - [Main arguments](#main-arguments)
     - [Main options](#main-options)
 - [CSV file format](#csv-file-format)
+- [Related environment variables](#related-environment-variables)
 - [Examples](#examples)
 
 ## Usage
@@ -25,7 +26,7 @@ $ sudo -u www-data bin/console roster:ingest:line-item <path> [--storage=local] 
 
 | Option          | Description                                                                                                   |
 | ----------------|:--------------------------------------------------------------------------------------------------------------|
-| -s, --storage   | Filesystem storage identifier [default: `default`] ([Storage registry documentation](../storage-registry.md)) |
+| -s, --storage   | Filesystem storage identifier [default: `local`] More information can be found [here](../storage-registry.md).|
 | -d, --delimiter | CSV delimiter [default: `,`]                                                                                  |
 | -b, --batch     | Batch size [default: `1000`]                                                                                  |
 | -f, --force     | To apply database modifications or not [default: `false`]                                                     |
@@ -57,6 +58,12 @@ http://taoplatform.loc/delivery_6.rdf,label6,gra13_ita_6,1546682400,1546713000,2
 | `startTimestamp` | Starting date of line item as [Unix epoch timestamp](https://www.epochconverter.com/clock). |
 | `endTimestamp` | Ending date of line item as [Unix epoch timestamp](https://www.epochconverter.com/clock). |
 | `maxAttempts` | Maximum available test taking attempts (`0` = infinite attempts). |
+
+## Related environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
 
 ## Examples
 

@@ -7,6 +7,7 @@ data into the application for LTI 1.1 launches.
     - [Main arguments](#main-arguments)
     - [Main options](#main-options)
 - [CSV file format](#csv-file-format)
+- [Related environment variables](#related-environment-variables)
 - [Examples](#examples)
 
 ## Usage
@@ -24,7 +25,7 @@ $ sudo -u www-data bin/console roster:ingest:lti-instance <path> [--storage=loca
 
 | Option          | Description                                                                                                   |
 | ----------------|:--------------------------------------------------------------------------------------------------------------|
-| -s, --storage   | Filesystem storage identifier [default: `default`] ([Storage registry documentation](../storage-registry.md)) |
+| -s, --storage   | Filesystem storage identifier [default: `local`] More information can be found [here](../storage-registry.md).|
 | -d, --delimiter | CSV delimiter [default: `,`]                                                                                  |
 | -b, --batch     | Batch size [default: `1000`]                                                                                  |
 | -f, --force     | To apply database modifications or not [default: `false`]                                                     |
@@ -53,6 +54,12 @@ infra_5,http://infra_5.com,key5,secret5
 | `ltiLink` | Unique LTI link used by LTI 1.1 launch. |
 | `ltiKey` | LTI key used by LTI 1.1 launch. |
 | `ltiSecret` | LTI secret used by LTI 1.1 launch. |
+
+## Related environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
 
 ## Examples
 

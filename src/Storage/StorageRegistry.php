@@ -28,7 +28,7 @@ use OAT\SimpleRoster\Storage\Exception\StorageNotFoundException;
 
 class StorageRegistry
 {
-    public const DEFAULT_STORAGE = 'default';
+    public const DEFAULT_STORAGE = 'local';
 
     /** @var iterable|Storage[] */
     private $storages;

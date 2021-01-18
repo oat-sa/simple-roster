@@ -6,6 +6,7 @@
 - [Environment variables](#environment-variables)
 - [Application setup steps (production)](#application-setup-steps-production)
 - [Performance checklist (production)](https://symfony.com/doc/current/performance.html)
+- [CLI documentation](cli-documentation.md)
 - [LTI configuration](features/lti.md)
 - [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
 - [Applying custom route prefix](#applying-custom-route-prefix)
@@ -33,11 +34,12 @@ The main configuration file is `.env`, located in root folder.
 | `CORS_ALLOW_ORIGIN` | Allowed origin domain for cross-origin resource sharing. Example: `^https?://test-taker-portal.com$` |
 | `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
 | `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
-| `REDIS_SESSION_CACHE_HOST` | Redis host for sessions cache storage. |
-| `REDIS_SESSION_CACHE_PORT` | Redis port for sessions cache storage. |
+| `REDIS_JWT_CACHE_HOST` | Redis host for JWT cache storage. |
+| `REDIS_JWT_CACHE_PORT` | Redis port for JWT cache storage. |
 | `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
-| `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching collection of LTI instances. |
+| `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching entire collection of LTI instances. |
 | `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items. |
+| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](cli/user-cache-warmer-command.md#asynchronous-cache-warmup-with-amazon-sqs). |
 | `WEBHOOK_BASIC_AUTH_USERNAME` | Basic auth username for [webhook](features/update-line-items-webhook.md). |
 | `WEBHOOK_BASIC_AUTH_PASSWORD` | Basic auth password for [webhook](features/update-line-items-webhook.md). |
 | `APP_API_KEY` | API key used by [Lambda Assignment Manager](https://github.com/oat-sa/lambda-assignment-manager) to access bulk API endpoints. |
@@ -102,7 +104,7 @@ The main configuration file is `.env`, located in root folder.
 1. Ensure application is healthy by calling the healthcheck API endpoint:
 
     ```shell script
-    $ curl -sb -H http://{APPLICATION_URL}/api/v1
+    $ curl -sb -H https://{APPLICATION_URL}/api/v1
     ```
    
    Response should be something like this:
@@ -114,9 +116,33 @@ The main configuration file is `.env`, located in root folder.
     }
     ```
    
- 1. Start ingestion process ([CLI documentation](cli-documentation.md#ingestion-related-commands)).
+ 1. Execute LTI instance ingestion (Only in case of [LTI 1.1.1](features/lti.md#lti-111))
  
- 2. Warm up cache ([CLI documentation](cli-documentation.md#cache-warmup-related-commands)).
+    Documentation: [LTI instance ingester command](cli/lti-instance-ingester-command.md).
+    
+ 1. Execute line item ingestion
+ 
+    Documentation: [Line item ingester command](cli/line-item-ingester-command.md).
+    
+1. Execute user ingestion
+
+    Documentation: [User ingester command](cli/user-ingester-command.md).
+    
+1. Execute assignment ingestion
+
+    Documentation: [Assignment ingester command](cli/assignment-ingester-command.md).
+ 
+ 1. Warm up LTI instance cache
+ 
+    Documentation: [LTI instance cache warmer command](cli/lti-instance-cache-warmer-command.md).
+    
+1. Warm up line item cache
+
+    Documentation: [Line item cache warmer command](cli/line-item-cache-warmer-command.md).
+
+1. Warm up user cache
+
+    Documentation: [User cache warmer command](cli/user-cache-warmer-command.md).
 
 ## Generate RSA keypair for JWT authentication flow
 

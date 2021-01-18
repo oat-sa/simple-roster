@@ -10,13 +10,13 @@ in order to be able to utilize usage of multiple different filesystem instances 
 
 ## Default configuration (local storage)
 
-By default there is only one storage enabled in `config/packages/flysystem.yaml` file, the `default` storage and it's using
+By default there is only one storage enabled in `config/packages/flysystem.yaml` file, the `local` storage and it's using
 the local filesystem:
 
 ```yaml
 flysystem:
     storages:
-        default.storage:
+        local.storage:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%'
@@ -76,12 +76,11 @@ class MyService
 
 ## Storage usage in tests
 
-In functional / integration tests it should be avoided to use the local filesystem whenever it's possible by utilizing the `test` 
-in-memory storage configured in `config/packages/test/flysystem.yaml` file:
+In test environment the `local` storage is configured to use in-memory adapter in `config/packages/test/flysystem.yaml` file:
 
 ```yaml
 flysystem:
     storages:
-        test.storage:
+        local.storage:
             adapter: 'memory'
 ```

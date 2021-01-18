@@ -5,7 +5,8 @@
 
 - [Usage](#usage)
     - [Main options](#main-options)
-    - [Examples](#examples)
+- [Related environment variables](#related-environment-variables)
+- [Examples](#examples)
 - [Synchronous cache warmup parallelization](#synchronous-cache-warmup-parallelization)
     - [Example](#example)
 - [Asynchronous cache warmup with Amazon SQS](#asynchronous-cache-warmup-with-amazon-sqs)
@@ -31,7 +32,18 @@ For the full list of options please refer to the helper option:
 $ sudo -u www-data bin/console roster:cache-warmup:user -h
 ```
 
-### Examples
+## Related environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
+| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
+| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
+| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
+| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](#asynchronous-cache-warmup-with-amazon-sqs). |
+
+
+## Examples
 
 Warming up all result cache entries in batches of 10.000:
 

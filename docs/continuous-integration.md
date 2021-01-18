@@ -28,7 +28,7 @@ Currently, the following checks are included:
 To run phpunit and infection together with clover coverage report generated:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc) --min-msi=95 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml""
+$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc) --min-msi=99 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml""
 ```
 
 Configuration files:
