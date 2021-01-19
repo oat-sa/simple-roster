@@ -91,7 +91,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [],
             [
                 'PHP_AUTH_USER' => 'wrongUsername',
-                'PHP_AUTH_PW' => 'wrongPassword'
+                'PHP_AUTH_PW' => 'wrongPassword',
             ],
             ''
         );
@@ -115,7 +115,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [],
             [
                 'PHP_AUTH_USER' => 'testUsername',
-                'PHP_AUTH_PW' => 'testPassword'
+                'PHP_AUTH_PW' => 'testPassword',
             ],
             $requestBody
         );
@@ -144,7 +144,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [],
             [
                 'PHP_AUTH_USER' => 'testUsername',
-                'PHP_AUTH_PW' => 'testPassword'
+                'PHP_AUTH_PW' => 'testPassword',
             ],
             (string)json_encode($this->getSuccessRequestBody())
         );
@@ -157,13 +157,13 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         /** @var LineItem $lineItem */
         $lineItem = $lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
-        $lineItemCache = $this->resultCacheImplementation->fetch('line_item_1');
+        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.1');
 
         $this->assertHasLogRecord(
             [
                 'message' => 'Impossible to update the line item. The slug wrong-alias does not exist.',
                 'context' => [
-                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f'
+                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f',
                 ],
             ],
             Logger::ERROR
@@ -191,20 +191,20 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                    'status' => 'ignored'
+                    'status' => 'ignored',
                 ],
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                    'status' => 'error'
+                    'status' => 'error',
                 ],
                 [
                     'eventId' => 'lastDuplicatedEvent',
-                    'status' => 'accepted'
+                    'status' => 'accepted',
                 ],
                 [
                     'eventId' => 'duplicated',
-                    'status' => 'ignored'
-                ]
+                    'status' => 'ignored',
+                ],
             ],
             json_decode(
                 $this->kernelBrowser->getResponse()->getContent(),
@@ -224,7 +224,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [],
             [
                 'PHP_AUTH_USER' => 'testUsername',
-                'PHP_AUTH_PW' => 'testPassword'
+                'PHP_AUTH_PW' => 'testPassword',
             ],
             (string)json_encode($this->getRequestBodyUnknownEvent())
         );
@@ -235,8 +235,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                    'status' => 'ignored'
-                ]
+                    'status' => 'ignored',
+                ],
             ],
             json_decode(
                 $this->kernelBrowser->getResponse()->getContent(),
@@ -443,7 +443,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                         'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }

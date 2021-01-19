@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
+use DateInterval;
+use DateTime;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use DateInterval;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AssignmentRepositoryTest extends KernelTestCase

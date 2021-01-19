@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\GarbageCollector;
 
+use Carbon\Carbon;
+use DateTime;
+use Monolog\Logger;
 use OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use Carbon\Carbon;
-use DateTime;
-use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;

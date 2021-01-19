@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Security\OAuth;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class OAuthSignerTest extends TestCase

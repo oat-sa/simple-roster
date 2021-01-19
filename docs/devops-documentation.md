@@ -96,10 +96,15 @@ The main configuration file is `.env`, located in root folder.
     $ sudo -u www-data bin/console doctrine:ensure-production-settings
     ```
 
-1. Create database schema:
+1. Create database:
 
     ```shell script
     $ sudo -u www-data bin/console doctrine:database:create
+    ``` 
+1. Setup database schema:
+
+    ```shell script
+    $ sudo -u www-data bin/console doctrine:database:update --force
     ``` 
 
 1. Ensure application is healthy by calling the healthcheck API endpoint:

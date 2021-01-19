@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Generator;
 
 class LineItemCacheIdGenerator
 {
-    public const CACHE_KEY_PATTERN = 'line_item_%d';
+    public const CACHE_KEY_PATTERN = 'lineItem.%d';
 
     public function generate(int $id): string
     {

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,17 +15,20 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Generator;
+namespace OAT\SimpleRoster\Tests\Unit\Generator;
 
-class UserCacheIdGenerator
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use PHPUnit\Framework\TestCase;
+
+class UserCacheIdGeneratorTest extends TestCase
 {
-    public function generate(string $username): string
+    public function testItCanGenerateCacheId(): void
     {
-        return sprintf('user.%s', $username);
+        self::assertSame('user.testUser', (new UserCacheIdGenerator())->generate('testUser'));
     }
 }

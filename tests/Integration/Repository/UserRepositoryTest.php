@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\EntityNotFoundException;
+use InvalidArgumentException;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\EntityNotFoundException;
-use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase

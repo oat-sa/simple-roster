@@ -138,7 +138,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             [
                 'message' => 'Result cache for Line Item Id 1 have been successfully warmed up.',
                 'context' => [
-                    'cacheKey' => 'line_item_1',
+                    'cacheKey' => 'lineItem.1',
                     'cacheTtl' => '3,600',
                 ],
             ],
@@ -149,7 +149,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             [
                 'message' => 'Result cache for Line Item Id 2 have been successfully warmed up.',
                 'context' => [
-                    'cacheKey' => 'line_item_2',
+                    'cacheKey' => 'lineItem.2',
                     'cacheTtl' => '3,600',
                 ],
             ],
@@ -160,7 +160,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             [
                 'message' => 'Result cache for Line Item Id 3 have been successfully warmed up.',
                 'context' => [
-                    'cacheKey' => 'line_item_3',
+                    'cacheKey' => 'lineItem.3',
                     'cacheTtl' => '3,600',
                 ],
             ],
