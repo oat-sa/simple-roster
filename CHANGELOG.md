@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 - TODO: To be released
+## 2.0.0 - 2021-01-21
 
 ### Added
 - Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
