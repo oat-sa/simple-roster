@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Entity;
+declare(strict_types=1);
 
-use App\Entity\LineItem;
+namespace OAT\SimpleRoster\Tests\Unit\Entity;
+
 use DateTime;
+use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
 
 class LineItemTest extends TestCase
@@ -40,14 +40,14 @@ class LineItemTest extends TestCase
 
     public function testItIsAvailableForDateIfStartDateIsNotSet(): void
     {
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 
     public function testItIsAvailableForDateIfEndDateIsNotSet(): void
     {
         $this->subject->setStartAt(new DateTime('-3 days'));
 
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 
     public function testItIsAvailableForDateIfDateIsBetweenStartDateAndEndDate(): void
@@ -56,6 +56,6 @@ class LineItemTest extends TestCase
             ->setStartAt(new DateTime('-1 day'))
             ->setEndAt(new DateTime('+1 day'));
 
-        $this->assertTrue($this->subject->isAvailableForDate(new DateTime()));
+        self::assertTrue($this->subject->isAvailableForDate(new DateTime()));
     }
 }

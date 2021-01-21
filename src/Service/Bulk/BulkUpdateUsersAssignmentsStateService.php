@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,19 +18,21 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Service\Bulk;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Bulk\Processor\BulkOperationCollectionProcessorInterface;
-use App\Bulk\Result\BulkResult;
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Repository\UserRepository;
+namespace OAT\SimpleRoster\Service\Bulk;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use LogicException;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -71,10 +71,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
             try {
                 $this->processOperation($operation, $result);
             } catch (Throwable $exception) {
-                $this->logger->error(
-                    'Bulk assignments cancellation error: ' . $exception->getMessage(),
-                    ['operation' => serialize($operation)]
-                );
+                $this->logger->error('Bulk assignments cancellation error: ' . $exception->getMessage());
                 $result->addBulkOperationFailure($operation);
             }
         }
@@ -84,18 +81,20 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
     private function processResult(BulkResult $result): BulkResult
     {
-        if (!$result->hasFailures()) {
-            $this->entityManager->flush();
-            $this->entityManager->commit();
-
-            foreach ($this->logBuffer as $logRecord) {
-                $this->logger->info(
-                    $logRecord['message'],
-                    ['lineItem' => $logRecord['lineItem']]
-                );
-            }
-        } else {
+        if ($result->hasFailures()) {
             $this->entityManager->rollback();
+
+            return $result;
+        }
+
+        $this->entityManager->flush();
+        $this->entityManager->commit();
+
+        foreach ($this->logBuffer as $logRecord) {
+            $this->logger->info(
+                $logRecord['message'],
+                ['lineItem' => $logRecord['lineItem']]
+            );
         }
 
         return $result;
@@ -109,16 +108,10 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
-        $user = $userRepository->getByUsernameWithAssignments($operation->getIdentifier());
+        $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
-        foreach ($user->getAssignments() as $assignment) {
-            if (!$assignment->isCancellable()) {
-                continue;
-            }
-
-            if (!$operation->isDryRun()) {
-                $assignment->setState(Assignment::STATE_CANCELLED);
-            }
+        foreach ($user->getCancellableAssignments() as $assignment) {
+            $assignment->setState(Assignment::STATE_CANCELLED);
 
             $this->logBuffer[] = [
                 'message' => sprintf(

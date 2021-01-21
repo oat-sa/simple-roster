@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,15 +18,17 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Service;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\Infrastructure;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Exception\AssignmentNotFoundException;
-use App\Repository\AssignmentRepository;
-use App\Service\CompleteUserAssignmentService;
+namespace OAT\SimpleRoster\Tests\Unit\Service;
+
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\Infrastructure;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -67,7 +67,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -80,20 +79,20 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setAttemptsCount(1);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('persist')
-            ->with($this->callback(static function (Assignment $assignment) {
+            ->with(self::callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_COMPLETED;
             }));
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->markAssignmentAsCompleted(5);
@@ -104,7 +103,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug')
@@ -117,20 +115,20 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setAttemptsCount(1);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('persist')
-            ->with($this->callback(static function (Assignment $assignment) {
+            ->with(self::callback(static function (Assignment $assignment) {
                 return $assignment->getState() === Assignment::STATE_READY;
             }));
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $this->subject->markAssignmentAsCompleted(5);
@@ -141,7 +139,6 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = (new LineItem())
-            ->setInfrastructure(new Infrastructure())
             ->setUri('uri')
             ->setLabel('label')
             ->setSlug('slug');
@@ -152,13 +149,13 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setUser($user);
 
         $this->assignmentRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(5)
             ->willReturn($assignment);
 
         $this->logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('info')
             ->with(
                 "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",

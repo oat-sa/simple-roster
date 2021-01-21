@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,9 +18,11 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\EventSubscriber;
+declare(strict_types=1);
 
-use App\Request\RequestIdStorage;
+namespace OAT\SimpleRoster\EventSubscriber;
+
+use OAT\SimpleRoster\Request\RequestIdStorage;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

@@ -1,48 +1,80 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    app.api_key: '%env(resolve:APP_API_KEY)%'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
-    app.lti.key: '%env(resolve:LTI_KEY)%'
-    app.lti.secret: '%env(resolve:LTI_SECRET)%'
+    app.assignment_state_interval_threshold: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
+    app.cache.host: '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
+    app.cache.port: '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+    app.cache.ttl.get_user_with_assignments: '%env(int:CACHE_TTL_GET_USER_WITH_ASSIGNMENTS)%'
+    app.cache.ttl.lti_instance_list: '%env(int:CACHE_TTL_LTI_INSTANCES)%'
+    app.cache.ttl.get_line_item_by_id: '%env(int:CACHE_TTL_LINE_ITEM)%'
+    app.lti.version: '%env(resolve:LTI_VERSION)%'
+    app.lti.launch_presentation_return_url: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
+    app.lti.launch_presentation_locale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
+    app.lti1p1.load_balancing_strategy: '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+    app.lti1p3.registration_id: '%env(resolve:LTI1P3_REGISTRATION_ID)%'
+    app.lti.outcome_xml_namespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+    app.jwt.private_key_path: '%env(resolve:JWT_SECRET_KEY)%'
+    app.jwt.public_key_path: '%env(resolve:JWT_PUBLIC_KEY)%'
+    app.jwt.passphrase: '%env(resolve:JWT_PASSPHRASE)%'
+    app.jwt.access_token_ttl: '%env(int:JWT_ACCESS_TOKEN_TTL)%'
+    app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
+    app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
+    app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
 
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
         bind:
-            $debug: '%env(resolve:APP_DEBUG)%'
             $kernelEnvironment: '%kernel.environment%'
-            $ltiInstances: '%ltiInstances%'
-            $ltiLaunchPresentationReturnUrl: '%env(resolve:LTI_LAUNCH_PRESENTATION_RETURN_URL)%'
-            $ltiLaunchPresentationLocale: '%env(resolve:LTI_LAUNCH_PRESENTATION_LOCALE)%'
-            $ltiInstancesLoadBalancerEnabled: '%env(bool:LTI_ENABLE_INSTANCES_LOAD_BALANCER)%'
-            $appApiKey: '%env(resolve:APP_API_KEY)%'
-            $ltiKey: '%app.lti.key%'
-            $ltiSecret: '%app.lti.secret%'
+            $ltiLaunchPresentationReturnUrl: '%app.lti.launch_presentation_return_url%'
+            $ltiLaunchPresentationLocale: '%app.lti.launch_presentation_locale%'
+            $appApiKey: '%app.api_key%'
+            $userCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
+            $ltiInstancesCacheTtl: '%app.cache.ttl.lti_instance_list%'
+            $userWithAssignmentsCacheTtl: '%app.cache.ttl.get_user_with_assignments%'
+            $ltiVersion: '%app.lti.version%'
+            $ltiRegistrationId: '%app.lti1p3.registration_id%'
+            $jwtTokenCache: '@app.jwt_cache.adapter'
+            $jwtPrivateKeyPath: '%app.jwt.private_key_path%'
+            $jwtPublicKeyPath: '%app.jwt.public_key_path%'
+            $jwtPassphrase: '%app.jwt.passphrase%'
+            $jwtAccessTokenTtl: '%app.jwt.access_token_ttl%'
+            $jwtRefreshTokenTtl: '%app.jwt.refresh_token_ttl%'
+            $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
 
     _instanceof:
-        App\Ingester\Ingester\IngesterInterface:
-            tags: ['app.ingester']
-        App\Ingester\Source\IngesterSourceInterface:
-            tags: ['app.ingester_source']
-        App\EventListener\Doctrine\EntityListenerInterface:
+        OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
             tags: ['doctrine.orm.entity_listener']
 
-    app.session_storage.connection:
+    app.jwt_cache.connection:
         class: Redis
         calls:
-            -   method: connect
-                arguments:
-                    - '%env(resolve:REDIS_SESSION_CACHE_HOST)%'
-                    - '%env(int:REDIS_SESSION_CACHE_PORT)%'
+            - method: connect
+              arguments:
+                  - '%app.jwt.cache.host%'
+                  - '%app.jwt.cache.port%'
+
+    app.jwt_cache.adapter:
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            $redisClient: '@app.jwt_cache.connection'
 
     app.doctrine_cache.connection:
         class: Redis
         calls:
             -   method: connect
                 arguments:
-                    - '%env(resolve:REDIS_DOCTRINE_CACHE_HOST)%'
-                    - '%env(int:REDIS_DOCTRINE_CACHE_PORT)%'
+                    - '%app.cache.host%'
+                    - '%app.cache.port%'
 
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\RedisCache
@@ -51,43 +83,22 @@ services:
                 arguments:
                     - '@app.doctrine_cache.connection'
 
-    App\:
+    OAT\SimpleRoster\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Model,Migrations,Tests,Kernel.php}'
 
-    App\Action\:
+    OAT\SimpleRoster\Action\:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
 
-    App\Repository\UserRepository:
-        arguments:
-            $userCacheTtl: '%env(REDIS_DOCTRINE_USER_CACHE_TTL)%'
-
-    App\Ingester\Registry\IngesterRegistry:
-        arguments: [!tagged 'app.ingester']
-
-    App\Ingester\Registry\IngesterSourceRegistry:
-        arguments: [!tagged 'app.ingester_source']
-
-    App\Ingester\Source\S3CsvIngesterSource:
-        arguments:
-            $client: '@aws.s3'
-            $bucket: '%env(AWS_S3_INGEST_BUCKET)%'
-
-    App\EventSubscriber\UserCacheInvalidationSubscriber:
+    OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
         tags: ['doctrine.event_subscriber']
 
-    App\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
+    OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
         arguments:
-            $cleanUpInterval: '%env(ASSIGNMENT_STATE_INTERVAL_THRESHOLD)%'
+            $cleanUpInterval: '%app.assignment_state_interval_threshold%'
 
-    App\Command\Cache\DoctrineResultCacheWarmerCommand:
-        arguments:
-            $doctrineConfiguration: '@doctrine.orm.default_configuration'
-        tags:
-            - { name: monolog.logger, channel: cache_warmup }
-
-    App\Logger\UserRequestSessionLogProcessor:
+    OAT\SimpleRoster\Logger\UserRequestLogProcessor:
         tags:
             - { name: 'monolog.processor', channel: 'request' }
             - { name: 'monolog.processor', channel: 'app' }
@@ -97,14 +108,30 @@ services:
         arguments:
             - '@app.session_storage.connection'
 
-    App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
-        factory: '@App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
+    OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface:
+        factory: '@OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory'
         arguments:
-            - '%env(resolve:LTI_INSTANCE_LOAD_BALANCING_STRATEGY)%'
+            - '%app.lti1p1.load_balancing_strategy%'
+
+    OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor:
+        arguments:
+            $xmlNamespace: '%app.lti.outcome_xml_namespace%'
+
+    OAT\SimpleRoster\Storage\StorageRegistry:
+        public: true
+        arguments: [!tagged 'app.storage']
 
     Ramsey\Uuid\UuidFactoryInterface:
         class: Ramsey\Uuid\UuidFactory
 
-    App\Lti\Extractor\ReplaceResultSourceIdExtractor:
-        arguments:
-            $xmlNamespace: '%env(LTI_OUTCOME_XML_NAMESPACE)%'
+    OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory:
+        lazy: true
+
+    OAT\SimpleRoster\Lti\Factory\Lti1p3RequestFactory:
+        lazy: true
+
+    OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface:
+        factory: '@OAT\SimpleRoster\Lti\Builder\LtiRequestFactoryBuilder'
+
+    OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
+        class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator

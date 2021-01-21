@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Bulk\Operation;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
+namespace OAT\SimpleRoster\Tests\Unit\Bulk\Operation;
+
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use PHPUnit\Framework\TestCase;
 
 class BulkOperationCollectionTest extends TestCase
@@ -39,8 +39,8 @@ class BulkOperationCollectionTest extends TestCase
             ->add($operation1)
             ->add($operation2);
 
-        $this->assertCount(2, $subject);
-        $this->assertEquals(
+        self::assertCount(2, $subject);
+        self::assertSame(
             [
                 'identifier1' => $operation1,
                 'identifier2' => $operation2,

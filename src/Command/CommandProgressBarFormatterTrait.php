@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Command;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Command;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,9 +28,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 trait CommandProgressBarFormatterTrait
 {
     /** @var string */
-    public $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
+    protected $format = '<info>Progress:</info> %current%/%max% [%bar%] %percent:3s%% | ' .
+    ' <info>Time:</info> %elapsed:6s% / %estimated:-6s% | <info>Memory:</info> %memory:6s%';
 
-    public function createNewFormattedProgressBar(OutputInterface $output): ProgressBar
+    public function createFormattedProgressBar(OutputInterface $output): ProgressBar
     {
         $progressBar = new ProgressBar($output);
 

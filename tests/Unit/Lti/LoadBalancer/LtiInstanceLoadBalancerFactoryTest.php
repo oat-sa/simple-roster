@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,16 +18,24 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Lti\LoadBalancer;
+declare(strict_types=1);
 
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
-use App\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
-use App\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
+
 use LogicException;
+use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
+use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
+use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LtiInstanceLoadBalancerFactoryTest extends TestCase
 {
+    /** @var LtiInstanceRepository|MockObject */
+    private $ltiInstanceRepository;
+
     /** @var LtiInstanceLoadBalancerFactory */
     private $subject;
 
@@ -37,22 +43,35 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->subject = new LtiInstanceLoadBalancerFactory([]);
+        $this->ltiInstanceRepository = $this->createMock(LtiInstanceRepository::class);
+        $this->subject = new LtiInstanceLoadBalancerFactory($this->ltiInstanceRepository);
     }
 
     public function testItCanResolveUsernameLtiInstanceLoadBalancerStrategy(): void
     {
-        $this->assertInstanceOf(
+        $expectedCollectionToPass = new UniqueLtiInstanceCollection();
+        $this->ltiInstanceRepository
+            ->expects(self::once())
+            ->method('findAllAsCollection')
+            ->willReturn($expectedCollectionToPass);
+
+        self::assertInstanceOf(
             UsernameLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USERNAME)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME)
         );
     }
 
     public function testItCanResolveUserGroupIdLtiInstanceLoadBalancerStrategy(): void
     {
-        $this->assertInstanceOf(
+        $expectedCollectionToPass = new UniqueLtiInstanceCollection();
+        $this->ltiInstanceRepository
+            ->expects(self::once())
+            ->method('findAllAsCollection')
+            ->willReturn($expectedCollectionToPass);
+
+        self::assertInstanceOf(
             UserGroupIdLtiInstanceLoadBalancer::class,
-            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::LOAD_BALANCING_STRATEGY_USER_GROUP_ID)
+            call_user_func($this->subject, LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID)
         );
     }
 

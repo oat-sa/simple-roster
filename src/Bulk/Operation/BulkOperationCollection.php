@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Bulk\Operation;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Bulk\Operation;
 
 use ArrayIterator;
 use Countable;
@@ -31,7 +31,6 @@ class BulkOperationCollection implements IteratorAggregate, Countable
     /** @var BulkOperation[] */
     private $operations = [];
 
-
     public function add(BulkOperation $operation): self
     {
         $this->operations[$operation->getIdentifier()] = $operation;
@@ -39,21 +38,9 @@ class BulkOperationCollection implements IteratorAggregate, Countable
         return $this;
     }
 
-    public function clear(): self
-    {
-        $this->operations = [];
-
-        return $this;
-    }
-
-    public function count()
+    public function count(): int
     {
         return count($this->operations);
-    }
-
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
     }
 
     /**

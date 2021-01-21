@@ -1,8 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,40 +18,41 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\LoadBalancer;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
 
 use LogicException;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 
 class LtiInstanceLoadBalancerFactory
 {
-    public const LOAD_BALANCING_STRATEGY_USERNAME = 'username';
-    public const LOAD_BALANCING_STRATEGY_USER_GROUP_ID = 'userGroupId';
+    public const STRATEGY_USERNAME = 'username';
+    public const STRATEGY_USER_GROUP_ID = 'userGroupId';
 
     private const VALID_LOAD_BALANCING_STRATEGIES = [
-        self::LOAD_BALANCING_STRATEGY_USERNAME,
-        self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID,
+        self::STRATEGY_USERNAME,
+        self::STRATEGY_USER_GROUP_ID,
     ];
 
-    /** @var string[] */
-    private $ltiInstances;
+    /** @var LtiInstanceRepository */
+    private $ltiInstanceRepository;
 
-    public function __construct(array $ltiInstances)
+    public function __construct(LtiInstanceRepository $ltiInstanceRepository)
     {
-        $this->ltiInstances = $ltiInstances;
+        $this->ltiInstanceRepository = $ltiInstanceRepository;
     }
 
     /**
      * @throws LogicException
      */
-    public function __invoke(string $loadBalancingStrategy): LtiInstanceLoadBalancerInterface
+    public function __invoke(string $ltiLoadBalancingStrategy): LtiInstanceLoadBalancerInterface
     {
-        switch ($loadBalancingStrategy) {
-            case self::LOAD_BALANCING_STRATEGY_USERNAME:
-                return new UsernameLtiInstanceLoadBalancer($this->ltiInstances);
-
-            case self::LOAD_BALANCING_STRATEGY_USER_GROUP_ID:
-                return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstances);
-
+        switch ($ltiLoadBalancingStrategy) {
+            case self::STRATEGY_USERNAME:
+                return new UsernameLtiInstanceLoadBalancer($this->ltiInstanceRepository->findAllAsCollection());
+            case self::STRATEGY_USER_GROUP_ID:
+                return new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceRepository->findAllAsCollection());
             default:
                 throw new LogicException(
                     sprintf(

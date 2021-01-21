@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,9 +18,11 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Security\TokenExtractor;
+declare(strict_types=1);
 
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+namespace OAT\SimpleRoster\Tests\Unit\Security\TokenExtractor;
+
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,20 +42,20 @@ class AuthorizationHeaderTokenExtractorTest extends TestCase
     {
         $request = new Request();
 
-        $this->assertNull($this->subject->extract($request));
+        self::assertEmpty($this->subject->extract($request));
     }
 
     public function testExtractWithInvalidAuthorizationHeader(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'invalid']);
 
-        $this->assertNull($this->subject->extract($request));
+        self::assertEmpty($this->subject->extract($request));
     }
 
     public function testExtractWithValidAuthorizationHeader(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer 12345']);
 
-        $this->assertEquals('12345', $this->subject->extract($request));
+        self::assertSame('12345', $this->subject->extract($request));
     }
 }

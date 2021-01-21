@@ -1,0 +1,43 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Kernel.php"
+        ]
+    },
+    "timeout": 1000,
+    "logs": {
+        "text": "var/log/infection/infection.log",
+        "perMutator": "var/log/infection/per-mutator.md"
+    },
+    "mutators": {
+        "@default": true,
+        "CastString": false,
+        "CastBool": false,
+        "CastInt": false,
+        "DecrementInteger": false,
+        "global-ignoreSourceCodeByRegex": [
+            "\\$this->symfonyStyle->newLine.*",
+            ".*->isDryRun.*"
+        ],
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "\\$this->progressBar->.*",
+                "\\$this->symfonyStyle->title.*",
+                "\\$this->symfonyStyle->comment*",
+                ".*$->flush.*"
+            ]
+        },
+        "OneZeroInteger": {
+            "ignore": [
+                "OAT\\SimpleRoster\\Repository\\NativeAssignmentRepository::insertMultiple"
+            ]
+        }
+    },
+    "phpUnit": {
+        "customPath": "bin/phpunit"
+    },
+    "tmpDir": "var/cache/infection"
+}

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,28 +18,32 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Lti\Request;
+declare(strict_types=1);
 
-use App\Lti\Request\LtiRequest;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Request;
+
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\TestCase;
 
 class LtiRequestTest extends TestCase
 {
     public function testGettersPostConstruction(): void
     {
-        $subject = new LtiRequest('link', ['param1', 'param2']);
+        $subject = new LtiRequest('link', 'version', ['param1', 'param2']);
 
-        $this->assertEquals('link', $subject->getLink());
-        $this->assertEquals(['param1', 'param2'], $subject->getParameters());
+        self::assertSame('link', $subject->getLink());
+        self::assertSame('version', $subject->getVersion());
+        self::assertSame(['param1', 'param2'], $subject->getParameters());
     }
 
     public function testJsonSerialization(): void
     {
-        $subject = new LtiRequest('link', ['param1', 'param2']);
+        $subject = new LtiRequest('link', 'version', ['param1', 'param2']);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'ltiLink' => 'link',
+                'ltiVersion' => 'version',
                 'ltiParams' => ['param1', 'param2']
             ],
             $subject->jsonSerialize()

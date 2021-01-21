@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,13 +18,15 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\EventSubscriber;
+declare(strict_types=1);
 
-use App\Repository\InfrastructureRepository;
-use App\Security\OAuth\OAuthContext;
-use App\Security\OAuth\OAuthSignatureValidatedActionInterface;
-use App\Security\OAuth\OAuthSigner;
+namespace OAT\SimpleRoster\EventSubscriber;
+
 use Doctrine\ORM\NonUniqueResultException;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
+use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -36,28 +36,16 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 {
     public const AUTH_REALM = 'SimpleRoster';
 
-    /** @var InfrastructureRepository */
+    /** @var LtiInstanceRepository */
     private $repository;
 
     /** @var OAuthSigner */
     private $signer;
 
-    /** @var string */
-    private $ltiKey;
-
-    /** @var string */
-    private $ltiSecret;
-
-    public function __construct(
-        InfrastructureRepository $repository,
-        OAuthSigner $signer,
-        string $ltiKey,
-        string $ltiSecret
-    ) {
+    public function __construct(LtiInstanceRepository $repository, OAuthSigner $signer)
+    {
         $this->repository = $repository;
         $this->signer = $signer;
-        $this->ltiKey = $ltiKey;
-        $this->ltiSecret = $ltiSecret;
     }
 
     /**
@@ -81,7 +69,11 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if ((string)$request->query->get('oauth_consumer_key') !== $this->ltiKey) {
+        $ltiInstance = $this->repository->findByLtiKey(
+            (string)$request->query->get('oauth_consumer_key')
+        );
+
+        if (!$ltiInstance) {
             throw new UnauthorizedHttpException(
                 sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
             );
@@ -100,7 +92,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             $context,
             $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
             $request->getMethod(),
-            $this->ltiSecret
+            $ltiInstance->getLtiSecret()
         );
 
         if ($signature !== $request->query->get('oauth_signature')) {

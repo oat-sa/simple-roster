@@ -1,8 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,19 +18,22 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\LoadBalancer;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Lti\Exception\IndeterminableLtiInstanceUrlException;
-use App\Lti\Exception\IndeterminableLtiRequestContextIdException;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
+
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
+use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 
 interface LtiInstanceLoadBalancerInterface
 {
     /**
      * @throws IndeterminableLtiInstanceUrlException
      */
-    public function getLtiInstanceUrl(User $user): string;
+    public function getLtiInstance(User $user): LtiInstance;
 
     /**
      * @throws IndeterminableLtiRequestContextIdException

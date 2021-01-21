@@ -2,12 +2,14 @@ pipeline {
     agent {
         dockerfile {
             filename 'Dockerfile'
-            dir 'docker/jenkins'
+            dir 'docker/phpfpm'
             label 'builder'
         }
     }
     environment {
         HOME = '.'
+        APP_ENV="test"
+        APP_DEBUG="true"
     }
     stages {
         stage('Tests') {
@@ -30,15 +32,23 @@ pipeline {
                     script: './bin/console cache:warmup --env=test'
                 )
                 sh(
-                    label: 'Infection - Running mutation testing',
-                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=85 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                    label: 'Running static code analysis - PHP CodeSniffer',
+                    script: './vendor/bin/phpcs -p'
                 )
                 sh(
-                    label: 'PHPUnit - Checking test coverage',
+                    label: 'Running static code analysis - PHPMD',
+                    script: './vendor/bin/phpmd src,tests json phpmd.xml'
+                )
+                sh(
+                    label: 'Running testing suite - PHPUnit & Infection',
+                    script: 'XDEBUG_MODE=coverage && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
+                )
+                sh(
+                    label: 'Checking test coverage - PHPUnit',
                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
                 )
                 sh(
-                    label: 'PHPStan - Running static code analysis',
+                    label: 'Running static code analysis - PHPStan',
                     script: './vendor/bin/phpstan analyse --level=max'
                 )
             }

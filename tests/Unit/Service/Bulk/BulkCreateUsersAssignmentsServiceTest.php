@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,19 +18,22 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Service\Bulk;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Service\Bulk\BulkCreateUsersAssignmentsService;
+namespace OAT\SimpleRoster\Tests\Unit\Service\Bulk;
+
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
@@ -71,7 +72,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->setLineItem(new LineItem()));
 
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
+            ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($user) {
                 return $user->setUsername($username);
             });
@@ -83,7 +84,15 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add($expectedFailingOperation)
             ->add($successfulOperation);
 
-        $this->assertEquals([
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Bulk assignments create error: wrong type.',
+                ['operation' => $expectedFailingOperation],
+            );
+
+        self::assertSame([
             'data' => [
                 'applied' => false,
                 'results' => [
@@ -94,14 +103,43 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
     }
 
-    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    public function testItLogsUnexpectedException(): void
     {
         $this->userRepository
-            ->method('getByUsernameWithAssignments')
-            ->willReturnCallback(static function (string $username) {
+            ->method('findByUsernameWithAssignments')
+            ->willThrowException(new RuntimeException('Something unexpected happened'));
+
+        $expectedOperation = new BulkOperation('testUser', BulkOperation::TYPE_CREATE);
+        $bulkOperationCollection = (new BulkOperationCollection())->add($expectedOperation);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Bulk assignments create error: Something unexpected happened',
+                ['operation' => $expectedOperation]
+            );
+
+        self::assertSame([
+            'data' => [
+                'applied' => false,
+                'results' => [
+                    'testUser' => false,
+                ],
+            ],
+        ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
+    }
+
+    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
+    {
+        $expectedLineItem = new LineItem();
+
+        $this->userRepository
+            ->method('findByUsernameWithAssignments')
+            ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
                 return (new User())
                     ->setUsername($username)
-                    ->addAssignment((new Assignment())->setLineItem(new LineItem()));
+                    ->addAssignment((new Assignment())->setLineItem($expectedLineItem));
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -110,8 +148,26 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
+
+        $this->logger
+            ->expects(self::exactly(3))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    "Successful assignment creation (username = 'test').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment creation (username = 'test1').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+                [
+                    "Successful assignment creation (username = 'test2').",
+                    ['lineItem' => $expectedLineItem],
+                ],
+            );
 
         $this->subject->process($bulkOperationCollection);
     }

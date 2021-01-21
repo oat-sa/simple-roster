@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Security\OAuth;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Security\OAuth;
 
 use InvalidArgumentException;
 
@@ -68,14 +68,14 @@ class OAuthSigner
         ksort($parameters, SORT_STRING);
 
         foreach ($parameters as $name => $value) {
-            $encodedParameters[] = $this->encode($name) . '=' . $this->encode($value);
+            $encodedParameters[] = $this->encode((string)$name) . '=' . $this->encode((string)$value);
         }
 
         return implode('&', $encodedParameters);
     }
 
-    private function encode($value): string
+    private function encode(string $value): string
     {
-        return str_replace(['%7E', '+'], ['~', ' '], rawurlencode((string)$value));
+        return str_replace(['%7E', '+'], ['~', ' '], rawurlencode($value));
     }
 }

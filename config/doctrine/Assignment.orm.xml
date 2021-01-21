@@ -1,28 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This program is free software; you can redistribute it and/or
+  ~  modify it under the terms of the GNU General Public License
+  ~  as published by the Free Software Foundation; under version 2
+  ~  of the License (non-upgradable).
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program; if not, write to the Free Software
+  ~  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+  ~
+  ~  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+  -->
+
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="App\Repository\AssignmentRepository" name="App\Entity\Assignment" table="assignments">
+    <entity repository-class="OAT\SimpleRoster\Repository\AssignmentRepository" name="OAT\SimpleRoster\Entity\Assignment" table="assignments">
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="assignments_id_seq" allocation-size="1" initial-value="1"/>
         </id>
-        <field name="state" type="string" column="state" length="255" precision="0" scale="0" nullable="false"/>
+        <field name="state" column="state" length="255" precision="0" scale="0"/>
         <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
         <field name="attemptsCount" type="integer" column="attempts_count" precision="0" scale="0" nullable="true">
             <options>
                 <option name="default">0</option>
             </options>
         </field>
-        <many-to-one field="user" target-entity="App\Entity\User" inversed-by="assignments" fetch="LAZY">
+        <field name="lineItemId" type="integer" column="line_item_id" precision="0" scale="0" nullable="false"/>
+        <many-to-one field="user" target-entity="OAT\SimpleRoster\Entity\User" inversed-by="assignments" fetch="LAZY">
             <cascade>
                 <cascade-persist/>
             </cascade>
             <join-columns>
-                <join-column name="user_id" referenced-column-name="id"/>
+                <join-column name="user_id" referenced-column-name="id" nullable="false"/>
             </join-columns>
         </many-to-one>
-        <many-to-one field="lineItem" target-entity="App\Entity\LineItem" fetch="EAGER">
+        <many-to-one field="lineItem" target-entity="OAT\SimpleRoster\Entity\LineItem" fetch="LAZY">
             <join-columns>
                 <join-column name="line_item_id" referenced-column-name="id"/>
             </join-columns>
@@ -30,5 +49,10 @@
         <lifecycle-callbacks>
             <lifecycle-callback type="preUpdate" method="refreshUpdatedAt"/>
         </lifecycle-callbacks>
+        <entity-listeners>
+            <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\LineItemLoaderListener">
+                <lifecycle-callback type="postLoad" method="postLoad"/>
+            </entity-listener>
+        </entity-listeners>
     </entity>
 </doctrine-mapping>

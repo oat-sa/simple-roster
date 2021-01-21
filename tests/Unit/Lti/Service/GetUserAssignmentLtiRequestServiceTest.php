@@ -20,58 +20,34 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Lti\Service;
+namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
-use App\Entity\User;
-use App\Exception\AssignmentNotProcessableException;
-use App\Generator\NonceGenerator;
-use App\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
-use App\Lti\Service\GetUserAssignmentLtiRequestService;
-use App\Security\OAuth\OAuthSigner;
 use Carbon\Carbon;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
+use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\RouterInterface;
 
 class GetUserAssignmentLtiRequestServiceTest extends TestCase
 {
     /** @var GetUserAssignmentLtiRequestService */
     private $subject;
 
-    /** @var LtiInstanceLoadBalancerInterface|MockObject */
-    private $loadBalancer;
-
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
-
-    /** @var bool */
-    private $ltiInstancesLoadBalancerEnabled;
+    /** @var Lti1p1RequestFactory|MockObject  */
+    private $ltiRequestFactory;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ltiLaunchPresentationReturnUrl = 'http://example.com/index.html';
-        $this->ltiLaunchPresentationLocale = 'fr-FR';
-        $this->ltiInstancesLoadBalancerEnabled = true;
-        $this->loadBalancer = $this->createMock(LtiInstanceLoadBalancerInterface::class);
+        $this->ltiRequestFactory = $this->createMock(Lti1p1RequestFactory::class);
 
-        $this->subject = new GetUserAssignmentLtiRequestService(
-            $this->createMock(OAuthSigner::class),
-            $this->createMock(NonceGenerator::class),
-            $this->createMock(RouterInterface::class),
-            $this->loadBalancer,
-            $this->ltiLaunchPresentationReturnUrl,
-            $this->ltiLaunchPresentationLocale,
-            $this->ltiInstancesLoadBalancerEnabled,
-            'testLtiKey',
-            'testLtiSecret'
-        );
+        $this->subject = new GetUserAssignmentLtiRequestService($this->ltiRequestFactory);
     }
 
     /**
@@ -92,6 +68,10 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $assignment
             ->setLineItem($lineItem)
             ->setState($nonSuitableAssignmentStatus);
+
+        $this->ltiRequestFactory
+            ->expects(self::never())
+            ->method('create');
 
         $this->subject->getAssignmentLtiRequest($assignment);
     }
@@ -120,6 +100,10 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setLineItem($lineItem)
             ->setState($assignmentStatus)
             ->setAttemptsCount($attemptsCount);
+
+        $this->ltiRequestFactory
+            ->expects(self::never())
+            ->method('create');
 
         $this->subject->getAssignmentLtiRequest($assignment);
     }
@@ -153,40 +137,14 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setAttemptsCount($attemptsCount)
             ->setState($assignmentStatus);
 
-        $expectedLtiContextId = 'expectedLtiContextId';
+        $this->ltiRequestFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with($assignment);
 
-        $this->loadBalancer
-            ->expects($this->once())
-            ->method('getLtiRequestContextId')
-            ->with($assignment)
-            ->willReturn($expectedLtiContextId);
+        $ltiRequest = $this->subject->getAssignmentLtiRequest($assignment);
 
-        $this->assertSame(
-            [
-                'ltiLink' => '/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtZGVsaXZlcnktdXJpLmh0bWwifQ==',
-                'ltiParams' => [
-                    'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'testLtiKey',
-                    'oauth_nonce' => '',
-                    'oauth_signature' => '',
-                    'oauth_signature_method' => 'HMAC-SHA1',
-                    'oauth_timestamp' => (string)Carbon::now()->timestamp,
-                    'oauth_version' => '1.0',
-                    'lti_message_type' => 'basic-lti-launch-request',
-                    'lti_version' => 'LTI-1p0',
-                    'context_id' => $expectedLtiContextId,
-                    'roles' => 'Learner',
-                    'user_id' => 'testUsername',
-                    'lis_person_name_full' => 'testUsername',
-                    'resource_link_id' => 5,
-                    'lis_outcome_service_url' => null,
-                    'lis_result_sourcedid' => 5,
-                    'launch_presentation_return_url' => $this->ltiLaunchPresentationReturnUrl,
-                    'launch_presentation_locale' => $this->ltiLaunchPresentationLocale,
-                ],
-            ],
-            $this->subject->getAssignmentLtiRequest($assignment)->jsonSerialize()
-        );
+        self::assertInstanceOf(LtiRequest::class, $ltiRequest);
 
         Carbon::setTestNow();
     }

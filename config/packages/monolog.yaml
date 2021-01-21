@@ -1,12 +1,15 @@
 monolog:
+    channels: ["cache_warmup"]
     handlers:
         main:
-            type: stream
+            type: rotating_file
+            max_files: 5
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event"]
+            channels: ["!event", "!messenger"]
         cache_warmup:
-            level: debug
-            type: stream
+            type: rotating_file
+            max_files: 5
             path: '%kernel.logs_dir%/cache-warmup.%kernel.environment%.log'
+            level: debug
             channels: ['cache_warmup']

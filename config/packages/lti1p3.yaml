@@ -1,0 +1,33 @@
+lti1p3:
+    scopes:
+        - 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
+    key_chains:
+        platformKey:
+            key_set_name: 'platformSet'
+            public_key: 'file://%kernel.project_dir%/config/secrets/public.key'
+            private_key: 'file://%kernel.project_dir%/config/secrets/private.key'
+            private_key_passphrase: null
+    platforms:
+        platform:
+            name: 'Platform'
+            audience: '%env(LTI1P3_PLATFORM_AUDIENCE)%'
+            oidc_authentication_url: '%env(LTI1P3_PLATFORM_OIDC_AUTHENTICATION_URL)%'
+            oauth2_access_token_url: '%env(LTI1P3_PLATFORM_OAUTH2_ACCESS_TOKEN_URL)%'
+    tools:
+        tool:
+            name: 'Tool'
+            audience: '%env(LTI1P3_TOOL_AUDIENCE)%'
+            oidc_initiation_url: '%env(LTI1P3_TOOL_OIDC_INITIATION_URL)%'
+            launch_url: '%env(LTI1P3_TOOL_LAUNCH_URL)%'
+            deep_linking_url: null
+    registrations:
+        simpleRoster:
+            client_id: '%env(LTI1P3_TOOL_CLIENT_ID)%'
+            platform: 'platform'
+            tool: 'tool'
+            deployment_ids:
+                - '1'
+            platform_key_chain: 'platformKey'
+            tool_key_chain: null
+            platform_jwks_url: null
+            tool_jwks_url: '%env(LTI1P3_TOOL_JWKS_URL)%'

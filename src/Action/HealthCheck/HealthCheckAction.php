@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Action\HealthCheck;
+declare(strict_types=1);
 
-use App\Responder\SerializerResponder;
-use App\Service\HealthCheck\HealthCheckService;
+namespace OAT\SimpleRoster\Action\HealthCheck;
+
+use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\HealthCheck\HealthCheckService;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckAction

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Entity;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Entity;
 
 use Carbon\Carbon;
 use DateTime;
@@ -67,6 +67,9 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var int */
     private $attemptsCount = 0;
 
+    /** @var int */
+    private $lineItemId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class Assignment implements JsonSerializable, EntityInterface
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getLineItemId(): int
+    {
+        return $this->lineItemId;
+    }
+
+    public function setLineItemId(int $lineItemId): self
+    {
+        $this->lineItemId = $lineItemId;
 
         return $this;
     }
@@ -127,7 +142,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function isCancelled(): bool
+    private function isCancelled(): bool
     {
         return $this->state === self::STATE_CANCELLED;
     }
@@ -135,6 +150,16 @@ class Assignment implements JsonSerializable, EntityInterface
     public function isCancellable(): bool
     {
         return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
+    }
+
+    private function isAvailableForDate(): bool
+    {
+        return $this->getLineItem()->isAvailableForDate(Carbon::now()->toDateTime());
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->getLineItem()->isActive() && !$this->isCancelled() && $this->isAvailableForDate();
     }
 
     public function getAttemptsCount(): int
@@ -161,12 +186,10 @@ class Assignment implements JsonSerializable, EntityInterface
         $maxAttempts = $this->getLineItem()->getMaxAttempts();
 
         if ($maxAttempts === 0 || $this->getAttemptsCount() < $maxAttempts) {
-            $this->setState(self::STATE_READY);
-        } else {
-            $this->setState(self::STATE_COMPLETED);
+            return $this->setState(self::STATE_READY);
         }
 
-        return $this;
+        return $this->setState(self::STATE_COMPLETED);
     }
 
     public function jsonSerialize(): array

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,13 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Service\HealthCheck;
+declare(strict_types=1);
 
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\HealthCheck\HealthCheckResult;
+namespace OAT\SimpleRoster\Service\HealthCheck;
+
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
+use OAT\SimpleRoster\HealthCheck\HealthCheckResult;
 
 class HealthCheckService
 {

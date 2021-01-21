@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,12 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Repository;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
+namespace OAT\SimpleRoster\Repository;
+
 use DateTime;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\Assignment;
 
 /**
  * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)
@@ -43,7 +43,7 @@ class AssignmentRepository extends AbstractRepository
     /**
      * @return Paginator|Assignment[]
      */
-    public function findAllByStateAndUpdatedAtPaginated(
+    public function findByStateAndUpdatedAtPaged(
         string $state,
         DateTime $updatedAt,
         int $offset = null,

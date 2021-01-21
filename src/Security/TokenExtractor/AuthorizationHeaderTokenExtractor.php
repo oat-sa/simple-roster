@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Security\TokenExtractor;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Security\TokenExtractor;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -29,10 +29,10 @@ class AuthorizationHeaderTokenExtractor
     public const AUTHORIZATION_HEADER = 'Authorization';
     public const AUTHORIZATION_HEADER_PREFIX = 'Bearer';
 
-    public function extract(Request $request): ?string
+    public function extract(Request $request): string
     {
         if (!$request->headers->has(self::AUTHORIZATION_HEADER)) {
-            return null;
+            return '';
         }
 
         $authorizationHeader = (string)$request->headers->get(self::AUTHORIZATION_HEADER);
@@ -40,7 +40,7 @@ class AuthorizationHeaderTokenExtractor
         $headerParts = explode(' ', $authorizationHeader);
 
         if (!(2 === count($headerParts) && 0 === strcasecmp($headerParts[0], self::AUTHORIZATION_HEADER_PREFIX))) {
-            return null;
+            return '';
         }
 
         return $headerParts[1];

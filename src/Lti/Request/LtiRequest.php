@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,25 +18,32 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\Request;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Lti\Request;
 
 use JsonSerializable;
 
 class LtiRequest implements JsonSerializable
 {
     public const LTI_MESSAGE_TYPE = 'basic-lti-launch-request';
-    public const LTI_VERSION = 'LTI-1p0';
+    public const LTI_VERSION_1P1 = '1.1.1';
+    public const LTI_VERSION_1P3 = '1.3.0';
     public const LTI_ROLE = 'Learner';
 
     /** @var string */
     private $link;
 
+    /** @var string */
+    private $version;
+
     /** @var array  */
     private $parameters;
 
-    public function __construct(string $link, array $parameters)
+    public function __construct(string $link, string $version, array $parameters)
     {
         $this->link = $link;
+        $this->version = $version;
         $this->parameters = $parameters;
     }
 
@@ -47,15 +52,21 @@ class LtiRequest implements JsonSerializable
         return $this->link;
     }
 
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
+
     public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'ltiLink' => $this->link,
+            'ltiVersion' => $this->version,
             'ltiParams' => $this->parameters,
         ];
     }

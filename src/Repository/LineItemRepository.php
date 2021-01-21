@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,21 +18,94 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Repository;
+declare(strict_types=1);
 
-use App\Entity\LineItem;
-use Doctrine\Common\Persistence\ManagerRegistry;
+namespace OAT\SimpleRoster\Repository;
+
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
+use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 
 /**
  * @method LineItem|null find($id, $lockMode = null, $lockVersion = null)
  * @method LineItem|null findOneBy(array $criteria, array $orderBy = null)
- * @method LineItem[]    findAll()
  * @method LineItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class LineItemRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    /** @var int */
+    private $lineItemCacheTtl;
+
+    /** @var LineItemCacheIdGenerator */
+    private $cacheIdGenerator;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        LineItemCacheIdGenerator $cacheIdGenerator,
+        int $lineItemCacheTtl
+    ) {
         parent::__construct($registry, LineItem::class);
+        $this->cacheIdGenerator = $cacheIdGenerator;
+        $this->lineItemCacheTtl = $lineItemCacheTtl;
+    }
+
+    public function findAllAsCollection(): LineItemCollection
+    {
+        $collection = new LineItemCollection();
+        /** @var LineItem $lineItem */
+        foreach ($this->findAll() as $lineItem) {
+            $collection->add($lineItem);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOneById(int $id): LineItem
+    {
+        $lineItem = $this->createQueryBuilder('l')
+            ->select('l')
+            ->where('l.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
+            ->getOneOrNullResult();
+
+        if (null === $lineItem) {
+            throw new EntityNotFoundException(sprintf("LineItem with id = '%d' cannot be found.", $id));
+        }
+
+        return $lineItem;
+    }
+
+    public function findLineItemsByCriteria(FindLineItemCriteria $criteria): LineItemCollection
+    {
+        $queryBuilder = $this->createQueryBuilder('l')
+            ->select('l');
+
+        if ($criteria->hasLineItemIdsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.id IN (:ids)')
+                ->setParameter('ids', $criteria->getLineItemIds());
+        }
+
+        if ($criteria->hasLineItemSlugsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.slug IN (:slugs)')
+                ->setParameter('slugs', $criteria->getLineItemSlugs());
+        }
+
+        $lineItemsCollection = new LineItemCollection();
+        $result = $queryBuilder->getQuery()->getResult();
+        foreach ($result as $row) {
+            $lineItemsCollection->add($row);
+        }
+
+        return $lineItemsCollection;
     }
 }

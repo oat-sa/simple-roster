@@ -1,25 +1,23 @@
 .idea/
-.php_cs.cache
 
 ###> symfony/framework-bundle ###
-.env
 /.env.local
 /.env.local.php
 /.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/.php_cs.cache
+###< squizlabs/php_codesniffer ###
 
-###> symfony/web-server-bundle ###
-/.web-server-pid
-###< symfony/web-server-bundle ###
-
-/infection.json
-/phpstan.neon
-
-###> phpunit/phpunit ###
-/phpunit.xml
+###> symfony/phpunit-bridge ###
+.phpunit
 .phpunit.result.cache
-bin/.phpunit
-###< phpunit/phpunit ###
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+config/secrets/

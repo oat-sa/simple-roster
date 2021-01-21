@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\EventListener\Doctrine;
+declare(strict_types=1);
 
-use App\Entity\User;
-use App\EventListener\Doctrine\UserPasswordEncoderListener;
+namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
+
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -50,11 +50,11 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('encodePassword');
 
         $entity
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setPassword');
 
         $this->subject->prePersist($entity);
@@ -67,14 +67,14 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('encodePassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
         $this->subject->prePersist($entity);
 
-        $this->assertEquals(
+        self::assertSame(
             'encodedPassword',
             $entity->getPassword()
         );
@@ -87,14 +87,14 @@ class UserPasswordEncoderListenerTest extends TestCase
 
         $this
             ->userPasswordEncoderMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('encodePassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
         $this->subject->preUpdate($entity);
 
-        $this->assertEquals(
+        self::assertSame(
             'encodedPassword',
             $entity->getPassword()
         );

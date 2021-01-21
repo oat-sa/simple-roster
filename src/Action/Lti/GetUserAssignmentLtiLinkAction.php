@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,15 +18,18 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Action\Lti;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\AssignmentNotFoundException;
-use App\Exception\AssignmentNotProcessableException;
-use App\Lti\Service\GetUserAssignmentLtiRequestService;
-use App\Responder\SerializerResponder;
+namespace OAT\SimpleRoster\Action\Lti;
+
 use Doctrine\ORM\EntityManagerInterface;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
+use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -90,6 +91,8 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
+        } catch (AssignmentUnavailableException $exception) {
+            throw new ConflictHttpException($exception->getMessage());
         } catch (AssignmentNotProcessableException $exception) {
             throw new ConflictHttpException($exception->getMessage());
         }

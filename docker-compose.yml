@@ -29,38 +29,27 @@ services:
             - 9000
         networks:
             - simple-roster
+            - oat-docker
         volumes:
             - .:/var/www/html:cached
             - $COMPOSER_HOME:/root/.composer
         working_dir: /var/www/html
 
-    simple-roster-doctrine-redis:
-        container_name: simple-roster-doctrine-redis
+    simple-roster-redis:
+        container_name: simple-roster-redis
         image: redis
         command: ["redis-server", "--appendonly", "yes"]
-        hostname: simple-roster-doctrine-redis
+        hostname: simple-roster-redis
         networks:
             - simple-roster
         ports:
             - 6379
         volumes:
-            - simple-roster-doctrine-redis-volume:/data
-
-    simple-roster-session-redis:
-        container_name: simple-roster-session-redis
-        image: redis
-        command: ["redis-server", "--appendonly", "yes"]
-        hostname: simple-roster-session-redis
-        networks:
-            - simple-roster
-        ports:
-            - 6379
-        volumes:
-            - simple-roster-session-redis-volume:/data
+            - simple-roster-redis-volume:/data
 
     simple-roster-postgres:
         container_name: simple-roster-postgres
-        image: postgres:9.5.15
+        image: postgres
         networks:
             - simple-roster
         ports:
@@ -84,9 +73,7 @@ services:
             - BLACKFIRE_SERVER_TOKEN
 
 volumes:
-    simple-roster-doctrine-redis-volume:
-        driver: local
-    simple-roster-session-redis-volume:
+    simple-roster-redis-volume:
         driver: local
     simple-roster-postgres-volume:
         driver: local

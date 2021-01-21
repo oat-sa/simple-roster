@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,12 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Entity;
+declare(strict_types=1);
 
-use App\Exception\AssignmentNotFoundException;
-use Carbon\Carbon;
+namespace OAT\SimpleRoster\Entity;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface
@@ -117,6 +117,23 @@ class User implements UserInterface, EntityInterface
         return $this->assignments;
     }
 
+    /**
+     * @return Collection|Assignment[]
+     */
+    public function getCancellableAssignments(): Collection
+    {
+        $assignments = $this->getAssignments();
+
+        $list = new ArrayCollection();
+        foreach ($assignments as $assignment) {
+            if ($assignment->isCancellable()) {
+                $list->add($assignment);
+            }
+        }
+
+        return $list;
+    }
+
     public function addAssignment(Assignment $assignment): self
     {
         if (!$this->assignments->contains($assignment)) {
@@ -147,14 +164,9 @@ class User implements UserInterface, EntityInterface
     public function getAvailableAssignments(): array
     {
         $availableAssignments = [];
-        $now = Carbon::now()->toDateTime();
 
         foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->isCancelled()) {
-                continue;
-            }
-
-            if (!$assignment->getLineItem()->isAvailableForDate($now)) {
+            if (!$assignment->isAvailable()) {
                 continue;
             }
 
@@ -167,9 +179,9 @@ class User implements UserInterface, EntityInterface
     /**
      * @throws AssignmentNotFoundException
      */
-    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    public function getAssignmentById(int $assignmentId): Assignment
     {
-        foreach ($this->getAvailableAssignments() as $assignment) {
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->getId() === $assignmentId) {
                 return $assignment;
             }
@@ -177,6 +189,23 @@ class User implements UserInterface, EntityInterface
 
         throw new AssignmentNotFoundException(
             sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+        );
+    }
+
+    /**
+     * @throws AssignmentNotFoundException
+     * @throws AssignmentUnavailableException
+     */
+    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    {
+        $assignment = $this->getAssignmentById($assignmentId);
+
+        if ($assignment->isAvailable()) {
+            return $assignment;
+        }
+
+        throw new AssignmentUnavailableException(
+            sprintf("Assignment with id '%s' for user '%s' is unavailable.", $assignmentId, $this->getUsername())
         );
     }
 
@@ -196,9 +225,10 @@ class User implements UserInterface, EntityInterface
     /**
      * @see UserInterface
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         // not needed when using the "argon2i" algorithm in security.yaml
+        return null;
     }
 
     /**

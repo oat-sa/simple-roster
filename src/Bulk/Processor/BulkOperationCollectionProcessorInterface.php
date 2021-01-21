@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Bulk\Processor;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Bulk\Result\BulkResult;
+namespace OAT\SimpleRoster\Bulk\Processor;
+
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
 
 interface BulkOperationCollectionProcessorInterface
 {

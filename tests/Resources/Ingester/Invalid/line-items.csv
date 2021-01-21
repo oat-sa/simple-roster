@@ -1,5 +1,0 @@
-uri,label,slug,infrastructure,startTimestamp,endTimestamp,maxAttempts
-http://taoplatform.loc/delivery_1.rdf,label1,gra13_ita_1,infra_1,1546682400,1546713000,0
-http://taoplatform.loc/delivery_2.rdf,label2,gra13_ita_1,infra_2,1546682400,1546713000,0
-http://taoplatform.loc/delivery_3.rdf,label3,gra13_ita_1,infra_3,,1546713000,0
-http://taoplatform.loc/delivery_4.rdf,label4,gra13_ita_1,infra_4,1546682400,,0

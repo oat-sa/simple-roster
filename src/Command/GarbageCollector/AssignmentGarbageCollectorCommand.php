@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,14 +18,17 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Command\GarbageCollector;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Repository\AssignmentRepository;
+namespace OAT\SimpleRoster\Command\GarbageCollector;
+
+use ArrayIterator;
 use Carbon\Carbon;
 use DateInterval;
 use Exception;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,7 +67,7 @@ class AssignmentGarbageCollectorCommand extends Command
         $this->cleanUpInterval = new DateInterval($cleanUpInterval);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -130,15 +131,21 @@ class AssignmentGarbageCollectorCommand extends Command
     {
         $numberOfCollectedAssignments = 0;
         do {
-            $stuckAssignments = $this->assignmentRepository->findAllByStateAndUpdatedAtPaginated(
+            $stuckAssignments = $this->assignmentRepository->findByStateAndUpdatedAtPaged(
                 Assignment::STATE_STARTED,
                 Carbon::now()->subtract($this->cleanUpInterval)->toDateTime(),
                 0,
                 $batchSize
             );
 
+            /** @var ArrayIterator $stuckAssignmentsIterator */
+            $stuckAssignmentsIterator = $stuckAssignments->getIterator();
+            $assignmentCount = $stuckAssignmentsIterator->count();
+
+            $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected " .
+                "and marked as '%s' by garbage collector.";
+
             /** @var Assignment $assignment */
-            $assignmentCount = $stuckAssignments->getIterator()->count();
             foreach ($stuckAssignments as $assignment) {
                 $assignment->complete();
 
@@ -149,7 +156,7 @@ class AssignmentGarbageCollectorCommand extends Command
                 $numberOfCollectedAssignments++;
                 $this->logger->info(
                     sprintf(
-                        "Assignment with id='%s' of user with username='%s' has been collected and marked as '%s' by garbage collector.",
+                        $logMessagePlaceholder,
                         $assignment->getId(),
                         $assignment->getUser()->getUsername(),
                         $assignment->getState()

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Action\Assignment;
+declare(strict_types=1);
 
-use App\Entity\User;
-use App\Responder\SerializerResponder;
+namespace OAT\SimpleRoster\Action\Assignment;
+
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 

@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,26 +18,41 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\EventSubscriber;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Exception\DoctrineResultCacheImplementationNotFoundException;
-use App\Generator\UserCacheIdGenerator;
-use App\Repository\UserRepository;
+namespace OAT\SimpleRoster\EventSubscriber;
+
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Model\UsernameCollection;
+use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class UserCacheInvalidationSubscriber implements EventSubscriber
 {
+    /** @var UserCacheWarmerService */
+    private $userCacheWarmerService;
+
     /** @var UserCacheIdGenerator */
     private $userCacheIdGenerator;
 
-    public function __construct(UserCacheIdGenerator $userCacheIdGenerator)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        UserCacheWarmerService $userCacheWarmerService,
+        UserCacheIdGenerator $userCacheIdGenerator,
+        LoggerInterface $cacheWarmupLogger
+    ) {
+        $this->userCacheWarmerService = $userCacheWarmerService;
         $this->userCacheIdGenerator = $userCacheIdGenerator;
+        $this->logger = $cacheWarmupLogger;
     }
 
     public function getSubscribedEvents()
@@ -49,58 +63,50 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     }
 
     /**
-     * @throws DoctrineResultCacheImplementationNotFoundException
+     * @throws Throwable
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $entityManager = $eventArgs->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
-        $scheduledEntityChanges = [
-            'insert' => $unitOfWork->getScheduledEntityInsertions(),
-            'update' => $unitOfWork->getScheduledEntityUpdates(),
-            'delete' => $unitOfWork->getScheduledEntityDeletions(),
-        ];
-        foreach ($scheduledEntityChanges as $entities) {
-            foreach ($entities as $entity) {
-                if ($entity instanceof User) {
-                    $this->clearUserCache($entity, $entityManager);
-                } elseif ($entity instanceof Assignment) {
-                    $this->clearUserCache($entity->getUser(), $entityManager);
-                }
+        $usersToInvalidate = [];
+        foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
+            if ($entity instanceof User) {
+                $usersToInvalidate[$entity->getUsername()] = $entity;
+            } elseif ($entity instanceof Assignment) {
+                $usersToInvalidate[$entity->getUser()->getUsername()] = $entity->getUser();
             }
+        }
+
+        /** @var CacheProvider $resultCacheImplementation */
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+
+        /** @var User $user */
+        foreach ($usersToInvalidate as $user) {
+            $this->clearUserCache($user, $resultCacheImplementation);
         }
     }
 
     /**
-     * @throws DoctrineResultCacheImplementationNotFoundException
+     * @throws Throwable
      */
-    private function clearUserCache(User $user, EntityManager $entityManager): void
+    private function clearUserCache(User $user, CacheProvider $resultCacheImplementation): void
     {
-        $resultCacheImplementation = $entityManager
-            ->getConfiguration()
-            ->getResultCacheImpl();
+        $username = (string)$user->getUsername();
+        $cacheKey = $this->userCacheIdGenerator->generate($username);
+        $resultCacheImplementation->delete($cacheKey);
 
-        if ($resultCacheImplementation === null) {
-            throw new DoctrineResultCacheImplementationNotFoundException(
-                'Doctrine result cache implementation is not configured.'
-            );
-        }
+        $this->logger->info(
+            sprintf(
+                "Cache for user '%s' was successfully invalidated.",
+                $username
+            ),
+            [
+                'cacheKey' => $cacheKey,
+            ]
+        );
 
-        $resultCacheImplementation->delete($this->userCacheIdGenerator->generate((string)$user->getUsername()));
-        $this->warmUserCache($user, $entityManager);
-    }
-
-    private function warmUserCache(User $user, EntityManager $entityManager): void
-    {
-        if ($entityManager->getUnitOfWork()->isInIdentityMap($user)) {
-            // Repository must be instantiated here because lazy loading is not available for doctrine event
-            // subscribers. Injecting it in constructor leads to circular reference in DI container.
-            /** @var UserRepository $userRepository * */
-            $userRepository = $entityManager->getRepository(User::class);
-
-            // Refresh by query
-            $userRepository->getByUsernameWithAssignments((string)$user->getUsername());
-        }
+        $this->userCacheWarmerService->process((new UsernameCollection())->add($username));
     }
 }

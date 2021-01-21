@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Bulk\Operation;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Bulk\Operation;
 
 class BulkOperation
 {
@@ -32,9 +32,6 @@ class BulkOperation
 
     /** @var string */
     private $type;
-
-    /** @var bool */
-    private $isDryRun = false;
 
     /** @var string[] */
     private $attributes;
@@ -54,18 +51,6 @@ class BulkOperation
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function isDryRun(): bool
-    {
-        return $this->isDryRun;
-    }
-
-    public function setIsDryRun(bool $isDryRun): self
-    {
-        $this->isDryRun = $isDryRun;
-
-        return $this;
     }
 
     public function getAttributes(): array

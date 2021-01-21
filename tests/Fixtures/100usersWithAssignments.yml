@@ -1,21 +1,12 @@
-App\Entity\Infrastructure:
-    infrastructure:
-        label: 'The first infrastructure'
-        ltiDirectorLink: 'http://lti-director.com'
-        ltiKey: 'myKey'
-        ltiSecret: 'mySecret'
-
-App\Entity\LineItem:
+OAT\SimpleRoster\Entity\LineItem:
     lineItem:
-        infrastructure: '@infrastructure'
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug'
+        slug: 'lineItemSlug1'
         startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
     lineItem2:
-        infrastructure: '@infrastructure'
         label: 'The second line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug2'
@@ -23,15 +14,14 @@ App\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
     lineItem3:
-        infrastructure: '@infrastructure'
         label: 'The third line item'
-        uri: 'http://lineitemuri.com'
+        uri: 'http://different-lineitemuri.com'
         slug: 'lineItemSlug3'
         startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
 
-App\Entity\Assignment:
+OAT\SimpleRoster\Entity\Assignment:
     assignment_{1..50}:
         lineItem: '@lineItem'
         state: 'ready'
@@ -42,7 +32,7 @@ App\Entity\Assignment:
         lineItem: '@lineItem3'
         state: 'ready'
 
-App\Entity\User:
+OAT\SimpleRoster\Entity\User:
     user_{1..100}:
         username: 'user_<current()>'
         plainPassword: 'password'

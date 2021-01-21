@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Security\Authenticator;
+declare(strict_types=1);
 
-use App\Security\Authenticator\ApiKeyAuthenticator;
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+namespace OAT\SimpleRoster\Tests\Unit\Security\Authenticator;
+
+use OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +39,7 @@ class ApiKeyAuthenticatorTest extends TestCase
             'key'
         );
 
-        $this->assertFalse($subject->supportsRememberMe());
+        self::assertFalse($subject->supportsRememberMe());
     }
 
     public function testItThrowsExceptionUnauthorizedExceptionOnAuthenticationError(): void

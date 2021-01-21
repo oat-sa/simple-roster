@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Responder;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Responder;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
@@ -34,16 +35,19 @@ class SerializerResponder
 
     /** @var SerializerInterface */
     private $serializer;
-    
-    /** @var bool */
-    private $debug;
 
-    public function __construct(SerializerInterface $serializer, bool $debug = false)
+    /** @var KernelInterface */
+    private $kernel;
+
+    public function __construct(SerializerInterface $serializer, KernelInterface $kernel)
     {
         $this->serializer = $serializer;
-        $this->debug = $debug;
+        $this->kernel = $kernel;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function createJsonResponse($data, int $statusCode = Response::HTTP_OK, array $headers = []): JsonResponse
     {
         return JsonResponse::fromJsonString(
@@ -53,15 +57,18 @@ class SerializerResponder
         );
     }
 
-    public function createErrorJsonResponse(Throwable $exception, int $statusCode = 500, array $headers = []): JsonResponse
-    {
+    public function createErrorJsonResponse(
+        Throwable $exception,
+        int $statusCode = 500,
+        array $headers = []
+    ): JsonResponse {
         $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : $statusCode;
 
         $content = [
-            'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE
+            'message' => $statusCode < 500 ? $exception->getMessage() : self::DEFAULT_ERROR_MESSAGE,
         ];
 
-        if ($this->debug) {
+        if ($this->kernel->isDebug()) {
             $content['message'] = $exception->getMessage();
             $content['trace'] = $exception->getTraceAsString();
         }

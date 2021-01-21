@@ -2,5 +2,28 @@ services:
     _defaults:
         public: true
 
+    test.line_item_repository:
+        alias: OAT\SimpleRoster\Repository\LineItemRepository
+        public: true
+
+    test.lti_repository:
+        alias: OAT\SimpleRoster\Repository\LtiInstanceRepository
+        public: true
+
+    test.user_repository:
+        alias: OAT\SimpleRoster\Repository\UserRepository
+        public: true
+
+    test.jwt_parser:
+        alias: Lcobucci\JWT\Parser
+        public: true
+
     app.doctrine_cache.provider:
         class: Doctrine\Common\Cache\ArrayCache
+
+    test.uid_generator:
+        alias: Ramsey\Uuid\UuidFactoryInterface
+        public: true
+
+    app.jwt_cache.adapter:
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,29 +18,29 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Traits;
+declare(strict_types=1);
 
-use App\Entity\User;
+namespace OAT\SimpleRoster\Tests\Traits;
+
+use OAT\SimpleRoster\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\HttpFoundation\Request;
 
 trait UserAuthenticatorTrait
 {
-    protected function logInAs(User $user, KernelBrowser $kernelBrowser): void
+    protected function logInAs(User $user, KernelBrowser $kernelBrowser): array
     {
-        /** @var Session $session */
-        $session = $kernelBrowser->getContainer()->get('session');
+        $kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/auth/token',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            (string)json_encode(['username' => $user->getUsername(), 'password' => $user->getPlainPassword()])
+        );
 
-        // the firewall context defaults to the firewall name
-        $firewallContext = 'api';
-
-        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
-        $session->set('_security_' . $firewallContext, serialize($token));
-        $session->save();
-
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $kernelBrowser->getCookieJar()->set($cookie);
+        return (array)json_decode($this->kernelBrowser->getResponse()->getContent(), true);
     }
 }

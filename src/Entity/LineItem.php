@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,7 +18,9 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Entity;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Entity;
 
 use DateTimeInterface;
 use JsonSerializable;
@@ -39,17 +39,17 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var string */
     private $slug;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $startAt;
 
-    /** @var DateTimeInterface */
+    /** @var DateTimeInterface|null */
     private $endAt;
-
-    /** @var Infrastructure */
-    private $infrastructure;
 
     /** @var int */
     private $maxAttempts = 0;
+
+    /** @var bool */
+    private $isActive = true;
 
     public function getId(): ?int
     {
@@ -97,7 +97,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt;
     }
 
-    public function setStartAt(DateTimeInterface $startAt): self
+    public function setStartAt(?DateTimeInterface $startAt): self
     {
         $this->startAt = $startAt;
 
@@ -109,21 +109,9 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->endAt;
     }
 
-    public function setEndAt(DateTimeInterface $endAt): self
+    public function setEndAt(?DateTimeInterface $endAt): self
     {
         $this->endAt = $endAt;
-
-        return $this;
-    }
-
-    public function getInfrastructure(): Infrastructure
-    {
-        return $this->infrastructure;
-    }
-
-    public function setInfrastructure(Infrastructure $infrastructure): self
-    {
-        $this->infrastructure = $infrastructure;
 
         return $this;
     }
@@ -154,14 +142,26 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->maxAttempts !== 0;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
+            'isActive' => $this->isActive(),
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
-            'infrastructure' => $this->getInfrastructure()->getId(),
             'maxAttempts' => $this->getMaxAttempts(),
         ];
     }

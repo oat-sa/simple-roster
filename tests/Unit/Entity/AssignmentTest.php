@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Entity;
+namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use App\Entity\Assignment;
-use App\Entity\LineItem;
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
 
 class AssignmentTest extends TestCase
@@ -51,7 +51,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertEquals(
+        self::assertSame(
             Assignment::STATE_COMPLETED,
             $this->subject->getState()
         );
@@ -65,7 +65,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertEquals(
+        self::assertSame(
             Assignment::STATE_READY,
             $this->subject->getState()
         );
@@ -79,7 +79,7 @@ class AssignmentTest extends TestCase
 
         $this->subject->complete();
 
-        $this->assertEquals(
+        self::assertSame(
             Assignment::STATE_READY,
             $this->subject->getState()
         );

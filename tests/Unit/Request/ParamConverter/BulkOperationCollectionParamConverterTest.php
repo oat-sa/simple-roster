@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Request\ParamConverter;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperationCollection;
-use App\Request\ParamConverter\BulkOperationCollectionParamConverter;
+namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
+
+use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use PHPUnit\Framework\TestCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
@@ -43,7 +43,7 @@ class BulkOperationCollectionParamConverterTest extends TestCase
 
     public function testItIsAParamConverter(): void
     {
-        $this->assertInstanceOf(ParamConverterInterface::class, $this->subject);
+        self::assertInstanceOf(ParamConverterInterface::class, $this->subject);
     }
 
     public function testItSupportsBulkOperationCollection(): void
@@ -51,7 +51,7 @@ class BulkOperationCollectionParamConverterTest extends TestCase
         $paramConverter = new ParamConverter([]);
         $paramConverter->setClass(BulkOperationCollection::class);
 
-        $this->assertTrue($this->subject->supports($paramConverter));
+        self::assertTrue($this->subject->supports($paramConverter));
     }
 
     public function testItSetsBulkOperationAsRequestAttribute(): void
@@ -67,7 +67,7 @@ class BulkOperationCollectionParamConverterTest extends TestCase
         $requestBodyContent = json_encode([
             ['identifier' => 'user1'],
             ['identifier' => 'user2'],
-        ]);
+        ], JSON_THROW_ON_ERROR, 512);
 
         $request = Request::create(
             '/test',
@@ -81,13 +81,13 @@ class BulkOperationCollectionParamConverterTest extends TestCase
 
         $this->subject->apply($request, $paramConverter);
 
-        $this->assertTrue($request->attributes->has($expectedParameterName));
+        self::assertTrue($request->attributes->has($expectedParameterName));
 
         /** @var BulkOperationCollection $bulkOperationCollection */
         $bulkOperationCollection = $request->attributes->get($expectedParameterName);
 
-        $this->assertInstanceOf(BulkOperationCollection::class, $bulkOperationCollection);
+        self::assertInstanceOf(BulkOperationCollection::class, $bulkOperationCollection);
 
-        $this->assertCount(2, $bulkOperationCollection);
+        self::assertCount(2, $bulkOperationCollection);
     }
 }

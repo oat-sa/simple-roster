@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,13 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Integration\Entity;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\User;
-use App\Tests\Traits\DatabaseTestingTrait;
+namespace OAT\SimpleRoster\Tests\Integration\Entity;
+
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserTest extends KernelTestCase
@@ -49,14 +49,14 @@ class UserTest extends KernelTestCase
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
 
-        $this->assertCount(1, $subject->getAssignments());
-        $this->assertCount(1, $subject->getAvailableAssignments());
+        self::assertCount(1, $subject->getAssignments());
+        self::assertCount(1, $subject->getAvailableAssignments());
 
-        $this->assertSame($assignment, current($subject->getAvailableAssignments()));
+        self::assertSame($assignment, current($subject->getAvailableAssignments()));
 
         $subject->removeAssignment($assignment);
 
-        $this->assertEmpty($subject->getAssignments());
-        $this->assertEmpty($subject->getAvailableAssignments());
+        self::assertEmpty($subject->getAssignments());
+        self::assertEmpty($subject->getAvailableAssignments());
     }
 }

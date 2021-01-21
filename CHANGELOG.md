@@ -1,25 +1,76 @@
 # Changelog
 
+## 2.0.0 - 2021-01-21
+
+### Added
+- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
+- Added [roster:ingest:lti-instance](docs/cli/lti-instance-ingester-command.md) command.
+- Added [roster:ingest:line-item](docs/cli/line-item-ingester-command.md) command.
+- Added [roster:ingest:user](docs/cli/user-ingester-command.md) command.
+- Added [roster:ingest:assignment](docs/cli/assignment-ingester-command.md) command.
+- Added [roster:cache-warmup:lti-instance](docs/cli/lti-instance-cache-warmer-command.md) command.
+- Added [roster:cache-warmup:line-item](docs/cli/line-item-cache-warmer-command.md) command.
+- Added [roster:cache-warmup:user](docs/cli/user-cache-warmer-command.md) command.
+- Added [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command.
+- Added [roster:modify-entity:line-item:change-state](docs/cli/modify-entity-line-item-change-state-command.md) command.
+- Added possibility to use multiple filesystem instances with the help of [Storage registry](docs/storage-registry.md).
+- Added possibility to launch assignments with [LTI 1.3](http://www.imsglobal.org/spec/lti/v1p3/).
+- Added possibility to process a `basic outcome replaceResult` request using LTI 1.3 flow.
+- Added `LTI_VERSION` environment variable to control version we are working (1.1.1 or 1.3.0).
+- Added `CACHE_TTL_LINE_ITEM` environment variable.
+- Added environment variables specific for [LTI 1.3](docs/devops-documentation.md).
+- Added `WEBHOOK_BASIC_AUTH_USERNAME` and `WEBHOOK_BASIC_AUTH_PASSWORD` environment variables.
+- Added possibility to profile CLI commands and HTTP calls with [Blackfire](docs/blackfire.md).
+- Added static code analysis with PHPStan, PHP Mess Detector and PHP CodeSniffer to pull request CI pipeline.
+- Added possibility to update line items via WebHook Endpoint: `/v1/web-hooks/update-line-items`
+
+### Changed
+- Raised minimum required PHP version from `7.2` to `7.3`.
+- Upgraded Symfony framework version from `4` to `5`.
+- `REDIS_DOCTRINE_USER_CACHE_TTL` environment variable has been renamed to `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS`.
+- Renamed `.env.dist` to `.env` based on [Symfony recommendations](https://symfony.com/doc/current/configuration/dot-env-changes.html).
+- Merged `simple-roster-doctrine-redis` and `simple-roster-session-redis` docker containers to ease development.
+- Application namespace has been changed from `App\` to `OAT\SimpleRoster\`.
+- Changed `APP_ROUTE_PREFIX` variable to exclude API version from it. Corresponding changes made to the `routes.yaml`/`security.yaml`
+- Changed security flow to use JWT for api endpoints. Everything under `^%app.route_prefix%/v1/` except `healthcheck` and `bulk` endpoints is affected
+- Changed login endpoint for JWT auth. Now it is not `^%app.route_prefix%/v1/auth/login`, but `^%app.route_prefix%/v1/auth/token`
+- Renamed `UpdateLtiOutcomeAction` to `UpdateLti1p1OutcomeAction` for consistency.
+- Changed security settings to use basic authentication on webhook endpoint.
+- Moved health check endpoint to API root.
+
+### Removed
+- Removed `roster:ingest` command.
+- Removed `roster:native-ingest:user` command.
+- Removed `roster:cache:warmup` command.
+- Removed `roster:assignments:bulk-create` command.
+- Removed `roster:assignments:bulk-cancel` command.
+- Removed `lti_instances.yaml` configuration file.
+- Removed `LTI_KEY`, `LTI_SECRET` and `LTI_ENABLE_INSTANCES_LOAD_BALANCER` environment variables.
+
+### Fixed
+- Fixed HTTP code returned in case assignment exists but unavailable for `getUserAssignmentLtiLink` endpoint.
+- Fixed response on `UpdateLti1p1OutcomeAction` to return valid XML on success.
+
 ## 1.8.1 - 2020-10-27
 
 ### Changed
-- Switched from offset based pagination to cursor based in `DoctrineResultCacheWarmerCommand` for better performance.
-- Switched from ORM to native queries in `NativeUserIngesterCommand` for better performance.
+- Switched from offset based pagination to cursor based in `roster:cache:warmup` command for better performance.
+- Switched from ORM to native queries in [roster:ingest:user](docs/cli/user-ingester-command.md) command for better performance.
 
 ### Fixed
-- Fixed bug in `DoctrineResultCacheWarmerCommand` where lack of order by clause caused wrong pagination with PostgreSQL.
+- Fixed bug in `roster:cache:warmup` command where lack of order by clause caused wrong pagination with PostgreSQL.
 - Fixed `OAuthSignatureValidationSubscriber` to read LTI credentials from configuration instead of database.
 
 ## 1.8.0 - 2020-10-08
 
 ### Added
 - Added possibility to specify LTI key and secret through environment variables.
-- Added `modulo` and `remainder` options to `DoctrineResultCacheWarmerCommand` for parallelized cache warmups. More info [here](docs/cli/doctrine-result-cache-warmer-command.md#advanced-usage).
+- Added `modulo` and `remainder` options to `roster:cache:warmup` command for parallelized cache warmups. More info [here](docs/cli/cache-warmer-command.md#advanced-usage).
 - Added separate log channel for cache warmup for better trackability of failed cache warmups.
-- Added possibility to ingest multiple assignments per user with `NativeUserIngesterCommand`. More details [here](docs/cli/native-user-ingester-command.md#user-ingestion-with-multiple-assignments).
+- Added possibility to ingest multiple assignments per user with [roster:ingest:user](docs/cli/user-ingester-command.md) command. More details [here](docs/cli/user-ingester-command.md#user-ingestion-with-multiple-assignments).
 
 ### Changed
-- Performance improvement of `NativeUserIngesterCommand` by counting the number of users by using process component.
+- Performance improvement of [roster:ingest:user](docs/cli/user-ingester-command.md) command by counting the number of users by using process component.
 
 ## 1.7.0 - 2020-09-16
 
@@ -100,13 +151,13 @@
 ## 1.4.1 - 2019-08-08
 
 ### Fixed
-- Fixed missing User `groupId` handling in `NativeUserIngesterCommand`.
+- Fixed missing User `groupId` handling in [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Fixed PHPUnit version to `<8.3` because of https://github.com/symfony/symfony/issues/32879.
 
 ## 1.4.0 - 2019-07-23
 
 ### Added
-- Added `force` parameter to `NativeUserIngesterCommand`
+- Added `force` parameter to [roster:ingest:user](docs/cli/user-ingester-command.md) command.
 - Added possibility to determine the `contextId` LTI request parameter based on LTI load balancing strategy.
 
 ### Fixed
@@ -116,7 +167,7 @@
 
 ### Added
 - Added `groupId` property to `User` entity for logical grouping of users.
-- Added possibility to warm up result cache by line item ids or user ids in `DoctrineResultCacheWarmerCommand`.
+- Added possibility to warm up result cache by line item ids or user ids in `roster:cache:warmup` command.
 - Introduced LTI load balancing interface, implemented `User` group id based LTI load balancing strategy.
 
 ### Changed

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,12 +18,14 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Generator;
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Generator;
 
 class UserCacheIdGenerator
 {
     public function generate(string $username): string
     {
-        return sprintf('user_%s', hash('sha256', $username));
+        return sprintf('user.%s', $username);
     }
 }

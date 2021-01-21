@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,9 +18,11 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\EventSubscriber;
+declare(strict_types=1);
 
-use App\EventSubscriber\OAuthSignatureValidationSubscriber;
+namespace OAT\SimpleRoster\Tests\Unit\EventSubscriber;
+
+use OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -30,7 +30,7 @@ class OAuthSignatureValidationSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertSame(
             [KernelEvents::CONTROLLER => 'onKernelController'],
             OAuthSignatureValidationSubscriber::getSubscribedEvents()
         );

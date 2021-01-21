@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,11 +18,13 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Security\Provider;
+declare(strict_types=1);
 
-use App\Entity\User;
-use App\Repository\UserRepository;
+namespace OAT\SimpleRoster\Security\Provider;
+
 use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -48,10 +48,10 @@ class UserProvider implements UserProviderInterface
     /**
      * @throws UsernameNotFoundException
      */
-    public function loadUserByUsername($username): UserInterface
+    public function loadUserByUsername(string $username): UserInterface
     {
         try {
-            return $this->userRepository->getByUsernameWithAssignments($username);
+            return $this->userRepository->findByUsernameWithAssignments($username);
         } catch (ORMException $exception) {
             throw new UsernameNotFoundException(sprintf("Username '%s' does not exist", $username));
         }
@@ -70,7 +70,7 @@ class UserProvider implements UserProviderInterface
         // We dont refresh user on logout since we rely on session storage, so no need to reload it from database
         if ($this->requestStack->getCurrentRequest()->attributes->get('_route') !== 'logout') {
             try {
-                return $this->userRepository->getByUsernameWithAssignments((string)$user->getUsername());
+                return $this->userRepository->findByUsernameWithAssignments((string)$user->getUsername());
             } catch (ORMException $exception) {
                 throw new UsernameNotFoundException(sprintf("User '%s' could not be reloaded", $user->getUsername()));
             }
@@ -79,7 +79,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function supportsClass($class): bool
+    public function supportsClass(string $class): bool
     {
         return User::class === $class;
     }

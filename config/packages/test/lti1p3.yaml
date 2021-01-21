@@ -1,0 +1,36 @@
+lti1p3:
+    key_chains:
+        platformKey:
+            key_set_name: 'platformSet'
+            public_key: 'file://%kernel.project_dir%/config/secrets/test/public.key'
+            private_key: 'file://%kernel.project_dir%/config/secrets/test/private.key'
+            private_key_passphrase: ~
+        toolKey:
+            key_set_name: 'toolSet'
+            public_key: 'file://%kernel.project_dir%/config/secrets/test/public.key'
+            private_key: 'file://%kernel.project_dir%/config/secrets/test/private.key'
+            private_key_passphrase: ~
+    platforms:
+        testPlatform:
+            name: 'Test platform'
+            audience: 'https://localhost/platform'
+            oidc_authentication_url: 'https://localhost/lti1p3/oidc/authentication'
+            oauth2_access_token_url: 'http://localhost/lti1p3/auth/platformKey/token'
+    tools:
+        testTool:
+            name: 'Test tool'
+            audience: 'http://localhost/tool'
+            oidc_initiation_url: 'http://localhost/lti1p3/oidc/initiation'
+            launch_url: 'http://localhost/tool/launch'
+            deep_linking_url: null
+    registrations:
+        testRegistration:
+            client_id: 'test'
+            platform: 'testPlatform'
+            tool: 'testTool'
+            deployment_ids:
+                - '1'
+            platform_key_chain: 'platformKey'
+            tool_key_chain: 'toolKey'
+            platform_jwks_url: ~
+            tool_jwks_url: ~

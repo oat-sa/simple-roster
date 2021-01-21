@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Tests\Unit\Bulk\Result;
+declare(strict_types=1);
 
-use App\Bulk\Operation\BulkOperation;
-use App\Bulk\Result\BulkResult;
+namespace OAT\SimpleRoster\Tests\Unit\Bulk\Result;
+
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
+use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use PHPUnit\Framework\TestCase;
 
 class BulkResultTest extends TestCase
@@ -39,7 +39,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationSuccess($operation2);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => true,
@@ -64,7 +64,7 @@ class BulkResultTest extends TestCase
             ->addBulkOperationSuccess($operation1)
             ->addBulkOperationFailure($operation2);
 
-        $this->assertEquals(
+        self::assertSame(
             [
                 'data' => [
                     'applied' => false,

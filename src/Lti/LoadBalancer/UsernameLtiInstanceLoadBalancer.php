@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,16 +18,19 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Lti\LoadBalancer;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Entity\User;
+namespace OAT\SimpleRoster\Lti\LoadBalancer;
+
+use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Entity\User;
 
 class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
-    public function getLtiInstanceUrl(User $user): string
+    public function getLtiInstance(User $user): LtiInstance
     {
-        return $this->getLoadBalancedLtiInstanceUrl((string)$user->getUsername());
+        return $this->computeLtiInstanceByString((string)$user->getUsername());
     }
 
     public function getLtiRequestContextId(Assignment $assignment): string

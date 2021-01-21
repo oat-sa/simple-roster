@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,10 +18,12 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Security\Authenticator;
+declare(strict_types=1);
 
-use App\Entity\User;
-use App\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
+namespace OAT\SimpleRoster\Security\Authenticator;
+
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -49,6 +49,9 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         $this->appApiKey = $appApiKey;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function supports(Request $request): bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
@@ -61,26 +64,41 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         return new User();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function checkCredentials($credentials, UserInterface $user): bool
     {
         return $credentials['token'] === $this->appApiKey;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
         return null;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         throw $this->createUnauthorizedHttpException($exception);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         throw $this->createUnauthorizedHttpException($authException);

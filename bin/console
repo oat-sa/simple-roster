@@ -1,17 +1,26 @@
 #!/usr/bin/env php
 <?php
 
-use App\Kernel;
+declare(strict_types=1);
+
+use Blackfire\Client;
+use Blackfire\ClientConfiguration;
+use OAT\SimpleRoster\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Debug\Debug;
+use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
+
+if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL;
+}
 
 set_time_limit(0);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-if (!class_exists(Application::class)) {
-    throw new RuntimeException('You need to add "symfony/framework-bundle" as a Composer dependency.');
+if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
+    throw new LogicException('You need to add "symfony/framework-bundle" and "symfony/dotenv" as Composer dependencies.');
 }
 
 $input = new ArgvInput();
@@ -23,7 +32,7 @@ if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG=' . $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-require dirname(__DIR__) . '/config/bootstrap.php';
+(new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
@@ -33,6 +42,24 @@ if ($_SERVER['APP_DEBUG']) {
     }
 }
 
+$isBlackfireProfilingRequested =
+    $_ENV['BLACKFIRE_ENABLED'] == true
+    && $input->hasParameterOption('--blackfire', true);
+
+if ($isBlackfireProfilingRequested) {
+    $config = new ClientConfiguration(
+        $_ENV['BLACKFIRE_CLIENT_ID'],
+        $_ENV['BLACKFIRE_CLIENT_TOKEN']
+    );
+    $blackfire = new Client($config);
+    $probe = $blackfire->createProbe();
+}
+
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
 $application = new Application($kernel);
+
 $application->run($input);
+
+if ($isBlackfireProfilingRequested) {
+    $blackfire->endProbe($probe);
+}

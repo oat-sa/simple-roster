@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,14 +18,21 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Repository;
+declare(strict_types=1);
 
-use App\Entity\User;
-use App\Exception\InvalidUsernameException;
-use App\Generator\UserCacheIdGenerator;
-use Doctrine\Common\Persistence\ManagerRegistry;
+namespace OAT\SimpleRoster\Repository;
+
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
+use Exception;
+use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\InvalidUsernameException;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Model\UsernameCollection;
+use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
+use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -55,22 +60,20 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws InvalidUsernameException
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
-    public function getByUsernameWithAssignments(string $username): User
+    public function findByUsernameWithAssignments(string $username): User
     {
         if (empty($username)) {
             throw new InvalidUsernameException('Empty username received.');
         }
 
+        /** @var User|null $user */
         $user = $this
             ->createQueryBuilder('u')
-            ->select('u, a, l, i')
-            ->leftJoin('u.assignments', 'a')
-            ->leftJoin('a.lineItem', 'l')
-            ->leftJoin('l.infrastructure', 'i')
+            ->select('u, a')
+            ->innerJoin('u.assignments', 'a')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -82,5 +85,108 @@ class UserRepository extends AbstractRepository
         }
 
         return $user;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function findAllUsernamesPaged(
+        int $limit,
+        ?int $lastUserId,
+        FindUserCriteria $criteria = null
+    ): UsernameResultSet {
+        if ($limit < 1) {
+            throw new InvalidArgumentException("Invalid 'limit' parameter received.");
+        }
+
+        if (null === $criteria) {
+            $criteria = new FindUserCriteria();
+        }
+
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->distinct()
+            ->select('u.id', 'u.username')
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults($limit + 1);
+
+        if (null !== $lastUserId) {
+            $queryBuilder
+                ->andWhere('u.id > :lastUserId')
+                ->setParameter('lastUserId', $lastUserId);
+        }
+
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->innerJoin('u.assignments', 'a')
+                ->innerJoin('a.lineItem', 'l')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
+        }
+
+        $userIds = [];
+        $usernameCollection = new UsernameCollection();
+        $result = $queryBuilder->getQuery()->getResult();
+        foreach ($result as $row) {
+            if (count($usernameCollection) < $limit) {
+                $usernameCollection->add($row['username']);
+                $userIds[] = $row['id'];
+            }
+        }
+
+        return new UsernameResultSet(
+            $usernameCollection,
+            count($result) === $limit + 1,
+            $userIds[$limit - 1] ?? null
+        );
+    }
+
+    public function countByCriteria(FindUserCriteria $criteria = null): int
+    {
+        if (!$criteria) {
+            $criteria = new FindUserCriteria();
+        }
+
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('COUNT(u.id) AS number_of_users');
+
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->leftJoin('u.assignments', 'a')
+                ->leftJoin('a.lineItem', 'l')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->where('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
+        }
+
+        $result = $queryBuilder
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return null === $result ? 0 : (int)$result['number_of_users'];
     }
 }

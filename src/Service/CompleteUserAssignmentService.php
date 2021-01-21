@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,12 +18,13 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
-namespace App\Service;
+declare(strict_types=1);
 
-use App\Entity\Assignment;
-use App\Exception\AssignmentNotFoundException;
-use App\Repository\AssignmentRepository;
+namespace OAT\SimpleRoster\Service;
+
 use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService
