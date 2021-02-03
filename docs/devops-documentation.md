@@ -166,6 +166,12 @@ To generate public key:
 $ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
 ```
 
+Make sure you have right permissions:
+
+```shell script
+$ chown -R www-data: config/secrets/prod
+```
+
 ## Applying custom route prefix
 
 Custom route prefix can be defined via `APP_ROUTE_PREFIX` application environment. 
