@@ -54,16 +54,16 @@ The main configuration file is `.env`, located in root folder.
 
 1. Configure all LTI related environment variables in `.env` file described [here](features/lti.md).
 
-1. Optimize configuration file with [Composer](https://getcomposer.org/):
-
-    ```shell script
-    $ sudo -u www-data composer dump-env prod
-    ```
-
 1. Install application dependencies:
 
     ```shell script
     $ sudo -u www-data composer install --no-dev --no-scripts --optimize-autoloader
+    ```
+    
+1. Optimize configuration file with [Composer](https://getcomposer.org/):
+
+    ```shell script
+    $ sudo -u www-data composer dump-env prod
     ```
 
 1. Clear application cache:
