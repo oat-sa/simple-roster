@@ -104,7 +104,7 @@ The main configuration file is `.env`, located in root folder.
 1. Setup database schema:
 
     ```shell script
-    $ sudo -u www-data bin/console doctrine:database:update --force
+    $ sudo -u www-data bin/console doctrine:schema:update --force
     ``` 
 
 1. Ensure application is healthy by calling the healthcheck API endpoint:
