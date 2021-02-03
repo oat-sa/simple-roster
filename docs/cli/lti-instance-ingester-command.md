@@ -40,7 +40,7 @@ $ sudo -u www-data bin/console roster:ingest:lti-instance -h
 Here is an example csv structure: 
 
 ```csv
-label,ltiLink,ltiKey,ltiSecret],
+label,ltiLink,ltiKey,ltiSecret,
 infra_1,http://infra_1.com,key1,secret1
 infra_2,http://infra_2.com,key2,secret2
 infra_3,http://infra_3.com,key3,secret3
