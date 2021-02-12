@@ -35,6 +35,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p1LaunchUrlBuilder
 {
+    private const LTI_VERSION_REQUEST_STRING = 'LTI-1p0';
+
     /** @var RouterInterface */
     private $router;
 
@@ -86,7 +88,7 @@ class Lti1p1LaunchUrlBuilder
     {
         return [
             'lti_message_type' => LtiRequest::LTI_MESSAGE_TYPE,
-            'lti_version' => LtiRequest::LTI_VERSION_1P1,
+            'lti_version' => self::LTI_VERSION_REQUEST_STRING,
             'context_id' => $this->loadBalancer->getLtiRequestContextId($assignment),
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
