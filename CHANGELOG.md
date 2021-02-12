@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 - 2021-02-12
+
+### Changed
+- Used proper `lti_version` string for LTI 1.1 requests
+
 ## 2.0.0 - 2021-01-21
 
 ### Added
