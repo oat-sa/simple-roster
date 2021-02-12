@@ -70,31 +70,31 @@ Considering Simple Roster was configured to generate LTI 1.1.1 Links, this shoul
 
 ```json
 {
-	"ltiVersion": "1.1.1",
-		"ltiLink": "http://infra_1.com",
-		"ltiParams": {
-		"oauth_body_hash": "string",
-		"oauth_consumer_key": "string",
-		"oauth_nonce": "string",
-		"oauth_signature": "string",
-		"oauth_signature_method": "string",
-		"oauth_timestamp": "string",
-		"oauth_version": "string",
-		"lti_message_type": "string",
-		"lti_version": "string",
-		"context_id": 0,
-		"context_label": "string",
-		"context_title": "string",
-		"context_type": "string",
-		"roles": "string",
-		"user_id": 0,
-		"lis_person_name_full": "string",
-		"resource_link_id": 0,
-		"lis_outcome_service_url": "string",
-		"lis_result_sourcedid": 0,
-		"launch_presentation_return_url": "string",
-		"launch_presentation_locale": "it-IT"
-	}
+    "ltiVersion": "1.1.1",
+    "ltiLink": "http://infra_1.com",
+    "ltiParams": {
+        "oauth_body_hash": "string",
+        "oauth_consumer_key": "string",
+        "oauth_nonce": "string",
+        "oauth_signature": "string",
+        "oauth_signature_method": "string",
+        "oauth_timestamp": "string",
+        "oauth_version": "string",
+        "lti_message_type": "string",
+        "lti_version": "string",
+        "context_id": 0,
+        "context_label": "string",
+        "context_title": "string",
+        "context_type": "string",
+        "roles": "string",
+        "user_id": 0,
+        "lis_person_name_full": "string",
+        "resource_link_id": 0,
+        "lis_outcome_service_url": "string",
+        "lis_result_sourcedid": 0,
+        "launch_presentation_return_url": "string",
+        "launch_presentation_locale": "it-IT"
+    }
 }
 ```
 
@@ -150,8 +150,8 @@ Considering Simple Roster was configured to generate LTI 1.3.0 Links, this shoul
 
 ```json
 {
-	"ltiLink": "http://tool-url/lti1p3/oidc/initiation?extensive-list-of-parameters",
-	"ltiVersion": "1.3.0",
-	"ltiParams": []
+    "ltiLink": "http://tool-url/lti1p3/oidc/initiation?extensive-list-of-parameters",
+    "ltiVersion": "1.3.0",
+    "ltiParams": []
 }
 ```

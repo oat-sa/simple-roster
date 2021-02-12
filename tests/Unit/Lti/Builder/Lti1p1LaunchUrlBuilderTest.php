@@ -72,7 +72,7 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
         self::assertSame(
             [
                 'lti_message_type' => 'basic-lti-launch-request',
-                'lti_version' => '1.1.1',
+                'lti_version' => 'LTI-1p0',
                 'context_id' => 'contextId',
                 'roles' => 'Learner',
                 'user_id' => 'testUser',
