@@ -54,16 +54,16 @@ The main configuration file is `.env`, located in root folder.
 
 1. Configure all LTI related environment variables in `.env` file described [here](features/lti.md).
 
-1. Optimize configuration file with [Composer](https://getcomposer.org/):
-
-    ```shell script
-    $ sudo -u www-data composer dump-env prod
-    ```
-
 1. Install application dependencies:
 
     ```shell script
     $ sudo -u www-data composer install --no-dev --no-scripts --optimize-autoloader
+    ```
+    
+1. Optimize configuration file with [Composer](https://getcomposer.org/):
+
+    ```shell script
+    $ sudo -u www-data composer dump-env prod
     ```
 
 1. Clear application cache:
@@ -104,7 +104,7 @@ The main configuration file is `.env`, located in root folder.
 1. Setup database schema:
 
     ```shell script
-    $ sudo -u www-data bin/console doctrine:database:update --force
+    $ sudo -u www-data bin/console doctrine:schema:update --force
     ``` 
 
 1. Ensure application is healthy by calling the healthcheck API endpoint:
@@ -164,6 +164,12 @@ To generate public key:
 
 ```shell script
 $ openssl pkey -in config/secrets/prod/jwt_private.pem -out config/secrets/prod/jwt_public.pem -pubout
+```
+
+Make sure you have right permissions:
+
+```shell script
+$ chown -R www-data: config/secrets/prod
 ```
 
 ## Applying custom route prefix
