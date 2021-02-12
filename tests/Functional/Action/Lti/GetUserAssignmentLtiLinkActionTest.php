@@ -234,7 +234,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = '1.1.1';
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request(
@@ -296,7 +296,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = '1.1.1';
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request(
@@ -353,7 +353,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
-        $_ENV['LTI_VERSION'] = '1.1.1';
+        $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
