@@ -234,7 +234,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = 'LTI-1p0';
+        $_ENV['LTI_VERSION'] = '1.1.1';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
         $this->kernelBrowser->request(
@@ -251,12 +251,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => 'LTI-1p0',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => 'hQF/spzJlWW/8b6W8NxdBmXziWc=',
+                    'oauth_signature' => '5h5qQLR3LU+M3shVKcOrdhha42s=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -296,7 +296,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $_ENV['LTI_VERSION'] = 'LTI-1p0';
+        $_ENV['LTI_VERSION'] = '1.1.1';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
 
         $this->kernelBrowser->request(
@@ -313,12 +313,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => 'LTI-1p0',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => '5KYN42BiXP9LqFIK0YknnxbSMoM=',
+                    'oauth_signature' => '5OssBcbEHykois20vvMRjdtcwzE=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
@@ -353,7 +353,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
-        $_ENV['LTI_VERSION'] = 'LTI-1p0';
+        $_ENV['LTI_VERSION'] = '1.1.1';
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
@@ -380,12 +380,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
-                'ltiVersion' => 'LTI-1p0',
+                'ltiVersion' => LtiRequest::LTI_VERSION_1P1,
                 'ltiParams' => [
                     'oauth_body_hash' => '',
                     'oauth_consumer_key' => 'testLtiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
-                    'oauth_signature' => '4FmtcaSOQHjZBZRlbJ/PdUxba0g=',
+                    'oauth_signature' => 'HeoFoJdHRWQG0ceWzJs1wDuRklY=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
                     'oauth_timestamp' => (string)Carbon::getTestNow()->getTimestamp(),
                     'oauth_version' => OAuthContext::VERSION_1_0,
