@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.2 - TO BE RELEASED
+
+### Fixed
+- Fixed JWT token authentication to not support requests with `Authorization` header but no bearer token.
+
 ## 2.0.1 - 2021-02-12
 
 ### Fixed
