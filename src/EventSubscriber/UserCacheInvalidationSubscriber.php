@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
@@ -45,6 +46,9 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var User[] */
+    private $usersToInvalidate = [];
+
     public function __construct(
         UserCacheWarmerService $userCacheWarmerService,
         UserCacheIdGenerator $userCacheIdGenerator,
@@ -59,6 +63,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
     {
         return [
             Events::onFlush,
+            Events::postFlush,
         ];
     }
 
@@ -70,20 +75,25 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         $entityManager = $eventArgs->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
-        $usersToInvalidate = [];
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof User) {
-                $usersToInvalidate[$entity->getUsername()] = $entity;
+                $this->usersToInvalidate[$entity->getUsername()] = $entity;
             } elseif ($entity instanceof Assignment) {
-                $usersToInvalidate[$entity->getUser()->getUsername()] = $entity->getUser();
+                $this->usersToInvalidate[$entity->getUser()->getUsername()] = $entity->getUser();
             }
         }
+    }
 
+    /**
+     * @throws Throwable
+     */
+    public function postFlush(PostFlushEventArgs $eventArgs): void
+    {
+        $entityManager = $eventArgs->getEntityManager();
         /** @var CacheProvider $resultCacheImplementation */
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
-        /** @var User $user */
-        foreach ($usersToInvalidate as $user) {
+        foreach ($this->usersToInvalidate as $user) {
             $this->clearUserCache($user, $resultCacheImplementation);
         }
     }

@@ -119,6 +119,9 @@
     "fakerphp/faker": {
         "version": "v1.10.1"
     },
+    "friendsofphp/proxy-manager-lts": {
+        "version": "v1.0.3"
+    },
     "fzaninotto/faker": {
         "version": "v1.8.0"
     },
@@ -154,6 +157,15 @@
     },
     "justinrainbow/json-schema": {
         "version": "5.2.8"
+    },
+    "laminas/laminas-code": {
+        "version": "3.4.1"
+    },
+    "laminas/laminas-eventmanager": {
+        "version": "3.3.0"
+    },
+    "laminas/laminas-zendframework-bridge": {
+        "version": "1.1.1"
     },
     "lcobucci/jwt": {
         "version": "3.3.3"

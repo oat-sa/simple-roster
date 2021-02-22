@@ -3,12 +3,14 @@
 ## 2.0.2 - TO BE RELEASED
 
 ### Fixed
+- Fixed cache warmup logic to trigger on `postFlush` event instead of `onFlush` to guarantee database modifications being done before refreshing the cache.
 - Fixed JWT token authentication to not support requests with `Authorization` header but no bearer token.
+
 
 ## 2.0.1 - 2021-02-12
 
 ### Fixed
-- Used proper `lti_version` string for LTI 1.1 requests. We were trying to send it as `1.1.1` while TAO does support only `LTI-1p0` for LTI 1.x
+- Used proper `lti_version` string for LTI 1.1 requests. We were trying to send it as `1.1.1` while TAO does support only `LTI-1p0` for LTI 1.x.
 
 ## 2.0.0 - 2021-01-21
 
