@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\Lti;
 
-use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,8 +44,8 @@ class GetUserAssignmentLtiLinkAction
     /** @var GetUserAssignmentLtiRequestService */
     private $getUserAssignmentLtiRequestService;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
     /** @var LoggerInterface */
     private $logger;
@@ -53,12 +53,12 @@ class GetUserAssignmentLtiLinkAction
     public function __construct(
         SerializerResponder $responder,
         GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
-        EntityManagerInterface $entityManager,
+        AssignmentRepository $assignmentRepository,
         LoggerInterface $logger
     ) {
         $this->responder = $responder;
         $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
-        $this->entityManager = $entityManager;
+        $this->assignmentRepository = $assignmentRepository;
         $this->logger = $logger;
     }
 
@@ -75,10 +75,9 @@ class GetUserAssignmentLtiLinkAction
                 $assignment
                     ->setState(Assignment::STATE_STARTED)
                     ->incrementAttemptsCount();
-            }
 
-            $this->entityManager->persist($assignment);
-            $this->entityManager->flush();
+                $this->assignmentRepository->flush();
+            }
 
             $this->logger->info(
                 sprintf("LTI request was successfully generated for assignment with id='%s'", $assignmentId),
@@ -91,9 +90,7 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (AssignmentUnavailableException $exception) {
-            throw new ConflictHttpException($exception->getMessage());
-        } catch (AssignmentNotProcessableException $exception) {
+        } catch (AssignmentUnavailableException | AssignmentNotProcessableException $exception) {
             throw new ConflictHttpException($exception->getMessage());
         }
     }
