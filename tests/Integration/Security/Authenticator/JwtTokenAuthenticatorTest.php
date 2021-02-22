@@ -71,7 +71,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->jwtPassphrase = static::$container->getParameter('app.jwt.passphrase');
     }
 
-    public function testItSupportRequestOnlyWithAuthorizationHeaderPresent(): void
+    public function testItSupportRequestOnlyWithAuthorizationBearerHeaderPresent(): void
     {
         self::assertFalse($this->subject->supports(Request::create('/test')));
 
@@ -85,6 +85,25 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         );
 
         self::assertTrue($this->subject->supports($request));
+    }
+
+
+    /**
+     * @dataProvider provideUnsupportedAuthorizationHeaderPayload
+     */
+    public function testItDoesNotSupportRequestWithAuthorizationHeaderButNoBearerPayloadPrefix(
+        string $authorizationHeaderPayload
+    ): void {
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => $authorizationHeaderPayload]
+        );
+
+        self::assertFalse($this->subject->supports($request));
     }
 
     public function testItCanReturnCredentialsFromRequest(): void
@@ -205,5 +224,15 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     public function testItDoesNotSupportRememberMe(): void
     {
         self::assertFalse($this->subject->supportsRememberMe());
+    }
+
+    public function provideUnsupportedAuthorizationHeaderPayload(): array
+    {
+        return [
+            'nonBearer' => ['nonBearer Something'],
+            'empty' => [''],
+            'OAuth realm' => ['Oauth realm'],
+            'BearerWithEmptyToken' => ['Bearer '],
+        ];
     }
 }

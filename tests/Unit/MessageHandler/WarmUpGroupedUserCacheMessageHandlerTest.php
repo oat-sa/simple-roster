@@ -136,10 +136,6 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
             ->method('error')
             ->with($expectedExceptionMessage);
 
-        $this->entityManager
-            ->expects(self::once())
-            ->method('clear');
-
         $message = new WarmUpGroupedUserCacheMessage(['testUser']);
 
         try {

@@ -106,8 +106,6 @@ class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
                 $this->cacheWarmupLogger->error($errorLog);
 
                 throw $exception;
-            } finally {
-                $this->entityManager->clear();
             }
         }
     }

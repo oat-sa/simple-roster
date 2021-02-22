@@ -9,6 +9,7 @@
 - [Performance checklist (production)](https://symfony.com/doc/current/performance.html)
 - [CLI documentation](cli-documentation.md)
 - [LTI configuration](features/lti.md)
+- [Database UML diagram](#database-uml-diagram)
 - [Generate RSA keypair for JWT authentication flow](#generate-rsa-keypair-for-jwt-authentication-flow)
 - [Applying custom route prefix](#applying-custom-route-prefix)
 - [Activate/Deactivate line items](cli/modify-entity-line-item-change-state-command.md)
@@ -149,6 +150,10 @@ The main configuration file is `.env`, located in root folder.
 1. Warm up user cache
 
     Documentation: [User cache warmer command](cli/user-cache-warmer-command.md).
+
+## Database UML diagram
+
+![Database UML diagram](db-uml.png)
 
 ## Generate RSA keypair for JWT authentication flow
 
