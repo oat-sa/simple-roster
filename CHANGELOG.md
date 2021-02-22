@@ -4,6 +4,8 @@
 
 ### Fixed
 - Fixed cache warmup logic to trigger on `postFlush` event instead of `onFlush` to guarantee database modifications being done before refreshing the cache.
+- Fixed JWT token authentication to not support requests with `Authorization` header but no bearer token.
+
 
 ## 2.0.1 - 2021-02-12
 
