@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.2 - TO BE RELEASED
+
+### Fixed
+- Fixed cache warmup logic to trigger on `postFlush` event instead of `onFlush` to guarantee database modifications being done before refreshing the cache.
+
 ## 2.0.1 - 2021-02-12
 
 ### Fixed
