@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
@@ -56,18 +55,5 @@ class LtiInstanceRepository extends AbstractRepository
             ->getResult();
 
         return new UniqueLtiInstanceCollection(...$ltiInstances);
-    }
-
-    /**
-     * @throws NonUniqueResultException
-     */
-    public function findByLtiKey(string $ltiKey): ?LtiInstance
-    {
-        return $this
-            ->createQueryBuilder('i')
-            ->where('i.ltiKey = :ltiKey')
-            ->setParameter('ltiKey', $ltiKey)
-            ->getQuery()
-            ->getOneOrNullResult();
     }
 }

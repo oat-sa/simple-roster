@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.3 - 2021-02-23
+
+### Fixed
+- Fixed LTI 1.1 Outcome signature validation logic to be able to handle use case when multiple LTI instances share the same LTI key.
+
 ## 2.0.2 - 2021-02-22
 
 ### Fixed
