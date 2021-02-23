@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventSubscriber;
 
-use Doctrine\ORM\NonUniqueResultException;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -42,10 +42,17 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /** @var OAuthSigner */
     private $signer;
 
-    public function __construct(LtiInstanceRepository $repository, OAuthSigner $signer)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        LtiInstanceRepository $repository,
+        OAuthSigner $signer,
+        LoggerInterface $securityLogger
+    ) {
         $this->repository = $repository;
         $this->signer = $signer;
+        $this->logger = $securityLogger;
     }
 
     /**
@@ -58,9 +65,6 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonUniqueResultException
-     */
     public function onKernelController(ControllerEvent $event): void
     {
         if (!$event->getController() instanceof OAuthSignatureValidatedActionInterface) {
@@ -68,16 +72,6 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-
-        $ltiInstance = $this->repository->findByLtiKey(
-            (string)$request->query->get('oauth_consumer_key')
-        );
-
-        if (!$ltiInstance) {
-            throw new UnauthorizedHttpException(
-                sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
-            );
-        }
 
         $context = new OAuthContext(
             (string)$request->query->get('oauth_body_hash'),
@@ -88,17 +82,55 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             (string)$request->query->get('oauth_version')
         );
 
-        $signature = $this->signer->sign(
-            $context,
-            $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
-            $request->getMethod(),
-            $ltiInstance->getLtiSecret()
-        );
+        $ltiKeyToValidate = (string)$request->query->get('oauth_consumer_key');
+        $possibleLtiInstances = $this->repository
+            ->findAllAsCollection()
+            ->filterByLtiKey($ltiKeyToValidate);
 
-        if ($signature !== $request->query->get('oauth_signature')) {
+        if ($possibleLtiInstances->isEmpty()) {
+            $this->logger->error(
+                sprintf(
+                    "Invalid OAuth consumer key received, LTI instance with LTI key = '%s' cannot be found.",
+                    $ltiKeyToValidate
+                )
+            );
+
             throw new UnauthorizedHttpException(
-                sprintf('realm="%s", oauth_error="access token invalid"', static::AUTH_REALM)
+                sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
             );
         }
+
+        $signatureToValidate = $request->query->get('oauth_signature');
+        foreach ($possibleLtiInstances as $ltiInstance) {
+            $signature = $this->signer->sign(
+                $context,
+                $request->getSchemeAndHttpHost() . explode('?', $request->getRequestUri())[0],
+                $request->getMethod(),
+                $ltiInstance->getLtiSecret()
+            );
+
+            if ($signature === $signatureToValidate) {
+                $this->logger->info(
+                    'Successful OAuth signature validation.',
+                    [
+                        'ltiInstance' => $ltiInstance,
+                    ]
+                );
+
+                return;
+            }
+        }
+
+        $this->logger->error(
+            'Failed OAuth signature validation.',
+            [
+                'context' => $context,
+                'signature' => $signatureToValidate,
+            ]
+        );
+
+        throw new UnauthorizedHttpException(
+            sprintf('realm="%s", oauth_error="access token invalid"', static::AUTH_REALM)
+        );
     }
 }

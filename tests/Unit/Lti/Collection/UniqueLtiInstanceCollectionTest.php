@@ -54,6 +54,7 @@ class UniqueLtiInstanceCollectionTest extends TestCase
             }
         }
     }
+
     public function testIfLtiInstanceWithSameLabelCannotBeAddedTwice(): void
     {
         $ltiInstance = new LtiInstance(1, 'instance_1', 'link', 'key', 'secret');
@@ -64,5 +65,23 @@ class UniqueLtiInstanceCollectionTest extends TestCase
         $subject->add($ltiInstance);
 
         self::assertCount(1, $subject);
+    }
+
+    public function testIfCanBeFilteredByLtiKey(): void
+    {
+        $ltiInstances = [
+            new LtiInstance(1, 'label_1', 'link_1', 'key_1', 'secret_1'),
+            new LtiInstance(2, 'label_2', 'link_2', 'key_1', 'secret_2'),
+            new LtiInstance(3, 'label_3', 'link_3', 'key_1', 'secret_3'),
+            new LtiInstance(4, 'label_4', 'link_4', 'key_2', 'secret_4'),
+            new LtiInstance(5, 'label_5', 'link_5', 'key_2', 'secret_5'),
+        ];
+
+        $subject = new UniqueLtiInstanceCollection(...$ltiInstances);
+
+        self::assertCount(3, $subject->filterByLtiKey('key_1'));
+        self::assertSame('label_1', $subject->getByIndex(0)->getLabel());
+        self::assertSame('label_2', $subject->getByIndex(1)->getLabel());
+        self::assertSame('label_3', $subject->getByIndex(2)->getLabel());
     }
 }
