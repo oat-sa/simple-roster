@@ -65,7 +65,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "2.0",
-            "ref": "368794356c1fb634e58b38ad2addb36933f2e73e"
+            "ref": "40631978d2c4adc9b11220b13eba539b727c36a8"
         },
         "files": [
             "config/packages/doctrine.yaml",
@@ -231,7 +231,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "1.5",
-            "ref": "6388de23860284db9acce0a7a5d9d13153bcb571"
+            "ref": "6bea22e6c564fba3a1391615cada1437d0bde39c"
         },
         "files": [
             "config/packages/nelmio_cors.yaml"
@@ -544,12 +544,12 @@
         "version": "v5.1.8"
     },
     "symfony/phpunit-bridge": {
-        "version": "4.3",
+        "version": "5.1",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "4.3",
-            "ref": "6d0e35f749d5f4bfe1f011762875275cd3f9874f"
+            "version": "5.1",
+            "ref": "bf16921ef8309a81d9f046e9b6369c46bcbd031f"
         },
         "files": [
             ".env.test",
@@ -595,7 +595,16 @@
         "version": "v4.2.3"
     },
     "symfony/psr-http-message-bridge": {
-        "version": "v2.0.2"
+        "version": "2.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.1",
+            "ref": "df8ec1e90aec60d301ec59a22093fc3febedb795"
+        },
+        "files": [
+            "config/packages/psr_http_message_bridge.yaml"
+        ]
     },
     "symfony/redis-messenger": {
         "version": "v5.1.8"
