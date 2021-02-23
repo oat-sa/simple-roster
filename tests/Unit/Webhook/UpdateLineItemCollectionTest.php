@@ -114,14 +114,14 @@ class UpdateLineItemCollectionTest extends TestCase
             new UpdateLineItemDto('22', 'test', 'http://i.o', new DateTimeImmutable())
         );
 
-        self::assertSame(2, $collection->count());
+        self::assertCount(2, $collection);
 
         $filtered = $collection->filter(
             function (UpdateLineItemDto $updateLineItemDto): bool {
                 return '22' === $updateLineItemDto->getId();
             }
         );
-        self::assertSame(1, $filtered->count());
+        self::assertCount(1, $filtered);
     }
 
     public function testItSetStatus(): void
@@ -145,12 +145,12 @@ class UpdateLineItemCollectionTest extends TestCase
     public function testItCounts(): void
     {
         $emptyCollection = new UpdateLineItemCollection();
-        self::assertSame(0, $emptyCollection->count());
+        self::assertCount(0, $emptyCollection);
 
         $collection = new UpdateLineItemCollection(
             new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable())
         );
 
-        self::assertSame(1, $collection->count());
+        self::assertCount(1, $collection);
     }
 }
