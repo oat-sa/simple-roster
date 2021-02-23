@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
+use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -29,6 +30,7 @@ use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -40,6 +42,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use XmlTestingTrait;
     use AssignmentStatusTestingTrait;
+    use LoggerTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -51,13 +54,20 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $this->kernelBrowser = self::createClient();
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
+        $this->setUpTestLogHandler('security');
     }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
         $this->kernelBrowser->request('POST', '/api/v1/lti1p1/outcome');
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->assertHasLogRecordWithMessage(
+            "Invalid OAuth consumer key received, LTI instance with LTI key = '' cannot be found.",
+            Logger::ERROR
+        );
     }
 
     public function testItReturns401IfWrongAuthentication(): void
@@ -84,7 +94,9 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             ]
         );
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->assertHasLogRecordWithMessage('Failed OAuth signature validation.', Logger::ERROR);
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
@@ -124,12 +136,15 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultRequestXml()
         );
 
-        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals(
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(
             $this->getValidReplaceResultResponseXml($messageIdentifier),
             $this->kernelBrowser->getResponse()->getContent()
         );
+
         $this->assertAssignmentStatus(Assignment::STATE_READY);
+
+        $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
@@ -162,7 +177,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
@@ -194,7 +209,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultRequestXmlWithWrongAssignment()
         );
 
-        self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 

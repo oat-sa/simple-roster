@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Security\OAuth;
 
+use JsonSerializable;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use PHPUnit\Framework\TestCase;
 
@@ -44,5 +45,30 @@ class OAuthContextTest extends TestCase
         self::assertSame('signatureMethod', $subject->getSignatureMethod());
         self::assertSame('timestamp', $subject->getTimestamp());
         self::assertSame('version', $subject->getVersion());
+    }
+
+    public function testItIsJsonSerializable(): void
+    {
+        $subject = new OAuthContext(
+            'expectedBodyHash',
+            'expectedConsumerKey',
+            'expectedNonce',
+            'expectedSignatureMethod',
+            'expectedTimestamp',
+            'expectedVersion'
+        );
+
+        self::assertInstanceOf(JsonSerializable::class, $subject);
+        self::assertSame(
+            [
+                'bodyHash' => 'expectedBodyHash',
+                'consumerKey' => 'expectedConsumerKey',
+                'nonce' => 'expectedNonce',
+                'signatureMethod' => 'expectedSignatureMethod',
+                'timestamp' => 'expectedTimestamp',
+                'version' => 'expectedVersion',
+            ],
+            $subject->jsonSerialize()
+        );
     }
 }
