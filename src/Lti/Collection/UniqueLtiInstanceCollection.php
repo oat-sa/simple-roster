@@ -72,7 +72,7 @@ class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
     {
         $this->ltiInstances = array_filter(
             $this->ltiInstances,
-            static function (LtiInstance $ltiInstance) use ($ltiKey) {
+            static function (LtiInstance $ltiInstance) use ($ltiKey): bool {
                 return $ltiInstance->getLtiKey() === $ltiKey;
             }
         );
