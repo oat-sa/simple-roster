@@ -310,6 +310,12 @@
     "phpstan/phpstan-symfony": {
         "version": "0.11.1"
     },
+    "psalm/plugin-phpunit": {
+        "version": "0.15.1"
+    },
+    "psalm/plugin-symfony": {
+        "version": "v2.1.2"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },

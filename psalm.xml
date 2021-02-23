@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<psalm
+        autoloader="bin/.phpunit/phpunit-8.3-0/vendor/autoload.php"
+        errorLevel="3"
+        reportMixedIssues="false"
+        hideExternalErrors="true"
+        useDocblockTypes="false"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <directory name="tests"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+        </ignoreFiles>
+    </projectFiles>
+    <mockClasses>
+        <class name="PHPUnit\Framework\MockObject\MockObject"/>
+    </mockClasses>
+    <issueHandlers>
+        <RedundantCast>
+            <errorLevel type="suppress">
+                <directory name="src/Command"/>
+            </errorLevel>
+        </RedundantCast>
+        <PossiblyNullArrayOffset>
+            <errorLevel type="suppress">
+                <file name="src/EventSubscriber/UserCacheInvalidationSubscriber.php" />
+            </errorLevel>
+        </PossiblyNullArrayOffset>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <file name="src/Entity/LineItem.php"/>
+                <file name="src/Logger/UserRequestLogProcessor.php"/>
+            </errorLevel>
+        </PossiblyNullReference>
+    </issueHandlers>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">
+            <containerXml>var/cache/test/OAT_SimpleRoster_KernelTestDebugContainer.xml</containerXml>
+        </pluginClass>
+    </plugins>
+</psalm>

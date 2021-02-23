@@ -274,7 +274,7 @@ EOF
         $this->lineItemSlugs = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_SLUGS)),
             static function ($value): bool {
-                return !empty($value) && is_string($value) && mb_strlen($value) > 1;
+                return !empty($value) && mb_strlen($value) > 1;
             }
         );
 
@@ -293,7 +293,7 @@ EOF
         $this->usernames = array_filter(
             explode(',', (string)$input->getOption(self::OPTION_USERNAMES)),
             static function ($value): bool {
-                return !empty($value) && is_string($value) && mb_strlen($value) > 1;
+                return !empty($value) && mb_strlen($value) > 1;
             }
         );
 

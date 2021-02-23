@@ -65,7 +65,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('POST', '/api/v1/lti1p3/outcome');
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
@@ -97,8 +97,8 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultRequestXml()
         );
 
-        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertEquals(
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(
             $this->getValidReplaceResultResponseXml($messageIdentifier),
             $this->kernelBrowser->getResponse()->getContent()
         );
@@ -122,7 +122,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultRequestXml()
         );
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             'JWT access token scopes are invalid',
             (string)$this->kernelBrowser->getResponse()->getContent()
@@ -144,7 +144,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
         $response = $this->kernelBrowser->getResponse();
         self::assertInstanceOf(Response::class, $response);
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
         self::assertStringContainsString(
             'A Token was not found in the TokenStorage',
             (string)$response->getContent()
@@ -167,7 +167,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
         $response = $this->kernelBrowser->getResponse();
         self::assertInstanceOf(Response::class, $response);
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
         self::assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
     }
 
@@ -191,7 +191,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             'invalidXml'
         );
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
@@ -215,7 +215,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultRequestXmlWithWrongAssignment()
         );
 
-        self::assertEquals(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 }

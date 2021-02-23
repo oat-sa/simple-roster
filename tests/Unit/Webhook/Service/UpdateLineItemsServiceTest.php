@@ -82,7 +82,7 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        self::assertEquals('ignored', $updateLineItemDto->getStatus());
+        self::assertSame('ignored', $updateLineItemDto->getStatus());
     }
 
     public function testItAcceptsUpdate(): void
@@ -133,7 +133,7 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        self::assertEquals('accepted', $updateLineItemDto->getStatus());
+        self::assertSame('accepted', $updateLineItemDto->getStatus());
     }
 
     public function testItIgnoresDuplicatedUpdates(): void
@@ -197,8 +197,8 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDtoDuplicated = $result->getIterator()[1];
 
-        self::assertEquals('accepted', $updateLineItemDto->getStatus());
-        self::assertEquals('ignored', $updateLineItemDtoDuplicated->getStatus());
+        self::assertSame('accepted', $updateLineItemDto->getStatus());
+        self::assertSame('ignored', $updateLineItemDtoDuplicated->getStatus());
     }
 
     public function testErrorForUpdatesWithNotFoundSlug(): void
@@ -240,6 +240,6 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        self::assertEquals('error', $updateLineItemDto->getStatus());
+        self::assertSame('error', $updateLineItemDto->getStatus());
     }
 }

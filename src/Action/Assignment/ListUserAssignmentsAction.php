@@ -37,11 +37,9 @@ class ListUserAssignmentsAction
         $this->responder = $responder;
     }
 
-    /**
-     * @param User $user
-     */
     public function __invoke(UserInterface $user): Response
     {
+        /** @var User $user */
         return $this->responder->createJsonResponse(['assignments' => $user->getAssignments()]);
     }
 }

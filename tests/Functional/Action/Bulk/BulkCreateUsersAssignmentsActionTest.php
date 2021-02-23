@@ -184,7 +184,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                 'data' => [
                     'applied' => false,
                     'results' => [
-                        $user->getUsername() => true,
+                        (string)$user->getUsername() => true,
                         'nonExistingUser1' => false,
                     ],
                 ],
@@ -225,7 +225,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                 'data' => [
                     'applied' => true,
                     'results' => [
-                        $user->getUsername() => true,
+                        (string)$user->getUsername() => true,
                     ],
                 ],
             ],
