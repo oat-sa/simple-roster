@@ -2,7 +2,6 @@
 <psalm
         autoloader="bin/.phpunit/phpunit-8.5-0/vendor/autoload.php"
         errorLevel="3"
-        reportMixedIssues="false"
         hideExternalErrors="true"
         useDocblockTypes="false"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
