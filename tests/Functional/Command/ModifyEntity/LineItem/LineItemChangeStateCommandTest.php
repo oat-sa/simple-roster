@@ -92,7 +92,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
             $lineItemCache = $this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId));
             $cache = current(current($lineItemCache));
-            self::assertEquals(1, $cache['is_active_3']);
+            self::assertSame('1', $cache['is_active_3']);
         }
 
         $commandResult = $this->commandTester->execute(
@@ -313,7 +313,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
 
-            self::assertEquals($isActive, $lineItem->isActive());
+            self::assertSame($isActive, $lineItem->isActive());
 
             $cache = current(
                 current($this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId)))

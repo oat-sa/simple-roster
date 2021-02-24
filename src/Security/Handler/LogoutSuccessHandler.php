@@ -63,7 +63,7 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
         $this->serializerResponder = $serializerResponder;
     }
 
-    public function onLogoutSuccess(Request $request)
+    public function onLogoutSuccess(Request $request): JsonResponse
     {
         $accessToken = $this->tokenExtractor->extract($request);
         $parsedToken = (new Parser())->parse($accessToken);

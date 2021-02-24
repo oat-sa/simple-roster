@@ -104,7 +104,7 @@ class AssignmentGarbageCollectorCommand extends Command
                 throw new InvalidArgumentException("Invalid 'batch-size' argument received.");
             }
 
-            $isDryRun = !(bool)$input->getOption('force');
+            $isDryRun = !$input->getOption('force');
             $numberOfCollectedAssignments = $this->collectStuckAssignments($batchSize, $isDryRun);
 
             $successMessage = $numberOfCollectedAssignments !== 0

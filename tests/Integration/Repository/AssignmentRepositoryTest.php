@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
 use DateInterval;
 use DateTime;
+use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -46,6 +47,22 @@ class AssignmentRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $this->subject = self::$container->get(AssignmentRepository::class);
+    }
+
+    public function testItCanFindAssignmentById(): void
+    {
+        $assignment = $this->subject->findById(1);
+
+        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(1, $assignment->getAttemptsCount());
+    }
+
+    public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
+    {
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage("Assignment with id = '999' cannot be found.");
+
+        $this->subject->findById(999);
     }
 
     public function testItCanReturnAssignmentsByStateAndUpdatedAt(): void

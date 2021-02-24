@@ -62,12 +62,10 @@ class GetUserAssignmentLtiLinkAction
         $this->logger = $logger;
     }
 
-    /**
-     * @param User $user
-     */
     public function __invoke(UserInterface $user, int $assignmentId): Response
     {
         try {
+            /** @var User $user */
             $assignment = $user->getAvailableAssignmentById($assignmentId);
             $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 

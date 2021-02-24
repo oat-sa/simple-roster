@@ -79,7 +79,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             ''
         );
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturns401IfWrongCredentialsInformed(): void
@@ -96,7 +96,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             ''
         );
 
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     /**
@@ -120,7 +120,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             $requestBody
         );
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -129,7 +129,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertEquals(
+        self::assertSame(
             $expectedMessage,
             $decodedResponse['error']['message']
         );
@@ -149,7 +149,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getSuccessRequestBody())
         );
 
-        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         /** @var LineItemRepository $lineItemRepository */
         $lineItemRepository = $this->getRepository(LineItem::class);
@@ -180,14 +180,14 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             Logger::INFO
         );
 
-        self::assertEquals('https://docker.localhost/ontologies/tao.rdf#RightOne', $lineItem->getUri());
+        self::assertSame('https://docker.localhost/ontologies/tao.rdf#RightOne', $lineItem->getUri());
 
-        self::assertEquals(
+        self::assertSame(
             'https://docker.localhost/ontologies/tao.rdf#RightOne',
             current($lineItemCache)[0]['uri_1']
         );
 
-        self::assertEquals(
+        self::assertSame(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
@@ -229,9 +229,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getRequestBodyUnknownEvent())
         );
 
-        self::assertEquals(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        self::assertEquals(
+        self::assertSame(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',

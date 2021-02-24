@@ -35,6 +35,6 @@ trait AssignmentStatusTestingTrait
         $assignment = $repository->find(1);
 
         self::assertInstanceOf(Assignment::class, $assignment);
-        self::assertEquals($status, $assignment->getState());
+        self::assertSame($status, $assignment->getState());
     }
 }

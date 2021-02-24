@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service;
 
+use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\Infrastructure;
 use OAT\SimpleRoster\Entity\LineItem;
@@ -59,6 +60,10 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->expectException(AssignmentNotFoundException::class);
         $this->expectExceptionMessage("Assignment with id '5' not found.");
 
+        $this->assignmentRepository
+            ->method('findById')
+            ->willThrowException(new EntityNotFoundException());
+
         $this->subject->markAssignmentAsCompleted(5);
     }
 
@@ -80,7 +85,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
         $this->assignmentRepository
             ->expects(self::once())
-            ->method('find')
+            ->method('findById')
             ->with(5)
             ->willReturn($assignment);
 
@@ -116,7 +121,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
         $this->assignmentRepository
             ->expects(self::once())
-            ->method('find')
+            ->method('findById')
             ->with(5)
             ->willReturn($assignment);
 
@@ -150,7 +155,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
         $this->assignmentRepository
             ->expects(self::once())
-            ->method('find')
+            ->method('findById')
             ->with(5)
             ->willReturn($assignment);
 

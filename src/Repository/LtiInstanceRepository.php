@@ -26,12 +26,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 
-/**
- * @method LtiInstance|null   find($id, $lockMode = null, $lockVersion = null)
- * @method LtiInstance|null   findOneBy(array $criteria, array $orderBy = null)
- * @method LtiInstance[]|null findAll()
- * @method LtiInstance[]|null findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class LtiInstanceRepository extends AbstractRepository
 {
     public const CACHE_ID_ALL_LTI_INSTANCES = 'lti_instances.all';

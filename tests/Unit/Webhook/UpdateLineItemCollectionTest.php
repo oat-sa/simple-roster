@@ -58,7 +58,7 @@ class UpdateLineItemCollectionTest extends TestCase
         );
 
         $dto = $collection->findLastByTriggeredTimeOrFail();
-        self::assertEquals('22', $dto->getId());
+        self::assertSame('22', $dto->getId());
     }
 
     public function testItFindsLastByTriggeredTimeDuplicatedTime(): void
@@ -79,7 +79,7 @@ class UpdateLineItemCollectionTest extends TestCase
         );
 
         $dto = $collection->findLastByTriggeredTimeOrFail();
-        self::assertEquals('22', $dto->getId());
+        self::assertSame('22', $dto->getId());
     }
 
     public function testAccessors(): void
@@ -103,8 +103,8 @@ class UpdateLineItemCollectionTest extends TestCase
 
         self::assertCount(2, $ids);
 
-        self::assertEquals('11', $ids[0]);
-        self::assertEquals('22', $ids[1]);
+        self::assertSame('11', $ids[0]);
+        self::assertSame('22', $ids[1]);
     }
 
     public function testItFilters(): void
@@ -114,14 +114,14 @@ class UpdateLineItemCollectionTest extends TestCase
             new UpdateLineItemDto('22', 'test', 'http://i.o', new DateTimeImmutable())
         );
 
-        self::assertEquals(2, $collection->count());
+        self::assertCount(2, $collection);
 
         $filtered = $collection->filter(
             function (UpdateLineItemDto $updateLineItemDto): bool {
                 return '22' === $updateLineItemDto->getId();
             }
         );
-        self::assertEquals(1, $filtered->count());
+        self::assertCount(1, $filtered);
     }
 
     public function testItSetStatus(): void
@@ -132,25 +132,25 @@ class UpdateLineItemCollectionTest extends TestCase
         );
 
         foreach ($collection as $dto) {
-            self::assertEquals('ignored', $dto->getStatus());
+            self::assertSame('ignored', $dto->getStatus());
         }
 
         $collectionAccepted = $collection->setStatus('accepted');
 
         foreach ($collectionAccepted as $dto) {
-            self::assertEquals('accepted', $dto->getStatus());
+            self::assertSame('accepted', $dto->getStatus());
         }
     }
 
     public function testItCounts(): void
     {
         $emptyCollection = new UpdateLineItemCollection();
-        self::assertEquals(0, $emptyCollection->count());
+        self::assertCount(0, $emptyCollection);
 
         $collection = new UpdateLineItemCollection(
             new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable())
         );
 
-        self::assertEquals(1, $collection->count());
+        self::assertCount(1, $collection);
     }
 }

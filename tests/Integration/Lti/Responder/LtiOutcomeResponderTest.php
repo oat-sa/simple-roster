@@ -55,6 +55,6 @@ class LtiOutcomeResponderTest extends KernelTestCase
 
         $response = $subject->createXmlResponse(1);
 
-        self::assertEquals($this->getValidReplaceResultResponseXml($messageIdentifier), $response->getContent());
+        self::assertSame($this->getValidReplaceResultResponseXml($messageIdentifier), $response->getContent());
     }
 }
