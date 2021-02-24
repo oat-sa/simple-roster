@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
-use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -77,14 +76,5 @@ class LtiInstanceRepositoryTest extends KernelTestCase
         $cacheValue = $this->doctrineResultCache->fetch(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
         self::assertCount(1, $cacheValue);
         self::assertCount(5, array_values($cacheValue)[0]);
-    }
-
-    public function testItCanFindByLtiKey(): void
-    {
-        self::assertInstanceOf(LtiInstance::class, $this->subject->findByLtiKey('ltiKey_w2n'));
-        self::assertInstanceOf(LtiInstance::class, $this->subject->findByLtiKey('ltiKey_4eb'));
-        self::assertInstanceOf(LtiInstance::class, $this->subject->findByLtiKey('ltiKey_qqy'));
-        self::assertInstanceOf(LtiInstance::class, $this->subject->findByLtiKey('ltiKey_awr'));
-        self::assertInstanceOf(LtiInstance::class, $this->subject->findByLtiKey('ltiKey_zoi'));
     }
 }

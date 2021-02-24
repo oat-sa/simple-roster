@@ -50,6 +50,9 @@ class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
         return $this;
     }
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function getByIndex(int $index): LtiInstance
     {
         if ($index < 0 || $index >= count($this)) {
@@ -63,6 +66,18 @@ class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
         }
 
         return $this->ltiInstances[$index];
+    }
+
+    public function filterByLtiKey(string $ltiKey): self
+    {
+        $this->ltiInstances = array_filter(
+            $this->ltiInstances,
+            static function (LtiInstance $ltiInstance) use ($ltiKey): bool {
+                return $ltiInstance->getLtiKey() === $ltiKey;
+            }
+        );
+
+        return $this;
     }
 
     /**

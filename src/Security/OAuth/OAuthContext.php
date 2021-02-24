@@ -22,7 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\OAuth;
 
-class OAuthContext
+use JsonSerializable;
+
+class OAuthContext implements JsonSerializable
 {
     public const VERSION_1_0 = '1.0';
     public const METHOD_MAC_SHA1 = 'HMAC-SHA1';
@@ -89,5 +91,17 @@ class OAuthContext
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'bodyHash' => $this->bodyHash,
+            'consumerKey' => $this->consumerKey,
+            'nonce' => $this->nonce,
+            'signatureMethod' => $this->signatureMethod,
+            'timestamp' => $this->timestamp,
+            'version' => $this->version,
+        ];
     }
 }
