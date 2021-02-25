@@ -29,7 +29,12 @@ use IteratorAggregate;
 class UsernameCollection implements Countable, IteratorAggregate
 {
     /** @var string[] */
-    private $collection = [];
+    private $collection;
+
+    public function __construct(string ...$usernames)
+    {
+        $this->collection = $usernames;
+    }
 
     public function add(string $username): self
     {
