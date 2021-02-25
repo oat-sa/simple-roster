@@ -28,8 +28,10 @@ use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
+use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -43,6 +45,9 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
+    /** @var UserCacheWarmerService|MockObject */
+    private $userCacheWarmerService;
+
     /** @var UserRepository|MockObject */
     private $userRepository;
 
@@ -54,6 +59,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->userCacheWarmerService = $this->createMock(UserCacheWarmerService::class);
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -62,7 +68,11 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
             ->with(User::class)
             ->willReturn($this->userRepository);
 
-        $this->subject = new BulkCreateUsersAssignmentsService($this->entityManager, $this->logger);
+        $this->subject = new BulkCreateUsersAssignmentsService(
+            $this->entityManager,
+            $this->userCacheWarmerService,
+            $this->logger
+        );
     }
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
@@ -150,6 +160,16 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         $this->entityManager
             ->expects(self::once())
             ->method('flush');
+
+        $this->userCacheWarmerService
+            ->expects(self::once())
+            ->method('process')
+            ->with(
+                self::callback(static function (UsernameCollection $collection): bool {
+                    return $collection->count() === 3
+                        && $collection->getIterator()->getArrayCopy() === ['test', 'test1', 'test2'];
+                })
+            );
 
         $this->logger
             ->expects(self::exactly(3))

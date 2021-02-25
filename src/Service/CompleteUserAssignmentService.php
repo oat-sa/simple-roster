@@ -22,7 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Psr\Log\LoggerInterface;
@@ -47,9 +49,9 @@ class CompleteUserAssignmentService
      */
     public function markAssignmentAsCompleted(int $assignmentId): void
     {
-        $assignment = $this->assignmentRepository->find($assignmentId);
-
-        if (!$assignment) {
+        try {
+            $assignment = $this->assignmentRepository->findById($assignmentId);
+        } catch (EntityNotFoundException $exception) {
             throw new AssignmentNotFoundException(sprintf("Assignment with id '%s' not found.", $assignmentId));
         }
 

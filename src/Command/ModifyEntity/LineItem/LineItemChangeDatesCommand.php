@@ -172,7 +172,7 @@ EOF
 
         $this->validateAndSetDates($input);
 
-        $this->isDryRun = !(bool)$input->getOption(self::OPTION_FORCE);
+        $this->isDryRun = !$input->getOption(self::OPTION_FORCE);
     }
 
     /**
@@ -316,7 +316,7 @@ EOF
         $dateObj = null;
         if (!empty($dateString)) {
             try {
-                $date = Carbon::createFromFormat(Carbon::ISO8601, $dateString);
+                $date = Carbon::createFromFormat(Carbon::ATOM, $dateString);
                 $dateObj = $date ? $date->toDateTime() : null;
             } catch (Throwable $e) {
                 $message = sprintf(

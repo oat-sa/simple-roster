@@ -31,27 +31,27 @@ class XmlResponseTest extends TestCase
     {
         $request = new XmlResponse('content');
 
-        self::assertEquals('content', $request->getContent());
-        self::assertEquals(XmlResponse::HTTP_OK, $request->getStatusCode());
-        self::assertEquals('text/xml', $request->headers->get('content-type'));
+        self::assertSame('content', $request->getContent());
+        self::assertSame(XmlResponse::HTTP_OK, $request->getStatusCode());
+        self::assertSame('text/xml', $request->headers->get('content-type'));
     }
 
     public function testXmlResponseWithSpecificStatusCode(): void
     {
         $request = new XmlResponse('error', XmlResponse::HTTP_BAD_REQUEST);
 
-        self::assertEquals('error', $request->getContent());
-        self::assertEquals(XmlResponse::HTTP_BAD_REQUEST, $request->getStatusCode());
-        self::assertEquals('text/xml', $request->headers->get('content-type'));
+        self::assertSame('error', $request->getContent());
+        self::assertSame(XmlResponse::HTTP_BAD_REQUEST, $request->getStatusCode());
+        self::assertSame('text/xml', $request->headers->get('content-type'));
     }
 
     public function testXmlResponseWithExtraHeaders(): void
     {
         $request = new XmlResponse('content', XmlResponse::HTTP_OK, ['my-header' => 'my-value']);
 
-        self::assertEquals('content', $request->getContent());
-        self::assertEquals(XmlResponse::HTTP_OK, $request->getStatusCode());
-        self::assertEquals('text/xml', $request->headers->get('content-type'));
-        self::assertEquals('my-value', $request->headers->get('my-header'));
+        self::assertSame('content', $request->getContent());
+        self::assertSame(XmlResponse::HTTP_OK, $request->getStatusCode());
+        self::assertSame('text/xml', $request->headers->get('content-type'));
+        self::assertSame('my-value', $request->headers->get('my-header'));
     }
 }

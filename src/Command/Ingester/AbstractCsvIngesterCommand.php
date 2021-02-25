@@ -70,7 +70,7 @@ abstract class AbstractCsvIngesterCommand extends Command
         $this->csvReaderBuilder = $csvReaderBuilder;
         $this->storageRegistry = $storageRegistry;
 
-        parent::__construct(static::getIngesterCommandName());
+        parent::__construct($this->getIngesterCommandName());
     }
 
     abstract protected function getIngesterCommandName(): string;

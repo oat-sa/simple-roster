@@ -23,21 +23,40 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use DateTime;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\Assignment;
 
-/**
- * @method Assignment|null find($id, $lockMode = null, $lockVersion = null)
- * @method Assignment|null findOneBy(array $criteria, array $orderBy = null)
- * @method Assignment[]    findAll()
- * @method Assignment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class AssignmentRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Assignment::class);
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    public function findById(int $assignmentId): Assignment
+    {
+        $assignment = $this
+            ->createQueryBuilder('a')
+            ->select('a')
+            ->where('a.id = :id')
+            ->setParameter('id', $assignmentId)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (null === $assignment) {
+            throw new EntityNotFoundException(
+                sprintf("Assignment with id = '%d' cannot be found.", $assignmentId)
+            );
+        }
+
+        return $assignment;
     }
 
     /**

@@ -212,8 +212,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             $lineItemCache = current(current($this->resultCache->fetch($lineItemCacheId)));
 
             self::assertTrue($this->resultCache->contains($lineItemCacheId));
-            self::assertEquals($persistedData['start_at'], $lineItemCache['start_at_4']);
-            self::assertEquals($persistedData['end_at'], $lineItemCache['end_at_5']);
+            self::assertSame($persistedData['start_at'], $lineItemCache['start_at_4']);
+            self::assertSame($persistedData['end_at'], $lineItemCache['end_at_5']);
         }
     }
 

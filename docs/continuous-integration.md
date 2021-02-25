@@ -10,6 +10,7 @@
         - [PHP CodeSniffer](#php-codesniffer)
         - [PHP Mess Detector](#php-mess-detector)
         - [PHPStan](#phpstan)
+        - [Psalm](#psalm)
 
 ## Pull request CI pipeline
 
@@ -69,7 +70,15 @@ Configuration file: [phpmd.xml](../phpmd.xml)
 To run static code analysis with PHPStan execute:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm vendor/bin/phpstan analyse --level=max
+$ docker container exec -it simple-roster-phpfpm vendor/bin/phpstan analyse
 ```
 
 Configuration file: [phpstan.neon](../phpstan.neon)
+
+#### Psalm
+
+To run static code analysis with Psalm execute:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm vendor/bin/psalm
+```

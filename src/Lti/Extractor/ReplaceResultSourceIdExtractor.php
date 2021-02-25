@@ -54,7 +54,7 @@ class ReplaceResultSourceIdExtractor
             'x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
         );
 
-        if (false === $sourceIdNodes || count($sourceIdNodes) !== 1 || !$sourceIdNodes[0] instanceof SimpleXMLElement) {
+        if (false === $sourceIdNodes || count($sourceIdNodes) !== 1) {
             throw new InvalidLtiReplaceResultBodyException();
         }
 

@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Bulk\Operation;
 
+use ArrayIterator;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use PHPUnit\Framework\TestCase;
@@ -39,13 +40,16 @@ class BulkOperationCollectionTest extends TestCase
             ->add($operation1)
             ->add($operation2);
 
+        /** @var ArrayIterator $iterator */
+        $iterator = $subject->getIterator();
+
         self::assertCount(2, $subject);
         self::assertSame(
             [
                 'identifier1' => $operation1,
                 'identifier2' => $operation2,
             ],
-            $subject->getIterator()->getArrayCopy()
+            $iterator->getArrayCopy()
         );
     }
 }

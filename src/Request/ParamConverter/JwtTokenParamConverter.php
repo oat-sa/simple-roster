@@ -29,6 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Throwable;
 
 class JwtTokenParamConverter implements ParamConverterInterface
 {
@@ -50,7 +51,7 @@ class JwtTokenParamConverter implements ParamConverterInterface
         try {
             $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
             $this->tokenVerifier->isValid($refreshToken);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             throw new BadRequestHttpException('Invalid token.');
         }
 

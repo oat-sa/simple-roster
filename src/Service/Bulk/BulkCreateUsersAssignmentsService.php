@@ -31,7 +31,9 @@ use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -40,15 +42,22 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var UserCacheWarmerService */
+    private $userCacheWarmerService;
+
     /** @var LoggerInterface */
     private $logger;
 
     /** @var array */
     private $logBuffer = [];
 
-    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserCacheWarmerService $userCacheWarmerService,
+        LoggerInterface $logger
+    ) {
         $this->entityManager = $entityManager;
+        $this->userCacheWarmerService = $userCacheWarmerService;
         $this->logger = $logger;
     }
 
@@ -132,6 +141,10 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
                 ['lineItem' => $logRecord['lineItem']]
             );
         }
+
+        $this->userCacheWarmerService->process(
+            new UsernameCollection(...$result->getSuccessfulBulkOperationIdentifiers())
+        );
 
         return $result;
     }

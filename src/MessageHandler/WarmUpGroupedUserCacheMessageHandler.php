@@ -37,9 +37,6 @@ use Throwable;
 
 class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
     /** @var UserRepository */
     private $userRepository;
 
@@ -69,7 +66,6 @@ class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
         LoggerInterface $cacheWarmupLogger,
         int $userWithAssignmentsCacheTtl
     ) {
-        $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
         $this->cacheIdGenerator = $cacheIdGenerator;
         $this->messengerLogger = $messengerLogger;
