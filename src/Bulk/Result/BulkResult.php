@@ -38,6 +38,21 @@ class BulkResult implements JsonSerializable
         return $this->addBulkOperationResult($operation, true);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getSuccessfulBulkOperationIdentifiers(): array
+    {
+        return array_keys(
+            array_filter(
+                $this->results,
+                static function (bool $result): bool {
+                    return $result === true;
+                }
+            )
+        );
+    }
+
     public function addBulkOperationFailure(BulkOperation $operation): self
     {
         $this->failuresCount++;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.4 - 2021-02-25
+
+### Fixed
+- Fixed missing cache invalidation when creating new assignments through the bulk create assignments API endpoint.
+
 ## 2.0.3 - 2021-02-23
 
 ### Fixed

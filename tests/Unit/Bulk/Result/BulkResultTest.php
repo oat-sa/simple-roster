@@ -77,4 +77,25 @@ class BulkResultTest extends TestCase
             $subject->jsonSerialize()
         );
     }
+
+    public function testItReturnsSuccessfulBulkOperationIdentifiers(): void
+    {
+        $subject = new BulkResult();
+
+        $operation1 = new BulkOperation('identifier1', BulkOperation::TYPE_UPDATE);
+        $operation2 = new BulkOperation('identifier2', BulkOperation::TYPE_CREATE);
+        $operation3 = new BulkOperation('identifier3', BulkOperation::TYPE_CREATE);
+        $operation4 = new BulkOperation('identifier4', BulkOperation::TYPE_UPDATE);
+
+        $subject
+            ->addBulkOperationSuccess($operation1)
+            ->addBulkOperationSuccess($operation3)
+            ->addBulkOperationFailure($operation2)
+            ->addBulkOperationFailure($operation4);
+
+        self::assertSame(
+            ['identifier1', 'identifier3'],
+            $subject->getSuccessfulBulkOperationIdentifiers()
+        );
+    }
 }
