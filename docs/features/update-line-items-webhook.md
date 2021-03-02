@@ -36,7 +36,7 @@ curl --location --request POST 'http://simple-roster.docker.localhost/api/v1/web
 			"triggeredTimestamp":1565602390,
 			"eventData":{
 				"alias":"line-item-slug",
-				"deliveryURI":"https://tao.platform/ontologies/tao.rdf#delivery-uri"
+				"remoteDeliveryId":"https://tao.platform/ontologies/tao.rdf#delivery-uri"
 			}
 		}
 	]
@@ -49,13 +49,13 @@ To use this endpoint, the `Authorization` header should be defined as the sample
 
 #### Attribute Descriptions
 
-| Attribute             | Description                                                                                                                                                                                                      |
-| ----------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| eventId               | The event identifier. The format is described in the [WebHook Payload Schema Definition](#webhook-schema-definition). It is used by the Simple Roster only to return it in the webhook response.                 |
-| eventName             | The name of the event. Only `RemoteDeliveryPublicationFinished` will be handled by Simple Roster. Any other events will be ignored.                                                                              |
-| triggeredTimestamp    | A timestamp that represents when the event happened. In case of duplicate events, Simple Roster will assume the latter based on this attribute. The other events will be ignored.                                |
-| eventData.alias       | The delivery URI alias for the new publication. This value must match the slug in the line items that need to be updated. If the line items are not found, the event is not accepted and is considered an error. |
-| eventData.deliveryURI | The Delivery URI of the new publication. In case the alias match with the line items slug, this value will replace the line items URI.                                                                           |
+| Attribute                  | Description                                                                                                                                                                                                      |
+| ---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| eventId                    | The event identifier. The format is described in the [WebHook Payload Schema Definition](#webhook-schema-definition). It is used by the Simple Roster only to return it in the webhook response.                 |
+| eventName                  | The name of the event. Only `RemoteDeliveryPublicationFinished` will be handled by Simple Roster. Any other events will be ignored.                                                                              |
+| triggeredTimestamp         | A timestamp that represents when the event happened. In case of duplicate events, Simple Roster will assume the latter based on this attribute. The other events will be ignored.                                |
+| eventData.alias            | The delivery URI alias for the new publication. This value must match the slug in the line items that need to be updated. If the line items are not found, the event is not accepted and is considered an error. |
+| eventData.remoteDeliveryId | The Delivery URI of the new publication. In case the alias match with the line items slug, this value will replace the line items URI.                                                                           |
 
 ### Endpoint Descriptions
 

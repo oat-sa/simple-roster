@@ -44,7 +44,7 @@ $ docker container exec -it simple-roster-phpfpm openssl pkey -in config/secrets
 The rest of the configuration is pre-configured with the `.env.docker` file, so next step is to set up the containers:
 
 ```shell script
-$ docker-compose --env-file .env.local up -d
+$ docker-compose --env-file .env.docker up -d
 ```
 
 Then install application dependencies:
