@@ -252,7 +252,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
      */
     public function provideWrongRequestBodies(): array
     {
-        $missingDeliveryUri = 'Invalid Request Body: [events][0][eventData][deliveryURI] -> This field is missing.';
+        $missingRemoteDeliveryId = 'Invalid Request Body: '
+            . '[events][0][eventData][remoteDeliveryId] -> This field is missing.';
 
         $invalidAliasType = 'Invalid Request Body: [events][0][eventName] -> This field is missing.'
             . ' [events][0][eventData][alias] -> This value should be of type string.';
@@ -279,7 +280,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                                     'triggeredTimestamp' => 1565602371,
                                     'eventData' => [
                                         'alias' => 'qti-interactions-delivery',
-                                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                                     ],
                                 ],
                             ],
@@ -298,7 +299,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                                 'triggeredTimestamp' => 1565602371,
                                 'eventData' => [
                                     'alias' => 'qti-interactions-delivery',
-                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                                 ],
                             ],
                         ],
@@ -316,7 +317,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                                 'eventName' => 'RemoteDeliveryPublicationFinishesssd',
                                 'eventData' => [
                                     'alias' => 'qti-interactions-delivery',
-                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                                 ],
                             ],
                         ],
@@ -324,7 +325,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ),
                 'expectedMessage' => 'Invalid Request Body: [events][0][triggeredTimestamp] -> This field is missing.',
             ],
-            'IncompleteEventDeliveryUri' => [
+            'IncompleteEventRemoteDeliveryId' => [
                 'requestBody' => json_encode(
                     [
                         'source' => 'https://someinstance.taocloud.org/',
@@ -340,7 +341,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                         ],
                     ]
                 ),
-                'expectedMessage' => $missingDeliveryUri,
+                'expectedMessage' => $missingRemoteDeliveryId,
             ],
             'WrongAliasType' => [
                 'requestBody' => json_encode(
@@ -352,7 +353,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                                 'triggeredTimestamp' => 1565602371,
                                 'eventData' => [
                                     'alias' => 123,
-                                    'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                                 ],
                             ],
                         ],
@@ -393,7 +394,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'qti-interactions-delivery',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                         'withExtraFields' => true,
                     ],
                     'withExtraFields' => true,
@@ -404,7 +405,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'wrong-alias',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
                 [
@@ -413,7 +414,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602390,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
+                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
                     ],
                 ],
                 [
@@ -422,7 +423,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602380,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
             ],
@@ -440,7 +441,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'qti-interactions-delivery',
-                        'deliveryURI' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
+                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                     ],
                 ],
             ],
