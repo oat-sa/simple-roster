@@ -24,5 +24,5 @@ namespace OAT\SimpleRoster\Entity;
 
 interface EntityInterface
 {
-    public function getId(): ?int; // FIXME
+    public function getId(): ?int; // FIXME Remove ? after all entity is immutable
 }

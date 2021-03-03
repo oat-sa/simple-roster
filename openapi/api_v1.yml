@@ -372,6 +372,17 @@ components:
                     type: integer
                     description: The end DateTime in UNIX timestamp
                     example: 1542880258
+                isActive:
+                    type: integer
+                    description: Indicates if the line item is enabled or not
+                    example: 1
+                status:
+                    type: string
+                    enum:
+                        - enabled
+                        - disabled
+                    description: Status of the line item
+                    example: enabled
                 maxAttempts:
                     type: integer
                     description: The maximum number of attempts

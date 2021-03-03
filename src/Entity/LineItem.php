@@ -142,11 +142,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function isDisabled(): bool
-    {
-        return $this->status === self::STATUS_DISABLED;
-    }
-
     public function getStartAt(): ?DateTimeInterface
     {
         return $this->startAt;
@@ -172,11 +167,15 @@ class LineItem implements JsonSerializable, EntityInterface
 
     public function isAvailableForDate(DateTimeInterface $date): bool
     {
-        if (null === $this->startAt || null === $this->endAt) {
-            return true;
+        if ($this->startAt !== null && $date < $this->startAt) {
+            return false;
         }
 
-        return $this->startAt <= $date && $this->endAt >= $date;
+        if ($this->endAt !== null && $date > $this->endAt) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getMaxAttempts(): int
@@ -194,7 +193,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
-            'isActive' => $this->isEnabled(), // TODO remove from API response in next major release
             'status' => $this->status,
             'startDateTime' => $this->startAt !== null ? $this->startAt->getTimestamp() : '',
             'endDateTime' => $this->endAt !== null ? $this->endAt->getTimestamp() : '',
