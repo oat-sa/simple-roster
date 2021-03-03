@@ -2,8 +2,14 @@
 
 ## 2.1.0 - To be released
 
+### Added
+- Added `status` column on `line_items` database table.
+
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
+
+### Removed
+- Removed `isActive` column from `line_items` database table.
 
 ## 2.0.5 - 2021-03-03
 
