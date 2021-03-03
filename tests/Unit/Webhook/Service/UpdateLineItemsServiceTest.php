@@ -95,15 +95,14 @@ class UpdateLineItemsServiceTest extends TestCase
                 ]
             )
             ->willReturn([
-                    new LineItem(
-                        1,
-                        'testLabel',
-                        'http://lineitemuri.com',
-                        'qti-interactions-delivery',
-                        LineItem::STATUS_ENABLED
-                    ),
-                ]
-            );
+                new LineItem(
+                    1,
+                    'testLabel',
+                    'http://lineitemuri.com',
+                    'qti-interactions-delivery',
+                    LineItem::STATUS_ENABLED
+                ),
+            ]);
 
         $this->entityManager->expects(self::once())
             ->method('persist');
