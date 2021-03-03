@@ -1,4 +1,6 @@
 # Changelog
+## 2.0.5 - 2021-03-01
+- renamed event payload attribute name from deliveryURI to remoteDeliveryId
 
 ## 2.0.4 - 2021-02-25
 
