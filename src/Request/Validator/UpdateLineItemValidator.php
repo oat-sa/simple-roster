@@ -98,7 +98,7 @@ class UpdateLineItemValidator
                                                                     new Assert\Type('string'),
                                                                 ],
                                                             ),
-                                                            "deliveryURI" => new Assert\Type('string'),
+                                                            "remoteDeliveryId" => new Assert\Type('string'),
                                                         ],
                                                         'allowExtraFields' => true,
                                                     ],
