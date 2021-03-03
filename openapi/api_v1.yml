@@ -418,11 +418,11 @@ components:
                                     alias:
                                         type: string
                                         description: This data should match with the line item slug on the simple roster context
-                                    deliveryURI:
+                                    remoteDeliveryId:
                                         type: string
                                         description: Based on the match between alias and slug, this field will be the new uri on the matched line item
                                 required:
-                                    - deliveryURI
+                                    - remoteDeliveryId
                         required:
                             - eventId
                             - eventName

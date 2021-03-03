@@ -77,7 +77,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
                             "triggeredTimestamp":1565602390,
                             "eventData":{
                                 "alias":"qti-interactions-delivery",
-                                "deliveryURI":"https://tao.instance/ontologies/tao.rdf#kkkkzk"
+                                "remoteDeliveryId":"https://tao.instance/ontologies/tao.rdf#kkkkzk"
                             }
                         }
                     ]
