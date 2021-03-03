@@ -28,60 +28,51 @@ use PHPUnit\Framework\TestCase;
 
 class AssignmentTest extends TestCase
 {
-    /** @var LineItem */
-    private $lineItem;
-
-    /** @var Assignment */
-    private $subject;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->lineItem = new LineItem();
-        $this->subject = new Assignment();
-        $this->subject->setLineItem($this->lineItem);
-    }
-
     public function testItUpdatesStateAsCompletedIfMaxAttemptsIsReached(): void
     {
-        $this->lineItem->setMaxAttempts(1);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 1);
+        $subject = new Assignment();
+        $subject->setLineItem($lineItem);
 
-        $this->subject->incrementAttemptsCount();
+        $subject->incrementAttemptsCount();
 
-        $this->subject->complete();
+        $subject->complete();
 
         self::assertSame(
             Assignment::STATE_COMPLETED,
-            $this->subject->getState()
+            $subject->getState()
         );
     }
 
     public function testItUpdatesStateAsReadyIfMaxAttemptsIs0(): void
     {
-        $this->lineItem->setMaxAttempts(0);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $subject = new Assignment();
+        $subject->setLineItem($lineItem);
 
-        $this->subject->incrementAttemptsCount();
+        $subject->incrementAttemptsCount();
 
-        $this->subject->complete();
+        $subject->complete();
 
         self::assertSame(
             Assignment::STATE_READY,
-            $this->subject->getState()
+            $subject->getState()
         );
     }
 
     public function testItUpdatesStateAsReadyIfMaxAttemptsIsNotReached(): void
     {
-        $this->lineItem->setMaxAttempts(2);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 2);
+        $subject = new Assignment();
+        $subject->setLineItem($lineItem);
 
-        $this->subject->incrementAttemptsCount();
+        $subject->incrementAttemptsCount();
 
-        $this->subject->complete();
+        $subject->complete();
 
         self::assertSame(
             Assignment::STATE_READY,
-            $this->subject->getState()
+            $subject->getState()
         );
     }
 }

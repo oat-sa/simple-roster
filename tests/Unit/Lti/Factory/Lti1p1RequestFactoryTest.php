@@ -81,7 +81,7 @@ class Lti1p1RequestFactoryTest extends TestCase
             ->willReturn($expectedLtiInstance);
 
         $assignment = (new Assignment())
-            ->setLineItem(new LineItem())
+            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
             ->setUser(new User());
 
         $this->launchUrlBuilder

@@ -28,11 +28,7 @@
         <field name="label" column="label" length="255" precision="0" scale="0"/>
         <field name="uri" column="uri" length="255" precision="0" scale="0"/>
         <field name="slug" column="slug" length="255" precision="0" scale="0" unique="true"/>
-        <field name="isActive" column="is_active" type="boolean" nullable="false">
-            <options>
-                <option name="default">true</option>
-            </options>
-        </field>
+        <field name="status" length="255" precision="0" scale="0" />
         <field name="startAt" type="datetime" column="start_at" precision="0" scale="0" nullable="true"/>
         <field name="endAt" type="datetime" column="end_at" precision="0" scale="0" nullable="true"/>
         <field name="maxAttempts" type="integer" column="max_attempts" precision="0" scale="0" nullable="true">

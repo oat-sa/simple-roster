@@ -28,6 +28,7 @@ use Exception;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -88,11 +89,12 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     {
         foreach ($lineItemIds as $lineItemId) {
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
-            self::assertTrue($lineItem->isActive());
+            self::assertTrue($lineItem->isEnabled());
 
             $lineItemCache = $this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId));
             $cache = current(current($lineItemCache));
-            self::assertSame('1', $cache['is_active_3']);
+
+            self::assertSame('enabled', $cache['status_3']);
         }
 
         $commandResult = $this->commandTester->execute(
@@ -107,7 +109,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
         $this->assertMessageDisplays($lineItemIds, 'deactivate');
 
-        $this->assertLineItems($lineItemIds, 'deactivate', false);
+        $this->assertLineItems($lineItemIds, 'deactivate', LineItem::STATUS_DISABLED);
     }
 
     /**
@@ -124,7 +126,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             ['capture_stderr_separately' => true]
         );
 
-        $this->assertLineItems($lineItemIds, 'deactivate', false);
+        $this->assertLineItems($lineItemIds, 'deactivate', LineItem::STATUS_DISABLED);
 
         $commandResult = $this->commandTester->execute(
             [
@@ -138,13 +140,13 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
         $this->assertMessageDisplays($lineItemIds, 'activate');
 
-        $this->assertLineItems($lineItemIds, 'activate', true);
+        $this->assertLineItems($lineItemIds, 'activate', LineItem::STATUS_ENABLED);
     }
 
     public function testEnsureOnlyOneLineIsDeactivated(): void
     {
         $secondLineItem = $this->lineItemRepository->findOneById(2);
-        self::assertTrue($secondLineItem->isActive());
+        self::assertTrue($secondLineItem->isEnabled());
 
         $this->commandTester->execute(
             [
@@ -155,10 +157,10 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             ['capture_stderr_separately' => true]
         );
         $firstLineItem = $this->lineItemRepository->findOneById(1);
-        self::assertFalse($firstLineItem->isActive());
+        self::assertFalse($firstLineItem->isEnabled());
 
         $secondLineItem = $this->lineItemRepository->findOneById(2);
-        self::assertTrue($secondLineItem->isActive());
+        self::assertTrue($secondLineItem->isEnabled());
     }
 
     /**
@@ -293,7 +295,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         );
     }
 
-    private function assertLineItems(array $lineItemIds, string $toggle, bool $isActive): void
+    private function assertLineItems(array $lineItemIds, string $toggle, string $expectedLineItemStatus): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $this->assertHasLogRecord(
@@ -313,12 +315,12 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
 
-            self::assertSame($isActive, $lineItem->isActive());
+            self::assertSame($expectedLineItemStatus, $lineItem->getStatus());
 
             $cache = current(
                 current($this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId)))
             );
-            self::assertEquals((int)$isActive, $cache['is_active_3']);
+            self::assertEquals($expectedLineItemStatus, $cache['status_3']);
         }
     }
 

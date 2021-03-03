@@ -1,25 +1,34 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem:
-        label: 'The first line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug1'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: 1
+            label: 'The first line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug1'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
     lineItem2:
-        label: 'The second line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug2'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: 2
+            label: 'The second line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug2'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
     lineItem3:
-        label: 'The third line item'
-        uri: 'http://different-lineitemuri.com'
-        slug: 'lineItemSlug3'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: 3
+            label: 'The third line item'
+            uri: 'http://different-lineitemuri.com'
+            slug: 'lineItemSlug3'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment_{1..50}:

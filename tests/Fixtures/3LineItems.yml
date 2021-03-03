@@ -1,12 +1,18 @@
 OAT\SimpleRoster\Entity\LineItem:
     line_item_{1..2}]:
+        __construct:
+            id: <intval(<current()>->id)>
             label: 'line_item_<current()>'
             uri: 'https://test.taocloud.fr/__n/<current()>/'
             slug: 'slug-<current()>'
+            status: 'enabled'
     line_item_qqy:
+        __construct:
+            id: 3
             label: 'line_item_qqy'
             uri: 'https://test.taocloud.fr/__n/qqy/'
             slug: 'slug-qqy'
-            startAt: '<dateTime()>'
-            endAt: '<dateTime()>'
+            status: 'enabled'
+            startAt: '<dateTimeBetween("now", "now")>'
+            endAt: '<dateTimeBetween($startAt, "+1 days")>'
             maxAttempts: 3

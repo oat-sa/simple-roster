@@ -58,7 +58,7 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
 
         $assignment
             ->setUser((new User())->setUsername('testUser'))
-            ->setLineItem((new LineItem())->setUri('http://test-uri.com'));
+            ->setLineItem(new LineItem(1, 'testLabel', 'http://test-uri.com', 'testSlug', LineItem::STATUS_ENABLED));
 
         $subject = new Lti1p1LaunchUrlBuilder($router, $loadBalancer, $ltiConfiguration);
 

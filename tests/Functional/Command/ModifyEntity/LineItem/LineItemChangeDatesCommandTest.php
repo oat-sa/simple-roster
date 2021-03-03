@@ -29,6 +29,7 @@ use InvalidArgumentException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -137,7 +138,6 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     ): void {
         $lineItemIds = $persistedData['lineItemIds'];
 
-        $this->loadFixtureByFilename('3LineItems.yml');
         $this->assertCacheDoesNotExist($lineItemIds);
 
         self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
@@ -159,8 +159,6 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $parameters, array $persistedData): void
     {
         $lineItemIds = $persistedData['lineItemIds'];
-
-        $this->loadFixtureByFilename('3LineItems.yml');
         $this->assertCacheDoesNotExist($lineItemIds);
 
         $parameters['-f'] = null;
@@ -182,8 +180,6 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
      */
     public function testItWarnsIfNoLineItemWasFound(array $parameters): void
     {
-        $this->loadFixtureByFilename('3LineItems.yml');
-
         self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
@@ -277,14 +273,14 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         return [
             'usingShortIdsParameterAndDates' => [
                 'parameters' => [
-                    '-i' => '1,2,3',
+                    '-i' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
             ],
             'usingLongIdParameterAndDates' => [
                 'parameters' => [
-                    '--line-item-ids' => '1,2,3',
+                    '--line-item-ids' => '4,5,6',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
@@ -323,66 +319,66 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         return [
             'usingSingleIdAndDates' => [
                 'parameters' => [
-                    '-i' => '4',
+                    '-i' => '3',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4],
+                    'lineItemIds' => [3],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => '2020-01-10 00:00:00',
                 ],
             ],
             'usingSingleIdsWithoutDates' => [
                 'parameters' => [
-                    '-i' => '4'
+                    '-i' => '3'
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4],
+                    'lineItemIds' => [3],
                     'start_at' => null,
                     'end_at' => null,
                 ],
             ],
             'usingMultipleIdsAndDates' => [
                 'parameters' => [
-                    '-i' => '4,5,6',
+                    '-i' => '1,2,3',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => '2020-01-10 00:00:00',
                 ],
             ],
             'usingMultipleIdsWithoutDates' => [
                 'parameters' => [
-                    '-i' => '4,5,6'
+                    '-i' => '1,2,3'
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => null,
                     'end_at' => null,
                 ],
             ],
             'usingIdsAndStartDateOnly' => [
                 'parameters' => [
-                    '-i' => '4,5,6',
+                    '-i' => '1,2,3',
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => null,
                 ],
             ],
             'usingIdsAndEndDateOnly' => [
                 'parameters' => [
-                    '-i' => '4,5,6',
+                    '-i' => '1,2,3',
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => null,
                     'end_at' => '2020-01-01 00:00:00',
                 ],
@@ -394,7 +390,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4],
+                    'lineItemIds' => [1],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => '2020-01-10 00:00:00',
                 ],
@@ -404,7 +400,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-s' => 'slug-1',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4],
+                    'lineItemIds' => [1],
                     'start_at' => null,
                     'end_at' => null,
                 ],
@@ -416,7 +412,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => '2020-01-10 00:00:00',
                 ],
@@ -426,7 +422,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-s' => 'slug-1,slug-2,slug-qqy',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => null,
                     'end_at' => null,
                 ],
@@ -437,7 +433,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--start-date' => '2020-01-01T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => '2020-01-01 00:00:00',
                     'end_at' => null,
                 ],
@@ -448,7 +444,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4, 5, 6],
+                    'lineItemIds' => [1, 2, 3],
                     'start_at' => null,
                     'end_at' => '2020-01-01 00:00:00',
                 ],

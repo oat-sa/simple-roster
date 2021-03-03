@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -52,7 +52,7 @@ class LineItemChangeStateCommand extends Command
 
     private const TOGGLE_OPERATIONS = [
         self::TOGGLE_ACTIVATE,
-        self::TOGGLE_DEACTIVATE
+        self::TOGGLE_DEACTIVATE,
     ];
 
     /** @var LineItemRepository */
@@ -163,11 +163,11 @@ EOF
         try {
             $this->symfonyStyle->comment(sprintf('Executing %s...', ucfirst($toggle)));
 
-            /** @var ArrayCollection $lineItems */
+            /** @var LineItem[] $lineItems */
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
             foreach ($lineItems as $lineItem) {
-                $lineItem->setIsActive($toggle === self::TOGGLE_ACTIVATE);
+                $toggle === self::TOGGLE_ACTIVATE ? $lineItem->enable() : $lineItem->disable();
 
                 $this->logger->info(
                     sprintf(

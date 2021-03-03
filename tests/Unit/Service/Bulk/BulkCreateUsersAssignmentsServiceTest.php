@@ -79,7 +79,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     {
         $user = (new User())->addAssignment((new Assignment())
             ->setState(Assignment::STATE_READY)
-            ->setLineItem(new LineItem()));
+            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED)));
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -142,7 +142,7 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $expectedLineItem = new LineItem();
+        $expectedLineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')

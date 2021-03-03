@@ -58,7 +58,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->expectException(AssignmentNotProcessableException::class);
         $this->expectExceptionMessage("Assignment with id '5' does not have a suitable state.");
 
-        $lineItem = new LineItem();
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);
 
         $assignment
@@ -87,8 +87,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->expectException(AssignmentNotProcessableException::class);
         $this->expectExceptionMessage("Assignment with id '8' has reached the maximum attempts.");
 
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, $maxAttempts);
 
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);
 
@@ -118,9 +117,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
     ): void {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts)
-            ->setUri('http://test-delivery-uri.html');
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, $maxAttempts);
 
         $user = (new User())
             ->setUsername('testUsername');

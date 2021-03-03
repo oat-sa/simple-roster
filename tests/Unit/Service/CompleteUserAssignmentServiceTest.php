@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\Infrastructure;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
@@ -71,11 +70,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(1);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 1);
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
@@ -107,11 +102,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(2);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 2);
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
@@ -143,10 +134,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug');
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)

@@ -43,7 +43,7 @@ class LineItemCollectionTest extends TestCase
 
     public function testIfLineItemCanBeAdded(): void
     {
-        $lineItem = (new LineItem())->setSlug('test');
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
         $subject = (new LineItemCollection())->add($lineItem);
 
         self::assertCount(1, $subject);

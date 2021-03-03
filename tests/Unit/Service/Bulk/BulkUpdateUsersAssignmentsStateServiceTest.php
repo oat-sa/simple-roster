@@ -76,7 +76,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         );
 
         $expectedAssignment = (new Assignment())
-            ->setLineItem(new LineItem())
+            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
             ->setState(Assignment::STATE_STARTED);
 
         $expectedUser = (new User())
@@ -112,7 +112,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $expectedLineItem = new LineItem();
+        $expectedLineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -185,7 +185,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
 
         $completedAssignment = (new Assignment())
-            ->setLineItem(new LineItem())
+            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
             ->setState(Assignment::STATE_COMPLETED);
 
         $user = (new User())

@@ -152,14 +152,12 @@ class Assignment implements JsonSerializable, EntityInterface
         return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
     }
 
-    private function isAvailableForDate(): bool
-    {
-        return $this->getLineItem()->isAvailableForDate(Carbon::now()->toDateTime());
-    }
-
     public function isAvailable(): bool
     {
-        return $this->getLineItem()->isActive() && !$this->isCancelled() && $this->isAvailableForDate();
+        return
+            $this->lineItem->isEnabled()
+            && !$this->isCancelled()
+            && $this->lineItem->isAvailableForDate(Carbon::now()->toDateTime());
     }
 
     public function getAttemptsCount(): int
