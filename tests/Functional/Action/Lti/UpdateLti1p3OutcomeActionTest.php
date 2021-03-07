@@ -26,7 +26,7 @@ use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
@@ -39,7 +39,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use SecurityTestingTrait;
     use XmlTestingTrait;
-    use AssignmentStatusTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
@@ -47,11 +46,16 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     /** @var RegistrationInterface */
     private $registration;
 
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->assignmentRepository = static::$container->get(AssignmentRepository::class);
+
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
@@ -102,7 +106,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             $this->getValidReplaceResultResponseXml($messageIdentifier),
             $this->kernelBrowser->getResponse()->getContent()
         );
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_READY, $this->assignmentRepository->find(1)->getStatus());
     }
 
     public function testItReturns401IfWithInvalidScope(): void
@@ -192,7 +196,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_READY, $this->assignmentRepository->find(1)->getStatus());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -216,6 +220,6 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_READY, $this->assignmentRepository->find(1)->getStatus());
     }
 }

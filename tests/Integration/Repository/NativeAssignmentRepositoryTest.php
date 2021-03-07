@@ -55,9 +55,9 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleAssignments(): void
     {
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1, 'user1', 1);
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1, 'user2', 1);
-        $assignment3 = new AssignmentDto(Assignment::STATE_READY, 1, 'user3', 1);
+        $assignment1 = new AssignmentDto(Assignment::STATUS_READY, 1, 'user1', 1);
+        $assignment2 = new AssignmentDto(Assignment::STATUS_READY, 1, 'user2', 1);
+        $assignment3 = new AssignmentDto(Assignment::STATUS_READY, 1, 'user3', 1);
 
         $assignmentCollection = (new AssignmentDtoCollection())
             ->add($assignment1)
@@ -71,7 +71,7 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
         /** @var Assignment $assignment */
         foreach ($assignments as $assignment) {
-            self::assertSame(Assignment::STATE_READY, $assignment->getState());
+            self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
             self::assertSame(0, $assignment->getAttemptsCount());
         }
     }

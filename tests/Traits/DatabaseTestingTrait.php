@@ -27,6 +27,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
+use Fidry\AliceDataFixtures\Persistence\PurgeMode;
 use Hautelook\AliceBundle\PhpUnit\BaseDatabaseTrait;
 
 trait DatabaseTestingTrait
@@ -53,7 +54,12 @@ trait DatabaseTestingTrait
         /** @var PurgerLoader $loader */
         $loader = static::$container->get('fidry_alice_data_fixtures.loader.doctrine');
 
-        $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
+        $loader->load(
+            [sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)],
+            [],
+            [],
+            PurgeMode::createNoPurgeMode()
+        );
     }
 
     protected function getManagerRegistry(): ManagerRegistry

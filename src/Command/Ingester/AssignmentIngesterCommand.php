@@ -193,6 +193,6 @@ EOF
     ): AssignmentDto {
         $lineItem = $lineItems->getBySlug($lineItemSlug);
 
-        return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), $username);
+        return new AssignmentDto(Assignment::STATUS_READY, (int)$lineItem->getId(), $username);
     }
 }

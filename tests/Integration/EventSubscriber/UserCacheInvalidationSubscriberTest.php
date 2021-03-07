@@ -106,7 +106,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
         $user = $this->userRepository->findByUsernameWithAssignments($username);
         self::assertTrue($this->resultCache->contains($cacheId));
 
-        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
+        $user->getLastAssignment()->start();
 
         $this->userRepository->flush();
 

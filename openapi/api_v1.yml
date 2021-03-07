@@ -339,9 +339,9 @@ components:
                     type: string
                     description: The username of the user who belongs to the assignment
                     example: johndoe
-                state:
+                status:
                     type: string
-                    description: State of assignment
+                    description: Status of assignment
                     enum:
                         - ready
                         - started
@@ -401,7 +401,7 @@ components:
                     type: array
                     items: {}
                     description: Operation attributes
-                    example: ["state": "cancelled"]
+                    example: ["status": "cancelled"]
         UpdateLineItemWebHook:
             type: object
             properties:

@@ -95,18 +95,9 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $assignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
+        $lineItem = new LineItem(5, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(1, Assignment::STATUS_READY, $lineItem);
 
         self::assertSame('5', $this->subject->getLtiRequestContextId($assignment));
-    }
-
-    private function getLineItemMock(int $lineItemId): LineItem
-    {
-        $lineItem = $this->createMock(LineItem::class);
-        $lineItem
-            ->method('getId')
-            ->willReturn($lineItemId);
-
-        return $lineItem;
     }
 }

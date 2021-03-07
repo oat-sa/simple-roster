@@ -100,7 +100,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                 [
                     'id' => $user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
-                    'state' => Assignment::STATE_READY,
+                    'status' => Assignment::STATUS_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
                         'uri' => $lineItem->getUri(),
@@ -144,7 +144,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                 [
                     'id' => $user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
-                    'state' => Assignment::STATE_READY,
+                    'status' => Assignment::STATUS_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
                         'uri' => $lineItem->getUri(),

@@ -111,7 +111,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         foreach ($user->getCancellableAssignments() as $assignment) {
-            $assignment->setState(Assignment::STATE_CANCELLED);
+            $assignment->cancel();
 
             $this->logBuffer[] = [
                 'message' => sprintf(
@@ -129,14 +129,14 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     /**
      * @throws LogicException
      */
-    private function validateStateTransition(BulkOperation $operation): void
+    private function validateStateTransition(BulkOperation $operation): void // TODO should be done within Assignment
     {
-        if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
+        if ($operation->getAttribute('state') !== Assignment::STATUS_CANCELLED) {
             throw new LogicException(
                 sprintf(
                     "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
                     $operation->getAttribute('state'),
-                    Assignment::STATE_CANCELLED
+                    Assignment::STATUS_CANCELLED
                 )
             );
         }

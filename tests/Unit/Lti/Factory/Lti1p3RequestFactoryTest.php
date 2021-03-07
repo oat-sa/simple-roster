@@ -26,6 +26,8 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
@@ -85,7 +87,8 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->with('registrationId')
             ->willReturn(null);
 
-        $this->subject->create(new Assignment());
+        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $this->subject->create(new Assignment(1, Assignment::STATUS_READY, $lineItem));
     }
 
     public function testItReturnsAssignmentLtiRequest(): void
@@ -95,7 +98,6 @@ class Lti1p3RequestFactoryTest extends TestCase
         $this->registrationRepository
             ->method('find')
             ->willReturn($this->createMock(Registration::class));
-
 
         $assignment = $this->createMock(Assignment::class);
 

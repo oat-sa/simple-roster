@@ -25,9 +25,9 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
-use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Psr\Log\LoggerInterface;
@@ -41,8 +41,8 @@ class GetUserAssignmentLtiLinkAction
     /** @var SerializerResponder */
     private $responder;
 
-    /** @var GetUserAssignmentLtiRequestService */
-    private $getUserAssignmentLtiRequestService;
+    /** @var LtiRequestFactoryInterface */
+    private $ltiRequestFactory;
 
     /** @var AssignmentRepository */
     private $assignmentRepository;
@@ -52,12 +52,12 @@ class GetUserAssignmentLtiLinkAction
 
     public function __construct(
         SerializerResponder $responder,
-        GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
+        LtiRequestFactoryInterface $ltiRequestFactory,
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger
     ) {
         $this->responder = $responder;
-        $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
+        $this->ltiRequestFactory = $ltiRequestFactory;
         $this->assignmentRepository = $assignmentRepository;
         $this->logger = $logger;
     }
@@ -67,15 +67,15 @@ class GetUserAssignmentLtiLinkAction
         try {
             /** @var User $user */
             $assignment = $user->getAvailableAssignmentById($assignmentId);
-            $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
+            $ltiRequest = $this->ltiRequestFactory->create($assignment);
 
-            if ($assignment->getState() !== Assignment::STATE_STARTED) {
-                $assignment
-                    ->setState(Assignment::STATE_STARTED)
-                    ->incrementAttemptsCount();
+            if ($assignment->getStatus() !== Assignment::STATUS_STARTED) {
+                $assignment->start();
 
                 $this->assignmentRepository->flush();
             }
+
+            // TODO validation must be done here if it can be launched or not
 
             $this->logger->info(
                 sprintf("LTI request was successfully generated for assignment with id='%s'", $assignmentId),
@@ -88,7 +88,7 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (AssignmentUnavailableException | AssignmentNotProcessableException $exception) {
+        } catch (AssignmentUnavailableException | InvalidAssignmentStatusTransitionException $exception) {
             throw new ConflictHttpException($exception->getMessage());
         }
     }

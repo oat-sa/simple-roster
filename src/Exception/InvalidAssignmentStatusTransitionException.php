@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,26 +15,16 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Traits;
+namespace OAT\SimpleRoster\Exception;
 
-use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
+use RuntimeException;
 
-trait AssignmentStatusTestingTrait
+class InvalidAssignmentStatusTransitionException extends RuntimeException
 {
-    public function assertAssignmentStatus(string $status): void
-    {
-        /** @var AssignmentRepository $repository */
-        $repository = $this->getRepository(Assignment::class);
 
-        $assignment = $repository->find(1);
-
-        self::assertInstanceOf(Assignment::class, $assignment);
-        self::assertSame($status, $assignment->getState());
-    }
 }

@@ -72,12 +72,11 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $successfulOperation = new BulkOperation(
             'test',
             BulkOperation::TYPE_UPDATE,
-            ['state' => Assignment::STATE_CANCELLED]
+            ['state' => Assignment::STATUS_CANCELLED]
         );
 
-        $expectedAssignment = (new Assignment())
-            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
-            ->setState(Assignment::STATE_STARTED);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $expectedAssignment = new Assignment(1, Assignment::STATUS_STARTED, $lineItem);
 
         $expectedUser = (new User())
             ->setUsername('expectedUser')
@@ -117,19 +116,17 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $this->userRepository
             ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
+                $assignment = new Assignment(1, Assignment::STATUS_STARTED, $expectedLineItem);
+
                 return (new User())
                     ->setUsername($username)
-                    ->addAssignment(
-                        (new Assignment())
-                            ->setState(Assignment::STATE_STARTED)
-                            ->setLineItem($expectedLineItem)
-                    );
+                    ->addAssignment($assignment);
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
-            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
-            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]));
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]));
 
         $this->entityManager
             ->expects(self::once())
@@ -140,15 +137,15 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->method('info')
             ->withConsecutive(
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test').",
+                    "Successful assignment cancellation (assignmentId = '1', username = 'test').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test1').",
+                    "Successful assignment cancellation (assignmentId = '1', username = 'test1').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test2').",
+                    "Successful assignment cancellation (assignmentId = '1', username = 'test2').",
                     ['lineItem' => $expectedLineItem],
                 ],
             );
@@ -166,7 +163,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             sprintf(
                 "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
                 $invalidState,
-                Assignment::STATE_CANCELLED
+                Assignment::STATUS_CANCELLED
             )
         );
 
@@ -182,14 +179,12 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
     public function testItIgnoresCompletedAssignments(): void
     {
-        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
+        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]);
 
-        $completedAssignment = (new Assignment())
-            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
-            ->setState(Assignment::STATE_COMPLETED);
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $completedAssignment = new Assignment(1, Assignment::STATUS_COMPLETED, $lineItem);
 
-        $user = (new User())
-            ->addAssignment($completedAssignment);
+        $user = (new User())->addAssignment($completedAssignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -199,15 +194,15 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
         $this->subject->process($bulkOperationCollection)->jsonSerialize();
 
-        self::assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+        self::assertSame(Assignment::STATUS_COMPLETED, $completedAssignment->getStatus());
     }
 
     public function provideUnsupportedAssignmentState(): array
     {
         return [
-            Assignment::STATE_STARTED => [Assignment::STATE_STARTED],
-            Assignment::STATE_READY => [Assignment::STATE_READY],
-            Assignment::STATE_COMPLETED => [Assignment::STATE_COMPLETED],
+            Assignment::STATUS_STARTED => [Assignment::STATUS_STARTED],
+            Assignment::STATUS_READY => [Assignment::STATUS_READY],
+            Assignment::STATUS_COMPLETED => [Assignment::STATUS_COMPLETED],
         ];
     }
 }

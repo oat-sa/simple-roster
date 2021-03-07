@@ -196,7 +196,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         self::assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
         $this->getEntityManager()->refresh($user->getLastAssignment());
-        self::assertSame(Assignment::STATE_READY, $user->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_READY, $user->getLastAssignment()->getStatus());
         self::assertCount(1, $user->getAvailableAssignments());
 
         $this->assertHasLogRecordWithMessage(
@@ -240,7 +240,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Assignment::STATE_CANCELLED, $reloadedUser->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_CANCELLED, $reloadedUser->getLastAssignment()->getStatus());
         self::assertCount(0, $reloadedUser->getAvailableAssignments());
     }
 
@@ -273,7 +273,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $payload[] = [
                 'identifier' => $user,
                 'attributes' => [
-                    'state' => Assignment::STATE_CANCELLED,
+                    'state' => Assignment::STATUS_CANCELLED,
                 ],
             ];
         }

@@ -58,7 +58,7 @@ class AssignmentIngesterTest extends TestCase
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage("User with username 'nonExistingUser' cannot not found.");
 
-        $assignment = new AssignmentDto(Assignment::STATE_READY, 1, 'nonExistingUser');
+        $assignment = new AssignmentDto(Assignment::STATUS_READY, 1, 'nonExistingUser');
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment]);
 
         $this->subject->ingest($assignmentCollection);
@@ -66,8 +66,8 @@ class AssignmentIngesterTest extends TestCase
 
     public function testItCanIngestAssignments(): void
     {
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1, 'testUser1');
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1, 'testUser2');
+        $assignment1 = new AssignmentDto(Assignment::STATUS_READY, 1, 'testUser1');
+        $assignment2 = new AssignmentDto(Assignment::STATUS_READY, 1, 'testUser2');
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
         $this->userRepository

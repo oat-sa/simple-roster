@@ -77,9 +77,11 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
     {
-        $user = (new User())->addAssignment((new Assignment())
-            ->setState(Assignment::STATE_READY)
-            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED)));
+        $user = new User();
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(1, Assignment::STATUS_READY, $lineItem);
+
+        $user->addAssignment($assignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -147,9 +149,11 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
         $this->userRepository
             ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
+                $assignment = new Assignment(1, Assignment::STATUS_READY, $expectedLineItem);
+
                 return (new User())
                     ->setUsername($username)
-                    ->addAssignment((new Assignment())->setLineItem($expectedLineItem));
+                    ->addAssignment($assignment);
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())

@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Bulk;
 use Carbon\Carbon;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
@@ -238,7 +239,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         $userRepository = $this->getRepository(User::class);
         $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_READY, $reloadedUser->getLastAssignment()->getStatus());
         self::assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
         self::assertCount(1, $reloadedUser->getAvailableAssignments());
     }

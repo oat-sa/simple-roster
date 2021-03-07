@@ -24,13 +24,14 @@ namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface;
 use OAT\SimpleRoster\EventListener\Doctrine\LineItemLoaderListener;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class LineItemLoaderListenerTest extends TestCase
+class LineItemLoaderListenerTest extends TestCase // FIXME this should not be a unit test
 {
     /** @var LineItemLoaderListener */
     private $subject;
@@ -62,7 +63,7 @@ class LineItemLoaderListenerTest extends TestCase
             ->with(1)
             ->willReturn($expectedLineItem);
 
-        $assignment = (new Assignment())->setLineItemId(1);
+        $assignment = (new Assignment(1, Assignment::STATUS_READY, $expectedLineItem));
 
         $this->subject->postLoad($assignment);
 

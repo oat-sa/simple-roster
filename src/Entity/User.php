@@ -122,10 +122,8 @@ class User implements UserInterface, EntityInterface
      */
     public function getCancellableAssignments(): Collection
     {
-        $assignments = $this->getAssignments();
-
         $list = new ArrayCollection();
-        foreach ($assignments as $assignment) {
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->isCancellable()) {
                 $list->add($assignment);
             }

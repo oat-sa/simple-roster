@@ -25,10 +25,10 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
-use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
@@ -41,19 +41,23 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use XmlTestingTrait;
-    use AssignmentStatusTestingTrait;
     use LoggerTestingTrait;
 
     /** @var KernelBrowser */
     private $kernelBrowser;
+
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->assignmentRepository = static::$container->get(AssignmentRepository::class);
+
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+        $this->loadFixtureByFilename('userWithStartedAssignment.yml');
 
         $this->setUpTestLogHandler('security');
     }
@@ -142,7 +146,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->kernelBrowser->getResponse()->getContent()
         );
 
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_READY, $this->assignmentRepository->find(1)->getStatus());
 
         $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
     }
@@ -178,7 +182,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_STARTED, $this->assignmentRepository->find(1)->getStatus());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -210,7 +214,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-        $this->assertAssignmentStatus(Assignment::STATE_READY);
+        self::assertSame(Assignment::STATUS_STARTED, $this->assignmentRepository->find(1)->getStatus());
     }
 
     private function generateSignature(LtiInstance $ltiInstance, string $time): string

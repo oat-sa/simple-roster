@@ -31,6 +31,7 @@ use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
@@ -91,6 +92,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     /**
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
+     * @throws InvalidAssignmentStatusTransitionException
      */
     private function processOperation(BulkOperation $operation, BulkResult $result): void
     {
@@ -100,17 +102,15 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
 
         $lastAssignment = $user->getLastAssignment();
 
+        // TODO what if there is no last assignment?
+
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->isCancellable()) {
-                $assignment->setState(Assignment::STATE_CANCELLED);
-            }
+            $assignment->cancel();
         }
 
-        $newAssignment = (new Assignment())
-            ->setState(Assignment::STATE_READY)
-            ->setLineItem($lastAssignment->getLineItem());
-
+        $newAssignment = new Assignment(0, Assignment::STATUS_READY, $lastAssignment->getLineItem());
         $user->addAssignment($newAssignment);
+
         $this->entityManager->persist($newAssignment);
 
         $result->addBulkOperationSuccess($operation);

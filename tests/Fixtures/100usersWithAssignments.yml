@@ -32,14 +32,20 @@ OAT\SimpleRoster\Entity\LineItem:
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment_{1..50}:
-        lineItem: '@lineItem'
-        state: 'ready'
+        __construct:
+            id: <intval(<current()>->id)>
+            status: 'ready'
+            lineItem: '@lineItem'
     assignment_{51..60}:
-        lineItem: '@lineItem2'
-        state: 'ready'
+        __construct:
+            id: <intval(<current()>->id)>
+            status: 'ready'
+            lineItem: '@lineItem2'
     assignment_{61..100}:
-        lineItem: '@lineItem3'
-        state: 'ready'
+        __construct:
+            id: <intval(<current()>->id)>
+            status: 'ready'
+            lineItem: '@lineItem3'
 
 OAT\SimpleRoster\Entity\User:
     user_{1..100}:

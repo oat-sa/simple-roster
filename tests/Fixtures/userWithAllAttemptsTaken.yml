@@ -1,10 +1,10 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem2:
         __construct:
-            id: 1
+            id: 2
             label: 'The first line item'
             uri: 'http://lineitemuri.com'
-            slug: 'lineItemSlug'
+            slug: 'slug2'
             status: 'enabled'
             startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
@@ -19,6 +19,8 @@ OAT\SimpleRoster\Entity\User:
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment2:
-        lineItem: '@lineItem2'
-        state: 'completed'
-        attemptsCount: 2
+        __construct:
+            id: 2
+            status: 'ready'
+            lineItem: '@lineItem2'
+            attemptsCount: 2

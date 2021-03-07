@@ -53,7 +53,7 @@ class AssignmentRepositoryTest extends KernelTestCase
     {
         $assignment = $this->subject->findById(1);
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(1, $assignment->getAttemptsCount());
     }
 
@@ -68,7 +68,7 @@ class AssignmentRepositoryTest extends KernelTestCase
     public function testItCanReturnAssignmentsByStateAndUpdatedAt(): void
     {
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime);
+        $assignments = $this->subject->findByStatusAndUpdatedAtPaged(Assignment::STATUS_STARTED, $dateTime);
 
         self::assertCount(10, $assignments->getIterator());
         self::assertCount(10, $assignments);
@@ -77,7 +77,7 @@ class AssignmentRepositoryTest extends KernelTestCase
     public function testItCanReturnAssignmentsByStateAndUpdatedAtPaginated(): void
     {
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime, 2, 3);
+        $assignments = $this->subject->findByStatusAndUpdatedAtPaged(Assignment::STATUS_STARTED, $dateTime, 2, 3);
 
         self::assertCount(3, $assignments->getIterator());
         self::assertCount(10, $assignments);

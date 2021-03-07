@@ -25,14 +25,13 @@
             <generator strategy="AUTO"/>
             <sequence-generator sequence-name="assignments_id_seq" allocation-size="1" initial-value="1"/>
         </id>
-        <field name="state" column="state" length="255" precision="0" scale="0"/>
+        <field name="status" length="255" precision="0" scale="0"/>
         <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
         <field name="attemptsCount" type="integer" column="attempts_count" precision="0" scale="0" nullable="true">
             <options>
                 <option name="default">0</option>
             </options>
         </field>
-        <field name="lineItemId" type="integer" column="line_item_id" precision="0" scale="0" nullable="false"/>
         <many-to-one field="user" target-entity="OAT\SimpleRoster\Entity\User" inversed-by="assignments" fetch="LAZY">
             <cascade>
                 <cascade-persist/>

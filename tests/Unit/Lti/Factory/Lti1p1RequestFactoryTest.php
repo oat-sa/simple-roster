@@ -67,22 +67,18 @@ class Lti1p1RequestFactoryTest extends TestCase
     {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
-        $expectedLtiInstance = new LtiInstance(
-            1,
-            'ltiInstanceLabel',
-            'http://lti-infra.taocloud.org',
-            'ltiKey',
-            'ltiSecret'
-        );
+        $expectedLtiInstance = new LtiInstance(1, 'ltiLabel', 'http://lti-infra.taocloud.org', 'ltiKey', 'ltiSecret');
 
         $this->loadBalancer
             ->expects(self::once())
             ->method('getLtiInstance')
             ->willReturn($expectedLtiInstance);
 
-        $assignment = (new Assignment())
-            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED))
-            ->setUser(new User());
+        $user = new User();
+        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(1, Assignment::STATUS_READY, $lineItem);
+
+        $user->addAssignment($assignment);
 
         $this->launchUrlBuilder
             ->expects(self::once())

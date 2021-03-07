@@ -66,7 +66,7 @@ class NativeAssignmentRepository extends AbstractRepository
         }
 
         $query = sprintf(
-            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
+            'INSERT INTO assignments (id, user_id, line_item_id, status, attempts_count) VALUES %s', // TODO: parenthesis?
             implode(',', $queryParts)
         );
 

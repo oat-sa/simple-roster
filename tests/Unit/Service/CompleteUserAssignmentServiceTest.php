@@ -71,12 +71,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 1);
+        $assignment = new Assignment(1, Assignment::STATUS_STARTED, $lineItem, 1);
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
@@ -88,7 +85,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_COMPLETED;
+                return $assignment->getStatus() === Assignment::STATUS_COMPLETED;
             }));
 
         $this->assignmentRepository
@@ -103,12 +100,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 2);
+        $assignment = new Assignment(1, Assignment::STATUS_STARTED, $lineItem, 1);
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
@@ -120,7 +114,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_READY;
+                return $assignment->getStatus() === Assignment::STATUS_READY;
             }));
 
         $this->assignmentRepository
@@ -135,11 +129,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $user = (new User())->setUsername('expectedUsername');
 
         $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(1, Assignment::STATUS_STARTED, $lineItem);
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())

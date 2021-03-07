@@ -28,6 +28,7 @@ OAT\SimpleRoster\Entity\User:
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment1:
-        lineItem: '@lineItem1'
-        state: 'ready'
-        attemptsCount: 1
+        __construct:
+            status: 'ready'
+            lineItem: '@lineItem1'
+            attemptsCount: 1
