@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
+
 ## 2.0.5 - 2021-03-03
 
 ### Fixed
