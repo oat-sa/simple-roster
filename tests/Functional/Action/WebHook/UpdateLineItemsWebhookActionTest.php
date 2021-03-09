@@ -157,7 +157,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         /** @var LineItem $lineItem */
         $lineItem = $lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
-        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.1');
+        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.00000001-0000-6000-0000-000000000000');
 
         $this->assertHasLogRecord(
             [
@@ -171,7 +171,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'The line item id 1 was updated',
+                'message' => 'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 'context' => [
                     'oldUri' => 'http://lineitemuri.com',
                     'newUri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',

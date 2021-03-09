@@ -96,18 +96,9 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $assignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
+        $lineItem = (new LineItem())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = (new Assignment())->setLineItem($lineItem);
 
-        self::assertSame('5', $this->subject->getLtiRequestContextId($assignment));
-    }
-
-    private function getLineItemMock(int $lineItemId): LineItem
-    {
-        $lineItem = $this->createMock(LineItem::class);
-        $lineItem
-            ->method('getId')
-            ->willReturn($lineItemId);
-
-        return $lineItem;
+        self::assertSame('00000001-0000-6000-0000-000000000000', $this->subject->getLtiRequestContextId($assignment));
     }
 }

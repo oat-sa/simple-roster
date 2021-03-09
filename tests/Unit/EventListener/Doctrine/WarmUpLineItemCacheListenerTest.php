@@ -33,6 +33,7 @@ use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class WarmUpLineItemCacheListenerTest extends TestCase
 {
@@ -89,9 +90,10 @@ class WarmUpLineItemCacheListenerTest extends TestCase
 
     public function testItWarmsUpCacheDuringPostUpdate(): void
     {
-        $this->lineItemRepository->expects(self::once())
+        $this->lineItemRepository
+            ->expects(self::once())
             ->method('findOneById')
-            ->with(1);
+            ->with(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $cacheProvider = $this->createMock(CacheProvider::class);
         $cacheProvider->expects(self::once())
@@ -104,7 +106,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
 
         $this->lineItemCacheIdGenerator->expects(self::once())
             ->method('generate')
-            ->with(1)
+            ->with(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->willReturn('line_item_1');
 
         $subject = new WarmUpLineItemCacheListener(
@@ -116,7 +118,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
         $lineItem = $this->createMock(LineItem::class);
         $lineItem->expects(self::once())
             ->method('getId')
-            ->willReturn(1);
+            ->willReturn(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $subject->postUpdate($lineItem);
     }

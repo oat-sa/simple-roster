@@ -9,6 +9,7 @@ OAT\SimpleRoster\Entity\LtiInstance:
 
 OAT\SimpleRoster\Entity\LineItem:
     lineItem1:
+        id: <uuidV6('00000001-0000-6000-0000-000000000000')>
         label: 'The first line item'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug'

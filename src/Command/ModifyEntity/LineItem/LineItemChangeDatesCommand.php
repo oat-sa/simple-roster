@@ -33,6 +33,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemChangeDatesCommand extends Command
@@ -54,7 +55,7 @@ class LineItemChangeDatesCommand extends Command
     /** @var string[] */
     private $lineItemSlugs;
 
-    /** @var int[] */
+    /** @var UuidV6[] */
     private $lineItemIds;
 
     /** @var DateTime|null */
@@ -200,8 +201,8 @@ EOF
 
                 $this->logger->info(
                     sprintf(
-                        'New dates were set for line item with: "%d"',
-                        $lineItem->getId()
+                        'New dates were set for line item with: "%s"',
+                        (string)$lineItem->getId()
                     ),
                     $lineItem->jsonSerialize()
                 );
@@ -237,20 +238,22 @@ EOF
 
     private function initializeLineItemIdsOption(InputInterface $input): void
     {
-        $lineItemIds = array_filter(
-            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
-            static function (string $value): bool {
-                return !empty($value) && (int)$value > 0;
-            }
-        );
+        try {
+            $this->lineItemIds = array_map(
+                static function (string $lineItemId): UuidV6 {
+                    return new UuidV6($lineItemId);
+                },
+                explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
+            );
+        } catch (Throwable $exception) {
+            $this->lineItemIds = [];
+        }
 
-        if (empty($lineItemIds)) {
+        if (empty($this->lineItemIds)) {
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
             );
         }
-
-        $this->lineItemIds = array_map('intval', $lineItemIds);
     }
 
     /**

@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemRepositoryTest extends KernelTestCase
 {
@@ -62,29 +63,42 @@ class LineItemRepositoryTest extends KernelTestCase
         $collection = $this->subject->findAllAsCollection();
 
         self::assertCount(3, $collection);
-        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
-        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
-        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+        self::assertEquals(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            $collection->getBySlug('lineItemSlug1')->getId()
+        );
+        self::assertEquals(
+            new UuidV6('00000002-0000-6000-0000-000000000000'),
+            $collection->getBySlug('lineItemSlug2')->getId()
+        );
+        self::assertEquals(
+            new UuidV6('00000003-0000-6000-0000-000000000000'),
+            $collection->getBySlug('lineItemSlug3')->getId()
+        );
     }
 
     public function testItCanFindOneLineItemById(): void
     {
-        $lineItem = $this->subject->findOneById(1);
+        $lineItem = $this->subject->findOneById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(1, $lineItem->getId());
+        self::assertSame('lineItemSlug1', $lineItem->getSlug());
     }
 
     public function testItCanFindLineItemsByIdsUsingCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemIds(1, 2, 3);
+        $criteria->addLineItemIds(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            new UuidV6('00000002-0000-6000-0000-000000000000'),
+            new UuidV6('00000003-0000-6000-0000-000000000000')
+        );
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
         self::assertCount(3, $collection);
-        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
-        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
-        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+        self::assertSame('The first line item', $collection->getBySlug('lineItemSlug1')->getLabel());
+        self::assertSame('The second line item', $collection->getBySlug('lineItemSlug2')->getLabel());
+        self::assertSame('The third line item', $collection->getBySlug('lineItemSlug3')->getLabel());
     }
 
     public function testItCanFindLineItemsBySlugUsingCriteria(): void
@@ -95,15 +109,18 @@ class LineItemRepositoryTest extends KernelTestCase
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
         self::assertCount(3, $collection);
-        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
-        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
-        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+        self::assertSame('The first line item', $collection->getBySlug('lineItemSlug1')->getLabel());
+        self::assertSame('The second line item', $collection->getBySlug('lineItemSlug2')->getLabel());
+        self::assertSame('The third line item', $collection->getBySlug('lineItemSlug3')->getLabel());
     }
 
     public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingIdsCriteria(): void
     {
         $criteria = new FindLineItemCriteria();
-        $criteria->addLineItemIds(1000, 1001);
+        $criteria->addLineItemIds(
+            new UuidV6('00000010-0000-6000-0000-000000000000'),
+            new UuidV6('00000011-0000-6000-0000-000000000000')
+        );
 
         $collection = $this->subject->findLineItemsByCriteria($criteria);
 
@@ -122,7 +139,7 @@ class LineItemRepositoryTest extends KernelTestCase
 
     public function testItUsesResultCacheImplementationForFindingLineItemById(): void
     {
-        $id = 1;
+        $id = new UuidV6('00000001-0000-6000-0000-000000000000');
 
         $expectedResultCacheId = $this->cacheIdGenerator->generate($id);
 
@@ -137,6 +154,6 @@ class LineItemRepositoryTest extends KernelTestCase
     {
         $this->expectException(EntityNotFoundException::class);
 
-        $this->subject->findOneById(10);
+        $this->subject->findOneById(new UuidV6('00000011-0000-6000-0000-000000000000'));
     }
 }

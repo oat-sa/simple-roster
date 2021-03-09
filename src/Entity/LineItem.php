@@ -24,10 +24,11 @@ namespace OAT\SimpleRoster\Entity;
 
 use DateTimeInterface;
 use JsonSerializable;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItem implements JsonSerializable, EntityInterface
 {
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -51,9 +52,16 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var bool */
     private $isActive = true;
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
+    }
+
+    public function setId(UuidV6 $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getLabel(): ?string
