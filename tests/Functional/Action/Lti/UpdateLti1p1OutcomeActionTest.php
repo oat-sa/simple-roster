@@ -110,7 +110,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
         self::$container->set('test.uid_generator', $uidGenerator);
 
-        $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
+        $messageIdentifier = \Ramsey\Uuid\Rfc4122\UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         $uidGenerator
             ->method('uuid4')
