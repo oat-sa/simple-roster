@@ -22,22 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Faker\Provider;
 
+use Exception;
 use Faker\Provider\Base as BaseProvider;
-use InvalidArgumentException;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV6;
 
 class UuidFakerProvider extends BaseProvider
 {
-    public static function uuidV4(): UuidV4
-    {
-        return new UuidV4();
-    }
-
     /**
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
-    public static function customUuidV4(string $customUuid): UuidV4
+    public static function uuidV6(string $uuidV6 = null): UuidV6
     {
-        return new UuidV4($customUuid);
+        return new UuidV6($uuidV6);
     }
 }

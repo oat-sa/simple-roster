@@ -32,7 +32,7 @@ use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p1LaunchUrlBuilderTest extends TestCase
 {
@@ -50,7 +50,7 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
 
         $ltiConfiguration = new LtiConfiguration(LtiRequest::LTI_VERSION_1P1, 'returnUrl', 'en-EN', 'registrationId');
 
-        $ltiInstanceId = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
         $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);

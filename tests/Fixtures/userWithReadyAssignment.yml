@@ -1,7 +1,7 @@
 OAT\SimpleRoster\Entity\LtiInstance:
     ltiInstance:
         __construct:
-            id: <customUuidv4('00000000-0000-4000-0000-000000000001')>
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
             label: 'testLtiInstance'
             ltiLink: 'https://lti-instance.taocolud.org'
             ltiKey: 'testLtiKey'

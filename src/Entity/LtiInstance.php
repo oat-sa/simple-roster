@@ -22,11 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
-use Carbon\Carbon;
-use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV6;
 
 class LtiInstance implements EntityInterface
 {
@@ -45,26 +42,16 @@ class LtiInstance implements EntityInterface
     /** @var string */
     private $ltiSecret;
 
-    /** @var int */
-    private $createdAt;
-
-    public function __construct(
-        Uuid $id,
-        string $label,
-        string $ltiLink,
-        string $ltiKey,
-        string $ltiSecret,
-        int $createdAt = null
-    ) {
+    public function __construct(UuidV6 $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
+    {
         $this->id = $id;
         $this->label = $label;
         $this->ltiLink = $ltiLink;
         $this->ltiKey = $ltiKey;
         $this->ltiSecret = $ltiSecret;
-        $this->createdAt = $createdAt ?? (int)(Carbon::now()->getPreciseTimestamp());
     }
 
-    public function getId(): Uuid
+    public function getId(): UuidV6
     {
         return $this->id;
     }
@@ -87,10 +74,5 @@ class LtiInstance implements EntityInterface
     public function getLtiSecret(): string
     {
         return $this->ltiSecret;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return DateTimeImmutable::createFromMutable((new DateTime())->setTimestamp($this->createdAt));
     }
 }

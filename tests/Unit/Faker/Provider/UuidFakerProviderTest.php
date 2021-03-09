@@ -29,14 +29,14 @@ use Symfony\Component\Uid\Uuid;
 
 class UuidFakerProviderTest extends TestCase
 {
-    public function testItCanGenerateValidUuidV4Identifier(): void
+    public function testItCanGenerateValidUuidV6Identifier(): void
     {
-        self::assertTrue(Uuid::isValid((string)UuidFakerProvider::uuidV4()));
+        self::assertTrue(Uuid::isValid((string)UuidFakerProvider::uuidV6()));
     }
 
     public function testItCanGenerateValidCustomUuidV4Identifier(): void
     {
-        $customUuid = UuidFakerProvider::customUuidV4('00000000-0000-4000-0000-000000000001');
+        $customUuid = UuidFakerProvider::uuidV6('00000001-0000-6000-0000-000000000000');
 
         self::assertTrue(Uuid::isValid((string)$customUuid));
     }
@@ -45,6 +45,6 @@ class UuidFakerProviderTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        UuidFakerProvider::customUuidV4('invalid');
+        UuidFakerProvider::uuidV6('invalid');
     }
 }

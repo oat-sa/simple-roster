@@ -35,7 +35,7 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p1RequestFactoryTest extends TestCase
 {
@@ -68,7 +68,7 @@ class Lti1p1RequestFactoryTest extends TestCase
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
         $expectedLtiInstance = new LtiInstance(
-            new UuidV4('00000000-0000-4000-0000-000000000001'),
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
             'ltiInstanceLabel',
             'http://lti-infra.taocloud.org',
             'ltiKey',

@@ -22,14 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Ingester;
 
-use Carbon\Carbon;
 use OAT\SimpleRoster\Csv\CsvReaderBuilder;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
@@ -102,15 +101,11 @@ EOF
             $this->progressBar->start();
 
             $numberOfProcessedRows = 0;
-            $currentTime = Carbon::now();
             foreach ($this->csvReader->getRecords() as $rawLtiInstance) {
                 $this->validateRow($rawLtiInstance, 'label', 'ltiLink', 'ltiKey', 'ltiSecret');
 
                 $numberOfProcessedRows++;
-                $this->ltiInstanceRepository->persist($this->createLtiInstance($rawLtiInstance, $currentTime));
-
-                // It's crucial to not have identical creation time of LTI instances because of sorting reasons.
-                $currentTime->addMicroseconds(1);
+                $this->ltiInstanceRepository->persist($this->createLtiInstance($rawLtiInstance));
 
                 if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
@@ -164,15 +159,14 @@ EOF
         return 0;
     }
 
-    private function createLtiInstance(array $rawLtiInstance, Carbon $currentTime): LtiInstance
+    private function createLtiInstance(array $rawLtiInstance): LtiInstance
     {
         return new LtiInstance(
-            new UuidV4(),
+            new UuidV6(),
             $rawLtiInstance['label'],
             $rawLtiInstance['ltiLink'],
             $rawLtiInstance['ltiKey'],
-            $rawLtiInstance['ltiSecret'],
-            (int)$currentTime->getPreciseTimestamp()
+            $rawLtiInstance['ltiSecret']
         );
     }
 }

@@ -24,15 +24,11 @@
             table="lti_instances">
         <id name="id" type="uuid">
             <generator strategy="CUSTOM"/>
-            <custom-id-generator class="Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator"/>
+            <custom-id-generator class="Symfony\Bridge\Doctrine\IdGenerator\UuidV6Generator"/>
         </id>
         <field name="label" column="label" length="255" precision="0" scale="0" unique="true"/>
         <field name="ltiLink" column="lti_link" length="255" precision="0" scale="0" unique="true"/>
         <field name="ltiKey" column="lti_key" length="255" precision="0" scale="0"/>
         <field name="ltiSecret" column="lti_secret" length="255" precision="0" scale="0"/>
-        <field name="createdAt" type="decimal" column="created_at" precision="16" />
-        <indexes>
-            <index columns="created_at" />
-        </indexes>
     </entity>
 </doctrine-mapping>

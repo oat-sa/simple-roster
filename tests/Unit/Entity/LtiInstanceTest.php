@@ -22,32 +22,19 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Entity;
 
-use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\EntityInterface;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Uid\UuidV6;
 
 class LtiInstanceTest extends TestCase
 {
     public function testItImplementsEntityInterface(): void
     {
-        $id = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $id = new UuidV6('00000001-0000-6000-0000-000000000000');
         $subject = new LtiInstance($id, 'label', 'link', 'key', 'secret');
 
         self::assertInstanceOf(EntityInterface::class, $subject);
         self::assertSame($id, $subject->getId());
-    }
-
-    public function testItInitializesCreationTimeIfItIsNotProvided(): void
-    {
-        Carbon::setTestNow(Carbon::createFromTimestamp(1615278391.261860)->toDateTimeString('microsecond'));
-
-        $id = new UuidV4('00000000-0000-4000-0000-000000000001');
-        $subject = new LtiInstance($id, 'label', 'link', 'key', 'secret');
-
-        self::assertSame(1615278391261860, $subject->getCreatedAt()->getTimestamp());
-
-        Carbon::setTestNow();
     }
 }
