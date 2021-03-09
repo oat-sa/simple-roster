@@ -317,7 +317,7 @@ EOF
         if (!empty($dateString)) {
             try {
                 $date = Carbon::createFromFormat(Carbon::ATOM, $dateString);
-                $dateObj = $date ? $date->toDateTime() : null;
+                $dateObj = $date ? $date->setTimezone('UTC')->toDateTime() : null;
             } catch (Throwable $e) {
                 $message = sprintf(
                     '%s is an invalid date. Expected format: 2020-01-01T00:00:00+0000',
