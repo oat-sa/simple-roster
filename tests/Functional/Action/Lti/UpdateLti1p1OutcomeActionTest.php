@@ -36,6 +36,7 @@ use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\UuidV4;
 
 class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
@@ -239,7 +240,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         /** @var LtiInstanceRepository $repository */
         $repository = $this->getRepository(LtiInstance::class);
 
-        $ltiInstance = $repository->find(1);
+        $ltiInstance = $repository->find(new UuidV4('00000000-0000-4000-0000-000000000001'));
 
         self::assertInstanceOf(LtiInstance::class, $ltiInstance);
 

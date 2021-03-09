@@ -60,9 +60,17 @@ class LtiInstanceRepositoryTest extends KernelTestCase
         $this->doctrineResultCache = $doctrineResultCache;
     }
 
-    public function testItCanFindAll(): void
+    public function testItCanFindAllOrderedByCreatedAt(): void
     {
-        self::assertCount(5, $this->subject->findAllAsCollection());
+        $collection = $this->subject->findAllAsCollection();
+
+        self::assertCount(5, $collection);
+
+        self::assertSame('cluster_qqy', $collection->getByIndex(0)->getLabel());
+        self::assertSame('cluster_zoi', $collection->getByIndex(1)->getLabel());
+        self::assertSame('cluster_w2n', $collection->getByIndex(2)->getLabel());
+        self::assertSame('cluster_awr', $collection->getByIndex(3)->getLabel());
+        self::assertSame('cluster_4eb', $collection->getByIndex(4)->getLabel());
     }
 
     public function testItCachesAllLtiInstances(): void

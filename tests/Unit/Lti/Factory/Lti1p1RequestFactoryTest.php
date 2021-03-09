@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\Factory;
 
 use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\NonceGenerator;
@@ -36,6 +35,7 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV4;
 
 class Lti1p1RequestFactoryTest extends TestCase
 {
@@ -68,7 +68,7 @@ class Lti1p1RequestFactoryTest extends TestCase
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
         $expectedLtiInstance = new LtiInstance(
-            1,
+            new UuidV4('00000000-0000-4000-0000-000000000001'),
             'ltiInstanceLabel',
             'http://lti-infra.taocloud.org',
             'ltiKey',
@@ -80,9 +80,7 @@ class Lti1p1RequestFactoryTest extends TestCase
             ->method('getLtiInstance')
             ->willReturn($expectedLtiInstance);
 
-        $assignment = (new Assignment())
-            ->setLineItem(new LineItem())
-            ->setUser(new User());
+        $assignment = (new Assignment())->setUser(new User());
 
         $this->launchUrlBuilder
             ->expects(self::once())

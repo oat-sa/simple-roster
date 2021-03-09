@@ -1,36 +1,41 @@
 OAT\SimpleRoster\Entity\LtiInstance:
     cluster_w2n:
         __construct:
-            id: 1
+            id: <customUuidv4('00000000-0000-4000-0000-000000000001')>
             label: 'cluster_w2n'
             ltiLink: 'https://test.taocloud.fr/__n/w2n/'
             ltiKey: 'ltiKey_w2n'
             ltiSecret: 'ltiSecret_w2n'
+            createdAt: 1615279077 # Order: 3
     cluster_4eb:
         __construct:
-            id: 2
+            id: <customUuidv4('00000000-0000-4000-0000-000000000002')>
             label: 'cluster_4eb'
             ltiLink: 'https://test.taocloud.fr/__n/4eb/'
             ltiKey: 'ltiKey_4eb'
             ltiSecret: 'ltiSecret_4eb'
+            createdAt: 1615279079 # Order: 5
     cluster_qqy:
         __construct:
-            id: 3
+            id: <customUuidv4('00000000-0000-4000-0000-000000000003')>
             label: 'cluster_qqy'
             ltiLink: 'https://test.taocloud.fr/__n/qqy/'
             ltiKey: 'ltiKey_qqy'
             ltiSecret: 'ltiSecret_qqy'
+            createdAt: 1615279075 # Order: 1
     cluster_awr:
         __construct:
-            id: 4
+            id: <customUuidv4('00000000-0000-4000-0000-000000000004')>
             label: 'cluster_awr'
             ltiLink: 'https://test.taocloud.fr/__n/awr/'
             ltiKey: 'ltiKey_awr'
             ltiSecret: 'ltiSecret_awr'
+            createdAt: 1615279078 # Order: 4
     cluster_zoi:
         __construct:
-            id: 5
+            id: <customUuidv4('00000000-0000-4000-0000-000000000005')>
             label: 'cluster_zoi'
             ltiLink: 'https://test.taocloud.fr/__n/zoi/'
             ltiKey: 'ltiKey_zoi'
             ltiSecret: 'ltiSecret_zoi'
+            createdAt: 1615279076 # Order: 2

@@ -612,6 +612,9 @@
     "symfony/polyfill-php80": {
         "version": "v1.17.0"
     },
+    "symfony/polyfill-uuid": {
+        "version": "v1.22.1"
+    },
     "symfony/process": {
         "version": "v4.1.10"
     },
@@ -724,6 +727,9 @@
             "config/packages/twig.yaml",
             "templates/base.html.twig"
         ]
+    },
+    "symfony/uid": {
+        "version": "v5.2.4"
     },
     "symfony/validator": {
         "version": "4.3",

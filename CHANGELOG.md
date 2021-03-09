@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0 - To be released
+
+### Added
+- Added `createdAt` column to `lti_instances` database table.
+
+### Changed
+- Changed identifier generation strategy of entities from `auto increment` to `uuid`.
+
 ## 2.0.5 - 2021-03-03
 
 ### Fixed

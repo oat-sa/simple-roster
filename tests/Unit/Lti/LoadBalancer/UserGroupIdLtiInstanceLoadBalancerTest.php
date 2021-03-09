@@ -31,6 +31,7 @@ use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV4;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
@@ -44,13 +45,19 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         parent::setUp();
 
+        $ltiInstanceId1 = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $ltiInstanceId2 = new UuidV4('00000000-0000-4000-0000-000000000002');
+        $ltiInstanceId3 = new UuidV4('00000000-0000-4000-0000-000000000003');
+        $ltiInstanceId4 = new UuidV4('00000000-0000-4000-0000-000000000004');
+        $ltiInstanceId5 = new UuidV4('00000000-0000-4000-0000-000000000005');
+
         $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
-            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
-            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
-            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
-            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
-            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+            ->add(new LtiInstance($ltiInstanceId1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
+            ->add(new LtiInstance($ltiInstanceId2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
+            ->add(new LtiInstance($ltiInstanceId3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
+            ->add(new LtiInstance($ltiInstanceId4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
+            ->add(new LtiInstance($ltiInstanceId5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
 
         $this->subject = new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }

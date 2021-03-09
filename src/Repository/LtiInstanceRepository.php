@@ -44,6 +44,7 @@ class LtiInstanceRepository extends AbstractRepository
     {
         $ltiInstances = $this->createQueryBuilder('l')
             ->select('l')
+            ->orderBy('l.createdAt')
             ->getQuery()
             ->enableResultCache($this->ltiInstancesCacheTtl, self::CACHE_ID_ALL_LTI_INSTANCES)
             ->getResult();

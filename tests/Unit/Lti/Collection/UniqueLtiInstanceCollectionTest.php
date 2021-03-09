@@ -26,17 +26,24 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV4;
 
 class UniqueLtiInstanceCollectionTest extends TestCase
 {
     public function testItThrowsExceptionIfInvalidIndexReceived(): void
     {
+        $ltiInstanceId1 = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $ltiInstanceId2 = new UuidV4('00000000-0000-4000-0000-000000000002');
+        $ltiInstanceId3 = new UuidV4('00000000-0000-4000-0000-000000000003');
+        $ltiInstanceId4 = new UuidV4('00000000-0000-4000-0000-000000000004');
+        $ltiInstanceId5 = new UuidV4('00000000-0000-4000-0000-000000000005');
+
         $ltiInstances = [
-            new LtiInstance(1, 'instance_1', 'link', 'key', 'secret'),
-            new LtiInstance(2, 'instance_2', 'link', 'key', 'secret'),
-            new LtiInstance(3, 'instance_3', 'link', 'key', 'secret'),
-            new LtiInstance(4, 'instance_4', 'link', 'key', 'secret'),
-            new LtiInstance(5, 'instance_5', 'link', 'key', 'secret'),
+            new LtiInstance($ltiInstanceId1, 'instance_1', 'link', 'key', 'secret'),
+            new LtiInstance($ltiInstanceId2, 'instance_2', 'link', 'key', 'secret'),
+            new LtiInstance($ltiInstanceId3, 'instance_3', 'link', 'key', 'secret'),
+            new LtiInstance($ltiInstanceId4, 'instance_4', 'link', 'key', 'secret'),
+            new LtiInstance($ltiInstanceId5, 'instance_5', 'link', 'key', 'secret'),
         ];
 
         $subject = new UniqueLtiInstanceCollection(...$ltiInstances);
@@ -57,7 +64,8 @@ class UniqueLtiInstanceCollectionTest extends TestCase
 
     public function testIfLtiInstanceWithSameLabelCannotBeAddedTwice(): void
     {
-        $ltiInstance = new LtiInstance(1, 'instance_1', 'link', 'key', 'secret');
+        $ltiInstanceId = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $ltiInstance = new LtiInstance($ltiInstanceId, 'instance_1', 'link', 'key', 'secret');
         $subject = new UniqueLtiInstanceCollection($ltiInstance, $ltiInstance);
 
         self::assertCount(1, $subject);
@@ -69,12 +77,18 @@ class UniqueLtiInstanceCollectionTest extends TestCase
 
     public function testIfCanBeFilteredByLtiKey(): void
     {
+        $ltiInstanceId1 = new UuidV4('00000000-0000-4000-0000-000000000001');
+        $ltiInstanceId2 = new UuidV4('00000000-0000-4000-0000-000000000002');
+        $ltiInstanceId3 = new UuidV4('00000000-0000-4000-0000-000000000003');
+        $ltiInstanceId4 = new UuidV4('00000000-0000-4000-0000-000000000004');
+        $ltiInstanceId5 = new UuidV4('00000000-0000-4000-0000-000000000005');
+
         $ltiInstances = [
-            new LtiInstance(1, 'label_1', 'link_1', 'key_1', 'secret_1'),
-            new LtiInstance(2, 'label_2', 'link_2', 'key_1', 'secret_2'),
-            new LtiInstance(3, 'label_3', 'link_3', 'key_1', 'secret_3'),
-            new LtiInstance(4, 'label_4', 'link_4', 'key_2', 'secret_4'),
-            new LtiInstance(5, 'label_5', 'link_5', 'key_2', 'secret_5'),
+            new LtiInstance($ltiInstanceId1, 'label_1', 'link_1', 'key_1', 'secret_1'),
+            new LtiInstance($ltiInstanceId2, 'label_2', 'link_2', 'key_1', 'secret_2'),
+            new LtiInstance($ltiInstanceId3, 'label_3', 'link_3', 'key_1', 'secret_3'),
+            new LtiInstance($ltiInstanceId4, 'label_4', 'link_4', 'key_2', 'secret_4'),
+            new LtiInstance($ltiInstanceId5, 'label_5', 'link_5', 'key_2', 'secret_5'),
         ];
 
         $subject = new UniqueLtiInstanceCollection(...$ltiInstances);
