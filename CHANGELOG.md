@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.5 - TBD
+
+### Fixed
+- Fixed command for update start and end dates when using timezone.
+
 ## 2.0.5 - 2021-03-03
 
 ### Fixed
