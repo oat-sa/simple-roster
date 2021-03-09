@@ -22,12 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV6;
 
 class LtiInstance implements EntityInterface
 {
-    /** @var Uuid */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
