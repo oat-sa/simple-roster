@@ -34,14 +34,14 @@ class UuidFakerProviderTest extends TestCase
         self::assertTrue(Uuid::isValid((string)UuidFakerProvider::uuidV6()));
     }
 
-    public function testItCanGenerateValidCustomUuidV4Identifier(): void
+    public function testItCanGenerateValidCustomUuidV6Identifier(): void
     {
         $customUuid = UuidFakerProvider::uuidV6('00000001-0000-6000-0000-000000000000');
 
         self::assertTrue(Uuid::isValid((string)$customUuid));
     }
 
-    public function testItThrowsExceptionIfInvalidCustomUuidV4IdentifierIsProvided(): void
+    public function testItThrowsExceptionIfInvalidCustomUuidV6IdentifierIsProvided(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

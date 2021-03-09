@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -110,7 +111,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
         self::$container->set('test.uid_generator', $uidGenerator);
 
-        $messageIdentifier = \Ramsey\Uuid\Rfc4122\UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
+        $messageIdentifier = UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         $uidGenerator
             ->method('uuid4')
