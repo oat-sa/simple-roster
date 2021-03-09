@@ -25,7 +25,10 @@
                     \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
                     \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber,
                     \League\Csv\Reader,
-                    \League\Csv\Writer
+                    \League\Csv\Writer,
+                    \OAT\SimpleRoster\Faker\Provider\UuidFakerProvider,
+                    \Symfony\Component\Uid\Uuid,
+                    \DateTimeImmutable,
                 </value>
             </property>
         </properties>
