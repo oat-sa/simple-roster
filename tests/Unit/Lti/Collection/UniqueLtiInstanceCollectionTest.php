@@ -58,7 +58,13 @@ class UniqueLtiInstanceCollectionTest extends TestCase
 
     public function testIfLtiInstanceWithSameLabelCannotBeAddedTwice(): void
     {
-        $ltiInstance = new LtiInstance(new UuidV6('00000001-0000-6000-0000-000000000000'), 'infra1', 'link', 'key', 'secret');
+        $ltiInstance = new LtiInstance(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'infra1',
+            'link',
+            'key',
+            'secret'
+        );
         $subject = new UniqueLtiInstanceCollection($ltiInstance, $ltiInstance);
 
         self::assertCount(1, $subject);
