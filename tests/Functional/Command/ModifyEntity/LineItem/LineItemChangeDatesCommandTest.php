@@ -453,6 +453,18 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     'end_at' => '2020-01-01 00:00:00',
                 ],
             ],
+            'usingDatesWithTimeZone' => [
+                'parameters' => [
+                    '-s' => 'slug-1',
+                    '--start-date' => '2020-01-01T00:00:00+0100',
+                    '--end-date' => '2020-01-10T00:00:00+0100',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [4],
+                    'start_at' => '2019-12-31 23:00:00',
+                    'end_at' => '2020-01-09 23:00:00',
+                ],
+            ],
         ];
     }
 }
