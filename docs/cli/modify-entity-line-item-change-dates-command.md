@@ -31,12 +31,6 @@ For the full list of options please refer to the helper option:
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -h
 ```
 
-## Related environment variables
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
-
 ## Examples
 - Updating dates of line items using IDs
 ```shell script
@@ -45,6 +39,10 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,
 - Updating dates of line items using Slugs
 ```shell script
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
+```
+- Updating dates in a different timezone (UTC+1)
+```shell script
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00+0100 --end-date 2020-01-05T00:00:00+0100 --force
 ```
 - Nullifying dates of a line item by line item
 ```shell script
