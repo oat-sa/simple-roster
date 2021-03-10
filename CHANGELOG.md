@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Added possibility to limit the number of requests per endpoint based on a fixed window.
+- Added `RATE_LIMITER_STORAGE_DSN`, `RATE_LIMITER_FIXED_WINDOW_ROUTES`, `RATE_LIMITER_FIXED_WINDOW_LIMIT` and `RATE_LIMITER_FIXED_WINDOW_INTERVAL` environment variables.
+- Added `LOCK_DSN` environment variable
+
 ## 2.0.5 - 2021-03-03
 
 ### Fixed
