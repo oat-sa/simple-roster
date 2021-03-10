@@ -209,7 +209,7 @@ EOF
             }
 
             if ($this->isDryRun) {
-                $this->symfonyStyle->success(
+                $this->symfonyStyle->warning(
                     sprintf(
                         '[DRY RUN] %d line item(s) have been updated.',
                         $lineItemsCollection->count()
