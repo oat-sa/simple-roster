@@ -71,7 +71,7 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
         if ($limiter->consume(1)->isAccepted()) {
             return;
         }
-        
+
         $limit = $limiter->consume();
 
         $this->logger->warning(
