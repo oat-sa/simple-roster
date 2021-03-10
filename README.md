@@ -11,6 +11,7 @@
 - [Docker development](docs/docker-development.md)
 - [Local development](docs/local-development.md)
 - [Features](#)
+    - [Fixed Window Rate Limiter](docs/features/fixed-window-rate-limiter.md)
     - [Learning Tools Interoperability](docs/features/lti.md)
     - [Update Line Items Webhook](docs/features/update-line-items-webhook.md)
 - [CLI documentation](docs/cli-documentation.md)
