@@ -31,6 +31,12 @@ For the full list of options please refer to the helper option:
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -h
 ```
 
+## Related environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
+
 ## Examples
 - Updating dates of line items using IDs
 ```shell script

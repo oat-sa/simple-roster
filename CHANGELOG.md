@@ -1,9 +1,10 @@
 # Changelog
 
-## 2.0.5 - TBD
+## 2.0.6 - TBD
 
 ### Fixed
-- Fixed command for update start and end dates when using timezone.
+- Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 
+  We now convert the input date(s) to UTC before persisting it.
 
 ## 2.0.5 - 2021-03-03
 
