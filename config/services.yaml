@@ -26,6 +26,7 @@ parameters:
     app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
+    app.rate_limiter.fixed_window_routes: '%env(csv:RATE_LIMITER_FIXED_WINDOW_ROTES)%'
 
 services:
     # default configuration for services in *this* file
@@ -50,6 +51,7 @@ services:
             $jwtAccessTokenTtl: '%app.jwt.access_token_ttl%'
             $jwtRefreshTokenTtl: '%app.jwt.refresh_token_ttl%'
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
+            $fixedWindowRoutes: '%app.rate_limiter.fixed_window_routes%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:

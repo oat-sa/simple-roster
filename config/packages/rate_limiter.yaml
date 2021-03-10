@@ -1,0 +1,7 @@
+framework:
+  rate_limiter:
+    fixed_window:
+      policy: 'fixed_window'
+      limit: '%env(int:RATE_LIMITER_FIXED_WINDOW_LIMIT)%'
+      interval: '%env(RATE_LIMITER_FIXED_WINDOW_INTERVAL)%'
+      cache_pool: 'app.cache.rate_limiter'

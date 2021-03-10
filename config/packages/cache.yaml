@@ -1,5 +1,12 @@
 framework:
     cache:
+        pools:
+            rate_limiter_cache:
+                name: app.cache.rate_limiter
+                public: true
+                adapter: cache.adapter.redis
+                provider: '%env(RATE_LIMITER_STORAGE_DSN)%'
+
         # Unique name of your app: used to compute stable namespaces for cache keys.
         #prefix_seed: your_vendor_name/app_name
 
