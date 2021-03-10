@@ -5,4 +5,3 @@ framework:
       limit: '%env(int:RATE_LIMITER_FIXED_WINDOW_LIMIT)%'
       interval: '%env(RATE_LIMITER_FIXED_WINDOW_INTERVAL)%'
       cache_pool: 'app.cache.rate_limiter'
-      
