@@ -68,6 +68,9 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         $this->setUpTestLogHandler('security');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItAcceptsRequestsAfterItervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems';
@@ -89,7 +92,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             "Rate Limit Exceeded. Please retry after",
-            $this->kernelBrowser->getResponse()->getContent(),
+            (string)$this->kernelBrowser->getResponse()->getContent(),
         );
         $this->assertHasLogRecord(
             [
@@ -109,6 +112,9 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItAcceptsRequestsIfThereIsNoRouteConfigured(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = '';
@@ -132,6 +138,9 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItAcceptsRequestsWithDifferentRouteConfigured(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'healthCheck';
@@ -151,6 +160,9 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItBlocksRequestAfter2RequestsInItervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems';
@@ -168,7 +180,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             "Rate Limit Exceeded. Please retry after",
-            $this->kernelBrowser->getResponse()->getContent(),
+            (string)$this->kernelBrowser->getResponse()->getContent(),
         );
         $this->assertHasLogRecord(
             [
@@ -182,6 +194,9 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function testItBlocksRequestWithMultipleRoutesAfter2RequestsInItervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems,healthCheck';
@@ -203,7 +218,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             "Rate Limit Exceeded. Please retry after",
-            $this->kernelBrowser->getResponse()->getContent(),
+            (string)$this->kernelBrowser->getResponse()->getContent(),
         );
         $this->assertHasLogRecord(
             [
