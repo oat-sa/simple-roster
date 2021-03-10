@@ -26,7 +26,7 @@ parameters:
     app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
-    app.rate_limiter.fixed_window_routes: '%env(csv:RATE_LIMITER_FIXED_WINDOW_ROTES)%'
+    app.rate_limiter.fixed_window_routes: '%env(csv:RATE_LIMITER_FIXED_WINDOW_ROUTES)%'
 
 services:
     # default configuration for services in *this* file

@@ -24,6 +24,7 @@
                     \OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber,
                     \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
                     \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber,
+                    \OAT\SimpleRoster\EventSubscriber\FixedWindowRateLimiterSubscriber,
                     \League\Csv\Reader,
                     \League\Csv\Writer
                 </value>
