@@ -67,22 +67,25 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
 
         $clientIp = $request->getClientIp();
         $limiter = $this->fixedWindowLimiter->create($clientIp);
-        if (!$limiter->consume(1)->isAccepted()) {
-            $limit = $limiter->consume();
 
-            $this->logger->warning(
-                sprintf('The client with ip: %s, exceeded the limit of requests.', $clientIp),
-                [
-                    'routes' => $this->fixedWindowRoutes,
-                    'limit' => $limit->getLimit()
-                ]
-            );
-
-            $retryAfter = $limit->getRetryAfter();
-            throw new TooManyRequestsHttpException(
-                $retryAfter->getTimestamp(),
-                sprintf("Rate Limit Exceeded. Please retry after: %s", $retryAfter->format(DATE_ATOM))
-            );
+        if ($limiter->consume(1)->isAccepted()) {
+            return;
         }
+        
+        $limit = $limiter->consume();
+
+        $this->logger->warning(
+            sprintf('The client with ip: %s, exceeded the limit of requests.', $clientIp),
+            [
+                'routes' => $this->fixedWindowRoutes,
+                'limit' => $limit->getLimit()
+            ]
+        );
+
+        $retryAfter = $limit->getRetryAfter();
+        throw new TooManyRequestsHttpException(
+            $retryAfter->getTimestamp(),
+            sprintf("Rate Limit Exceeded. Please retry after: %s", $retryAfter->format(DATE_ATOM))
+        );
     }
 }
