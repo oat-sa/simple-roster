@@ -65,7 +65,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        $this->setUpTestLogHandler();
+        $this->setUpTestLogHandler('security');
     }
 
     public function testItAcceptsRequestsAfterItervalOfTwoSeconds(): void
@@ -82,6 +82,8 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
+        $this->resetKernel();
+
         $this->executeUpdateLineItemsRequest();
 
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -89,6 +91,17 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
             "Rate Limit Exceeded. Please retry after",
             $this->kernelBrowser->getResponse()->getContent(),
         );
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
+                'context' => [
+                    'routes' => ['updateLineItems'],
+                    'limit' => 2
+                ],
+            ],
+            Logger::WARNING
+        );
+
         sleep(2);
 
         $this->executeUpdateLineItemsRequest();
@@ -148,12 +161,24 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
+        $this->resetKernel();
+
         $this->executeUpdateLineItemsRequest();
 
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             "Rate Limit Exceeded. Please retry after",
             $this->kernelBrowser->getResponse()->getContent(),
+        );
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
+                'context' => [
+                    'routes' => ['updateLineItems'],
+                    'limit' => 1
+                ],
+            ],
+            Logger::WARNING
         );
     }
 
@@ -171,12 +196,24 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
+        $this->resetKernel();
+
         $this->executeHealthCheckRequest();
 
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertStringContainsString(
             "Rate Limit Exceeded. Please retry after",
             $this->kernelBrowser->getResponse()->getContent(),
+        );
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
+                'context' => [
+                    'routes' => ['updateLineItems', 'healthCheck'],
+                    'limit' => 2
+                ],
+            ],
+            Logger::WARNING
         );
     }
 
@@ -219,5 +256,12 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     private function executeHealthCheckRequest(): void
     {
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1');
+    }
+
+    private function resetKernel(): void
+    {
+        self::ensureKernelShutdown();
+        $this->kernelBrowser = self::createClient();
+        $this->setUpTestLogHandler('security');
     }
 }

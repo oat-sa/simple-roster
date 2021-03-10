@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventSubscriber;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -33,13 +34,20 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
     /** @var RateLimiterFactory */
     private $fixedWindowLimiter;
 
-    /** @var string|null */
+    /** @var string[] */
     private $fixedWindowRoutes;
 
-    public function __construct(RateLimiterFactory $fixedWindowLimiter, array $fixedWindowRoutes)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        RateLimiterFactory $fixedWindowLimiter,
+        LoggerInterface $securityLogger,
+        array $fixedWindowRoutes
+    ) {
         $this->fixedWindowLimiter = $fixedWindowLimiter;
         $this->fixedWindowRoutes = $fixedWindowRoutes;
+        $this->logger = $securityLogger;
     }
 
     public static function getSubscribedEvents(): array
@@ -57,13 +65,23 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $limiter = $this->fixedWindowLimiter->create($request->getClientIp());
-        if (false === $limiter->consume(1)->isAccepted()) {
+        $clientIp = $request->getClientIp();
+        $limiter = $this->fixedWindowLimiter->create($clientIp);
+        if (!$limiter->consume(1)->isAccepted()) {
             $limit = $limiter->consume();
 
+            $this->logger->warning(
+                sprintf('The client with ip: %s, exceeded the limit of requests.', $clientIp),
+                [
+                    'routes' => $this->fixedWindowRoutes,
+                    'limit' => $limit->getLimit()
+                ]
+            );
+
+            $retryAfter = $limit->getRetryAfter();
             throw new TooManyRequestsHttpException(
-                $limit->getRetryAfter()->getTimestamp(),
-                sprintf("Rate Limit Exceeded. Please retry after: %s", $limit->getRetryAfter()->format(DATE_ATOM))
+                $retryAfter->getTimestamp(),
+                sprintf("Rate Limit Exceeded. Please retry after: %s", $retryAfter->format(DATE_ATOM))
             );
         }
     }
