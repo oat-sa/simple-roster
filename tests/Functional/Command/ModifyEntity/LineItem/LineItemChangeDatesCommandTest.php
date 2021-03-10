@@ -146,7 +146,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
         self::assertStringContainsString(
-            sprintf('[OK] [DRY RUN] %d line item(s) have been updated.', count($lineItemIds)),
+            sprintf('[WARNING] [DRY RUN] %d line item(s) have been updated.', count($lineItemIds)),
             $display
         );
 
