@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -53,14 +53,13 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => ['onKernelController', 255],
+            KernelEvents::REQUEST => ['onKernelRequest', 17],
         ];
     }
 
-    public function onKernelController(ControllerEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-
         if (!in_array($request->attributes->get('_route'), $this->fixedWindowRoutes)) {
             return;
         }

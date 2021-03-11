@@ -119,7 +119,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = '';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 2;
-        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 second';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
 
         $this->executeUpdateLineItemsRequest();
 
@@ -145,7 +145,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'healthCheck';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 2;
-        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 second';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
 
         $this->executeUpdateLineItemsRequest();
 
@@ -167,7 +167,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 1;
-        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 second';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
 
         $this->executeUpdateLineItemsRequest();
 
@@ -201,7 +201,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems,healthCheck';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 2;
-        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 second';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
 
         $this->executeUpdateLineItemsRequest();
 
@@ -226,6 +226,49 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
                 'context' => [
                     'routes' => ['updateLineItems', 'healthCheck'],
                     'limit' => 2
+                ],
+            ],
+            Logger::WARNING
+        );
+    }
+
+
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItBlocksRequestWithNotAnonymousRouteAfter2RequestsInIntervalOfTwoSeconds(): void
+    {
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems,healthCheck,getAccessToken';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 3;
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
+
+        $this->executeUpdateLineItemsRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->executeHealthCheckRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->executeGeAccessTokenRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->resetKernel();
+
+        $this->executeGeAccessTokenRequest();
+
+        self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertStringContainsString(
+            "Rate Limit Exceeded. Please retry after",
+            (string)$this->kernelBrowser->getResponse()->getContent(),
+        );
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
+                'context' => [
+                    'routes' => ['updateLineItems', 'healthCheck', 'getAccessToken'],
+                    'limit' => 3
                 ],
             ],
             Logger::WARNING
@@ -278,5 +321,19 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         self::ensureKernelShutdown();
         $this->kernelBrowser = self::createClient();
         $this->setUpTestLogHandler('security');
+    }
+
+    private function executeGeAccessTokenRequest(): void
+    {
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/auth/token',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            (string)json_encode(['username' => 'user1', 'password' => 'password'])
+        );
     }
 }

@@ -31,7 +31,7 @@ class FixedWindowRateLimiterSubscriberTest extends TestCase
     public function testSubscribedEvents(): void
     {
         self::assertSame(
-            [KernelEvents::CONTROLLER => ['onKernelController', 255]],
+            [KernelEvents::REQUEST => ['onKernelRequest', 17]],
             FixedWindowRateLimiterSubscriber::getSubscribedEvents()
         );
     }
