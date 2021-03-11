@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.6 - TBD
+## [Unreleased]
 
 ### Fixed
 - Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 
