@@ -7,6 +7,10 @@
 - Added `RATE_LIMITER_STORAGE_DSN`, `RATE_LIMITER_FIXED_WINDOW_ROUTES`, `RATE_LIMITER_FIXED_WINDOW_LIMIT` and `RATE_LIMITER_FIXED_WINDOW_INTERVAL` environment variables.
 - Added `LOCK_DSN` environment variable
 
+### Fixed
+- Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 
+  We now convert the input date(s) to UTC before persisting it.
+
 ## 2.0.5 - 2021-03-03
 
 ### Fixed
