@@ -46,6 +46,10 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,
 ```shell script
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
 ```
+- Updating dates in a different timezone (UTC+1)
+```shell script
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00+0100 --end-date 2020-01-05T00:00:00+0100 --force
+```
 - Nullifying dates of a line item by line item
 ```shell script
 //Nullifying start and end dates
