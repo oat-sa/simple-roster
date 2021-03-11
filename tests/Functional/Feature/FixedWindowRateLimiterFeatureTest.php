@@ -22,12 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Feature;
 
-use Doctrine\Common\Cache\CacheProvider;
-use JsonException;
 use Monolog\Logger;
-use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
-use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -43,25 +38,12 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     /** @var KernelBrowser */
     private $kernelBrowser;
 
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
 
-        $ormConfiguration = $this->getEntityManager()->getConfiguration();
-        $resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
-
-        if (!$resultCacheImplementation instanceof CacheProvider) {
-            throw new DoctrineResultCacheImplementationNotFoundException(
-                'Doctrine result cache implementation is not configured.'
-            );
-        }
-
-        $this->resultCacheImplementation = $resultCacheImplementation;
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
