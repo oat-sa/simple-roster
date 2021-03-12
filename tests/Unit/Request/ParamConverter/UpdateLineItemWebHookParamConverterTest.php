@@ -68,12 +68,14 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             Request::class
         );
 
+        $eventName = 'oat\\\\taoPublishing\\\\model\\\\publishing\\\\event\\\\RemoteDeliveryCreatedEvent';
+
         $payload = '{
                     "source":"https://someinstance.taocloud.org/",
                     "events":[
                         {
                             "eventId":"52a3de8dd0f270fd193f9f4bff05232c",
-                            "eventName":"RemoteDeliveryPublicationFinished",
+                            "eventName":"' . $eventName . '",
                             "triggeredTimestamp":1565602390,
                             "eventData":{
                                 "alias":"qti-interactions-delivery",
@@ -116,7 +118,10 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
         self::assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
 
         self::assertSame("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
-        self::assertSame("RemoteDeliveryPublicationFinished", $updateLineItemDto->getName());
+        self::assertSame(
+            'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
+            $updateLineItemDto->getName()
+        );
         self::assertSame(1565602390, $updateLineItemDto->getTriggeredTime()->getTimestamp());
         self::assertSame("qti-interactions-delivery", $updateLineItemDto->getSlug());
         self::assertSame(
