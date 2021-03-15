@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -60,7 +61,7 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!in_array($request->attributes->get('_route'), $this->fixedWindowRoutes)) {
+        if (!$this->isValid($request)) {
             return;
         }
 
@@ -86,5 +87,11 @@ class FixedWindowRateLimiterSubscriber implements EventSubscriberInterface
             $retryAfter->getTimestamp(),
             sprintf("Rate Limit Exceeded. Please retry after: %s", $retryAfter->format(DATE_ATOM))
         );
+    }
+
+    private function isValid(Request $request): bool
+    {
+        return '*' === (string)current($this->fixedWindowRoutes)
+            || in_array($request->attributes->get('_route'), $this->fixedWindowRoutes);
     }
 }

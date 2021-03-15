@@ -53,7 +53,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItAcceptsRequestsAfterItervalOfTwoSeconds(): void
+    public function testItAcceptsRequestsAfterIntervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 2;
@@ -145,7 +145,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItBlocksRequestAfter2RequestsInItervalOfTwoSeconds(): void
+    public function testItBlocksRequestAfterTwoRequestsInItervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 1;
@@ -179,7 +179,7 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItBlocksRequestWithMultipleRoutesAfter2RequestsInItervalOfTwoSeconds(): void
+    public function testItBlocksRequestWithMultipleRoutesAfterTwoRequestsInItervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems,healthCheck';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 2;
@@ -214,11 +214,10 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
         );
     }
 
-
     /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function testItBlocksRequestWithNotAnonymousRouteAfter2RequestsInIntervalOfTwoSeconds(): void
+    public function testItBlocksRequestWithAnonymousRouteAfterThreeRequestsInIntervalOfTwoSeconds(): void
     {
         $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = 'updateLineItems,healthCheck,getAccessToken';
         $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 3;
@@ -250,6 +249,48 @@ class FixedWindowRateLimiterFeatureTest extends WebTestCase
                 'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
                 'context' => [
                     'routes' => ['updateLineItems', 'healthCheck', 'getAccessToken'],
+                    'limit' => 3
+                ],
+            ],
+            Logger::WARNING
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testItBlocksAllRoutesUsingAsterisk(): void
+    {
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_ROUTES'] = '*';
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_LIMIT'] = 3;
+        $_ENV['RATE_LIMITER_FIXED_WINDOW_INTERVAL'] = '2 seconds';
+
+        $this->executeUpdateLineItemsRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->executeHealthCheckRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->executeGeAccessTokenRequest();
+
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+
+        $this->resetKernel();
+
+        $this->executeGeAccessTokenRequest();
+
+        self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertStringContainsString(
+            "Rate Limit Exceeded. Please retry after",
+            (string)$this->kernelBrowser->getResponse()->getContent(),
+        );
+        $this->assertHasLogRecord(
+            [
+                'message' => 'The client with ip: 127.0.0.1, exceeded the limit of requests.',
+                'context' => [
+                    'routes' => ['*'],
                     'limit' => 3
                 ],
             ],
