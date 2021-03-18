@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
@@ -124,6 +125,7 @@ EOF
                 $lineItem = $lineItems->getBySlug($rawAssignment['lineItemSlug']);
 
                 $assignmentDto = new AssignmentDto(
+                    new UuidV6(),
                     Assignment::STATE_READY,
                     $lineItem->getId(),
                     $rawAssignment['username']

@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Lti\Extractor;
 
 use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use SimpleXMLElement;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class ReplaceResultSourceIdExtractor
@@ -39,12 +40,12 @@ class ReplaceResultSourceIdExtractor
     /**
      * @throws InvalidLtiReplaceResultBodyException
      */
-    public function extractSourceId(string $xmlContent): int
+    public function extractSourceId(string $xmlContent): UuidV6
     {
         try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (Throwable $exception) {
-            throw new InvalidLtiReplaceResultBodyException();
+            throw new InvalidLtiReplaceResultBodyException('Invalid XML received.');
         }
 
         $xml->registerXPathNamespace('x', $this->xmlNamespace);
@@ -55,9 +56,17 @@ class ReplaceResultSourceIdExtractor
         );
 
         if (false === $sourceIdNodes || count($sourceIdNodes) !== 1) {
-            throw new InvalidLtiReplaceResultBodyException();
+            throw new InvalidLtiReplaceResultBodyException('Source id node cannot be extracted by Xpath.');
         }
 
-        return (int)$sourceIdNodes[0];
+        $sourceId = (string)$sourceIdNodes[0];
+
+        try {
+            return new UuidV6($sourceId);
+        } catch (Throwable $exception) {
+            throw new InvalidLtiReplaceResultBodyException(
+                sprintf("Extracted source id '%s' is not a valid UUID.", $sourceId)
+            );
+        }
     }
 }

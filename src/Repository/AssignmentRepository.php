@@ -28,6 +28,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\Assignment;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentRepository extends AbstractRepository
 {
@@ -40,19 +41,19 @@ class AssignmentRepository extends AbstractRepository
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
-    public function findById(int $assignmentId): Assignment
+    public function findById(UuidV6 $assignmentId): Assignment
     {
         $assignment = $this
             ->createQueryBuilder('a')
             ->select('a')
             ->where('a.id = :id')
-            ->setParameter('id', $assignmentId)
+            ->setParameter('id', $assignmentId, 'uuid')
             ->getQuery()
             ->getOneOrNullResult();
 
         if (null === $assignment) {
             throw new EntityNotFoundException(
-                sprintf("Assignment with id = '%d' cannot be found.", $assignmentId)
+                sprintf("Assignment with id = '%s' cannot be found.", (string)$assignmentId)
             );
         }
 

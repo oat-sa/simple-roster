@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentRepositoryTest extends KernelTestCase
 {
@@ -51,7 +52,7 @@ class AssignmentRepositoryTest extends KernelTestCase
 
     public function testItCanFindAssignmentById(): void
     {
-        $assignment = $this->subject->findById(1);
+        $assignment = $this->subject->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
         self::assertSame(1, $assignment->getAttemptsCount());
@@ -60,9 +61,9 @@ class AssignmentRepositoryTest extends KernelTestCase
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
     {
         $this->expectException(EntityNotFoundException::class);
-        $this->expectExceptionMessage("Assignment with id = '999' cannot be found.");
+        $this->expectExceptionMessage("Assignment with id = '00000999-0000-6000-0000-000000000000' cannot be found.");
 
-        $this->subject->findById(999);
+        $this->subject->findById(new UuidV6('00000999-0000-6000-0000-000000000000'));
     }
 
     public function testItCanReturnAssignmentsByStateAndUpdatedAt(): void
@@ -70,8 +71,8 @@ class AssignmentRepositoryTest extends KernelTestCase
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
         $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime);
 
-        self::assertCount(10, $assignments->getIterator());
-        self::assertCount(10, $assignments);
+        self::assertCount(9, $assignments->getIterator());
+        self::assertCount(9, $assignments);
     }
 
     public function testItCanReturnAssignmentsByStateAndUpdatedAtPaginated(): void
@@ -80,6 +81,6 @@ class AssignmentRepositoryTest extends KernelTestCase
         $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime, 2, 3);
 
         self::assertCount(3, $assignments->getIterator());
-        self::assertCount(10, $assignments);
+        self::assertCount(9, $assignments);
     }
 }

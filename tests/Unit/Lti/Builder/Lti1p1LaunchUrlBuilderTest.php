@@ -53,12 +53,8 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
         $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
         $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-        $assignment
-            ->method('getId')
-            ->willReturn(10);
-
-        $assignment
+        $assignment = (new Assignment())
+            ->setId(new UuidV6('00000010-0000-6000-0000-000000000000'))
             ->setUser((new User())->setUsername('testUser'))
             ->setLineItem((new LineItem())->setUri('http://test-uri.com'));
 
@@ -79,9 +75,9 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
                 'roles' => 'Learner',
                 'user_id' => 'testUser',
                 'lis_person_name_full' => 'testUser',
-                'resource_link_id' => 10,
+                'resource_link_id' => '00000010-0000-6000-0000-000000000000',
                 'lis_outcome_service_url' => 'http://test-service-url',
-                'lis_result_sourcedid' => 10,
+                'lis_result_sourcedid' => '00000010-0000-6000-0000-000000000000',
                 'launch_presentation_return_url' => 'returnUrl',
                 'launch_presentation_locale' => 'en-EN',
             ],

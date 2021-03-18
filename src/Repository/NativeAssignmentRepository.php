@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,14 +31,9 @@ use OAT\SimpleRoster\Entity\Assignment;
 
 class NativeAssignmentRepository extends AbstractRepository
 {
-    /** @var string */
-    private $kernelEnvironment;
-
-    public function __construct(ManagerRegistry $registry, string $kernelEnvironment)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Assignment::class);
-
-        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     /**
@@ -50,19 +43,15 @@ class NativeAssignmentRepository extends AbstractRepository
     public function insertMultiple(AssignmentDtoCollection $assignments): void
     {
         $queryParts = [];
-        $assignmentIndex = $this->getAvailableAssignmentStartIndex();
-
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "(%s, %s, '%s', '%s', %s)",
-                $assignmentIndex,
+                "('%s', %s, '%s', '%s', %s)",
+                (string)$assignmentDto->getId(),
                 $assignmentDto->getUserId(),
                 (string)$assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
                 0
             );
-
-            $assignmentIndex++;
         }
 
         $query = sprintf(
@@ -72,39 +61,5 @@ class NativeAssignmentRepository extends AbstractRepository
 
         $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
         $this->_em->clear();
-        $this->refreshSequence();
-    }
-
-    /**
-     * @throws NoResultException
-     * @throws NonUniqueResultException
-     */
-    private function getAvailableAssignmentStartIndex(): int
-    {
-        $index = $this
-            ->createQueryBuilder('a')
-            ->select('MAX(a.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        return (int)$index + 1;
-    }
-
-    /**
-     * @codeCoverageIgnore Cannot be tested with SQLite database
-     *
-     * @throws ORMException
-     */
-    private function refreshSequence(): void
-    {
-        if ($this->kernelEnvironment !== 'test') {
-            $this
-                ->getEntityManager()
-                ->createNativeQuery(
-                    "SELECT SETVAL('assignments_id_seq', COALESCE(MAX(id), 1)) FROM assignments",
-                    new ResultSetMapping()
-                )
-                ->execute();
-        }
     }
 }

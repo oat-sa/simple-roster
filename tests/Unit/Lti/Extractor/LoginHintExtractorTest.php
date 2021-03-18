@@ -40,12 +40,12 @@ class LoginHintExtractorTest extends TestCase
 
     public function testShouldExtractDataWhenLoginHintIsWellFormed(): void
     {
-        $loginHint = 'user::1';
+        $loginHint = 'user::00000001-0000-6000-0000-000000000000';
 
         $loginHintDto = $this->subject->extract($loginHint);
 
         self::assertSame('user', $loginHintDto->getUsername());
-        self::assertSame(1, $loginHintDto->getAssignmentId());
+        self::assertSame('00000001-0000-6000-0000-000000000000', (string)$loginHintDto->getAssignmentId());
     }
 
     /**

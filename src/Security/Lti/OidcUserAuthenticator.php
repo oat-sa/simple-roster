@@ -75,10 +75,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
                 ]
             );
 
-            return new UserAuthenticationResult(
-                true,
-                new UserIdentity((string) $user->getUsername())
-            );
+            return new UserAuthenticationResult(true, new UserIdentity((string) $user->getUsername()));
         } catch (Throwable $exception) {
             throw new LtiException($exception->getMessage());
         }
@@ -92,7 +89,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
         $assignmentFound = false;
 
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->getId() === $loginHintDto->getAssignmentId()) {
+            if ((string)$assignment->getId() === (string)$loginHintDto->getAssignmentId()) {
                 $assignmentFound = true;
                 break;
             }

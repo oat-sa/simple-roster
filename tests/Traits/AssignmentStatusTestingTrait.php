@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Traits;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
+use Symfony\Component\Uid\UuidV6;
 
 trait AssignmentStatusTestingTrait
 {
@@ -32,7 +33,7 @@ trait AssignmentStatusTestingTrait
         /** @var AssignmentRepository $repository */
         $repository = $this->getRepository(Assignment::class);
 
-        $assignment = $repository->find(1);
+        $assignment = $repository->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertInstanceOf(Assignment::class, $assignment);
         self::assertSame($status, $assignment->getState());

@@ -7,15 +7,16 @@ OAT\SimpleRoster\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 2
 
+OAT\SimpleRoster\Entity\Assignment:
+    assignment2:
+        id: <uuidV6(00000003-0000-6000-0000-000000000000)>
+        lineItem: '@lineItem2'
+        state: 'completed'
+        attemptsCount: 2
+
 OAT\SimpleRoster\Entity\User:
     user2:
         username: 'userWithAllAttemptsTaken'
         plainPassword: 'password'
         groupId: 'group_1'
         assignments: ['@assignment2']
-
-OAT\SimpleRoster\Entity\Assignment:
-    assignment2:
-        lineItem: '@lineItem2'
-        state: 'completed'
-        attemptsCount: 2

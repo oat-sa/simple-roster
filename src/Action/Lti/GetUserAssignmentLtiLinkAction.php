@@ -35,6 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class GetUserAssignmentLtiLinkAction
 {
@@ -62,11 +63,11 @@ class GetUserAssignmentLtiLinkAction
         $this->logger = $logger;
     }
 
-    public function __invoke(UserInterface $user, int $assignmentId): Response
+    public function __invoke(UserInterface $user, string $assignmentId): Response
     {
         try {
             /** @var User $user */
-            $assignment = $user->getAvailableAssignmentById($assignmentId);
+            $assignment = $user->getAvailableAssignmentById(new UuidV6($assignmentId));
             $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 
             if ($assignment->getState() !== Assignment::STATE_STARTED) {

@@ -60,6 +60,7 @@ class AssignmentIngesterTest extends TestCase
         $this->expectExceptionMessage("User with username 'nonExistingUser' cannot not found.");
 
         $assignment = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
             Assignment::STATE_READY,
             new UuidV6('00000001-0000-6000-0000-000000000000'),
             'nonExistingUser'
@@ -74,8 +75,20 @@ class AssignmentIngesterTest extends TestCase
     {
         $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'testUser1');
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'testUser2');
+        $assignment1 = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
+            Assignment::STATE_READY,
+            $lineItemId,
+            'testUser1'
+        );
+
+        $assignment2 = new AssignmentDto(
+            new UuidV6('00000022-0000-6000-0000-000000000000'),
+            Assignment::STATE_READY,
+            $lineItemId,
+            'testUser2'
+        );
+
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
         $this->userRepository

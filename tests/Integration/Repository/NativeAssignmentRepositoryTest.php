@@ -58,9 +58,14 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
     {
         $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user1', 1);
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user2', 1);
-        $assignment3 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user3', 1);
+        $assignmentId1 = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment1 = new AssignmentDto($assignmentId1, Assignment::STATE_READY, $lineItemId, 'user1', 1);
+
+        $assignmentId2 = new UuidV6('00000002-0000-6000-0000-000000000000');
+        $assignment2 = new AssignmentDto($assignmentId2, Assignment::STATE_READY, $lineItemId, 'user2', 1);
+
+        $assignmentId3 = new UuidV6('00000003-0000-6000-0000-000000000000');
+        $assignment3 = new AssignmentDto($assignmentId3, Assignment::STATE_READY, $lineItemId, 'user3', 1);
 
         $assignmentCollection = (new AssignmentDtoCollection())
             ->add($assignment1)
@@ -69,7 +74,7 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultiple($assignmentCollection);
 
-        $assignments = $this->assignmentRepository->findBy(['id' => [11, 12, 13]]);
+        $assignments = $this->assignmentRepository->findBy(['id' => [$assignmentId1, $assignmentId2, $assignmentId3]]);
         self::assertCount(3, $assignments);
 
         /** @var Assignment $assignment */

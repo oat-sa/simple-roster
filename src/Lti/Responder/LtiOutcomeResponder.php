@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Responder;
 
 use Ramsey\Uuid\UuidFactoryInterface;
+use Symfony\Component\Uid\UuidV6;
 use Twig\Environment;
 
 class LtiOutcomeResponder
@@ -39,14 +40,14 @@ class LtiOutcomeResponder
         $this->uuidFactory = $uuidFactory;
     }
 
-    public function createXmlResponse(int $assignmentId): XmlResponse
+    public function createXmlResponse(UuidV6 $assignmentId): XmlResponse
     {
         $xml = $this->twig->render(
             'basic-outcome/replace-result-response.xml.twig',
             [
                 'messageIdentifier' => $this->uuidFactory->uuid4(),
-                'messageRefIdentifier' => $assignmentId,
-                'description' => sprintf('Assignment with Id %d was updated', $assignmentId),
+                'messageRefIdentifier' => (string)$assignmentId,
+                'description' => sprintf('Assignment with Id %s was updated', (string)$assignmentId),
             ]
         );
 

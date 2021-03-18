@@ -34,6 +34,7 @@ use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\UuidV6;
 
 class UpdateLti1p3OutcomeActionTest extends WebTestCase
 {
@@ -86,6 +87,8 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ->method('uuid4')
             ->willReturn($messageIdentifier);
 
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
         $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti1p3/outcome',
@@ -95,14 +98,15 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            $this->getValidReplaceResultRequestXml()
+            $this->getXmlRequestTemplate($assignmentId)
         );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame(
-            $this->getValidReplaceResultResponseXml($messageIdentifier),
+            $this->getValidReplaceResultResponseXml($messageIdentifier, $assignmentId),
             $this->kernelBrowser->getResponse()->getContent()
         );
+
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
@@ -120,7 +124,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            $this->getValidReplaceResultRequestXml()
+            $this->getXmlRequestTemplate(new UuidV6('00000001-0000-6000-0000-000000000000'))
         );
 
         self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -140,16 +144,13 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $this->getValidReplaceResultRequestXml()
+            $this->getXmlRequestTemplate(new UuidV6('00000001-0000-6000-0000-000000000000'))
         );
 
         $response = $this->kernelBrowser->getResponse();
         self::assertInstanceOf(Response::class, $response);
         self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
-        self::assertStringContainsString(
-            'A Token was not found in the TokenStorage',
-            (string)$response->getContent()
-        );
+        self::assertStringContainsString('A Token was not found in the TokenStorage', (string)$response->getContent());
     }
 
     public function testItReturnsUnauthorizedResponseWithInvalidToken(): void
@@ -163,7 +164,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => 'Bearer invalid'
             ],
-            $this->getValidReplaceResultRequestXml()
+            $this->getXmlRequestTemplate(new UuidV6('00000001-0000-6000-0000-000000000000'))
         );
 
         $response = $this->kernelBrowser->getResponse();
@@ -203,6 +204,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             ['https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome']
         );
         $authorization = sprintf('Bearer %s', $accessToken);
+        $nonExistingAssignmentId = new UuidV6('00000999-0000-6000-0000-000000000000');
 
         $this->kernelBrowser->request(
             'POST',
@@ -213,7 +215,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
                 'CONTENT_TYPE' => 'text/xml',
                 'HTTP_AUTHORIZATION' => $authorization
             ],
-            $this->getValidReplaceResultRequestXmlWithWrongAssignment()
+            $this->getXmlRequestTemplate($nonExistingAssignmentId)
         );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());

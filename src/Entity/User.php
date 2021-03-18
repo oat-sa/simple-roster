@@ -27,6 +27,7 @@ use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class User implements UserInterface, EntityInterface
 {
@@ -179,16 +180,16 @@ class User implements UserInterface, EntityInterface
     /**
      * @throws AssignmentNotFoundException
      */
-    public function getAssignmentById(int $assignmentId): Assignment
+    public function getAssignmentById(UuidV6 $assignmentId): Assignment
     {
         foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->getId() === $assignmentId) {
+            if ((string)$assignment->getId() === (string)$assignmentId) {
                 return $assignment;
             }
         }
 
         throw new AssignmentNotFoundException(
-            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+            sprintf("Assignment id '%s' not found for user '%s'.", (string)$assignmentId, $this->getUsername())
         );
     }
 
@@ -196,7 +197,7 @@ class User implements UserInterface, EntityInterface
      * @throws AssignmentNotFoundException
      * @throws AssignmentUnavailableException
      */
-    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    public function getAvailableAssignmentById(UuidV6 $assignmentId): Assignment
     {
         $assignment = $this->getAssignmentById($assignmentId);
 
@@ -205,7 +206,11 @@ class User implements UserInterface, EntityInterface
         }
 
         throw new AssignmentUnavailableException(
-            sprintf("Assignment with id '%s' for user '%s' is unavailable.", $assignmentId, $this->getUsername())
+            sprintf(
+                "Assignment with id '%s' for user '%s' is unavailable.",
+                (string)$assignmentId,
+                $this->getUsername()
+            )
         );
     }
 
