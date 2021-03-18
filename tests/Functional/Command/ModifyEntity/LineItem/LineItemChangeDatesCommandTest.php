@@ -492,7 +492,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--end-date' => '2020-01-10T00:00:00+0100',
                 ],
                 'persistedData' => [
-                    'lineItemIds' => [4],
+                    'lineItemIds' => [new UuidV6('00000001-0000-6000-0000-000000000000')],
                     'start_at' => '2019-12-31 23:00:00',
                     'end_at' => '2020-01-09 23:00:00',
                 ],
