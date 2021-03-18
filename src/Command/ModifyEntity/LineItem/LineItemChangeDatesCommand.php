@@ -87,7 +87,8 @@ class LineItemChangeDatesCommand extends Command
 The <info>%command.name%</info> command changes the dates for specific line items.
 
 <comment>Not specifying a start-date or end-date option will nullify the value for the column.</comment>
-<comment>Dates are expected to be in the format: 2020-01-01T00:00:00+0000</comment>
+<comment>Dates are expected to be in the format: 2020-01-01T00:00:00+0000.</comment>
+<comment>You can adjust the timezone: 2020-01-01T00:00:00+0100 will be stored as 2019-12-31 23:00:00 GMT.</comment>
 
 To change both start and end date of a line item using IDs:
     <info>php %command.full_name% -i 1,2,3 --start-date <date> --end-date <date></info>
@@ -209,7 +210,7 @@ EOF
             }
 
             if ($this->isDryRun) {
-                $this->symfonyStyle->success(
+                $this->symfonyStyle->warning(
                     sprintf(
                         '[DRY RUN] %d line item(s) have been updated.',
                         $lineItemsCollection->count()
@@ -320,7 +321,7 @@ EOF
         if (!empty($dateString)) {
             try {
                 $date = Carbon::createFromFormat(Carbon::ATOM, $dateString);
-                $dateObj = $date ? $date->toDateTime() : null;
+                $dateObj = $date ? $date->setTimezone('UTC')->toDateTime() : null;
             } catch (Throwable $e) {
                 $message = sprintf(
                     '%s is an invalid date. Expected format: 2020-01-01T00:00:00+0000',

@@ -31,7 +31,7 @@ class UpdateLineItemDto implements JsonSerializable
     public const STATUS_ERROR = 'error';
     public const STATUS_IGNORED = 'ignored';
 
-    public const NAME = 'RemoteDeliveryPublicationFinished';
+    public const NAME = 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent';
 
     /** @var string */
     private $id;

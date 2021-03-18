@@ -401,7 +401,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ],
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                    'eventName' => 'RemoteDeliveryPublicationFinished',
+                    'eventName' => 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                     'triggeredTimestamp' => 1565602371,
                     'eventData' => [
                         'alias' => 'wrong-alias',
@@ -410,7 +410,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ],
                 [
                     'eventId' => 'lastDuplicatedEvent',
-                    'eventName' => 'RemoteDeliveryPublicationFinished',
+                    'eventName' => 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                     'triggeredTimestamp' => 1565602390,
                     'eventData' => [
                         'alias' => 'lineItemSlug',
@@ -419,7 +419,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ],
                 [
                     'eventId' => 'duplicated',
-                    'eventName' => 'RemoteDeliveryPublicationFinished',
+                    'eventName' => 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                     'triggeredTimestamp' => 1565602380,
                     'eventData' => [
                         'alias' => 'lineItemSlug',

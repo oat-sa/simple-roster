@@ -123,7 +123,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '52a3de8dd0f270fd193f9f4bff05232f',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'
@@ -178,14 +178,14 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '111',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602380),
                 'qti-interactions-delivery'
             ),
             new UpdateLineItemDto(
                 '222',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#duplicated',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'
@@ -231,7 +231,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '52a3de8dd0f270fd193f9f4bff05232f',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'

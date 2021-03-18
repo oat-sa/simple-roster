@@ -142,7 +142,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertStringContainsString('[NOTE] Checking line items to be updated...', $display);
         self::assertStringContainsString(
-            sprintf('[OK] [DRY RUN] %d line item(s) have been updated.', count($lineItemIds)),
+            sprintf('[WARNING] [DRY RUN] %d line item(s) have been updated.', count($lineItemIds)),
             $display
         );
 
@@ -483,6 +483,18 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     ],
                     'start_at' => null,
                     'end_at' => '2020-01-01 00:00:00',
+                ],
+            ],
+            'usingDatesWithTimeZone' => [
+                'parameters' => [
+                    '-s' => 'slug-1',
+                    '--start-date' => '2020-01-01T00:00:00+0100',
+                    '--end-date' => '2020-01-10T00:00:00+0100',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [new UuidV6('00000001-0000-6000-0000-000000000000')],
+                    'start_at' => '2019-12-31 23:00:00',
+                    'end_at' => '2020-01-09 23:00:00',
                 ],
             ],
         ];
