@@ -26,7 +26,7 @@ use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
@@ -56,7 +56,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
      */
     public function testItThrowsExceptionIfAssignmentDoesNotHaveSuitableState(string $nonSuitableAssignmentStatus): void
     {
-        $this->expectException(AssignmentNotProcessableException::class);
+        $this->expectException(AssignmentUnavailableException::class);
         $this->expectExceptionMessage(
             "Assignment with id '00000001-0000-6000-0000-000000000000' does not have a suitable state."
         );
@@ -82,7 +82,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         int $attemptsCount,
         string $assignmentStatus
     ): void {
-        $this->expectException(AssignmentNotProcessableException::class);
+        $this->expectException(AssignmentUnavailableException::class);
         $this->expectExceptionMessage(
             "Assignment with id '00000001-0000-6000-0000-000000000000' has reached the maximum attempts."
         );

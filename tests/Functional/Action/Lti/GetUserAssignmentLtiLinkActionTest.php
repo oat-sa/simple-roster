@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
 use Carbon\Carbon;
-use DateInterval;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Generator\NonceGenerator;
@@ -142,7 +141,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentIsNotAvailable(): void
     {
-        Carbon::setTestNow(Carbon::now()->add(new DateInterval('P3Y')));
+        Carbon::setTestNow(Carbon::create(2100));
 
         $userRepository = static::$container->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
@@ -170,9 +169,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfLineItemIsNotAvailable(): void
     {
-        Carbon::setTestNow(
-            Carbon::create(2019, 1, 1, 0, 0, 0)
-        );
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
         $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
 

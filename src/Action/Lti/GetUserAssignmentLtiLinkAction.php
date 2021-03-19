@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
@@ -89,7 +88,7 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (AssignmentUnavailableException | AssignmentNotProcessableException $exception) {
+        } catch (AssignmentUnavailableException $exception) {
             throw new ConflictHttpException($exception->getMessage());
         }
     }
