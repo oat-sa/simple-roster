@@ -22,8 +22,9 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity repository-class="OAT\SimpleRoster\Repository\LtiInstanceRepository" name="OAT\SimpleRoster\Entity\LtiInstance"
             table="lti_instances">
-        <id name="id" type="integer" column="id">
-            <generator strategy="AUTO"/>
+        <id name="id" type="uuid">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Symfony\Bridge\Doctrine\IdGenerator\UuidV6Generator"/>
         </id>
         <field name="label" column="label" length="255" precision="0" scale="0" unique="true"/>
         <field name="ltiLink" column="lti_link" length="255" precision="0" scale="0" unique="true"/>

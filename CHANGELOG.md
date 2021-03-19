@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## 2.1.0 - To be released
+
+### Changed
+- Changed identifier generation strategy of entities from `auto increment` to `uuid`.
 
 ### Fixed
 - Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
