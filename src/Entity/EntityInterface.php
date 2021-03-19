@@ -22,10 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
+use Symfony\Component\Uid\UuidV6;
+
 interface EntityInterface
 {
-    /**
-     * @return mixed
-     */
-    public function getId(); // FIXME: return Uuid when all entities are converted
+    public function getId(): UuidV6;
 }
