@@ -183,7 +183,7 @@ class User implements UserInterface, EntityInterface
     public function getAssignmentById(UuidV6 $assignmentId): Assignment
     {
         foreach ($this->getAssignments() as $assignment) {
-            if ((string)$assignment->getId() === (string)$assignmentId) {
+            if ($assignment->getId()->equals($assignmentId)) {
                 return $assignment;
             }
         }

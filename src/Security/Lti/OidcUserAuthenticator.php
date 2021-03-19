@@ -89,8 +89,9 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
         $assignmentFound = false;
 
         foreach ($user->getAssignments() as $assignment) {
-            if ((string)$assignment->getId() === (string)$loginHintDto->getAssignmentId()) {
+            if ($assignment->getId()->equals($loginHintDto->getAssignmentId())) {
                 $assignmentFound = true;
+
                 break;
             }
         }
