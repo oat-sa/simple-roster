@@ -46,8 +46,6 @@ class UserCacheWarmerCommand extends Command
     private const OPTION_USERNAMES = 'usernames';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_BATCH = 'batch';
-    private const OPTION_MODULO = 'modulo';
-    private const OPTION_REMAINDER = 'remainder';
 
     private const DEFAULT_BATCH_SIZE = 1000;
 
