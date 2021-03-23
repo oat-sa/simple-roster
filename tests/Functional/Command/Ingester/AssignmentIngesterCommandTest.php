@@ -26,7 +26,6 @@ use OAT\SimpleRoster\Command\Ingester\AssignmentIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\LineItemIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
@@ -172,7 +171,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         ];
 
         /** @var UserRepository $userRepository */
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::$container->get(UserRepository::class);
 
         foreach ($expectedAssignmentCounts as $username => $expectedAssignmentCount) {
             $user = $userRepository->findByUsernameWithAssignments($username);

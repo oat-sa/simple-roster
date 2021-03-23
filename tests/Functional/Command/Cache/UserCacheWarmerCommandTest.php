@@ -37,8 +37,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Symfony\Component\Uid\BinaryUtil;
-use Symfony\Component\Uid\UuidV6;
 
 class UserCacheWarmerCommandTest extends KernelTestCase
 {

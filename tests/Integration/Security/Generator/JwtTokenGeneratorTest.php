@@ -49,7 +49,7 @@ class JwtTokenGeneratorTest extends KernelTestCase
 
         self::$container->set('test.uid_generator', $this->testUuidFactory);
 
-        $this->subject = static::$container->get(JwtTokenGenerator::class);
+        $this->subject = self::$container->get(JwtTokenGenerator::class);
     }
 
     public function testItCanCreateTokenWithClaims(): void
