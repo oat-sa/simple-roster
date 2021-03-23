@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class UserIngesterCommand extends AbstractCsvIngesterCommand
@@ -177,6 +178,7 @@ EOF
     private function createUserDto(array $rawUser): UserDto
     {
         return new UserDto(
+            new UuidV6(),
             $rawUser['username'],
             $this->passwordEncoder->encodePassword(new User(), $rawUser['password']),
             $rawUser['groupId'] ?? null

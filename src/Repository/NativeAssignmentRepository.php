@@ -45,9 +45,9 @@ class NativeAssignmentRepository extends AbstractRepository
         $queryParts = [];
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "('%s', %s, '%s', '%s', %s)",
+                "('%s', '%s', '%s', '%s', %s)",
                 (string)$assignmentDto->getId(),
-                $assignmentDto->getUserId(),
+                (string)$assignmentDto->getUserId(),
                 (string)$assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
                 0

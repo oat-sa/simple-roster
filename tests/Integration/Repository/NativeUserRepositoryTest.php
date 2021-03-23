@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class NativeUserRepositoryTest extends KernelTestCase
 {
@@ -54,8 +55,11 @@ class NativeUserRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleUsers(): void
     {
-        $user1 = new UserDto('test1', 'test');
-        $user2 = new UserDto('test2', 'test');
+        $userId1 = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $userId2 = new UuidV6('00000002-0000-6000-0000-000000000000');
+
+        $user1 = new UserDto($userId1, 'test1', 'test');
+        $user2 = new UserDto($userId2, 'test2', 'test');
 
         $userCollection = (new UserDtoCollection())
             ->add($user1)
@@ -63,14 +67,11 @@ class NativeUserRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultiple($userCollection);
 
-        $user1 = $this->userRepository->find(1);
-        $user2 = $this->userRepository->find(2);
+        $users = $this->getRepository(User::class)->findAll();
+        self::assertCount(2, $users);
 
-        self::assertInstanceOf(User::class, $user1);
-        self::assertInstanceOf(User::class, $user2);
-
-        self::assertSame(1, $user1->getId());
-        self::assertSame(2, $user2->getId());
+        self::assertTrue($userId1->equals($users[0]->getId()));
+        self::assertTrue($userId2->equals($users[1]->getId()));
     }
 
     public function testItCanFindUsersByUsername(): void

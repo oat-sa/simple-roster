@@ -91,13 +91,16 @@ class AssignmentIngesterTest extends TestCase
 
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
+        $expectedUserId1 = '00000111-0000-6000-0000-000000000000';
+        $expectedUserId2 = '00000222-0000-6000-0000-000000000000';
+
         $this->userRepository
             ->expects(self::once())
             ->method('findUsernames')
             ->with(['testUser1', 'testUser2'])
             ->willReturn([
-                ['id' => 1, 'username' => 'testUser1'],
-                ['id' => 2, 'username' => 'testUser2'],
+                ['id' => $expectedUserId1, 'username' => 'testUser1'],
+                ['id' => $expectedUserId2, 'username' => 'testUser2'],
             ]);
 
         $this->assignmentRepository
@@ -107,7 +110,7 @@ class AssignmentIngesterTest extends TestCase
 
         $this->subject->ingest($assignmentCollection);
 
-        self::assertSame(1, $assignment1->getUserId());
-        self::assertSame(2, $assignment2->getUserId());
+        self::assertSame($expectedUserId1, (string)$assignment1->getUserId());
+        self::assertSame($expectedUserId2, (string)$assignment2->getUserId());
     }
 }

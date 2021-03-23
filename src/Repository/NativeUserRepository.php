@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,14 +32,9 @@ use Throwable;
 
 class NativeUserRepository extends AbstractRepository
 {
-    /** @var string */
-    private $kernelEnvironment;
-
-    public function __construct(ManagerRegistry $registry, string $kernelEnvironment)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
-
-        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     /**
@@ -51,18 +44,14 @@ class NativeUserRepository extends AbstractRepository
     public function insertMultiple(UserDtoCollection $users): void
     {
         $queryParts = [];
-        $userIndex = $this->findNextAvailableUserIndex();
-
         foreach ($users as $user) {
             $queryParts[] = sprintf(
-                "(%s, '%s', '%s', '[]', '%s')",
-                $userIndex,
+                "('%s', '%s', '%s', '[]', '%s')",
+                (string)$user->getId(),
                 $user->getUsername(),
                 $user->getPassword(),
                 $user->getGroupId()
             );
-
-            $userIndex++;
         }
 
         $query = sprintf(
@@ -72,7 +61,6 @@ class NativeUserRepository extends AbstractRepository
 
         $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
         $this->_em->clear();
-        $this->refreshSequence();
     }
 
     /**
@@ -84,7 +72,7 @@ class NativeUserRepository extends AbstractRepository
     {
         $query = sprintf(
             "SELECT id, username FROM users WHERE username IN (%s)",
-            implode(',', array_map(static function (string $username) {
+            implode(',', array_map(static function (string $username): string {
                 return "'" . $username . "'";
             }, $usernames))
         );
@@ -93,38 +81,5 @@ class NativeUserRepository extends AbstractRepository
         $statement->execute();
 
         return $statement->fetchAllAssociative();
-    }
-
-    /**
-     * @throws NoResultException
-     * @throws NonUniqueResultException
-     */
-    private function findNextAvailableUserIndex(): int
-    {
-        $index = $this
-            ->createQueryBuilder('u')
-            ->select('MAX(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        return (int)$index + 1;
-    }
-
-    /**
-     * @codeCoverageIgnore Cannot be tested with SQLite database
-     *
-     * @throws ORMException
-     */
-    private function refreshSequence(): void
-    {
-        if ($this->kernelEnvironment !== 'test') {
-            $this
-                ->getEntityManager()
-                ->createNativeQuery(
-                    "SELECT SETVAL('users_id_seq', COALESCE(MAX(id), 1)) FROM users",
-                    new ResultSetMapping()
-                )
-                ->execute();
-        }
     }
 }

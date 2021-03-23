@@ -33,6 +33,7 @@ use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
+use Symfony\Component\Uid\UuidV6;
 
 class UserRepository extends AbstractRepository
 {
@@ -86,7 +87,7 @@ class UserRepository extends AbstractRepository
      */
     public function findAllUsernamesPaged(
         int $limit,
-        ?int $lastUserId,
+        ?UuidV6 $lastUserId,
         FindUserCriteria $criteria = null
     ): UsernameResultSet {
         if ($limit < 1) {
@@ -106,7 +107,7 @@ class UserRepository extends AbstractRepository
         if (null !== $lastUserId) {
             $queryBuilder
                 ->andWhere('u.id > :lastUserId')
-                ->setParameter('lastUserId', $lastUserId);
+                ->setParameter('lastUserId', $lastUserId, 'uuid');
         }
 
         if ($criteria->hasUsernameCriterion()) {

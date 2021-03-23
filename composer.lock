@@ -132,16 +132,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.174.3",
+            "version": "3.175.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "d58a350b23810a3930f432364af2d7589cf672b3"
+                "reference": "31baa9e0c4330f01eb74b8a7ef086e9d34f8391e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d58a350b23810a3930f432364af2d7589cf672b3",
-                "reference": "d58a350b23810a3930f432364af2d7589cf672b3",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/31baa9e0c4330f01eb74b8a7ef086e9d34f8391e",
+                "reference": "31baa9e0c4330f01eb74b8a7ef086e9d34f8391e",
                 "shasum": ""
             },
             "require": {
@@ -216,9 +216,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.174.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.175.0"
             },
-            "time": "2021-03-18T18:16:53+00:00"
+            "time": "2021-03-19T18:13:22+00:00"
         },
         {
             "name": "aws/aws-sdk-php-symfony",
@@ -1110,16 +1110,16 @@
         },
         {
             "name": "doctrine/doctrine-bundle",
-            "version": "2.2.4",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineBundle.git",
-                "reference": "708ed6f99c3d0142e15a8b05022946367cfcc075"
+                "reference": "8b922578bdee2243a26202b13df795e170efaef8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/708ed6f99c3d0142e15a8b05022946367cfcc075",
-                "reference": "708ed6f99c3d0142e15a8b05022946367cfcc075",
+                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/8b922578bdee2243a26202b13df795e170efaef8",
+                "reference": "8b922578bdee2243a26202b13df795e170efaef8",
                 "shasum": ""
             },
             "require": {
@@ -1200,7 +1200,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/DoctrineBundle/issues",
-                "source": "https://github.com/doctrine/DoctrineBundle/tree/2.2.4"
+                "source": "https://github.com/doctrine/DoctrineBundle/tree/2.3.0"
             },
             "funding": [
                 {
@@ -1216,7 +1216,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-25T11:33:34+00:00"
+            "time": "2021-03-16T16:24:04+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -1999,16 +1999,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.7.0",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3"
+                "reference": "35ea11d335fd638b5882ff1725228b3d35496ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/53330f47520498c0ae1f61f7e2c90f55690c06a3",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/35ea11d335fd638b5882ff1725228b3d35496ab1",
+                "reference": "35ea11d335fd638b5882ff1725228b3d35496ab1",
                 "shasum": ""
             },
             "require": {
@@ -2068,9 +2068,9 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/1.7.0"
+                "source": "https://github.com/guzzle/psr7/tree/1.8.1"
             },
-            "time": "2020-09-30T07:37:11+00:00"
+            "time": "2021-03-21T16:25:00+00:00"
         },
         {
             "name": "laminas/laminas-code",
@@ -11370,16 +11370,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.81",
+            "version": "0.12.82",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8"
+                "reference": "3920f0fb0aff39263d3a4cb0bca120a67a1a6a11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
-                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/3920f0fb0aff39263d3a4cb0bca120a67a1a6a11",
+                "reference": "3920f0fb0aff39263d3a4cb0bca120a67a1a6a11",
                 "shasum": ""
             },
             "require": {
@@ -11410,7 +11410,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.81"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.82"
             },
             "funding": [
                 {
@@ -11426,7 +11426,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-08T22:03:02+00:00"
+            "time": "2021-03-19T06:08:17+00:00"
         },
         {
             "name": "phpstan/phpstan-doctrine",

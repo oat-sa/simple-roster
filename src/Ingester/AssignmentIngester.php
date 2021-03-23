@@ -28,6 +28,7 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class AssignmentIngester
@@ -54,7 +55,7 @@ class AssignmentIngester
     {
         $existingUsernames = [];
         foreach ($this->userRepository->findUsernames($assignments->getAllUsernames()) as $existingUser) {
-            $existingUsernames[$existingUser['username']] = (int)$existingUser['id'];
+            $existingUsernames[$existingUser['username']] = $existingUser['id'];
         }
 
         foreach ($assignments as $assignment) {
@@ -64,7 +65,7 @@ class AssignmentIngester
                 );
             }
 
-            $assignment->setUserId($existingUsernames[$assignment->getUsername()]);
+            $assignment->setUserId(new UuidV6($existingUsernames[$assignment->getUsername()]));
         }
 
         $this->assignmentRepository->insertMultiple($assignments);
