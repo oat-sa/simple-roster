@@ -27,7 +27,6 @@ use Doctrine\ORM\EntityNotFoundException;
 use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
-use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
@@ -84,27 +83,11 @@ class UserRepositoryTest extends KernelTestCase
         self::assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
     }
 
-    public function testItThrowsExceptionIfWeTryToGetUserWithAssignmentsWithEmptyUsername(): void
-    {
-        $this->expectException(InvalidUsernameException::class);
-        $this->expectExceptionMessage('Empty username received.');
-
-        $this->subject->findByUsernameWithAssignments('');
-    }
-
     public function testItThrowsExceptionIfUserCannotBeFound(): void
     {
         $this->expectException(EntityNotFoundException::class);
 
         $this->subject->findByUsernameWithAssignments('nonExistingUser');
-    }
-
-    public function testItThrowsExceptionIfInvalidLimitProvided(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid 'limit' parameter received.");
-
-        $this->subject->findAllUsernamesByCriteriaPaged(0, null);
     }
 
     /**

@@ -23,22 +23,17 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
-use Exception;
-use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 use Symfony\Component\Uid\UuidV6;
-use Throwable;
 
 class UserRepository extends AbstractRepository
 {
@@ -61,14 +56,9 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
      */
     public function findByUsernameWithAssignments(string $username): User
     {
-        if (empty($username)) {
-            throw new InvalidUsernameException('Empty username received.');
-        }
-
         /** @var User|null $user */
         $user = $this
             ->createQueryBuilder('u')
@@ -87,17 +77,11 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
-    /**
-     * @throws Exception
-     */
     public function findAllUsernamesByCriteriaPaged(
         int $limit,
         ?UuidV6 $lastUserId,
         FindUserCriteria $criteria = null
     ): UsernameResultSet {
-        if ($limit < 1) {
-            throw new InvalidArgumentException("Invalid 'limit' parameter received.");
-        }
 
         if (null === $criteria) {
             $criteria = new FindUserCriteria();
@@ -204,8 +188,6 @@ class UserRepository extends AbstractRepository
 
     /**
      * @param string[] $usernames
-     *
-     * @throws Throwable
      */
     public function findUsernames(array $usernames): array
     {
