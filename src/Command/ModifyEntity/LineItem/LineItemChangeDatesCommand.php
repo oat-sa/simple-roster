@@ -83,6 +83,8 @@ class LineItemChangeDatesCommand extends Command
         parent::configure();
 
         $this->setDescription('Updates the start and end dates of line item(s).');
+
+        // @codingStandardsIgnoreStart
         $this->setHelp(<<<EOF
 The <info>%command.name%</info> command changes the dates for specific line items.
 
@@ -91,14 +93,15 @@ The <info>%command.name%</info> command changes the dates for specific line item
 <comment>You can adjust the timezone: 2020-01-01T00:00:00+0100 will be stored as 2019-12-31 23:00:00 GMT.</comment>
 
 To change both start and end date of a line item using IDs:
-    <info>php %command.full_name% -i 1,2,3 --start-date <date> --end-date <date></info>
-    <info>php %command.full_name% --line-item-ids 1,2,3 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% --line-item-ids 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date <date> --end-date <date></info>
 
 To change both start and end date of a line item using slugs:
     <info>php %command.full_name% -s slug1,slug2,slug3 --start-date <date> --end-date <date></info>
     <info>php %command.full_name% --line-item-slugs slug1,slug2,slug3 --start-date <date> --end-date <date></info>
 EOF
         );
+        // @codingStandardsIgnoreEnd
 
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
