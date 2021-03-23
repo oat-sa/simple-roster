@@ -5,6 +5,9 @@
 ### Changed
 - Changed identifier generation strategy of entities from `auto increment` to `uuid`.
 
+### Removed
+- Removed synchronous parallel cache warmup feature from user cache warmer command.
+
 ### Fixed
 - Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
 - Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 

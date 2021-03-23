@@ -26,7 +26,6 @@ use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
-use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
@@ -70,12 +69,6 @@ class UserCacheWarmerCommand extends Command
     /** @var array */
     private $lineItemSlugs = [];
 
-    /** @var int|null */
-    private $modulo;
-
-    /** @var int|null */
-    private $remainder;
-
     public function __construct(UserCacheWarmerService $userCacheWarmerService, UserRepository $userRepository)
     {
         $this->userCacheWarmerService = $userCacheWarmerService;
@@ -106,12 +99,6 @@ Use the --usernames option to warm up the cache for specific users:
 Use the --line-item-slugs option to warm up the cache for users having assignments for specific line items:
 
     <info>php %command.full_name% --line-item-slugs=slug_1,slug_2,slug_3</info>
-
-Use the --modulo and --remainder options for parallelized cache warmup:
-
-    <info>php %command.full_name% --modulo=4 --remainder=1</info>
-    <comment>(Documentation: https://github.com/oat-sa/simple-roster/blob/develop/docs/cli/user-cache-warmer-command.md#synchronous-cache-warmup-parallelization)
-    </comment>
 EOF
         // @codingStandardsIgnoreEnd
         );
@@ -138,22 +125,6 @@ EOF
             'l',
             InputOption::VALUE_REQUIRED,
             'Comma separated list of line item slugs to scope the cache warmup'
-        );
-
-        $this->addOption(
-            self::OPTION_MODULO,
-            'm',
-            InputOption::VALUE_REQUIRED,
-            "Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < |M|), where A = user id, Q = quotient, " .
-            "R = 'remainder' option"
-        );
-
-        $this->addOption(
-            self::OPTION_REMAINDER,
-            'r',
-            InputOption::VALUE_REQUIRED,
-            "Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < |M|), where A = user id, Q = quotient, " .
-            "M = 'modulo' option"
         );
     }
 
@@ -183,14 +154,6 @@ EOF
                     self::OPTION_LINE_ITEM_SLUGS
                 )
             );
-        }
-
-        if ($input->getOption(self::OPTION_MODULO)) {
-            $this->initializeModuloOption($input);
-        }
-
-        if ($input->getOption(self::OPTION_REMAINDER) !== null) {
-            $this->initializeRemainderOption($input);
         }
     }
 
@@ -304,77 +267,6 @@ EOF
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function initializeModuloOption(InputInterface $input): void
-    {
-        if ($input->getOption(self::OPTION_REMAINDER) === null) {
-            throw new InvalidArgumentException(
-                sprintf("Option '%s' is expected to be specified.", self::OPTION_REMAINDER)
-            );
-        }
-
-        if (!is_numeric($input->getOption(self::OPTION_MODULO))) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Option '%s' is expected to be numeric.",
-                    self::OPTION_MODULO
-                )
-            );
-        }
-
-        $modulo = (int)$input->getOption(self::OPTION_MODULO);
-
-        if ($modulo < 2 || $modulo > 100) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Invalid '%s' option received: %d, expected value: 2 <= m <= 100",
-                    self::OPTION_MODULO,
-                    $modulo
-                )
-            );
-        }
-
-        $this->modulo = $modulo;
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function initializeRemainderOption(InputInterface $input): void
-    {
-        if (!$input->getOption(self::OPTION_MODULO)) {
-            throw new InvalidArgumentException(
-                sprintf("Option '%s' is expected to be specified.", self::OPTION_MODULO)
-            );
-        }
-
-        if (!is_numeric($input->getOption(self::OPTION_REMAINDER))) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Option '%s' is expected to be numeric.",
-                    self::OPTION_REMAINDER
-                )
-            );
-        }
-
-        $remainder = (int)$input->getOption(self::OPTION_REMAINDER);
-
-        if ($remainder < 0 || $remainder >= $this->modulo) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Invalid '%s' option received: %d, expected value: 0 <= r <= %d",
-                    self::OPTION_REMAINDER,
-                    $remainder,
-                    $this->modulo - 1
-                )
-            );
-        }
-
-        $this->remainder = $remainder;
-    }
-
     private function getFindUserCriteria(): FindUserCriteria
     {
         $criteria = new FindUserCriteria();
@@ -385,12 +277,6 @@ EOF
 
         if (!empty($this->lineItemSlugs)) {
             $criteria->addLineItemSlugCriterion(...$this->lineItemSlugs);
-        }
-
-        if ($this->modulo && $this->remainder !== null) {
-            $criteria->addEuclideanDivisionCriterion(
-                new EuclideanDivisionCriterion($this->modulo, $this->remainder)
-            );
         }
 
         return $criteria;
