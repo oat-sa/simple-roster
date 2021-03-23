@@ -25,12 +25,15 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
 use InvalidArgumentException;
+use OAT\SimpleRoster\DataTransferObject\UserDto;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserRepositoryTest extends KernelTestCase
 {
@@ -52,7 +55,6 @@ class UserRepositoryTest extends KernelTestCase
         self::bootKernel();
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
         $this->subject = self::$container->get(UserRepository::class);
         $this->doctrineResultCacheImplementation = self::$container->get('doctrine.orm.default_result_cache');
@@ -61,6 +63,7 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItCanGetUserWithAssignmentsByUsername(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
         $user = $this->subject->findByUsernameWithAssignments('user_1');
 
         self::assertSame('user_1', $user->getUsername());
@@ -69,6 +72,8 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItUsesResultCacheImplementationForGettingTheUserWithAssignments(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $username = 'user_1';
         $expectedResultCacheId = $this->userCacheIdGenerator->generate($username);
 
@@ -99,7 +104,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'limit' parameter received.");
 
-        $this->subject->findAllUsernamesPaged(0, null);
+        $this->subject->findAllUsernamesByCriteriaPaged(0, null);
     }
 
     /**
@@ -107,10 +112,12 @@ class UserRepositoryTest extends KernelTestCase
      */
     public function testItCanFindAllUsernamesPaged(int $limit): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $lastUserId = null;
         $userIdIndex = 0;
         do {
-            $resultSet = $this->subject->findAllUsernamesPaged($limit, $lastUserId);
+            $resultSet = $this->subject->findAllUsernamesByCriteriaPaged($limit, $lastUserId);
 
             self::assertLessThanOrEqual($limit, count($resultSet));
 
@@ -127,11 +134,15 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItCanCountUsers(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         self::assertSame(100, $this->subject->countByCriteria());
     }
 
     public function testItCanCountUsersByUsernameCriteria(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $criteria = (new FindUserCriteria())
             ->addUsernameCriterion('user_1', 'user_10', 'user_73', 'user_88');
 
@@ -140,10 +151,48 @@ class UserRepositoryTest extends KernelTestCase
 
     public function testItCanCountUsersByLineItemSlugCriteria(): void
     {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
         $criteria = (new FindUserCriteria())
             ->addLineItemSlugCriterion('lineItemSlug2', 'lineItemSlug3');
 
         self::assertSame(50, $this->subject->countByCriteria($criteria));
+    }
+
+    public function testItCanInsertMultipleUsers(): void
+    {
+        $userId1 = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $userId2 = new UuidV6('00000002-0000-6000-0000-000000000000');
+
+        $user1 = new UserDto($userId1, 'test1', 'test');
+        $user2 = new UserDto($userId2, 'test2', 'test');
+
+        $userCollection = (new UserDtoCollection())
+            ->add($user1)
+            ->add($user2);
+
+        $this->subject->insertMultipleNatively($userCollection);
+
+        $users = $this->subject->findAll();
+        self::assertCount(2, $users);
+
+        self::assertTrue($userId1->equals($users[0]->getId()));
+        self::assertTrue($userId2->equals($users[1]->getId()));
+    }
+
+    public function testItCanFindUsersByUsername(): void
+    {
+        $this->loadFixtureByFilename('100usersWithAssignments.yml');
+
+        $expectedUsernames = ['user_1', 'user_2', 'user_3', 'user_4', 'user_5'];
+
+        $users = $this->subject->findUsernames($expectedUsernames);
+
+        self::assertCount(5, $users);
+
+        foreach ($expectedUsernames as $expectedUsername) {
+            self::assertContains($expectedUsername, $expectedUsernames);
+        }
     }
 
     public function provideLimits(): array

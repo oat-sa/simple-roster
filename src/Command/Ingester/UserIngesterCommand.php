@@ -27,7 +27,7 @@ use OAT\SimpleRoster\Csv\CsvReaderBuilder;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,7 +39,7 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
 {
     public const NAME = 'roster:ingest:user';
 
-    /** @var NativeUserRepository */
+    /** @var UserRepository */
     private $userRepository;
 
     /** @var UserPasswordEncoderInterface */
@@ -48,7 +48,7 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,
         StorageRegistry $storageRegistry,
-        NativeUserRepository $userRepository,
+        UserRepository $userRepository,
         UserPasswordEncoderInterface $passwordEncoder
     ) {
         parent::__construct($csvReaderBuilder, $storageRegistry);
@@ -120,7 +120,7 @@ EOF
 
                 if ($this->batchProcessable($numberOfProcessedRows)) {
                     if (!$this->isDryRun) {
-                        $this->userRepository->insertMultiple($userDtoCollection);
+                        $this->userRepository->insertMultipleNatively($userDtoCollection);
                     }
 
                     $userDtoCollection->clear();
@@ -129,7 +129,7 @@ EOF
             }
 
             if (!$this->isDryRun && !$userDtoCollection->isEmpty()) {
-                $this->userRepository->insertMultiple($userDtoCollection);
+                $this->userRepository->insertMultipleNatively($userDtoCollection);
             }
 
             $this->progressBar->finish();

@@ -28,14 +28,14 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
 use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
-use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\UuidV6;
 
 class AssignmentIngesterTest extends TestCase
 {
-    /** @var NativeUserRepository|MockObject */
+    /** @var UserRepository|MockObject */
     private $userRepository;
 
     /** @var NativeAssignmentRepository|MockObject */
@@ -48,7 +48,7 @@ class AssignmentIngesterTest extends TestCase
     {
         parent::setUp();
 
-        $this->userRepository = $this->createMock(NativeUserRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
         $this->assignmentRepository = $this->createMock(NativeAssignmentRepository::class);
 
         $this->subject = new AssignmentIngester($this->userRepository, $this->assignmentRepository);

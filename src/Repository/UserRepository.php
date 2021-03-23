@@ -24,9 +24,13 @@ namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 use Exception;
 use InvalidArgumentException;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
@@ -34,6 +38,7 @@ use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 use Symfony\Component\Uid\UuidV6;
+use Throwable;
 
 class UserRepository extends AbstractRepository
 {
@@ -85,7 +90,7 @@ class UserRepository extends AbstractRepository
     /**
      * @throws Exception
      */
-    public function findAllUsernamesPaged(
+    public function findAllUsernamesByCriteriaPaged(
         int $limit,
         ?UuidV6 $lastUserId,
         FindUserCriteria $criteria = null
@@ -169,5 +174,51 @@ class UserRepository extends AbstractRepository
             ->getOneOrNullResult();
 
         return null === $result ? 0 : (int)$result['number_of_users'];
+    }
+
+    /**
+     * @throws ORMException
+     * @throws MappingException
+     */
+    public function insertMultipleNatively(UserDtoCollection $users): void
+    {
+        $queryParts = [];
+        foreach ($users as $user) {
+            $queryParts[] = sprintf(
+                "('%s', '%s', '%s', '[]', '%s')",
+                (string)$user->getId(),
+                $user->getUsername(),
+                $user->getPassword(),
+                $user->getGroupId()
+            );
+        }
+
+        $query = sprintf(
+            'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
+            implode(',', $queryParts)
+        );
+
+        $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
+        $this->_em->clear();
+    }
+
+    /**
+     * @param string[] $usernames
+     *
+     * @throws Throwable
+     */
+    public function findUsernames(array $usernames): array
+    {
+        $query = sprintf(
+            "SELECT id, username FROM users WHERE username IN (%s)",
+            implode(',', array_map(static function (string $username): string {
+                return "'" . $username . "'";
+            }, $usernames))
+        );
+
+        $statement = $this->_em->getConnection()->prepare($query);
+        $statement->execute();
+
+        return $statement->fetchAllAssociative();
     }
 }

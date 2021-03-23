@@ -98,7 +98,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository
-            ->method('findAllUsernamesPaged')
+            ->method('findAllUsernamesByCriteriaPaged')
             ->willThrowException(new LogicException('Yaaay'));
 
         $userRepository

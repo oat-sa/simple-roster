@@ -185,7 +185,7 @@ EOF
 
         try {
             do {
-                $resultSet = $this->userRepository->findAllUsernamesPaged($this->batchSize, $lastUserId, $criteria);
+                $resultSet = $this->userRepository->findAllUsernamesByCriteriaPaged($this->batchSize, $lastUserId, $criteria);
                 if (!$resultSet->isEmpty()) {
                     $this->userCacheWarmerService->process($resultSet->getUsernameCollection());
                 }

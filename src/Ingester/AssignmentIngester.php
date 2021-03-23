@@ -27,19 +27,19 @@ use Doctrine\Persistence\Mapping\MappingException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
-use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class AssignmentIngester
 {
-    /** @var NativeUserRepository */
+    /** @var UserRepository */
     private $userRepository;
 
     /** @var NativeAssignmentRepository */
     private $assignmentRepository;
 
-    public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
+    public function __construct(UserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
     {
         $this->userRepository = $userRepository;
         $this->assignmentRepository = $assignmentRepository;
