@@ -26,7 +26,7 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
-use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\Uid\UuidV6;
 use Throwable;
@@ -36,10 +36,10 @@ class AssignmentIngester
     /** @var UserRepository */
     private $userRepository;
 
-    /** @var NativeAssignmentRepository */
+    /** @var AssignmentRepository */
     private $assignmentRepository;
 
-    public function __construct(UserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
+    public function __construct(UserRepository $userRepository, AssignmentRepository $assignmentRepository)
     {
         $this->userRepository = $userRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -68,6 +68,6 @@ class AssignmentIngester
             $assignment->setUserId(new UuidV6($existingUsernames[$assignment->getUsername()]));
         }
 
-        $this->assignmentRepository->insertMultiple($assignments);
+        $this->assignmentRepository->insertMultipleNatively($assignments);
     }
 }

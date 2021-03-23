@@ -27,7 +27,7 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
-use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +38,7 @@ class AssignmentIngesterTest extends TestCase
     /** @var UserRepository|MockObject */
     private $userRepository;
 
-    /** @var NativeAssignmentRepository|MockObject */
+    /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;
 
     /** @var AssignmentIngester */
@@ -48,8 +48,8 @@ class AssignmentIngesterTest extends TestCase
     {
         parent::setUp();
 
+        $this->assignmentRepository = $this->createMock(AssignmentRepository::class);
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->assignmentRepository = $this->createMock(NativeAssignmentRepository::class);
 
         $this->subject = new AssignmentIngester($this->userRepository, $this->assignmentRepository);
     }
@@ -105,7 +105,7 @@ class AssignmentIngesterTest extends TestCase
 
         $this->assignmentRepository
             ->expects(self::once())
-            ->method('insertMultiple')
+            ->method('insertMultipleNatively')
             ->with($assignmentCollection);
 
         $this->subject->ingest($assignmentCollection);
