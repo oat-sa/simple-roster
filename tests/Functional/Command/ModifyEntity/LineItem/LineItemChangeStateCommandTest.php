@@ -36,6 +36,7 @@ use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemChangeStateCommandTest extends KernelTestCase
 {
@@ -99,7 +100,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             [
                 'toggle' => 'deactivate',
                 'query-field' => $queryField,
-                'query-value' => $queryValue
+                'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
@@ -130,7 +131,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             [
                 'toggle' => 'activate',
                 'query-field' => $queryField,
-                'query-value' => $queryValue
+                'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
@@ -143,21 +144,21 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
     public function testEnsureOnlyOneLineIsDeactivated(): void
     {
-        $secondLineItem = $this->lineItemRepository->findOneById(2);
+        $secondLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000002-0000-6000-0000-000000000000'));
         self::assertTrue($secondLineItem->isActive());
 
         $this->commandTester->execute(
             [
                 'toggle' => 'deactivate',
                 'query-field' => 'id',
-                'query-value' => 1,
+                'query-value' => '00000001-0000-6000-0000-000000000000',
             ],
             ['capture_stderr_separately' => true]
         );
-        $firstLineItem = $this->lineItemRepository->findOneById(1);
+        $firstLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000001-0000-6000-0000-000000000000'));
         self::assertFalse($firstLineItem->isActive());
 
-        $secondLineItem = $this->lineItemRepository->findOneById(2);
+        $secondLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000002-0000-6000-0000-000000000000'));
         self::assertTrue($secondLineItem->isActive());
     }
 
@@ -186,7 +187,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $lineItemRepository = $this->createMock(LineItemRepository::class);
         $lineItemRepository->expects(self::once())
             ->method('findBy')
-            ->with(['id' => 1])
+            ->with(['id' => [(new UuidV6('00000001-0000-6000-0000-000000000000'))->toBinary()]])
             ->willThrowException(new Exception('Database Error'));
 
         self::$container->set('test.line_item_repository', $lineItemRepository);
@@ -195,7 +196,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
 
         $commandTester->execute(
-            ['toggle' => 'deactivate', 'query-field' => 'id', 'query-value' => '1'],
+            ['toggle' => 'deactivate', 'query-field' => 'id', 'query-value' => '00000001-0000-6000-0000-000000000000'],
             ['capture_stderr_separately' => true]
         );
 
@@ -206,32 +207,45 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     {
         return [
             'bySlug' => [
-                'line-item-ids' => [2],
+                'line-item-ids' => [new UuidV6('00000002-0000-6000-0000-000000000000')],
                 'query-field' => 'slug',
                 'query-value' => ['lineItemSlug2'],
             ],
             'byMultipleSlugs' => [
-                'line-item-ids' => [2, 1],
+                'line-item-ids' => [
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000001-0000-6000-0000-000000000000')
+                ],
                 'query-field' => 'slug',
                 'query-value' => ['lineItemSlug2', 'lineItemSlug1'],
             ],
             'byId' => [
-                'line-item-ids' => [1],
+                'line-item-ids' => [new UuidV6('00000001-0000-6000-0000-000000000000')],
                 'query-field' => 'id',
-                'query-value' => ['1'],
+                'query-value' => ['00000001-0000-6000-0000-000000000000'],
             ],
             'byMultipleIds' => [
-                'line-item-ids' => [1, 3],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000')
+                    ],
                 'query-field' => 'id',
-                'query-value' => ['1', '3'],
+                'query-value' => ['00000001-0000-6000-0000-000000000000', '00000003-0000-6000-0000-000000000000'],
             ],
             'byUri' => [
-                'line-item-ids' => [1, 2],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000')
+                ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com'],
             ],
             'byMultipleUris' => [
-                'line-item-ids' => [1, 2, 3],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000')
+                ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
             ],
@@ -273,7 +287,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                     'query-field' => 'uri',
                 ],
                 'expectedMessage' => 'Not enough arguments (missing: "query-value")',
-            ]
+            ],
         ];
     }
 
@@ -299,14 +313,10 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             $this->assertHasLogRecord(
                 [
                     'message' => sprintf(
-                        'The operation: "%s" was executed for Line Item with id: "%d"',
+                        "The operation: '%s' was executed for Line Item with id: '%s'",
                         $toggle,
-                        $lineItemId
-                    ),
-                    'context' => [
-                        'slug' => sprintf('lineItemSlug%d', $lineItemId),
-                        'uri' => $this->getContextUriByLineItemId($lineItemId),
-                    ],
+                        (string)$lineItemId
+                    )
                 ],
                 Logger::INFO
             );
@@ -320,16 +330,5 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             );
             self::assertEquals((int)$isActive, $cache['is_active_3']);
         }
-    }
-
-    private function getContextUriByLineItemId(int $lineItemId): string
-    {
-        $contextUris = [
-            1 => 'http://lineitemuri.com',
-            2 => 'http://lineitemuri.com',
-            3 => 'http://different-lineitemuri.com',
-        ];
-
-        return $contextUris[$lineItemId];
     }
 }

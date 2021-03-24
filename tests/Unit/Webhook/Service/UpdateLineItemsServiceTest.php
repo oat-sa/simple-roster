@@ -32,6 +32,7 @@ use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class UpdateLineItemsServiceTest extends TestCase
 {
@@ -97,6 +98,7 @@ class UpdateLineItemsServiceTest extends TestCase
             ->willReturn(
                 [
                     (new LineItem())
+                        ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
                         ->setSlug('qti-interactions-delivery')
                         ->setUri('http://lineitemuri.com')
                 ]
@@ -108,7 +110,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::once())
             ->method('info')
             ->with(
-                'The line item id 0 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'http://lineitemuri.com',
                     'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
@@ -139,6 +141,7 @@ class UpdateLineItemsServiceTest extends TestCase
     public function testItIgnoresDuplicatedUpdates(): void
     {
         $lineItem = (new LineItem())
+            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setSlug('qti-interactions-delivery');
 
         $this->lineItemRepository->expects(self::once())
@@ -163,7 +166,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::at(0))
             ->method('info')
             ->with(
-                'The line item id 0 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                     'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'

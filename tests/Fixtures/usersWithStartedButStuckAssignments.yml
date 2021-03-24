@@ -1,5 +1,6 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem:
+        id: <uuidV6('00000001-0000-6000-0000-000000000000')>
         label: 'The first line item with 1 maximum attempt'
         uri: 'http://lineitemuri.com'
         slug: 'lineItemSlug'
@@ -7,6 +8,7 @@ OAT\SimpleRoster\Entity\LineItem:
         endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
         maxAttempts: 1
     lineItem2:
+        id: <uuidV6('00000002-0000-6000-0000-000000000000')>
         label: 'The second line item with infinite attempts'
         uri: 'http://lineitemuri.com'
         slug: 'lineItem2Slug'

@@ -35,6 +35,7 @@ use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemCacheWarmerCommandTest extends KernelTestCase
 {
@@ -110,9 +111,21 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('3LineItems.yml');
 
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(1)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(2)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(3)));
+        self::assertFalse(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000001-0000-6000-0000-000000000000'))
+            )
+        );
+        self::assertFalse(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000002-0000-6000-0000-000000000000'))
+            )
+        );
+        self::assertFalse(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000003-0000-6000-0000-000000000000'))
+            )
+        );
 
         self::assertSame(0, $this->commandTester->execute([], ['capture_stderr_separately' => true]));
 
@@ -123,9 +136,21 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(1)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(2)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(3)));
+        self::assertTrue(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000001-0000-6000-0000-000000000000'))
+            )
+        );
+        self::assertTrue(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000002-0000-6000-0000-000000000000'))
+            )
+        );
+        self::assertTrue(
+            $this->resultCache->contains(
+                $this->lineItemCacheIdGenerator->generate(new UuidV6('00000003-0000-6000-0000-000000000000'))
+            )
+        );
     }
 
     public function testItLogsSuccessfulCacheWarmup(): void
@@ -136,9 +161,10 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'Result cache for Line Item Id 1 have been successfully warmed up.',
+                'message' => "Result cache for Line Item with id = '00000001-0000-6000-0000-000000000000' " .
+                    "have been successfully warmed up.",
                 'context' => [
-                    'cacheKey' => 'lineItem.1',
+                    'cacheKey' => 'lineItem.00000001-0000-6000-0000-000000000000',
                     'cacheTtl' => '3,600',
                 ],
             ],
@@ -147,9 +173,10 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'Result cache for Line Item Id 2 have been successfully warmed up.',
+                'message' => "Result cache for Line Item with id = '00000002-0000-6000-0000-000000000000' " .
+                    "have been successfully warmed up.",
                 'context' => [
-                    'cacheKey' => 'lineItem.2',
+                    'cacheKey' => 'lineItem.00000002-0000-6000-0000-000000000000',
                     'cacheTtl' => '3,600',
                 ],
             ],
@@ -158,9 +185,10 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'Result cache for Line Item Id 3 have been successfully warmed up.',
+                'message' => "Result cache for Line Item with id = '00000003-0000-6000-0000-000000000000' " .
+                    "have been successfully warmed up.",
                 'context' => [
-                    'cacheKey' => 'lineItem.3',
+                    'cacheKey' => 'lineItem.00000003-0000-6000-0000-000000000000',
                     'cacheTtl' => '3,600',
                 ],
             ],

@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemChangeStateCommand extends Command
@@ -52,7 +53,7 @@ class LineItemChangeStateCommand extends Command
 
     private const TOGGLE_OPERATIONS = [
         self::TOGGLE_ACTIVATE,
-        self::TOGGLE_DEACTIVATE
+        self::TOGGLE_DEACTIVATE,
     ];
 
     /** @var LineItemRepository */
@@ -163,6 +164,15 @@ EOF
         try {
             $this->symfonyStyle->comment(sprintf('Executing %s...', ucfirst($toggle)));
 
+            if ($queryField === self::FIELD_ID) {
+                $queryValue = array_map(
+                    static function (string $id): string {
+                        return (new UuidV6($id))->toBinary();
+                    },
+                    (array)$queryValue
+                );
+            }
+
             /** @var ArrayCollection $lineItems */
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
@@ -171,11 +181,10 @@ EOF
 
                 $this->logger->info(
                     sprintf(
-                        'The operation: "%s" was executed for Line Item with id: "%d"',
+                        "The operation: '%s' was executed for Line Item with id: '%s'",
                         $toggle,
-                        $lineItem->getId()
-                    ),
-                    ['slug' => $lineItem->getSlug(), 'uri' => $lineItem->getUri()]
+                        (string)$lineItem->getId()
+                    )
                 );
             }
 
