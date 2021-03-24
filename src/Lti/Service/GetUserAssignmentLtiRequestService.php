@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Service;
 
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
@@ -38,7 +38,7 @@ class GetUserAssignmentLtiRequestService
     }
 
     /**
-     * @throws AssignmentNotProcessableException
+     * @throws AssignmentUnavailableException
      */
     public function getAssignmentLtiRequest(Assignment $assignment): LtiRequest
     {
@@ -48,7 +48,7 @@ class GetUserAssignmentLtiRequestService
     }
 
     /**
-     * @throws AssignmentNotProcessableException
+     * @throws AssignmentUnavailableException
      */
     private function checkIfAssignmentCanBeProcessed(Assignment $assignment): void
     {
@@ -63,13 +63,13 @@ class GetUserAssignmentLtiRequestService
                 ($maxAttempts === $attemptsCount && $assignment->getState() === Assignment::STATE_COMPLETED)
             )
         ) {
-            throw new AssignmentNotProcessableException(
+            throw new AssignmentUnavailableException(
                 sprintf("Assignment with id '%s' has reached the maximum attempts.", $assignment->getId())
             );
         }
 
         if (!in_array($assignment->getState(), [Assignment::STATE_READY, Assignment::STATE_STARTED], true)) {
-            throw new AssignmentNotProcessableException(
+            throw new AssignmentUnavailableException(
                 sprintf("Assignment with id '%s' does not have a suitable state.", $assignment->getId())
             );
         }

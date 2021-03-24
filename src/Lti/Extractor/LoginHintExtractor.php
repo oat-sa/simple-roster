@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Lti\Extractor;
 
 use LogicException;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
+use Symfony\Component\Uid\UuidV6;
 
 class LoginHintExtractor
 {
@@ -50,7 +51,7 @@ class LoginHintExtractor
 
         return new LoginHintDto(
             $matches['username'],
-            (int)$matches['assignmentId'],
+            new UuidV6($matches['assignmentId']),
         );
     }
 }

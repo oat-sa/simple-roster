@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\Action\Lti;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
@@ -35,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class GetUserAssignmentLtiLinkAction
 {
@@ -62,11 +62,11 @@ class GetUserAssignmentLtiLinkAction
         $this->logger = $logger;
     }
 
-    public function __invoke(UserInterface $user, int $assignmentId): Response
+    public function __invoke(UserInterface $user, string $assignmentId): Response
     {
         try {
             /** @var User $user */
-            $assignment = $user->getAvailableAssignmentById($assignmentId);
+            $assignment = $user->getAvailableAssignmentById(new UuidV6($assignmentId));
             $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
 
             if ($assignment->getState() !== Assignment::STATE_STARTED) {
@@ -87,9 +87,9 @@ class GetUserAssignmentLtiLinkAction
 
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
-            throw new NotFoundHttpException($exception->getMessage());
-        } catch (AssignmentUnavailableException | AssignmentNotProcessableException $exception) {
-            throw new ConflictHttpException($exception->getMessage());
+            throw new NotFoundHttpException($exception->getMessage(), $exception);
+        } catch (AssignmentUnavailableException $exception) {
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         }
     }
 }

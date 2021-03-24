@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\Infrastructure;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
@@ -33,6 +32,7 @@ use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
@@ -58,13 +58,13 @@ class CompleteUserAssignmentServiceTest extends TestCase
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
     {
         $this->expectException(AssignmentNotFoundException::class);
-        $this->expectExceptionMessage("Assignment with id '5' not found.");
+        $this->expectExceptionMessage("Assignment with id '00000001-0000-6000-0000-000000000000' not found.");
 
         $this->assignmentRepository
             ->method('findById')
             ->willThrowException(new EntityNotFoundException());
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted(new UuidV6('00000001-0000-6000-0000-000000000000'));
     }
 
     public function testItMarksAssignmentAsCompleted(): void
@@ -77,7 +77,10 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setSlug('slug')
             ->setMaxAttempts(1);
 
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
         $assignment = (new Assignment())
+            ->setId($assignmentId)
             ->setState(Assignment::STATE_STARTED)
             ->setLineItem($lineItem)
             ->setUser($user)
@@ -86,7 +89,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->assignmentRepository
@@ -100,7 +103,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('flush');
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 
     public function testItMarksAssignmentAsReady(): void
@@ -113,7 +116,10 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setSlug('slug')
             ->setMaxAttempts(2);
 
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
         $assignment = (new Assignment())
+            ->setId($assignmentId)
             ->setState(Assignment::STATE_STARTED)
             ->setLineItem($lineItem)
             ->setUser($user)
@@ -122,7 +128,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->assignmentRepository
@@ -136,7 +142,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('flush');
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 
     public function testItLogsSuccessfulCompletion(): void
@@ -148,7 +154,10 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->setLabel('label')
             ->setSlug('slug');
 
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
         $assignment = (new Assignment())
+            ->setId($assignmentId)
             ->setState(Assignment::STATE_STARTED)
             ->setLineItem($lineItem)
             ->setUser($user);
@@ -156,17 +165,18 @@ class CompleteUserAssignmentServiceTest extends TestCase
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->logger
             ->expects(self::once())
             ->method('info')
             ->with(
-                "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",
+                "Assignment with id='00000001-0000-6000-0000-000000000000' of user with username='expectedUsername' " .
+                "has been marked as completed.",
                 ['lineItem' => $assignment->getLineItem()]
             );
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 }

@@ -27,6 +27,7 @@ use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class User implements UserInterface, EntityInterface
 {
@@ -179,10 +180,10 @@ class User implements UserInterface, EntityInterface
     /**
      * @throws AssignmentNotFoundException
      */
-    public function getAssignmentById(int $assignmentId): Assignment
+    public function getAssignmentById(UuidV6 $assignmentId): Assignment
     {
         foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->getId() === $assignmentId) {
+            if ($assignment->getId()->equals($assignmentId)) {
                 return $assignment;
             }
         }
@@ -196,7 +197,7 @@ class User implements UserInterface, EntityInterface
      * @throws AssignmentNotFoundException
      * @throws AssignmentUnavailableException
      */
-    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    public function getAvailableAssignmentById(UuidV6 $assignmentId): Assignment
     {
         $assignment = $this->getAssignmentById($assignmentId);
 

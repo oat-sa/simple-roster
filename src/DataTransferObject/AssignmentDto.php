@@ -26,6 +26,9 @@ use Symfony\Component\Uid\UuidV6;
 
 class AssignmentDto
 {
+    /** @var UuidV6 */
+    private $id;
+
     /** @var string */
     private $state;
 
@@ -38,12 +41,18 @@ class AssignmentDto
     /** @var int|null */
     private $userId;
 
-    public function __construct(string $state, UuidV6 $lineItemId, string $username, int $userId = null)
+    public function __construct(UuidV6 $id, string $state, UuidV6 $lineItemId, string $username, int $userId = null)
     {
+        $this->id = $id;
         $this->state = $state;
         $this->lineItemId = $lineItemId;
         $this->username = $username;
         $this->userId = $userId;
+    }
+
+    public function getId(): UuidV6
+    {
+        return $this->id;
     }
 
     public function getState(): string

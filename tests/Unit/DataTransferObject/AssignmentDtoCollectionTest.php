@@ -43,7 +43,14 @@ class AssignmentDtoCollectionTest extends TestCase
 
     public function testIfAssignmentCanBeAdded(): void
     {
-        $assignment = new AssignmentDto('test', new UuidV6('00000001-0000-6000-0000-000000000000'), 'testUsername', 1);
+        $assignment = new AssignmentDto(
+            new UuidV6('00000002-0000-6000-0000-000000000000'),
+            'test',
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testUsername',
+            1
+        );
+
         $subject = (new AssignmentDtoCollection())->add($assignment);
 
         self::assertCount(1, $subject);
@@ -55,7 +62,16 @@ class AssignmentDtoCollectionTest extends TestCase
         $subject = new AssignmentDtoCollection();
         self::assertTrue($subject->isEmpty());
 
-        $subject->add(new AssignmentDto('test', new UuidV6('00000001-0000-6000-0000-000000000000'), 'testUsername', 1));
+        $subject->add(
+            new AssignmentDto(
+                new UuidV6('00000002-0000-6000-0000-000000000000'),
+                'test',
+                new UuidV6('00000001-0000-6000-0000-000000000000'),
+                'testUsername',
+                1
+            )
+        );
+
         self::assertFalse($subject->isEmpty());
     }
 
@@ -63,9 +79,15 @@ class AssignmentDtoCollectionTest extends TestCase
     {
         $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
-        $assignment1 = new AssignmentDto('test', $lineItemId, 'testUsername', 1);
-        $assignment2 = new AssignmentDto('test', $lineItemId, 'testUsername', 1);
-        $assignment3 = new AssignmentDto('test', $lineItemId, 'testUsername_2', 1);
+
+        $assignmentId1 = new UuidV6('00000011-0000-6000-0000-000000000000');
+        $assignment1 = new AssignmentDto($assignmentId1, 'test', $lineItemId, 'testUsername', 1);
+
+        $assignmentId2 = new UuidV6('00000022-0000-6000-0000-000000000000');
+        $assignment2 = new AssignmentDto($assignmentId2, 'test', $lineItemId, 'testUsername', 1);
+
+        $assignmentId3 = new UuidV6('00000033-0000-6000-0000-000000000000');
+        $assignment3 = new AssignmentDto($assignmentId3, 'test', $lineItemId, 'testUsername_2', 1);
 
         $subject = (new AssignmentDtoCollection())
             ->add($assignment1)

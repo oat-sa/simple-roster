@@ -75,7 +75,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
         self::assertSame('http://localhost/lti1p3/oidc/initiation', $ltiMessage->getUrl());
         self::assertSame('https://localhost/platform', $ltiParameters['iss']);
-        self::assertSame('user1::1', $ltiParameters['login_hint']);
+        self::assertSame('user1::00000001-0000-6000-0000-000000000000', $ltiParameters['login_hint']);
         self::assertSame('http://localhost/tool/launch', $ltiParameters['target_link_uri']);
         self::assertSame('1', $ltiParameters['lti_deployment_id']);
         self::assertSame('test', $ltiParameters['client_id']);

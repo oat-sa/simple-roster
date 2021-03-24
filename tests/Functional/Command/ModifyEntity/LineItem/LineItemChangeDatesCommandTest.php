@@ -191,10 +191,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
             $this->assertHasLogRecord(
                 [
-                    'message' => sprintf(
-                        'New dates were set for line item with: "%s"',
-                        (string)$lineItemId
-                    ),
+                    'message' => sprintf('New dates were set for line item with: "%s"', $lineItemId),
                     'context' => $lineItem->jsonSerialize(),
                 ],
                 Logger::INFO

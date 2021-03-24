@@ -26,19 +26,20 @@ use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
+use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class GetUserAssignmentLtiRequestServiceTest extends TestCase
 {
     /** @var GetUserAssignmentLtiRequestService */
     private $subject;
 
-    /** @var Lti1p1RequestFactory|MockObject  */
+    /** @var Lti1p1RequestFactory|MockObject */
     private $ltiRequestFactory;
 
     public function setUp(): void
@@ -55,17 +56,14 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
      */
     public function testItThrowsExceptionIfAssignmentDoesNotHaveSuitableState(string $nonSuitableAssignmentStatus): void
     {
-        $this->expectException(AssignmentNotProcessableException::class);
-        $this->expectExceptionMessage("Assignment with id '5' does not have a suitable state.");
+        $this->expectException(AssignmentUnavailableException::class);
+        $this->expectExceptionMessage(
+            "Assignment with id '00000001-0000-6000-0000-000000000000' does not have a suitable state."
+        );
 
         $lineItem = new LineItem();
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-
-        $assignment
-            ->method('getId')
-            ->willReturn(5);
-
-        $assignment
+        $assignment = (new Assignment())
+            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setLineItem($lineItem)
             ->setState($nonSuitableAssignmentStatus);
 
@@ -84,19 +82,15 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         int $attemptsCount,
         string $assignmentStatus
     ): void {
-        $this->expectException(AssignmentNotProcessableException::class);
-        $this->expectExceptionMessage("Assignment with id '8' has reached the maximum attempts.");
+        $this->expectException(AssignmentUnavailableException::class);
+        $this->expectExceptionMessage(
+            "Assignment with id '00000001-0000-6000-0000-000000000000' has reached the maximum attempts."
+        );
 
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts);
+        $lineItem = (new LineItem())->setMaxAttempts($maxAttempts);
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-
-        $assignment
-            ->method('getId')
-            ->willReturn(8);
-
-        $assignment
+        $assignment = (new Assignment())
+            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setLineItem($lineItem)
             ->setState($assignmentStatus)
             ->setAttemptsCount($attemptsCount);
@@ -122,16 +116,10 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setMaxAttempts($maxAttempts)
             ->setUri('http://test-delivery-uri.html');
 
-        $user = (new User())
-            ->setUsername('testUsername');
+        $user = (new User())->setUsername('testUsername');
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-
-        $assignment
-            ->method('getId')
-            ->willReturn(5);
-
-        $assignment
+        $assignment = (new Assignment())
+            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setLineItem($lineItem)
             ->setUser($user)
             ->setAttemptsCount($attemptsCount)
