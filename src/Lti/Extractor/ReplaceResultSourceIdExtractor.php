@@ -45,7 +45,7 @@ class ReplaceResultSourceIdExtractor
         try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (Throwable $exception) {
-            throw new InvalidLtiReplaceResultBodyException('Invalid XML received.');
+            throw new InvalidLtiReplaceResultBodyException('Invalid XML received.', 0, $exception);
         }
 
         $xml->registerXPathNamespace('x', $this->xmlNamespace);
@@ -65,7 +65,9 @@ class ReplaceResultSourceIdExtractor
             return new UuidV6($sourceId);
         } catch (Throwable $exception) {
             throw new InvalidLtiReplaceResultBodyException(
-                sprintf("Extracted source id '%s' is not a valid UUID.", $sourceId)
+                sprintf("Extracted source id '%s' is not a valid UUID.", $sourceId),
+                0,
+                $exception
             );
         }
     }

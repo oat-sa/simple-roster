@@ -56,9 +56,7 @@ class AssignmentRepository extends AbstractRepository
             ->getOneOrNullResult();
 
         if (null === $assignment) {
-            throw new EntityNotFoundException(
-                sprintf("Assignment with id = '%s' cannot be found.", (string)$assignmentId)
-            );
+            throw new EntityNotFoundException(sprintf("Assignment with id = '%s' cannot be found.", $assignmentId));
         }
 
         return $assignment;

@@ -114,7 +114,7 @@ class AssignmentRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultipleNatively($assignmentCollection);
 
-        $assignments = $this->subject->findBy(['id' => [(string)$assignmentId1, $assignmentId2, $assignmentId3]]);
+        $assignments = $this->subject->findBy(['id' => [$assignmentId1, $assignmentId2, $assignmentId3]]);
         self::assertCount(3, $assignments);
 
         /** @var Assignment $assignment */

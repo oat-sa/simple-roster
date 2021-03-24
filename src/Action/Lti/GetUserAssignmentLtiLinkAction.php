@@ -87,9 +87,9 @@ class GetUserAssignmentLtiLinkAction
 
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
-            throw new NotFoundHttpException($exception->getMessage());
+            throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (AssignmentUnavailableException $exception) {
-            throw new ConflictHttpException($exception->getMessage());
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         }
     }
 }

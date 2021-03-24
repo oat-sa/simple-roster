@@ -8,6 +8,8 @@
 ### Removed
 - Removed synchronous parallel cache warmup feature from user cache warmer command.
 
+## 2.0.6 - 2021-03-12
+
 ### Fixed
 - Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
 - Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 

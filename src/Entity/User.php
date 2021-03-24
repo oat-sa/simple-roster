@@ -196,7 +196,7 @@ class User implements UserInterface, EntityInterface
         }
 
         throw new AssignmentNotFoundException(
-            sprintf("Assignment id '%s' not found for user '%s'.", (string)$assignmentId, $this->getUsername())
+            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
         );
     }
 
@@ -213,11 +213,7 @@ class User implements UserInterface, EntityInterface
         }
 
         throw new AssignmentUnavailableException(
-            sprintf(
-                "Assignment with id '%s' for user '%s' is unavailable.",
-                (string)$assignmentId,
-                $this->getUsername()
-            )
+            sprintf("Assignment with id '%s' for user '%s' is unavailable.", $assignmentId, $this->getUsername())
         );
     }
 

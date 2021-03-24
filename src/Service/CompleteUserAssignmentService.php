@@ -52,7 +52,7 @@ class CompleteUserAssignmentService
         try {
             $assignment = $this->assignmentRepository->findById($assignmentId);
         } catch (EntityNotFoundException $exception) {
-            throw new AssignmentNotFoundException(sprintf("Assignment with id '%s' not found.", (string)$assignmentId));
+            throw new AssignmentNotFoundException(sprintf("Assignment with id '%s' not found.", $assignmentId));
         }
 
         $assignment->complete();
