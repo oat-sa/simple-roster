@@ -162,31 +162,4 @@ class BulkCreateUsersAssignmentsServiceTest extends KernelTestCase
             Logger::ERROR
         );
     }
-
-    public function testItHandlesAndLogsIfUserHasNoAssignments(): void
-    {
-        $this->loadFixtureByFilename('userWithoutAssignments.yml');
-
-        $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('user_without_assignments', BulkOperation::TYPE_CREATE));
-
-        $bulkResult = $this->subject->process($bulkOperationCollection);
-
-        self::assertSame(
-            [
-                'data' => [
-                    'applied' => false,
-                    'results' => [
-                        'user_without_assignments' => false,
-                    ],
-                ],
-            ],
-            $bulkResult->jsonSerialize()
-        );
-
-        $this->assertHasLogRecordWithMessage(
-            "Bulk assignments create error: User 'user_without_assignments' does not have any assignments.",
-            Logger::ERROR
-        );
-    }
 }

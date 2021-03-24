@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Entity;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\UuidV6;
@@ -59,5 +60,15 @@ class UserTest extends KernelTestCase
 
         self::assertEmpty($subject->getAssignments());
         self::assertEmpty($subject->getAvailableAssignments());
+    }
+
+    public function testItThrowsExceptionIfUserHasNoAssignments(): void
+    {
+        $this->expectException(AssignmentNotFoundException::class);
+        $this->expectExceptionMessage("User 'testUser' does not have any assignments.");
+
+        (new User())
+            ->setUsername('testUser')
+            ->getLastAssignment();
     }
 }

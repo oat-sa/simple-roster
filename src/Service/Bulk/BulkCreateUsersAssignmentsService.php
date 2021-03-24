@@ -27,7 +27,6 @@ use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
@@ -99,12 +98,6 @@ class BulkCreateUsersAssignmentsService
         $user = $this->userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         $lastAssignment = $user->getLastAssignment();
-
-        if (null === $lastAssignment) {
-            throw new AssignmentNotFoundException(
-                sprintf("User '%s' does not have any assignments.", $user->getUsername())
-            );
-        }
 
         foreach ($user->getAssignments() as $assignment) {
             $assignment->cancel();

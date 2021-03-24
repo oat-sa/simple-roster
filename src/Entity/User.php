@@ -143,9 +143,20 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
-    public function getLastAssignment(): ?Assignment
+    /**
+     * @throws AssignmentNotFoundException
+     */
+    public function getLastAssignment(): Assignment
     {
-        return $this->assignments->last() ?: null;
+        $lastAssignment = $this->assignments->last();
+
+        if (!$lastAssignment instanceof Assignment) {
+            throw new AssignmentNotFoundException(
+                sprintf("User '%s' does not have any assignments.", $this->username)
+            );
+        }
+
+        return $lastAssignment;
     }
 
     public function removeAssignment(Assignment $assignment): self
