@@ -29,11 +29,7 @@
         <field name="password" column="password" length="255"/>
         <field name="roles" type="json_array" column="roles"/>
         <field name="groupId" column="group_id" length="255" nullable="true"/>
-        <one-to-many field="assignments" target-entity="OAT\SimpleRoster\Entity\Assignment" mapped-by="user" fetch="LAZY">
-            <cascade>
-                <cascade-persist/>
-            </cascade>
-        </one-to-many>
+        <one-to-many field="assignments" target-entity="OAT\SimpleRoster\Entity\Assignment" mapped-by="user" fetch="LAZY" />
         <entity-listeners>
             <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener">
                 <lifecycle-callback type="prePersist" method="prePersist"/>

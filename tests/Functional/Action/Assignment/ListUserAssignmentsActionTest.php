@@ -98,7 +98,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
         self::assertSame([
             'assignments' => [
                 [
-                    'id' => $user->getLastAssignment()->getId(),
+                    'id' => (string)$user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
                     'status' => Assignment::STATUS_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
@@ -142,7 +142,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
         self::assertSame([
             'assignments' => [
                 [
-                    'id' => $user->getLastAssignment()->getId(),
+                    'id' => (string)$user->getLastAssignment()->getId(),
                     'username' => $user->getUsername(),
                     'status' => Assignment::STATUS_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),

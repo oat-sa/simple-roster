@@ -1,35 +1,35 @@
 OAT\SimpleRoster\Entity\LtiInstance:
     cluster_w2n:
         __construct:
-            id: 1
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
             label: 'cluster_w2n'
             ltiLink: 'https://test.taocloud.fr/__n/w2n/'
             ltiKey: 'ltiKey_w2n'
             ltiSecret: 'ltiSecret_w2n'
     cluster_4eb:
         __construct:
-            id: 2
+            id: <uuidV6('00000002-0000-6000-0000-000000000000')>
             label: 'cluster_4eb'
             ltiLink: 'https://test.taocloud.fr/__n/4eb/'
             ltiKey: 'ltiKey_4eb'
             ltiSecret: 'ltiSecret_4eb'
     cluster_qqy:
         __construct:
-            id: 3
+            id: <uuidV6('00000003-0000-6000-0000-000000000000')>
             label: 'cluster_qqy'
             ltiLink: 'https://test.taocloud.fr/__n/qqy/'
             ltiKey: 'ltiKey_qqy'
             ltiSecret: 'ltiSecret_qqy'
     cluster_awr:
         __construct:
-            id: 4
+            id: <uuidV6('00000004-0000-6000-0000-000000000000')>
             label: 'cluster_awr'
             ltiLink: 'https://test.taocloud.fr/__n/awr/'
             ltiKey: 'ltiKey_awr'
             ltiSecret: 'ltiSecret_awr'
     cluster_zoi:
         __construct:
-            id: 5
+            id: <uuidV6('00000005-0000-6000-0000-000000000000')>
             label: 'cluster_zoi'
             ltiLink: 'https://test.taocloud.fr/__n/zoi/'
             ltiKey: 'ltiKey_zoi'

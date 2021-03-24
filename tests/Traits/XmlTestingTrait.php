@@ -22,42 +22,16 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Traits;
 
+use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Uid\UuidV6;
+
 trait XmlTestingTrait
 {
-    public function getValidReplaceResultRequestXml(): string
+    public function getValidReplaceResultResponseXml(UuidInterface $messageIdentifier, UuidV6 $assignmentId): string
     {
-        return $this->getXmlRequestTemplate(
-            1,
-            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
-        );
-    }
+        $messageIdentifier = (string)$messageIdentifier;
+        $assignmentId = (string)$assignmentId;
 
-    public function getValidReplaceResultRequestXmlWithWrongAssignment(): string
-    {
-        return $this->getXmlRequestTemplate(
-            100000000,
-            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
-        );
-    }
-
-    public function getValidReplaceResultRequestXmlWithWrongNamespace(): string
-    {
-        return $this->getXmlRequestTemplate(
-            1,
-            'ttp://www.imsglobal.org/lis/oms1p0/pox'
-        );
-    }
-
-    public function getValidReplaceResultRequestXmlWithoutId(): string
-    {
-        return $this->getXmlRequestTemplate(
-            null,
-            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
-        );
-    }
-
-    public function getValidReplaceResultResponseXml(string $messageIdentifier): string
-    {
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <imsx_POXEnvelopeResponse xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -68,8 +42,8 @@ trait XmlTestingTrait
             <imsx_statusInfo>
                 <imsx_codeMajor>success</imsx_codeMajor>
                 <imsx_severity>status</imsx_severity>
-                <imsx_description>Assignment with Id 1 was updated</imsx_description>
-                <imsx_messageRefIdentifier>1</imsx_messageRefIdentifier>
+                <imsx_description>Assignment with Id $assignmentId was updated</imsx_description>
+                <imsx_messageRefIdentifier>$assignmentId</imsx_messageRefIdentifier>
                 <imsx_operationRefIdentifier>replaceResult</imsx_operationRefIdentifier>
             </imsx_statusInfo>
         </imsx_POXResponseHeaderInfo>
@@ -82,11 +56,14 @@ trait XmlTestingTrait
 XML;
     }
 
-    private function getXmlRequestTemplate(?int $assignmentId, string $namespace): string
-    {
+    public function getXmlRequestTemplate(
+        ?UuidV6 $assignmentId,
+        string $xmlNamespace = 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+    ): string {
         $assignmentIdBlock = '';
 
-        if ($assignmentId !== null) {
+        $assignmentId = (string)$assignmentId;
+        if (!empty($assignmentId)) {
             $assignmentIdBlock = <<<sourceGUID
 <sourcedGUID>
     <sourcedId>$assignmentId</sourcedId>
@@ -96,7 +73,7 @@ sourceGUID;
 
         return <<<XML
 <?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "$namespace">
+<imsx_POXEnvelopeRequest xmlns = "$xmlNamespace">
     <imsx_POXHeader>
         <imsx_POXRequestHeaderInfo>
             <imsx_version>V1.0</imsx_version>

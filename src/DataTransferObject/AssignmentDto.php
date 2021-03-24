@@ -22,12 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\DataTransferObject;
 
+use Symfony\Component\Uid\UuidV6;
+
 class AssignmentDto
 {
+    /** @var UuidV6 */
+    private $id;
+
     /** @var string */
     private $state;
 
-    /** @var int */
+    /** @var UuidV6 */
     private $lineItemId;
 
     /** @var string */
@@ -36,12 +41,18 @@ class AssignmentDto
     /** @var int|null */
     private $userId;
 
-    public function __construct(string $state, int $lineItemId, string $username, int $userId = null)
+    public function __construct(UuidV6 $id, string $state, UuidV6 $lineItemId, string $username, int $userId = null)
     {
+        $this->id = $id;
         $this->state = $state;
         $this->lineItemId = $lineItemId;
         $this->username = $username;
         $this->userId = $userId;
+    }
+
+    public function getId(): UuidV6
+    {
+        return $this->id;
     }
 
     public function getState(): string
@@ -49,7 +60,7 @@ class AssignmentDto
         return $this->state;
     }
 
-    public function getLineItemId(): int
+    public function getLineItemId(): UuidV6
     {
         return $this->lineItemId;
     }

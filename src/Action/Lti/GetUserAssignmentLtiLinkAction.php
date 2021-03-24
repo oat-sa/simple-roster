@@ -62,7 +62,7 @@ class GetUserAssignmentLtiLinkAction
         $this->logger = $logger;
     }
 
-    public function __invoke(UserInterface $user, int $assignmentId): Response
+    public function __invoke(UserInterface $user, string $assignmentId): Response
     {
         try {
             /** @var User $user */
@@ -75,8 +75,6 @@ class GetUserAssignmentLtiLinkAction
                 $this->assignmentRepository->flush();
             }
 
-            // TODO validation must be done here if it can be launched or not
-
             $this->logger->info(
                 sprintf("LTI request was successfully generated for assignment with id='%s'", $assignmentId),
                 [
@@ -87,9 +85,9 @@ class GetUserAssignmentLtiLinkAction
 
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
-            throw new NotFoundHttpException($exception->getMessage());
+            throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (AssignmentUnavailableException | InvalidAssignmentStatusTransitionException $exception) {
-            throw new ConflictHttpException($exception->getMessage());
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         }
     }
 }

@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
@@ -47,11 +48,11 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
-            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
-            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
-            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
-            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
-            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+            ->add(new LtiInstance(new UuidV6('00000001-0000-6000-0000-000000000000'), '1', 'link1', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000002-0000-6000-0000-000000000000'), '2', 'link2', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000003-0000-6000-0000-000000000000'), '3', 'link3', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000004-0000-6000-0000-000000000000'), '4', 'link4', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000005-0000-6000-0000-000000000000'), '5', 'link5', 'key', 'secret'));
 
         $this->subject = new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
@@ -107,8 +108,19 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
         $user = new User();
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        $assignment = new Assignment(1, Assignment::STATUS_READY, $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
 
         $user->addAssignment($assignment);
 
@@ -118,8 +130,19 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     public function testItCanReturnLtiRequestContextId(): void
     {
         $user = (new User())->setGroupId('group_5');
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        $assignment = new Assignment(1, Assignment::STATUS_READY, $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
 
         $user->addAssignment($assignment);
 

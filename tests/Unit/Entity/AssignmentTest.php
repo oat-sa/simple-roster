@@ -25,11 +25,12 @@ namespace OAT\SimpleRoster\Tests\Unit\Entity;
 use Carbon\Carbon;
 use DateTime;
 use InvalidArgumentException;
+use LogicException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentTest extends TestCase
 {
@@ -38,8 +39,16 @@ class AssignmentTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid assignment status received: 'invalidStatus'.");
 
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        new Assignment(1, 'invalidStatus', $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
+
+        new Assignment(new UuidV6('00000001-0000-6000-0000-000000000000'), 'invalidStatus', $lineItem);
     }
 
     public function testItThrowsExceptionIAttemptsCountIsSmallerThanZero(): void
@@ -47,8 +56,15 @@ class AssignmentTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'attemptsCount' received.");
 
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        new Assignment(1, Assignment::STATUS_READY, $lineItem, -1);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        new Assignment(new UuidV6('00000001-0000-6000-0000-000000000000'), Assignment::STATUS_READY, $lineItem, -1);
     }
 
     public function testItThrowsExceptionIfAttemptsCountIsGreaterThanAllowedByLineItem(): void
@@ -56,8 +72,39 @@ class AssignmentTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid 'attemptsCount' received.");
 
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED, 5);
-        new Assignment(1, Assignment::STATUS_READY, $lineItem, 6);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED,
+            5
+        );
+
+        new Assignment(new UuidV6('00000001-0000-6000-0000-000000000000'), Assignment::STATUS_READY, $lineItem, 6);
+    }
+
+    public function testItThrowsExceptionIfUserIsNotSet(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('User is not set');
+
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED,
+            5
+        );
+
+        $subject = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
+
+        $subject->getUser();
     }
 
     /**
@@ -77,7 +124,7 @@ class AssignmentTest extends TestCase
         $lineItemEndDateTime = $lineItemEndDateTime ? new DateTime($lineItemEndDateTime) : null;
 
         $lineItem = new LineItem(
-            1,
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
             'label',
             'uri',
             'slug',
@@ -87,7 +134,7 @@ class AssignmentTest extends TestCase
             $lineItemEndDateTime
         );
 
-        $subject = new Assignment(1, $assignmentStatus, $lineItem, 0);
+        $subject = new Assignment(new UuidV6('00000001-0000-6000-0000-000000000000'), $assignmentStatus, $lineItem, 0);
 
         self::assertSame($expectedAvailability, $subject->isAvailable());
 
@@ -148,11 +195,24 @@ class AssignmentTest extends TestCase
         string $lineItemStatus,
         int $assignmentAttemptsCount,
         int $lineItemMaxAttemptsCount,
-        int $expectedAssignmentAttemptsCountAfterStart,
+        int $expectedAssignmentAttemptsCount,
         string $expectedExceptionMessage = null
     ): void {
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', $lineItemStatus, $lineItemMaxAttemptsCount);
-        $subject = new Assignment(1, $assignmentStatus, $lineItem, $assignmentAttemptsCount);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            $lineItemStatus,
+            $lineItemMaxAttemptsCount
+        );
+
+        $subject = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            $assignmentStatus,
+            $lineItem,
+            $assignmentAttemptsCount
+        );
 
         try {
             $subject->start();
@@ -162,7 +222,7 @@ class AssignmentTest extends TestCase
         } catch (InvalidAssignmentStatusTransitionException $exception) {
             self::assertSame($expectedExceptionMessage, $exception->getMessage());
         } finally {
-            self::assertSame($expectedAssignmentAttemptsCountAfterStart, $subject->getAttemptsCount());
+            self::assertSame($expectedAssignmentAttemptsCount, $subject->getAttemptsCount());
         }
     }
 
@@ -174,44 +234,45 @@ class AssignmentTest extends TestCase
                 'lineItemStatus' => LineItem::STATUS_ENABLED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 2,
-                'expectedAssignmentAttemptsCountAfterStart' => 1,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be started due to invalid status: " .
-                    "'ready' expected, 'started' detected.",
+                'expectedAssignmentAttemptsCount' => 1,
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "started due to invalid status: 'ready' expected, 'started' detected.",
             ],
             'assignmentIsCancelled' => [
                 'assignmentStatus' => Assignment::STATUS_CANCELLED,
                 'lineItemStatus' => LineItem::STATUS_ENABLED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 2,
-                'expectedAssignmentAttemptsCountAfterStart' => 1,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be started due to invalid status: " .
-                    "'ready' expected, 'cancelled' detected.",
+                'expectedAssignmentAttemptsCount' => 1,
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "started due to invalid status: 'ready' expected, 'cancelled' detected.",
             ],
             'assignmentIsCompleted' => [
                 'assignmentStatus' => Assignment::STATUS_COMPLETED,
                 'lineItemStatus' => LineItem::STATUS_ENABLED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 2,
-                'expectedAssignmentAttemptsCountAfterStart' => 1,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be started due to invalid status: " .
-                    "'ready' expected, 'completed' detected.",
+                'expectedAssignmentAttemptsCount' => 1,
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "started due to invalid status: 'ready' expected, 'completed' detected.",
             ],
             'lineItemIsDisabled' => [
                 'assignmentStatus' => Assignment::STATUS_READY,
                 'lineItemStatus' => LineItem::STATUS_DISABLED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 2,
-                'expectedAssignmentAttemptsCountAfterStart' => 1,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be started, line item is disabled.",
+                'expectedAssignmentAttemptsCount' => 1,
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "started, line item is disabled.",
             ],
             'maximumAllowedAttemptsAreReached' => [
                 'assignmentStatus' => Assignment::STATUS_READY,
                 'lineItemStatus' => LineItem::STATUS_ENABLED,
                 'assignmentAttemptsCount' => 2,
                 'lineItemMaxAttemptsCount' => 2,
-                'expectedAssignmentAttemptsCountAfterStart' => 2,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be started. Maximum number of attempts" .
-                    " (2) have been reached.",
+                'expectedAssignmentAttemptsCount' => 2,
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "started. Maximum number of attempts (2) have been reached.",
             ],
             'successfulStart' => [
                 'assignmentStatus' => Assignment::STATUS_READY,
@@ -232,8 +293,15 @@ class AssignmentTest extends TestCase
         bool $expectedIsCancellable,
         string $expectedExceptionMessage = null
     ): void {
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        $subject = new Assignment(1, $assignmentStatus, $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $subject = new Assignment(new UuidV6('00000001-0000-6000-0000-000000000000'), $assignmentStatus, $lineItem);
 
         if (null !== $expectedExceptionMessage) {
             $this->expectException(InvalidAssignmentStatusTransitionException::class);
@@ -263,14 +331,14 @@ class AssignmentTest extends TestCase
             'cancelledAssignment' => [
                 'assignmentStatus' => Assignment::STATUS_CANCELLED,
                 'expectedIsCancellable' => false,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be cancelled. " .
-                    "Status must be one of 'ready', 'started', 'cancelled' detected.",
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "cancelled. Status must be one of 'ready', 'started', 'cancelled' detected.",
             ],
             'completedAssignment' => [
                 'assignmentStatus' => Assignment::STATUS_COMPLETED,
                 'expectedIsCancellable' => false,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be cancelled. " .
-                    "Status must be one of 'ready', 'started', 'completed' detected.",
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "cancelled. Status must be one of 'ready', 'started', 'completed' detected.",
             ],
         ];
     }
@@ -285,8 +353,21 @@ class AssignmentTest extends TestCase
         string $expectedAssignmentStatus,
         string $expectedExceptionMessage = null
     ): void {
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED, $lineItemMaxAttemptsCount);
-        $subject = new Assignment(1, $assignmentStatus, $lineItem, $assignmentAttemptsCount);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED,
+            $lineItemMaxAttemptsCount
+        );
+
+        $subject = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            $assignmentStatus,
+            $lineItem,
+            $assignmentAttemptsCount
+        );
 
         if (null !== $expectedExceptionMessage) {
             $this->expectException(InvalidAssignmentStatusTransitionException::class);
@@ -327,25 +408,25 @@ class AssignmentTest extends TestCase
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 1,
                 'expectedAssignmentStatus' => Assignment::STATUS_READY,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be completed, because it's in " .
-                    "'ready' status, 'started' expected.",
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "completed, because it's in 'ready' status, 'started' expected.",
             ],
             'cancelledAssignment' => [
                 'assignmentStatus' => Assignment::STATUS_CANCELLED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 1,
                 'expectedAssignmentStatus' => Assignment::STATUS_CANCELLED,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be completed, because it's in " .
-                    "'cancelled' status, 'started' expected.",
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "completed, because it's in 'cancelled' status, 'started' expected.",
             ],
             'completedAssignment' => [
                 'assignmentStatus' => Assignment::STATUS_COMPLETED,
                 'assignmentAttemptsCount' => 1,
                 'lineItemMaxAttemptsCount' => 1,
                 'expectedAssignmentStatus' => Assignment::STATUS_COMPLETED,
-                'expectedExceptionMessage' => "Assignment with id = '1' cannot be completed, because it's in " .
-                    "'completed' status, 'started' expected.",
-            ]
+                'expectedExceptionMessage' => "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be " .
+                    "completed, because it's in 'completed' status, 'started' expected.",
+            ],
         ];
     }
 }

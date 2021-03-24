@@ -1,7 +1,7 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItemUnavailable:
         __construct:
-            id: 2
+            id: <uuidV6('00000002-0000-6000-0000-000000000000')>
             label: 'The first line item'
             uri: 'http://lineitemuri.com'
             slug: 'lineItemSlug2'
@@ -10,17 +10,17 @@ OAT\SimpleRoster\Entity\LineItem:
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
             maxAttempts: 2
 
+OAT\SimpleRoster\Entity\Assignment:
+    assignment1:
+        __construct:
+            id: <uuidV6(00000002-0000-6000-0000-000000000000)>
+            lineItem: '@lineItemUnavailable'
+            status: 'ready'
+            attemptsCount: 1
+
 OAT\SimpleRoster\Entity\User:
     user1:
         username: 'username'
         plainPassword: 'password'
         groupId: 'group_1'
-        assignments: ['@assignment1']
-
-OAT\SimpleRoster\Entity\Assignment:
-    assignment1:
-        __construct:
-            id: 2
-            status: 'ready'
-            lineItem: '@lineItemUnavailable'
-            attemptsCount: 1
+        assignments: [ '@assignment1' ]

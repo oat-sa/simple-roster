@@ -26,7 +26,9 @@ use Carbon\Carbon;
 use DateTime;
 use InvalidArgumentException;
 use JsonSerializable;
+use LogicException;
 use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
+use Symfony\Component\Uid\UuidV6;
 
 class Assignment implements JsonSerializable, EntityInterface
 {
@@ -42,7 +44,7 @@ class Assignment implements JsonSerializable, EntityInterface
         self::STATUS_CANCELLED,
     ];
 
-    /** @var int|null */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -54,20 +56,19 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var LineItem */
     private $lineItem;
 
-    /** @var DateTime */
+    /** @var DateTime|null */
     private $updatedAt;
 
     /** @var int */
     private $attemptsCount;
 
     public function __construct(
-        int $id = null,
+        UuidV6 $id,
         string $status,
         LineItem $lineItem,
         int $attemptsCount = 0,
         DateTime $updatedAt = null
     ) {
-        // TODO validate id (in line item entity too)
         $this->id = $id;
 
         if (!in_array($status, self::VALID_STATUSES, true)) {
@@ -85,7 +86,7 @@ class Assignment implements JsonSerializable, EntityInterface
         $this->updatedAt = $updatedAt;
     }
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
     }
@@ -95,9 +96,14 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->status;
     }
 
+    /**
+     * @throws LogicException
+     */
     public function getUser(): User
     {
-        // TODO throw exception if it's not set.
+        if (null === $this->user) {
+            throw new LogicException('User is not set.');
+        }
 
         return $this->user;
     }
@@ -114,14 +120,14 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->lineItem;
     }
 
-    public function setLineItem(LineItem $lineItem): self // TODO check if it can be changed. Validation must be done (max attempt for example)
+    public function setLineItem(LineItem $lineItem): self
     {
         $this->lineItem = $lineItem;
 
         return $this;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
@@ -146,7 +152,7 @@ class Assignment implements JsonSerializable, EntityInterface
         if ($this->status !== self::STATUS_READY) {
             throw new InvalidAssignmentStatusTransitionException(
                 sprintf(
-                    "Assignment with id = '%d' cannot be started due to invalid status: '%s' expected, '%s' detected.",
+                    "Assignment with id = '%s' cannot be started due to invalid status: '%s' expected, '%s' detected.",
                     $this->id,
                     self::STATUS_READY,
                     $this->status
@@ -157,7 +163,7 @@ class Assignment implements JsonSerializable, EntityInterface
         if (!$this->lineItem->isEnabled()) {
             throw new InvalidAssignmentStatusTransitionException(
                 sprintf(
-                    "Assignment with id = '%d' cannot be started, line item is disabled.",
+                    "Assignment with id = '%s' cannot be started, line item is disabled.",
                     $this->id
                 )
             );
@@ -166,7 +172,7 @@ class Assignment implements JsonSerializable, EntityInterface
         if ($this->lineItem->hasMaxAttempts() && $this->attemptsCount >= $this->lineItem->getMaxAttempts()) {
             throw new InvalidAssignmentStatusTransitionException(
                 sprintf(
-                    "Assignment with id = '%d' cannot be started. Maximum number of attempts (%d) have been reached.",
+                    "Assignment with id = '%s' cannot be started. Maximum number of attempts (%d) have been reached.",
                     $this->id,
                     $this->lineItem->getMaxAttempts()
                 )
@@ -187,7 +193,7 @@ class Assignment implements JsonSerializable, EntityInterface
         if (!$this->isCancellable()) {
             throw new InvalidAssignmentStatusTransitionException(
                 sprintf(
-                    "Assignment with id = '%d' cannot be cancelled. Status must be one of '%s', '%s' detected.",
+                    "Assignment with id = '%s' cannot be cancelled. Status must be one of '%s', '%s' detected.",
                     $this->id,
                     implode('\', \'', [self::STATUS_READY, self::STATUS_STARTED]),
                     $this->status
@@ -213,7 +219,7 @@ class Assignment implements JsonSerializable, EntityInterface
         if ($this->status !== self::STATUS_STARTED) {
             throw new InvalidAssignmentStatusTransitionException(
                 sprintf(
-                    "Assignment with id = '%d' cannot be completed, because it's in '%s' status, '%s' expected.",
+                    "Assignment with id = '%s' cannot be completed, because it's in '%s' status, '%s' expected.",
                     $this->id,
                     $this->status,
                     self::STATUS_STARTED
@@ -249,8 +255,8 @@ class Assignment implements JsonSerializable, EntityInterface
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
-            'username' => $this->getUser()->getUsername(), // TODO user id should be enough
+            'id' => (string)$this->id,
+            'username' => $this->getUser()->getUsername(),
             'status' => $this->getStatus(),
             'attemptsCount' => $this->getAttemptsCount(),
             'lineItem' => $this->lineItem,

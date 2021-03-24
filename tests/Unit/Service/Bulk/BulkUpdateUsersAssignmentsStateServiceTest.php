@@ -34,6 +34,7 @@ use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 {
@@ -75,8 +76,19 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ['state' => Assignment::STATUS_CANCELLED]
         );
 
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
-        $expectedAssignment = new Assignment(1, Assignment::STATUS_STARTED, $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $expectedAssignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_STARTED,
+            $lineItem
+        );
 
         $expectedUser = (new User())
             ->setUsername('expectedUser')
@@ -111,12 +123,22 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $expectedLineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $expectedLineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
-                $assignment = new Assignment(1, Assignment::STATUS_STARTED, $expectedLineItem);
+                $assignment = new Assignment(
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    Assignment::STATUS_STARTED,
+                    $expectedLineItem
+                );
 
                 return (new User())
                     ->setUsername($username)
@@ -137,15 +159,18 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->method('info')
             ->withConsecutive(
                 [
-                    "Successful assignment cancellation (assignmentId = '1', username = 'test').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '1', username = 'test1').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test1').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '1', username = 'test2').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test2').",
                     ['lineItem' => $expectedLineItem],
                 ],
             );
@@ -181,8 +206,19 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
     {
         $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]);
 
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
-        $completedAssignment = new Assignment(1, Assignment::STATUS_COMPLETED, $lineItem);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $completedAssignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_COMPLETED,
+            $lineItem
+        );
 
         $user = (new User())->addAssignment($completedAssignment);
 

@@ -27,6 +27,7 @@ use DateTimeInterface;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemTest extends TestCase
 {
@@ -35,7 +36,7 @@ class LineItemTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid line item status received: 'invalidStatus'");
 
-        new LineItem(1, 'label', 'uri', 'slug', 'invalidStatus');
+        new LineItem(new UuidV6('00000001-0000-6000-0000-000000000000'), 'label', 'uri', 'slug', 'invalidStatus');
     }
 
     public function testItThrowsExceptionIfInvalidMaxAttemptsReceived(): void
@@ -43,7 +44,14 @@ class LineItemTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("'maxAttempts' must be greater or equal to zero.");
 
-        new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED, -1);
+        new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED,
+            -1
+        );
     }
 
     public function testItThrowsExceptionIfInvalidAvailabilityDatesReceived(): void
@@ -54,7 +62,16 @@ class LineItemTest extends TestCase
         $startAt = new DateTime('2021-03-03');
         $endAt = new DateTime('2021-03-02');
 
-        new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED, 0, $startAt, $endAt);
+        new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED,
+            0,
+            $startAt,
+            $endAt
+        );
     }
 
     /**
@@ -65,7 +82,13 @@ class LineItemTest extends TestCase
         DateTimeInterface $startAt = null,
         DateTimeInterface $endAt = null
     ): void {
-        $subject = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $subject = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
 
         $subject->setAvailabilityDates($startAt, $endAt);
 
@@ -90,7 +113,7 @@ class LineItemTest extends TestCase
                     '2021-03-03T12:00:00+0000' => true,
                 ],
                 'startAt' => new DateTime('2021-03-03T00:00:00'),
-                'endAt' => null
+                'endAt' => null,
             ],
             'onlyEndAtIsSpecified' => [
                 'testCases' => [
@@ -98,7 +121,7 @@ class LineItemTest extends TestCase
                     '2021-03-04T00:00:00+0000' => false,
                 ],
                 'startAt' => null,
-                'endAt' => new DateTime('2021-03-03T00:00:00')
+                'endAt' => new DateTime('2021-03-03T00:00:00'),
             ],
             'availabilityDatesAreSpecified' => [
                 'testCases' => [
@@ -107,8 +130,8 @@ class LineItemTest extends TestCase
                     '2021-03-11T00:00:00+0000' => false,
                 ],
                 'startAt' => new DateTime('2021-03-03T00:00:00'),
-                'endAt' => new DateTime('2021-03-10T00:00:00')
-            ]
+                'endAt' => new DateTime('2021-03-10T00:00:00'),
+            ],
         ];
     }
 }

@@ -27,7 +27,6 @@ use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Configuration\LtiConfiguration;
 use OAT\SimpleRoster\Lti\Exception\RegistrationNotFoundException;
@@ -36,6 +35,7 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p3RequestFactoryTest extends TestCase
 {
@@ -87,8 +87,21 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->with('registrationId')
             ->willReturn(null);
 
-        $lineItem = new LineItem(1, 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
-        $this->subject->create(new Assignment(1, Assignment::STATUS_READY, $lineItem));
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $this->subject->create(
+            new Assignment(
+                new UuidV6('00000001-0000-6000-0000-000000000000'),
+                Assignment::STATUS_READY,
+                $lineItem
+            )
+        );
     }
 
     public function testItReturnsAssignmentLtiRequest(): void
@@ -99,7 +112,20 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->method('find')
             ->willReturn($this->createMock(Registration::class));
 
-        $assignment = $this->createMock(Assignment::class);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
 
         $message = $this->createMock(LtiMessageInterface::class);
         $message

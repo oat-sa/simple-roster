@@ -23,25 +23,20 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\DataTransferObject;
 
 use InvalidArgumentException;
+use Symfony\Component\Uid\UuidV6;
 
 class LoginHintDto
 {
-    public const LOGIN_HINT_SEPARATOR = '::';
-
     /** @var string */
     private $username;
 
-    /** @var int */
+    /** @var UuidV6 */
     private $assignmentId;
 
-    public function __construct(string $username, int $assignmentId)
+    public function __construct(string $username, UuidV6 $assignmentId)
     {
         if (empty($username)) {
             throw new InvalidArgumentException('Username can\'t be empty.');
-        }
-
-        if ($assignmentId === 0) {
-            throw new InvalidArgumentException('Assignment ID can\'t be 0.');
         }
 
         $this->username = $username;
@@ -53,13 +48,13 @@ class LoginHintDto
         return $this->username;
     }
 
-    public function getAssignmentId(): int
+    public function getAssignmentId(): UuidV6
     {
         return $this->assignmentId;
     }
 
     public function __toString(): string
     {
-        return implode(self::LOGIN_HINT_SEPARATOR, get_object_vars($this));
+        return sprintf('%s::%s', $this->username, (string)$this->assignmentId);
     }
 }

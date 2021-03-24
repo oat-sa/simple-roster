@@ -24,5 +24,8 @@ namespace OAT\SimpleRoster\Entity;
 
 interface EntityInterface
 {
-    public function getId(): ?int; // FIXME Remove ? after all entity is immutable
+    /**
+     * @return mixed
+     */
+    public function getId(); // FIXME: return Uuid when all entities are converted
 }

@@ -7,9 +7,17 @@
 
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
+- Changed identifier generation strategy of entities from `auto increment` to `uuid`.
 
 ### Removed
 - Removed `isActive` column from `line_items` database table.
+
+## 2.0.6 - 2021-03-12
+
+### Fixed
+- Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
+- Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset.
+  We now convert the input date(s) to UTC before persisting it.
 
 ## 2.0.5 - 2021-03-03
 

@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemRepository extends AbstractRepository
 {
@@ -61,18 +62,18 @@ class LineItemRepository extends AbstractRepository
     /**
      * @throws EntityNotFoundException
      */
-    public function findOneById(int $id): LineItem
+    public function findOneById(UuidV6 $id): LineItem
     {
         $lineItem = $this->createQueryBuilder('l')
             ->select('l')
             ->where('l.id = :id')
-            ->setParameter('id', $id)
+            ->setParameter('id', $id, 'uuid')
             ->getQuery()
             ->enableResultCache($this->lineItemCacheTtl, $this->cacheIdGenerator->generate($id))
             ->getOneOrNullResult();
 
         if (null === $lineItem) {
-            throw new EntityNotFoundException(sprintf("LineItem with id = '%d' cannot be found.", $id));
+            throw new EntityNotFoundException(sprintf("LineItem with id = '%s' cannot be found.", (string)$id));
         }
 
         return $lineItem;
@@ -86,7 +87,12 @@ class LineItemRepository extends AbstractRepository
         if ($criteria->hasLineItemIdsCriteria()) {
             $queryBuilder
                 ->andWhere('l.id IN (:ids)')
-                ->setParameter('ids', $criteria->getLineItemIds());
+                ->setParameter(
+                    'ids',
+                    array_map(static function (UuidV6 $lineItemId): string {
+                        return $lineItemId->toBinary();
+                    }, $criteria->getLineItemIds())
+                );
         }
 
         if ($criteria->hasLineItemSlugsCriteria()) {

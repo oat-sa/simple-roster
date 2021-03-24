@@ -25,9 +25,14 @@ namespace OAT\SimpleRoster\Repository;
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
+use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentRepository extends AbstractRepository
 {
@@ -40,20 +45,18 @@ class AssignmentRepository extends AbstractRepository
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
-    public function findById(int $assignmentId): Assignment
+    public function findById(UuidV6 $assignmentId): Assignment
     {
         $assignment = $this
             ->createQueryBuilder('a')
             ->select('a')
             ->where('a.id = :id')
-            ->setParameter('id', $assignmentId)
+            ->setParameter('id', $assignmentId, 'uuid')
             ->getQuery()
             ->getOneOrNullResult();
 
         if (null === $assignment) {
-            throw new EntityNotFoundException(
-                sprintf("Assignment with id = '%d' cannot be found.", $assignmentId)
-            );
+            throw new EntityNotFoundException(sprintf("Assignment with id = '%s' cannot be found.", $assignmentId));
         }
 
         return $assignment;
@@ -85,5 +88,32 @@ class AssignmentRepository extends AbstractRepository
         }
 
         return new Paginator($queryBuilder->getQuery(), false);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws MappingException
+     */
+    public function insertMultipleNatively(AssignmentDtoCollection $assignments): void
+    {
+        $queryParts = [];
+        foreach ($assignments as $assignmentDto) {
+            $queryParts[] = sprintf(
+                "('%s', %s, '%s', '%s', %s)",
+                (string)$assignmentDto->getId(),
+                $assignmentDto->getUserId(),
+                (string)$assignmentDto->getLineItemId(),
+                $assignmentDto->getState(),
+                0
+            );
+        }
+
+        $query = sprintf(
+            'INSERT INTO assignments (id, user_id, line_item_id, status, attempts_count) VALUES %s',
+            implode(',', $queryParts)
+        );
+
+        $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
+        $this->_em->clear();
     }
 }

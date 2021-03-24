@@ -28,11 +28,11 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
-use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
@@ -122,9 +122,12 @@ EOF
 
                 $numberOfProcessedRows++;
 
-                $assignmentDto = $this->createAssignmentDto(
-                    $lineItems,
-                    $rawAssignment['lineItemSlug'],
+                $lineItem = $lineItems->getBySlug($rawAssignment['lineItemSlug']);
+
+                $assignmentDto = new AssignmentDto(
+                    new UuidV6(),
+                    Assignment::STATUS_READY,
+                    $lineItem->getId(),
                     $rawAssignment['username']
                 );
 
@@ -181,18 +184,5 @@ EOF
         }
 
         return 0;
-    }
-
-    /**
-     * @throws LineItemNotFoundException
-     */
-    private function createAssignmentDto(
-        LineItemCollection $lineItems,
-        string $lineItemSlug,
-        string $username
-    ): AssignmentDto {
-        $lineItem = $lineItems->getBySlug($lineItemSlug);
-
-        return new AssignmentDto(Assignment::STATUS_READY, (int)$lineItem->getId(), $username);
     }
 }

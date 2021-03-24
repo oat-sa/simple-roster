@@ -26,6 +26,7 @@ use OAT\SimpleRoster\Exception\InvalidLtiReplaceResultBodyException;
 use OAT\SimpleRoster\Lti\Extractor\ReplaceResultSourceIdExtractor;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {
@@ -37,13 +38,15 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     public function testItCanExtractSourceId(): void
     {
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
-        self::assertSame(1, $subject->extractSourceId($this->getValidReplaceResultRequestXml()));
+        self::assertEquals($assignmentId, $subject->extractSourceId($this->getXmlRequestTemplate($assignmentId)));
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlContent(): void
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
+        $this->expectExceptionMessage('Invalid XML received.');
 
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
@@ -53,18 +56,37 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlNamespace(): void
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
+        $this->expectExceptionMessage('Source id node cannot be extracted by Xpath.');
 
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $invalidNamespace = 'http://www.imsglobal.org/lis/oms1p0/pox';
 
-        $subject->extractSourceId($this->getValidReplaceResultRequestXmlWithWrongNamespace());
+        $subject->extractSourceId($this->getXmlRequestTemplate($assignmentId, $invalidNamespace));
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnMissingId(): void
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
+        $this->expectExceptionMessage('Source id node cannot be extracted by Xpath.');
 
         $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
-        $subject->extractSourceId($this->getValidReplaceResultRequestXmlWithoutId());
+        $subject->extractSourceId($this->getXmlRequestTemplate(null));
+    }
+
+    public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidSourceId(): void
+    {
+        $this->expectException(InvalidLtiReplaceResultBodyException::class);
+        $this->expectExceptionMessage("Extracted source id 'notValidUuid' is not a valid UUID.");
+
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
+
+        $uuidMock = $this->createPartialMock(UuidV6::class, ['__toString']);
+        $uuidMock
+            ->method('__toString')
+            ->willReturn('notValidUuid');
+
+        $subject->extractSourceId($this->getXmlRequestTemplate($uuidMock));
     }
 }

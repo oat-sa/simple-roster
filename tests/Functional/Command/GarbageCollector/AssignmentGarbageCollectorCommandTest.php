@@ -57,13 +57,17 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow();
+    }
+
     public function testOutputWhenThereIsNothingToUpdate(): void
     {
         self::assertSame(0, $this->commandTester->execute([]));
-        self::assertStringContainsString(
-            '[OK] Nothing to update.',
-            $this->commandTester->getDisplay()
-        );
+        self::assertStringContainsString('[OK] Nothing to update.', $this->commandTester->getDisplay());
     }
 
     public function testDryRunDoesNotUpdateAssignmentState(): void
@@ -72,12 +76,12 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute([]));
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
         self::assertCount(
-            10,
+            9,
             $this->getRepository(Assignment::class)->findBy(['status' => Assignment::STATUS_STARTED])
         );
     }
@@ -93,7 +97,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             ]
         ));
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
@@ -113,11 +117,12 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected and " .
             "marked as '%s' by garbage collector.";
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 9; $i++) {
+            $expectedAssignmentIdInLog = sprintf('0000000%d-0000-6000-0000-000000000000', $i);
             $this->assertHasLogRecordWithMessage(
                 sprintf(
                     $logMessagePlaceholder,
-                    $i,
+                    $expectedAssignmentIdInLog,
                     'userWithStartedButStuckAssignment_' . $i,
                     $expectedStatusMap[$i]
                 ),
@@ -146,7 +151,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             )
         );
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 

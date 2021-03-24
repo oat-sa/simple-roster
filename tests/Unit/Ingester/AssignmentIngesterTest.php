@@ -27,17 +27,18 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
-use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentIngesterTest extends TestCase
 {
     /** @var NativeUserRepository|MockObject */
     private $userRepository;
 
-    /** @var NativeAssignmentRepository|MockObject */
+    /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;
 
     /** @var AssignmentIngester */
@@ -48,7 +49,7 @@ class AssignmentIngesterTest extends TestCase
         parent::setUp();
 
         $this->userRepository = $this->createMock(NativeUserRepository::class);
-        $this->assignmentRepository = $this->createMock(NativeAssignmentRepository::class);
+        $this->assignmentRepository = $this->createMock(AssignmentRepository::class);
 
         $this->subject = new AssignmentIngester($this->userRepository, $this->assignmentRepository);
     }
@@ -58,7 +59,13 @@ class AssignmentIngesterTest extends TestCase
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage("User with username 'nonExistingUser' cannot not found.");
 
-        $assignment = new AssignmentDto(Assignment::STATUS_READY, 1, 'nonExistingUser');
+        $assignment = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'nonExistingUser'
+        );
+
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment]);
 
         $this->subject->ingest($assignmentCollection);
@@ -66,8 +73,22 @@ class AssignmentIngesterTest extends TestCase
 
     public function testItCanIngestAssignments(): void
     {
-        $assignment1 = new AssignmentDto(Assignment::STATUS_READY, 1, 'testUser1');
-        $assignment2 = new AssignmentDto(Assignment::STATUS_READY, 1, 'testUser2');
+        $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
+        $assignment1 = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItemId,
+            'testUser1'
+        );
+
+        $assignment2 = new AssignmentDto(
+            new UuidV6('00000022-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItemId,
+            'testUser2'
+        );
+
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
         $this->userRepository
@@ -81,7 +102,7 @@ class AssignmentIngesterTest extends TestCase
 
         $this->assignmentRepository
             ->expects(self::once())
-            ->method('insertMultiple')
+            ->method('insertMultipleNatively')
             ->with($assignmentCollection);
 
         $this->subject->ingest($assignmentCollection);

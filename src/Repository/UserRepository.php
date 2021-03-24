@@ -55,7 +55,6 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
      */
     public function findByUsernameWithAssignments(string $username): User
     {

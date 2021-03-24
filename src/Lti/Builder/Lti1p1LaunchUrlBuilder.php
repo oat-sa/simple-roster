@@ -93,13 +93,13 @@ class Lti1p1LaunchUrlBuilder
             'roles' => LtiRequest::LTI_ROLE,
             'user_id' => $assignment->getUser()->getUsername(),
             'lis_person_name_full' => $assignment->getUser()->getUsername(),
-            'resource_link_id' => $assignment->getId(),
+            'resource_link_id' => (string)$assignment->getId(),
             'lis_outcome_service_url' => $this->router->generate(
                 'updateLti1p1Outcome',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
-            'lis_result_sourcedid' => $assignment->getId(),
+            'lis_result_sourcedid' => (string)$assignment->getId(),
             'launch_presentation_return_url' => $this->ltiConfiguration->getLtiLaunchPresentationReturnUrl(),
             'launch_presentation_locale' => $this->ltiConfiguration->getLtiLaunchPresentationLocale(),
         ];

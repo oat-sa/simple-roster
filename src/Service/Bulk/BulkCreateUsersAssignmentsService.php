@@ -23,25 +23,24 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Bulk;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\NonUniqueResultException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
-use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
-class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProcessorInterface
+class BulkCreateUsersAssignmentsService
 {
     /** @var EntityManagerInterface */
     private $entityManager;
+
+    /** @var UserRepository */
+    private $userRepository;
 
     /** @var UserCacheWarmerService */
     private $userCacheWarmerService;
@@ -54,10 +53,12 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
 
     public function __construct(
         EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
         UserCacheWarmerService $userCacheWarmerService,
         LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
+        $this->userRepository = $userRepository;
         $this->userCacheWarmerService = $userCacheWarmerService;
         $this->logger = $logger;
     }
@@ -90,15 +91,11 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     }
 
     /**
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
-     * @throws InvalidAssignmentStatusTransitionException
+     * @throws Throwable
      */
     private function processOperation(BulkOperation $operation, BulkResult $result): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->entityManager->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
+        $user = $this->userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         $lastAssignment = $user->getLastAssignment();
 
@@ -108,7 +105,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
             $assignment->cancel();
         }
 
-        $newAssignment = new Assignment(0, Assignment::STATUS_READY, $lastAssignment->getLineItem());
+        $newAssignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lastAssignment->getLineItem());
         $user->addAssignment($newAssignment);
 
         $this->entityManager->persist($newAssignment);

@@ -213,7 +213,8 @@ paths:
                     description: The ID of the assignment
                     required: true
                     schema:
-                        type: integer
+                        type: string
+                    example: '1eb8b191-65c6-6334-af9e-0940ec6dd603'
             responses:
                 200:
                     description: Success
@@ -332,9 +333,9 @@ components:
             type: object
             properties:
                 id:
-                    type: integer
+                    type: string
                     description: The assignment ID
-                    example: 13
+                    example: '1eb8b191-65c6-6334-af9e-0940ec6dd603'
                 username:
                     type: string
                     description: The username of the user who belongs to the assignment

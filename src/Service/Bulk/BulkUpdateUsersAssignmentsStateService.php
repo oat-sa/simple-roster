@@ -28,7 +28,6 @@ use Doctrine\ORM\NonUniqueResultException;
 use LogicException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
-use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
@@ -36,7 +35,7 @@ use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
+class BulkUpdateUsersAssignmentsStateService
 {
     /** @var EntityManagerInterface */
     private $entityManager;

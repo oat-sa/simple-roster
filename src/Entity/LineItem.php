@@ -25,13 +25,14 @@ namespace OAT\SimpleRoster\Entity;
 use DateTimeInterface;
 use InvalidArgumentException;
 use JsonSerializable;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItem implements JsonSerializable, EntityInterface
 {
     public const STATUS_ENABLED = 'enabled';
     public const STATUS_DISABLED = 'disabled';
 
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -59,7 +60,7 @@ class LineItem implements JsonSerializable, EntityInterface
      * @throws InvalidArgumentException
      */
     public function __construct(
-        int $id,
+        UuidV6 $id,
         string $label,
         string $uri,
         string $slug,
@@ -91,7 +92,7 @@ class LineItem implements JsonSerializable, EntityInterface
         $this->endAt = $endAt;
     }
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
     }

@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
@@ -161,7 +162,7 @@ EOF
     private function createLtiInstance(array $rawLtiInstance): LtiInstance
     {
         return new LtiInstance(
-            0,
+            new UuidV6(),
             $rawLtiInstance['label'],
             $rawLtiInstance['ltiLink'],
             $rawLtiInstance['ltiKey'],

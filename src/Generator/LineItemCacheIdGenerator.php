@@ -22,12 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Generator;
 
+use Symfony\Component\Uid\UuidV6;
+
 class LineItemCacheIdGenerator
 {
-    public const CACHE_KEY_PATTERN = 'lineItem.%d';
+    public const CACHE_KEY_PATTERN = 'lineItem.%s';
 
-    public function generate(int $id): string
+    public function generate(UuidV6 $id): string
     {
-        return sprintf(self::CACHE_KEY_PATTERN, $id);
+        return sprintf(self::CACHE_KEY_PATTERN, (string)$id);
     }
 }
