@@ -34,6 +34,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemChangeDatesCommand extends Command
@@ -55,7 +56,7 @@ class LineItemChangeDatesCommand extends Command
     /** @var string[] */
     private $lineItemSlugs;
 
-    /** @var int[] */
+    /** @var UuidV6[] */
     private $lineItemIds;
 
     /** @var DateTime|null */
@@ -83,21 +84,25 @@ class LineItemChangeDatesCommand extends Command
         parent::configure();
 
         $this->setDescription('Updates the start and end dates of line item(s).');
+
+        // @codingStandardsIgnoreStart
         $this->setHelp(<<<EOF
 The <info>%command.name%</info> command changes the dates for specific line items.
 
 <comment>Not specifying a start-date or end-date option will nullify the value for the column.</comment>
-<comment>Dates are expected to be in the format: 2020-01-01T00:00:00+0000</comment>
+<comment>Dates are expected to be in the format: 2020-01-01T00:00:00+0000.</comment>
+<comment>You can adjust the timezone: 2020-01-01T00:00:00+0100 will be stored as 2019-12-31 23:00:00 GMT.</comment>
 
 To change both start and end date of a line item using IDs:
-    <info>php %command.full_name% -i 1,2,3 --start-date <date> --end-date <date></info>
-    <info>php %command.full_name% --line-item-ids 1,2,3 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% --line-item-ids 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date <date> --end-date <date></info>
 
 To change both start and end date of a line item using slugs:
     <info>php %command.full_name% -s slug1,slug2,slug3 --start-date <date> --end-date <date></info>
     <info>php %command.full_name% --line-item-slugs slug1,slug2,slug3 --start-date <date> --end-date <date></info>
 EOF
         );
+        // @codingStandardsIgnoreEnd
 
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
@@ -201,15 +206,15 @@ EOF
 
                 $this->logger->info(
                     sprintf(
-                        'New dates were set for line item with: "%d"',
-                        $lineItem->getId()
+                        'New dates were set for line item with: "%s"',
+                        (string)$lineItem->getId()
                     ),
                     $lineItem->jsonSerialize()
                 );
             }
 
             if ($this->isDryRun) {
-                $this->symfonyStyle->success(
+                $this->symfonyStyle->warning(
                     sprintf(
                         '[DRY RUN] %d line item(s) have been updated.',
                         $lineItemsCollection->count()
@@ -238,20 +243,22 @@ EOF
 
     private function initializeLineItemIdsOption(InputInterface $input): void
     {
-        $lineItemIds = array_filter(
-            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
-            static function (string $value): bool {
-                return !empty($value) && (int)$value > 0;
-            }
-        );
+        try {
+            $this->lineItemIds = array_map(
+                static function (string $lineItemId): UuidV6 {
+                    return new UuidV6($lineItemId);
+                },
+                explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_IDS)),
+            );
+        } catch (Throwable $exception) {
+            $this->lineItemIds = [];
+        }
 
-        if (empty($lineItemIds)) {
+        if (empty($this->lineItemIds)) {
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
             );
         }
-
-        $this->lineItemIds = array_map('intval', $lineItemIds);
     }
 
     /**
@@ -318,7 +325,7 @@ EOF
         if (!empty($dateString)) {
             try {
                 $date = Carbon::createFromFormat(Carbon::ATOM, $dateString);
-                $dateObj = $date ? $date->toDateTime() : null;
+                $dateObj = $date ? $date->setTimezone('UTC')->toDateTime() : null;
             } catch (Throwable $e) {
                 $message = sprintf(
                     '%s is an invalid date. Expected format: 2020-01-01T00:00:00+0000',

@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class NativeAssignmentRepositoryTest extends KernelTestCase
 {
@@ -55,9 +56,11 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
 
     public function testItCanInsertMultipleAssignments(): void
     {
-        $assignment1 = new AssignmentDto(Assignment::STATE_READY, 1, 'user1', 1);
-        $assignment2 = new AssignmentDto(Assignment::STATE_READY, 1, 'user2', 1);
-        $assignment3 = new AssignmentDto(Assignment::STATE_READY, 1, 'user3', 1);
+        $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
+        $assignment1 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user1', 1);
+        $assignment2 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user2', 1);
+        $assignment3 = new AssignmentDto(Assignment::STATE_READY, $lineItemId, 'user3', 1);
 
         $assignmentCollection = (new AssignmentDtoCollection())
             ->add($assignment1)

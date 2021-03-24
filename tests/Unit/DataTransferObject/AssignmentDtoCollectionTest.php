@@ -27,6 +27,7 @@ use IteratorAggregate;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentDtoCollectionTest extends TestCase
 {
@@ -42,7 +43,7 @@ class AssignmentDtoCollectionTest extends TestCase
 
     public function testIfAssignmentCanBeAdded(): void
     {
-        $assignment = new AssignmentDto('test', 1, 'testUsername', 1);
+        $assignment = new AssignmentDto('test', new UuidV6('00000001-0000-6000-0000-000000000000'), 'testUsername', 1);
         $subject = (new AssignmentDtoCollection())->add($assignment);
 
         self::assertCount(1, $subject);
@@ -54,15 +55,17 @@ class AssignmentDtoCollectionTest extends TestCase
         $subject = new AssignmentDtoCollection();
         self::assertTrue($subject->isEmpty());
 
-        $subject->add(new AssignmentDto('test', 1, 'testUsername', 1));
+        $subject->add(new AssignmentDto('test', new UuidV6('00000001-0000-6000-0000-000000000000'), 'testUsername', 1));
         self::assertFalse($subject->isEmpty());
     }
 
     public function testItReturnsUniqueUsernames(): void
     {
-        $assignment1 = new AssignmentDto('test', 1, 'testUsername', 1);
-        $assignment2 = new AssignmentDto('test', 1, 'testUsername', 1);
-        $assignment3 = new AssignmentDto('test', 1, 'testUsername_2', 1);
+        $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
+        $assignment1 = new AssignmentDto('test', $lineItemId, 'testUsername', 1);
+        $assignment2 = new AssignmentDto('test', $lineItemId, 'testUsername', 1);
+        $assignment3 = new AssignmentDto('test', $lineItemId, 'testUsername_2', 1);
 
         $subject = (new AssignmentDtoCollection())
             ->add($assignment1)

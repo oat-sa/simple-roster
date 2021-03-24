@@ -29,6 +29,7 @@ use OAT\SimpleRoster\EventListener\Doctrine\LineItemLoaderListener;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemLoaderListenerTest extends TestCase
 {
@@ -54,15 +55,20 @@ class LineItemLoaderListenerTest extends TestCase
 
     public function testItSetLineItemFromRepositoryOnPostLoadEvent(): void
     {
-        $expectedLineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $expectedLineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->lineItemRepository
             ->expects(self::once())
             ->method('findOneById')
-            ->with(1)
+            ->with(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->willReturn($expectedLineItem);
-
-        $assignment = (new Assignment())->setLineItemId(1);
+        $assignment = (new Assignment())->setLineItem($expectedLineItem);
 
         $this->subject->postLoad($assignment);
 

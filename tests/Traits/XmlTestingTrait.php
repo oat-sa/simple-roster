@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Traits;
 
+use Ramsey\Uuid\UuidInterface;
+
 trait XmlTestingTrait
 {
     public function getValidReplaceResultRequestXml(): string
@@ -56,8 +58,10 @@ trait XmlTestingTrait
         );
     }
 
-    public function getValidReplaceResultResponseXml(string $messageIdentifier): string
+    public function getValidReplaceResultResponseXml(UuidInterface $messageIdentifier): string
     {
+        $messageIdentifier = (string)$messageIdentifier;
+
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <imsx_POXEnvelopeResponse xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">

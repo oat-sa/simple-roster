@@ -32,6 +32,7 @@ use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class UpdateLineItemsServiceTest extends TestCase
 {
@@ -96,7 +97,7 @@ class UpdateLineItemsServiceTest extends TestCase
             )
             ->willReturn([
                 new LineItem(
-                    1,
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
                     'testLabel',
                     'http://lineitemuri.com',
                     'qti-interactions-delivery',
@@ -110,7 +111,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::once())
             ->method('info')
             ->with(
-                'The line item id 1 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'http://lineitemuri.com',
                     'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
@@ -123,7 +124,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '52a3de8dd0f270fd193f9f4bff05232f',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'
@@ -140,7 +141,13 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testItIgnoresDuplicatedUpdates(): void
     {
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'qti-interactions-delivery', LineItem::STATUS_ENABLED);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'qti-interactions-delivery',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->lineItemRepository->expects(self::once())
             ->method('findBy')
@@ -164,7 +171,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::at(0))
             ->method('info')
             ->with(
-                'The line item id 1 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                     'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
@@ -176,14 +183,14 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '111',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602380),
                 'qti-interactions-delivery'
             ),
             new UpdateLineItemDto(
                 '222',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#duplicated',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'
@@ -229,7 +236,7 @@ class UpdateLineItemsServiceTest extends TestCase
         $updateLineItemCollection = new UpdateLineItemCollection(
             new UpdateLineItemDto(
                 '52a3de8dd0f270fd193f9f4bff05232f',
-                'RemoteDeliveryPublicationFinished',
+                'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
                 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 (new DateTimeImmutable())->setTimestamp(1565602371),
                 'qti-interactions-delivery'

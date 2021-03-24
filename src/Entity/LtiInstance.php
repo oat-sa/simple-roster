@@ -22,9 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
+use Symfony\Component\Uid\UuidV6;
+
 class LtiInstance implements EntityInterface
 {
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -39,7 +41,7 @@ class LtiInstance implements EntityInterface
     /** @var string */
     private $ltiSecret;
 
-    public function __construct(int $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
+    public function __construct(UuidV6 $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
     {
         $this->id = $id;
         $this->label = $label;
@@ -48,7 +50,7 @@ class LtiInstance implements EntityInterface
         $this->ltiSecret = $ltiSecret;
     }
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
     }

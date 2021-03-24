@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
@@ -70,7 +71,14 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 1);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
@@ -102,7 +110,14 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 2);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            2
+        );
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)
@@ -134,7 +149,13 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $assignment = (new Assignment())
             ->setState(Assignment::STATE_STARTED)

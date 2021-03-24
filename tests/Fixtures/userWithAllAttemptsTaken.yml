@@ -1,7 +1,7 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem2:
         __construct:
-            id: 1
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
             label: 'The first line item'
             uri: 'http://lineitemuri.com'
             slug: 'lineItemSlug'
@@ -15,7 +15,7 @@ OAT\SimpleRoster\Entity\User:
         username: 'userWithAllAttemptsTaken'
         plainPassword: 'password'
         groupId: 'group_1'
-        assignments: ['@assignment2']
+        assignments: [ '@assignment2' ]
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment2:

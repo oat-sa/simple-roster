@@ -25,14 +25,16 @@ namespace OAT\SimpleRoster\Tests\Unit\Entity;
 use OAT\SimpleRoster\Entity\EntityInterface;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LtiInstanceTest extends TestCase
 {
     public function testItImplementsEntityInterface(): void
     {
-        $subject = new LtiInstance(1, 'label', 'link', 'key', 'secret');
+        $id = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $subject = new LtiInstance($id, 'label', 'link', 'key', 'secret');
 
         self::assertInstanceOf(EntityInterface::class, $subject);
-        self::assertSame(1, $subject->getId());
+        self::assertSame($id, $subject->getId());
     }
 }

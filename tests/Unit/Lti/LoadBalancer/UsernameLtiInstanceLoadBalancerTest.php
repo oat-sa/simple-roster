@@ -30,6 +30,7 @@ use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UsernameLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UsernameLtiInstanceLoadBalancerTest extends TestCase
 {
@@ -45,11 +46,11 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
         $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
-            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
-            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
-            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
-            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
-            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+            ->add(new LtiInstance(new UuidV6('00000001-0000-6000-0000-000000000000'), '1', 'link1', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000002-0000-6000-0000-000000000000'), '2', 'link2', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000003-0000-6000-0000-000000000000'), '3', 'link3', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000004-0000-6000-0000-000000000000'), '4', 'link4', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6('00000005-0000-6000-0000-000000000000'), '5', 'link5', 'key', 'secret'));
 
         $this->subject = new UsernameLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
@@ -95,18 +96,16 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $assignment = (new Assignment())->setLineItem($this->getLineItemMock(5));
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
 
-        self::assertSame('5', $this->subject->getLtiRequestContextId($assignment));
-    }
+        $assignment = (new Assignment())->setLineItem($lineItem);
 
-    private function getLineItemMock(int $lineItemId): LineItem
-    {
-        $lineItem = $this->createMock(LineItem::class);
-        $lineItem
-            ->method('getId')
-            ->willReturn($lineItemId);
-
-        return $lineItem;
+        self::assertSame('00000001-0000-6000-0000-000000000000', $this->subject->getLtiRequestContextId($assignment));
     }
 }

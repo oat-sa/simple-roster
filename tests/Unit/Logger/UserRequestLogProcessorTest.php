@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Logger;
 
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Logger\UserRequestLogProcessor;
-use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Security;
@@ -34,9 +33,6 @@ class UserRequestLogProcessorTest extends TestCase
     /** @var Security|MockObject */
     private $security;
 
-    /** @var RequestIdStorage */
-    private $requestIdStorage;
-
     /** @var UserRequestLogProcessor */
     private $subject;
 
@@ -45,20 +41,7 @@ class UserRequestLogProcessorTest extends TestCase
         parent::setUp();
 
         $this->security = $this->createMock(Security::class);
-        $this->requestIdStorage = new RequestIdStorage();
-
-        $this->subject = new UserRequestLogProcessor($this->security, $this->requestIdStorage);
-    }
-
-    public function testItExtendsLogRecordWithRequestId(): void
-    {
-        $this->requestIdStorage->setRequestId('expectedRequestId');
-
-        $logRecord = call_user_func($this->subject, ['logRecord']);
-
-        self::assertArrayHasKey('extra', $logRecord);
-        self::assertArrayHasKey('requestId', $logRecord['extra']);
-        self::assertSame('expectedRequestId', $logRecord['extra']['requestId']);
+        $this->subject = new UserRequestLogProcessor($this->security);
     }
 
     public function testItExtendsLogRecordWithUsername(): void

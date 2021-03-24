@@ -32,10 +32,12 @@ use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\UuidV6;
 
 class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
@@ -109,7 +111,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
         self::$container->set('test.uid_generator', $uidGenerator);
 
-        $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
+        $messageIdentifier = UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
         $uidGenerator
             ->method('uuid4')
@@ -239,7 +241,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         /** @var LtiInstanceRepository $repository */
         $repository = $this->getRepository(LtiInstance::class);
 
-        $ltiInstance = $repository->find(1);
+        $ltiInstance = $repository->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertInstanceOf(LtiInstance::class, $ltiInstance);
 

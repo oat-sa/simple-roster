@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 
 use InvalidArgumentException;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -31,6 +30,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemChangeStateCommand extends Command
@@ -163,7 +163,15 @@ EOF
         try {
             $this->symfonyStyle->comment(sprintf('Executing %s...', ucfirst($toggle)));
 
-            /** @var LineItem[] $lineItems */
+            if ($queryField === self::FIELD_ID) {
+                $queryValue = array_map(
+                    static function (string $id): string {
+                        return (new UuidV6($id))->toBinary();
+                    },
+                    (array)$queryValue
+                );
+            }
+
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
             foreach ($lineItems as $lineItem) {
@@ -171,11 +179,10 @@ EOF
 
                 $this->logger->info(
                     sprintf(
-                        'The operation: "%s" was executed for Line Item with id: "%d"',
+                        "The operation: '%s' was executed for Line Item with id: '%s'",
                         $toggle,
-                        $lineItem->getId()
-                    ),
-                    ['slug' => $lineItem->getSlug(), 'uri' => $lineItem->getUri()]
+                        (string)$lineItem->getId()
+                    )
                 );
             }
 

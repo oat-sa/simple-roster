@@ -1,7 +1,7 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItemUnavailable:
         __construct:
-            id: 2
+            id: <uuidV6('00000002-0000-6000-0000-000000000000')>
             label: 'The first line item'
             uri: 'http://lineitemuri.com'
             slug: 'lineItemSlug2'

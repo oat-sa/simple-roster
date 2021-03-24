@@ -67,9 +67,6 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var int */
     private $attemptsCount = 0;
 
-    /** @var int */
-    private $lineItemId;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -95,18 +92,6 @@ class Assignment implements JsonSerializable, EntityInterface
     public function setUser(User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getLineItemId(): int
-    {
-        return $this->lineItemId;
-    }
-
-    public function setLineItemId(int $lineItemId): self
-    {
-        $this->lineItemId = $lineItemId;
 
         return $this;
     }

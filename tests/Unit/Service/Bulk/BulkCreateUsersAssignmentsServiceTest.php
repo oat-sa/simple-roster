@@ -36,6 +36,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Uid\UuidV6;
 
 class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
@@ -77,9 +78,18 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
     {
-        $user = (new User())->addAssignment((new Assignment())
-            ->setState(Assignment::STATE_READY)
-            ->setLineItem(new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED)));
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $user = (new User())
+            ->addAssignment((new Assignment())
+                ->setState(Assignment::STATE_READY)
+                ->setLineItem($lineItem));
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -142,7 +152,13 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $expectedLineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $expectedLineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')

@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p1LaunchUrlBuilderTest extends TestCase
 {
@@ -49,16 +50,25 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
 
         $ltiConfiguration = new LtiConfiguration(LtiRequest::LTI_VERSION_1P1, 'returnUrl', 'en-EN', 'registrationId');
 
-        $ltiInstance = new LtiInstance(1, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
+        $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
         $assignment = $this->createPartialMock(Assignment::class, ['getId']);
         $assignment
             ->method('getId')
             ->willReturn(10);
 
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'http://test-uri.com',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
         $assignment
             ->setUser((new User())->setUsername('testUser'))
-            ->setLineItem(new LineItem(1, 'testLabel', 'http://test-uri.com', 'testSlug', LineItem::STATUS_ENABLED));
+            ->setLineItem($lineItem);
 
         $subject = new Lti1p1LaunchUrlBuilder($router, $loadBalancer, $ltiConfiguration);
 

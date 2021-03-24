@@ -25,12 +25,21 @@ namespace OAT\SimpleRoster\Tests\Unit\Entity;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class AssignmentTest extends TestCase
 {
     public function testItUpdatesStateAsCompletedIfMaxAttemptsIsReached(): void
     {
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 1);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
+
         $subject = new Assignment();
         $subject->setLineItem($lineItem);
 
@@ -46,7 +55,14 @@ class AssignmentTest extends TestCase
 
     public function testItUpdatesStateAsReadyIfMaxAttemptsIs0(): void
     {
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
         $subject = new Assignment();
         $subject->setLineItem($lineItem);
 
@@ -62,7 +78,14 @@ class AssignmentTest extends TestCase
 
     public function testItUpdatesStateAsReadyIfMaxAttemptsIsNotReached(): void
     {
-        $lineItem = new LineItem(1, 'testLabel', 'testUri', 'testSlug', LineItem::STATUS_ENABLED, 2);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            2
+        );
         $subject = new Assignment();
         $subject->setLineItem($lineItem);
 

@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Logger;
 
-use OAT\SimpleRoster\Request\RequestIdStorage;
 use Symfony\Component\Security\Core\Security;
 
 class UserRequestLogProcessor
@@ -30,20 +29,13 @@ class UserRequestLogProcessor
     /** @var Security */
     private $security;
 
-    /** @var RequestIdStorage */
-    private $requestIdStorage;
-
-    public function __construct(
-        Security $security,
-        RequestIdStorage $requestIdStorage
-    ) {
+    public function __construct(Security $security)
+    {
         $this->security = $security;
-        $this->requestIdStorage = $requestIdStorage;
     }
 
     public function __invoke(array $record): array
     {
-        $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
         $record['extra']['username'] = $this->security->getUser() !== null
             ? $this->security->getUser()->getUsername()
             : 'guest';
