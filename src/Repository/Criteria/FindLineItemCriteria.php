@@ -22,15 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository\Criteria;
 
+use Symfony\Component\Uid\UuidV6;
+
 class FindLineItemCriteria
 {
-    /** @var int[] */
+    /** @var UuidV6[] */
     private $lineItemIds = [];
 
     /** @var string[] */
     private $lineItemSlugs = [];
 
-    public function addLineItemIds(int ...$lineItemIds): self
+    public function addLineItemIds(UuidV6 ...$lineItemIds): self
     {
         $this->lineItemIds = $lineItemIds;
 
@@ -44,6 +46,9 @@ class FindLineItemCriteria
         return $this;
     }
 
+    /**
+     * @return UuidV6[]
+     */
     public function getLineItemIds(): array
     {
         return $this->lineItemIds;

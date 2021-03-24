@@ -45,7 +45,7 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activ
 ```
 - Activating a line item by line item id
 ```shell script
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activate id 4
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state activate id 00000001-0000-6000-0000-000000000000
 ```
 - Activating a line item by line item uri
 ```shell script
@@ -61,7 +61,7 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deact
 ```
 - Deactivating a line item by line item id
 ```shell script
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate id 4
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-state deactivate id 00000001-0000-6000-0000-000000000000
 ```
 - Deactivating a line item by line item uri
 ```shell script

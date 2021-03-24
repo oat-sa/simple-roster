@@ -99,7 +99,7 @@ class UpdateLineItemsService
             $this->entityManager->persist($lineItem);
 
             $this->logger->info(
-                sprintf('The line item id %d was updated', $lineItem->getId()),
+                sprintf('The line item id %s was updated', (string)$lineItem->getId()),
                 [
                     'oldUri' => $oldUri,
                     'newUri' => $dto->getLineItemUri(),

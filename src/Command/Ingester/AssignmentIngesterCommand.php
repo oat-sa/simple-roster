@@ -28,7 +28,6 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
-use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
@@ -122,9 +121,11 @@ EOF
 
                 $numberOfProcessedRows++;
 
-                $assignmentDto = $this->createAssignmentDto(
-                    $lineItems,
-                    $rawAssignment['lineItemSlug'],
+                $lineItem = $lineItems->getBySlug($rawAssignment['lineItemSlug']);
+
+                $assignmentDto = new AssignmentDto(
+                    Assignment::STATE_READY,
+                    $lineItem->getId(),
                     $rawAssignment['username']
                 );
 
@@ -181,18 +182,5 @@ EOF
         }
 
         return 0;
-    }
-
-    /**
-     * @throws LineItemNotFoundException
-     */
-    private function createAssignmentDto(
-        LineItemCollection $lineItems,
-        string $lineItemSlug,
-        string $username
-    ): AssignmentDto {
-        $lineItem = $lineItems->getBySlug($lineItemSlug);
-
-        return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), $username);
     }
 }

@@ -65,6 +65,7 @@ class UniqueLtiInstanceCollectionTest extends TestCase
             'key',
             'secret'
         );
+
         $subject = new UniqueLtiInstanceCollection($ltiInstance, $ltiInstance);
 
         self::assertCount(1, $subject);

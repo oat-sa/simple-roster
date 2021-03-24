@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemIngesterCommand extends AbstractCsvIngesterCommand
@@ -172,6 +173,7 @@ EOF
     {
         $lineItem =
             (new LineItem())
+                ->setId(new UuidV6())
                 ->setUri($rawLineItem['uri'])
                 ->setLabel($rawLineItem['label'])
                 ->setSlug($rawLineItem['slug'])

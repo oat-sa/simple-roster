@@ -117,14 +117,14 @@ class LineItemCacheWarmerCommand extends Command
             }
             /** @var LineItem $lineItem */
             foreach ($lineItemCollection as $lineItem) {
-                $id = (int)$lineItem->getId();
+                $id = $lineItem->getId();
                 $lineItemCacheKey = $this->lineItemCacheIdGenerator->generate($id);
 
                 $this->resultCacheImplementation->delete($lineItemCacheKey);
                 $this->lineItemRepository->findOneById($id);
 
                 $this->logger->info(
-                    sprintf('Result cache for Line Item Id %d have been successfully warmed up.', $id),
+                    sprintf("Result cache for Line Item with id = '%s' have been successfully warmed up.", (string)$id),
                     [
                         'cacheKey' => $lineItemCacheKey,
                         'cacheTtl' => number_format($this->lineItemCacheTtl),
