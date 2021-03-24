@@ -204,10 +204,7 @@ EOF
                 $this->lineItemRepository->persist($lineItem);
 
                 $this->logger->info(
-                    sprintf(
-                        'New dates were set for line item with: "%s"',
-                        (string)$lineItem->getId()
-                    ),
+                    sprintf('New dates were set for line item with: "%s"', $lineItem->getId()),
                     $lineItem->jsonSerialize()
                 );
             }

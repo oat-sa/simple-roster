@@ -214,7 +214,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             'byMultipleSlugs' => [
                 'line-item-ids' => [
                     new UuidV6('00000002-0000-6000-0000-000000000000'),
-                    new UuidV6('00000001-0000-6000-0000-000000000000')
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
                 ],
                 'query-field' => 'slug',
                 'query-value' => ['lineItemSlug2', 'lineItemSlug1'],
@@ -227,15 +227,15 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             'byMultipleIds' => [
                 'line-item-ids' => [
                     new UuidV6('00000001-0000-6000-0000-000000000000'),
-                    new UuidV6('00000003-0000-6000-0000-000000000000')
-                    ],
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
                 'query-field' => 'id',
                 'query-value' => ['00000001-0000-6000-0000-000000000000', '00000003-0000-6000-0000-000000000000'],
             ],
             'byUri' => [
                 'line-item-ids' => [
                     new UuidV6('00000001-0000-6000-0000-000000000000'),
-                    new UuidV6('00000002-0000-6000-0000-000000000000')
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
                 ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com'],
@@ -244,7 +244,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                 'line-item-ids' => [
                     new UuidV6('00000001-0000-6000-0000-000000000000'),
                     new UuidV6('00000002-0000-6000-0000-000000000000'),
-                    new UuidV6('00000003-0000-6000-0000-000000000000')
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
                 ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
@@ -315,8 +315,8 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                     'message' => sprintf(
                         "The operation: '%s' was executed for Line Item with id: '%s'",
                         $toggle,
-                        (string)$lineItemId
-                    )
+                        $lineItemId
+                    ),
                 ],
                 Logger::INFO
             );
