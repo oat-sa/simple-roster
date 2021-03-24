@@ -178,11 +178,7 @@ EOF
                 $toggle === self::TOGGLE_ACTIVATE ? $lineItem->enable() : $lineItem->disable();
 
                 $this->logger->info(
-                    sprintf(
-                        "The operation: '%s' was executed for Line Item with id: '%s'",
-                        $toggle,
-                        (string)$lineItem->getId()
-                    )
+                    sprintf("The operation: '%s' was executed for Line Item with id: '%s'", $toggle, $lineItem->getId())
                 );
             }
 

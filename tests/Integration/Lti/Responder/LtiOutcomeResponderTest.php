@@ -27,6 +27,7 @@ use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 use Twig\Environment;
 
 class LtiOutcomeResponderTest extends KernelTestCase
@@ -54,8 +55,12 @@ class LtiOutcomeResponderTest extends KernelTestCase
 
         $subject = new LtiOutcomeResponder($twig, $uuidFactory);
 
-        $response = $subject->createXmlResponse(1);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $response = $subject->createXmlResponse($assignmentId);
 
-        self::assertSame($this->getValidReplaceResultResponseXml($messageIdentifier), $response->getContent());
+        self::assertSame(
+            $this->getValidReplaceResultResponseXml($messageIdentifier, $assignmentId),
+            $response->getContent()
+        );
     }
 }

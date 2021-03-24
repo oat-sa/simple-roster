@@ -85,6 +85,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         );
 
         $expectedAssignment = (new Assignment())
+            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setLineItem($lineItem)
             ->setState(Assignment::STATE_STARTED);
 
@@ -136,6 +137,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
                     ->setUsername($username)
                     ->addAssignment(
                         (new Assignment())
+                            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
                             ->setState(Assignment::STATE_STARTED)
                             ->setLineItem($expectedLineItem)
                     );
@@ -155,15 +157,18 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->method('info')
             ->withConsecutive(
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test1').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test1').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test2').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test2').",
                     ['lineItem' => $expectedLineItem],
                 ],
             );

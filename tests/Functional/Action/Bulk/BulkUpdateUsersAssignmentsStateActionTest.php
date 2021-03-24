@@ -260,7 +260,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
         );
 
         $this->assertHasLogRecordWithMessage(
-            "Successful assignment cancellation (assignmentId = '1', username = 'user1').",
+            "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+            "username = 'user1').",
             Logger::INFO
         );
     }

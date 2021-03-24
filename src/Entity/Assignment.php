@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Entity;
 use Carbon\Carbon;
 use DateTime;
 use JsonSerializable;
+use Symfony\Component\Uid\UuidV6;
 
 class Assignment implements JsonSerializable, EntityInterface
 {
@@ -49,7 +50,7 @@ class Assignment implements JsonSerializable, EntityInterface
      */
     public const STATE_CANCELLED = 'cancelled';
 
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -67,9 +68,16 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var int */
     private $attemptsCount = 0;
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
+    }
+
+    public function setId(UuidV6 $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getState(): ?string
@@ -178,7 +186,7 @@ class Assignment implements JsonSerializable, EntityInterface
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
+            'id' => (string)$this->id,
             'username' => $this->getUser()->getUsername(),
             'state' => $this->getState(),
             'attemptsCount' => $this->getAttemptsCount(),

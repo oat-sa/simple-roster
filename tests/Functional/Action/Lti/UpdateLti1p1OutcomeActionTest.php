@@ -135,12 +135,15 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $this->getValidReplaceResultRequestXml()
+            $this->getXmlRequestTemplate(new UuidV6('00000001-0000-6000-0000-000000000000'))
         );
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame(
-            $this->getValidReplaceResultResponseXml($messageIdentifier),
+            $this->getValidReplaceResultResponseXml(
+                $messageIdentifier,
+                new UuidV6('00000001-0000-6000-0000-000000000000')
+            ),
             $this->kernelBrowser->getResponse()->getContent()
         );
 
@@ -200,6 +203,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             'oauth_version' => '1.0',
         ]);
 
+        $nonExistingAssignmentId = new UuidV6('00000999-0000-6000-0000-000000000000');
+
         $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti1p1/outcome?' . $queryParameters,
@@ -208,7 +213,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'text/xml',
             ],
-            $this->getValidReplaceResultRequestXmlWithWrongAssignment()
+            $this->getXmlRequestTemplate($nonExistingAssignmentId)
         );
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());

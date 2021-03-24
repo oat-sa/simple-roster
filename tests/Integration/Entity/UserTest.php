@@ -26,6 +26,7 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserTest extends KernelTestCase
 {
@@ -47,7 +48,7 @@ class UserTest extends KernelTestCase
         $subject = $this->getRepository(User::class)->find(1);
 
         /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(1);
+        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertCount(1, $subject->getAssignments());
         self::assertCount(1, $subject->getAvailableAssignments());
