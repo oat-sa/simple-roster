@@ -143,9 +143,9 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
-    public function getLastAssignment(): Assignment
+    public function getLastAssignment(): ?Assignment
     {
-        return $this->assignments->last();
+        return $this->assignments->last() ?: null;
     }
 
     public function removeAssignment(Assignment $assignment): self

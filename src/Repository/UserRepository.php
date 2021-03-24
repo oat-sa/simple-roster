@@ -66,7 +66,7 @@ class UserRepository extends AbstractRepository
         $user = $this
             ->createQueryBuilder('u')
             ->select('u, a')
-            ->innerJoin('u.assignments', 'a')
+            ->leftJoin('u.assignments', 'a')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()

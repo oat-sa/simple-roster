@@ -65,7 +65,7 @@ class BulkUpdateUsersAssignmentsStateService
                 continue;
             }
 
-            $this->validateStateTransition($operation);
+            $this->validateStateAttribute($operation);
 
             try {
                 $this->processOperation($operation, $result);
@@ -128,7 +128,7 @@ class BulkUpdateUsersAssignmentsStateService
     /**
      * @throws LogicException
      */
-    private function validateStateTransition(BulkOperation $operation): void // TODO should be done within Assignment
+    private function validateStateAttribute(BulkOperation $operation): void
     {
         if ($operation->getAttribute('state') !== Assignment::STATUS_CANCELLED) {
             throw new LogicException(
