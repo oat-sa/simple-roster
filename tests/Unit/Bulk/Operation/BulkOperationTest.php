@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Bulk\Operation;
 
+use JsonSerializable;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use PHPUnit\Framework\TestCase;
 
@@ -35,5 +36,23 @@ class BulkOperationTest extends TestCase
         self::assertSame(BulkOperation::TYPE_UPDATE, $subject->getType());
         self::assertSame(['key' => 'value'], $subject->getAttributes());
         self::assertSame('value', $subject->getAttribute('key'));
+    }
+
+    public function testItIsJsonSerializable(): void
+    {
+        $subject = new BulkOperation('identifier', BulkOperation::TYPE_UPDATE, ['key' => 'value']);
+
+        self::assertInstanceOf(JsonSerializable::class, $subject);
+
+        self::assertSame(
+            [
+                'identifier' => 'identifier',
+                'type' => 'update',
+                'attributes' => [
+                    'key' => 'value',
+                ],
+            ],
+            $subject->jsonSerialize()
+        );
     }
 }

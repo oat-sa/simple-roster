@@ -1,0 +1,48 @@
+OAT\SimpleRoster\Entity\LineItem:
+    lineItem:
+        __construct:
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
+            label: 'The first line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug1'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+    lineItem2:
+        __construct:
+            id: <uuidV6('00000002-0000-6000-0000-000000000000')>
+            label: 'The second line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug2'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+    lineItem3:
+        __construct:
+            id: <uuidV6('00000003-0000-6000-0000-000000000000')>
+            label: 'The third line item'
+            uri: 'http://different-lineitemuri.com'
+            slug: 'lineItemSlug3'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+
+OAT\SimpleRoster\Entity\Assignment:
+    assignment_1:
+        lineItem: '@lineItem'
+        state: 'ready'
+    assignment_2:
+        lineItem: '@lineItem2'
+        state: 'ready'
+    assignment_3:
+        lineItem: '@lineItem3'
+        state: 'ready'
+
+OAT\SimpleRoster\Entity\User:
+    user_{1..3}:
+        username: 'user_<current()>'
+        plainPassword: 'password'
+        assignments: [ '@assignment_<current()>' ]
