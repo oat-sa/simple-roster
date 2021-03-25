@@ -77,7 +77,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
         /** @var LtiInstance $expectedLtiInstance */
         foreach ($expectedLtiInstanceMap as $username => $expectedLtiInstance) {
-            $user = (new User())->setUsername($username);
+            $user = new User(new UuidV6(), $username, 'testPassword');
 
             $actualLtiInstance = $this->subject->getLtiInstance($user);
 

@@ -69,7 +69,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
     public function testItMarksAssignmentAsCompleted(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
         $lineItem = new LineItem(
             new UuidV6('00000001-0000-6000-0000-000000000000'),
@@ -107,7 +107,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
     public function testItMarksAssignmentAsReady(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
         $lineItem = new LineItem(
             new UuidV6('00000001-0000-6000-0000-000000000000'),
@@ -145,7 +145,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
 
     public function testItLogsSuccessfulCompletion(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
         $lineItem = new LineItem(
             new UuidV6('00000001-0000-6000-0000-000000000000'),

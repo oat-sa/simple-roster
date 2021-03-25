@@ -40,11 +40,12 @@ class UserTest extends KernelTestCase
         self::bootKernel();
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 
     public function testItCanRetrieveAndRemoveAssignments(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         /** @var User $subject */
         $subject = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
@@ -55,11 +56,6 @@ class UserTest extends KernelTestCase
         self::assertCount(1, $subject->getAvailableAssignments());
 
         self::assertSame($assignment, current($subject->getAvailableAssignments()));
-
-        $subject->removeAssignment($assignment);
-
-        self::assertEmpty($subject->getAssignments());
-        self::assertEmpty($subject->getAvailableAssignments());
     }
 
     public function testItThrowsExceptionIfUserHasNoAssignments(): void
@@ -67,8 +63,6 @@ class UserTest extends KernelTestCase
         $this->expectException(AssignmentNotFoundException::class);
         $this->expectExceptionMessage("User 'testUser' does not have any assignments.");
 
-        (new User())
-            ->setUsername('testUser')
-            ->getLastAssignment();
+        (new User(new UuidV6(), 'testUser', 'testPassword'))->getLastAssignment();
     }
 }

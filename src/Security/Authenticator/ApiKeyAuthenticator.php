@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Uid\UuidV6;
 
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
@@ -69,7 +70,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return new User();
+        return new User(new UuidV6(), 'apiUser', 'notUsed');
     }
 
     /**

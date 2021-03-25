@@ -48,11 +48,11 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
-            ->add(new LtiInstance(new UuidV6('00000001-0000-6000-0000-000000000000'), '1', 'link1', 'key', 'secret'))
-            ->add(new LtiInstance(new UuidV6('00000002-0000-6000-0000-000000000000'), '2', 'link2', 'key', 'secret'))
-            ->add(new LtiInstance(new UuidV6('00000003-0000-6000-0000-000000000000'), '3', 'link3', 'key', 'secret'))
-            ->add(new LtiInstance(new UuidV6('00000004-0000-6000-0000-000000000000'), '4', 'link4', 'key', 'secret'))
-            ->add(new LtiInstance(new UuidV6('00000005-0000-6000-0000-000000000000'), '5', 'link5', 'key', 'secret'));
+            ->add(new LtiInstance(new UuidV6(), 'label1', 'link1', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label2', 'link2', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label3', 'link3', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label4', 'link4', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label5', 'link5', 'key', 'secret'));
 
         $this->subject = new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
@@ -62,11 +62,11 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
         self::assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
     }
 
-    public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDetermined(): void
+    public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDeterminedDueToMissingGroupId(): void
     {
         $this->expectException(IndeterminableLtiInstanceUrlException::class);
 
-        $this->subject->getLtiInstance((new User())->setId(new UuidV6()));
+        $this->subject->getLtiInstance(new User(new UuidV6(), 'testUser', 'testPassword'));
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -86,7 +86,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         /** @var LtiInstance $expectedLtiInstance */
         foreach ($expectedResultsMap as $userGroupId => $expectedLtiInstance) {
-            $user = (new User())->setGroupId($userGroupId);
+            $user = new User(new UuidV6(), 'testUser', 'testPassword', $userGroupId);
 
             $actualLtiInstance = $this->subject->getLtiInstance($user);
 
@@ -107,20 +107,9 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $user = (new User())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
-        $lineItem = new LineItem(
-            new UuidV6('00000001-0000-6000-0000-000000000000'),
-            'label',
-            'uri',
-            'slug',
-            LineItem::STATUS_ENABLED
-        );
-
-        $assignment = new Assignment(
-            new UuidV6('00000001-0000-6000-0000-000000000000'),
-            Assignment::STATUS_READY,
-            $lineItem
-        );
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
+        $lineItem = new LineItem(new UuidV6(), 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lineItem);
 
         $user->addAssignment($assignment);
 
@@ -129,20 +118,9 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $user = (new User())->setGroupId('group_5');
-        $lineItem = new LineItem(
-            new UuidV6('00000001-0000-6000-0000-000000000000'),
-            'label',
-            'uri',
-            'slug',
-            LineItem::STATUS_ENABLED
-        );
-
-        $assignment = new Assignment(
-            new UuidV6('00000001-0000-6000-0000-000000000000'),
-            Assignment::STATUS_READY,
-            $lineItem
-        );
+        $user = new User(new UuidV6(), 'testUser', 'testPassword', 'group_5');
+        $lineItem = new LineItem(new UuidV6(), 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lineItem);
 
         $user->addAssignment($assignment);
 

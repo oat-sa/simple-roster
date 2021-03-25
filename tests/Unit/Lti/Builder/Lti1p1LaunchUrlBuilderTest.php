@@ -53,15 +53,9 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
         $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
         $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
-        $lineItem = new LineItem(
-            new UuidV6('00000001-0000-6000-0000-000000000000'),
-            'testLabel',
-            'http://test-uri.com',
-            'testSlug',
-            LineItem::STATUS_ENABLED
-        );
+        $lineItem = new LineItem(new UuidV6(), 'testLabel', 'http://test.com', 'testSlug', LineItem::STATUS_ENABLED);
 
-        $user = (new User())->setUsername('testUser');
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
 
         $assignment = new Assignment(
             new UuidV6('00000010-0000-6000-0000-000000000000'),
@@ -76,7 +70,7 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
         $launchUrl = $subject->build($ltiInstance, $assignment);
 
         self::assertSame(
-            'ltiLink/ltiDeliveryProvider/DeliveryTool/launch/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtdXJpLmNvbSJ9',
+            'ltiLink/ltiDeliveryProvider/DeliveryTool/launch/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QuY29tIn0=',
             $launchUrl->getLtiLink()
         );
 

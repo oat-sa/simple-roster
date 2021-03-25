@@ -37,23 +37,38 @@ class User implements UserInterface, EntityInterface
     /** @var string */
     private $username;
 
+    /** @var string|null */
+    private $plainPassword;
+
     /** @var string */
     private $password;
 
-    /** @var ArrayCollection|Assignment[] */
-    private $assignments;
-
     /** @var string[] */
-    private $roles = [];
-
-    /** @var string|null */
-    private $plainPassword;
+    private $roles;
 
     /** @var string|null */
     private $groupId;
 
-    public function __construct()
-    {
+    /** @var ArrayCollection|Assignment[] */
+    private $assignments;
+
+    public function __construct(
+        UuidV6 $id,
+        string $username,
+        string $plainPassword,
+        string $groupId = null,
+        array $roles = []
+    ) {
+        $this->id = $id;
+        $this->username = $username;
+        $this->plainPassword = $plainPassword;
+        $this->groupId = $groupId;
+
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
+        }
+
+        $this->roles = $roles;
         $this->assignments = new ArrayCollection();
     }
 
@@ -62,42 +77,9 @@ class User implements UserInterface, EntityInterface
         return $this->id;
     }
 
-    public function setId(UuidV6 $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
     public function getUsername(): ?string
     {
         return $this->username;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function setPlainPassword(string $plainPassword): self
-    {
-        $this->plainPassword = $plainPassword;
-
-        return $this;
     }
 
     public function getGroupId(): ?string
@@ -110,7 +92,7 @@ class User implements UserInterface, EntityInterface
         return null !== $this->groupId;
     }
 
-    public function setGroupId(string $groupId): self
+    public function setGroupId(?string $groupId): self
     {
         $this->groupId = $groupId;
 
@@ -130,14 +112,14 @@ class User implements UserInterface, EntityInterface
      */
     public function getCancellableAssignments(): Collection
     {
-        $list = new ArrayCollection();
+        $cancellableAssignments = new ArrayCollection();
         foreach ($this->getAssignments() as $assignment) {
             if ($assignment->isCancellable()) {
-                $list->add($assignment);
+                $cancellableAssignments->add($assignment);
             }
         }
 
-        return $list;
+        return $cancellableAssignments;
     }
 
     public function addAssignment(Assignment $assignment): self
@@ -195,22 +177,6 @@ class User implements UserInterface, EntityInterface
 
     /**
      * @throws AssignmentNotFoundException
-     */
-    public function getAssignmentById(UuidV6 $assignmentId): Assignment
-    {
-        foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->getId()->equals($assignmentId)) {
-                return $assignment;
-            }
-        }
-
-        throw new AssignmentNotFoundException(
-            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
-        );
-    }
-
-    /**
-     * @throws AssignmentNotFoundException
      * @throws AssignmentUnavailableException
      */
     public function getAvailableAssignmentById(string $assignmentId): Assignment
@@ -227,37 +193,78 @@ class User implements UserInterface, EntityInterface
     }
 
     /**
-     * @see UserInterface
+     * @internal
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return $this->roles; // TODO test if role is added properly
     }
 
     /**
-     * @see UserInterface
+     * @internal
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @internal
+     */
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     */
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @internal
+     */
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @internal
      */
     public function getSalt(): ?string
     {
-        // not needed when using the "argon2i" algorithm in security.yaml
         return null;
     }
 
     /**
-     * @see UserInterface
+     * @internal
      */
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
     }
 
-    public function getPlainPassword(): ?string
+    /**
+     * @throws AssignmentNotFoundException
+     */
+    private function getAssignmentById(UuidV6 $assignmentId): Assignment
     {
-        return $this->plainPassword;
+        foreach ($this->getAssignments() as $assignment) {
+            if ($assignment->getId()->equals($assignmentId)) {
+                return $assignment;
+            }
+        }
+
+        throw new AssignmentNotFoundException(
+            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+        );
     }
 }

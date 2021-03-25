@@ -35,6 +35,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Uid\UuidV6;
 
 class JwtTokenAuthenticatorTest extends KernelTestCase
 {
@@ -169,7 +170,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionCode(Response::HTTP_FORBIDDEN);
 
         $expiredToken = $this->tokenGenerator->create(
-            (new User())->setUsername('testUser'),
+            new User(new UuidV6(), 'testUser', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600
@@ -188,7 +189,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionMessage("Username 'testUser' does not exist");
 
         $token = $this->tokenGenerator->create(
-            (new User())->setUsername('testUser'),
+            new User(new UuidV6(), 'testUser', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600
@@ -202,7 +203,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $token = $this->tokenGenerator->create(
-            (new User())->setUsername('user1'),
+            new User(new UuidV6(), 'user1', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600

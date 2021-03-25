@@ -49,6 +49,8 @@ OAT\SimpleRoster\Entity\Assignment:
 
 OAT\SimpleRoster\Entity\User:
     user_{1..100}:
-        username: 'user_<current()>'
-        plainPassword: 'password'
-        assignments: ['@assignment_<current()>']
+        __construct:
+            id: <uuidV6()>
+            username: 'user_<current()>'
+            plainPassword: 'password'
+        assignments: [ '@assignment_<current()>' ]
