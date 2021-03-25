@@ -29,24 +29,25 @@ use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidFactoryInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\UuidV6;
 
 class UpdateLti1p1OutcomeActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
     use XmlTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    /** @var LtiInstanceRepository */
+    private $ltiInstanceRepository;
 
     /** @var AssignmentRepository */
     private $assignmentRepository;
@@ -56,7 +57,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
-        $this->assignmentRepository = static::$container->get(AssignmentRepository::class);
+        $this->ltiInstanceRepository = self::$container->get(LtiInstanceRepository::class);
+        $this->assignmentRepository = self::$container->get(AssignmentRepository::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithStartedAssignment.yml');
@@ -68,7 +70,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     {
         $this->kernelBrowser->request('POST', '/api/v1/lti1p1/outcome');
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
 
         $this->assertHasLogRecordWithMessage(
             "Invalid OAuth consumer key received, LTI instance with LTI key = '' cannot be found.",
@@ -100,8 +102,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             ]
         );
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
-
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
         $this->assertHasLogRecordWithMessage('Failed OAuth signature validation.', Logger::ERROR);
     }
 
@@ -142,7 +143,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->getXmlRequestTemplate(new UuidV6('00000001-0000-6000-0000-000000000000'))
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_OK);
+
         self::assertSame(
             $this->getValidReplaceResultResponseXml(
                 $messageIdentifier,
@@ -151,10 +153,9 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->kernelBrowser->getResponse()->getContent()
         );
 
-        self::assertSame(
-            Assignment::STATUS_READY,
-            $this->assignmentRepository->find(new UuidV6('00000001-0000-6000-0000-000000000000'))->getStatus()
-        );
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+
+        self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
 
         $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
     }
@@ -189,11 +190,10 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $xmlBody
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(
-            Assignment::STATUS_STARTED,
-            $this->assignmentRepository->find(new UuidV6('00000001-0000-6000-0000-000000000000'))->getStatus()
-        );
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -226,11 +226,10 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             $this->getXmlRequestTemplate($nonExistingAssignmentId)
         );
 
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame(
-            Assignment::STATUS_STARTED,
-            $this->assignmentRepository->find(new UuidV6('00000001-0000-6000-0000-000000000000'))->getStatus()
-        );
+        $this->assertApiStatusCode(Response::HTTP_NOT_FOUND);
+
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
     }
 
     private function generateSignature(LtiInstance $ltiInstance, string $time): string
@@ -256,10 +255,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
     private function getLtiInstance(): LtiInstance
     {
-        /** @var LtiInstanceRepository $repository */
-        $repository = $this->getRepository(LtiInstance::class);
-
-        $ltiInstance = $repository->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $ltiInstance = $this->ltiInstanceRepository->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertInstanceOf(LtiInstance::class, $ltiInstance);
 

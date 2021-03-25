@@ -26,6 +26,7 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use OAT\SimpleRoster\Model\UsernameCollection;
+use Symfony\Component\Uid\UuidV6;
 
 class UsernameResultSet implements Countable, IteratorAggregate
 {
@@ -35,10 +36,10 @@ class UsernameResultSet implements Countable, IteratorAggregate
     /** @var bool */
     private $hasMore;
 
-    /** @var int|null */
+    /** @var UuidV6|null */
     private $lastUserId;
 
-    public function __construct(UsernameCollection $collection, bool $hasMore, ?int $lastUserId)
+    public function __construct(UsernameCollection $collection, bool $hasMore, ?UuidV6 $lastUserId)
     {
         $this->collection = $collection;
         $this->hasMore = $hasMore;
@@ -50,7 +51,7 @@ class UsernameResultSet implements Countable, IteratorAggregate
         return $this->hasMore;
     }
 
-    public function getLastUserId(): ?int
+    public function getLastUserId(): ?UuidV6
     {
         return $this->lastUserId;
     }

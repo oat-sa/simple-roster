@@ -24,9 +24,10 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use Lcobucci\JWT\Parser;
 use Monolog\Logger;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,17 +35,19 @@ use Throwable;
 
 class LoginActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    /** @var UserRepository */
+    private $userRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->userRepository = self::$container->get(UserRepository::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -65,34 +68,19 @@ class LoginActionTest extends WebTestCase
             json_encode(['username' => 'invalid', 'password' => 'invalid'], JSON_THROW_ON_ERROR, 512)
         );
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Invalid credentials.', $decodedResponse['error']);
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
+        $this->assertApiErrorResponse('Invalid credentials.');
     }
 
     public function testSuccessfulAuthentication(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/token',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ],
-            json_encode(['username' => 'user1', 'password' => 'password'], JSON_THROW_ON_ERROR, 512)
-        );
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->authenticateAs($user);
 
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $this->assertApiStatusCode(Response::HTTP_OK);
+
+        $decodedResponse = $this->getDecodedJsonApiResponse();
 
         self::assertArrayHasKey('accessToken', $decodedResponse);
         self::assertArrayHasKey('refreshToken', $decodedResponse);
@@ -118,7 +106,7 @@ class LoginActionTest extends WebTestCase
                 'context' => [
                     'cacheId' => 'jwt.refreshToken.user1',
                     'cacheTtl' => 86400,
-                ]
+                ],
             ], Logger::INFO);
         } catch (Throwable $throwable) {
             self::fail('JWT token parsing error: ' . $throwable->getMessage());

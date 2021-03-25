@@ -21,6 +21,7 @@ OAT\SimpleRoster\Entity\LineItem:
 
 OAT\SimpleRoster\Entity\User:
     user1:
+        id: <uuidV6('00000001-0000-6000-0000-000000000000')>
         username: 'user1'
         plainPassword: 'password'
         groupId: 'group_1'

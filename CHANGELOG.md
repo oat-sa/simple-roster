@@ -13,6 +13,7 @@
 ### Removed
 - Removed `isActive` column from `line_items` database table.
 - Removed `state` column from `assignments` database table.
+- Removed synchronous parallel cache warmup feature from user cache warmer command.
 
 ## 2.0.6 - 2021-03-12
 

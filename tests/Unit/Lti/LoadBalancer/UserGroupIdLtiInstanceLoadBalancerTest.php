@@ -66,7 +66,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiInstanceUrlException::class);
 
-        $this->subject->getLtiInstance(new User());
+        $this->subject->getLtiInstance((new User())->setId(new UuidV6()));
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -107,7 +107,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $user = new User();
+        $user = (new User())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
         $lineItem = new LineItem(
             new UuidV6('00000001-0000-6000-0000-000000000000'),
             'label',

@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserDtoTest extends TestCase
 {
@@ -33,7 +34,7 @@ class UserDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Username cannot be empty');
 
-        new UserDto('', 'password');
+        new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), '', 'password');
     }
 
     public function testItThrowsExceptionIfEmptyPasswordReceived(): void
@@ -41,7 +42,7 @@ class UserDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Password cannot be empty');
 
-        new UserDto('username', '');
+        new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), 'username', '');
     }
 
     public function testItThrowsExceptionIfGroupIdIsSetBuItIsEmpty(): void
@@ -49,6 +50,6 @@ class UserDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Group id cannot be empty');
 
-        new UserDto('username', 'password', '');
+        new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), 'username', 'password', '');
     }
 }

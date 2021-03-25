@@ -33,16 +33,13 @@
             </options>
         </field>
         <many-to-one field="user" target-entity="OAT\SimpleRoster\Entity\User" inversed-by="assignments" fetch="LAZY">
-            <cascade>
-                <cascade-persist/>
-            </cascade>
             <join-columns>
                 <join-column name="user_id" referenced-column-name="id" nullable="false"/>
             </join-columns>
         </many-to-one>
         <many-to-one field="lineItem" target-entity="OAT\SimpleRoster\Entity\LineItem" fetch="LAZY">
             <join-columns>
-                <join-column name="line_item_id"  referenced-column-name="id"/>
+                <join-column name="line_item_id"  referenced-column-name="id" nullable="false"/>
             </join-columns>
         </many-to-one>
         <lifecycle-callbacks>

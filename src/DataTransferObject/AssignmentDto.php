@@ -38,10 +38,10 @@ class AssignmentDto
     /** @var string */
     private $username;
 
-    /** @var int|null */
+    /** @var UuidV6|null */
     private $userId;
 
-    public function __construct(UuidV6 $id, string $state, UuidV6 $lineItemId, string $username, int $userId = null)
+    public function __construct(UuidV6 $id, string $state, UuidV6 $lineItemId, string $username, UuidV6 $userId = null)
     {
         $this->id = $id;
         $this->state = $state;
@@ -70,12 +70,12 @@ class AssignmentDto
         return $this->username;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): ?UuidV6
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): self
+    public function setUserId(UuidV6 $userId): self
     {
         $this->userId = $userId;
 

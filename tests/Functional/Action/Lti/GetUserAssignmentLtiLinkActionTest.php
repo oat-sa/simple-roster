@@ -28,12 +28,12 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,22 +41,23 @@ use Symfony\Component\Uid\UuidV6;
 
 class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
-    use UserAuthenticatorTrait;
     use LoggerTestingTrait;
-
-    /** @var KernelBrowser */
-    private $kernelBrowser;
 
     /** @var UserRepository */
     private $userRepository;
+
+    /** @var AssignmentRepository */
+    private $assignmentRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
-        $this->userRepository = static::$container->get(UserRepository::class);
+        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->assignmentRepository = self::$container->get(AssignmentRepository::class);
 
         $this->setUpDatabase();
 
@@ -69,33 +70,33 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->kernelBrowser->request('GET', '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link');
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function testItReturns405IfHttpMethodIsNotAllowed(): void
+    {
+        $this->kernelBrowser->request('POST', '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link');
+
+        $this->assertApiStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
     }
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
+
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000002-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
-            "Assignment id '00000002-0000-6000-0000-000000000000' not found for user 'user1'.",
-            $decodedResponse['error']['message']
+        $this->assertApiStatusCode(Response::HTTP_NOT_FOUND);
+        $this->assertApiErrorResponseMessage(
+            "Assignment id '00000002-0000-6000-0000-000000000000' not found for user 'user1'."
         );
     }
 
@@ -105,27 +106,20 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         Carbon::setTestNow();
 
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
+
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_CONFLICT);
+        $this->assertApiErrorResponseMessage(
             "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be started due to invalid status: " .
-            "'ready' expected, 'completed' detected.",
-            $decodedResponse['error']['message']
+            "'ready' expected, 'completed' detected."
         );
     }
 
@@ -135,20 +129,19 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
+
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        self::assertSame(
-            "Assignment with id '00000001-0000-6000-0000-000000000000' for user 'user1' is unavailable.",
-            $decodedResponse['error']['message']
+        $this->assertApiStatusCode(Response::HTTP_CONFLICT);
+        $this->assertApiErrorResponseMessage(
+            "Assignment with id '00000001-0000-6000-0000-000000000000' for user 'user1' is unavailable."
         );
 
         Carbon::setTestNow();
@@ -161,20 +154,19 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         Carbon::setTestNow(Carbon::create(2019));
 
+        $user = $this->userRepository->findByUsernameWithAssignments('username');
+
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000002-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('username')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-        self::assertSame(
-            "Assignment with id '00000002-0000-6000-0000-000000000000' for user 'username' is unavailable.",
-            $decodedResponse['error']['message']
+        $this->assertApiStatusCode(Response::HTTP_CONFLICT);
+        $this->assertApiErrorResponseMessage(
+            "Assignment with id '00000002-0000-6000-0000-000000000000' for user 'username' is unavailable."
         );
 
         Carbon::setTestNow();
@@ -185,22 +177,20 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
         $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
 
+        $user = $this->userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
+
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000003-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('userWithAllAttemptsTaken')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_CONFLICT, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_CONFLICT);
+        $this->assertApiErrorResponseMessage(
             "Assignment with id = '00000003-0000-6000-0000-000000000000' cannot be started. Maximum number of " .
-            "attempts (2) have been reached.",
-            $decodedResponse['error']['message']
+            "attempts (2) have been reached."
         );
     }
 
@@ -211,7 +201,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
+        Carbon::setTestNow(Carbon::create(2019));
+
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
@@ -221,12 +213,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
@@ -251,12 +242,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'en-EN',
                 ],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
 
-        /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+
         self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
@@ -270,7 +260,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
+        Carbon::setTestNow(Carbon::create(2019));
+
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USER_GROUP_ID;
@@ -280,12 +272,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
@@ -310,12 +301,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'en-EN',
                 ],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
 
-        /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+
         self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
@@ -335,21 +325,22 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = 'it-IT';
         $_ENV['LTI_INSTANCE_LOAD_BALANCING_STRATEGY'] = LtiInstanceLoadBalancerFactory::STRATEGY_USERNAME;
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
+        Carbon::setTestNow(Carbon::create(2019));
+
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
         $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'] = $initialLtiLaunchPresentationLocale;
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'ltiLink' => 'https://lti-instance.taocolud.org/ltiDeliveryProvider/DeliveryTool/launch/' .
                     'eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
@@ -374,12 +365,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                     'launch_presentation_return_url' => 'http://example.com/index.html',
                     'launch_presentation_locale' => 'it-IT',
                 ],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
 
-        /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+
         self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
     }
@@ -388,15 +378,13 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
+        Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
-
-        /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $this->kernelBrowser->insulate(true);
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->authenticateAs($user);
         $this->kernelBrowser->insulate(false);
         //This trick with insulation switchOn/switchOff above is needed to have
         //log test handler not missing between requests
@@ -406,11 +394,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = $this->getDecodedJsonApiResponse();
 
         $this->assertHasRecordThatPasses(
             static function (array $record) use ($assignment, $response) {
@@ -436,7 +423,9 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
+        Carbon::setTestNow(Carbon::create(2019));
+
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P3;
 
@@ -445,12 +434,12 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->getAccessToken('user1')]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_OK);
 
-        $response = json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = $this->getDecodedJsonApiResponse();
         $decodedLtiLink = urldecode($response['ltiLink']);
 
         self::assertStringContainsString('iss=https://localhost/platform', $decodedLtiLink);
@@ -462,20 +451,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         self::assertSame(LtiRequest::LTI_VERSION_1P3, $response['ltiVersion']);
         self::assertSame([], $response['ltiParams']);
 
-        /** @var Assignment $assignment */
-        $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+
         self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
         Carbon::setTestNow();
-    }
-
-    private function getAccessToken(string $username): string
-    {
-        $user = $this->userRepository->findByUsernameWithAssignments($username);
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
-
-        return $authenticationResponse['accessToken'];
     }
 }
