@@ -132,16 +132,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.175.0",
+            "version": "3.175.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "31baa9e0c4330f01eb74b8a7ef086e9d34f8391e"
+                "reference": "836564a2cef648e60fee63d3f9c5a74757aa3217"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/31baa9e0c4330f01eb74b8a7ef086e9d34f8391e",
-                "reference": "31baa9e0c4330f01eb74b8a7ef086e9d34f8391e",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/836564a2cef648e60fee63d3f9c5a74757aa3217",
+                "reference": "836564a2cef648e60fee63d3f9c5a74757aa3217",
                 "shasum": ""
             },
             "require": {
@@ -216,9 +216,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.175.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.175.3"
             },
-            "time": "2021-03-19T18:13:22+00:00"
+            "time": "2021-03-24T18:14:18+00:00"
         },
         {
             "name": "aws/aws-sdk-php-symfony",
@@ -11683,16 +11683,16 @@
         },
         {
             "name": "psalm/plugin-symfony",
-            "version": "v2.2.1",
+            "version": "v2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/psalm-plugin-symfony.git",
-                "reference": "69bc80d00d9cb484c0f3795775bcbbd70a853f2d"
+                "reference": "3a35eb7e8a494a565c6bc015eca0b3cbb5e10701"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/psalm-plugin-symfony/zipball/69bc80d00d9cb484c0f3795775bcbbd70a853f2d",
-                "reference": "69bc80d00d9cb484c0f3795775bcbbd70a853f2d",
+                "url": "https://api.github.com/repos/psalm/psalm-plugin-symfony/zipball/3a35eb7e8a494a565c6bc015eca0b3cbb5e10701",
+                "reference": "3a35eb7e8a494a565c6bc015eca0b3cbb5e10701",
                 "shasum": ""
             },
             "require": {
@@ -11741,9 +11741,9 @@
             "description": "Psalm Plugin for Symfony",
             "support": {
                 "issues": "https://github.com/psalm/psalm-plugin-symfony/issues",
-                "source": "https://github.com/psalm/psalm-plugin-symfony/tree/v2.2.1"
+                "source": "https://github.com/psalm/psalm-plugin-symfony/tree/v2.2.2"
             },
-            "time": "2021-03-03T06:31:41+00:00"
+            "time": "2021-03-23T21:07:33+00:00"
         },
         {
             "name": "sanmai/pipeline",

@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester;
 
-use Doctrine\ORM\ORMException;
-use Doctrine\Persistence\Mapping\MappingException;
+use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
@@ -46,15 +45,15 @@ class AssignmentIngester
     }
 
     /**
-     * @throws ORMException
-     * @throws UserNotFoundException
-     * @throws MappingException
      * @throws Throwable
      */
     public function ingest(AssignmentDtoCollection $assignments): void
     {
         $existingUsernames = [];
         foreach ($this->userRepository->findUsernames($assignments->getAllUsernames()) as $existingUser) {
+            if (!isset($existingUser['id'], $existingUser['username'])) {
+                throw new InvalidArgumentException('Invalid user received.');
+            }
             $existingUsernames[$existingUser['username']] = $existingUser['id'];
         }
 

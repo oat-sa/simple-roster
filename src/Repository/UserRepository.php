@@ -170,7 +170,7 @@ class UserRepository extends AbstractRepository
         foreach ($users as $user) {
             $queryParts[] = sprintf(
                 "('%s', '%s', '%s', '[]', '%s')",
-                (string)$user->getId(),
+                $user->getId(),
                 $user->getUsername(),
                 $user->getPassword(),
                 $user->getGroupId()
