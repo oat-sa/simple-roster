@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<psalm
+    <psalm
         autoloader="bin/.phpunit/phpunit-8.5-0/vendor/autoload.php"
         errorLevel="3"
         hideExternalErrors="true"
@@ -7,7 +7,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="https://getpsalm.org/schema/config"
         xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
->
+    >
     <projectFiles>
         <directory name="src"/>
         <directory name="tests"/>
@@ -24,6 +24,12 @@
                 <directory name="src/Command"/>
             </errorLevel>
         </RedundantCast>
+        <MissingPropertyType>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+                <directory name="src"/>
+            </errorLevel>
+        </MissingPropertyType>
         <PossiblyNullArrayOffset>
             <errorLevel type="suppress">
                 <file name="src/EventSubscriber/UserCacheInvalidationSubscriber.php" />
@@ -42,4 +48,4 @@
             <containerXml>var/cache/test/OAT_SimpleRoster_KernelTestDebugContainer.xml</containerXml>
         </pluginClass>
     </plugins>
-</psalm>
+    </psalm>

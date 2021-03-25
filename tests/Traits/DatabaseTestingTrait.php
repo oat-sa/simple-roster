@@ -51,7 +51,7 @@ trait DatabaseTestingTrait
     protected function loadFixtureByFilename(string $filename): void
     {
         /** @var PurgerLoader $loader */
-        $loader = static::$container->get('fidry_alice_data_fixtures.loader.doctrine');
+        $loader = self::$container->get('fidry_alice_data_fixtures.loader.doctrine');
 
         $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
     }

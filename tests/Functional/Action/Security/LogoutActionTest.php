@@ -22,33 +22,36 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use Lcobucci\JWT\Parser;
 use Monolog\Logger;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogoutActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
-    use UserAuthenticatorTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    /** @var UserRepository */
+    private $userRepository;
+
+    /** @var JwtTokenCacheIdGenerator */
+    private $jwtTokenCacheIdGenerator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->jwtTokenCacheIdGenerator = self::$container->get(JwtTokenCacheIdGenerator::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -58,36 +61,30 @@ class LogoutActionTest extends WebTestCase
 
     public function testItLogsOutProperlyTheUser(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/auth/logout',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_NO_CONTENT);
     }
 
     public function testItRemovesTokenOnLogout(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
-
-        $cacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
+        $authenticationResponse = $this->authenticateAs($user);
+        $refreshToken = $authenticationResponse->getRefreshToken();
 
         /** @var CacheItemPoolInterface $cachePool */
         $cachePool = self::$container->get('app.jwt_cache.adapter');
 
-        $refreshTokenCacheItem = $cachePool->getItem($cacheIdGenerator->generate($refreshToken));
+        $refreshTokenCacheItem = $cachePool->getItem($this->jwtTokenCacheIdGenerator->generate($refreshToken));
+
         self::assertTrue($refreshTokenCacheItem->isHit());
 
         $this->kernelBrowser->request(
@@ -95,24 +92,22 @@ class LogoutActionTest extends WebTestCase
             '/api/v1/auth/logout',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse->getAccessToken()]
         );
 
-        self::assertSame(Response::HTTP_NO_CONTENT, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_NO_CONTENT);
 
-        $refreshTokenCacheItem = $cachePool->getItem($cacheIdGenerator->generate($refreshToken));
+        $refreshTokenCacheItem = $cachePool->getItem($this->jwtTokenCacheIdGenerator->generate($refreshToken));
+
         self::assertFalse($refreshTokenCacheItem->isHit());
     }
 
     public function testItLogsRefreshTokenInvalidation(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
-
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
-        $cacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $authenticationResponse = $this->authenticateAs($user);
+        $refreshToken = $authenticationResponse->getRefreshToken();
 
         self::ensureKernelShutdown();
         $this->kernelBrowser = self::createClient();
@@ -124,13 +119,13 @@ class LogoutActionTest extends WebTestCase
             '/api/v1/auth/logout',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse->getAccessToken()]
         );
 
         $this->assertHasLogRecord([
             'message' => "Refresh token for user 'user1' has been invalidated.",
             'context' => [
-                'cacheId' => $cacheIdGenerator->generate($refreshToken),
+                'cacheId' => $this->jwtTokenCacheIdGenerator->generate($refreshToken),
             ],
         ], Logger::INFO);
     }

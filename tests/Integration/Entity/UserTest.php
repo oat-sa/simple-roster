@@ -45,7 +45,7 @@ class UserTest extends KernelTestCase
     public function testItCanRetrieveAndRemoveAssignments(): void
     {
         /** @var User $subject */
-        $subject = $this->getRepository(User::class)->find(1);
+        $subject = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));

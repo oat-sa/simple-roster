@@ -22,20 +22,21 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Ingester;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
-use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\UuidV6;
 
 class AssignmentIngesterTest extends TestCase
 {
-    /** @var NativeUserRepository|MockObject */
+    /** @var UserRepository|MockObject */
     private $userRepository;
 
     /** @var AssignmentRepository|MockObject */
@@ -48,8 +49,8 @@ class AssignmentIngesterTest extends TestCase
     {
         parent::setUp();
 
-        $this->userRepository = $this->createMock(NativeUserRepository::class);
         $this->assignmentRepository = $this->createMock(AssignmentRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->subject = new AssignmentIngester($this->userRepository, $this->assignmentRepository);
     }
@@ -91,13 +92,16 @@ class AssignmentIngesterTest extends TestCase
 
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
+        $expectedUserId1 = new UuidV6('00000111-0000-6000-0000-000000000000');
+        $expectedUserId2 = new UuidV6('00000222-0000-6000-0000-000000000000');
+
         $this->userRepository
             ->expects(self::once())
             ->method('findUsernames')
             ->with(['testUser1', 'testUser2'])
             ->willReturn([
-                ['id' => 1, 'username' => 'testUser1'],
-                ['id' => 2, 'username' => 'testUser2'],
+                ['id' => $expectedUserId1, 'username' => 'testUser1'],
+                ['id' => $expectedUserId2, 'username' => 'testUser2'],
             ]);
 
         $this->assignmentRepository
@@ -107,7 +111,61 @@ class AssignmentIngesterTest extends TestCase
 
         $this->subject->ingest($assignmentCollection);
 
-        self::assertSame(1, $assignment1->getUserId());
-        self::assertSame(2, $assignment2->getUserId());
+        self::assertTrue($expectedUserId1->equals($assignment1->getUserId()));
+        self::assertTrue($expectedUserId2->equals($assignment2->getUserId()));
+    }
+
+    public function testItThrowsExceptionIfIdKeyIsNotPresent(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid user received.');
+
+        $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
+        $assignment = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
+            Assignment::STATE_READY,
+            $lineItemId,
+            'testUser'
+        );
+
+        $assignmentCollection = new AssignmentDtoCollection(...[$assignment]);
+
+        $this->userRepository
+            ->expects(self::once())
+            ->method('findUsernames')
+            ->with(['testUser'])
+            ->willReturn([
+                ['username' => 'testUser'],
+            ]);
+
+        $this->subject->ingest($assignmentCollection);
+    }
+
+    public function testItThrowsExceptionIfUsernameKeyIsNotPresent(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid user received.');
+
+        $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
+
+        $assignment = new AssignmentDto(
+            new UuidV6('00000011-0000-6000-0000-000000000000'),
+            Assignment::STATE_READY,
+            $lineItemId,
+            'testUser'
+        );
+
+        $assignmentCollection = new AssignmentDtoCollection(...[$assignment]);
+
+        $this->userRepository
+            ->expects(self::once())
+            ->method('findUsernames')
+            ->with(['testUser'])
+            ->willReturn([
+                ['id' => '00000111-0000-6000-0000-000000000000'],
+            ]);
+
+        $this->subject->ingest($assignmentCollection);
     }
 }

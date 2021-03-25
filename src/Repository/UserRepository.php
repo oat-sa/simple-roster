@@ -23,16 +23,17 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
-use InvalidArgumentException;
+use Doctrine\Persistence\Mapping\MappingException;
+use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
+use Symfony\Component\Uid\UuidV6;
 
 class UserRepository extends AbstractRepository
 {
@@ -55,14 +56,9 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
      */
     public function findByUsernameWithAssignments(string $username): User
     {
-        if (empty($username)) {
-            throw new InvalidUsernameException('Empty username received.');
-        }
-
         /** @var User|null $user */
         $user = $this
             ->createQueryBuilder('u')
@@ -81,17 +77,11 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function findAllUsernamesPaged(
+    public function findAllUsernamesByCriteriaPaged(
         int $limit,
-        ?int $lastUserId,
+        ?UuidV6 $lastUserId,
         FindUserCriteria $criteria = null
     ): UsernameResultSet {
-        if ($limit < 1) {
-            throw new InvalidArgumentException("Invalid 'limit' parameter received.");
-        }
 
         if (null === $criteria) {
             $criteria = new FindUserCriteria();
@@ -106,7 +96,7 @@ class UserRepository extends AbstractRepository
         if (null !== $lastUserId) {
             $queryBuilder
                 ->andWhere('u.id > :lastUserId')
-                ->setParameter('lastUserId', $lastUserId);
+                ->setParameter('lastUserId', $lastUserId, 'uuid');
         }
 
         if ($criteria->hasUsernameCriterion()) {
@@ -121,13 +111,6 @@ class UserRepository extends AbstractRepository
                 ->innerJoin('a.lineItem', 'l')
                 ->andWhere('l.slug IN (:lineItemSlugs)')
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
-        }
-
-        if ($criteria->hasEuclideanDivisionCriterion()) {
-            $queryBuilder
-                ->andWhere('MOD(u.id, :modulo) = :remainder')
-                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
-                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
         }
 
         $userIds = [];
@@ -170,17 +153,49 @@ class UserRepository extends AbstractRepository
                 ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
         }
 
-        if ($criteria->hasEuclideanDivisionCriterion()) {
-            $queryBuilder
-                ->where('MOD(u.id, :modulo) = :remainder')
-                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
-                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
-        }
-
         $result = $queryBuilder
             ->getQuery()
             ->getOneOrNullResult();
 
         return null === $result ? 0 : (int)$result['number_of_users'];
+    }
+
+    /**
+     * @throws ORMException
+     * @throws MappingException
+     */
+    public function insertMultipleNatively(UserDtoCollection $users): void
+    {
+        $queryParts = [];
+        foreach ($users as $user) {
+            $queryParts[] = sprintf(
+                "('%s', '%s', '%s', '[]', '%s')",
+                $user->getId(),
+                $user->getUsername(),
+                $user->getPassword(),
+                $user->getGroupId()
+            );
+        }
+
+        $query = sprintf(
+            'INSERT INTO users (id, username, password, roles, group_id) VALUES %s',
+            implode(',', $queryParts)
+        );
+
+        $this->_em->createNativeQuery($query, new ResultSetMapping())->execute();
+        $this->_em->clear();
+    }
+
+    /**
+     * @param string[] $usernames
+     */
+    public function findUsernames(array $usernames): array
+    {
+        return ($this->createQueryBuilder('u'))
+            ->select('u.id, u.username')
+            ->where('u.username IN (:usernames)')
+            ->setParameter('usernames', $usernames)
+            ->getQuery()
+            ->getArrayResult();
     }
 }

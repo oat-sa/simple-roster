@@ -7,8 +7,6 @@
     - [Main options](#main-options)
 - [Related environment variables](#related-environment-variables)
 - [Examples](#examples)
-- [Synchronous cache warmup parallelization](#synchronous-cache-warmup-parallelization)
-    - [Example](#example)
 - [Asynchronous cache warmup with Amazon SQS](#asynchronous-cache-warmup-with-amazon-sqs)
     - [Setting up the worker](#setting-up-the-worker)
     - [Deploying to production](#deploying-to-production)
@@ -60,62 +58,6 @@ Warming up result cache entries for specific line items:
 ```shell script
 $ sudo -u www-data bin/console roster:cache-warmup:user --line-item-slugs=slug1,slug2,slug3
 ```
-
-## Synchronous cache warmup parallelization
-
-Sometimes it can be necessary to parallelize the cache warmup process due to the huge amount of users in the system. This
-can be done by applying an Euclidean division (`modulo` option) on the primary key of the users (ID) and by launching 
-multiple commands in parallel with different `remainder` option. 
-
-| Option | Description |
-| ------------- |:---------------|
-| -m, --modulo | Modulo (M) of Euclidean division A = M*Q + R (0 ≤ R < M), where A = user id, Q = quotient, R = 'remainder' option. |
-| -r, --remainder | Remainder (R) of Euclidean division A = M*Q + R (0 ≤ R < M), where A = user id, Q = quotient, M = 'modulo' option. |
-
-### Example
-
-Let's assume we would like to parallelize the cache warmup by launching `4` instances of the command in separate screens:
-
-First let's warmup the cache for all users where `ID % 4 === 0`.
-
-```shell script
-$ screen -S cache-warmup-0
-$ sudo -u www-data bin/console roster:cache-warmup:user --modulo=4 --remainder=0
-```
-
-Exit from screen `cache-warmup-0` by pressing `CTRL+A` then `CTRL+D`.
-
-Now let's warmup the cache for all users where `ID % 4 === 1`.
-
-```shell script
-$ screen -S cache-warmup-1
-$ sudo -u www-data bin/console roster:cache-warmup:user --modulo=4 --remainder=1
-```
-
-Exit from screen `cache-warmup-1` by pressing `CTRL+A` then `CTRL+D`.
-
-Now let's warmup the cache for all users where `ID % 4 === 2`.
-
-```shell script
-$ screen -S cache-warmup-2
-$ sudo -u www-data bin/console roster:cache-warmup:user --modulo=4 --remainder=2
-```
-
-Exit from screen `cache-warmup-2` by pressing `CTRL+A` then `CTRL+D`.
-
-Now let's warmup the cache for all users where `ID % 4 === 3`.
-
-```shell script
-$ screen -S cache-warmup-3
-$ sudo -u www-data bin/console roster:cache-warmup:user --modulo=4 --remainder=3
-```
-
-Exit from screen `cache-warmup-3` by pressing `CTRL+A` then `CTRL+D`.
-
-Once all the commands have finished, the result cache should be warmed up for all the users in the system.
-
-> **Important** - Always take into account the physical limitations of your web server, database instance and cache server 
-> before deciding how many command instances to launch in parallel.
 
 ## Asynchronous cache warmup with Amazon SQS
 

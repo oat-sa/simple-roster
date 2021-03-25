@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository\Criteria;
 
-use Exception;
-
 class FindUserCriteria
 {
     /** @var string[] */
@@ -31,9 +29,6 @@ class FindUserCriteria
 
     /** @var string[] */
     private $lineItemSlugs = [];
-
-    /** @var EuclideanDivisionCriterion|null */
-    private $euclideanDivisionCriterion;
 
     public function addUsernameCriterion(string ...$usernames): self
     {
@@ -73,29 +68,5 @@ class FindUserCriteria
     public function hasLineItemSlugCriterion(): bool
     {
         return !empty($this->lineItemSlugs);
-    }
-
-    public function addEuclideanDivisionCriterion(EuclideanDivisionCriterion $criterion): self
-    {
-        $this->euclideanDivisionCriterion = $criterion;
-
-        return $this;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getEuclideanDivisionCriterion(): EuclideanDivisionCriterion
-    {
-        if (null === $this->euclideanDivisionCriterion) {
-            throw new Exception('Criterion is not defined.');
-        }
-
-        return $this->euclideanDivisionCriterion;
-    }
-
-    public function hasEuclideanDivisionCriterion(): bool
-    {
-        return null !== $this->euclideanDivisionCriterion;
     }
 }

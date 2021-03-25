@@ -76,7 +76,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
         $loginHint = 'user1::00000001-0000-6000-0000-000000000000';
         $loginHintDto = new LoginHintDto('user1', new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        $user = $this->getRepository(User::class)->find(1);
+        $user = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $this->loginHintExtractor
             ->expects(self::once())
@@ -114,7 +114,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             'Assignment with ID 00000099-0000-6000-0000-000000000000 not found for username user1.'
         );
 
-        $user = $this->getRepository(User::class)->find(1);
+        $user = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $loginHint = 'user1::00000099-0000-6000-0000-000000000000';
         $loginHintDto = new LoginHintDto('user1', new UuidV6('00000099-0000-6000-0000-000000000000'));

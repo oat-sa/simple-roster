@@ -5,6 +5,9 @@
 ### Changed
 - Changed identifier generation strategy of entities from `auto increment` to `uuid`.
 
+### Removed
+- Removed synchronous parallel cache warmup feature from user cache warmer command.
+
 ## 2.0.6 - 2021-03-12
 
 ### Fixed
