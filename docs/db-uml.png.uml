@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>c8c5f41b-da66-49e9-9f19-344f533c0c6a.DATABASE:simple-roster</OriginalElement>
+  <nodes>
+    <node x="92.75" y="258.0">c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.assignments</node>
+    <node x="424.0" y="0.0">c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.lti_instances</node>
+    <node x="203.0" y="0.0">c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.line_items</node>
+    <node x="0.0" y="33.0">c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.users</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.assignments" target="c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.users">
+      <point x="-49.25" y="-82.0" />
+      <point x="142.0" y="233.0" />
+      <point x="91.5" y="233.0" />
+      <point x="0.0" y="71.0" />
+    </edge>
+    <edge source="c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.assignments" target="c8c5f41b-da66-49e9-9f19-344f533c0c6a.TABLE:simple-roster.public.line_items">
+      <point x="49.25" y="-82.0" />
+      <point x="240.5" y="233.0" />
+      <point x="291.0" y="233.0" />
+      <point x="0.0" y="104.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="302.5" y="211.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+
