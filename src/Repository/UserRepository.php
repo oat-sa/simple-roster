@@ -191,16 +191,11 @@ class UserRepository extends AbstractRepository
      */
     public function findUsernames(array $usernames): array
     {
-        $query = sprintf(
-            "SELECT id, username FROM users WHERE username IN (%s)",
-            implode(',', array_map(static function (string $username): string {
-                return "'" . $username . "'";
-            }, $usernames))
-        );
-
-        $statement = $this->_em->getConnection()->prepare($query);
-        $statement->execute();
-
-        return $statement->fetchAllAssociative();
+        return ($this->createQueryBuilder('u'))
+            ->select('u.id, u.username')
+            ->where('u.username IN (:usernames)')
+            ->setParameter('usernames', $usernames)
+            ->getQuery()
+            ->getArrayResult();
     }
 }

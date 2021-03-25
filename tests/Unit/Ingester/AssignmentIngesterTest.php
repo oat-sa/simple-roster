@@ -92,8 +92,8 @@ class AssignmentIngesterTest extends TestCase
 
         $assignmentCollection = new AssignmentDtoCollection(...[$assignment1, $assignment2]);
 
-        $expectedUserId1 = '00000111-0000-6000-0000-000000000000';
-        $expectedUserId2 = '00000222-0000-6000-0000-000000000000';
+        $expectedUserId1 = new UuidV6('00000111-0000-6000-0000-000000000000');
+        $expectedUserId2 = new UuidV6('00000222-0000-6000-0000-000000000000');
 
         $this->userRepository
             ->expects(self::once())
@@ -111,8 +111,8 @@ class AssignmentIngesterTest extends TestCase
 
         $this->subject->ingest($assignmentCollection);
 
-        self::assertSame($expectedUserId1, (string)$assignment1->getUserId());
-        self::assertSame($expectedUserId2, (string)$assignment2->getUserId());
+        self::assertTrue($expectedUserId1->equals($assignment1->getUserId()));
+        self::assertTrue($expectedUserId2->equals($assignment2->getUserId()));
     }
 
     public function testItThrowsExceptionIfIdKeyIsNotPresent(): void

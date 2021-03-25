@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Tests\Traits;
 
 use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Tests\Utils\AuthenticationResponse;
+use OAT\SimpleRoster\Tests\Helpers\Authentication\AuthenticationResponse;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Utils;
+namespace OAT\SimpleRoster\Tests\Helpers\Authentication;
 
 use Lcobucci\JWT\Token;
 
