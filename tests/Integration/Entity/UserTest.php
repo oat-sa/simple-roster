@@ -56,6 +56,11 @@ class UserTest extends KernelTestCase
         self::assertCount(1, $subject->getAvailableAssignments());
 
         self::assertSame($assignment, current($subject->getAvailableAssignments()));
+
+        $subject->removeAssignment($assignment);
+
+        self::assertEmpty($subject->getAssignments());
+        self::assertEmpty($subject->getAvailableAssignments());
     }
 
     public function testItThrowsExceptionIfUserHasNoAssignments(): void
