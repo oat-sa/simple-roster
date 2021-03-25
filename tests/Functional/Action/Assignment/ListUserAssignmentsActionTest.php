@@ -25,28 +25,27 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Assignment;
 use Carbon\Carbon;
 use DateTimeInterface;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListUserAssignmentsActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
-    use UserAuthenticatorTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    /** @var UserRepository */
+    private $userRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+        $this->userRepository = self::$container->get(UserRepository::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -56,106 +55,93 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/assignments');
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
-            'Full authentication is required to access this resource.',
-            $decodedResponse
-        );
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
+        $this->assertApiResponse('Full authentication is required to access this resource.');
     }
 
     public function testItReturnListOfUserAssignmentsWhenCurrentDateMatchesLineItemAvailability(): void
     {
         Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
-
         $startDate = $lineItem->getStartAt();
         $endDate = $lineItem->getEndAt();
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame([
-            'assignments' => [
-                [
-                    'id' => (string)$user->getLastAssignment()->getId(),
-                    'username' => $user->getUsername(),
-                    'state' => Assignment::STATE_READY,
-                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
-                    'lineItem' => [
-                        'uri' => $lineItem->getUri(),
-                        'label' => $lineItem->getLabel(),
-                        'status' => $lineItem->getStatus(),
-                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
-                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
-                        'maxAttempts' => $lineItem->getMaxAttempts(),
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
+            [
+                'assignments' => [
+                    [
+                        'id' => (string)$user->getLastAssignment()->getId(),
+                        'username' => $user->getUsername(),
+                        'state' => Assignment::STATE_READY,
+                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                        'lineItem' => [
+                            'uri' => $lineItem->getUri(),
+                            'label' => $lineItem->getLabel(),
+                            'status' => $lineItem->getStatus(),
+                            'startDateTime' => $startDate instanceof DateTimeInterface
+                                ? $startDate->getTimestamp()
+                                : '',
+                            'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                            'maxAttempts' => $lineItem->getMaxAttempts(),
+                        ],
                     ],
                 ],
-            ],
-        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
+            ]
+        );
     }
 
     public function testItReturnListOfUserAssignmentsEvenWhenCurrentDateDoesNotMatchLineItemAvailability(): void
     {
         Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/assignments',
             [],
             [],
-            ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse['accessToken']]
+            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
         );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
-
         $startDate = $lineItem->getStartAt();
         $endDate = $lineItem->getEndAt();
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-        self::assertSame([
-            'assignments' => [
-                [
-                    'id' => (string)$user->getLastAssignment()->getId(),
-                    'username' => $user->getUsername(),
-                    'state' => Assignment::STATE_READY,
-                    'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
-                    'lineItem' => [
-                        'uri' => $lineItem->getUri(),
-                        'label' => $lineItem->getLabel(),
-                        'status' => $lineItem->getStatus(),
-                        'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
-                        'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
-                        'maxAttempts' => $lineItem->getMaxAttempts(),
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
+            [
+                'assignments' => [
+                    [
+                        'id' => (string)$user->getLastAssignment()->getId(),
+                        'username' => $user->getUsername(),
+                        'state' => Assignment::STATE_READY,
+                        'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
+                        'lineItem' => [
+                            'uri' => $lineItem->getUri(),
+                            'label' => $lineItem->getLabel(),
+                            'status' => $lineItem->getStatus(),
+                            'startDateTime' => $startDate instanceof DateTimeInterface
+                                ? $startDate->getTimestamp()
+                                : '',
+                            'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
+                            'maxAttempts' => $lineItem->getMaxAttempts(),
+                        ],
                     ],
                 ],
-            ],
-        ], json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR));
+            ]
+        );
     }
 }

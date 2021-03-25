@@ -31,7 +31,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class User implements UserInterface, EntityInterface
 {
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -57,9 +57,16 @@ class User implements UserInterface, EntityInterface
         $this->assignments = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
+    }
+
+    public function setId(UuidV6 $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getUsername(): ?string

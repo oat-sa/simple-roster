@@ -27,6 +27,7 @@ use IteratorAggregate;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserDtoCollectionTest extends TestCase
 {
@@ -46,13 +47,13 @@ class UserDtoCollectionTest extends TestCase
         self::assertCount(0, $subject);
         self::assertTrue($subject->isEmpty());
 
-        $user1 = new UserDto('user1', 'password1');
+        $user1 = new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), 'user1', 'password1');
         $subject->add($user1);
 
         self::assertCount(1, $subject);
         self::assertFalse($subject->isEmpty());
 
-        $user2 = new UserDto('user2', 'password2');
+        $user2 = new UserDto(new UuidV6('00000002-0000-6000-0000-000000000000'), 'user2', 'password2');
         $subject->add($user2);
 
         self::assertCount(2, $subject);

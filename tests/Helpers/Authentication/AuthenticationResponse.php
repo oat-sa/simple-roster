@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,15 +15,36 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Exception;
+namespace OAT\SimpleRoster\Tests\Helpers\Authentication;
 
-use RuntimeException;
+use Lcobucci\JWT\Token;
 
-class InvalidUsernameException extends RuntimeException
+class AuthenticationResponse
 {
+    /** @var Token */
+    private $accessToken;
+
+    /** @var Token */
+    private $refreshToken;
+
+    public function __construct(Token $accessToken, Token $refreshToken)
+    {
+        $this->accessToken = $accessToken;
+        $this->refreshToken = $refreshToken;
+    }
+
+    public function getAccessToken(): Token
+    {
+        return $this->accessToken;
+    }
+
+    public function getRefreshToken(): Token
+    {
+        return $this->refreshToken;
+    }
 }

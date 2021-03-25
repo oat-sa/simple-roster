@@ -23,26 +23,21 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class RefreshAccessTokenActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
-    use UserAuthenticatorTrait;
-
-    /** @var KernelBrowser */
-    private $kernelBrowser;
 
     /** @var UserRepository */
     private $userRepository;
@@ -64,19 +59,19 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        $this->userRepository = static::$container->get(UserRepository::class);
-        $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
-        $this->tokenCache = static::$container->get('app.jwt_cache.adapter');
-        $this->tokenCacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->tokenGenerator = self::$container->get(JwtTokenGenerator::class);
+        $this->tokenCache = self::$container->get('app.jwt_cache.adapter');
+        $this->tokenCacheIdGenerator = self::$container->get(JwtTokenCacheIdGenerator::class);
     }
 
     public function testIfAccessTokenCanBeRefreshed(): void
     {
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->authenticateAs($user);
 
-        $initialAccessToken = $authenticationResponse['accessToken'];
+        $initialAccessToken = $authenticationResponse->getAccessToken();
 
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -84,16 +79,12 @@ class RefreshAccessTokenActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
+            json_encode(['refreshToken' => (string)$authenticationResponse->getRefreshToken()], JSON_THROW_ON_ERROR)
         );
 
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
+        $this->assertApiStatusCode(Response::HTTP_OK);
 
+        $decodedResponse = $this->getDecodedJsonApiResponse();
         self::assertArrayHasKey('accessToken', $decodedResponse);
         self::assertNotSame($initialAccessToken, $decodedResponse['accessToken']);
     }
@@ -102,16 +93,8 @@ class RefreshAccessTokenActionTest extends WebTestCase
     {
         $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/auth/refresh-token');
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame("Missing 'refreshToken' in request body.", $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->assertApiErrorResponseMessage("Missing 'refreshToken' in request body.");
     }
 
     public function testItReturnsExceptionIfInvalidRefreshTokenReceived(): void
@@ -125,16 +108,8 @@ class RefreshAccessTokenActionTest extends WebTestCase
             json_encode(['refreshToken' => 'invalidToken'], JSON_THROW_ON_ERROR)
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Invalid token.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->assertApiErrorResponseMessage('Invalid token.');
     }
 
     public function testItReturnsExceptionIfUserCannotBeFound(): void
@@ -155,23 +130,14 @@ class RefreshAccessTokenActionTest extends WebTestCase
             json_encode(['refreshToken' => (string)$tokenForNonExistingUser], JSON_THROW_ON_ERROR)
         );
 
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Invalid token.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_FORBIDDEN);
+        $this->assertApiErrorResponseMessage('Invalid token.');
     }
 
     public function testItReturnsExceptionIfRefreshTokenIsExpired(): void
     {
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
-
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
+        $authenticationResponse = $this->authenticateAs($user);
 
         Carbon::setTestNow('+2 years');
 
@@ -181,31 +147,21 @@ class RefreshAccessTokenActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
+            json_encode(['refreshToken' => (string)$authenticationResponse->getRefreshToken()], JSON_THROW_ON_ERROR)
         );
 
         Carbon::setTestNow();
 
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Expired token.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_FORBIDDEN);
+        $this->assertApiErrorResponseMessage('Expired token.');
     }
 
     public function testItReturnsExceptionIfRefreshTokenCannotBeFoundInCache(): void
     {
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
+        $authenticationResponse = $this->authenticateAs($user);
 
-        $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
-
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
-        $cacheId = $this->tokenCacheIdGenerator->generate($refreshToken);
+        $cacheId = $this->tokenCacheIdGenerator->generate($authenticationResponse->getRefreshToken());
         $this->tokenCache->deleteItem($cacheId);
 
         $this->kernelBrowser->request(
@@ -214,18 +170,10 @@ class RefreshAccessTokenActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
+            json_encode(['refreshToken' => (string)$authenticationResponse->getRefreshToken()], JSON_THROW_ON_ERROR)
         );
 
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Expired token.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_FORBIDDEN);
+        $this->assertApiErrorResponseMessage('Expired token.');
     }
 }

@@ -48,7 +48,7 @@ class AssignmentDtoCollectionTest extends TestCase
             'test',
             new UuidV6('00000001-0000-6000-0000-000000000000'),
             'testUsername',
-            1
+            new UuidV6('00000001-0000-6000-0000-000000000000')
         );
 
         $subject = (new AssignmentDtoCollection())->add($assignment);
@@ -68,7 +68,7 @@ class AssignmentDtoCollectionTest extends TestCase
                 'test',
                 new UuidV6('00000001-0000-6000-0000-000000000000'),
                 'testUsername',
-                1
+                new UuidV6('00000001-0000-6000-0000-000000000000')
             )
         );
 
@@ -78,16 +78,16 @@ class AssignmentDtoCollectionTest extends TestCase
     public function testItReturnsUniqueUsernames(): void
     {
         $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
-
+        $userId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
         $assignmentId1 = new UuidV6('00000011-0000-6000-0000-000000000000');
-        $assignment1 = new AssignmentDto($assignmentId1, 'test', $lineItemId, 'testUsername', 1);
+        $assignment1 = new AssignmentDto($assignmentId1, 'test', $lineItemId, 'testUsername', $userId);
 
         $assignmentId2 = new UuidV6('00000022-0000-6000-0000-000000000000');
-        $assignment2 = new AssignmentDto($assignmentId2, 'test', $lineItemId, 'testUsername', 1);
+        $assignment2 = new AssignmentDto($assignmentId2, 'test', $lineItemId, 'testUsername', $userId);
 
         $assignmentId3 = new UuidV6('00000033-0000-6000-0000-000000000000');
-        $assignment3 = new AssignmentDto($assignmentId3, 'test', $lineItemId, 'testUsername_2', 1);
+        $assignment3 = new AssignmentDto($assignmentId3, 'test', $lineItemId, 'testUsername_2', $userId);
 
         $subject = (new AssignmentDtoCollection())
             ->add($assignment1)

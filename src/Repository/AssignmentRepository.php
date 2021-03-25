@@ -99,10 +99,10 @@ class AssignmentRepository extends AbstractRepository
         $queryParts = [];
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "('%s', %s, '%s', '%s', %s)",
-                (string)$assignmentDto->getId(),
+                "('%s', '%s', '%s', '%s', %s)",
+                $assignmentDto->getId(),
                 $assignmentDto->getUserId(),
-                (string)$assignmentDto->getLineItemId(),
+                $assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
                 0
             );
