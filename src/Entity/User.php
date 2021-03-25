@@ -197,7 +197,7 @@ class User implements UserInterface, EntityInterface
      */
     public function getRoles(): array
     {
-        return $this->roles; // TODO test if role is added properly
+        return $this->roles;
     }
 
     /**

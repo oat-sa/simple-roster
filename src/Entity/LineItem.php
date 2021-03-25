@@ -207,6 +207,7 @@ class LineItem implements JsonSerializable, EntityInterface
     private function validateAvailabilityDates(DateTimeInterface $startAt = null, DateTimeInterface $endAt = null): void
     {
         if (null !== $startAt && null !== $endAt && $startAt >= $endAt) {
+            var_dump($startAt, $endAt);
             throw new InvalidArgumentException(
                 "Invalid availability dates received. 'endAt' must be greater than 'startAt'."
             );
