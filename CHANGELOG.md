@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.7 - 2021-03-27
+
+### Fixed
+- Fixed memory leak in user cache warmup process.
+
 ## 2.0.6 - 2021-03-12
 
 ### Fixed
