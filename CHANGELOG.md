@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 2.0.6 - 2021-03-12
 
 ### Added
 - Added possibility to limit the number of requests per endpoint based on a fixed window.
@@ -8,6 +8,7 @@
 - Added `LOCK_DSN` environment variable
 
 ### Fixed
+- Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
 - Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 
   We now convert the input date(s) to UTC before persisting it.
 
