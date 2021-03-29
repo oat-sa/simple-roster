@@ -13,6 +13,11 @@
 - Removed `isActive` column from `line_items` database table.
 - Removed synchronous parallel cache warmup feature from user cache warmer command.
 
+## 2.0.7 - 2021-03-27
+
+### Fixed
+- Fixed memory leak in user cache warmup process.
+
 ## 2.0.6 - 2021-03-12
 
 ### Fixed
