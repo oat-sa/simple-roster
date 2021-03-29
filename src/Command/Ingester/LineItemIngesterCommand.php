@@ -172,11 +172,11 @@ EOF
     private function createLineItem(array $rawLineItem): LineItem
     {
         $startAt = isset($rawLineItem['startTimestamp'])
-            ? (new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp'])
+            ? DateTime::createFromFormat('U', $rawLineItem['startTimestamp'])
             : null;
 
         $endAt = isset($rawLineItem['endTimestamp'])
-            ? (new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp'])
+            ? DateTime::createFromFormat('U', $rawLineItem['endTimestamp'])
             : null;
 
         return new LineItem(
