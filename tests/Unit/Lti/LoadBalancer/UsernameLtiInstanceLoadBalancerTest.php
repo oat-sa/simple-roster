@@ -96,7 +96,14 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $lineItem = (new LineItem())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
         $assignment = (new Assignment())->setLineItem($lineItem);
 
         self::assertSame('00000001-0000-6000-0000-000000000000', $this->subject->getLtiRequestContextId($assignment));

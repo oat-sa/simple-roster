@@ -171,20 +171,23 @@ EOF
 
     private function createLineItem(array $rawLineItem): LineItem
     {
-        $lineItem =
-            (new LineItem())
-                ->setId(new UuidV6())
-                ->setUri($rawLineItem['uri'])
-                ->setLabel($rawLineItem['label'])
-                ->setSlug($rawLineItem['slug'])
-                ->setMaxAttempts((int)$rawLineItem['maxAttempts']);
+        $startAt = isset($rawLineItem['startTimestamp']) && !(empty($rawLineItem['startTimestamp']))
+            ? (new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp'])
+            : null;
 
-        if (isset($rawLineItem['startTimestamp']) && $rawLineItem['endTimestamp']) {
-            $lineItem
-                ->setStartAt((new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp']))
-                ->setEndAt((new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp']));
-        }
+        $endAt = isset($rawLineItem['endTimestamp']) && !(empty($rawLineItem['endTimestamp']))
+            ? (new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp'])
+            : null;
 
-        return $lineItem;
+        return new LineItem(
+            new UuidV6(),
+            $rawLineItem['label'],
+            $rawLineItem['uri'],
+            $rawLineItem['slug'],
+            LineItem::STATUS_ENABLED,
+            (int)$rawLineItem['maxAttempts'],
+            $startAt,
+            $endAt
+        );
     }
 }

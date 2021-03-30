@@ -98,7 +98,14 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->method('find')
             ->willReturn($this->createMock(Registration::class));
 
-        $lineItem = (new LineItem())->setSlug('testSlug');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
 
         $assignment = (new Assignment())
             ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))

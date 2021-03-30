@@ -71,11 +71,14 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(1);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
@@ -110,11 +113,14 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(2);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            2
+        );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
@@ -149,10 +155,13 @@ class CompleteUserAssignmentServiceTest extends TestCase
     {
         $user = (new User())->setUsername('expectedUsername');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
 

@@ -27,7 +27,6 @@ use Monolog\Logger;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
-use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -38,7 +37,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class UserCacheWarmerServiceTest extends KernelTestCase
 {
     use LoggerTestingTrait;
-    use DatabaseTestingTrait;
 
     /** @var UserCacheWarmerService */
     private $subject;

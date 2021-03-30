@@ -1,11 +1,14 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem2:
-        label: 'The first line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 2
+        __construct:
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
+            label: 'The first line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 2
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment2:
@@ -19,4 +22,4 @@ OAT\SimpleRoster\Entity\User:
         username: 'userWithAllAttemptsTaken'
         plainPassword: 'password'
         groupId: 'group_1'
-        assignments: ['@assignment2']
+        assignments: [ '@assignment2' ]

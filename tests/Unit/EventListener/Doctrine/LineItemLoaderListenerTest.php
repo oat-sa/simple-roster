@@ -55,7 +55,13 @@ class LineItemLoaderListenerTest extends TestCase
 
     public function testItSetLineItemFromRepositoryOnPostLoadEvent(): void
     {
-        $expectedLineItem = (new LineItem())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $expectedLineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->lineItemRepository
             ->expects(self::once())

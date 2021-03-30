@@ -89,7 +89,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'lineItem' => [
                             'uri' => $lineItem->getUri(),
                             'label' => $lineItem->getLabel(),
-                            'isActive' => $lineItem->isActive(),
+                            'status' => $lineItem->getStatus(),
                             'startDateTime' => $startDate instanceof DateTimeInterface
                                 ? $startDate->getTimestamp()
                                 : '',
@@ -132,7 +132,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'lineItem' => [
                             'uri' => $lineItem->getUri(),
                             'label' => $lineItem->getLabel(),
-                            'isActive' => $lineItem->isActive(),
+                            'status' => $lineItem->getStatus(),
                             'startDateTime' => $startDate instanceof DateTimeInterface
                                 ? $startDate->getTimestamp()
                                 : '',

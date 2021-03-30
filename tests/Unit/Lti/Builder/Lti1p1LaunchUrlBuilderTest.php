@@ -53,10 +53,18 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
         $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
         $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'http://test-uri.com',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
         $assignment = (new Assignment())
             ->setId(new UuidV6('00000010-0000-6000-0000-000000000000'))
             ->setUser((new User())->setUsername('testUser'))
-            ->setLineItem((new LineItem())->setUri('http://test-uri.com'));
+            ->setLineItem($lineItem);
 
         $subject = new Lti1p1LaunchUrlBuilder($router, $loadBalancer, $ltiConfiguration);
 

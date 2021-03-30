@@ -39,8 +39,6 @@ trait LoggerTestingTrait
 
     protected function setUpTestLogHandler(string ...$channels): void
     {
-        static::ensureKernelTestCase();
-
         /** @var Logger $logger */
         $logger = self::$container->get(LoggerInterface::class);
         $this->handler = new TestHandler();

@@ -1,14 +1,18 @@
 OAT\SimpleRoster\Entity\LineItem:
     line_item_{1..2}]:
-        id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
-        label: 'line_item_<current()>'
-        uri: 'https://test.taocloud.fr/__n/<current()>/'
-        slug: 'slug-<current()>'
+        __construct:
+            id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
+            label: 'line_item_<current()>'
+            uri: 'https://test.taocloud.fr/__n/<current()>/'
+            slug: 'slug-<current()>'
+            status: 'enabled'
     line_item_qqy:
-        id: <uuidV6('00000003-0000-6000-0000-000000000000')>
-        label: 'line_item_qqy'
-        uri: 'https://test.taocloud.fr/__n/qqy/'
-        slug: 'slug-qqy'
-        startAt: '<dateTime()>'
-        endAt: '<dateTime()>'
-        maxAttempts: 3
+        __construct:
+            id: <uuidV6('00000003-0000-6000-0000-000000000000')>
+            label: 'line_item_qqy'
+            uri: 'https://test.taocloud.fr/__n/qqy/'
+            slug: 'slug-qqy'
+            status: 'enabled'
+            startAt: '<dateTime()>'
+            endAt: '<dateTimeBetween($startAt, "+1 days")>'
+            maxAttempts: 3

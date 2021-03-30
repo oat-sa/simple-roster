@@ -25,10 +25,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\Bulk;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
-use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Entity\User;
-use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
@@ -42,12 +38,6 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     /** @var BulkCreateUsersAssignmentsService */
     private $subject;
 
-    /** @var EntityManagerInterface|MockObject */
-    private $entityManager;
-
-    /** @var UserCacheWarmerService|MockObject */
-    private $userCacheWarmerService;
-
     /** @var UserRepository|MockObject */
     private $userRepository;
 
@@ -58,59 +48,16 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->userCacheWarmerService = $this->createMock(UserCacheWarmerService::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->entityManager
-            ->method('getRepository')
-            ->with(User::class)
-            ->willReturn($this->userRepository);
-
         $this->subject = new BulkCreateUsersAssignmentsService(
-            $this->entityManager,
-            $this->userCacheWarmerService,
+            $entityManager,
+            $this->userRepository,
+            $this->createMock(UserCacheWarmerService::class),
             $this->logger
         );
-    }
-
-    public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
-    {
-        $user = (new User())->addAssignment((new Assignment())
-            ->setState(Assignment::STATE_READY)
-            ->setLineItem(new LineItem()));
-
-        $this->userRepository
-            ->method('findByUsernameWithAssignments')
-            ->willReturnCallback(static function (string $username) use ($user) {
-                return $user->setUsername($username);
-            });
-
-        $expectedFailingOperation = new BulkOperation('expectedFailure', BulkOperation::TYPE_UPDATE);
-        $successfulOperation = new BulkOperation('test', BulkOperation::TYPE_CREATE);
-
-        $bulkOperationCollection = (new BulkOperationCollection())
-            ->add($expectedFailingOperation)
-            ->add($successfulOperation);
-
-        $this->logger
-            ->expects(self::once())
-            ->method('error')
-            ->with(
-                'Bulk assignments create error: wrong type.',
-                ['operation' => $expectedFailingOperation],
-            );
-
-        self::assertSame([
-            'data' => [
-                'applied' => false,
-                'results' => [
-                    'expectedFailure' => false,
-                    'test' => true,
-                ],
-            ],
-        ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
     }
 
     public function testItLogsUnexpectedException(): void
@@ -138,57 +85,5 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
                 ],
             ],
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
-    }
-
-    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
-    {
-        $expectedLineItem = new LineItem();
-
-        $this->userRepository
-            ->method('findByUsernameWithAssignments')
-            ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
-                return (new User())
-                    ->setUsername($username)
-                    ->addAssignment((new Assignment())->setLineItem($expectedLineItem));
-            });
-
-        $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_CREATE))
-            ->add(new BulkOperation('test1', BulkOperation::TYPE_CREATE))
-            ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->userCacheWarmerService
-            ->expects(self::once())
-            ->method('process')
-            ->with(
-                self::callback(static function (UsernameCollection $collection): bool {
-                    return $collection->count() === 3
-                        && $collection->getIterator()->getArrayCopy() === ['test', 'test1', 'test2'];
-                })
-            );
-
-        $this->logger
-            ->expects(self::exactly(3))
-            ->method('info')
-            ->withConsecutive(
-                [
-                    "Successful assignment creation (username = 'test').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment creation (username = 'test1').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment creation (username = 'test2').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-            );
-
-        $this->subject->process($bulkOperationCollection);
     }
 }

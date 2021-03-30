@@ -61,7 +61,13 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             "Assignment with id '00000001-0000-6000-0000-000000000000' does not have a suitable state."
         );
 
-        $lineItem = new LineItem();
+        $lineItem = $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
         $assignment = (new Assignment())
             ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->setLineItem($lineItem)
@@ -87,7 +93,14 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             "Assignment with id '00000001-0000-6000-0000-000000000000' has reached the maximum attempts."
         );
 
-        $lineItem = (new LineItem())->setMaxAttempts($maxAttempts);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            $maxAttempts
+        );
 
         $assignment = (new Assignment())
             ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
@@ -112,9 +125,14 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
     ): void {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
-        $lineItem = (new LineItem())
-            ->setMaxAttempts($maxAttempts)
-            ->setUri('http://test-delivery-uri.html');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            $maxAttempts
+        );
 
         $user = (new User())->setUsername('testUsername');
 

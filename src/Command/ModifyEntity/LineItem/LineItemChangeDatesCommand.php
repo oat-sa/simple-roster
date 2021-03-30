@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 use Carbon\Carbon;
 use DateTime;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Psr\Log\LoggerInterface;
@@ -197,9 +198,9 @@ EOF
                 return 0;
             }
 
+            /** @var LineItem $lineItem */
             foreach ($lineItemsCollection as $lineItem) {
-                $lineItem->setStartAt($this->startDate);
-                $lineItem->setEndAt($this->endDate);
+                $lineItem->setAvailabilityDates($this->startDate, $this->endDate);
 
                 $this->lineItemRepository->persist($lineItem);
 
