@@ -171,11 +171,11 @@ EOF
 
     private function createLineItem(array $rawLineItem): LineItem
     {
-        $startAt = isset($rawLineItem['startTimestamp'])
+        $startAt = isset($rawLineItem['startTimestamp']) && !(empty($rawLineItem['startTimestamp']))
             ? (new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp'])
             : null;
 
-        $endAt = isset($rawLineItem['endTimestamp'])
+        $endAt = isset($rawLineItem['endTimestamp']) && !(empty($rawLineItem['endTimestamp']))
             ? (new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp'])
             : null;
 
