@@ -35,7 +35,7 @@ use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BulkUpdateUsersAssignmentsStateService
+class BulkUpdateUsersAssignmentsStatusService
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -65,7 +65,7 @@ class BulkUpdateUsersAssignmentsStateService
                 continue;
             }
 
-            $this->validateStateAttribute($operation);
+            $this->validateStatusAttribute($operation);
 
             try {
                 $this->processOperation($operation, $result);
@@ -101,7 +101,6 @@ class BulkUpdateUsersAssignmentsStateService
 
     /**
      * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
      */
     private function processOperation(BulkOperation $operation, BulkResult $result): void
     {
@@ -128,13 +127,13 @@ class BulkUpdateUsersAssignmentsStateService
     /**
      * @throws LogicException
      */
-    private function validateStateAttribute(BulkOperation $operation): void
+    private function validateStatusAttribute(BulkOperation $operation): void
     {
-        if ($operation->getAttribute('state') !== Assignment::STATUS_CANCELLED) {
+        if ($operation->getAttribute('status') !== Assignment::STATUS_CANCELLED) {
             throw new LogicException(
                 sprintf(
                     "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
-                    $operation->getAttribute('state'),
+                    $operation->getAttribute('status'),
                     Assignment::STATUS_CANCELLED
                 )
             );
