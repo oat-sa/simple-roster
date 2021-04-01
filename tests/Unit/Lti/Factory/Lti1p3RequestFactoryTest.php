@@ -87,7 +87,21 @@ class Lti1p3RequestFactoryTest extends TestCase
             ->with('registrationId')
             ->willReturn(null);
 
-        $this->subject->create(new Assignment());
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $this->subject->create(
+            new Assignment(
+                new UuidV6('00000001-0000-6000-0000-000000000000'),
+                Assignment::STATUS_READY,
+                $lineItem
+            )
+        );
     }
 
     public function testItReturnsAssignmentLtiRequest(): void
@@ -107,9 +121,11 @@ class Lti1p3RequestFactoryTest extends TestCase
             1
         );
 
-        $assignment = (new Assignment())
-            ->setId(new UuidV6('00000001-0000-6000-0000-000000000000'))
-            ->setLineItem($lineItem);
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
 
         $message = $this->createMock(LtiMessageInterface::class);
         $message

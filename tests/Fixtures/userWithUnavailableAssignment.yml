@@ -12,10 +12,11 @@ OAT\SimpleRoster\Entity\LineItem:
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment1:
-        id: <uuidV6(00000002-0000-6000-0000-000000000000)>
-        lineItem: '@lineItemUnavailable'
-        state: 'ready'
-        attemptsCount: 1
+        __construct:
+            id: <uuidV6(00000002-0000-6000-0000-000000000000)>
+            lineItem: '@lineItemUnavailable'
+            status: 'ready'
+            attemptsCount: 1
 
 OAT\SimpleRoster\Entity\User:
     user1:

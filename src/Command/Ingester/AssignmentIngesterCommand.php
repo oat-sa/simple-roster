@@ -126,7 +126,7 @@ EOF
 
                 $assignmentDto = new AssignmentDto(
                     new UuidV6(),
-                    Assignment::STATE_READY,
+                    Assignment::STATUS_READY,
                     $lineItem->getId(),
                     $rawAssignment['username']
                 );

@@ -130,10 +130,8 @@ class User implements UserInterface, EntityInterface
      */
     public function getCancellableAssignments(): Collection
     {
-        $assignments = $this->getAssignments();
-
         $list = new ArrayCollection();
-        foreach ($assignments as $assignment) {
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->isCancellable()) {
                 $list->add($assignment);
             }
@@ -152,9 +150,20 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
+    /**
+     * @throws AssignmentNotFoundException
+     */
     public function getLastAssignment(): Assignment
     {
-        return $this->assignments->last();
+        $lastAssignment = $this->assignments->last();
+
+        if (!$lastAssignment instanceof Assignment) {
+            throw new AssignmentNotFoundException(
+                sprintf("User '%s' does not have any assignments.", $this->username)
+            );
+        }
+
+        return $lastAssignment;
     }
 
     public function removeAssignment(Assignment $assignment): self
@@ -204,9 +213,9 @@ class User implements UserInterface, EntityInterface
      * @throws AssignmentNotFoundException
      * @throws AssignmentUnavailableException
      */
-    public function getAvailableAssignmentById(UuidV6 $assignmentId): Assignment
+    public function getAvailableAssignmentById(string $assignmentId): Assignment
     {
-        $assignment = $this->getAssignmentById($assignmentId);
+        $assignment = $this->getAssignmentById(new UuidV6($assignmentId));
 
         if ($assignment->isAvailable()) {
             return $assignment;

@@ -32,14 +32,20 @@ OAT\SimpleRoster\Entity\LineItem:
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment_1:
-        lineItem: '@lineItem'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            lineItem: '@lineItem'
+            status: 'ready'
     assignment_2:
-        lineItem: '@lineItem2'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            lineItem: '@lineItem2'
+            status: 'ready'
     assignment_3:
-        lineItem: '@lineItem3'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            lineItem: '@lineItem3'
+            status: 'ready'
 
 OAT\SimpleRoster\Entity\User:
     user_{1..3}:

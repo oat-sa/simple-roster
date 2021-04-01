@@ -61,10 +61,15 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
             LineItem::STATUS_ENABLED
         );
 
-        $assignment = (new Assignment())
-            ->setId(new UuidV6('00000010-0000-6000-0000-000000000000'))
-            ->setUser((new User())->setUsername('testUser'))
-            ->setLineItem($lineItem);
+        $user = (new User())->setUsername('testUser');
+
+        $assignment = new Assignment(
+            new UuidV6('00000010-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
+
+        $user->addAssignment($assignment);
 
         $subject = new Lti1p1LaunchUrlBuilder($router, $loadBalancer, $ltiConfiguration);
 

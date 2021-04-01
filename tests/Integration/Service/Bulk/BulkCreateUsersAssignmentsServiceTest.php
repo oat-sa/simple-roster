@@ -86,8 +86,8 @@ class BulkCreateUsersAssignmentsServiceTest extends KernelTestCase
             $userAssignments = $user->getAssignments();
 
             self::assertCount(2, $userAssignments);
-            self::assertSame(Assignment::STATE_CANCELLED, $userAssignments[0]->getState());
-            self::assertSame(Assignment::STATE_READY, $userAssignments[1]->getState());
+            self::assertSame(Assignment::STATUS_CANCELLED, $userAssignments[0]->getStatus());
+            self::assertSame(Assignment::STATUS_READY, $userAssignments[1]->getStatus());
         }
     }
 

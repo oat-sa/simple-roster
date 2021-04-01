@@ -60,13 +60,14 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->assignmentRepository = self::$container->get(AssignmentRepository::class);
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler();
     }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         $this->kernelBrowser->request('GET', '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link');
 
         $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
@@ -81,6 +82,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
         $this->kernelBrowser->request(
@@ -99,12 +102,11 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentDoesNotHaveASuitableState(): void
     {
+        $this->loadFixtureByFilename('userWithCompletedAssignment.yml');
+
         Carbon::setTestNow();
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
-
-        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
-        $this->getEntityManager()->flush();
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
@@ -116,13 +118,16 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertApiStatusCode(Response::HTTP_CONFLICT);
         $this->assertApiErrorResponseMessage(
-            "Assignment with id '00000001-0000-6000-0000-000000000000' does not have a suitable state."
+            "Assignment with id = '00000001-0000-6000-0000-000000000000' cannot be started due to invalid status: " .
+            "'ready' expected, 'completed' detected."
         );
     }
 
     public function testItReturns409IfAssignmentIsNotAvailable(): void
     {
         Carbon::setTestNow(Carbon::create(2100));
+
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
 
@@ -144,9 +149,10 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfLineItemIsNotAvailable(): void
     {
-        Carbon::setTestNow(Carbon::create(2019));
-
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
         $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
+
+        Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('username');
 
@@ -168,6 +174,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns409IfAssignmentHasReachedMaximumAttempts(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
         $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
 
         $user = $this->userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
@@ -182,7 +189,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->assertApiStatusCode(Response::HTTP_CONFLICT);
         $this->assertApiErrorResponseMessage(
-            "Assignment with id '00000003-0000-6000-0000-000000000000' has reached the maximum attempts."
+            "Assignment with id = '00000003-0000-6000-0000-000000000000' cannot be started. Maximum number of " .
+            "attempts (2) have been reached."
         );
     }
 
@@ -191,6 +199,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUsernameLoadBalancerStrategy(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
@@ -237,7 +247,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
         Carbon::setTestNow();
@@ -248,6 +258,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLtiLinkAndUpdatedAssignmentAndAttemptsCountWithUserGroupIdLoadBalancerStrategy(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
@@ -294,7 +306,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
         Carbon::setTestNow();
@@ -305,6 +317,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLoadBalancedLtiLinkAndUpdatedAssignmentStateToStartedAndIncrementsAttemptsCount(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         $initialLtiLaunchPresentationLocale = $_ENV['LTI_LAUNCH_PRESENTATION_LOCALE'];
 
         $_ENV['LTI_VERSION'] = LtiRequest::LTI_VERSION_1P1;
@@ -356,41 +370,14 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
-    }
-
-    public function testItDoesNotUpdateStateAndAttemptsCountIfStateIsStarted(): void
-    {
-        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
-        $assignment->setState(Assignment::STATE_STARTED);
-
-        $this->getEntityManager()->flush();
-
-        Carbon::setTestNow(Carbon::create(2019));
-
-        $user = $this->userRepository->findByUsernameWithAssignments('user1');
-
-        $this->kernelBrowser->request(
-            Request::METHOD_GET,
-            '/api/v1/assignments/00000001-0000-6000-0000-000000000000/lti-link',
-            [],
-            [],
-            ['HTTP_Authorization' => 'Bearer ' . $this->authenticateAs($user)->getAccessToken()]
-        );
-
-        $this->assertApiStatusCode(Response::HTTP_OK);
-
-        $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
-
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
-        self::assertSame(1, $assignment->getAttemptsCount());
-
-        Carbon::setTestNow();
     }
 
     public function testItLogsSuccessfulLtiRequestCreation(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
@@ -410,19 +397,17 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             ['HTTP_Authorization' => 'Bearer ' . $authenticationResponse->getAccessToken()]
         );
 
-        $ltiRequestInResponse = $this->getDecodedJsonApiResponse();
-
-        self::assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+        $response = $this->getDecodedJsonApiResponse();
 
         $this->assertHasRecordThatPasses(
-            static function (array $record) use ($assignment, $ltiRequestInResponse) {
+            static function (array $record) use ($assignment, $response) {
                 /** @var LtiRequest $ltiRequest */
-                $ltiRequest = $record['context']['ltiRequest'];
+                $ltiRequest = $record['context']['ltiRequest'] ?? null;
 
                 return
                     $record['message'] === "LTI request was successfully generated for assignment with " .
                     "id='00000001-0000-6000-0000-000000000000'"
-                    && $ltiRequest->jsonSerialize() === $ltiRequestInResponse
+                    && $ltiRequest->jsonSerialize() === $response
                     && $record['context']['lineItem'] === $assignment->getLineItem();
             },
             Logger::INFO
@@ -436,6 +421,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
      */
     public function testItReturnsLti1p3Link(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         Carbon::setTestNow(Carbon::create(2019));
 
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
@@ -466,7 +453,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(2, $assignment->getAttemptsCount());
 
         Carbon::setTestNow();

@@ -26,7 +26,8 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
-use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
+use OAT\SimpleRoster\Lti\Factory\LtiRequestFactoryInterface;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Psr\Log\LoggerInterface;
@@ -34,15 +35,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\UuidV6;
 
 class GetUserAssignmentLtiLinkAction
 {
     /** @var SerializerResponder */
     private $responder;
 
-    /** @var GetUserAssignmentLtiRequestService */
-    private $getUserAssignmentLtiRequestService;
+    /** @var LtiRequestFactoryInterface */
+    private $ltiRequestFactory;
 
     /** @var AssignmentRepository */
     private $assignmentRepository;
@@ -52,12 +52,12 @@ class GetUserAssignmentLtiLinkAction
 
     public function __construct(
         SerializerResponder $responder,
-        GetUserAssignmentLtiRequestService $getUserAssignmentLtiRequestService,
+        LtiRequestFactoryInterface $ltiRequestFactory,
         AssignmentRepository $assignmentRepository,
         LoggerInterface $logger
     ) {
         $this->responder = $responder;
-        $this->getUserAssignmentLtiRequestService = $getUserAssignmentLtiRequestService;
+        $this->ltiRequestFactory = $ltiRequestFactory;
         $this->assignmentRepository = $assignmentRepository;
         $this->logger = $logger;
     }
@@ -66,13 +66,11 @@ class GetUserAssignmentLtiLinkAction
     {
         try {
             /** @var User $user */
-            $assignment = $user->getAvailableAssignmentById(new UuidV6($assignmentId));
-            $ltiRequest = $this->getUserAssignmentLtiRequestService->getAssignmentLtiRequest($assignment);
+            $assignment = $user->getAvailableAssignmentById($assignmentId);
+            $ltiRequest = $this->ltiRequestFactory->create($assignment);
 
-            if ($assignment->getState() !== Assignment::STATE_STARTED) {
-                $assignment
-                    ->setState(Assignment::STATE_STARTED)
-                    ->incrementAttemptsCount();
+            if ($assignment->getStatus() !== Assignment::STATUS_STARTED) {
+                $assignment->start();
 
                 $this->assignmentRepository->flush();
             }
@@ -88,7 +86,7 @@ class GetUserAssignmentLtiLinkAction
             return $this->responder->createJsonResponse($ltiRequest);
         } catch (AssignmentNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
-        } catch (AssignmentUnavailableException $exception) {
+        } catch (AssignmentUnavailableException | InvalidAssignmentStatusTransitionException $exception) {
             throw new ConflictHttpException($exception->getMessage(), $exception);
         }
     }

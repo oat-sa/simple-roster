@@ -47,7 +47,7 @@ class UserCacheWarmerCommand extends Command
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_BATCH = 'batch';
 
-    private const DEFAULT_BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = '1000';
 
     /** @var UserCacheWarmerService */
     private $userCacheWarmerService;

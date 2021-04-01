@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
@@ -106,7 +107,22 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $assignment = (new Assignment())->setUser((new User())->setId(new UuidV6()));
+        $user = (new User())->setId(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
+
+        $user->addAssignment($assignment);
 
         $this->subject->getLtiRequestContextId($assignment);
     }
@@ -114,7 +130,21 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     public function testItCanReturnLtiRequestContextId(): void
     {
         $user = (new User())->setGroupId('group_5');
-        $assignment = (new Assignment())->setUser($user);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'label',
+            'uri',
+            'slug',
+            LineItem::STATUS_ENABLED
+        );
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
+
+        $user->addAssignment($assignment);
 
         self::assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
     }

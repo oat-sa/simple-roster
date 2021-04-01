@@ -57,6 +57,8 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $this->kernelBrowser = self::createClient();
 
+        $this->setUpDatabase();
+
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->userRepository = self::$container->get(UserRepository::class);

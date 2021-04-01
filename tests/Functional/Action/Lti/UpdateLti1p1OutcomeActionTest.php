@@ -61,7 +61,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $this->assignmentRepository = self::$container->get(AssignmentRepository::class);
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+        $this->loadFixtureByFilename('userWithStartedAssignment.yml');
 
         $this->setUpTestLogHandler('security');
     }
@@ -154,7 +154,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         );
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
-        self::assertSame(Assignment::STATE_READY, $assignment->getState());
+
+        self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
 
         $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
     }
@@ -192,7 +193,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
-        self::assertSame(Assignment::STATE_READY, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
     }
 
     public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
@@ -228,7 +229,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $this->assertApiStatusCode(Response::HTTP_NOT_FOUND);
 
         $assignment = $this->assignmentRepository->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
-        self::assertSame(Assignment::STATE_READY, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
     }
 
     private function generateSignature(LtiInstance $ltiInstance, string $time): string

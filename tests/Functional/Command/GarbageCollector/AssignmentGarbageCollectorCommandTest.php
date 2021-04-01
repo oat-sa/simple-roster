@@ -80,7 +80,10 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $this->commandTester->getDisplay()
         );
 
-        self::assertCount(9, $this->getRepository(Assignment::class)->findBy(['state' => Assignment::STATE_STARTED]));
+        self::assertCount(
+            9,
+            $this->getRepository(Assignment::class)->findBy(['status' => Assignment::STATUS_STARTED])
+        );
     }
 
     public function testItCanUpdateStuckAssignments(): void
@@ -99,16 +102,16 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         );
 
         $expectedStatusMap = [
-            1 => Assignment::STATE_COMPLETED,
-            2 => Assignment::STATE_COMPLETED,
-            3 => Assignment::STATE_COMPLETED,
-            4 => Assignment::STATE_READY,
-            5 => Assignment::STATE_READY,
-            6 => Assignment::STATE_READY,
-            7 => Assignment::STATE_READY,
-            8 => Assignment::STATE_READY,
-            9 => Assignment::STATE_READY,
-            10 => Assignment::STATE_READY,
+            1 => Assignment::STATUS_COMPLETED,
+            2 => Assignment::STATUS_COMPLETED,
+            3 => Assignment::STATUS_COMPLETED,
+            4 => Assignment::STATUS_READY,
+            5 => Assignment::STATUS_READY,
+            6 => Assignment::STATUS_READY,
+            7 => Assignment::STATUS_READY,
+            8 => Assignment::STATUS_READY,
+            9 => Assignment::STATUS_READY,
+            10 => Assignment::STATUS_READY,
         ];
 
         $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected and " .
@@ -174,11 +177,11 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $assignment->getLineItem()->getMaxAttempts() === 0
             || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()
         ) {
-            self::assertSame(Assignment::STATE_READY, $assignment->getState());
+            self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
 
             return;
         }
 
-        self::assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_COMPLETED, $assignment->getStatus());
     }
 }

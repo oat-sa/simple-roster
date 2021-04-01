@@ -23,19 +23,18 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Bulk;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
-use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
-class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProcessorInterface
+class BulkCreateUsersAssignmentsService
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -92,7 +91,7 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
     }
 
     /**
-     * @throws EntityNotFoundException
+     * @throws Throwable
      */
     private function processOperation(BulkOperation $operation, BulkResult $result): void
     {
@@ -101,16 +100,12 @@ class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProces
         $lastAssignment = $user->getLastAssignment();
 
         foreach ($user->getAssignments() as $assignment) {
-            if ($assignment->isCancellable()) {
-                $assignment->setState(Assignment::STATE_CANCELLED);
-            }
+            $assignment->cancel();
         }
 
-        $newAssignment = (new Assignment())
-            ->setState(Assignment::STATE_READY)
-            ->setLineItem($lastAssignment->getLineItem());
-
+        $newAssignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lastAssignment->getLineItem());
         $user->addAssignment($newAssignment);
+
         $this->entityManager->persist($newAssignment);
 
         $result->addBulkOperationSuccess($operation);

@@ -28,7 +28,6 @@ use Doctrine\ORM\NonUniqueResultException;
 use LogicException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
-use OAT\SimpleRoster\Bulk\Processor\BulkOperationCollectionProcessorInterface;
 use OAT\SimpleRoster\Bulk\Result\BulkResult;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
@@ -36,7 +35,7 @@ use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionProcessorInterface
+class BulkUpdateUsersAssignmentsStatusService
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -66,7 +65,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
                 continue;
             }
 
-            $this->validateStateTransition($operation);
+            $this->validateStatusAttribute($operation);
 
             try {
                 $this->processOperation($operation, $result);
@@ -102,7 +101,6 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
 
     /**
      * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
      */
     private function processOperation(BulkOperation $operation, BulkResult $result): void
     {
@@ -111,7 +109,7 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
         $user = $userRepository->findByUsernameWithAssignments($operation->getIdentifier());
 
         foreach ($user->getCancellableAssignments() as $assignment) {
-            $assignment->setState(Assignment::STATE_CANCELLED);
+            $assignment->cancel();
 
             $this->logBuffer[] = [
                 'message' => sprintf(
@@ -129,14 +127,14 @@ class BulkUpdateUsersAssignmentsStateService implements BulkOperationCollectionP
     /**
      * @throws LogicException
      */
-    private function validateStateTransition(BulkOperation $operation): void
+    private function validateStatusAttribute(BulkOperation $operation): void
     {
-        if ($operation->getAttribute('state') !== Assignment::STATE_CANCELLED) {
+        if ($operation->getAttribute('status') !== Assignment::STATUS_CANCELLED) {
             throw new LogicException(
                 sprintf(
                     "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
-                    $operation->getAttribute('state'),
-                    Assignment::STATE_CANCELLED
+                    $operation->getAttribute('status'),
+                    Assignment::STATUS_CANCELLED
                 )
             );
         }

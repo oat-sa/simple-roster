@@ -81,13 +81,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem, 1);
 
-        $assignment = (new Assignment())
-            ->setId($assignmentId)
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
@@ -99,7 +95,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_COMPLETED;
+                return $assignment->getStatus() === Assignment::STATUS_COMPLETED;
             }));
 
         $this->assignmentRepository
@@ -123,13 +119,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem, 1);
 
-        $assignment = (new Assignment())
-            ->setId($assignmentId)
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
@@ -141,7 +133,7 @@ class CompleteUserAssignmentServiceTest extends TestCase
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_READY;
+                return $assignment->getStatus() === Assignment::STATUS_READY;
             }));
 
         $this->assignmentRepository
@@ -164,12 +156,9 @@ class CompleteUserAssignmentServiceTest extends TestCase
         );
 
         $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem);
 
-        $assignment = (new Assignment())
-            ->setId($assignmentId)
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user);
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
