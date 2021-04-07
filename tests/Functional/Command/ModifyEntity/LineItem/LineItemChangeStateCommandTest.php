@@ -86,7 +86,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItDeactivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
+    public function testItDisablesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
@@ -100,7 +100,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
         $commandResult = $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => $queryField,
                 'query-value' => $queryValue,
             ],
@@ -108,30 +108,30 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         );
         self::assertEquals(0, $commandResult);
 
-        $this->assertMessageDisplays($lineItemIds, 'deactivate');
+        $this->assertMessageDisplays($lineItemIds, 'disable');
 
-        $this->assertLineItems($lineItemIds, 'deactivate', LineItem::STATUS_DISABLED);
+        $this->assertLineItems($lineItemIds, 'disable', LineItem::STATUS_DISABLED);
     }
 
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItActivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
+    public function testItEnablesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => $queryField,
                 'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
 
-        $this->assertLineItems($lineItemIds, 'deactivate', LineItem::STATUS_DISABLED);
+        $this->assertLineItems($lineItemIds, 'disable', LineItem::STATUS_DISABLED);
 
         $commandResult = $this->commandTester->execute(
             [
-                'toggle' => 'activate',
+                'toggle' => 'enable',
                 'query-field' => $queryField,
                 'query-value' => $queryValue,
             ],
@@ -139,19 +139,19 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         );
         self::assertEquals(0, $commandResult);
 
-        $this->assertMessageDisplays($lineItemIds, 'activate');
+        $this->assertMessageDisplays($lineItemIds, 'enable');
 
-        $this->assertLineItems($lineItemIds, 'activate', LineItem::STATUS_ENABLED);
+        $this->assertLineItems($lineItemIds, 'enable', LineItem::STATUS_ENABLED);
     }
 
-    public function testEnsureOnlyOneLineIsDeactivated(): void
+    public function testEnsureOnlyOneLineIsDisabled(): void
     {
         $secondLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000002-0000-6000-0000-000000000000'));
         self::assertTrue($secondLineItem->isEnabled());
 
         $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => 'id',
                 'query-value' => '00000001-0000-6000-0000-000000000000',
             ],
@@ -198,7 +198,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
 
         $commandTester->execute(
-            ['toggle' => 'deactivate', 'query-field' => 'id', 'query-value' => '00000001-0000-6000-0000-000000000000'],
+            ['toggle' => 'disable', 'query-field' => 'id', 'query-value' => '00000001-0000-6000-0000-000000000000'],
             ['capture_stderr_separately' => true]
         );
 
@@ -263,11 +263,11 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                     'query-field' => 'id',
                     'query-value' => '1',
                 ],
-                'expectedMessage' => 'Invalid toggle argument. Please use: activate, deactivate',
+                'expectedMessage' => 'Invalid toggle argument. Please use: enable, disable',
             ],
             'invalidQueryField' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                     'query-field' => 'invalid-query-field',
                     'query-value' => '1',
                 ],
@@ -279,13 +279,13 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             ],
             'only-toggle' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                 ],
                 'expectedMessage' => 'Not enough arguments (missing: "query-field, query-value")',
             ],
             'with-no-query-value' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                     'query-field' => 'uri',
                 ],
                 'expectedMessage' => 'Not enough arguments (missing: "query-value")',
@@ -296,7 +296,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     private function assertMessageDisplays(array $lineItemIds, string $toggle): void
     {
         self::assertStringContainsString(
-            'Simple Roster - Line Item Activator',
+            'Simple Roster - Line item status updater',
             $this->commandTester->getDisplay()
         );
         self::assertStringContainsString(

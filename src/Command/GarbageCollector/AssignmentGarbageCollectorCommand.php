@@ -41,7 +41,7 @@ class AssignmentGarbageCollectorCommand extends Command
 {
     public const NAME = 'roster:garbage-collector:assignment';
 
-    private const DEFAULT_BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = '1000';
 
     /** @var AssignmentRepository */
     private $assignmentRepository;

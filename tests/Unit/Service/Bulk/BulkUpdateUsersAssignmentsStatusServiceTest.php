@@ -30,15 +30,15 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
+use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStatusService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Uid\UuidV6;
 
-class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
+class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
 {
-    /** @var BulkUpdateUsersAssignmentsStateService */
+    /** @var BulkUpdateUsersAssignmentsStatusService */
     private $subject;
 
     /** @var EntityManagerInterface|MockObject */
@@ -64,7 +64,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->with(User::class)
             ->willReturn($this->userRepository);
 
-        $this->subject = new BulkUpdateUsersAssignmentsStateService($this->entityManager, $this->logger);
+        $this->subject = new BulkUpdateUsersAssignmentsStatusService($this->entityManager, $this->logger);
     }
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
@@ -73,7 +73,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $successfulOperation = new BulkOperation(
             'test',
             BulkOperation::TYPE_UPDATE,
-            ['state' => Assignment::STATUS_CANCELLED]
+            ['status' => Assignment::STATUS_CANCELLED]
         );
 
         $lineItem = new LineItem(
@@ -143,9 +143,9 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]))
-            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]))
-            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]));
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]));
 
         $this->entityManager
             ->expects(self::once())
@@ -194,14 +194,14 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->willReturn(new User(new UuidV6(), 'expectedUser', 'testPassword'));
 
         $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => $invalidState]));
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => $invalidState]));
 
         $this->subject->process($bulkOperationCollection);
     }
 
     public function testItIgnoresCompletedAssignments(): void
     {
-        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATUS_CANCELLED]);
+        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]);
 
         $lineItem = new LineItem(
             new UuidV6('00000001-0000-6000-0000-000000000000'),

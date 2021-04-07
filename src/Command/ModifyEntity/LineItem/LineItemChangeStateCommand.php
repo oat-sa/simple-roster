@@ -47,12 +47,12 @@ class LineItemChangeStateCommand extends Command
         self::FIELD_URI,
     ];
 
-    private const TOGGLE_ACTIVATE = 'activate';
-    private const TOGGLE_DEACTIVATE = 'deactivate';
+    private const TOGGLE_ENABLE = 'enable';
+    private const TOGGLE_DISABLE = 'disable';
 
     private const TOGGLE_OPERATIONS = [
-        self::TOGGLE_ACTIVATE,
-        self::TOGGLE_DEACTIVATE,
+        self::TOGGLE_ENABLE,
+        self::TOGGLE_DISABLE,
     ];
 
     /** @var LineItemRepository */
@@ -64,10 +64,8 @@ class LineItemChangeStateCommand extends Command
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(
-        LineItemRepository $lineItemRepository,
-        LoggerInterface $logger
-    ) {
+    public function __construct(LineItemRepository $lineItemRepository, LoggerInterface $logger)
+    {
         parent::__construct(self::NAME);
 
         $this->lineItemRepository = $lineItemRepository;
@@ -78,49 +76,49 @@ class LineItemChangeStateCommand extends Command
     {
         parent::configure();
 
-        $this->setDescription('Activate/Deactivate line items into the application');
+        $this->setDescription('Modifies status of ingested line items');
         $this->setHelp(
             <<<EOF
-The <info>%command.name%</info> command Activate/Deactivate line items into the application.
+The <info>%command.name%</info> allows us to modify status of ingested line items.
 
     <info>php %command.full_name% <path></info>
 
-To Activate a line item by slug:
+To enable a line item by slug:
 
-    <info>php %command.full_name% activate slug {line-item-slug}</info>
+    <info>php %command.full_name% enable slug {line-item-slug}</info>
     
-To Activate a line item by multiple slugs:
+To enable a line item by multiple slugs:
 
-    <info>php %command.full_name% activate slug {line-item-slug1} {line-item-slug2}</info>
+    <info>php %command.full_name% enable slug {line-item-slug1} {line-item-slug2}</info>
 
-To Activate a line item by id:
+To enable a line item by id:
 
-    <info>php %command.full_name% activate id {line-item-id}</info>
+    <info>php %command.full_name% enable id {line-item-id}</info>
 
-To Activate a line item by uri:
+To enable a line item by uri:
 
-    <info>php %command.full_name% activate uri {line-item-id}</info>
-To Deactivate a line item by slug:
+    <info>php %command.full_name% enable uri {line-item-id}</info>
+To disable a line item by slug:
 
-    <info>php %command.full_name% deactivate slug {line-item-slug}</info>
+    <info>php %command.full_name% disable slug {line-item-slug}</info>
     
-To Deactivate a line item by id:
+To disable a line item by id:
 
-    <info>php %command.full_name% deactivate id {line-item-id}</info>
+    <info>php %command.full_name% disable id {line-item-id}</info>
 
-To Deactivate a line item by uri:
+To disable a line item by uri:
 
-    <info>php %command.full_name% deactivate uri {line-item-id}</info>
+    <info>php %command.full_name% disable uri {line-item-id}</info>
 EOF
         );
 
         $this->addArgument(
             'toggle',
             InputArgument::REQUIRED,
-            'Accepted two values "activate" to activate a line item. "deactivate" to deactivate a line item.'
+            'Accepted two values "enable" to enable a line item. "disable" to disable a line item.'
         );
 
-        $fieldQueryDescription = 'How do you want to query the line items that you want to activate/deactivate. '
+        $fieldQueryDescription = 'How do you want to query the line items that you want to enable/disable. '
             . 'Accepted parameters are: %s';
         $this->addArgument(
             'query-field',
@@ -145,7 +143,7 @@ EOF
 
         $this->symfonyStyle = new SymfonyStyle($input, $output);
 
-        $this->symfonyStyle->title('Simple Roster - Line Item Activator');
+        $this->symfonyStyle->title('Simple Roster - Line item status updater');
     }
 
     /**
@@ -175,7 +173,7 @@ EOF
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
             foreach ($lineItems as $lineItem) {
-                $toggle === self::TOGGLE_ACTIVATE ? $lineItem->enable() : $lineItem->disable();
+                $toggle === self::TOGGLE_ENABLE ? $lineItem->enable() : $lineItem->disable();
 
                 $this->logger->info(
                     sprintf("The operation: '%s' was executed for Line Item with id: '%s'", $toggle, $lineItem->getId())

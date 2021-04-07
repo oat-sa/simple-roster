@@ -35,7 +35,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
+class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
 {
     use ApiTestingTrait;
     use DatabaseTestingTrait;
@@ -224,7 +224,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $payload[] = [
                 'identifier' => $user,
                 'attributes' => [
-                    'state' => Assignment::STATUS_CANCELLED,
+                    'status' => Assignment::STATUS_CANCELLED,
                 ],
             ];
         }

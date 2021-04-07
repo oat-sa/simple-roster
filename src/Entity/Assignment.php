@@ -91,7 +91,7 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->id;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
