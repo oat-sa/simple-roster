@@ -197,17 +197,11 @@ class User implements UserInterface, EntityInterface
         return $this->roles;
     }
 
-    /**
-     * @internal
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * @internal
-     */
     public function setPassword(string $password): self
     {
         $this->password = $password;
@@ -215,25 +209,16 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
-    /**
-     * @internal
-     */
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    /**
-     * @internal
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
-    /**
-     * @internal
-     */
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
