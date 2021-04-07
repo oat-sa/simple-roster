@@ -90,9 +90,8 @@ class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
             $lineItem
         );
 
-        $expectedUser = (new User())
-            ->setUsername('expectedUser')
-            ->addAssignment($expectedAssignment);
+        $expectedUser = new User(new UuidV6(), 'expectedUser', 'testPassword');
+        $expectedUser->addAssignment($expectedAssignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -140,9 +139,7 @@ class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
                     $expectedLineItem
                 );
 
-                return (new User())
-                    ->setUsername($username)
-                    ->addAssignment($assignment);
+                return (new User(new UuidV6(), $username, 'testPassword'))->addAssignment($assignment);
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
@@ -194,7 +191,7 @@ class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
-            ->willReturn(new User());
+            ->willReturn(new User(new UuidV6(), 'expectedUser', 'testPassword'));
 
         $bulkOperationCollection = (new BulkOperationCollection())
             ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => $invalidState]));
@@ -220,7 +217,8 @@ class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
             $lineItem
         );
 
-        $user = (new User())->addAssignment($completedAssignment);
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
+        $user->addAssignment($completedAssignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')

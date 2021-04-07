@@ -27,6 +27,7 @@ use OAT\SimpleRoster\Logger\UserRequestLogProcessor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Uid\UuidV6;
 
 class UserRequestLogProcessorTest extends TestCase
 {
@@ -48,7 +49,7 @@ class UserRequestLogProcessorTest extends TestCase
     {
         $this->security
             ->method('getUser')
-            ->willReturn((new User())->setUsername('expectedUsername'));
+            ->willReturn(new User(new UuidV6(), 'expectedUsername', 'testPassword'));
 
         $logRecord = call_user_func($this->subject, ['logRecord']);
 

@@ -33,6 +33,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\UuidV6;
 
 class RefreshAccessTokenActionTest extends WebTestCase
 {
@@ -117,7 +118,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
     public function testItReturnsExceptionIfUserCannotBeFound(): void
     {
         $tokenForNonExistingUser = $this->tokenGenerator->create(
-            (new User())->setUsername('notExisting'),
+            new User(new UuidV6(), 'notExisting', 'testPassword'),
             Request::create('/test'),
             'refreshToken',
             3600

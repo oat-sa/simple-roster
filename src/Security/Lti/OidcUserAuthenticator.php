@@ -75,7 +75,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
                 ]
             );
 
-            return new UserAuthenticationResult(true, new UserIdentity((string) $user->getUsername()));
+            return new UserAuthenticationResult(true, new UserIdentity($user->getUsername()));
         } catch (Throwable $exception) {
             throw new LtiException($exception->getMessage());
         }

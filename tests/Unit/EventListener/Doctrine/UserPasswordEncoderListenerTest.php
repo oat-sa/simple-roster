@@ -27,6 +27,7 @@ use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
@@ -62,8 +63,7 @@ class UserPasswordEncoderListenerTest extends TestCase
 
     public function testItCorrectlyUpdatesTheEncodedPasswordUponPrePersist(): void
     {
-        $entity = new User();
-        $entity->setPlainPassword('password');
+        $entity = new User(new UuidV6(), 'testUser', 'password');
 
         $this
             ->userPasswordEncoderMock
@@ -82,8 +82,7 @@ class UserPasswordEncoderListenerTest extends TestCase
 
     public function testItCorrectlyUpdatesTheEncodedPasswordUponPreUpdate(): void
     {
-        $entity = new User();
-        $entity->setPlainPassword('password');
+        $entity = new User(new UuidV6(), 'testUser', 'password');
 
         $this
             ->userPasswordEncoderMock

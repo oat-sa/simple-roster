@@ -148,7 +148,7 @@ class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
                 'data' => [
                     'applied' => false,
                     'results' => [
-                        (string)$user->getUsername() => true,
+                        $user->getUsername() => true,
                         'nonExistingUser1' => false,
                     ],
                 ],

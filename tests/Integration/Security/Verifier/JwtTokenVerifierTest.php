@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Uid\UuidV6;
 
 class JwtTokenVerifierTest extends KernelTestCase
 {
@@ -49,7 +50,7 @@ class JwtTokenVerifierTest extends KernelTestCase
 
     public function testSuccessfulVerification(): void
     {
-        $user = (new User())->setUsername('testUser');
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
 
         $token = $this->tokenGenerator->create($user, Request::create('/test'), 'testSubject', 100);
 
