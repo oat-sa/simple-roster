@@ -70,6 +70,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
+        // TODO find a better way of defining API user
         return new User(new UuidV6(), 'apiUser', 'notUsed');
     }
 

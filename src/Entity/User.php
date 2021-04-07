@@ -77,7 +77,7 @@ class User implements UserInterface, EntityInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -192,9 +192,6 @@ class User implements UserInterface, EntityInterface
         );
     }
 
-    /**
-     * @internal
-     */
     public function getRoles(): array
     {
         return $this->roles;

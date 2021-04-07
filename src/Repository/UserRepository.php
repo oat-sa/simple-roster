@@ -173,7 +173,7 @@ class UserRepository extends AbstractRepository
                 $user->getId(),
                 $user->getUsername(),
                 $user->getPassword(),
-                json_encode(['ROLE_USER']),
+                json_encode($user->getRoles()),
                 $user->getGroupId()
             );
         }
