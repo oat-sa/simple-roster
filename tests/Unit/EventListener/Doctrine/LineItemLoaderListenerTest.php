@@ -68,7 +68,12 @@ class LineItemLoaderListenerTest extends TestCase
             ->method('findOneById')
             ->with(new UuidV6('00000001-0000-6000-0000-000000000000'))
             ->willReturn($expectedLineItem);
-        $assignment = (new Assignment())->setLineItem($expectedLineItem);
+
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $expectedLineItem
+        );
 
         $this->subject->postLoad($assignment);
 

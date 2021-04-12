@@ -57,7 +57,7 @@ class AssignmentRepositoryTest extends KernelTestCase
 
         $assignment = $this->subject->findById(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        self::assertSame(Assignment::STATE_STARTED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_STARTED, $assignment->getStatus());
         self::assertSame(1, $assignment->getAttemptsCount());
     }
 
@@ -74,7 +74,7 @@ class AssignmentRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime);
+        $assignments = $this->subject->findByStatusAndUpdatedAtPaged(Assignment::STATUS_STARTED, $dateTime);
 
         self::assertCount(9, $assignments->getIterator());
         self::assertCount(9, $assignments);
@@ -85,7 +85,7 @@ class AssignmentRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
         $dateTime = (new DateTime())->add(new DateInterval('P1D'));
-        $assignments = $this->subject->findByStateAndUpdatedAtPaged(Assignment::STATE_STARTED, $dateTime, 2, 3);
+        $assignments = $this->subject->findByStatusAndUpdatedAtPaged(Assignment::STATUS_STARTED, $dateTime, 2, 3);
 
         self::assertCount(3, $assignments->getIterator());
         self::assertCount(9, $assignments);
@@ -99,13 +99,13 @@ class AssignmentRepositoryTest extends KernelTestCase
         $lineItemId = new UuidV6('00000001-0000-6000-0000-000000000000');
 
         $assignmentId1 = new UuidV6('00000001-0000-6000-0000-000000000000');
-        $assignment1 = new AssignmentDto($assignmentId1, Assignment::STATE_READY, $lineItemId, 'user1', $userId);
+        $assignment1 = new AssignmentDto($assignmentId1, Assignment::STATUS_READY, $lineItemId, 'user1', $userId);
 
         $assignmentId2 = new UuidV6('00000002-0000-6000-0000-000000000000');
-        $assignment2 = new AssignmentDto($assignmentId2, Assignment::STATE_READY, $lineItemId, 'user2', $userId);
+        $assignment2 = new AssignmentDto($assignmentId2, Assignment::STATUS_READY, $lineItemId, 'user2', $userId);
 
         $assignmentId3 = new UuidV6('00000003-0000-6000-0000-000000000000');
-        $assignment3 = new AssignmentDto($assignmentId3, Assignment::STATE_READY, $lineItemId, 'user3', $userId);
+        $assignment3 = new AssignmentDto($assignmentId3, Assignment::STATUS_READY, $lineItemId, 'user3', $userId);
 
         $assignmentCollection = (new AssignmentDtoCollection())
             ->add($assignment1)
@@ -119,7 +119,7 @@ class AssignmentRepositoryTest extends KernelTestCase
 
         /** @var Assignment $assignment */
         foreach ($assignments as $assignment) {
-            self::assertSame(Assignment::STATE_READY, $assignment->getState());
+            self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
             self::assertSame(0, $assignment->getAttemptsCount());
         }
     }

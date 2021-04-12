@@ -65,8 +65,8 @@ class AssignmentRepository extends AbstractRepository
     /**
      * @return Paginator|Assignment[]
      */
-    public function findByStateAndUpdatedAtPaged(
-        string $state,
+    public function findByStatusAndUpdatedAtPaged(
+        string $status,
         DateTime $updatedAt,
         int $offset = null,
         int $limit = null
@@ -74,9 +74,9 @@ class AssignmentRepository extends AbstractRepository
         $queryBuilder = $this
             ->createQueryBuilder('a')
             ->select('a')
-            ->where('a.state = :state')
+            ->where('a.status = :status')
             ->andWhere('a.updatedAt <= :updatedAt')
-            ->setParameter('state', $state)
+            ->setParameter('status', $status)
             ->setParameter('updatedAt', $updatedAt);
 
         if (null !== $offset) {
@@ -109,7 +109,7 @@ class AssignmentRepository extends AbstractRepository
         }
 
         $query = sprintf(
-            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
+            'INSERT INTO assignments (id, user_id, line_item_id, status, attempts_count) VALUES %s',
             implode(',', $queryParts)
         );
 

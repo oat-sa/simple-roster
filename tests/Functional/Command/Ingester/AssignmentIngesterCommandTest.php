@@ -181,7 +181,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
 
             /** @var Assignment $assignment */
             foreach ($assignments as $assignment) {
-                self::assertSame(Assignment::STATE_READY, $assignment->getState());
+                self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
                 self::assertSame(0, $assignment->getAttemptsCount());
             }
         }

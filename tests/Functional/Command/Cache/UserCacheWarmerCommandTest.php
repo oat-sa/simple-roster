@@ -148,7 +148,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         self::assertInstanceOf(WarmUpGroupedUserCacheMessage::class, $message);
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return (string)$user->getUsername();
+            return $user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $message->getUsernames());
@@ -183,7 +183,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         }
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return (string)$user->getUsername();
+            return $user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $processedUsernames);

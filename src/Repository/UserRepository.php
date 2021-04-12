@@ -63,7 +63,7 @@ class UserRepository extends AbstractRepository
         $user = $this
             ->createQueryBuilder('u')
             ->select('u, a')
-            ->innerJoin('u.assignments', 'a')
+            ->leftJoin('u.assignments', 'a')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -169,10 +169,11 @@ class UserRepository extends AbstractRepository
         $queryParts = [];
         foreach ($users as $user) {
             $queryParts[] = sprintf(
-                "('%s', '%s', '%s', '[]', '%s')",
+                "('%s', '%s', '%s', '%s', '%s')",
                 $user->getId(),
                 $user->getUsername(),
                 $user->getPassword(),
+                json_encode($user->getRoles()),
                 $user->getGroupId()
             );
         }

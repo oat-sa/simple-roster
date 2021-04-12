@@ -180,7 +180,15 @@ EOF
         return new UserDto(
             new UuidV6(),
             $rawUser['username'],
-            $this->passwordEncoder->encodePassword(new User(), $rawUser['password']),
+            $this->passwordEncoder->encodePassword(
+                new User(
+                    new UuidV6(),
+                    $rawUser['username'],
+                    $rawUser['password']
+                ),
+                $rawUser['password']
+            ),
+            ['ROLE_USER'],
             $rawUser['groupId'] ?? null
         );
     }

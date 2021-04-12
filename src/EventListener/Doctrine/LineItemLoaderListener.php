@@ -41,7 +41,7 @@ class LineItemLoaderListener implements EntityListenerInterface
      */
     public function postLoad(Assignment $assignment): void
     {
-        //we're forcing the doctrine to load the line item by using cache instead of database query
+        // We're forcing doctrine to load the line item by using cache instead of database query
         $assignment->setLineItem(
             $this->lineItemRepository->findOneById($assignment->getLineItem()->getId())
         );

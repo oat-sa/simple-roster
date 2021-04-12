@@ -86,6 +86,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
 
         // Trigger cache by query
         $user = $this->userRepository->findByUsernameWithAssignments($username);
+
         self::assertTrue($this->resultCache->contains($cacheId));
 
         $user->setGroupId('letsChangeIt');
@@ -106,7 +107,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
         $user = $this->userRepository->findByUsernameWithAssignments($username);
         self::assertTrue($this->resultCache->contains($cacheId));
 
-        $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
+        $user->getLastAssignment()->start();
 
         $this->userRepository->flush();
 

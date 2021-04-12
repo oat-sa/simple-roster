@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Entity;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\UuidV6;
@@ -39,11 +40,12 @@ class UserTest extends KernelTestCase
         self::bootKernel();
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 
     public function testItCanRetrieveAndRemoveAssignments(): void
     {
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         /** @var User $subject */
         $subject = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
@@ -59,5 +61,13 @@ class UserTest extends KernelTestCase
 
         self::assertEmpty($subject->getAssignments());
         self::assertEmpty($subject->getAvailableAssignments());
+    }
+
+    public function testItThrowsExceptionIfUserHasNoAssignments(): void
+    {
+        $this->expectException(AssignmentNotFoundException::class);
+        $this->expectExceptionMessage("User 'testUser' does not have any assignments.");
+
+        (new User(new UuidV6(), 'testUser', 'testPassword'))->getLastAssignment();
     }
 }

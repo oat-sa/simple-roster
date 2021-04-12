@@ -22,26 +22,31 @@ OAT\SimpleRoster\Entity\LineItem:
 
 OAT\SimpleRoster\Entity\Assignment:
     startedButStuckAssignment_{1..3}:
-        id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
-        lineItem: '@lineItem'
-        state: 'started'
-        updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
-        attemptsCount: 1
+        __construct:
+            id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
+            status: 'started'
+            lineItem: '@lineItem'
+            attemptsCount: 1
+            updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
     startedButStuckAssignment_{4..7}:
-        id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
-        lineItem: '@lineItem'
-        state: 'started'
-        updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
-        attemptsCount: 0
+        __construct:
+            id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
+            status: 'started'
+            lineItem: '@lineItem'
+            attemptsCount: 0
+            updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
     startedButStuckAssignment_{8..9}:
-        id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
-        lineItem: '@lineItem2'
-        state: 'started'
-        updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
-        attemptsCount: 1
+        __construct:
+            id: <uuidV6(<strval(0000000<current()>-0000-6000-0000-000000000000)>)>
+            status: 'started'
+            lineItem: '@lineItem2'
+            attemptsCount: 0
+            updatedAt: '<dateTimeInInterval("-5 days", "-4 days")>'
 
 OAT\SimpleRoster\Entity\User:
     userWithStartedButStuckAssignment_{1..9}:
-        username: 'userWithStartedButStuckAssignment_<current()>'
-        plainPassword: 'password'
+        __construct:
+            id: <uuidV6()>
+            username: 'userWithStartedButStuckAssignment_<current()>'
+            plainPassword: 'password'
         assignments: [ '@startedButStuckAssignment_<current()>' ]

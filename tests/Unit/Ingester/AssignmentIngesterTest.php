@@ -62,7 +62,7 @@ class AssignmentIngesterTest extends TestCase
 
         $assignment = new AssignmentDto(
             new UuidV6('00000011-0000-6000-0000-000000000000'),
-            Assignment::STATE_READY,
+            Assignment::STATUS_READY,
             new UuidV6('00000001-0000-6000-0000-000000000000'),
             'nonExistingUser'
         );
@@ -78,14 +78,14 @@ class AssignmentIngesterTest extends TestCase
 
         $assignment1 = new AssignmentDto(
             new UuidV6('00000011-0000-6000-0000-000000000000'),
-            Assignment::STATE_READY,
+            Assignment::STATUS_READY,
             $lineItemId,
             'testUser1'
         );
 
         $assignment2 = new AssignmentDto(
             new UuidV6('00000022-0000-6000-0000-000000000000'),
-            Assignment::STATE_READY,
+            Assignment::STATUS_READY,
             $lineItemId,
             'testUser2'
         );
@@ -124,7 +124,7 @@ class AssignmentIngesterTest extends TestCase
 
         $assignment = new AssignmentDto(
             new UuidV6('00000011-0000-6000-0000-000000000000'),
-            Assignment::STATE_READY,
+            Assignment::STATUS_READY,
             $lineItemId,
             'testUser'
         );
@@ -151,7 +151,7 @@ class AssignmentIngesterTest extends TestCase
 
         $assignment = new AssignmentDto(
             new UuidV6('00000011-0000-6000-0000-000000000000'),
-            Assignment::STATE_READY,
+            Assignment::STATUS_READY,
             $lineItemId,
             'testUser'
         );

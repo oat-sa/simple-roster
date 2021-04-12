@@ -3,14 +3,16 @@
 ## 2.1.0 - To be released
 
 ### Added
-- Added `status` column on `line_items` database table.
+- Added `status` column to `line_items` database table.
+- Added `status` column to `assignments` database table.
 
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
-- Changed identifier generation strategy of entities from `auto increment` to `uuid`.
+- Changed identifier generation strategy of all entities from `auto increment` to `uuid`.
 
 ### Removed
 - Removed `isActive` column from `line_items` database table.
+- Removed `state` column from `assignments` database table.
 - Removed synchronous parallel cache warmup feature from user cache warmer command.
 
 ## 2.0.7 - 2021-03-27

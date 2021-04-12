@@ -1,0 +1,6 @@
+OAT\SimpleRoster\Entity\User:
+    user_without_assignments:
+        __construct:
+            id: <uuidV6()>
+            username: 'user_without_assignments'
+            plainPassword: 'password'

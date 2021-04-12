@@ -30,7 +30,7 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
     public function getLtiInstance(User $user): LtiInstance
     {
-        return $this->computeLtiInstanceByString((string)$user->getUsername());
+        return $this->computeLtiInstanceByString($user->getUsername());
     }
 
     public function getLtiRequestContextId(Assignment $assignment): string

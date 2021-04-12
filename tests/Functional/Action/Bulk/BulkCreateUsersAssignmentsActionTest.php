@@ -190,7 +190,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
         $reloadedUser = $this->userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Assignment::STATE_READY, $reloadedUser->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_READY, $reloadedUser->getLastAssignment()->getStatus());
         self::assertNotEquals($lastAssignment->getId(), $reloadedUser->getLastAssignment()->getId());
         self::assertCount(1, $reloadedUser->getAvailableAssignments());
     }

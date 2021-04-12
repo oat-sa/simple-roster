@@ -77,7 +77,7 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
 
         /** @var LtiInstance $expectedLtiInstance */
         foreach ($expectedLtiInstanceMap as $username => $expectedLtiInstance) {
-            $user = (new User())->setUsername($username);
+            $user = new User(new UuidV6(), $username, 'testPassword');
 
             $actualLtiInstance = $this->subject->getLtiInstance($user);
 
@@ -104,7 +104,11 @@ class UsernameLtiInstanceLoadBalancerTest extends TestCase
             LineItem::STATUS_ENABLED
         );
 
-        $assignment = (new Assignment())->setLineItem($lineItem);
+        $assignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
 
         self::assertSame('00000001-0000-6000-0000-000000000000', $this->subject->getLtiRequestContextId($assignment));
     }

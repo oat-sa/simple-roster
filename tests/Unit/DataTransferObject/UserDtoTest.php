@@ -50,6 +50,6 @@ class UserDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Group id cannot be empty');
 
-        new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), 'username', 'password', '');
+        new UserDto(new UuidV6('00000001-0000-6000-0000-000000000000'), 'username', 'password', [], '');
     }
 }

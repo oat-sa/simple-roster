@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class UserProviderTest extends KernelTestCase
 {
@@ -85,14 +86,14 @@ class UserProviderTest extends KernelTestCase
 
         $this->prepareRequestStackMock(1, 'route');
 
-        $this->subject->refreshUser((new User())->setUsername('invalid'));
+        $this->subject->refreshUser(new User(new UuidV6(), 'invalid', 'testPassword'));
     }
 
     public function testItDoesNotRefreshForLogout(): void
     {
         $this->prepareRequestStackMock(1, 'logout');
 
-        $toRefreshUser = (new User())->setUsername('invalid');
+        $toRefreshUser = new User(new UuidV6(), 'invalid', 'testPassword');
         $refreshedUser = $this->subject->refreshUser($toRefreshUser);
 
         self::assertSame($toRefreshUser, $refreshedUser);

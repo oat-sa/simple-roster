@@ -30,6 +30,7 @@ use Ramsey\Uuid\UuidFactoryInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Uid\UuidV6;
 
 class JwtTokenGeneratorTest extends KernelTestCase
 {
@@ -67,7 +68,8 @@ class JwtTokenGeneratorTest extends KernelTestCase
             ->method('uuid4')
             ->willReturn($uuid);
 
-        $testUser = (new User())->setUsername('testUsername');
+        $testUser = new User(new UuidV6(), 'testUsername', 'testPassword');
+
         $request = Request::create(
             '/test',
             'GET',
