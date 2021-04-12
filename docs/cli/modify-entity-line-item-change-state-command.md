@@ -1,6 +1,6 @@
 # Line Item change state command
 
-[LineItemChangeStateCommand](../../src/Command/ModifyEntity/LineItem/LineItemChangeStateCommand.php) is responsible for enable 
+[LineItemChangeStatusCommand](../../src/Command/ModifyEntity/LineItem/LineItemChangeStatusCommand.php) is responsible for enable 
 or disable `Line Items` after [ingestion](line-item-ingester-command.md).
 
 - [Usage](#usage)
