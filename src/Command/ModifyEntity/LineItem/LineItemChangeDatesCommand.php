@@ -43,6 +43,7 @@ class LineItemChangeDatesCommand extends Command
 
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
+    private const OPTION_LINE_ITEM_GROUP_IDS = 'line-item-group-ids';
     private const OPTION_START_DATE = 'start-date';
     private const OPTION_END_DATE = 'end-date';
     private const OPTION_FORCE = 'force';
@@ -58,6 +59,9 @@ class LineItemChangeDatesCommand extends Command
 
     /** @var UuidV6[] */
     private $lineItemIds;
+
+    /** @var string[] */
+    private $lineItemGroupIds;
 
     /** @var DateTime|null */
     private $startDate;
@@ -100,6 +104,10 @@ To change both start and end date of a line item using IDs:
 To change both start and end date of a line item using slugs:
     <info>php %command.full_name% -s slug1,slug2,slug3 --start-date <date> --end-date <date></info>
     <info>php %command.full_name% --line-item-slugs slug1,slug2,slug3 --start-date <date> --end-date <date></info>
+
+To change both start and end date of a line item using group ids:
+    <info>php %command.full_name% -g group1,group2,group3 --start-date <date> --end-date <date></info>
+    <info>php %command.full_name% --line-item-group-ids group1,group2,group3 --start-date <date> --end-date <date></info>
 EOF
         );
         // @codingStandardsIgnoreEnd
@@ -116,6 +124,13 @@ EOF
             's',
             InputOption::VALUE_REQUIRED,
             'Comma separated list of line item slugs to be updated',
+        );
+
+        $this->addOption(
+            self::OPTION_LINE_ITEM_GROUP_IDS,
+            'g',
+            InputOption::VALUE_REQUIRED,
+            'Comma separated list of line item group ids to be updated',
         );
 
         $this->addOption(
@@ -156,22 +171,28 @@ EOF
             $this->initializeLineItemSlugsOption($input);
         }
 
-        if (empty($this->lineItemIds) && empty($this->lineItemSlugs)) {
+        if ($input->getOption(self::OPTION_LINE_ITEM_GROUP_IDS)) {
+            $this->initializeLineItemGroupIdsOption($input);
+        }
+
+        if (empty($this->lineItemIds) && empty($this->lineItemSlugs) && empty($this->lineItemGroupIds)) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "You need to specify %s or %s option.",
+                    "You need to specify '%s', '%s' or '%s' option.",
                     self::OPTION_LINE_ITEM_IDS,
-                    self::OPTION_LINE_ITEM_SLUGS
+                    self::OPTION_LINE_ITEM_SLUGS,
+                    self::OPTION_LINE_ITEM_GROUP_IDS,
                 )
             );
         }
 
-        if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs)) {
+        if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs) && !empty($this->lineItemGroupIds)) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "Option '%s' and '%s' are exclusive options.",
+                    "Option '%s', '%s' and '%s' are exclusive options.",
                     self::OPTION_LINE_ITEM_IDS,
-                    self::OPTION_LINE_ITEM_SLUGS
+                    self::OPTION_LINE_ITEM_SLUGS,
+                    self::OPTION_LINE_ITEM_GROUP_IDS
                 )
             );
         }
@@ -277,6 +298,22 @@ EOF
         }
     }
 
+    private function initializeLineItemGroupIdsOption(InputInterface $input): void
+    {
+        $this->lineItemGroupIds = array_filter(
+            explode(',', (string)$input->getOption(self::OPTION_LINE_ITEM_GROUP_IDS)),
+            static function (string $value): bool {
+                return !empty($value);
+            }
+        );
+
+        if (empty($this->lineItemGroupIds)) {
+            throw new InvalidArgumentException(
+                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_GROUP_IDS)
+            );
+        }
+    }
+
     private function getFindLineItemCriteria(): FindLineItemCriteria
     {
         $criteria = new FindLineItemCriteria();
@@ -287,6 +324,10 @@ EOF
 
         if (!empty($this->lineItemSlugs)) {
             $criteria->addLineItemSlugs(...$this->lineItemSlugs);
+        }
+
+        if (!empty($this->lineItemGroupIds)) {
+            $criteria->addLineItemGroupIds(...$this->lineItemGroupIds);
         }
 
         return $criteria;

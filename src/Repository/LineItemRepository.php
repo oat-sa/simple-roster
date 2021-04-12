@@ -101,6 +101,12 @@ class LineItemRepository extends AbstractRepository
                 ->setParameter('slugs', $criteria->getLineItemSlugs());
         }
 
+        if ($criteria->hasLineItemGroupIdsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.groupId IN (:groupIds)')
+                ->setParameter('groupIds', $criteria->getLineItemGroupIds());
+        }
+
         $lineItemsCollection = new LineItemCollection();
         $result = $queryBuilder->getQuery()->getResult();
         foreach ($result as $row) {
