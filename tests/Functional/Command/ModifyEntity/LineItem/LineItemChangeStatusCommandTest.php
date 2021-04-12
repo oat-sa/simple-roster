@@ -251,6 +251,15 @@ class LineItemChangeStatusCommandTest extends KernelTestCase
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
             ],
+            'byGroupId' => [
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
+                'query-field' => 'groupId',
+                'query-value' => ['groupA', 'groupB'],
+            ],
         ];
     }
 

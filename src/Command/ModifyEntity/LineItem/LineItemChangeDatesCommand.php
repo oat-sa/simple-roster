@@ -175,7 +175,16 @@ EOF
             $this->initializeLineItemGroupIdsOption($input);
         }
 
-        if (empty($this->lineItemIds) && empty($this->lineItemSlugs) && empty($this->lineItemGroupIds)) {
+        $usedOptions = 0;
+        $exclusiveOptions = [$this->lineItemIds, $this->lineItemSlugs, $this->lineItemGroupIds];
+
+        foreach ($exclusiveOptions as $option) {
+            if (!empty($option)) {
+                $usedOptions++;
+            }
+        }
+
+        if ($usedOptions === 0) {
             throw new InvalidArgumentException(
                 sprintf(
                     "You need to specify '%s', '%s' or '%s' option.",
@@ -186,10 +195,10 @@ EOF
             );
         }
 
-        if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs) && !empty($this->lineItemGroupIds)) {
+        if ($usedOptions > 1) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "Option '%s', '%s' and '%s' are exclusive options.",
+                    "'%s', '%s' and '%s' are exclusive options.",
                     self::OPTION_LINE_ITEM_IDS,
                     self::OPTION_LINE_ITEM_SLUGS,
                     self::OPTION_LINE_ITEM_GROUP_IDS

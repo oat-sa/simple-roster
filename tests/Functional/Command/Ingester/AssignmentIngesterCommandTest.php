@@ -297,13 +297,13 @@ class AssignmentIngesterCommandTest extends KernelTestCase
     private function prepareLineItemIngestionContext(): void
     {
         $lineItemsCsvContent = [
-            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts'],
-            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2],
+            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts','groupId'],
+            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2, 'group1'],
         ];
 
         $this->writeCsv('line-items.csv', $lineItemsCsvContent);
