@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Logger;
 
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserRequestLogProcessor
 {
@@ -36,9 +37,13 @@ class UserRequestLogProcessor
 
     public function __invoke(array $record): array
     {
-        $record['extra']['username'] = $this->security->getUser() !== null
-            ? $this->security->getUser()->getUsername()
-            : 'guest';
+        $user = $this->security->getUser();
+        $username = 'guest';
+        if ($user instanceof UserInterface) {
+            $username = $user->getUsername();
+        }
+
+        $record['extra']['username'] = $username;
 
         return $record;
     }
