@@ -98,8 +98,8 @@ Use the --line-item-slugs option to warm up the cache for users having assignmen
 
     <info>php %command.full_name% --line-item-slugs=slug_1,slug_2,slug_3</info>
 EOF
-        // @codingStandardsIgnoreEnd
         );
+        // @codingStandardsIgnoreEnd
 
         $this->addBlackfireProfilingOption();
 
