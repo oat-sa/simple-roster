@@ -141,3 +141,6 @@ services:
 
     Lcobucci\JWT\Builder:
         class: Lcobucci\JWT\Builder
+
+    Lcobucci\JWT\Validation\Validator:
+        class: Lcobucci\JWT\Validation\Validator
