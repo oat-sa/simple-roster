@@ -28,8 +28,8 @@ class JwtTokenCacheIdGenerator
 {
     public function generate(Token $token, string $subject = null): string
     {
-        $subjectClaim = $subject ?? $token->getClaim('sub');
+        $subjectClaim = $subject ?? $token->claims()->get('sub');
 
-        return sprintf('jwt.%s.%s', $subjectClaim, $token->getClaim('aud'));
+        return sprintf('jwt.%s.%s', $subjectClaim, $token->claims()->get('aud')[0]);
     }
 }
