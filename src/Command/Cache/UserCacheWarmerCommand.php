@@ -50,7 +50,7 @@ class UserCacheWarmerCommand extends Command
     private const OPTION_MODULO = 'modulo';
     private const OPTION_REMAINDER = 'remainder';
 
-    private const DEFAULT_BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = '1000';
 
     /** @var UserCacheWarmerService */
     private $userCacheWarmerService;
@@ -113,8 +113,8 @@ Use the --modulo and --remainder options for parallelized cache warmup:
     <comment>(Documentation: https://github.com/oat-sa/simple-roster/blob/develop/docs/cli/user-cache-warmer-command.md#synchronous-cache-warmup-parallelization)
     </comment>
 EOF
-        // @codingStandardsIgnoreEnd
         );
+        // @codingStandardsIgnoreEnd
 
         $this->addBlackfireProfilingOption();
 

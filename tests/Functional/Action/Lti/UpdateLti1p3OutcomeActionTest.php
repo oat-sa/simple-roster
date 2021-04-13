@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;

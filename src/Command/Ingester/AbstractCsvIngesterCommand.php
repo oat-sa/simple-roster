@@ -42,7 +42,7 @@ abstract class AbstractCsvIngesterCommand extends Command
     use CommandProgressBarFormatterTrait;
     use BlackfireProfilerTrait;
 
-    private const DEFAULT_BATCH_SIZE = 1000;
+    private const DEFAULT_BATCH_SIZE = '1000';
 
     /** @var CsvReaderBuilder */
     protected $csvReaderBuilder;

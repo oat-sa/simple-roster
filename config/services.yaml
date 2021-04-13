@@ -135,3 +135,9 @@ services:
 
     OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface:
         class: OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator
+
+    Lcobucci\JWT\Parser:
+        class: Lcobucci\JWT\Parser
+
+    Lcobucci\JWT\Builder:
+        class: Lcobucci\JWT\Builder
