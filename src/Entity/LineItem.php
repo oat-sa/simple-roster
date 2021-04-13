@@ -199,11 +199,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->groupId;
     }
 
-    public function hasGroupId(): bool
-    {
-        return null !== $this->groupId;
-    }
-
     public function jsonSerialize(): array
     {
         return [
