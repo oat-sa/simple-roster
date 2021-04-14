@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Traits;
 
-use Carbon\Carbon;
+use LogicException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
@@ -32,13 +32,6 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 
 /**
@@ -72,11 +65,12 @@ trait Lti1p3SecurityTestingTrait
         array $claims = [],
         KeyInterface $key = null
     ): TokenInterface {
-        return (new Builder(null, $this->createTestIdGenerator()))->build(
-            $headers,
-            $claims,
-            $key ?? $this->createTestKeyChain()->getPrivateKey()
-        );
+        $key = $key ?? $this->createTestKeyChain()->getPrivateKey();
+        if ($key === null) {
+            throw new LogicException('Key cannot be null');
+        }
+
+        return (new Builder(null, $this->createTestIdGenerator()))->build($headers, $claims, $key);
     }
 
     private function parseJwt(string $tokenString): TokenInterface
@@ -91,13 +85,23 @@ trait Lti1p3SecurityTestingTrait
 
     private function createTestClientAccessToken(RegistrationInterface $registration, array $scopes = []): string
     {
+        $keyChain = $registration->getPlatformKeyChain();
+        if ($keyChain === null) {
+            throw new LogicException('Keychain cannot be null');
+        }
+
+        $key = $keyChain->getPrivateKey();
+        if ($key === null) {
+            throw new LogicException('Key cannot be null');
+        }
+
         $accessToken = $this->buildJwt(
             [],
             [
                 MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
                 'scopes' => $scopes,
             ],
-            $registration->getPlatformKeyChain()->getPrivateKey()
+            $key
         );
 
         return $accessToken->toString();
