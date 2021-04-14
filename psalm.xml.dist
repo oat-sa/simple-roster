@@ -33,8 +33,14 @@
             <errorLevel type="suppress">
                 <file name="src/Entity/LineItem.php"/>
                 <file name="src/Logger/UserRequestLogProcessor.php"/>
+                <file name="tests/Traits/Lti1p3SecurityTestingTrait.php"/>
             </errorLevel>
         </PossiblyNullReference>
+        <PossiblyNullArgument>
+           <errorLevel type="suppress">
+               <file name="tests/Traits/Lti1p3SecurityTestingTrait.php"/>
+           </errorLevel>
+       </PossiblyNullArgument>
     </issueHandlers>
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>

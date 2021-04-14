@@ -99,8 +99,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "OAT\\SimpleRoster\\Tests\\": "tests/",
-            "OAT\\Library\\Lti1p3Core\\Tests\\": "vendor/oat-sa/lib-lti1p3-core/tests/"
+            "OAT\\SimpleRoster\\Tests\\": "tests/"
         }
     },
     "scripts": {
