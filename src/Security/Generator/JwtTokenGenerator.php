@@ -72,11 +72,11 @@ class JwtTokenGenerator
             // jti claim
             ->identifiedBy($this->uuidFactory->uuid4()->toString())
             // iat claim
-            ->issuedAt((new DateTimeImmutable)->setTimestamp($currentTime))
+            ->issuedAt((new DateTimeImmutable())->setTimestamp($currentTime))
             // nbf claim
-            ->canOnlyBeUsedAfter((new DateTimeImmutable)->setTimestamp($currentTime))
+            ->canOnlyBeUsedAfter((new DateTimeImmutable())->setTimestamp($currentTime))
             // exp claim
-            ->expiresAt((new DateTimeImmutable)->setTimestamp($currentTime + $ttl))
+            ->expiresAt((new DateTimeImmutable())->setTimestamp($currentTime + $ttl))
             ->getToken(new Sha256(), new Key($this->privateKeyPath, $this->passphrase));
     }
 }
