@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Generator;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
@@ -60,6 +61,7 @@ class JwtTokenGenerator
     public function create(UserInterface $user, Request $request, string $subjectClaim, int $ttl): Token
     {
         $currentTime = Carbon::now()->unix();
+        $currentTimeAsDateTime = (new DateTimeImmutable())->setTimestamp($currentTime);
 
         return $this->builder
             // iss claim
@@ -71,11 +73,11 @@ class JwtTokenGenerator
             // jti claim
             ->identifiedBy($this->uuidFactory->uuid4()->toString())
             // iat claim
-            ->issuedAt($currentTime)
+            ->issuedAt($currentTimeAsDateTime)
             // nbf claim
-            ->canOnlyBeUsedAfter($currentTime)
+            ->canOnlyBeUsedAfter($currentTimeAsDateTime)
             // exp claim
-            ->expiresAt($currentTime + $ttl)
+            ->expiresAt((new DateTimeImmutable())->setTimestamp($currentTime + $ttl))
             ->getToken(new Sha256(), new Key($this->privateKeyPath, $this->passphrase));
     }
 }
