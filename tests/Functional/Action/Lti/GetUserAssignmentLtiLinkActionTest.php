@@ -133,7 +133,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'ltiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'oxXzS9KaVG7kiu6SIqRXCYgZn7E=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
@@ -182,7 +182,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                 'ltiLink' => 'http://lti-director.com/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'ltiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'Wv2Cjd2fo3ZiznrdSNB5qrgd2OQ=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,
@@ -239,7 +239,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
                 'ltiLink' => 'http://lb_infra_2/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL2xpbmVpdGVtdXJpLmNvbSJ9',
                 'ltiParams' => [
                     'oauth_body_hash' => '',
-                    'oauth_consumer_key' => 'myKey',
+                    'oauth_consumer_key' => 'ltiKey',
                     'oauth_nonce' => (new NonceGenerator())->generate(),
                     'oauth_signature' => 'NDgJcOtOaGTc/t44toJNoYXdCd8=',
                     'oauth_signature_method' => OAuthContext::METHOD_MAC_SHA1,

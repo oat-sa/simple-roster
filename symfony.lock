@@ -198,7 +198,7 @@
         "version": "v1.0.6"
     },
     "php": {
-        "version": "7.2"
+        "version": "7.3"
     },
     "phpstan/extension-installer": {
         "version": "1.0.1"
@@ -259,18 +259,6 @@
             "version": "5.2",
             "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
         }
-    },
-    "sensiolabs/security-checker": {
-        "version": "4.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.0",
-            "ref": "160c9b600564faa1224e8f387d49ef13ceb8b793"
-        },
-        "files": [
-            "config/packages/security_checker.yaml"
-        ]
     },
     "symfony/apache-pack": {
         "version": "1.0",
