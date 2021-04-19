@@ -64,13 +64,16 @@ class UserTest extends KernelTestCase
 
     public function testItReturnsOnlyAvailableAssignments(): void
     {
+        Carbon::setTestNow();
+        $currentTime = Carbon::now();
+
         $availableLineItem = (new LineItem())
-            ->setStartAt(Carbon::create('-1 day'))
-            ->setEndAt(Carbon::create('+1 day'));
+            ->setStartAt($currentTime->sub('day', 1)->toDateTime())
+            ->setEndAt($currentTime->add('day', 3)->toDateTime());
 
         $unavailableLineItem = (new LineItem())
-            ->setStartAt(Carbon::create('+1 day'))
-            ->setEndAt(Carbon::create('+2 day'));
+            ->setStartAt($currentTime->add('day', 1)->toDateTime())
+            ->setEndAt($currentTime->add('day', 2)->toDateTime());
 
         $unavailableAssignment1 = (new Assignment())
             ->setState(Assignment::STATE_CANCELLED)
