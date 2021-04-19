@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.8 - To be released
+## 2.0.8 - 2021-04-20
 
 ### Fixed
 - Fixed [CVE-2021-30130](https://github.com/advisories/GHSA-vf4w-fg7r-5v94) security vulnerability.
