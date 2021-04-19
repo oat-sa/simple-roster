@@ -307,6 +307,9 @@ EOF
         }
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function initializeLineItemGroupIdsOption(InputInterface $input): void
     {
         $this->lineItemGroupIds = array_filter(
