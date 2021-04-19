@@ -29,7 +29,6 @@ use InvalidArgumentException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -229,6 +228,12 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '-s' => ',',
                 ],
                 'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
+            ],
+            'invalidLineItemGroupIds' => [
+                'parameters' => [
+                    '-g' => ',',
+                ],
+                'expectedOutput' => 'Invalid \'line-item-group-ids\' option received.',
             ],
             'invalidDate' => [
                 'parameters' => [
@@ -576,11 +581,6 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     'end_at' => '2020-01-01 00:00:00',
                 ],
             ],
-
-
-
-
-
             'usingDatesWithTimeZone' => [
                 'parameters' => [
                     '-s' => 'slug-1',
