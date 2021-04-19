@@ -23,8 +23,10 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Entity;
 
 use App\Entity\Assignment;
+use App\Entity\LineItem;
 use App\Entity\User;
 use App\Tests\Traits\DatabaseTestingTrait;
+use Carbon\Carbon;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserTest extends KernelTestCase
@@ -58,5 +60,41 @@ class UserTest extends KernelTestCase
 
         $this->assertEmpty($subject->getAssignments());
         $this->assertEmpty($subject->getAvailableAssignments());
+    }
+
+    public function testItReturnsOnlyAvailableAssignments(): void
+    {
+        Carbon::setTestNow();
+        $currentTime = Carbon::now();
+
+        $availableLineItem = (new LineItem())
+            ->setStartAt($currentTime->sub('day', 1)->toDateTime())
+            ->setEndAt($currentTime->add('day', 3)->toDateTime());
+
+        $unavailableLineItem = (new LineItem())
+            ->setStartAt($currentTime->add('day', 1)->toDateTime())
+            ->setEndAt($currentTime->add('day', 2)->toDateTime());
+
+        $unavailableAssignment1 = (new Assignment())
+            ->setState(Assignment::STATE_CANCELLED)
+            ->setLineItem($availableLineItem);
+
+        $unavailableAssignment2 = (new Assignment())
+            ->setState(Assignment::STATE_READY)
+            ->setLineItem($unavailableLineItem);
+
+        $expectedAvailableAssignment = (new Assignment())
+            ->setState(Assignment::STATE_READY)
+            ->setLineItem($availableLineItem);
+
+        $user = (new User())
+            ->addAssignment($unavailableAssignment1)
+            ->addAssignment($unavailableAssignment2)
+            ->addAssignment($expectedAvailableAssignment);
+
+        $availableAssignments = $user->getAvailableAssignments();
+        self::assertCount(1, $availableAssignments);
+
+        self::assertSame($expectedAvailableAssignment, $availableAssignments[0]);
     }
 }

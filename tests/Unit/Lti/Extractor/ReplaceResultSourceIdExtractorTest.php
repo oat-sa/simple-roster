@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +18,8 @@ declare(strict_types=1);
  *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Lti\Extractor;
 
 use App\Exception\InvalidLtiReplaceResultBodyException;
@@ -28,12 +28,18 @@ use PHPUnit\Framework\TestCase;
 
 class ReplaceResultSourceIdExtractorTest extends TestCase
 {
+    private const LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0';
+    private const OLD_LTI_OUTCOME_XML_NAMESPACE = 'http://www.imsglobal.org/lis/oms1p0/pox';
+
     public function testItCanExtractSourceId(): void
     {
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         /** @var string $xmlContent */
-        $xmlContent = file_get_contents(__DIR__ . '/../../../Resources/LtiOutcome/valid_replace_result_body.xml');
+        $xmlContent = file_get_contents(
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/valid_replace_result_body.xml'
+        );
 
         $this->assertEquals(1, $subject->extractSourceId($xmlContent));
     }
@@ -42,20 +48,36 @@ class ReplaceResultSourceIdExtractorTest extends TestCase
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
 
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         $subject->extractSourceId('invalid');
+    }
+
+    public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnInvalidXmlNamespace(): void
+    {
+        $this->expectException(InvalidLtiReplaceResultBodyException::class);
+
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
+
+        /** @var string $xmlContent */
+        $xmlContent = file_get_contents(
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/invalid_replace_result_body_wrong_namespace.xml'
+        );
+
+        $subject->extractSourceId($xmlContent);
     }
 
     public function testItThrowsInvalidLtiReplaceResultBodyExceptionOnMissingId(): void
     {
         $this->expectException(InvalidLtiReplaceResultBodyException::class);
 
-        $subject = new ReplaceResultSourceIdExtractor();
+        $subject = new ReplaceResultSourceIdExtractor(self::LTI_OUTCOME_XML_NAMESPACE);
 
         /** @var string $xmlContent */
         $xmlContent = file_get_contents(
-            __DIR__ . '/../../../Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR
+            . 'Resources/LtiOutcome/invalid_replace_result_body_missing_id.xml'
         );
 
         $subject->extractSourceId($xmlContent);

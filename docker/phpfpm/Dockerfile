@@ -11,7 +11,8 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
-RUN yes | pecl install igbinary redis apcu xdebug
+RUN yes | pecl install igbinary apcu xdebug
+RUN pecl install redis
 
 RUN docker-php-ext-install pdo && \
     docker-php-ext-install pdo_mysql && \
@@ -54,6 +55,8 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://simple_roster_blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
