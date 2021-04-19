@@ -61,6 +61,7 @@ class JwtTokenGenerator
     public function create(UserInterface $user, Request $request, string $subjectClaim, int $ttl): Token
     {
         $currentTime = Carbon::now()->unix();
+        $currentTimeAsDateTime = (new DateTimeImmutable())->setTimestamp($currentTime);
 
         return $this->builder
             // iss claim
@@ -72,9 +73,9 @@ class JwtTokenGenerator
             // jti claim
             ->identifiedBy($this->uuidFactory->uuid4()->toString())
             // iat claim
-            ->issuedAt((new DateTimeImmutable())->setTimestamp($currentTime))
+            ->issuedAt($currentTimeAsDateTime)
             // nbf claim
-            ->canOnlyBeUsedAfter((new DateTimeImmutable())->setTimestamp($currentTime))
+            ->canOnlyBeUsedAfter($currentTimeAsDateTime)
             // exp claim
             ->expiresAt((new DateTimeImmutable())->setTimestamp($currentTime + $ttl))
             ->getToken(new Sha256(), new Key($this->privateKeyPath, $this->passphrase));
