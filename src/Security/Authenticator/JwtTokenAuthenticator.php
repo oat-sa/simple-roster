@@ -85,11 +85,11 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
             throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$this->tokenVerifier->isValid($token) || !$token->hasClaim('aud')) {
+        if (!$this->tokenVerifier->isValid($token) || !$token->claims()->has('aud')) {
             throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$token->hasClaim('sub') || $token->getClaim('sub') !== 'accessToken') {
+        if (!$token->claims()->has('sub') || $token->claims()->get('sub') !== 'accessToken') {
             throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }
 
@@ -97,7 +97,7 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
             throw new AuthenticationException('Expired token.', Response::HTTP_FORBIDDEN);
         }
 
-        return $userProvider->loadUserByUsername((string)$token->getClaim('aud'));
+        return $userProvider->loadUserByUsername((string)$token->claims()->get('aud')[0]);
     }
 
     /**

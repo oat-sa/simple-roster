@@ -32,6 +32,14 @@ pipeline {
                     script: './bin/console cache:warmup --env=test'
                 )
                 sh(
+                    label: 'Running static code analysis - CodeSniffer',
+                    script: './vendor/bin/phpcs -p'
+                )
+                sh(
+                    label: 'Running static code analysis - Mess Detector',
+                    script: './vendor/bin/phpmd src,tests json phpmd.xml'
+                )
+                sh(
                     label: 'Running testing suite - PHPUnit & Infection',
                     script: 'XDEBUG_MODE=coverage && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --test-framework-options="--coverage-clover=var/log/phpunit/coverage.xml"'
                 )
@@ -40,20 +48,12 @@ pipeline {
                     script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
                 )
                 sh(
+                    label: 'Running static code analysis - Psalm',
+                    script: './vendor/bin/psalm --threads=$(nproc)'
+                )
+                sh(
                     label: 'Running static code analysis - PHPStan',
                     script: './vendor/bin/phpstan analyse'
-                )
-                sh(
-                    label: 'Running static code analysis - Psalm',
-                    script: './vendor/bin/psalm'
-                )
-                sh(
-                    label: 'Running static code analysis - CodeSniffer',
-                    script: './vendor/bin/phpcs -p'
-                )
-                sh(
-                    label: 'Running static code analysis - Mess Detector',
-                    script: './vendor/bin/phpmd src,tests json phpmd.xml'
                 )
             }
         }

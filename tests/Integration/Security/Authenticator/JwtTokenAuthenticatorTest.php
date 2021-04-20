@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
@@ -135,7 +136,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionMessage('Invalid token.');
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser((string)(new Builder())->getToken(), $this->userProvider);
+        $this->subject->getUser($this->createMock(Token::class), $this->userProvider);
     }
 
     public function testItThrowsAuthenticationExceptionIfAudClaimIsNotPresent(): void

@@ -22,12 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\Lti1p3SecurityTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 class UpdateLti1p3OutcomeActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
-    use SecurityTestingTrait;
+    use Lti1p3SecurityTestingTrait;
     use XmlTestingTrait;
     use AssignmentStatusTestingTrait;
 
