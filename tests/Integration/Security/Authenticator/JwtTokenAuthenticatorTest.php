@@ -34,7 +34,6 @@ use OAT\SimpleRoster\Security\Provider\UserProvider;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Uid\UuidV6;
 
@@ -89,7 +88,6 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         self::assertTrue($this->subject->supports($request));
     }
 
-
     /**
      * @dataProvider provideUnsupportedAuthorizationHeaderPayload
      */
@@ -126,7 +124,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $this->subject->getUser('invalidToken', $this->userProvider);
     }
@@ -135,7 +133,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $this->subject->getUser($this->createMock(Token::class), $this->userProvider);
     }
@@ -144,7 +142,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $token = (new Builder())->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
 
@@ -155,7 +153,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $token = (new Builder())
             ->permittedFor('testAudience')
@@ -168,7 +166,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Expired token.');
-        $this->expectExceptionCode(Response::HTTP_FORBIDDEN);
+        $this->expectExceptionCode(403);
 
         $expiredToken = $this->tokenGenerator->create(
             new User(new UuidV6(), 'testUser', 'testPassword'),
