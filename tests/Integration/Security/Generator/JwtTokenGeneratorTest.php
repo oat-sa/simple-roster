@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Security\Generator;
 
 use Carbon\Carbon;
+use Lcobucci\JWT\Token\DataSet;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -79,18 +80,28 @@ class JwtTokenGeneratorTest extends KernelTestCase
             ['HTTP_HOST' => 'test.com']
         );
 
-        Carbon::setTestNow(Carbon::createFromTimestamp(10000000000));
+        Carbon::setTestNow(Carbon::create(2019));
 
         $token = $this->subject->create($testUser, $request, 'testSubject', 199);
 
-        self::assertSame('http://test.com', $token->getClaim('iss'));
-        self::assertSame('testSubject', $token->getClaim('sub'));
-        self::assertSame('testUsername', $token->getClaim('aud'));
-        self::assertSame($expectedUuid, $token->getClaim('jti'));
-        self::assertSame(10000000000, $token->getClaim('iat'));
-        self::assertSame(10000000000, $token->getClaim('nbf'));
-        self::assertSame(10000000199, $token->getClaim('exp'));
+        self::assertSame('http://test.com', $token->claims()->get('iss'));
+        self::assertSame('testSubject', $token->claims()->get('sub'));
+        self::assertSame('testUsername', $token->claims()->get('aud')[0]);
+        self::assertSame($expectedUuid, $token->claims()->get('jti'));
+        $this->assertDatetimeClaim($token->claims(), 'iat', '2019-01-01T00:00:00+00:00');
+        $this->assertDatetimeClaim($token->claims(), 'nbf', '2019-01-01T00:00:00+00:00');
+        $this->assertDatetimeClaim($token->claims(), 'exp', '2019-01-01T00:03:19+00:00');
 
         Carbon::setTestNow();
+    }
+
+    private function assertDatetimeClaim(DataSet $claims, string $claim, string $dateTimeAtom): void
+    {
+        $expectedDate = $claims->get($claim);
+        if (!$expectedDate instanceof \DateTimeImmutable) {
+            $this->fail(sprintf("Claim '%s' expected to be instace of %s", $claim, \DateTimeImmutable::class));
+        }
+
+        self::assertSame($dateTimeAtom, $expectedDate->format(DATE_ATOM));
     }
 }

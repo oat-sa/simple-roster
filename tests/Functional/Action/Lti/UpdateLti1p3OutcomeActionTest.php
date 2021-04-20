@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use OAT\Bundle\Lti1p3Bundle\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\Lti1p3SecurityTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidFactoryInterface;
@@ -40,7 +40,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 {
     use ApiTestingTrait;
     use DatabaseTestingTrait;
-    use SecurityTestingTrait;
+    use Lti1p3SecurityTestingTrait;
     use XmlTestingTrait;
 
     /** @var RegistrationInterface */
@@ -170,7 +170,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
         $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
         $this->assertApiErrorResponseMessage(
-            'LTI service request authentication failed: The JWT string must have two dots'
+            'LTI service request authentication failed: Cannot parse token: The JWT string must have two dots'
         );
     }
 

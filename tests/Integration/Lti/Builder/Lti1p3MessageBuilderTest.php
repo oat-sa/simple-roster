@@ -75,15 +75,15 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $ltiParameters = $ltiMessage->getParameters();
 
         self::assertSame('http://localhost/lti1p3/oidc/initiation', $ltiMessage->getUrl());
-        self::assertSame('https://localhost/platform', $ltiParameters['iss']);
-        self::assertSame('user1::00000001-0000-6000-0000-000000000000', $ltiParameters['login_hint']);
-        self::assertSame('http://localhost/tool/launch', $ltiParameters['target_link_uri']);
-        self::assertSame('1', $ltiParameters['lti_deployment_id']);
-        self::assertSame('test', $ltiParameters['client_id']);
+        self::assertSame('https://localhost/platform', $ltiParameters->get('iss'));
+        self::assertSame('user1::00000001-0000-6000-0000-000000000000', $ltiParameters->get('login_hint'));
+        self::assertSame('http://localhost/tool/launch', $ltiParameters->get('target_link_uri'));
+        self::assertSame('1', $ltiParameters->get('lti_deployment_id'));
+        self::assertSame('test', $ltiParameters->get('client_id'));
 
         /** @var Parser $tokenParser */
         $tokenParser = self::$container->get('test.jwt_parser');
-        $token = $tokenParser->parse($ltiParameters['lti_message_hint']);
+        $token = $tokenParser->parse($ltiParameters->get('lti_message_hint'));
 
         self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/launch_presentation'));
         self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/context'));

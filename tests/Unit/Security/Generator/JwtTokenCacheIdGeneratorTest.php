@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Security\Generator;
 
 use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\DataSet;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use PHPUnit\Framework\TestCase;
 
@@ -32,13 +33,18 @@ class JwtTokenCacheIdGeneratorTest extends TestCase
     {
         $subject = new JwtTokenCacheIdGenerator();
 
-        $token = $this->createMock(Token::class);
+        $claims = new DataSet(
+            [
+                'sub' => 'testSubject',
+                'aud' => ['testUsername'],
+            ],
+            'test'
+        );
 
+        $token = $this->createMock(Token::class);
         $token
-            ->expects(self::exactly(2))
-            ->method('getClaim')
-            ->withConsecutive(['sub'], ['aud'])
-            ->willReturnOnConsecutiveCalls('testSubject', 'testUsername');
+            ->method('claims')
+            ->willReturn($claims);
 
         self::assertSame('jwt.testSubject.testUsername', $subject->generate($token));
     }
@@ -47,13 +53,13 @@ class JwtTokenCacheIdGeneratorTest extends TestCase
     {
         $subject = new JwtTokenCacheIdGenerator();
 
-        $token = $this->createMock(Token::class);
+        $claims = new DataSet(['aud' => ['testUsername']], 'test');
 
+        $token = $this->createMock(Token::class);
         $token
             ->expects(self::once())
-            ->method('getClaim')
-            ->with('aud')
-            ->willReturn('testUsername');
+            ->method('claims')
+            ->willReturn($claims);
 
         self::assertSame(
             'jwt.expectedSubject.testUsername',
