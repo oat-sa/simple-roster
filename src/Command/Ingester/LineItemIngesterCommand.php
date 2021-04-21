@@ -103,6 +103,7 @@ EOF
 
             $numberOfProcessedRows = 0;
             foreach ($this->csvReader->getRecords() as $rawLineItem) {
+                // Status column in optional for backward compatibility
                 $this->validateRow(
                     $rawLineItem,
                     'uri',
@@ -184,7 +185,7 @@ EOF
             $rawLineItem['label'],
             $rawLineItem['uri'],
             $rawLineItem['slug'],
-            LineItem::STATUS_ENABLED,
+            $rawLineItem['status'] ?? LineItem::STATUS_ENABLED,
             (int)$rawLineItem['maxAttempts'],
             $startAt,
             $endAt
