@@ -5,7 +5,7 @@
 ### Added
 - Added `status` column to `line_items` database table.
 - Added `status` column to `assignments` database table.
-- Added possibility to define `status` of Line items during ingestion. 
+- Added possibility to define (optionally) `status` of Line items during ingestion with default value `enabled` for backward compatibility. 
 
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
