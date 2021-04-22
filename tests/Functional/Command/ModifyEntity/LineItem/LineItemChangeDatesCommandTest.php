@@ -214,26 +214,26 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
-                'expectedOutput' => 'You need to specify \'line-item-ids\', \'line-item-slugs\'' .
-                    ' or \'line-item-group-ids\' option.',
+                'expectedOutput' => "You need to specify 'line-item-ids', 'line-item-slugs'" .
+                    " or 'line-item-group-ids' option.",
             ],
             'invalidLineItemIds' => [
                 'parameters' => [
                     '-i' => 'a,b,c',
                 ],
-                'expectedOutput' => 'Invalid \'line-item-ids\' option received.',
+                'expectedOutput' => "Invalid 'line-item-ids' option received.",
             ],
             'invalidLineItemSlugs' => [
                 'parameters' => [
                     '-s' => ',',
                 ],
-                'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
+                'expectedOutput' => "Invalid 'line-item-slugs' option received.",
             ],
             'invalidLineItemGroupIds' => [
                 'parameters' => [
                     '-g' => ',',
                 ],
-                'expectedOutput' => 'Invalid \'line-item-group-ids\' option received.',
+                'expectedOutput' => "Invalid 'line-item-group-ids' option received.",
             ],
             'invalidDate' => [
                 'parameters' => [
@@ -267,7 +267,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                         '00000003-0000-6000-0000-000000000000',
                     '-s' => 'slug1,slug2,slug3',
                 ],
-                'expectedOutput' => '\'line-item-ids\', \'line-item-slugs\' and \'line-item-group-ids\'' .
+                'expectedOutput' => "'line-item-ids', 'line-item-slugs' and 'line-item-group-ids'" .
                     ' are exclusive options.',
             ],
         ];

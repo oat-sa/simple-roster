@@ -110,8 +110,7 @@ EOF
                     'slug',
                     'startTimestamp',
                     'endTimestamp',
-                    'maxAttempts',
-                    'groupId'
+                    'maxAttempts'
                 );
 
                 $numberOfProcessedRows++;
