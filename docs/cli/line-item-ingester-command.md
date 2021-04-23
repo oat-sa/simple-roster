@@ -41,19 +41,20 @@ $ sudo -u www-data bin/console roster:ingest:line-item -h
 Here is an example csv structure: 
 
 ```csv
-uri,label,slug,startTimestamp,endTimestamp,maxAttempts
-http://taoplatform.loc/delivery_1.rdf,label1,gra13_ita_1,1546682400,1546713000,1
-http://taoplatform.loc/delivery_2.rdf,label2,gra13_ita_2,1546682400,1546713000,2
-http://taoplatform.loc/delivery_3.rdf,label2,gra13_ita_3,1546682400,1546713000,1
-http://taoplatform.loc/delivery_4.rdf,label4,gra13_ita_4,1546682400,1546713000,2
-http://taoplatform.loc/delivery_5.rdf,label5,gra13_ita_5,1546682400,1546713000,1
-http://taoplatform.loc/delivery_6.rdf,label6,gra13_ita_6,1546682400,1546713000,2
+uri,label,status,slug,startTimestamp,endTimestamp,maxAttempts
+http://taoplatform.loc/delivery_1.rdf,label1,enabled,gra13_ita_1,1546682400,1546713000,1
+http://taoplatform.loc/delivery_2.rdf,label2,disabled,gra13_ita_2,1546682400,1546713000,2
+http://taoplatform.loc/delivery_3.rdf,label2,disabled,gra13_ita_3,1546682400,1546713000,1
+http://taoplatform.loc/delivery_4.rdf,label4,enabled,gra13_ita_4,1546682400,1546713000,2
+http://taoplatform.loc/delivery_5.rdf,label5,enabled,gra13_ita_5,1546682400,1546713000,1
+http://taoplatform.loc/delivery_6.rdf,label6,enabled,gra13_ita_6,1546682400,1546713000,2
 ```
 
 | Column | Description |
 |--------|-------------|
 | `uri` | Delivery URI of the line item. |
 | `label` | Label of the line item. |
+| `status` | Status of the line item (Optional field). Possible values: `enabled`, `disabled` [default: `enabled`]
 | `slug` | Unique slug (external identifier) of the line item. |
 | `startTimestamp` | Starting date of line item as [Unix epoch timestamp](https://www.epochconverter.com/clock). |
 | `endTimestamp` | Ending date of line item as [Unix epoch timestamp](https://www.epochconverter.com/clock). |
