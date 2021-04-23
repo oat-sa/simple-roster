@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 - To be released
+## 3.0.0 - To be released
 
 ### Added
 - Added `status` column to `line_items` database table.
