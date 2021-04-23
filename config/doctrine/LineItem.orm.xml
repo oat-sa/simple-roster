@@ -36,6 +36,7 @@
                 <option name="default">0</option>
             </options>
         </field>
+        <field name="groupId" column="group_id" length="255" nullable="true"/>
         <entity-listeners>
             <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener">
                 <lifecycle-callback type="postUpdate" method="postUpdate"/>

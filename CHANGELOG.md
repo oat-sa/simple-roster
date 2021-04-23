@@ -5,10 +5,13 @@
 ### Added
 - Added `status` column to `line_items` database table.
 - Added `status` column to `assignments` database table.
+- Added `groupId` column to `line_items` database table.
 
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
 - Changed identifier generation strategy of all entities from `auto increment` to `uuid`.
+- Updated commands to work with line item group id.
+- Renamed `roster:modify-entity:line-item:change-state` to `roster:modify-entity:line-item:change-status`. 
 
 ### Removed
 - Removed `isActive` column from `line_items` database table.

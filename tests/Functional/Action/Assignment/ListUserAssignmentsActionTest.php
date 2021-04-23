@@ -95,6 +95,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                                 : '',
                             'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                             'maxAttempts' => $lineItem->getMaxAttempts(),
+                            'groupId' => $lineItem->getGroupId()
                         ],
                     ],
                 ],
@@ -138,6 +139,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                                 : '',
                             'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                             'maxAttempts' => $lineItem->getMaxAttempts(),
+                            'groupId' => $lineItem->getGroupId(),
                         ],
                     ],
                 ],

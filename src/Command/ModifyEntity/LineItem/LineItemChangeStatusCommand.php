@@ -33,18 +33,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
-class LineItemChangeStateCommand extends Command
+class LineItemChangeStatusCommand extends Command
 {
-    public const NAME = 'roster:modify-entity:line-item:change-state';
+    public const NAME = 'roster:modify-entity:line-item:change-status';
 
     private const FIELD_ID = 'id';
     private const FIELD_SLUG = 'slug';
     private const FIELD_URI = 'uri';
+    private const FIELD_GROUP_ID = 'groupId';
 
     private const AVAILABLE_QUERY_FIELDS = [
         self::FIELD_ID,
         self::FIELD_SLUG,
         self::FIELD_URI,
+        self::FIELD_GROUP_ID
     ];
 
     private const TOGGLE_ENABLE = 'enable';
@@ -97,7 +99,12 @@ To enable a line item by id:
 
 To enable a line item by uri:
 
-    <info>php %command.full_name% enable uri {line-item-id}</info>
+    <info>php %command.full_name% enable uri {line-item-uri}</info>
+    
+To enable a line item by group_id:
+
+    <info>php %command.full_name% enable group_id {line-item-group-id}</info>
+        
 To disable a line item by slug:
 
     <info>php %command.full_name% disable slug {line-item-slug}</info>
@@ -108,7 +115,11 @@ To disable a line item by id:
 
 To disable a line item by uri:
 
-    <info>php %command.full_name% disable uri {line-item-id}</info>
+    <info>php %command.full_name% disable uri {line-item-uri}</info>
+
+To disable a line item by group_id:
+
+    <info>php %command.full_name% disable group_id {line-item-group-id}</info>
 EOF
         );
 

@@ -6,6 +6,7 @@ OAT\SimpleRoster\Entity\LineItem:
             uri: 'https://test.taocloud.fr/__n/<current()>/'
             slug: 'slug-<current()>'
             status: 'enabled'
+            groupId: 'groupA'
     line_item_qqy:
         __construct:
             id: <uuidV6('00000003-0000-6000-0000-000000000000')>
@@ -16,3 +17,4 @@ OAT\SimpleRoster\Entity\LineItem:
             startAt: '<dateTime()>'
             endAt: '<dateTimeBetween($startAt, "+1 days")>'
             maxAttempts: 3
+            groupId: 'groupB'

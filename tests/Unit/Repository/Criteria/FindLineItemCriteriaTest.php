@@ -41,6 +41,7 @@ class FindLineItemCriteriaTest extends TestCase
             new UuidV6('00000002-0000-6000-0000-000000000000'),
             new UuidV6('00000003-0000-6000-0000-000000000000')
         );
+        $subject->addLineItemGroupIds('group1', 'group2', 'group3');
 
         self::assertTrue($subject->hasLineItemIdsCriteria());
         self::assertEquals(
@@ -54,5 +55,8 @@ class FindLineItemCriteriaTest extends TestCase
 
         self::assertTrue($subject->hasLineItemSlugsCriteria());
         self::assertSame(['slug1', 'slug2', 'slug3'], $subject->getLineItemSlugs());
+
+        self::assertTrue($subject->hasLineItemGroupIdsCriteria());
+        self::assertSame(['group1', 'group2', 'group3'], $subject->getLineItemGroupIds());
     }
 }

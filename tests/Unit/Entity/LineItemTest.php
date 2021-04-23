@@ -69,6 +69,7 @@ class LineItemTest extends TestCase
             'slug',
             LineItem::STATUS_ENABLED,
             0,
+            'group',
             $startAt,
             $endAt
         );
