@@ -130,6 +130,7 @@ class AssignmentTest extends TestCase
             'slug',
             $lineItemStatus,
             0,
+            'group',
             $lineItemStartDateTime,
             $lineItemEndDateTime
         );

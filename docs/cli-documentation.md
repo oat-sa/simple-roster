@@ -25,8 +25,8 @@
 
 ## Other commands
 
-| Command                                       | Description                         | Documentation                                              |
-| ----------------------------------------------|:------------------------------------|:-----------------------------------------------------------|
-| `roster:modify-entity:line-item:change-dates` | Change line-item(s) start/end dates | [link](cli/modify-entity-line-item-change-dates-command.md)|
-| `roster:modify-entity:line-item:change-state` | Activate/Deactivate line items      | [link](cli/modify-entity-line-item-change-state-command.md)|
-| `roster:garbage-collector:assignment`         | Assignment garbage collection       | [link](cli/assignment-garbage-collector-command.md)        |
+| Command                                       | Description                         | Documentation                                               |
+| ----------------------------------------------|:------------------------------------|:------------------------------------------------------------|
+| `roster:modify-entity:line-item:change-dates` | Change line-item(s) start/end dates | [link](cli/modify-entity-line-item-change-dates-command.md) |
+| `roster:modify-entity:line-item:change-status`| Activate/Deactivate line items      | [link](cli/modify-entity-line-item-change-status-command.md)|
+| `roster:garbage-collector:assignment`         | Assignment garbage collection       | [link](cli/assignment-garbage-collector-command.md)         |

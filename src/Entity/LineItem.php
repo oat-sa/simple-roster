@@ -56,6 +56,9 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var int */
     private $maxAttempts;
 
+    /** @var string|null */
+    private $groupId;
+
     /**
      * @throws InvalidArgumentException
      */
@@ -66,6 +69,7 @@ class LineItem implements JsonSerializable, EntityInterface
         string $slug,
         string $status,
         int $maxAttempts = 0,
+        string $groupId = null,
         DateTimeInterface $startAt = null,
         DateTimeInterface $endAt = null
     ) {
@@ -85,6 +89,7 @@ class LineItem implements JsonSerializable, EntityInterface
         }
 
         $this->maxAttempts = $maxAttempts;
+        $this->groupId = $groupId;
 
         $this->validateAvailabilityDates($startAt, $endAt);
 
@@ -189,6 +194,11 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->maxAttempts !== 0;
     }
 
+    public function getGroupId(): ?string
+    {
+        return $this->groupId;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -198,6 +208,7 @@ class LineItem implements JsonSerializable, EntityInterface
             'startDateTime' => $this->startAt !== null ? $this->startAt->getTimestamp() : '',
             'endDateTime' => $this->endAt !== null ? $this->endAt->getTimestamp() : '',
             'maxAttempts' => $this->getMaxAttempts(),
+            'groupId' => $this->getGroupId()
         ];
     }
 

@@ -187,6 +187,7 @@ EOF
             $rawLineItem['slug'],
             $rawLineItem['status'] ?? LineItem::STATUS_ENABLED,
             (int)$rawLineItem['maxAttempts'],
+            $rawLineItem['groupId'] ?? null,
             $startAt,
             $endAt
         );

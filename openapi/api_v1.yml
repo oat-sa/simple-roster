@@ -384,6 +384,10 @@ components:
                     type: integer
                     description: The maximum number of attempts
                     example: 1
+                groupId:
+                    type: string
+                    description: Line Item group id
+                    example: 'Operation A'
         BulkCreateOperation:
             type: object
             properties:

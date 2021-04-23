@@ -32,6 +32,9 @@ class FindLineItemCriteria
     /** @var string[] */
     private $lineItemSlugs = [];
 
+    /** @var string[] */
+    private $lineItemGroupIds = [];
+
     public function addLineItemIds(UuidV6 ...$lineItemIds): self
     {
         $this->lineItemIds = $lineItemIds;
@@ -42,6 +45,13 @@ class FindLineItemCriteria
     public function addLineItemSlugs(string ...$lineItemSlugs): self
     {
         $this->lineItemSlugs = $lineItemSlugs;
+
+        return $this;
+    }
+
+    public function addLineItemGroupIds(string ...$lineItemGroupIds): self
+    {
+        $this->lineItemGroupIds = $lineItemGroupIds;
 
         return $this;
     }
@@ -59,6 +69,11 @@ class FindLineItemCriteria
         return $this->lineItemSlugs;
     }
 
+    public function getLineItemGroupIds(): array
+    {
+        return $this->lineItemGroupIds;
+    }
+
     public function hasLineItemIdsCriteria(): bool
     {
         return !empty($this->lineItemIds);
@@ -67,5 +82,10 @@ class FindLineItemCriteria
     public function hasLineItemSlugsCriteria(): bool
     {
         return !empty($this->lineItemSlugs);
+    }
+
+    public function hasLineItemGroupIdsCriteria(): bool
+    {
+        return !empty($this->lineItemGroupIds);
     }
 }

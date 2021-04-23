@@ -29,7 +29,6 @@ use InvalidArgumentException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -215,19 +214,26 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     '--start-date' => '2020-01-01T00:00:00+0000',
                     '--end-date' => '2020-01-10T00:00:00+0000',
                 ],
-                'expectedOutput' => 'You need to specify line-item-ids or line-item-slugs option.',
+                'expectedOutput' => "You need to specify 'line-item-ids', 'line-item-slugs'" .
+                    " or 'line-item-group-ids' option.",
             ],
             'invalidLineItemIds' => [
                 'parameters' => [
                     '-i' => 'a,b,c',
                 ],
-                'expectedOutput' => 'Invalid \'line-item-ids\' option received.',
+                'expectedOutput' => "Invalid 'line-item-ids' option received.",
             ],
             'invalidLineItemSlugs' => [
                 'parameters' => [
                     '-s' => ',',
                 ],
-                'expectedOutput' => 'Invalid \'line-item-slugs\' option received.',
+                'expectedOutput' => "Invalid 'line-item-slugs' option received.",
+            ],
+            'invalidLineItemGroupIds' => [
+                'parameters' => [
+                    '-g' => ',',
+                ],
+                'expectedOutput' => "Invalid 'line-item-group-ids' option received.",
             ],
             'invalidDate' => [
                 'parameters' => [
@@ -255,13 +261,14 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                 ],
                 'expectedOutput' => 'End date should be later than start date.',
             ],
-            'informedBothSlugsAndIds' => [
+            'informedExclusiveOptions' => [
                 'parameters' => [
                     '-i' => '00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000,' .
                         '00000003-0000-6000-0000-000000000000',
                     '-s' => 'slug1,slug2,slug3',
                 ],
-                'expectedOutput' => 'Option \'line-item-ids\' and \'line-item-slugs\' are exclusive options.',
+                'expectedOutput' => "'line-item-ids', 'line-item-slugs' and 'line-item-group-ids'" .
+                    ' are exclusive options.',
             ],
         ];
     }
@@ -471,6 +478,97 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             'usingSlugsAndEndDateOnly' => [
                 'parameters' => [
                     '-s' => 'slug-1,slug-2,slug-qqy',
+                    '--end-date' => '2020-01-01T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                        new UuidV6('00000003-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => null,
+                    'end_at' => '2020-01-01 00:00:00',
+                ],
+            ],
+
+
+
+            'usingSingleGroupIdAndDates' => [
+                'parameters' => [
+                    '-g' => 'groupA',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
+            ],
+            'usingSingleGroupIdWithoutDates' => [
+                'parameters' => [
+                    '-g' => 'groupA',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => null,
+                    'end_at' => null,
+                ],
+            ],
+            'usingMultipleGroupIdsAndDates' => [
+                'parameters' => [
+                    '-g' => 'groupA,groupB',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                    '--end-date' => '2020-01-10T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                        new UuidV6('00000003-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => '2020-01-10 00:00:00',
+                ],
+            ],
+            'usingMultipleGroupIdsWithoutDates' => [
+                'parameters' => [
+                    '-g' => 'groupA,groupB',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                        new UuidV6('00000003-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => null,
+                    'end_at' => null,
+                ],
+            ],
+            'usingGroupIdsAndStartDateOnly' => [
+                'parameters' => [
+                    '-g' => 'groupA,groupB',
+                    '--start-date' => '2020-01-01T00:00:00+0000',
+                ],
+                'persistedData' => [
+                    'lineItemIds' => [
+                        new UuidV6('00000001-0000-6000-0000-000000000000'),
+                        new UuidV6('00000002-0000-6000-0000-000000000000'),
+                        new UuidV6('00000003-0000-6000-0000-000000000000'),
+                    ],
+                    'start_at' => '2020-01-01 00:00:00',
+                    'end_at' => null,
+                ],
+            ],
+            'usingGroupIdsAndEndDateOnly' => [
+                'parameters' => [
+                    '-g' => 'groupA,groupB',
                     '--end-date' => '2020-01-01T00:00:00+0000',
                 ],
                 'persistedData' => [

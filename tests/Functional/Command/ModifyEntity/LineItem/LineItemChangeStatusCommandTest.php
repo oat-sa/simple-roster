@@ -27,7 +27,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use LogicException;
 use Monolog\Logger;
-use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
+use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStatusCommand;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -39,7 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Uid\UuidV6;
 
-class LineItemChangeStateCommandTest extends KernelTestCase
+class LineItemChangeStatusCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -64,7 +64,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -195,7 +195,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         self::$container->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
-        $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
+        $commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));
 
         $commandTester->execute(
             ['toggle' => 'disable', 'query-field' => 'id', 'query-value' => '00000001-0000-6000-0000-000000000000'],
@@ -250,6 +250,15 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                 ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
+            ],
+            'byGroupId' => [
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
+                'query-field' => 'groupId',
+                'query-value' => ['groupA', 'groupB'],
             ],
         ];
     }

@@ -9,6 +9,7 @@ OAT\SimpleRoster\Entity\LineItem:
             startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
             maxAttempts: 1
+            groupId: 'groupA'
     lineItem2:
         __construct:
             id: <uuidV6('00000002-0000-6000-0000-000000000000')>
@@ -19,6 +20,7 @@ OAT\SimpleRoster\Entity\LineItem:
             startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
             maxAttempts: 1
+            groupId: 'groupA'
     lineItem3:
         __construct:
             id: <uuidV6('00000003-0000-6000-0000-000000000000')>
@@ -29,6 +31,7 @@ OAT\SimpleRoster\Entity\LineItem:
             startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
             maxAttempts: 1
+            groupId: 'groupB'
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment_{1..50}:
