@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Lti\LoadBalancer;
 
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
@@ -31,6 +32,7 @@ use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\LoadBalancer\UserGroupIdLtiInstanceLoadBalancer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
@@ -46,11 +48,11 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         $this->ltiInstanceCollection = new UniqueLtiInstanceCollection();
         $this->ltiInstanceCollection
-            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
-            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'))
-            ->add(new LtiInstance(3, 'infra_3', 'http://lb_infra_3', 'key', 'secret'))
-            ->add(new LtiInstance(4, 'infra_4', 'http://lb_infra_4', 'key', 'secret'))
-            ->add(new LtiInstance(5, 'infra_5', 'http://lb_infra_5', 'key', 'secret'));
+            ->add(new LtiInstance(new UuidV6(), 'label1', 'link1', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label2', 'link2', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label3', 'link3', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label4', 'link4', 'key', 'secret'))
+            ->add(new LtiInstance(new UuidV6(), 'label5', 'link5', 'key', 'secret'));
 
         $this->subject = new UserGroupIdLtiInstanceLoadBalancer($this->ltiInstanceCollection);
     }
@@ -60,11 +62,11 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
         self::assertInstanceOf(LtiInstanceLoadBalancerInterface::class, $this->subject);
     }
 
-    public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDetermined(): void
+    public function testItThrowsExceptionIfLtiInstanceUrlCannotBeDeterminedDueToMissingGroupId(): void
     {
         $this->expectException(IndeterminableLtiInstanceUrlException::class);
 
-        $this->subject->getLtiInstance(new User());
+        $this->subject->getLtiInstance(new User(new UuidV6(), 'testUser', 'testPassword'));
     }
 
     public function testItCanLoadBalanceByUsername(): void
@@ -84,7 +86,7 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         /** @var LtiInstance $expectedLtiInstance */
         foreach ($expectedResultsMap as $userGroupId => $expectedLtiInstance) {
-            $user = (new User())->setGroupId($userGroupId);
+            $user = new User(new UuidV6(), 'testUser', 'testPassword', $userGroupId);
 
             $actualLtiInstance = $this->subject->getLtiInstance($user);
 
@@ -105,15 +107,22 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
     {
         $this->expectException(IndeterminableLtiRequestContextIdException::class);
 
-        $assignment = (new Assignment())->setUser(new User());
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
+        $lineItem = new LineItem(new UuidV6(), 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lineItem);
+
+        $user->addAssignment($assignment);
 
         $this->subject->getLtiRequestContextId($assignment);
     }
 
     public function testItCanReturnLtiRequestContextId(): void
     {
-        $user = (new User())->setGroupId('group_5');
-        $assignment = (new Assignment())->setUser($user);
+        $user = new User(new UuidV6(), 'testUser', 'testPassword', 'group_5');
+        $lineItem = new LineItem(new UuidV6(), 'label', 'uri', 'slug', LineItem::STATUS_ENABLED);
+        $assignment = new Assignment(new UuidV6(), Assignment::STATUS_READY, $lineItem);
+
+        $user->addAssignment($assignment);
 
         self::assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
     }

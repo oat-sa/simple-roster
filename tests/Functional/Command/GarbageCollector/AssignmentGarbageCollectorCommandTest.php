@@ -57,13 +57,17 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
         Carbon::setTestNow((new DateTime())->format('Y-m-d H:i:s'));
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow();
+    }
+
     public function testOutputWhenThereIsNothingToUpdate(): void
     {
         self::assertSame(0, $this->commandTester->execute([]));
-        self::assertStringContainsString(
-            '[OK] Nothing to update.',
-            $this->commandTester->getDisplay()
-        );
+        self::assertStringContainsString('[OK] Nothing to update.', $this->commandTester->getDisplay());
     }
 
     public function testDryRunDoesNotUpdateAssignmentState(): void
@@ -72,13 +76,13 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
 
         self::assertSame(0, $this->commandTester->execute([]));
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
         self::assertCount(
-            10,
-            $this->getRepository(Assignment::class)->findBy(['state' => Assignment::STATE_STARTED])
+            9,
+            $this->getRepository(Assignment::class)->findBy(['status' => Assignment::STATUS_STARTED])
         );
     }
 
@@ -93,31 +97,32 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             ]
         ));
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
         $expectedStatusMap = [
-            1 => Assignment::STATE_COMPLETED,
-            2 => Assignment::STATE_COMPLETED,
-            3 => Assignment::STATE_COMPLETED,
-            4 => Assignment::STATE_READY,
-            5 => Assignment::STATE_READY,
-            6 => Assignment::STATE_READY,
-            7 => Assignment::STATE_READY,
-            8 => Assignment::STATE_READY,
-            9 => Assignment::STATE_READY,
-            10 => Assignment::STATE_READY,
+            1 => Assignment::STATUS_COMPLETED,
+            2 => Assignment::STATUS_COMPLETED,
+            3 => Assignment::STATUS_COMPLETED,
+            4 => Assignment::STATUS_READY,
+            5 => Assignment::STATUS_READY,
+            6 => Assignment::STATUS_READY,
+            7 => Assignment::STATUS_READY,
+            8 => Assignment::STATUS_READY,
+            9 => Assignment::STATUS_READY,
+            10 => Assignment::STATUS_READY,
         ];
 
         $logMessagePlaceholder = "Assignment with id='%s' of user with username='%s' has been collected and " .
             "marked as '%s' by garbage collector.";
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 9; $i++) {
+            $expectedAssignmentIdInLog = sprintf('0000000%d-0000-6000-0000-000000000000', $i);
             $this->assertHasLogRecordWithMessage(
                 sprintf(
                     $logMessagePlaceholder,
-                    $i,
+                    $expectedAssignmentIdInLog,
                     'userWithStartedButStuckAssignment_' . $i,
                     $expectedStatusMap[$i]
                 ),
@@ -146,7 +151,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             )
         );
         self::assertStringContainsString(
-            "[OK] Total of '10' stuck assignments were successfully collected.",
+            "[OK] Total of '9' stuck assignments were successfully collected.",
             $this->commandTester->getDisplay()
         );
 
@@ -172,11 +177,11 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
             $assignment->getLineItem()->getMaxAttempts() === 0
             || $assignment->getAttemptsCount() < $assignment->getLineItem()->getMaxAttempts()
         ) {
-            self::assertSame(Assignment::STATE_READY, $assignment->getState());
+            self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
 
             return;
         }
 
-        self::assertSame(Assignment::STATE_COMPLETED, $assignment->getState());
+        self::assertSame(Assignment::STATUS_COMPLETED, $assignment->getStatus());
     }
 }

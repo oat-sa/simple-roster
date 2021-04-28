@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,26 +15,24 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Traits;
+namespace OAT\SimpleRoster\Faker\Provider;
 
-use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
+use Exception;
+use Faker\Provider\Base as BaseProvider;
+use Symfony\Component\Uid\UuidV6;
 
-trait AssignmentStatusTestingTrait
+class UuidFakerProvider extends BaseProvider
 {
-    public function assertAssignmentStatus(string $status): void
+    /**
+     * @throws Exception
+     */
+    public static function uuidV6(string $uuidV6 = null): UuidV6
     {
-        /** @var AssignmentRepository $repository */
-        $repository = $this->getRepository(Assignment::class);
-
-        $assignment = $repository->find(1);
-
-        self::assertInstanceOf(Assignment::class, $assignment);
-        self::assertSame($status, $assignment->getState());
+        return new UuidV6($uuidV6);
     }
 }

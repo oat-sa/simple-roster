@@ -213,7 +213,8 @@ paths:
                     description: The ID of the assignment
                     required: true
                     schema:
-                        type: integer
+                        type: string
+                    example: '1eb8b191-65c6-6334-af9e-0940ec6dd603'
             responses:
                 200:
                     description: Success
@@ -332,16 +333,16 @@ components:
             type: object
             properties:
                 id:
-                    type: integer
+                    type: string
                     description: The assignment ID
-                    example: 13
+                    example: '1eb8b191-65c6-6334-af9e-0940ec6dd603'
                 username:
                     type: string
                     description: The username of the user who belongs to the assignment
                     example: johndoe
-                state:
+                status:
                     type: string
-                    description: State of assignment
+                    description: Status of assignment
                     enum:
                         - ready
                         - started
@@ -372,10 +373,21 @@ components:
                     type: integer
                     description: The end DateTime in UNIX timestamp
                     example: 1542880258
+                status:
+                    type: string
+                    enum:
+                        - enabled
+                        - disabled
+                    description: Status of the line item
+                    example: enabled
                 maxAttempts:
                     type: integer
                     description: The maximum number of attempts
                     example: 1
+                groupId:
+                    type: string
+                    description: Line Item group id
+                    example: 'Operation A'
         BulkCreateOperation:
             type: object
             properties:
@@ -394,7 +406,7 @@ components:
                     type: array
                     items: {}
                     description: Operation attributes
-                    example: ["state": "cancelled"]
+                    example: ["status": "cancelled"]
         UpdateLineItemWebHook:
             type: object
             properties:

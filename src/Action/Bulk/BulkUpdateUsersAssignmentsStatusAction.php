@@ -24,19 +24,19 @@ namespace OAT\SimpleRoster\Action\Bulk;
 
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
+use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStatusService;
 use Symfony\Component\HttpFoundation\Response;
 
-class BulkUpdateUsersAssignmentsStateAction
+class BulkUpdateUsersAssignmentsStatusAction
 {
-    /** @var BulkUpdateUsersAssignmentsStateService */
+    /** @var BulkUpdateUsersAssignmentsStatusService */
     private $bulkAssignmentsStateService;
 
     /** @var SerializerResponder */
     private $responder;
 
     public function __construct(
-        BulkUpdateUsersAssignmentsStateService $bulkUpdateAssignmentsStateService,
+        BulkUpdateUsersAssignmentsStatusService $bulkUpdateAssignmentsStateService,
         SerializerResponder $responder
     ) {
         $this->bulkAssignmentsStateService = $bulkUpdateAssignmentsStateService;

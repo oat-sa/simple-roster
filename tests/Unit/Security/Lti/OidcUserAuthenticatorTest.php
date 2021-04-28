@@ -33,6 +33,7 @@ use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class OidcUserAuthenticatorTest extends KernelTestCase
 {
@@ -72,10 +73,10 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 
     public function testAuthenticateSuccessfully(): void
     {
-        $loginHint = 'user1::1';
-        $loginHintDto = new LoginHintDto('user1', 1);
+        $loginHint = 'user1::00000001-0000-6000-0000-000000000000';
+        $loginHintDto = new LoginHintDto('user1', new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        $user = $this->getRepository(User::class)->find(1);
+        $user = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         $this->loginHintExtractor
             ->expects(self::once())
@@ -92,7 +93,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->expects(self::once())
             ->method('info')
             ->with(
-                'OIDC authentication was successful with login hint user1::1',
+                'OIDC authentication was successful with login hint user1::00000001-0000-6000-0000-000000000000',
                 [
                     'username' => $loginHintDto->getUsername(),
                     'assignmentId' => $loginHintDto->getAssignmentId(),
@@ -109,12 +110,14 @@ class OidcUserAuthenticatorTest extends KernelTestCase
     public function testAuthenticateShouldFailIfAssignmentIsNotFound(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Assignment with ID 2 not found for username user1.');
+        $this->expectExceptionMessage(
+            'Assignment with ID 00000099-0000-6000-0000-000000000000 not found for username user1.'
+        );
 
-        $user = $this->getRepository(User::class)->find(1);
+        $user = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
 
-        $loginHint = 'user1::2';
-        $loginHintDto = new LoginHintDto('user1', 2);
+        $loginHint = 'user1::00000099-0000-6000-0000-000000000000';
+        $loginHintDto = new LoginHintDto('user1', new UuidV6('00000099-0000-6000-0000-000000000000'));
 
         $this->userRepository
             ->expects(self::once())

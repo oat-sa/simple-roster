@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\Infrastructure;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
@@ -33,6 +32,7 @@ use OAT\SimpleRoster\Service\CompleteUserAssignmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class CompleteUserAssignmentServiceTest extends TestCase
 {
@@ -58,115 +58,123 @@ class CompleteUserAssignmentServiceTest extends TestCase
     public function testItThrowsExceptionIfAssignmentCannotBeFoundById(): void
     {
         $this->expectException(AssignmentNotFoundException::class);
-        $this->expectExceptionMessage("Assignment with id '5' not found.");
+        $this->expectExceptionMessage("Assignment with id '00000001-0000-6000-0000-000000000000' not found.");
 
         $this->assignmentRepository
             ->method('findById')
             ->willThrowException(new EntityNotFoundException());
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted(new UuidV6('00000001-0000-6000-0000-000000000000'));
     }
 
     public function testItMarksAssignmentAsCompleted(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(1);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            1
+        );
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem, 1);
+
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_COMPLETED;
+                return $assignment->getStatus() === Assignment::STATUS_COMPLETED;
             }));
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('flush');
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 
     public function testItMarksAssignmentAsReady(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug')
-            ->setMaxAttempts(2);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED,
+            2
+        );
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user)
-            ->setAttemptsCount(1);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem, 1);
+
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('persist')
             ->with(self::callback(static function (Assignment $assignment) {
-                return $assignment->getState() === Assignment::STATE_READY;
+                return $assignment->getStatus() === Assignment::STATUS_READY;
             }));
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('flush');
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 
     public function testItLogsSuccessfulCompletion(): void
     {
-        $user = (new User())->setUsername('expectedUsername');
+        $user = new User(new UuidV6(), 'expectedUsername', 'testPassword');
 
-        $lineItem = (new LineItem())
-            ->setUri('uri')
-            ->setLabel('label')
-            ->setSlug('slug');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
-        $assignment = (new Assignment())
-            ->setState(Assignment::STATE_STARTED)
-            ->setLineItem($lineItem)
-            ->setUser($user);
+        $assignmentId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $assignment = new Assignment($assignmentId, Assignment::STATUS_STARTED, $lineItem);
+
+        $user->addAssignment($assignment);
 
         $this->assignmentRepository
             ->expects(self::once())
             ->method('findById')
-            ->with(5)
+            ->with($assignmentId)
             ->willReturn($assignment);
 
         $this->logger
             ->expects(self::once())
             ->method('info')
             ->with(
-                "Assignment with id='5' of user with username='expectedUsername' has been marked as completed.",
+                "Assignment with id='00000001-0000-6000-0000-000000000000' of user with username='expectedUsername' " .
+                "has been marked as completed.",
                 ['lineItem' => $assignment->getLineItem()]
             );
 
-        $this->subject->markAssignmentAsCompleted(5);
+        $this->subject->markAssignmentAsCompleted($assignmentId);
     }
 }

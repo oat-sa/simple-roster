@@ -32,6 +32,7 @@ use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class UpdateLineItemsServiceTest extends TestCase
 {
@@ -91,16 +92,18 @@ class UpdateLineItemsServiceTest extends TestCase
             ->method('findBy')
             ->with(
                 [
-                    'slug' => ['qti-interactions-delivery']
+                    'slug' => ['qti-interactions-delivery'],
                 ]
             )
-            ->willReturn(
-                [
-                    (new LineItem())
-                        ->setSlug('qti-interactions-delivery')
-                        ->setUri('http://lineitemuri.com')
-                ]
-            );
+            ->willReturn([
+                new LineItem(
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    'testLabel',
+                    'http://lineitemuri.com',
+                    'qti-interactions-delivery',
+                    LineItem::STATUS_ENABLED
+                ),
+            ]);
 
         $this->entityManager->expects(self::once())
             ->method('persist');
@@ -108,10 +111,10 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::once())
             ->method('info')
             ->with(
-                'The line item id 0 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'http://lineitemuri.com',
-                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
+                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 ]
             );
 
@@ -138,19 +141,24 @@ class UpdateLineItemsServiceTest extends TestCase
 
     public function testItIgnoresDuplicatedUpdates(): void
     {
-        $lineItem = (new LineItem())
-            ->setSlug('qti-interactions-delivery');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'qti-interactions-delivery',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(
                 [
-                    'slug' => ['qti-interactions-delivery', 'qti-interactions-delivery']
+                    'slug' => ['qti-interactions-delivery', 'qti-interactions-delivery'],
                 ]
             )
             ->willReturn(
                 [
-                    $lineItem
+                    $lineItem,
                 ]
             );
 
@@ -163,10 +171,10 @@ class UpdateLineItemsServiceTest extends TestCase
         $this->logger->expects(self::at(0))
             ->method('info')
             ->with(
-                'The line item id 0 was updated',
+                'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 [
                     'oldUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
-                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5'
+                    'newUri' => 'https://tao.instance/ontologies/tao.rdf#i5fb5',
                 ]
             );
 
@@ -207,7 +215,7 @@ class UpdateLineItemsServiceTest extends TestCase
             ->method('findBy')
             ->with(
                 [
-                    'slug' => ['qti-interactions-delivery']
+                    'slug' => ['qti-interactions-delivery'],
                 ]
             )
             ->willReturn([]);
@@ -219,7 +227,7 @@ class UpdateLineItemsServiceTest extends TestCase
             ->with(
                 'Impossible to update the line item. The slug qti-interactions-delivery does not exist.',
                 [
-                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f'
+                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f',
                 ]
             );
 

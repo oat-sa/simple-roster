@@ -27,7 +27,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use LogicException;
 use Monolog\Logger;
-use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
+use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStatusCommand;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
@@ -36,8 +37,9 @@ use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Uid\UuidV6;
 
-class LineItemChangeStateCommandTest extends KernelTestCase
+class LineItemChangeStatusCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -62,7 +64,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $kernel = self::bootKernel();
 
         $application = new Application($kernel);
-        $this->commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
+        $this->commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -84,81 +86,82 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItDeactivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
+    public function testItDisablesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
-            self::assertTrue($lineItem->isActive());
+            self::assertTrue($lineItem->isEnabled());
 
             $lineItemCache = $this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId));
             $cache = current(current($lineItemCache));
-            self::assertSame('1', $cache['is_active_3']);
+
+            self::assertSame('enabled', $cache['status_3']);
         }
 
         $commandResult = $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => $queryField,
-                'query-value' => $queryValue
+                'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
         self::assertEquals(0, $commandResult);
 
-        $this->assertMessageDisplays($lineItemIds, 'deactivate');
+        $this->assertMessageDisplays($lineItemIds, 'disable');
 
-        $this->assertLineItems($lineItemIds, 'deactivate', false);
+        $this->assertLineItems($lineItemIds, 'disable', LineItem::STATUS_DISABLED);
     }
 
     /**
      * @dataProvider provideValidArguments
      */
-    public function testItActivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
+    public function testItEnablesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => $queryField,
                 'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
 
-        $this->assertLineItems($lineItemIds, 'deactivate', false);
+        $this->assertLineItems($lineItemIds, 'disable', LineItem::STATUS_DISABLED);
 
         $commandResult = $this->commandTester->execute(
             [
-                'toggle' => 'activate',
+                'toggle' => 'enable',
                 'query-field' => $queryField,
-                'query-value' => $queryValue
+                'query-value' => $queryValue,
             ],
             ['capture_stderr_separately' => true]
         );
         self::assertEquals(0, $commandResult);
 
-        $this->assertMessageDisplays($lineItemIds, 'activate');
+        $this->assertMessageDisplays($lineItemIds, 'enable');
 
-        $this->assertLineItems($lineItemIds, 'activate', true);
+        $this->assertLineItems($lineItemIds, 'enable', LineItem::STATUS_ENABLED);
     }
 
-    public function testEnsureOnlyOneLineIsDeactivated(): void
+    public function testEnsureOnlyOneLineIsDisabled(): void
     {
-        $secondLineItem = $this->lineItemRepository->findOneById(2);
-        self::assertTrue($secondLineItem->isActive());
+        $secondLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000002-0000-6000-0000-000000000000'));
+        self::assertTrue($secondLineItem->isEnabled());
 
         $this->commandTester->execute(
             [
-                'toggle' => 'deactivate',
+                'toggle' => 'disable',
                 'query-field' => 'id',
-                'query-value' => 1,
+                'query-value' => '00000001-0000-6000-0000-000000000000',
             ],
             ['capture_stderr_separately' => true]
         );
-        $firstLineItem = $this->lineItemRepository->findOneById(1);
-        self::assertFalse($firstLineItem->isActive());
+        $firstLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000001-0000-6000-0000-000000000000'));
+        self::assertFalse($firstLineItem->isEnabled());
 
-        $secondLineItem = $this->lineItemRepository->findOneById(2);
-        self::assertTrue($secondLineItem->isActive());
+        $secondLineItem = $this->lineItemRepository->findOneById(new UuidV6('00000002-0000-6000-0000-000000000000'));
+        self::assertTrue($secondLineItem->isEnabled());
     }
 
     /**
@@ -186,16 +189,16 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $lineItemRepository = $this->createMock(LineItemRepository::class);
         $lineItemRepository->expects(self::once())
             ->method('findBy')
-            ->with(['id' => 1])
+            ->with(['id' => [(new UuidV6('00000001-0000-6000-0000-000000000000'))->toBinary()]])
             ->willThrowException(new Exception('Database Error'));
 
         self::$container->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
-        $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));
+        $commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));
 
         $commandTester->execute(
-            ['toggle' => 'deactivate', 'query-field' => 'id', 'query-value' => '1'],
+            ['toggle' => 'disable', 'query-field' => 'id', 'query-value' => '00000001-0000-6000-0000-000000000000'],
             ['capture_stderr_separately' => true]
         );
 
@@ -206,34 +209,56 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     {
         return [
             'bySlug' => [
-                'line-item-ids' => [2],
+                'line-item-ids' => [new UuidV6('00000002-0000-6000-0000-000000000000')],
                 'query-field' => 'slug',
                 'query-value' => ['lineItemSlug2'],
             ],
             'byMultipleSlugs' => [
-                'line-item-ids' => [2, 1],
+                'line-item-ids' => [
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                ],
                 'query-field' => 'slug',
                 'query-value' => ['lineItemSlug2', 'lineItemSlug1'],
             ],
             'byId' => [
-                'line-item-ids' => [1],
+                'line-item-ids' => [new UuidV6('00000001-0000-6000-0000-000000000000')],
                 'query-field' => 'id',
-                'query-value' => ['1'],
+                'query-value' => ['00000001-0000-6000-0000-000000000000'],
             ],
             'byMultipleIds' => [
-                'line-item-ids' => [1, 3],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
                 'query-field' => 'id',
-                'query-value' => ['1', '3'],
+                'query-value' => ['00000001-0000-6000-0000-000000000000', '00000003-0000-6000-0000-000000000000'],
             ],
             'byUri' => [
-                'line-item-ids' => [1, 2],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com'],
             ],
             'byMultipleUris' => [
-                'line-item-ids' => [1, 2, 3],
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
                 'query-field' => 'uri',
                 'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
+            ],
+            'byGroupId' => [
+                'line-item-ids' => [
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    new UuidV6('00000002-0000-6000-0000-000000000000'),
+                    new UuidV6('00000003-0000-6000-0000-000000000000'),
+                ],
+                'query-field' => 'groupId',
+                'query-value' => ['groupA', 'groupB'],
             ],
         ];
     }
@@ -247,11 +272,11 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                     'query-field' => 'id',
                     'query-value' => '1',
                 ],
-                'expectedMessage' => 'Invalid toggle argument. Please use: activate, deactivate',
+                'expectedMessage' => 'Invalid toggle argument. Please use: enable, disable',
             ],
             'invalidQueryField' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                     'query-field' => 'invalid-query-field',
                     'query-value' => '1',
                 ],
@@ -263,24 +288,24 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             ],
             'only-toggle' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                 ],
                 'expectedMessage' => 'Not enough arguments (missing: "query-field, query-value")',
             ],
             'with-no-query-value' => [
                 'arguments' => [
-                    'toggle' => 'activate',
+                    'toggle' => 'enable',
                     'query-field' => 'uri',
                 ],
                 'expectedMessage' => 'Not enough arguments (missing: "query-value")',
-            ]
+            ],
         ];
     }
 
     private function assertMessageDisplays(array $lineItemIds, string $toggle): void
     {
         self::assertStringContainsString(
-            'Simple Roster - Line Item Activator',
+            'Simple Roster - Line item status updater',
             $this->commandTester->getDisplay()
         );
         self::assertStringContainsString(
@@ -293,43 +318,28 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         );
     }
 
-    private function assertLineItems(array $lineItemIds, string $toggle, bool $isActive): void
+    private function assertLineItems(array $lineItemIds, string $toggle, string $expectedLineItemStatus): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $this->assertHasLogRecord(
                 [
                     'message' => sprintf(
-                        'The operation: "%s" was executed for Line Item with id: "%d"',
+                        "The operation: '%s' was executed for Line Item with id: '%s'",
                         $toggle,
                         $lineItemId
                     ),
-                    'context' => [
-                        'slug' => sprintf('lineItemSlug%d', $lineItemId),
-                        'uri' => $this->getContextUriByLineItemId($lineItemId),
-                    ],
                 ],
                 Logger::INFO
             );
 
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
 
-            self::assertSame($isActive, $lineItem->isActive());
+            self::assertSame($expectedLineItemStatus, $lineItem->getStatus());
 
             $cache = current(
                 current($this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId)))
             );
-            self::assertEquals((int)$isActive, $cache['is_active_3']);
+            self::assertEquals($expectedLineItemStatus, $cache['status_3']);
         }
-    }
-
-    private function getContextUriByLineItemId(int $lineItemId): string
-    {
-        $contextUris = [
-            1 => 'http://lineitemuri.com',
-            2 => 'http://lineitemuri.com',
-            3 => 'http://different-lineitemuri.com',
-        ];
-
-        return $contextUris[$lineItemId];
     }
 }

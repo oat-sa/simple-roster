@@ -22,15 +22,20 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository\Criteria;
 
+use Symfony\Component\Uid\UuidV6;
+
 class FindLineItemCriteria
 {
-    /** @var int[] */
+    /** @var UuidV6[] */
     private $lineItemIds = [];
 
     /** @var string[] */
     private $lineItemSlugs = [];
 
-    public function addLineItemIds(int ...$lineItemIds): self
+    /** @var string[] */
+    private $lineItemGroupIds = [];
+
+    public function addLineItemIds(UuidV6 ...$lineItemIds): self
     {
         $this->lineItemIds = $lineItemIds;
 
@@ -44,6 +49,16 @@ class FindLineItemCriteria
         return $this;
     }
 
+    public function addLineItemGroupIds(string ...$lineItemGroupIds): self
+    {
+        $this->lineItemGroupIds = $lineItemGroupIds;
+
+        return $this;
+    }
+
+    /**
+     * @return UuidV6[]
+     */
     public function getLineItemIds(): array
     {
         return $this->lineItemIds;
@@ -54,6 +69,11 @@ class FindLineItemCriteria
         return $this->lineItemSlugs;
     }
 
+    public function getLineItemGroupIds(): array
+    {
+        return $this->lineItemGroupIds;
+    }
+
     public function hasLineItemIdsCriteria(): bool
     {
         return !empty($this->lineItemIds);
@@ -62,5 +82,10 @@ class FindLineItemCriteria
     public function hasLineItemSlugsCriteria(): bool
     {
         return !empty($this->lineItemSlugs);
+    }
+
+    public function hasLineItemGroupIdsCriteria(): bool
+    {
+        return !empty($this->lineItemGroupIds);
     }
 }

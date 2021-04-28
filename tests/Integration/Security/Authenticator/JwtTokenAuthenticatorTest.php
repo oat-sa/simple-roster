@@ -34,8 +34,8 @@ use OAT\SimpleRoster\Security\Provider\UserProvider;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Uid\UuidV6;
 
 class JwtTokenAuthenticatorTest extends KernelTestCase
 {
@@ -64,12 +64,12 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = static::$container->get(JwtTokenAuthenticator::class);
+        $this->subject = self::$container->get(JwtTokenAuthenticator::class);
 
-        $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
-        $this->userProvider = static::$container->get(UserProvider::class);
-        $this->jwtPrivateKeyPath = static::$container->getParameter('app.jwt.private_key_path');
-        $this->jwtPassphrase = static::$container->getParameter('app.jwt.passphrase');
+        $this->tokenGenerator = self::$container->get(JwtTokenGenerator::class);
+        $this->userProvider = self::$container->get(UserProvider::class);
+        $this->jwtPrivateKeyPath = self::$container->getParameter('app.jwt.private_key_path');
+        $this->jwtPassphrase = self::$container->getParameter('app.jwt.passphrase');
     }
 
     public function testItSupportRequestOnlyWithAuthorizationBearerHeaderPresent(): void
@@ -87,7 +87,6 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         self::assertTrue($this->subject->supports($request));
     }
-
 
     /**
      * @dataProvider provideUnsupportedAuthorizationHeaderPayload
@@ -125,7 +124,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $this->subject->getUser('invalidToken', $this->userProvider);
     }
@@ -134,7 +133,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $this->subject->getUser($this->createMock(Token::class), $this->userProvider);
     }
@@ -143,7 +142,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $token = (new Builder())->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
 
@@ -154,7 +153,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionCode(400);
 
         $token = (new Builder())
             ->permittedFor('testAudience')
@@ -167,10 +166,10 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Expired token.');
-        $this->expectExceptionCode(Response::HTTP_FORBIDDEN);
+        $this->expectExceptionCode(403);
 
         $expiredToken = $this->tokenGenerator->create(
-            (new User())->setUsername('testUser'),
+            new User(new UuidV6(), 'testUser', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600
@@ -189,7 +188,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionMessage("Username 'testUser' does not exist");
 
         $token = $this->tokenGenerator->create(
-            (new User())->setUsername('testUser'),
+            new User(new UuidV6(), 'testUser', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600
@@ -203,7 +202,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $token = $this->tokenGenerator->create(
-            (new User())->setUsername('user1'),
+            new User(new UuidV6(), 'user1', 'testPassword'),
             Request::create('/test'),
             'accessToken',
             3600

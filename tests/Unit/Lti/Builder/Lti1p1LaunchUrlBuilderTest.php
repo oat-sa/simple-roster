@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerInterface;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p1LaunchUrlBuilderTest extends TestCase
 {
@@ -49,23 +50,27 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
 
         $ltiConfiguration = new LtiConfiguration(LtiRequest::LTI_VERSION_1P1, 'returnUrl', 'en-EN', 'registrationId');
 
-        $ltiInstance = new LtiInstance(1, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
+        $ltiInstanceId = new UuidV6('00000001-0000-6000-0000-000000000000');
+        $ltiInstance = new LtiInstance($ltiInstanceId, 'ltiInstance', 'ltiLink', 'ltiKey', 'ltiSecret');
 
-        $assignment = $this->createPartialMock(Assignment::class, ['getId']);
-        $assignment
-            ->method('getId')
-            ->willReturn(10);
+        $lineItem = new LineItem(new UuidV6(), 'testLabel', 'http://test.com', 'testSlug', LineItem::STATUS_ENABLED);
 
-        $assignment
-            ->setUser((new User())->setUsername('testUser'))
-            ->setLineItem((new LineItem())->setUri('http://test-uri.com'));
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
+
+        $assignment = new Assignment(
+            new UuidV6('00000010-0000-6000-0000-000000000000'),
+            Assignment::STATUS_READY,
+            $lineItem
+        );
+
+        $user->addAssignment($assignment);
 
         $subject = new Lti1p1LaunchUrlBuilder($router, $loadBalancer, $ltiConfiguration);
 
         $launchUrl = $subject->build($ltiInstance, $assignment);
 
         self::assertSame(
-            'ltiLink/ltiDeliveryProvider/DeliveryTool/launch/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QtdXJpLmNvbSJ9',
+            'ltiLink/ltiDeliveryProvider/DeliveryTool/launch/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rlc3QuY29tIn0=',
             $launchUrl->getLtiLink()
         );
 
@@ -77,9 +82,9 @@ class Lti1p1LaunchUrlBuilderTest extends TestCase
                 'roles' => 'Learner',
                 'user_id' => 'testUser',
                 'lis_person_name_full' => 'testUser',
-                'resource_link_id' => 10,
+                'resource_link_id' => '00000010-0000-6000-0000-000000000000',
                 'lis_outcome_service_url' => 'http://test-service-url',
-                'lis_result_sourcedid' => 10,
+                'lis_result_sourcedid' => '00000010-0000-6000-0000-000000000000',
                 'launch_presentation_return_url' => 'returnUrl',
                 'launch_presentation_locale' => 'en-EN',
             ],

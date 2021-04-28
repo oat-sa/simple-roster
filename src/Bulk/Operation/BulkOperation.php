@@ -22,7 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Bulk\Operation;
 
-class BulkOperation
+use JsonSerializable;
+
+class BulkOperation implements JsonSerializable
 {
     public const TYPE_CREATE = 'create';
     public const TYPE_UPDATE = 'update';
@@ -61,5 +63,14 @@ class BulkOperation
     public function getAttribute(string $attributeName): string
     {
         return $this->attributes[$attributeName];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'identifier' => $this->identifier,
+            'type' => $this->type,
+            'attributes' => $this->attributes,
+        ];
     }
 }

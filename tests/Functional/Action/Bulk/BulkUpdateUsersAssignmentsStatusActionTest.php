@@ -28,26 +28,29 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
+class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    /** @var UserRepository */
+    private $userRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer testApiKey']);
+        $this->userRepository = self::$container->get(UserRepository::class);
+
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
@@ -65,16 +68,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             '{}'
         );
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('API key authentication failure.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
+        $this->assertApiErrorResponseMessage('API key authentication failure.');
     }
 
     public function testItThrowsBadRequestHttpExceptionIfInvalidRequestBodyReceived(): void
@@ -88,19 +83,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             'invalid body content'
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
-            'Invalid JSON request body received. Error: Syntax error',
-            $decodedResponse['error']['message']
-        );
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->assertApiErrorResponseMessage('Invalid JSON request body received. Error: Syntax error');
     }
 
     public function testItThrowsBadRequestHttpExceptionIfEmptyRequestBodyReceived(): void
@@ -114,16 +98,8 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             json_encode([], JSON_THROW_ON_ERROR, 512)
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame('Empty request body received.', $decodedResponse['error']['message']);
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->assertApiErrorResponseMessage('Empty request body received.');
     }
 
     public function testItThrowsRequestEntityTooLargeHttpExceptionIfRequestPayloadIsTooLarge(): void
@@ -137,24 +113,12 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $this->generateRequestPayload(range(0, BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT))
         );
 
-        self::assertSame(
-            Response::HTTP_REQUEST_ENTITY_TOO_LARGE,
-            $this->kernelBrowser->getResponse()->getStatusCode()
-        );
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+        $this->assertApiErrorResponseMessage(
             sprintf(
                 "Bulk operation limit has been exceeded, maximum of '%s' allowed per request.",
                 BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT
-            ),
-            $decodedResponse['error']['message']
+            )
         );
     }
 
@@ -178,25 +142,23 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             ])
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'data' => [
                     'applied' => false,
                     'results' => [
-                        (string)$user->getUsername() => true,
+                        $user->getUsername() => true,
                         'nonExistingUser1' => false,
                     ],
                 ],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
 
         self::assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
         $this->getEntityManager()->refresh($user->getLastAssignment());
-        self::assertSame(Assignment::STATE_READY, $user->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_READY, $user->getLastAssignment()->getStatus());
         self::assertCount(1, $user->getAvailableAssignments());
 
         $this->assertHasLogRecordWithMessage(
@@ -207,60 +169,49 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
     public function testItUpdatesAssignmentStateWithValidUserProvided(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
         $this->kernelBrowser->request(
             Request::METHOD_PATCH,
             '/api/v1/bulk/assignments',
             [],
             [],
             [],
-            $this->generateRequestPayload([$user->getUsername()])
+            $this->generateRequestPayload(['user1'])
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'data' => [
                     'applied' => true,
                     'results' => [
-                        (string)$user->getUsername() => true,
+                        'user1' => true,
                     ],
                 ],
-            ],
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
 
         self::assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $reloadedUser = $userRepository->findByUsernameWithAssignments('user1');
+        $reloadedUser = $this->userRepository->findByUsernameWithAssignments('user1');
 
-        self::assertSame(Assignment::STATE_CANCELLED, $reloadedUser->getLastAssignment()->getState());
+        self::assertSame(Assignment::STATUS_CANCELLED, $reloadedUser->getLastAssignment()->getStatus());
         self::assertCount(0, $reloadedUser->getAvailableAssignments());
     }
 
     public function testItLogsSuccessfulBulkOperations(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getRepository(User::class);
-        $user = $userRepository->findByUsernameWithAssignments('user1');
-
         $this->kernelBrowser->request(
             Request::METHOD_PATCH,
             '/api/v1/bulk/assignments',
             [],
             [],
             [],
-            $this->generateRequestPayload([$user->getUsername()])
+            $this->generateRequestPayload(['user1'])
         );
 
         $this->assertHasLogRecordWithMessage(
-            "Successful assignment cancellation (assignmentId = '1', username = 'user1').",
+            "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+            "username = 'user1').",
             Logger::INFO
         );
     }
@@ -273,7 +224,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
             $payload[] = [
                 'identifier' => $user,
                 'attributes' => [
-                    'state' => Assignment::STATE_CANCELLED,
+                    'status' => Assignment::STATUS_CANCELLED,
                 ],
             ];
         }

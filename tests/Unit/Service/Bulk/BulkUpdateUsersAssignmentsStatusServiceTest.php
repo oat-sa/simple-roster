@@ -30,14 +30,15 @@ use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
+use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStatusService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Uid\UuidV6;
 
-class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
+class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
 {
-    /** @var BulkUpdateUsersAssignmentsStateService */
+    /** @var BulkUpdateUsersAssignmentsStatusService */
     private $subject;
 
     /** @var EntityManagerInterface|MockObject */
@@ -63,7 +64,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->with(User::class)
             ->willReturn($this->userRepository);
 
-        $this->subject = new BulkUpdateUsersAssignmentsStateService($this->entityManager, $this->logger);
+        $this->subject = new BulkUpdateUsersAssignmentsStatusService($this->entityManager, $this->logger);
     }
 
     public function testItAddsBulkOperationFailureIfWrongOperationTypeReceived(): void
@@ -72,16 +73,25 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         $successfulOperation = new BulkOperation(
             'test',
             BulkOperation::TYPE_UPDATE,
-            ['state' => Assignment::STATE_CANCELLED]
+            ['status' => Assignment::STATUS_CANCELLED]
         );
 
-        $expectedAssignment = (new Assignment())
-            ->setLineItem(new LineItem())
-            ->setState(Assignment::STATE_STARTED);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
-        $expectedUser = (new User())
-            ->setUsername('expectedUser')
-            ->addAssignment($expectedAssignment);
+        $expectedAssignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_STARTED,
+            $lineItem
+        );
+
+        $expectedUser = new User(new UuidV6(), 'expectedUser', 'testPassword');
+        $expectedUser->addAssignment($expectedAssignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -112,24 +122,30 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
     public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
     {
-        $expectedLineItem = new LineItem();
+        $expectedLineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
             ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
-                return (new User())
-                    ->setUsername($username)
-                    ->addAssignment(
-                        (new Assignment())
-                            ->setState(Assignment::STATE_STARTED)
-                            ->setLineItem($expectedLineItem)
-                    );
+                $assignment = new Assignment(
+                    new UuidV6('00000001-0000-6000-0000-000000000000'),
+                    Assignment::STATUS_STARTED,
+                    $expectedLineItem
+                );
+
+                return (new User(new UuidV6(), $username, 'testPassword'))->addAssignment($assignment);
             });
 
         $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
-            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]))
-            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]));
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test1', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]))
+            ->add(new BulkOperation('test2', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]));
 
         $this->entityManager
             ->expects(self::once())
@@ -140,15 +156,18 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->method('info')
             ->withConsecutive(
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test1').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test1').",
                     ['lineItem' => $expectedLineItem],
                 ],
                 [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test2').",
+                    "Successful assignment cancellation (assignmentId = '00000001-0000-6000-0000-000000000000', " .
+                    "username = 'test2').",
                     ['lineItem' => $expectedLineItem],
                 ],
             );
@@ -166,30 +185,40 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             sprintf(
                 "Not allowed state attribute received while bulk updating: '%s', '%s' expected.",
                 $invalidState,
-                Assignment::STATE_CANCELLED
+                Assignment::STATUS_CANCELLED
             )
         );
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
-            ->willReturn(new User());
+            ->willReturn(new User(new UuidV6(), 'expectedUser', 'testPassword'));
 
         $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => $invalidState]));
+            ->add(new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => $invalidState]));
 
         $this->subject->process($bulkOperationCollection);
     }
 
     public function testItIgnoresCompletedAssignments(): void
     {
-        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['state' => Assignment::STATE_CANCELLED]);
+        $operation = new BulkOperation('test', BulkOperation::TYPE_UPDATE, ['status' => Assignment::STATUS_CANCELLED]);
 
-        $completedAssignment = (new Assignment())
-            ->setLineItem(new LineItem())
-            ->setState(Assignment::STATE_COMPLETED);
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
 
-        $user = (new User())
-            ->addAssignment($completedAssignment);
+        $completedAssignment = new Assignment(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            Assignment::STATUS_COMPLETED,
+            $lineItem
+        );
+
+        $user = new User(new UuidV6(), 'testUser', 'testPassword');
+        $user->addAssignment($completedAssignment);
 
         $this->userRepository
             ->method('findByUsernameWithAssignments')
@@ -199,15 +228,15 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 
         $this->subject->process($bulkOperationCollection)->jsonSerialize();
 
-        self::assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
+        self::assertSame(Assignment::STATUS_COMPLETED, $completedAssignment->getStatus());
     }
 
     public function provideUnsupportedAssignmentState(): array
     {
         return [
-            Assignment::STATE_STARTED => [Assignment::STATE_STARTED],
-            Assignment::STATE_READY => [Assignment::STATE_READY],
-            Assignment::STATE_COMPLETED => [Assignment::STATE_COMPLETED],
+            Assignment::STATUS_STARTED => [Assignment::STATUS_STARTED],
+            Assignment::STATUS_READY => [Assignment::STATUS_READY],
+            Assignment::STATUS_COMPLETED => [Assignment::STATUS_COMPLETED],
         ];
     }
 }

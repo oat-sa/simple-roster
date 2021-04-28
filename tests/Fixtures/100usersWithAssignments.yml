@@ -1,39 +1,59 @@
 OAT\SimpleRoster\Entity\LineItem:
     lineItem:
-        label: 'The first line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug1'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: <uuidV6('00000001-0000-6000-0000-000000000000')>
+            label: 'The first line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug1'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+            groupId: 'groupA'
     lineItem2:
-        label: 'The second line item'
-        uri: 'http://lineitemuri.com'
-        slug: 'lineItemSlug2'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: <uuidV6('00000002-0000-6000-0000-000000000000')>
+            label: 'The second line item'
+            uri: 'http://lineitemuri.com'
+            slug: 'lineItemSlug2'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+            groupId: 'groupA'
     lineItem3:
-        label: 'The third line item'
-        uri: 'http://different-lineitemuri.com'
-        slug: 'lineItemSlug3'
-        startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
-        endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
-        maxAttempts: 1
+        __construct:
+            id: <uuidV6('00000003-0000-6000-0000-000000000000')>
+            label: 'The third line item'
+            uri: 'http://different-lineitemuri.com'
+            slug: 'lineItemSlug3'
+            status: 'enabled'
+            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
+            maxAttempts: 1
+            groupId: 'groupB'
 
 OAT\SimpleRoster\Entity\Assignment:
     assignment_{1..50}:
-        lineItem: '@lineItem'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            status: 'ready'
+            lineItem: '@lineItem'
     assignment_{51..60}:
-        lineItem: '@lineItem2'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            status: 'ready'
+            lineItem: '@lineItem2'
     assignment_{61..100}:
-        lineItem: '@lineItem3'
-        state: 'ready'
+        __construct:
+            id: <uuidV6()>
+            status: 'ready'
+            lineItem: '@lineItem3'
 
 OAT\SimpleRoster\Entity\User:
     user_{1..100}:
-        username: 'user_<current()>'
-        plainPassword: 'password'
-        assignments: ['@assignment_<current()>']
+        __construct:
+            id: <uuidV6()>
+            username: 'user_<current()>'
+            plainPassword: 'password'
+        assignments: [ '@assignment_<current()>' ]

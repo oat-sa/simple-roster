@@ -74,8 +74,8 @@ class AssignmentGarbageCollectorCommand extends Command
         $this->setDescription(
             sprintf(
                 "Transitions assignments stuck in '%s' state for a given amount of time to '%s' state",
-                Assignment::STATE_STARTED,
-                Assignment::STATE_COMPLETED
+                Assignment::STATUS_STARTED,
+                Assignment::STATUS_COMPLETED
             )
         );
 
@@ -131,8 +131,8 @@ class AssignmentGarbageCollectorCommand extends Command
     {
         $numberOfCollectedAssignments = 0;
         do {
-            $stuckAssignments = $this->assignmentRepository->findByStateAndUpdatedAtPaged(
-                Assignment::STATE_STARTED,
+            $stuckAssignments = $this->assignmentRepository->findByStatusAndUpdatedAtPaged(
+                Assignment::STATUS_STARTED,
                 Carbon::now()->subtract($this->cleanUpInterval)->toDateTime(),
                 0,
                 $batchSize
@@ -159,7 +159,7 @@ class AssignmentGarbageCollectorCommand extends Command
                         $logMessagePlaceholder,
                         $assignment->getId(),
                         $assignment->getUser()->getUsername(),
-                        $assignment->getState()
+                        $assignment->getStatus()
                     )
                 );
             }

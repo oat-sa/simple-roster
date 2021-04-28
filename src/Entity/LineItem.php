@@ -23,11 +23,16 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Entity;
 
 use DateTimeInterface;
+use InvalidArgumentException;
 use JsonSerializable;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItem implements JsonSerializable, EntityInterface
 {
-    /** @var int */
+    public const STATUS_ENABLED = 'enabled';
+    public const STATUS_DISABLED = 'disabled';
+
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
@@ -39,6 +44,9 @@ class LineItem implements JsonSerializable, EntityInterface
     /** @var string */
     private $slug;
 
+    /** @var string */
+    private $status;
+
     /** @var DateTimeInterface|null */
     private $startAt;
 
@@ -46,12 +54,50 @@ class LineItem implements JsonSerializable, EntityInterface
     private $endAt;
 
     /** @var int */
-    private $maxAttempts = 0;
+    private $maxAttempts;
 
-    /** @var bool */
-    private $isActive = true;
+    /** @var string|null */
+    private $groupId;
 
-    public function getId(): ?int
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(
+        UuidV6 $id,
+        string $label,
+        string $uri,
+        string $slug,
+        string $status,
+        int $maxAttempts = 0,
+        string $groupId = null,
+        DateTimeInterface $startAt = null,
+        DateTimeInterface $endAt = null
+    ) {
+        $this->id = $id;
+        $this->label = $label;
+        $this->uri = $uri;
+        $this->slug = $slug;
+
+        if (!in_array($status, [self::STATUS_ENABLED, self::STATUS_DISABLED], true)) {
+            throw new InvalidArgumentException(sprintf("Invalid line item status received: '%s'", $status));
+        }
+
+        $this->status = $status;
+
+        if ($maxAttempts < 0) {
+            throw new InvalidArgumentException("'maxAttempts' must be greater or equal to zero.");
+        }
+
+        $this->maxAttempts = $maxAttempts;
+        $this->groupId = $groupId;
+
+        $this->validateAvailabilityDates($startAt, $endAt);
+
+        $this->startAt = $startAt;
+        $this->endAt = $endAt;
+    }
+
+    public function getId(): UuidV6
     {
         return $this->id;
     }
@@ -59,13 +105,6 @@ class LineItem implements JsonSerializable, EntityInterface
     public function getLabel(): ?string
     {
         return $this->label;
-    }
-
-    public function setLabel(string $label): self
-    {
-        $this->label = $label;
-
-        return $this;
     }
 
     public function getUri(): string
@@ -85,9 +124,26 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->slug;
     }
 
-    public function setSlug(string $slug): self
+    public function getStatus(): string
     {
-        $this->slug = $slug;
+        return $this->status;
+    }
+
+    public function enable(): self
+    {
+        $this->status = self::STATUS_ENABLED;
+
+        return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->status === self::STATUS_ENABLED;
+    }
+
+    public function disable(): self
+    {
+        $this->status = self::STATUS_DISABLED;
 
         return $this;
     }
@@ -97,20 +153,19 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->startAt;
     }
 
-    public function setStartAt(?DateTimeInterface $startAt): self
-    {
-        $this->startAt = $startAt;
-
-        return $this;
-    }
-
     public function getEndAt(): ?DateTimeInterface
     {
         return $this->endAt;
     }
 
-    public function setEndAt(?DateTimeInterface $endAt): self
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function setAvailabilityDates(DateTimeInterface $startAt = null, DateTimeInterface $endAt = null): self
     {
+        $this->validateAvailabilityDates($startAt, $endAt);
+
+        $this->startAt = $startAt;
         $this->endAt = $endAt;
 
         return $this;
@@ -118,11 +173,15 @@ class LineItem implements JsonSerializable, EntityInterface
 
     public function isAvailableForDate(DateTimeInterface $date): bool
     {
-        if (null === $this->startAt || null === $this->endAt) {
-            return true;
+        if ($this->startAt !== null && $date < $this->startAt) {
+            return false;
         }
 
-        return $this->startAt <= $date && $this->endAt >= $date;
+        if ($this->endAt !== null && $date > $this->endAt) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getMaxAttempts(): int
@@ -130,28 +189,14 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->maxAttempts;
     }
 
-    public function setMaxAttempts(int $maxAttempts): self
-    {
-        $this->maxAttempts = $maxAttempts;
-
-        return $this;
-    }
-
     public function hasMaxAttempts(): bool
     {
         return $this->maxAttempts !== 0;
     }
 
-    public function isActive(): bool
+    public function getGroupId(): ?string
     {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): self
-    {
-        $this->isActive = $isActive;
-
-        return $this;
+        return $this->groupId;
     }
 
     public function jsonSerialize(): array
@@ -159,10 +204,23 @@ class LineItem implements JsonSerializable, EntityInterface
         return [
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
-            'isActive' => $this->isActive(),
-            'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
-            'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
+            'status' => $this->status,
+            'startDateTime' => $this->startAt !== null ? $this->startAt->getTimestamp() : '',
+            'endDateTime' => $this->endAt !== null ? $this->endAt->getTimestamp() : '',
             'maxAttempts' => $this->getMaxAttempts(),
+            'groupId' => $this->getGroupId()
         ];
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function validateAvailabilityDates(DateTimeInterface $startAt = null, DateTimeInterface $endAt = null): void
+    {
+        if (null !== $startAt && null !== $endAt && $startAt >= $endAt) {
+            throw new InvalidArgumentException(
+                "Invalid availability dates received. 'endAt' must be greater than 'startAt'."
+            );
+        }
     }
 }

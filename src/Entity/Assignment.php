@@ -24,36 +24,31 @@ namespace OAT\SimpleRoster\Entity;
 
 use Carbon\Carbon;
 use DateTime;
+use InvalidArgumentException;
 use JsonSerializable;
+use LogicException;
+use OAT\SimpleRoster\Exception\InvalidAssignmentStatusTransitionException;
+use Symfony\Component\Uid\UuidV6;
 
 class Assignment implements JsonSerializable, EntityInterface
 {
-    /**
-     * Assignment can be taken if other constraints allows it (dates)
-     */
-    public const STATE_READY = 'ready';
+    public const STATUS_READY = 'ready';
+    public const STATUS_STARTED = 'started';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
 
-    /**
-     * The LTI link for this assignment has been queried, and the state changed as “started” at the same time
-     */
-    public const STATE_STARTED = 'started';
+    private const VALID_STATUSES = [
+        self::STATUS_READY,
+        self::STATUS_STARTED,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
 
-    /**
-     * The test has been completed. We know that it has because simple-roster received the LTI-outcome request from
-     * the TAO delivery
-     */
-    public const STATE_COMPLETED = 'completed';
-
-    /**
-     * The assignment cannot be taken anymore
-     */
-    public const STATE_CANCELLED = 'cancelled';
-
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
-    private $state;
+    private $status;
 
     /** @var User */
     private $user;
@@ -61,52 +56,61 @@ class Assignment implements JsonSerializable, EntityInterface
     /** @var LineItem */
     private $lineItem;
 
-    /** @var DateTime */
+    /** @var DateTime|null */
     private $updatedAt;
 
     /** @var int */
-    private $attemptsCount = 0;
+    private $attemptsCount;
 
-    /** @var int */
-    private $lineItemId;
+    public function __construct(
+        UuidV6 $id,
+        string $status,
+        LineItem $lineItem,
+        int $attemptsCount = 0,
+        DateTime $updatedAt = null
+    ) {
+        $this->id = $id;
 
-    public function getId(): ?int
+        if (!in_array($status, self::VALID_STATUSES, true)) {
+            throw new InvalidArgumentException(sprintf("Invalid assignment status received: '%s'.", $status));
+        }
+
+        $this->status = $status;
+        $this->lineItem = $lineItem;
+
+        if ($attemptsCount < 0 || ($attemptsCount > $lineItem->getMaxAttempts() && $lineItem->hasMaxAttempts())) {
+            throw new InvalidArgumentException("Invalid 'attemptsCount' received.");
+        }
+
+        $this->attemptsCount = $attemptsCount;
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getId(): UuidV6
     {
         return $this->id;
     }
 
-    public function getState(): ?string
+    public function getStatus(): string
     {
-        return $this->state;
+        return $this->status;
     }
 
-    public function setState(string $state): self
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
+    /**
+     * @throws LogicException
+     */
     public function getUser(): User
     {
+        if (null === $this->user) {
+            throw new LogicException('User is not set.');
+        }
+
         return $this->user;
     }
 
     public function setUser(User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getLineItemId(): int
-    {
-        return $this->lineItemId;
-    }
-
-    public function setLineItemId(int $lineItemId): self
-    {
-        $this->lineItemId = $lineItemId;
 
         return $this;
     }
@@ -128,13 +132,6 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTime $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function refreshUpdatedAt(): self
     {
         $this->updatedAt = Carbon::now()->toDateTime();
@@ -142,62 +139,125 @@ class Assignment implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    private function isCancelled(): bool
-    {
-        return $this->state === self::STATE_CANCELLED;
-    }
-
-    public function isCancellable(): bool
-    {
-        return in_array($this->state, [self::STATE_STARTED, self::STATE_READY], true);
-    }
-
-    private function isAvailableForDate(): bool
-    {
-        return $this->getLineItem()->isAvailableForDate(Carbon::now()->toDateTime());
-    }
-
-    public function isAvailable(): bool
-    {
-        return $this->getLineItem()->isActive() && !$this->isCancelled() && $this->isAvailableForDate();
-    }
-
     public function getAttemptsCount(): int
     {
         return $this->attemptsCount;
     }
 
-    public function setAttemptsCount(int $attemptsCount): self
+    /**
+     * @throws InvalidAssignmentStatusTransitionException
+     */
+    public function start(): self
     {
-        $this->attemptsCount = $attemptsCount;
+        if ($this->status !== self::STATUS_READY) {
+            throw new InvalidAssignmentStatusTransitionException(
+                sprintf(
+                    "Assignment with id = '%s' cannot be started due to invalid status: '%s' expected, '%s' detected.",
+                    $this->id,
+                    self::STATUS_READY,
+                    $this->status
+                )
+            );
+        }
 
-        return $this;
-    }
+        if (!$this->lineItem->isEnabled()) {
+            throw new InvalidAssignmentStatusTransitionException(
+                sprintf(
+                    "Assignment with id = '%s' cannot be started, line item is disabled.",
+                    $this->id
+                )
+            );
+        }
 
-    public function incrementAttemptsCount(): self
-    {
+        if ($this->lineItem->hasMaxAttempts() && $this->attemptsCount >= $this->lineItem->getMaxAttempts()) {
+            throw new InvalidAssignmentStatusTransitionException(
+                sprintf(
+                    "Assignment with id = '%s' cannot be started. Maximum number of attempts (%d) have been reached.",
+                    $this->id,
+                    $this->lineItem->getMaxAttempts()
+                )
+            );
+        }
+
+        $this->status = self::STATUS_STARTED;
         $this->attemptsCount++;
 
         return $this;
     }
 
+    /**
+     * @throws InvalidAssignmentStatusTransitionException
+     */
+    public function cancel(): self
+    {
+        if (!$this->isCancellable()) {
+            throw new InvalidAssignmentStatusTransitionException(
+                sprintf(
+                    "Assignment with id = '%s' cannot be cancelled. Status must be one of '%s', '%s' detected.",
+                    $this->id,
+                    implode('\', \'', [self::STATUS_READY, self::STATUS_STARTED]),
+                    $this->status
+                )
+            );
+        }
+
+        $this->status = self::STATUS_CANCELLED;
+
+        return $this;
+    }
+
+    public function isCancellable(): bool
+    {
+        return in_array($this->status, [self::STATUS_STARTED, self::STATUS_READY], true);
+    }
+
+    /**
+     * @throws InvalidAssignmentStatusTransitionException
+     */
     public function complete(): self
     {
+        if ($this->status !== self::STATUS_STARTED) {
+            throw new InvalidAssignmentStatusTransitionException(
+                sprintf(
+                    "Assignment with id = '%s' cannot be completed, because it's in '%s' status, '%s' expected.",
+                    $this->id,
+                    $this->status,
+                    self::STATUS_STARTED
+                )
+            );
+        }
         $maxAttempts = $this->getLineItem()->getMaxAttempts();
 
         if ($maxAttempts === 0 || $this->getAttemptsCount() < $maxAttempts) {
-            return $this->setState(self::STATE_READY);
+            $this->status = self::STATUS_READY;
+
+            return $this;
         }
 
-        return $this->setState(self::STATE_COMPLETED);
+        $this->status = self::STATUS_COMPLETED;
+
+        return $this;
+    }
+
+    public function isAvailable(): bool
+    {
+        return
+            $this->lineItem->isEnabled()
+            && !$this->isCancelled()
+            && $this->lineItem->isAvailableForDate(Carbon::now()->toDateTime());
+    }
+
+    private function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
     }
 
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
+            'id' => (string)$this->id,
             'username' => $this->getUser()->getUsername(),
-            'state' => $this->getState(),
+            'status' => $this->getStatus(),
             'attemptsCount' => $this->getAttemptsCount(),
             'lineItem' => $this->lineItem,
         ];

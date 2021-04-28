@@ -98,7 +98,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository
-            ->method('findAllUsernamesPaged')
+            ->method('findAllUsernamesByCriteriaPaged')
             ->willThrowException(new LogicException('Yaaay'));
 
         $userRepository
@@ -148,7 +148,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         self::assertInstanceOf(WarmUpGroupedUserCacheMessage::class, $message);
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return (string)$user->getUsername();
+            return $user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $message->getUsernames());
@@ -183,7 +183,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         }
 
         $expectedUsernames = array_map(static function (User $user): string {
-            return (string)$user->getUsername();
+            return $user->getUsername();
         }, $this->getRepository(User::class)->findAll());
 
         self::assertSame($expectedUsernames, $processedUsernames);
@@ -258,36 +258,6 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
-    public function testItSuccessfullyInitiatesCacheWarmupWithEuclideanCriterion(): void
-    {
-        $this->loadFixtureByFilename('100usersWithAssignments.yml');
-
-        self::assertSame(0, $this->commandTester->execute(
-            [
-                '--modulo' => 20,
-                '--remainder' => 4,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
-
-        /** @var Envelope[] $queueMessages */
-        $queueMessages = $this->cacheWarmupTransport->get();
-        self::assertCount(1, $queueMessages);
-
-        $message = $queueMessages[0]->getMessage();
-        self::assertInstanceOf(WarmUpGroupedUserCacheMessage::class, $message);
-
-        $expectedUsernames = ['user_4', 'user_24', 'user_44', 'user_64', 'user_84'];
-
-        self::assertSame($expectedUsernames, $message->getUsernames());
-        self::assertStringContainsString(
-            '[OK] Cache warmup for 5 users was successfully initiated.',
-            $this->commandTester->getDisplay()
-        );
-    }
-
     public function provideInvalidParameters(): array
     {
         return [
@@ -315,53 +285,6 @@ class UserCacheWarmerCommandTest extends KernelTestCase
                     '--line-item-slugs' => 'slug_1,slug_2',
                 ],
                 'expectedOutput' => "Option 'usernames' and 'line-item-slugs' are exclusive options.",
-            ],
-            'missingRemainderOption' => [
-                'input' => [
-                    '--modulo' => 5,
-                ],
-                'expectedOutput' => "Option 'remainder' is expected to be specified.",
-            ],
-            'invalidRemainderOption' => [
-                'input' => [
-                    '--modulo' => 5,
-                    '--remainder' => 'invalid',
-                ],
-                'expectedOutput' => "Option 'remainder' is expected to be numeric.",
-            ],
-            'tooHighRemainderOption' => [
-                'input' => [
-                    '--modulo' => 3,
-                    '--remainder' => 3,
-                ],
-                'expectedOutput' => "Invalid 'remainder' option received: 3, expected value: 0 <= r <= 2",
-            ],
-            'invalidModuloOption' => [
-                'input' => [
-                    '--remainder' => 3,
-                    '--modulo' => 'invalid',
-                ],
-                'expectedOutput' => "Option 'modulo' is expected to be numeric.",
-            ],
-            'missingModuloOption' => [
-                'input' => [
-                    '--remainder' => 1,
-                ],
-                'expectedOutput' => "Option 'modulo' is expected to be specified.",
-            ],
-            'tooLowModuloOption' => [
-                'input' => [
-                    '--remainder' => 0,
-                    '--modulo' => 1,
-                ],
-                'expectedOutput' => "Invalid 'modulo' option received: 1, expected value: 2 <= m <= 100",
-            ],
-            'tooHighModuloOption' => [
-                'input' => [
-                    '--remainder' => 3,
-                    '--modulo' => 101,
-                ],
-                'expectedOutput' => "Invalid 'modulo' option received: 101, expected value: 2 <= m <= 100",
             ],
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,36 +15,16 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Request;
+namespace OAT\SimpleRoster\Exception;
 
-use LogicException;
+use RuntimeException;
 
-class RequestIdStorage
+class InvalidAssignmentStatusTransitionException extends RuntimeException
 {
-    /** @var string */
-    private $requestId;
 
-    public function getRequestId(): ?string
-    {
-        return $this->requestId;
-    }
-
-    /**
-     * @throws LogicException
-     */
-    public function setRequestId(string $requestId): self
-    {
-        if ($this->requestId) {
-            throw new LogicException('Request ID cannot not be set more than once per request.');
-        }
-
-        $this->requestId = $requestId;
-
-        return $this;
-    }
 }

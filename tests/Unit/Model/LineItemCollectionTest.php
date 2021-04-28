@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LineItemCollectionTest extends TestCase
 {
@@ -43,7 +44,14 @@ class LineItemCollectionTest extends TestCase
 
     public function testIfLineItemCanBeAdded(): void
     {
-        $lineItem = (new LineItem())->setSlug('test');
+        $lineItem = new LineItem(
+            new UuidV6('00000001-0000-6000-0000-000000000000'),
+            'testLabel',
+            'testUri',
+            'testSlug',
+            LineItem::STATUS_ENABLED
+        );
+
         $subject = (new LineItemCollection())->add($lineItem);
 
         self::assertCount(1, $subject);

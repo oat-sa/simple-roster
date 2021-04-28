@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Uid\UuidV6;
 use Throwable;
 
 class LineItemIngesterCommand extends AbstractCsvIngesterCommand
@@ -102,6 +103,7 @@ EOF
 
             $numberOfProcessedRows = 0;
             foreach ($this->csvReader->getRecords() as $rawLineItem) {
+                // Status column in optional for backward compatibility
                 $this->validateRow(
                     $rawLineItem,
                     'uri',
@@ -170,19 +172,24 @@ EOF
 
     private function createLineItem(array $rawLineItem): LineItem
     {
-        $lineItem =
-            (new LineItem())
-                ->setUri($rawLineItem['uri'])
-                ->setLabel($rawLineItem['label'])
-                ->setSlug($rawLineItem['slug'])
-                ->setMaxAttempts((int)$rawLineItem['maxAttempts']);
+        $startAt = isset($rawLineItem['startTimestamp']) && !(empty($rawLineItem['startTimestamp']))
+            ? (new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp'])
+            : null;
 
-        if (isset($rawLineItem['startTimestamp']) && $rawLineItem['endTimestamp']) {
-            $lineItem
-                ->setStartAt((new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp']))
-                ->setEndAt((new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp']));
-        }
+        $endAt = isset($rawLineItem['endTimestamp']) && !(empty($rawLineItem['endTimestamp']))
+            ? (new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp'])
+            : null;
 
-        return $lineItem;
+        return new LineItem(
+            new UuidV6(),
+            $rawLineItem['label'],
+            $rawLineItem['uri'],
+            $rawLineItem['slug'],
+            $rawLineItem['status'] ?? LineItem::STATUS_ENABLED,
+            (int)$rawLineItem['maxAttempts'],
+            $rawLineItem['groupId'] ?? null,
+            $startAt,
+            $endAt
+        );
     }
 }

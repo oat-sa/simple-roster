@@ -45,11 +45,8 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(
-        LtiInstanceRepository $repository,
-        OAuthSigner $signer,
-        LoggerInterface $securityLogger
-    ) {
+    public function __construct(LtiInstanceRepository $repository, OAuthSigner $signer, LoggerInterface $securityLogger)
+    {
         $this->repository = $repository;
         $this->signer = $signer;
         $this->logger = $securityLogger;
@@ -96,7 +93,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             );
 
             throw new UnauthorizedHttpException(
-                sprintf('realm="%s", oauth_error="consumer key invalid"', static::AUTH_REALM)
+                sprintf('realm="%s", oauth_error="consumer key invalid"', self::AUTH_REALM)
             );
         }
 
@@ -110,12 +107,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             );
 
             if ($signature === $signatureToValidate) {
-                $this->logger->info(
-                    'Successful OAuth signature validation.',
-                    [
-                        'ltiInstance' => $ltiInstance,
-                    ]
-                );
+                $this->logger->info('Successful OAuth signature validation.', ['ltiInstance' => $ltiInstance]);
 
                 return;
             }
@@ -130,7 +122,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
         );
 
         throw new UnauthorizedHttpException(
-            sprintf('realm="%s", oauth_error="access token invalid"', static::AUTH_REALM)
+            sprintf('realm="%s", oauth_error="access token invalid"', self::AUTH_REALM)
         );
     }
 }

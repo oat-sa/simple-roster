@@ -60,10 +60,7 @@ class Lti1p3MessageBuilder
         $lineItem = $assignment->getLineItem();
         $resourceLink = new LtiResourceLink($lineItem->getUri());
 
-        $loginHint = new LoginHintDto(
-            (string)$assignment->getUser()->getUsername(),
-            (int)$assignment->getId(),
-        );
+        $loginHint = new LoginHintDto($assignment->getUser()->getUsername(), $assignment->getId());
 
         return $this->ltiRequestBuilder->buildLtiResourceLinkLaunchRequest(
             $resourceLink,

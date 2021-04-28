@@ -16,13 +16,14 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -u <L
 
 ### Main options
 
-| Option                | Description                                                                                                                             |
-| ----------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
-| -i, --line-item-ids   | Comma separated list of line item ids.                                                                                                  |
-| -s, --line-item-slugs | Comma separated list of line item slugs.                                                                                                |
-| --start-date          | Define the start date for the specified line item(s). Expected Format: 2020-01-01T00:00:00+0000. If not informed, it will be nullified. |
-| --end-date            | Define the end date for the specified line item(s). Expected Format: 2020-01-01T00:00:00+0000. If not informed, it will be nullified.   |
-| -f, --force           | If not used, no changes will be made to database (Dry Run)                                                                              |
+| Option                    | Description                                                                                                                             |
+| --------------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
+| -i, --line-item-ids       | Comma separated list of line item ids.                                                                                                  |
+| -s, --line-item-slugs     | Comma separated list of line item slugs.                                                                                                |
+| -g, --line-item-group-ids | Comma separated list of line item group ids.                                                                                            |
+| --start-date              | Define the start date for the specified line item(s). Expected Format: 2020-01-01T00:00:00+0000. If not informed, it will be nullified. |
+| --end-date                | Define the end date for the specified line item(s). Expected Format: 2020-01-01T00:00:00+0000. If not informed, it will be nullified.   |
+| -f, --force               | If not used, no changes will be made to database (Dry Run)                                                                              |
 
 > **NOTE:** You need to specify at least one of the parameters (IDs or Slugs).
 
@@ -40,11 +41,15 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -h
 ## Examples
 - Updating dates of line items using IDs
 ```shell script
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,2,3 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
 ```
 - Updating dates of line items using Slugs
 ```shell script
 $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s slug1,slug2,slug3 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
+```
+- Updating dates of line items using Group Ids
+```shell script
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -g group1,group2,group3 --start-date 2020-01-01T00:00:00+0000 --end-date 2020-01-05T00:00:00+0000 --force
 ```
 - Updating dates in a different timezone (UTC+1)
 ```shell script
@@ -53,13 +58,13 @@ $ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -s sl
 - Nullifying dates of a line item by line item
 ```shell script
 //Nullifying start and end dates
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,2,3 -f
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 -f
 
 //Nullifying only start date
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,2,3 --end-date 2020-01-05T00:00:00+0000 --force
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --end-date 2020-01-05T00:00:00+0000 --force
 
 //Nullifying only end date
-$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 1,2,3 --start-date 2020-01-01T00:00:00+0000 --force
+$ sudo -u www-data bin/console roster:modify-entity:line-item:change-dates -i 00000001-0000-6000-0000-000000000000,00000002-0000-6000-0000-000000000000 --start-date 2020-01-01T00:00:00+0000 --force
 ```
 
 > **NOTE:** There is no need to warmup the cache manually for the affected line-items when you run this command,

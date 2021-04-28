@@ -26,7 +26,7 @@ use OAT\SimpleRoster\Command\Ingester\AssignmentIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\LineItemIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\Assignment;
-use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -170,15 +170,18 @@ class AssignmentIngesterCommandTest extends KernelTestCase
             'user_3' => 10,
         ];
 
+        /** @var UserRepository $userRepository */
+        $userRepository = self::$container->get(UserRepository::class);
+
         foreach ($expectedAssignmentCounts as $username => $expectedAssignmentCount) {
-            $user = $this->getRepository(User::class)->findOneBy(['username' => $username]);
+            $user = $userRepository->findByUsernameWithAssignments($username);
             $assignments = $user->getAssignments();
 
             self::assertCount($expectedAssignmentCount, $assignments);
 
             /** @var Assignment $assignment */
             foreach ($assignments as $assignment) {
-                self::assertSame(Assignment::STATE_READY, $assignment->getState());
+                self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
                 self::assertSame(0, $assignment->getAttemptsCount());
             }
         }
@@ -294,13 +297,13 @@ class AssignmentIngesterCommandTest extends KernelTestCase
     private function prepareLineItemIngestionContext(): void
     {
         $lineItemsCsvContent = [
-            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts'],
-            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2],
+            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts','groupId'],
+            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2, 'group1'],
         ];
 
         $this->writeCsv('line-items.csv', $lineItemsCsvContent);

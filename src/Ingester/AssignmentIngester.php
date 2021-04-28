@@ -22,39 +22,38 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester;
 
-use Doctrine\ORM\ORMException;
-use Doctrine\Persistence\Mapping\MappingException;
+use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\UserNotFoundException;
-use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
-use OAT\SimpleRoster\Repository\NativeUserRepository;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
 use Throwable;
 
 class AssignmentIngester
 {
-    /** @var NativeUserRepository */
+    /** @var UserRepository */
     private $userRepository;
 
-    /** @var NativeAssignmentRepository */
+    /** @var AssignmentRepository */
     private $assignmentRepository;
 
-    public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
+    public function __construct(UserRepository $userRepository, AssignmentRepository $assignmentRepository)
     {
         $this->userRepository = $userRepository;
         $this->assignmentRepository = $assignmentRepository;
     }
 
     /**
-     * @throws ORMException
-     * @throws UserNotFoundException
-     * @throws MappingException
      * @throws Throwable
      */
     public function ingest(AssignmentDtoCollection $assignments): void
     {
         $existingUsernames = [];
         foreach ($this->userRepository->findUsernames($assignments->getAllUsernames()) as $existingUser) {
-            $existingUsernames[$existingUser['username']] = (int)$existingUser['id'];
+            if (!isset($existingUser['id'], $existingUser['username'])) {
+                throw new InvalidArgumentException('Invalid user received.');
+            }
+            $existingUsernames[$existingUser['username']] = $existingUser['id'];
         }
 
         foreach ($assignments as $assignment) {
@@ -67,6 +66,6 @@ class AssignmentIngester
             $assignment->setUserId($existingUsernames[$assignment->getUsername()]);
         }
 
-        $this->assignmentRepository->insertMultiple($assignments);
+        $this->assignmentRepository->insertMultipleNatively($assignments);
     }
 }

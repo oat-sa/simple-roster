@@ -23,20 +23,34 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\DataTransferObject;
 
 use InvalidArgumentException;
+use Symfony\Component\Uid\UuidV6;
 
 class UserDto
 {
+    /** @var UuidV6 */
+    private $id;
+
     /** @var string */
     private $username;
 
     /** @var string */
     private $password;
 
+    /** @var array */
+    private $roles;
+
     /** @var string|null */
     private $groupId;
 
-    public function __construct(string $username, string $password, string $groupId = null)
-    {
+    public function __construct(
+        UuidV6 $id,
+        string $username,
+        string $password,
+        array $roles = [],
+        string $groupId = null
+    ) {
+        $this->id = $id;
+
         if (empty($username)) {
             throw new InvalidArgumentException('Username cannot be empty');
         }
@@ -51,7 +65,13 @@ class UserDto
 
         $this->username = $username;
         $this->password = $password;
+        $this->roles = $roles;
         $this->groupId = $groupId;
+    }
+
+    public function getId(): UuidV6
+    {
+        return $this->id;
     }
 
     public function getUsername(): string
@@ -62,6 +82,11 @@ class UserDto
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
     }
 
     public function getGroupId(): ?string

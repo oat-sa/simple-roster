@@ -103,7 +103,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
      */
     private function clearUserCache(User $user, CacheProvider $resultCacheImplementation): void
     {
-        $username = (string)$user->getUsername();
+        $username = $user->getUsername();
         $cacheKey = $this->userCacheIdGenerator->generate($username);
         $resultCacheImplementation->delete($cacheKey);
 

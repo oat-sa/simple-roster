@@ -23,9 +23,13 @@
                     \Symfony\Component\HttpFoundation\Request,
                     \OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber,
                     \OAT\SimpleRoster\EventSubscriber\OAuthSignatureValidationSubscriber,
-                    \OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber,
                     \League\Csv\Reader,
-                    \League\Csv\Writer
+                    \League\Csv\Writer,
+                    \OAT\SimpleRoster\Faker\Provider\UuidFakerProvider,
+                    \Symfony\Component\Uid\Uuid,
+                    \Ramsey\Uuid\Rfc4122\UuidV4,
+                    \DateTimeImmutable,
+                    \Fidry\AliceDataFixtures\Persistence\PurgeMode,
                 </value>
             </property>
         </properties>

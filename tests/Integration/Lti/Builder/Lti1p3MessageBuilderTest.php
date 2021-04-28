@@ -33,6 +33,7 @@ use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class Lti1p3MessageBuilderTest extends KernelTestCase
 {
@@ -62,7 +63,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $registration = $registrationRepository->find('testRegistration');
 
         /** @var User $user */
-        $user = $this->getRepository(User::class)->find(1);
+        $user = $this->getRepository(User::class)->find(new UuidV6('00000001-0000-6000-0000-000000000000'));
         $assignment = $user->getLastAssignment();
 
         $this->subject
@@ -75,7 +76,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
         self::assertSame('http://localhost/lti1p3/oidc/initiation', $ltiMessage->getUrl());
         self::assertSame('https://localhost/platform', $ltiParameters->get('iss'));
-        self::assertSame('user1::1', $ltiParameters->get('login_hint'));
+        self::assertSame('user1::00000001-0000-6000-0000-000000000000', $ltiParameters->get('login_hint'));
         self::assertSame('http://localhost/tool/launch', $ltiParameters->get('target_link_uri'));
         self::assertSame('1', $ltiParameters->get('lti_deployment_id'));
         self::assertSame('test', $ltiParameters->get('client_id'));

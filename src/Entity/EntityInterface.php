@@ -22,7 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
+use Symfony\Component\Uid\UuidV6;
+
 interface EntityInterface
 {
-    public function getId(): ?int;
+    public function getId(): UuidV6;
 }

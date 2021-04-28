@@ -59,13 +59,13 @@ class LineItemIngesterCommandTest extends KernelTestCase
     public function testItDoesNotIngestInDryRun(): void
     {
         $lineItemsCsvContent = [
-            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts'],
-            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2],
+            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts','groupId'],
+            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1, null],
+            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2, null],
+            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1, null],
+            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2, null],
+            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1, null],
+            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2, null],
         ];
 
         $this->writeCsv('line-items.csv', $lineItemsCsvContent);
@@ -102,13 +102,13 @@ class LineItemIngesterCommandTest extends KernelTestCase
     public function testSuccessfulBatchedIngestion(): void
     {
         $lineItemsCsvContent = [
-            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts'],
-            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2],
-            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1],
-            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2],
+            ['uri', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts', 'groupId'],
+            ['http://taoplatform.loc/delivery_1.rdf', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_2.rdf', 'label2', 'gra13_ita_2', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_3.rdf', 'label2', 'gra13_ita_3', 1546682400, 1546713000, 1, 'group1'],
+            ['http://taoplatform.loc/delivery_4.rdf', 'label4', 'gra13_ita_4', 1546682400, 1546713000, 2, 'group1'],
+            ['http://taoplatform.loc/delivery_5.rdf', 'label5', 'gra13_ita_5', 1546682400, 1546713000, 1, null],
+            ['http://taoplatform.loc/delivery_6.rdf', 'label6', 'gra13_ita_6', 1546682400, 1546713000, 2, null],
         ];
 
         $this->writeCsv('line-items.csv', $lineItemsCsvContent);
@@ -130,6 +130,36 @@ class LineItemIngesterCommandTest extends KernelTestCase
             '[OK] 6 line items have been successfully ingested.',
             $this->commandTester->getDisplay(true)
         );
+    }
+
+    public function testSuccessfulBatchedIngestionWithStatusColumn(): void
+    {
+        $lineItemsCsvContent = [
+            ['uri', 'status', 'label', 'slug', 'startTimestamp', 'endTimestamp', 'maxAttempts'],
+            ['http://taoplatform.loc/delivery_1.rdf', 'enabled', 'label1', 'gra13_ita_1', 1546682400, 1546713000, 1],
+            ['http://taoplatform.loc/delivery_2.rdf', 'enabled','label2', 'gra13_ita_2', 1546682400, 1546713000, 2],
+            ['http://taoplatform.loc/delivery_3.rdf', 'disabled','label2', 'gra13_ita_3', 1546682400, 1546713000, 1],
+            ['http://taoplatform.loc/delivery_4.rdf', 'enabled','label4', 'gra13_ita_4', 1546682400, 1546713000, 2],
+            ['http://taoplatform.loc/delivery_5.rdf', 'disabled','label5', 'gra13_ita_5', 1546682400, 1546713000, 1],
+            ['http://taoplatform.loc/delivery_6.rdf', 'enabled','label6', 'gra13_ita_6', 1546682400, 1546713000, 2],
+        ];
+
+        $this->writeCsv('line-items.csv', $lineItemsCsvContent);
+
+        $output = $this->commandTester->execute(
+            [
+                'path' => 'line-items.csv',
+                '--batch' => 4,
+                '--force' => true,
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ]
+        );
+
+        self::assertSame(0, $output);
+        self::assertCount(2, $this->getRepository(LineItem::class)->findBy(['status' => LineItem::STATUS_DISABLED]));
+        self::assertCount(4, $this->getRepository(LineItem::class)->findBy(['status' => LineItem::STATUS_ENABLED]));
     }
 
     /**

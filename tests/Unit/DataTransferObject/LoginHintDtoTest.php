@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Unit\DataTransferObject;
 use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV6;
 
 class LoginHintDtoTest extends TestCase
 {
@@ -33,22 +34,14 @@ class LoginHintDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Username can't be empty.");
 
-        new LoginHintDto('', 1);
-    }
-
-    public function testItThrowsExceptionIfEmptySlugReceived(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Assignment ID can't be 0.");
-
-        new LoginHintDto('username', 0);
+        new LoginHintDto('', new UuidV6('00000001-0000-6000-0000-000000000000'));
     }
 
     public function testLoginHintDtoCreation(): void
     {
-        $loginHintDto = new LoginHintDto('username', 1);
+        $loginHintDto = new LoginHintDto('username', new UuidV6('00000001-0000-6000-0000-000000000000'));
 
         self::assertSame('username', $loginHintDto->getUsername());
-        self::assertSame(1, $loginHintDto->getAssignmentId());
+        self::assertSame('00000001-0000-6000-0000-000000000000', (string)$loginHintDto->getAssignmentId());
     }
 }

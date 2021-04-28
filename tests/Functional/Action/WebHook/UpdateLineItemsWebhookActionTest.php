@@ -25,26 +25,26 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 use Doctrine\Common\Cache\CacheProvider;
 use JsonException;
 use Monolog\Logger;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLineItemsWebhookActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
-
     /** @var CacheProvider */
     private $resultCacheImplementation;
+
+    /** @var LineItemRepository */
+    private $lineItemRepository;
 
     protected function setUp(): void
     {
@@ -52,6 +52,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         $this->kernelBrowser = self::createClient();
 
+        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
         $ormConfiguration = $this->getEntityManager()->getConfiguration();
         $resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
 
@@ -62,24 +63,17 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         }
 
         $this->resultCacheImplementation = $resultCacheImplementation;
+
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
-
         $this->setUpTestLogHandler();
     }
 
     public function testItReturns401IfNoCredentialsInformed(): void
     {
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/web-hooks/update-line-items',
-            [],
-            [],
-            [],
-            ''
-        );
+        $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1/web-hooks/update-line-items');
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
     }
 
     public function testItReturns401IfWrongCredentialsInformed(): void
@@ -96,7 +90,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             ''
         );
 
-        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -104,10 +98,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
      *
      * @throws JsonException
      */
-    public function testItThrowsBadRequestIfRequestIsInvalid(
-        string $requestBody,
-        string $expectedMessage
-    ): void {
+    public function testItThrowsBadRequestIfRequestIsInvalid(string $requestBody, string $expectedMessage): void
+    {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/web-hooks/update-line-items',
@@ -120,19 +112,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             $requestBody
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        $decodedResponse = json_decode(
-            $this->kernelBrowser->getResponse()->getContent(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        self::assertSame(
-            $expectedMessage,
-            $decodedResponse['error']['message']
-        );
+        $this->assertApiStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->assertApiErrorResponseMessage($expectedMessage);
     }
 
     public function testItAcceptLineItemsToBeUpdated(): void
@@ -149,15 +130,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getSuccessRequestBody())
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
+        $lineItem = $this->lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
-        /** @var LineItemRepository $lineItemRepository */
-        $lineItemRepository = $this->getRepository(LineItem::class);
-
-        /** @var LineItem $lineItem */
-        $lineItem = $lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
-
-        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.1');
+        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.00000001-0000-6000-0000-000000000000');
 
         $this->assertHasLogRecord(
             [
@@ -171,7 +146,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'The line item id 1 was updated',
+                'message' => 'The line item id 00000001-0000-6000-0000-000000000000 was updated',
                 'context' => [
                     'oldUri' => 'http://lineitemuri.com',
                     'newUri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
@@ -187,7 +162,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             current($lineItemCache)[0]['uri_1']
         );
 
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
@@ -205,13 +181,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'eventId' => 'duplicated',
                     'status' => 'ignored',
                 ],
-            ],
-            json_decode(
-                $this->kernelBrowser->getResponse()->getContent(),
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            )
+            ]
         );
     }
 
@@ -229,21 +199,14 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getRequestBodyUnknownEvent())
         );
 
-        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
                     'status' => 'ignored',
                 ],
-            ],
-            json_decode(
-                $this->kernelBrowser->getResponse()->getContent(),
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            )
+            ]
         );
     }
 
@@ -271,112 +234,98 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             ],
             'IncompleteEventName' =>
                 [
-                    'requestBody' => json_encode(
-                        [
-                            'source' => 'https://someinstance.taocloud.org/',
-                            'events' => [
-                                [
-                                    'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                    'triggeredTimestamp' => 1565602371,
-                                    'eventData' => [
-                                        'alias' => 'qti-interactions-delivery',
-                                        'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
-                                    ],
+                    'requestBody' => json_encode([
+                        'source' => 'https://someinstance.taocloud.org/',
+                        'events' => [
+                            [
+                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                                'triggeredTimestamp' => 1565602371,
+                                'eventData' => [
+                                    'alias' => 'qti-interactions-delivery',
+                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                                 ],
                             ],
-                        ]
-                    ),
+                        ],
+                    ], JSON_THROW_ON_ERROR),
                     'expectedMessage' => 'Invalid Request Body: [events][0][eventName] -> This field is missing.',
                 ]
             ,
             'IncompleteEventId' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => [
-                            [
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' => [
-                                    'alias' => 'qti-interactions-delivery',
-                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
-                                ],
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => [
+                        [
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
+                                'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
-                    ]
-                ),
+                    ],
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => 'Invalid Request Body: [events][0][eventId] -> This field is missing.',
             ],
             'IncompleteEventTriggeredTimeStamp' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'eventData' => [
-                                    'alias' => 'qti-interactions-delivery',
-                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
-                                ],
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => [
+                        [
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
+                                'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
-                    ]
-                ),
+                    ],
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => 'Invalid Request Body: [events][0][triggeredTimestamp] -> This field is missing.',
             ],
             'IncompleteEventRemoteDeliveryId' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'eventName' => 'RemoteDeliveryPublicationFinishesssd',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' => [
-                                    'alias' => 'qti-interactions-delivery',
-                                ],
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => [
+                        [
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'eventName' => 'RemoteDeliveryPublicationFinishesssd',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 'qti-interactions-delivery',
                             ],
                         ],
-                    ]
-                ),
+                    ],
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => $missingRemoteDeliveryId,
             ],
             'WrongAliasType' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => [
-                            [
-                                'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                                'triggeredTimestamp' => 1565602371,
-                                'eventData' => [
-                                    'alias' => 123,
-                                    'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
-                                ],
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => [
+                        [
+                            'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                            'triggeredTimestamp' => 1565602371,
+                            'eventData' => [
+                                'alias' => 123,
+                                'remoteDeliveryId' => 'https://docker.localhost/ontologies/tao.rdf#FFF',
                             ],
                         ],
-                    ]
-                ),
+                    ],
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => $invalidAliasType,
             ],
             'EventsEmpty' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => [],
-                    ]
-                ),
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => [],
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => $eventsEmpty,
             ],
             'EventsAsString' => [
-                'requestBody' => json_encode(
-                    [
-                        'source' => 'https://someinstance.taocloud.org/',
-                        'events' => 'string',
-                    ]
-                ),
+                'requestBody' => json_encode([
+                    'source' => 'https://someinstance.taocloud.org/',
+                    'events' => 'string',
+                ], JSON_THROW_ON_ERROR),
                 'expectedMessage' => 'Invalid Request Body: [events] -> This value should be of type array.',
             ],
         ];

@@ -22,7 +22,7 @@ bulkCreateUsersAssignments:
 bulkUpdateUsersAssignmentsState:
   path: '%app.route_prefix%/v1/bulk/assignments'
   methods: PATCH
-  defaults: { _controller: OAT\SimpleRoster\Action\Bulk\BulkUpdateUsersAssignmentsStateAction }
+  defaults: { _controller: OAT\SimpleRoster\Action\Bulk\BulkUpdateUsersAssignmentsStatusAction }
 
 getUserAssignments:
   path: '%app.route_prefix%/v1/assignments'

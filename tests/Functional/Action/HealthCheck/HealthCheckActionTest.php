@@ -22,35 +22,39 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\HealthCheck;
 
+use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckActionTest extends WebTestCase
 {
+    use ApiTestingTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->kernelBrowser = self::createClient();
+    }
+
     public function testItReturns200WhenApplicationInHealthy(): void
     {
-        $kernelBrowser = self::createClient();
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1');
 
-        $kernelBrowser->request(Request::METHOD_GET, '/api/v1');
-
-        self::assertSame(Response::HTTP_OK, $kernelBrowser->getResponse()->getStatusCode());
-
-        self::assertSame(
+        $this->assertApiStatusCode(Response::HTTP_OK);
+        $this->assertApiResponse(
             [
                 'isDoctrineConnectionAvailable' => true,
                 'isDoctrineCacheAvailable' => true,
-            ],
-            json_decode($kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+            ]
         );
     }
 
     public function testItReturns405OnInvalidMethod(): void
     {
-        $kernelBrowser = self::createClient();
+        $this->kernelBrowser->request(Request::METHOD_POST, '/api/v1');
 
-        $kernelBrowser->request(Request::METHOD_POST, '/api/v1');
-
-        self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $kernelBrowser->getResponse()->getStatusCode());
+        $this->assertApiStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
     }
 }

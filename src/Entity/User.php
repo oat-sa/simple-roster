@@ -27,69 +27,59 @@ use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\UuidV6;
 
 class User implements UserInterface, EntityInterface
 {
-    /** @var int */
+    /** @var UuidV6 */
     private $id;
 
     /** @var string */
     private $username;
 
+    /** @var string|null */
+    private $plainPassword;
+
     /** @var string */
     private $password;
 
-    /** @var ArrayCollection|Assignment[] */
-    private $assignments;
-
     /** @var string[] */
-    private $roles = [];
-
-    /** @var string|null */
-    private $plainPassword;
+    private $roles;
 
     /** @var string|null */
     private $groupId;
 
-    public function __construct()
-    {
+    /** @var ArrayCollection|Assignment[] */
+    private $assignments;
+
+    public function __construct(
+        UuidV6 $id,
+        string $username,
+        string $plainPassword,
+        string $groupId = null,
+        array $roles = []
+    ) {
+        $this->id = $id;
+        $this->username = $username;
+        $this->plainPassword = $plainPassword;
+        $this->groupId = $groupId;
+
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
+        }
+
+        $this->roles = $roles;
         $this->assignments = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): UuidV6
     {
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function setPlainPassword(string $plainPassword): self
-    {
-        $this->plainPassword = $plainPassword;
-
-        return $this;
     }
 
     public function getGroupId(): ?string
@@ -102,7 +92,7 @@ class User implements UserInterface, EntityInterface
         return null !== $this->groupId;
     }
 
-    public function setGroupId(string $groupId): self
+    public function setGroupId(?string $groupId): self
     {
         $this->groupId = $groupId;
 
@@ -122,16 +112,14 @@ class User implements UserInterface, EntityInterface
      */
     public function getCancellableAssignments(): Collection
     {
-        $assignments = $this->getAssignments();
-
-        $list = new ArrayCollection();
-        foreach ($assignments as $assignment) {
+        $cancellableAssignments = new ArrayCollection();
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->isCancellable()) {
-                $list->add($assignment);
+                $cancellableAssignments->add($assignment);
             }
         }
 
-        return $list;
+        return $cancellableAssignments;
     }
 
     public function addAssignment(Assignment $assignment): self
@@ -144,9 +132,20 @@ class User implements UserInterface, EntityInterface
         return $this;
     }
 
+    /**
+     * @throws AssignmentNotFoundException
+     */
     public function getLastAssignment(): Assignment
     {
-        return $this->assignments->last();
+        $lastAssignment = $this->assignments->last();
+
+        if (!$lastAssignment instanceof Assignment) {
+            throw new AssignmentNotFoundException(
+                sprintf("User '%s' does not have any assignments.", $this->username)
+            );
+        }
+
+        return $lastAssignment;
     }
 
     public function removeAssignment(Assignment $assignment): self
@@ -178,27 +177,11 @@ class User implements UserInterface, EntityInterface
 
     /**
      * @throws AssignmentNotFoundException
-     */
-    public function getAssignmentById(int $assignmentId): Assignment
-    {
-        foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->getId() === $assignmentId) {
-                return $assignment;
-            }
-        }
-
-        throw new AssignmentNotFoundException(
-            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
-        );
-    }
-
-    /**
-     * @throws AssignmentNotFoundException
      * @throws AssignmentUnavailableException
      */
-    public function getAvailableAssignmentById(int $assignmentId): Assignment
+    public function getAvailableAssignmentById(string $assignmentId): Assignment
     {
-        $assignment = $this->getAssignmentById($assignmentId);
+        $assignment = $this->getAssignmentById(new UuidV6($assignmentId));
 
         if ($assignment->isAvailable()) {
             return $assignment;
@@ -209,38 +192,51 @@ class User implements UserInterface, EntityInterface
         );
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function getSalt(): ?string
+    public function getPassword(): ?string
     {
-        // not needed when using the "argon2i" algorithm in security.yaml
-        return null;
+        return $this->password;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials(): void
+    public function setPassword(string $password): self
     {
-        $this->plainPassword = null;
+        $this->password = $password;
+
+        return $this;
     }
 
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function eraseCredentials(): void
+    {
+        $this->plainPassword = null;
+    }
+
+    /**
+     * @throws AssignmentNotFoundException
+     */
+    private function getAssignmentById(UuidV6 $assignmentId): Assignment
+    {
+        foreach ($this->getAssignments() as $assignment) {
+            if ($assignment->getId()->equals($assignmentId)) {
+                return $assignment;
+            }
+        }
+
+        throw new AssignmentNotFoundException(
+            sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
+        );
     }
 }

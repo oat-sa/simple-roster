@@ -21,18 +21,14 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity repository-class="OAT\SimpleRoster\Repository\LineItemRepository" name="OAT\SimpleRoster\Entity\LineItem" table="line_items">
-        <id name="id" type="integer" column="id">
-            <generator strategy="AUTO"/>
-            <sequence-generator sequence-name="line_items_id_seq" allocation-size="1" initial-value="1"/>
+        <id name="id" type="uuid">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Symfony\Bridge\Doctrine\IdGenerator\UuidV6Generator"/>
         </id>
         <field name="label" column="label" length="255" precision="0" scale="0"/>
         <field name="uri" column="uri" length="255" precision="0" scale="0"/>
         <field name="slug" column="slug" length="255" precision="0" scale="0" unique="true"/>
-        <field name="isActive" column="is_active" type="boolean" nullable="false">
-            <options>
-                <option name="default">true</option>
-            </options>
-        </field>
+        <field name="status" length="255" precision="0" scale="0" />
         <field name="startAt" type="datetime" column="start_at" precision="0" scale="0" nullable="true"/>
         <field name="endAt" type="datetime" column="end_at" precision="0" scale="0" nullable="true"/>
         <field name="maxAttempts" type="integer" column="max_attempts" precision="0" scale="0" nullable="true">
@@ -40,6 +36,7 @@
                 <option name="default">0</option>
             </options>
         </field>
+        <field name="groupId" column="group_id" length="255" nullable="true"/>
         <entity-listeners>
             <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener">
                 <lifecycle-callback type="postUpdate" method="postUpdate"/>
