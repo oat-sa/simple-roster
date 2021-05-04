@@ -85,5 +85,4 @@ class LogoutEventListener
 
         $event->setResponse($this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT));
     }
-
 }
