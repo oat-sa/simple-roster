@@ -1,10 +1,5 @@
 # Changelog
 
-## 2.0.9 - TO BE RELEASED
-
-### Fixed
-- Fixed deprecation notice for LogoutSuccessHandler by replacing it with LogoutEventListener
-
 ## 2.0.8 - 2021-04-20
 
 ### Fixed
