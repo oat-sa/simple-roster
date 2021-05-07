@@ -61,13 +61,13 @@ class HealthCheckService
         try {
             $testQuery = $connection->getDatabasePlatform()->getDummySelectSQL();
             $testQueryResult = (bool)$connection->fetchOne($testQuery);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $testQueryResult = $connection->isConnected();
 
             $this->logger->critical(
                 sprintf(
                     'DB connection unavailable. Got `%s` exception from DBAL',
-                    $e->getMessage()
+                    $exception->getMessage()
                 )
             );
         }
