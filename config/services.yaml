@@ -144,3 +144,9 @@ services:
 
     Lcobucci\JWT\Validation\Validator:
         class: Lcobucci\JWT\Validation\Validator
+
+    OAT\SimpleRoster\Security\Listener\LogoutEventListener:
+        tags:
+            - name: 'kernel.event_listener'
+              event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
+              dispatcher: security.event_dispatcher.api
