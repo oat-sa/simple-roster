@@ -24,12 +24,16 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\HealthCheck;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Service\HealthCheck\HealthCheckService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class HealthCheckServiceTest extends TestCase
 {
@@ -39,6 +43,9 @@ class HealthCheckServiceTest extends TestCase
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
+    /** @var LoggerInterface|MockObject $logger */
+    private $logger;
+
     /** @var Configuration|MockObject */
     private $ormConfiguration;
 
@@ -47,6 +54,7 @@ class HealthCheckServiceTest extends TestCase
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->ormConfiguration = $this->createMock(Configuration::class);
 
         $this->entityManager
@@ -54,7 +62,7 @@ class HealthCheckServiceTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($this->ormConfiguration);
 
-        $this->subject = new HealthCheckService($this->entityManager);
+        $this->subject = new HealthCheckService($this->entityManager, $this->logger);
     }
 
     public function testItThrowsExceptionIfResultCacheImplementationIsNotConfigured(): void
@@ -77,11 +85,25 @@ class HealthCheckServiceTest extends TestCase
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
 
+        $platformMock = $this->createMock(AbstractPlatform::class);
+        $platformMock
+            ->expects(self::exactly(2))
+            ->method('getDummySelectSQL')
+            ->willReturn('SELECT 1')
+        ;
+
         $connectionMock = $this->createMock(Connection::class);
         $connectionMock
             ->expects(self::once())
-            ->method('ping')
-            ->willReturn(true);
+            ->method('getDatabasePlatform')
+            ->willReturn($platformMock)
+        ;
+        $connectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with($platformMock->getDummySelectSQL())
+            ->willReturn(1)
+        ;
 
         $this->entityManager
             ->expects(self::once())
@@ -107,11 +129,30 @@ class HealthCheckServiceTest extends TestCase
             ->method('getResultCacheImpl')
             ->willReturn($resultCacheImplMock);
 
+        $platformMock = $this->createMock(AbstractPlatform::class);
+        $platformMock
+            ->expects(self::exactly(2))
+            ->method('getDummySelectSQL')
+            ->willReturn('SELECT 1')
+        ;
+
         $connectionMock = $this->createMock(Connection::class);
         $connectionMock
             ->expects(self::once())
-            ->method('ping')
-            ->willReturn(false);
+            ->method('getDatabasePlatform')
+            ->willReturn($platformMock)
+        ;
+        $connectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with($platformMock->getDummySelectSQL())
+            ->willThrowException(new Exception())
+        ;
+        $connectionMock
+            ->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(false)
+        ;
 
         $this->entityManager
             ->expects(self::once())
