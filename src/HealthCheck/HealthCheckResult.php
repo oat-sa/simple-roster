@@ -26,11 +26,8 @@ use JsonSerializable;
 
 class HealthCheckResult implements JsonSerializable
 {
-    /** @var bool */
-    private $isDoctrineConnectionAvailable;
-
-    /** @var bool */
-    private $isDoctrineCacheAvailable;
+    private bool $isDoctrineConnectionAvailable;
+    private bool $isDoctrineCacheAvailable;
 
     public function __construct(bool $isDoctrineConnectionAvailable, bool $isDoctrineCacheAvailable)
     {

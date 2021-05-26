@@ -39,17 +39,12 @@ use Throwable;
 
 class BulkCreateUsersAssignmentsService implements BulkOperationCollectionProcessorInterface
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var UserCacheWarmerService */
-    private $userCacheWarmerService;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private EntityManagerInterface $entityManager;
+    private UserCacheWarmerService $userCacheWarmerService;
+    private LoggerInterface $logger;
 
     /** @var array */
-    private $logBuffer = [];
+    private array $logBuffer = [];
 
     public function __construct(
         EntityManagerInterface $entityManager,

@@ -34,14 +34,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UpdateLti1p3OutcomeAction
 {
-    /** @var ReplaceResultSourceIdExtractor */
-    private $replaceResultSourceIdExtractor;
-
-    /** @var CompleteUserAssignmentService */
-    private $completeUserAssignmentService;
-
-    /** @var LtiOutcomeResponder */
-    private $ltiOutcomeResponder;
+    private ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor;
+    private CompleteUserAssignmentService $completeUserAssignmentService;
+    private LtiOutcomeResponder $ltiOutcomeResponder;
 
     public function __construct(
         ReplaceResultSourceIdExtractor $replaceResultSourceIdExtractor,

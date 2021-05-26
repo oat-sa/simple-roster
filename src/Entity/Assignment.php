@@ -49,26 +49,13 @@ class Assignment implements JsonSerializable, EntityInterface
      */
     public const STATE_CANCELLED = 'cancelled';
 
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $state;
-
-    /** @var User */
-    private $user;
-
-    /** @var LineItem */
-    private $lineItem;
-
-    /** @var DateTime */
-    private $updatedAt;
-
-    /** @var int */
-    private $attemptsCount = 0;
-
-    /** @var int */
-    private $lineItemId;
+    private ?int $id = null;
+    private string $state;
+    private User $user;
+    private LineItem $lineItem;
+    private DateTime $updatedAt;
+    private int $attemptsCount = 0;
+    private int $lineItemId;
 
     public function getId(): ?int
     {

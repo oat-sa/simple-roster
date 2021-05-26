@@ -39,11 +39,8 @@ class AssignmentIngesterCommand extends AbstractCsvIngesterCommand
 {
     public const NAME = 'roster:ingest:assignment';
 
-    /** @var AssignmentIngester */
-    private $ingester;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
+    private AssignmentIngester $ingester;
+    private LineItemRepository $lineItemRepository;
 
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,

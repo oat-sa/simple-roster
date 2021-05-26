@@ -32,13 +32,13 @@ class LtiRequest implements JsonSerializable
     public const LTI_ROLE = 'Learner';
 
     /** @var string */
-    private $link;
+    private string $link;
 
     /** @var string */
-    private $version;
+    private string $version;
 
     /** @var array  */
-    private $parameters;
+    private array $parameters;
 
     public function __construct(string $link, string $version, array $parameters)
     {

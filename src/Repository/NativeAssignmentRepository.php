@@ -34,7 +34,7 @@ use OAT\SimpleRoster\Entity\Assignment;
 class NativeAssignmentRepository extends AbstractRepository
 {
     /** @var string */
-    private $kernelEnvironment;
+    private string $kernelEnvironment;
 
     public function __construct(ManagerRegistry $registry, string $kernelEnvironment)
     {

@@ -37,7 +37,7 @@ use Psr\Log\LoggerInterface;
 class CompleteUserAssignmentServiceTest extends TestCase
 {
     /** @var CompleteUserAssignmentService */
-    private $subject;
+    private CompleteUserAssignmentService $subject;
 
     /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;

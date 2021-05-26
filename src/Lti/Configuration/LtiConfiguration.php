@@ -24,17 +24,10 @@ namespace OAT\SimpleRoster\Lti\Configuration;
 
 class LtiConfiguration
 {
-    /** @var string */
-    private $ltiVersion;
-
-    /** @var string */
-    private $ltiLaunchPresentationReturnUrl;
-
-    /** @var string */
-    private $ltiLaunchPresentationLocale;
-
-    /** @var string */
-    private $ltiRegistrationId;
+    private string $ltiVersion;
+    private string $ltiLaunchPresentationReturnUrl;
+    private string $ltiLaunchPresentationLocale;
+    private string $ltiRegistrationId;
 
     public function __construct(
         string $ltiVersion,

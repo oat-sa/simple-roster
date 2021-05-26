@@ -29,8 +29,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class ListUserAssignmentsAction
 {
-    /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     public function __construct(SerializerResponder $responder)
     {

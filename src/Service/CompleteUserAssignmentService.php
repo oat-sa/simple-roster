@@ -31,11 +31,8 @@ use Psr\Log\LoggerInterface;
 
 class CompleteUserAssignmentService
 {
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private AssignmentRepository $assignmentRepository;
+    private LoggerInterface $logger;
 
     public function __construct(AssignmentRepository $assignmentRepository, LoggerInterface $logger)
     {

@@ -31,11 +31,8 @@ use Throwable;
 
 class JwtTokenVerifier
 {
-    /** @var Validator */
-    private $tokenValidator;
-
-    /** @var string */
-    private $publicKeyPath;
+    private Validator $tokenValidator;
+    private string $publicKeyPath;
 
     public function __construct(Validator $tokenValidator, string $jwtPublicKeyPath)
     {

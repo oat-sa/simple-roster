@@ -36,26 +36,13 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    /** @var JwtTokenGenerator */
-    private $jwtTokenGenerator;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $jwtTokenIdGenerator;
-
-    /** @var CacheItemPoolInterface */
-    private $jwtTokenCache;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var SerializerResponder */
-    private $responder;
-
-    /** @var int */
-    private $accessTokenTtl;
-
-    /** @var int */
-    private $refreshTokenTtl;
+    private JwtTokenGenerator $jwtTokenGenerator;
+    private JwtTokenCacheIdGenerator $jwtTokenIdGenerator;
+    private CacheItemPoolInterface $jwtTokenCache;
+    private LoggerInterface $logger;
+    private SerializerResponder $responder;
+    private int $accessTokenTtl;
+    private int $refreshTokenTtl;
 
     public function __construct(
         JwtTokenGenerator $jwtTokenGenerator,

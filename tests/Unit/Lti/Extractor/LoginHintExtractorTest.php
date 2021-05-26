@@ -28,8 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 class LoginHintExtractorTest extends TestCase
 {
-    /** @var LoginHintExtractor */
-    private $subject;
+    private LoginHintExtractor $subject;
 
     public function setUp(): void
     {

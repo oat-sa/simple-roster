@@ -30,22 +30,22 @@ class OAuthContext implements JsonSerializable
     public const METHOD_MAC_SHA1 = 'HMAC-SHA1';
 
     /** @var string */
-    private $bodyHash;
+    private string $bodyHash;
 
     /** @var string */
-    private $consumerKey;
+    private string $consumerKey;
 
     /** @var string */
-    private $nonce;
+    private string $nonce;
 
     /** @var string */
-    private $signatureMethod;
+    private string $signatureMethod;
 
     /** @var string */
-    private $timestamp;
+    private string $timestamp;
 
     /** @var string */
-    private $version;
+    private string $version;
 
     public function __construct(
         string $bodyHash,

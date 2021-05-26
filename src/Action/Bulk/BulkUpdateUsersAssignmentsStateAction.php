@@ -30,10 +30,10 @@ use Symfony\Component\HttpFoundation\Response;
 class BulkUpdateUsersAssignmentsStateAction
 {
     /** @var BulkUpdateUsersAssignmentsStateService */
-    private $bulkAssignmentsStateService;
+    private BulkUpdateUsersAssignmentsStateService $bulkAssignmentsStateService;
 
     /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     public function __construct(
         BulkUpdateUsersAssignmentsStateService $bulkUpdateAssignmentsStateService,

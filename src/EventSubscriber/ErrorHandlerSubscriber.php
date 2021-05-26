@@ -29,8 +29,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriber implements EventSubscriberInterface
 {
-    /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     public function __construct(SerializerResponder $responder)
     {

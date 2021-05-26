@@ -24,20 +24,11 @@ namespace OAT\SimpleRoster\Entity;
 
 class LtiInstance implements EntityInterface
 {
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $label;
-
-    /** @var string */
-    private $ltiLink;
-
-    /** @var string */
-    private $ltiKey;
-
-    /** @var string */
-    private $ltiSecret;
+    private int $id;
+    private string $label;
+    private string $ltiLink;
+    private string $ltiKey;
+    private string $ltiSecret;
 
     public function __construct(int $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
     {

@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.0.9 - 2021-05-19
+## 2.1.0 - To be released
+
+### Changed
+- Raised minimum required PHP version from `7.3` to `7.4`.
 
 ### Fixed
 - Fixed [User enumeration in authentication mechanisms (GHSA-g2qj-pmxm-9f8f)](https://github.com/advisories/GHSA-g2qj-pmxm-9f8f) security vulnerability.

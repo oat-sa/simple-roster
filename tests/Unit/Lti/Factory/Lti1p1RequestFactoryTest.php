@@ -39,8 +39,7 @@ use PHPUnit\Framework\TestCase;
 
 class Lti1p1RequestFactoryTest extends TestCase
 {
-    /** @var Lti1p1RequestFactory */
-    private $subject;
+    private Lti1p1RequestFactory $subject;
 
     /** @var Lti1p1LaunchUrlBuilder|MockObject */
     private $launchUrlBuilder;

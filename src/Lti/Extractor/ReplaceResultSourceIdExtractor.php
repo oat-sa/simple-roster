@@ -29,7 +29,7 @@ use Throwable;
 class ReplaceResultSourceIdExtractor
 {
     /** @var string */
-    private $xmlNamespace;
+    private string $xmlNamespace;
 
     public function __construct(string $xmlNamespace)
     {

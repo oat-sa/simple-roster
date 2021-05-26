@@ -34,11 +34,8 @@ use PHPUnit\Framework\TestCase;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
-    /** @var UniqueLtiInstanceCollection */
-    private $ltiInstanceCollection;
-
-    /** @var UserGroupIdLtiInstanceLoadBalancer */
-    private $subject;
+    private UniqueLtiInstanceCollection $ltiInstanceCollection;
+    private UserGroupIdLtiInstanceLoadBalancer $subject;
 
     protected function setUp(): void
     {

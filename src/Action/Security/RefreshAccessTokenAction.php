@@ -38,25 +38,25 @@ use Throwable;
 class RefreshAccessTokenAction
 {
     /** @var JwtTokenGenerator */
-    private $generator;
+    private JwtTokenGenerator $generator;
 
     /** @var UserRepository */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     /** @var CacheItemPoolInterface */
-    private $tokenCache;
+    private CacheItemPoolInterface $tokenCache;
 
     /** @var JwtTokenCacheIdGenerator */
-    private $tokenCacheIdGenerator;
+    private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
 
     /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var int */
-    private $accessTokenTtl;
+    private int $accessTokenTtl;
 
     public function __construct(
         JwtTokenGenerator $generator,

@@ -44,8 +44,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     use AssignmentStatusTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    private KernelBrowser $kernelBrowser;
 
     protected function setUp(): void
     {

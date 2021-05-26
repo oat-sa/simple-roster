@@ -34,17 +34,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class JwtTokenGenerator
 {
-    /** @var UuidFactoryInterface */
-    private $uuidFactory;
-
-    /** @var Builder */
-    private $builder;
-
-    /** @var string */
-    private $privateKeyPath;
-
-    /** @var string */
-    private $passphrase;
+    private UuidFactoryInterface $uuidFactory;
+    private Builder $builder;
+    private string $privateKeyPath;
+    private string $passphrase;
 
     public function __construct(
         UuidFactoryInterface $uuidFactory,

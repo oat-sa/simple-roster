@@ -29,11 +29,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BulkCreateUsersAssignmentsAction
 {
-    /** @var BulkCreateUsersAssignmentsService */
-    private $bulkCreateAssignmentService;
-
-    /** @var SerializerResponder */
-    private $responder;
+    private BulkCreateUsersAssignmentsService $bulkCreateAssignmentService;
+    private SerializerResponder $responder;
 
     public function __construct(
         BulkCreateUsersAssignmentsService $bulkCreateAssignmentService,

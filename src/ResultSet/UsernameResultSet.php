@@ -29,14 +29,9 @@ use OAT\SimpleRoster\Model\UsernameCollection;
 
 class UsernameResultSet implements Countable, IteratorAggregate
 {
-    /** @var UsernameCollection */
-    private $collection;
-
-    /** @var bool */
-    private $hasMore;
-
-    /** @var int|null */
-    private $lastUserId;
+    private UsernameCollection $collection;
+    private bool $hasMore;
+    private ?int $lastUserId;
 
     public function __construct(UsernameCollection $collection, bool $hasMore, ?int $lastUserId)
     {

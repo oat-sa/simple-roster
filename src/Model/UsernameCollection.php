@@ -29,7 +29,7 @@ use IteratorAggregate;
 class UsernameCollection implements Countable, IteratorAggregate
 {
     /** @var string[] */
-    private $collection;
+    private array $collection;
 
     public function __construct(string ...$usernames)
     {

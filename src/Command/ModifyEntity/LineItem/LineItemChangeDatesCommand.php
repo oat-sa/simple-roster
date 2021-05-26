@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 use Carbon\Carbon;
 use DateTime;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Psr\Log\LoggerInterface;
@@ -45,29 +46,18 @@ class LineItemChangeDatesCommand extends Command
     private const OPTION_END_DATE = 'end-date';
     private const OPTION_FORCE = 'force';
 
-    /** @var SymfonyStyle */
-    private $symfonyStyle;
-
-    /** @var bool */
-    private $isDryRun;
+    private SymfonyStyle $symfonyStyle;
+    private bool $isDryRun;
+    private ?DateTime $startDate = null;
+    private ?DateTime $endDate = null;
+    private LineItemRepository $lineItemRepository;
+    private LoggerInterface $logger;
 
     /** @var string[] */
-    private $lineItemSlugs;
+    private array $lineItemSlugs;
 
     /** @var int[] */
-    private $lineItemIds;
-
-    /** @var DateTime|null */
-    private $startDate;
-
-    /** @var DateTime|null */
-    private $endDate;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private array $lineItemIds;
 
     public function __construct(LineItemRepository $lineItemRepository, LoggerInterface $logger)
     {
@@ -193,6 +183,7 @@ EOF
                 return 0;
             }
 
+            /** @var LineItem $lineItem */
             foreach ($lineItemsCollection as $lineItem) {
                 $lineItem->setStartAt($this->startDate);
                 $lineItem->setEndAt($this->endDate);

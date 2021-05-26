@@ -36,8 +36,7 @@ class UpdateLineItemValidatorTest extends TestCase
     /** @var MockObject|ValidatorInterface */
     private $validator;
 
-    /** @var UpdateLineItemValidator */
-    private $subject;
+    private UpdateLineItemValidator $subject;
 
     protected function setUp(): void
     {

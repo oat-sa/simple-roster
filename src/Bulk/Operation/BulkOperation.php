@@ -27,14 +27,11 @@ class BulkOperation
     public const TYPE_CREATE = 'create';
     public const TYPE_UPDATE = 'update';
 
-    /** @var string */
-    private $identifier;
-
-    /** @var string */
-    private $type;
+    private string $identifier;
+    private string $type;
 
     /** @var string[] */
-    private $attributes;
+    private array $attributes;
 
     public function __construct(string $identifier, string $type, array $attributes = [])
     {

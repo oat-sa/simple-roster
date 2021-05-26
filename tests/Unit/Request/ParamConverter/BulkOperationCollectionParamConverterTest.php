@@ -31,8 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class BulkOperationCollectionParamConverterTest extends TestCase
 {
-    /** @var BulkOperationCollectionParamConverter */
-    private $subject;
+    private BulkOperationCollectionParamConverter $subject;
 
     protected function setUp(): void
     {

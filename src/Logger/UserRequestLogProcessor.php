@@ -27,11 +27,8 @@ use Symfony\Component\Security\Core\Security;
 
 class UserRequestLogProcessor
 {
-    /** @var Security */
-    private $security;
-
-    /** @var RequestIdStorage */
-    private $requestIdStorage;
+    private Security $security;
+    private RequestIdStorage $requestIdStorage;
 
     public function __construct(
         Security $security,

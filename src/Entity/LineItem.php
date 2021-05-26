@@ -27,29 +27,14 @@ use JsonSerializable;
 
 class LineItem implements JsonSerializable, EntityInterface
 {
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $label;
-
-    /** @var string */
-    private $uri;
-
-    /** @var string */
-    private $slug;
-
-    /** @var DateTimeInterface|null */
-    private $startAt;
-
-    /** @var DateTimeInterface|null */
-    private $endAt;
-
-    /** @var int */
-    private $maxAttempts = 0;
-
-    /** @var bool */
-    private $isActive = true;
+    private ?int $id = null;
+    private string $label;
+    private string $uri;
+    private string $slug;
+    private ?DateTimeInterface $startAt = null;
+    private ?DateTimeInterface $endAt = null;
+    private int $maxAttempts = 0;
+    private bool $isActive = true;
 
     public function getId(): ?int
     {

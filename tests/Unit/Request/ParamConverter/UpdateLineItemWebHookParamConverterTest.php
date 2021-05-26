@@ -37,8 +37,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UpdateLineItemWebHookParamConverterTest extends TestCase
 {
-    /** @var UpdateLineItemWebHookParamConverter */
-    private $subject;
+    private UpdateLineItemWebHookParamConverter $subject;
 
     /** @var MockObject|UpdateLineItemValidator */
     private $updateLineItemValidator;

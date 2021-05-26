@@ -34,17 +34,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriberTest extends KernelTestCase
 {
-    /** @var ErrorHandlerSubscriber */
-    private $subject;
-
-    /** @var SerializerResponder */
-    private $responder;
+    private ErrorHandlerSubscriber $subject;
+    private SerializerResponder $responder;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         self::bootKernel();
+
         $this->responder = self::$container->get(SerializerResponder::class);
         $this->subject = new ErrorHandlerSubscriber($this->responder);
     }

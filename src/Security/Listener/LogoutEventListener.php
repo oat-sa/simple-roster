@@ -33,20 +33,11 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 class LogoutEventListener
 {
-    /** @var AuthorizationHeaderTokenExtractor */
-    private $tokenExtractor;
-
-    /** @var CacheItemPoolInterface */
-    private $tokenCache;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $tokenCacheIdGenerator;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var SerializerResponder */
-    private $serializerResponder;
+    private AuthorizationHeaderTokenExtractor $tokenExtractor;
+    private CacheItemPoolInterface $tokenCache;
+    private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
+    private LoggerInterface $logger;
+    private SerializerResponder $serializerResponder;
 
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,

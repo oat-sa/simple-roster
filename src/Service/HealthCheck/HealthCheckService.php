@@ -30,11 +30,8 @@ use Psr\Log\LoggerInterface;
 
 class HealthCheckService
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var LoggerInterface $logger */
-    private $logger;
+    private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
     public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {

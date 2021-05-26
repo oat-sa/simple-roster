@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
 class LtiRequestFactoryBuilderTest extends TestCase
 {
     /** @var LtiRequestFactoryBuilder */
-    private $subject;
+    private LtiRequestFactoryBuilder $subject;
 
     /** @var Lti1p1RequestFactory */
     private $lti1p1RequestFactory;

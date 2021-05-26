@@ -34,10 +34,10 @@ class SerializerResponder
     public const DEFAULT_ERROR_MESSAGE = 'An error occurred.';
 
     /** @var SerializerInterface */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /** @var KernelInterface */
-    private $kernel;
+    private KernelInterface $kernel;
 
     public function __construct(SerializerInterface $serializer, KernelInterface $kernel)
     {

@@ -32,13 +32,13 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 class LtiRequestFactoryBuilder
 {
     /** @var Lti1p1RequestFactory */
-    private $lti1p1RequestFactory;
+    private Lti1p1RequestFactory $lti1p1RequestFactory;
 
     /** @var Lti1p3RequestFactory */
-    private $lti1p3RequestFactory;
+    private Lti1p3RequestFactory $lti1p3RequestFactory;
 
     /** @var LtiConfiguration */
-    private $ltiConfiguration;
+    private LtiConfiguration $ltiConfiguration;
 
     /**
      * Factories are in fact proxy classes using lazy service loading

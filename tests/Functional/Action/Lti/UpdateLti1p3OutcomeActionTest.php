@@ -41,11 +41,8 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     use XmlTestingTrait;
     use AssignmentStatusTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
-
-    /** @var RegistrationInterface */
-    private $registration;
+    private KernelBrowser $kernelBrowser;
+    private RegistrationInterface $registration;
 
     protected function setUp(): void
     {

@@ -28,8 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 class LineItemTest extends TestCase
 {
-    /** @var LineItem */
-    private $subject;
+    private LineItem $subject;
 
     protected function setUp(): void
     {
