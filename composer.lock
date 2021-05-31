@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "532da7f3a6495932d608991145d2cbbf",
+    "content-hash": "675f559174a697c004199b7c6f3967d3",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3176,21 +3176,21 @@
         },
         {
             "name": "oat-sa/bundle-lti1p3",
-            "version": "5.0.0",
+            "version": "6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/bundle-lti1p3.git",
-                "reference": "059a9ac1e6b18ead35ca75eb716867d8bc70a0f2"
+                "reference": "bbd668cebb858bdb2ecb4fb4ac6aeb3dbe3619f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/bundle-lti1p3/zipball/059a9ac1e6b18ead35ca75eb716867d8bc70a0f2",
-                "reference": "059a9ac1e6b18ead35ca75eb716867d8bc70a0f2",
+                "url": "https://api.github.com/repos/oat-sa/bundle-lti1p3/zipball/bbd668cebb858bdb2ecb4fb4ac6aeb3dbe3619f2",
+                "reference": "bbd668cebb858bdb2ecb4fb4ac6aeb3dbe3619f2",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "oat-sa/lib-lti1p3-core": "^5.0",
+                "oat-sa/lib-lti1p3-core": "^6.0",
                 "php": ">=7.2.0",
                 "symfony/framework-bundle": "^4.4 || ^5.1",
                 "symfony/psr-http-message-bridge": "^2.0",
@@ -3226,29 +3226,29 @@
             ],
             "support": {
                 "issues": "https://github.com/oat-sa/bundle-lti1p3/issues",
-                "source": "https://github.com/oat-sa/bundle-lti1p3/tree/5.0.0"
+                "source": "https://github.com/oat-sa/bundle-lti1p3/tree/6.0.0"
             },
-            "time": "2021-03-31T20:12:11+00:00"
+            "time": "2021-05-05T11:17:33+00:00"
         },
         {
             "name": "oat-sa/lib-lti1p3-core",
-            "version": "5.0.1",
+            "version": "6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-lti1p3-core.git",
-                "reference": "f467512fd97c29f052f60830ddafc202df64f9f8"
+                "reference": "e294e61742782f557f69ddd73202826516cb8f07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-core/zipball/f467512fd97c29f052f60830ddafc202df64f9f8",
-                "reference": "f467512fd97c29f052f60830ddafc202df64f9f8",
+                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-core/zipball/e294e61742782f557f69ddd73202826516cb8f07",
+                "reference": "e294e61742782f557f69ddd73202826516cb8f07",
                 "shasum": ""
             },
             "require": {
                 "codercat/jwk-to-pem": "^1.0",
                 "ext-json": "*",
                 "ext-openssl": "*",
-                "guzzlehttp/guzzle": "^7.2",
+                "guzzlehttp/guzzle": "^6.5 || ^7.0",
                 "lcobucci/jwt": "^3.4 || ^4.0",
                 "league/oauth2-server": "^8.2",
                 "nesbot/carbon": "^2.43",
@@ -3281,9 +3281,9 @@
             "description": "OAT LTI 1.3 Core Library",
             "support": {
                 "issues": "https://github.com/oat-sa/lib-lti1p3-core/issues",
-                "source": "https://github.com/oat-sa/lib-lti1p3-core/tree/5.0.1"
+                "source": "https://github.com/oat-sa/lib-lti1p3-core/tree/6.0.0"
             },
-            "time": "2021-04-13T09:33:27+00:00"
+            "time": "2021-05-18T08:56:56+00:00"
         },
         {
             "name": "ocramius/package-versions",

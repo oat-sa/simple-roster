@@ -23,7 +23,7 @@
         "league/flysystem-bundle": "^1.5",
         "nelmio/cors-bundle": "^2.0",
         "nesbot/carbon": "^2.11",
-        "oat-sa/bundle-lti1p3": "^5.0",
+        "oat-sa/bundle-lti1p3": "^6.0",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/amazon-sqs-messenger": "^5.0",
