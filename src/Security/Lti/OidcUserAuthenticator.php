@@ -23,8 +23,9 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Lti;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
@@ -37,13 +38,8 @@ use Throwable;
 
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
-    /** @var LoginHintExtractor */
     private LoginHintExtractor $loginHintExtractor;
-
-    /** @var UserRepository */
     private UserRepository $userRepository;
-
-    /** @var LoggerInterface */
     private LoggerInterface $logger;
 
     public function __construct(
@@ -58,9 +54,13 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
 
     /**
      * @throws LtiException
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function authenticate(string $loginHint): UserAuthenticationResultInterface
-    {
+    public function authenticate(
+        RegistrationInterface $registration,
+        string $loginHint
+    ): UserAuthenticationResultInterface {
         try {
             $loginHintDto = $this->loginHintExtractor->extract($loginHint);
             $user = $this->userRepository->findByUsernameWithAssignments($loginHintDto->getUsername());
@@ -77,7 +77,7 @@ class OidcUserAuthenticator implements UserAuthenticatorInterface
 
             return new UserAuthenticationResult(
                 true,
-                new UserIdentity((string) $user->getUsername())
+                new UserIdentity((string)$user->getUsername())
             );
         } catch (Throwable $exception) {
             throw new LtiException($exception->getMessage());

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
@@ -98,7 +99,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
                 ]
             );
 
-        $result = $this->subject->authenticate($loginHint);
+        $result = $this->subject->authenticate($this->createMock(Registration::class), $loginHint);
         $userIdentity = $result->getUserIdentity();
         $userIdentifier = null !== $userIdentity ? $userIdentity->getIdentifier() : null;
 
@@ -132,6 +133,6 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             ->expects(self::never())
             ->method('info');
 
-        $this->subject->authenticate($loginHint);
+        $this->subject->authenticate($this->createMock(Registration::class), $loginHint);
     }
 }
