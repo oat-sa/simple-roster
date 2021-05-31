@@ -31,7 +31,7 @@ class LtiInstanceRepository extends AbstractRepository
     public const CACHE_ID_ALL_LTI_INSTANCES = 'lti_instances.all';
 
     /** @var int */
-    private $ltiInstancesCacheTtl;
+    private int $ltiInstancesCacheTtl;
 
     public function __construct(ManagerRegistry $registry, int $ltiInstancesCacheTtl)
     {

@@ -28,8 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthorizationHeaderTokenExtractorTest extends TestCase
 {
-    /** @var AuthorizationHeaderTokenExtractor */
-    private $subject;
+    private AuthorizationHeaderTokenExtractor $subject;
 
     protected function setUp(): void
     {

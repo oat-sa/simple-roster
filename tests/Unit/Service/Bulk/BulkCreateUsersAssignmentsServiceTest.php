@@ -39,8 +39,7 @@ use RuntimeException;
 
 class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
-    /** @var BulkCreateUsersAssignmentsService */
-    private $subject;
+    private BulkCreateUsersAssignmentsService $subject;
 
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
@@ -138,57 +137,5 @@ class BulkCreateUsersAssignmentsServiceTest extends TestCase
                 ],
             ],
         ], $this->subject->process($bulkOperationCollection)->jsonSerialize());
-    }
-
-    public function testIfEntityManagerIsFlushedOnlyOnceDuringTheProcessToOptimizeMemoryConsumption(): void
-    {
-        $expectedLineItem = new LineItem();
-
-        $this->userRepository
-            ->method('findByUsernameWithAssignments')
-            ->willReturnCallback(static function (string $username) use ($expectedLineItem): User {
-                return (new User())
-                    ->setUsername($username)
-                    ->addAssignment((new Assignment())->setLineItem($expectedLineItem));
-            });
-
-        $bulkOperationCollection = (new BulkOperationCollection())
-            ->add(new BulkOperation('test', BulkOperation::TYPE_CREATE))
-            ->add(new BulkOperation('test1', BulkOperation::TYPE_CREATE))
-            ->add(new BulkOperation('test2', BulkOperation::TYPE_CREATE));
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->userCacheWarmerService
-            ->expects(self::once())
-            ->method('process')
-            ->with(
-                self::callback(static function (UsernameCollection $collection): bool {
-                    return $collection->count() === 3
-                        && $collection->getIterator()->getArrayCopy() === ['test', 'test1', 'test2'];
-                })
-            );
-
-        $this->logger
-            ->expects(self::exactly(3))
-            ->method('info')
-            ->withConsecutive(
-                [
-                    "Successful assignment creation (username = 'test').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment creation (username = 'test1').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment creation (username = 'test2').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-            );
-
-        $this->subject->process($bulkOperationCollection);
     }
 }

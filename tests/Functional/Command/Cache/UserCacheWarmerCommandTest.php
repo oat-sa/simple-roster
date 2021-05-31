@@ -44,7 +44,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     use LoggerTestingTrait;
 
     /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     /** @var TransportInterface */
     private $cacheWarmupTransport;

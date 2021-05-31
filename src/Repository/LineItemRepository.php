@@ -31,11 +31,8 @@ use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 
 class LineItemRepository extends AbstractRepository
 {
-    /** @var int */
-    private $lineItemCacheTtl;
-
-    /** @var LineItemCacheIdGenerator */
-    private $cacheIdGenerator;
+    private int $lineItemCacheTtl;
+    private LineItemCacheIdGenerator $cacheIdGenerator;
 
     public function __construct(
         ManagerRegistry $registry,

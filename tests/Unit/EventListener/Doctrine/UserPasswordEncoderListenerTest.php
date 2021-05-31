@@ -30,8 +30,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
-    /** @var UserPasswordEncoderListener */
-    private $subject;
+    private UserPasswordEncoderListener $subject;
 
     /** @var UserPasswordEncoderInterface|MockObject */
     private $userPasswordEncoderMock;

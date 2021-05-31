@@ -38,8 +38,7 @@ class OidcUserAuthenticatorTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var OidcUserAuthenticator */
-    private $subject;
+    private OidcUserAuthenticator $subject;
 
     /** @var LoginHintExtractor|MockObject */
     private $loginHintExtractor;
@@ -100,9 +99,10 @@ class OidcUserAuthenticatorTest extends KernelTestCase
             );
 
         $result = $this->subject->authenticate($loginHint);
+        $userIdentity = $result->getUserIdentity();
+        $userIdentifier = null !== $userIdentity ? $userIdentity->getIdentifier() : null;
 
-        self::assertInstanceOf(UserIdentityInterface::class, $result->getUserIdentity());
-        self::assertSame('user1', $result->getUserIdentity()->getIdentifier());
+        self::assertSame('user1', $userIdentifier);
         self::assertTrue($result->isSuccess());
     }
 

@@ -32,14 +32,9 @@ class UserCacheWarmerService
 {
     private const MESSAGE_SIZE = 100;
 
-    /** @var MessageBusInterface */
-    private $messageBus;
-
-    /** @var LoggerInterface */
-    private $messengerLogger;
-
-    /** @var LoggerInterface */
-    private $cacheWarmupLogger;
+    private MessageBusInterface $messageBus;
+    private LoggerInterface $messengerLogger;
+    private LoggerInterface $cacheWarmupLogger;
 
     public function __construct(
         MessageBusInterface $messageBus,

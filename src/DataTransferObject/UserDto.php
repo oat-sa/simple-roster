@@ -26,14 +26,9 @@ use InvalidArgumentException;
 
 class UserDto
 {
-    /** @var string */
-    private $username;
-
-    /** @var string */
-    private $password;
-
-    /** @var string|null */
-    private $groupId;
+    private string $username;
+    private string $password;
+    private ?string $groupId;
 
     public function __construct(string $username, string $password, string $groupId = null)
     {

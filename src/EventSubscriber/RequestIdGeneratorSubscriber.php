@@ -34,10 +34,10 @@ class RequestIdGeneratorSubscriber implements EventSubscriberInterface
     public const CLOUDFRONT_REQUEST_ID_HEADER = 'x-edge-request-id';
 
     /** @var UuidFactoryInterface */
-    private $uuidFactory;
+    private UuidFactoryInterface $uuidFactory;
 
     /** @var RequestIdStorage */
-    private $requestIdStorage;
+    private RequestIdStorage $requestIdStorage;
 
     public function __construct(UuidFactoryInterface $uuidFactory, RequestIdStorage $requestIdStorage)
     {

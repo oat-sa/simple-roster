@@ -33,11 +33,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
 {
-    /** @var UpdateLineItemValidator */
-    private $updateLineItemValidator;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private UpdateLineItemValidator $updateLineItemValidator;
+    private LoggerInterface $logger;
 
     public function __construct(UpdateLineItemValidator $updateLineItemValidator, LoggerInterface $requestLogger)
     {

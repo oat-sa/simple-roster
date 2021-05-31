@@ -37,26 +37,13 @@ use Throwable;
 
 class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var UserCacheIdGenerator */
-    private $cacheIdGenerator;
-
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
-
-    /** @var LoggerInterface */
-    private $messengerLogger;
-
-    /** @var LoggerInterface */
-    private $cacheWarmupLogger;
-
-    /** @var int */
-    private $cacheTtl;
+    private EntityManagerInterface $entityManager;
+    private UserRepository $userRepository;
+    private UserCacheIdGenerator $cacheIdGenerator;
+    private CacheProvider $resultCacheImplementation;
+    private LoggerInterface $messengerLogger;
+    private LoggerInterface $cacheWarmupLogger;
+    private int $cacheTtl;
 
     /**
      * @throws DoctrineResultCacheImplementationNotFoundException

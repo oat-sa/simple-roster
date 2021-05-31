@@ -36,7 +36,7 @@ class LineItemIngesterCommand extends AbstractCsvIngesterCommand
     public const NAME = 'roster:ingest:line-item';
 
     /** @var LineItemRepository */
-    private $lineItemRepository;
+    private LineItemRepository $lineItemRepository;
 
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,

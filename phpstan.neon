@@ -25,6 +25,3 @@ parameters:
     # Symfony CLI parameter handling
     - message: '#^Cannot cast array<string>(\|bool)?\|string\|null to (int|string).$#'
       path: src/Command
-    # Symfony container parameter retrieval
-    - message: '#^Property OAT\\SimpleRoster\\Tests\\Integration\\Security\\Authenticator\\JwtTokenAuthenticatorTest::(.+) \(string\) does not accept array\|bool\|float\|int\|string\|null.$#'
-      path: tests/Integration/Security/Authenticator/JwtTokenAuthenticatorTest.php

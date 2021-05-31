@@ -27,8 +27,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordEncoderListener implements EntityListenerInterface
 {
-    /** @var UserPasswordEncoderInterface */
-    private $userPasswordEncoder;
+    private UserPasswordEncoderInterface $userPasswordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $userPasswordEncoder)
     {

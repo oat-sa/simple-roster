@@ -38,13 +38,13 @@ use Throwable;
 class OidcUserAuthenticator implements UserAuthenticatorInterface
 {
     /** @var LoginHintExtractor */
-    private $loginHintExtractor;
+    private LoginHintExtractor $loginHintExtractor;
 
     /** @var UserRepository */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         LoginHintExtractor $loginHintExtractor,

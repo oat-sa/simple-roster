@@ -31,7 +31,7 @@ use IteratorAggregate;
 class UpdateLineItemCollection implements IteratorAggregate, Countable
 {
     /** @var UpdateLineItemDto[] */
-    private $updateLineItemsDto;
+    private array $updateLineItemsDto;
 
     public function __construct(UpdateLineItemDto ...$updateLineItemsDto)
     {

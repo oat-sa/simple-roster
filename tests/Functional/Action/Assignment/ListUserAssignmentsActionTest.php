@@ -39,8 +39,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    private KernelBrowser $kernelBrowser;
 
     protected function setUp(): void
     {

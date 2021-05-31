@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 class RequestIdStorageTest extends TestCase
 {
     /** @var RequestIdStorage */
-    private $subject;
+    private RequestIdStorage $subject;
 
     protected function setUp(): void
     {

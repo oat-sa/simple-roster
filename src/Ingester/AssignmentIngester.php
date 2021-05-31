@@ -32,11 +32,8 @@ use Throwable;
 
 class AssignmentIngester
 {
-    /** @var NativeUserRepository */
-    private $userRepository;
-
-    /** @var NativeAssignmentRepository */
-    private $assignmentRepository;
+    private NativeUserRepository $userRepository;
+    private NativeAssignmentRepository $assignmentRepository;
 
     public function __construct(NativeUserRepository $userRepository, NativeAssignmentRepository $assignmentRepository)
     {

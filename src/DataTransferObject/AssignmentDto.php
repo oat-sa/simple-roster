@@ -24,17 +24,10 @@ namespace OAT\SimpleRoster\DataTransferObject;
 
 class AssignmentDto
 {
-    /** @var string */
-    private $state;
-
-    /** @var int */
-    private $lineItemId;
-
-    /** @var string */
-    private $username;
-
-    /** @var int|null */
-    private $userId;
+    private string $state;
+    private int $lineItemId;
+    private string $username;
+    private ?int $userId;
 
     public function __construct(string $state, int $lineItemId, string $username, int $userId = null)
     {

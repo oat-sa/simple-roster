@@ -38,7 +38,7 @@ class CsvReaderBuilderTest extends TestCase
     private $storageRegistry;
 
     /** @var CsvReaderBuilder */
-    private $subject;
+    private CsvReaderBuilder $subject;
 
     protected function setUp(): void
     {

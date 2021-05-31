@@ -37,17 +37,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 class Lti1p3RequestFactory implements LtiRequestFactoryInterface
 {
-    /** @var RegistrationRepositoryInterface */
-    private $registrationRepository;
-
-    /** @var Lti1p3MessageBuilder */
-    private $ltiMessageBuilder;
-
-    /** @var LtiConfiguration */
-    private $ltiConfiguration;
-
-    /** @var RouterInterface */
-    private $router;
+    private RegistrationRepositoryInterface $registrationRepository;
+    private Lti1p3MessageBuilder $ltiMessageBuilder;
+    private LtiConfiguration $ltiConfiguration;
+    private RouterInterface $router;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,

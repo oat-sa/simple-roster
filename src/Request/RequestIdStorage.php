@@ -27,9 +27,9 @@ use LogicException;
 class RequestIdStorage
 {
     /** @var string */
-    private $requestId;
+    private string $requestId = '';
 
-    public function getRequestId(): ?string
+    public function getRequestId(): string
     {
         return $this->requestId;
     }

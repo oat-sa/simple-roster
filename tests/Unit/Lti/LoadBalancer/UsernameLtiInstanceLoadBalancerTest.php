@@ -33,11 +33,8 @@ use PHPUnit\Framework\TestCase;
 
 class UsernameLtiInstanceLoadBalancerTest extends TestCase
 {
-    /** @var UniqueLtiInstanceCollection */
-    private $ltiInstanceCollection;
-
-    /** @var UsernameLtiInstanceLoadBalancer */
-    private $subject;
+    private UniqueLtiInstanceCollection $ltiInstanceCollection;
+    private UsernameLtiInstanceLoadBalancer $subject;
 
     protected function setUp(): void
     {

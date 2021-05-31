@@ -37,8 +37,7 @@ use Psr\Log\LoggerInterface;
 
 class HealthCheckServiceTest extends TestCase
 {
-    /** @var HealthCheckService */
-    private $subject;
+    private HealthCheckService $subject;
 
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;

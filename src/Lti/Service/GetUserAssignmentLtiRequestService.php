@@ -29,8 +29,7 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class GetUserAssignmentLtiRequestService
 {
-    /** @var LtiRequestFactoryInterface */
-    private $ltiRequestFactory;
+    private LtiRequestFactoryInterface $ltiRequestFactory;
 
     public function __construct(LtiRequestFactoryInterface $ltiRequestFactory)
     {

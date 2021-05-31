@@ -41,19 +41,19 @@ class LtiInstanceCacheWarmerCommand extends Command
     public const NAME = 'roster:cache-warmup:lti-instance';
 
     /** @var LtiInstanceRepository */
-    private $ltiInstanceRepository;
+    private LtiInstanceRepository $ltiInstanceRepository;
 
     /** @var SymfonyStyle */
-    private $symfonyStyle;
+    private SymfonyStyle $symfonyStyle;
 
     /** @var CacheProvider */
     private $resultCacheImplementation;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var int */
-    private $ltiInstancesCacheTtl;
+    private int $ltiInstancesCacheTtl;
 
     public function __construct(
         LtiInstanceRepository $ltiInstanceRepository,

@@ -27,13 +27,12 @@ use Exception;
 class FindUserCriteria
 {
     /** @var string[] */
-    private $usernames = [];
+    private array $usernames = [];
 
     /** @var string[] */
-    private $lineItemSlugs = [];
+    private array $lineItemSlugs = [];
 
-    /** @var EuclideanDivisionCriterion|null */
-    private $euclideanDivisionCriterion;
+    private ?EuclideanDivisionCriterion $euclideanDivisionCriterion = null;
 
     public function addUsernameCriterion(string ...$usernames): self
     {

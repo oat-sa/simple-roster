@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Message;
 class WarmUpGroupedUserCacheMessage
 {
     /** @var string[] */
-    private $usernames;
+    private array $usernames;
 
     public function __construct(array $usernames)
     {

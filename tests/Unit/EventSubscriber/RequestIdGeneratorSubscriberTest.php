@@ -38,13 +38,13 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     private $uuidFactory;
 
     /** @var RequestIdStorage */
-    private $requestIdStorage;
+    private RequestIdStorage $requestIdStorage;
 
     /** @var RequestEvent|MockObject */
     private $requestEvent;
 
     /** @var RequestIdGeneratorSubscriber */
-    private $subject;
+    private RequestIdGeneratorSubscriber $subject;
 
     protected function setUp(): void
     {
