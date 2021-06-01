@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 - To be released
+## 2.1.0 - 2021-06-02
 
 ### Changed
 - Raised minimum required PHP version from `7.3` to `7.4`.
