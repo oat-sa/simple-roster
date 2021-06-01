@@ -29,7 +29,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 class LineItemLoaderListener implements EntityListenerInterface
 {
     /** @var LineItemRepository */
-    private $lineItemRepository;
+    private LineItemRepository $lineItemRepository;
 
     public function __construct(LineItemRepository $lineItemRepository)
     {

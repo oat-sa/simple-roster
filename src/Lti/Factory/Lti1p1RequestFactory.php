@@ -35,17 +35,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Lti1p1RequestFactory implements LtiRequestFactoryInterface
 {
-    /** @var Lti1p1LaunchUrlBuilder */
-    private $launchUrlBuilder;
-
-    /** @var OAuthSigner */
-    private $signer;
-
-    /** @var NonceGenerator */
-    private $generator;
-
-    /** @var LtiInstanceLoadBalancerInterface */
-    private $loadBalancer;
+    private Lti1p1LaunchUrlBuilder $launchUrlBuilder;
+    private OAuthSigner $signer;
+    private NonceGenerator $generator;
+    private LtiInstanceLoadBalancerInterface $loadBalancer;
 
     public function __construct(
         Lti1p1LaunchUrlBuilder $launchUrlBuilder,

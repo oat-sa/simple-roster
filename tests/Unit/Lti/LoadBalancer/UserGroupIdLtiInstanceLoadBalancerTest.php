@@ -36,11 +36,8 @@ use Symfony\Component\Uid\UuidV6;
 
 class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 {
-    /** @var UniqueLtiInstanceCollection */
-    private $ltiInstanceCollection;
-
-    /** @var UserGroupIdLtiInstanceLoadBalancer */
-    private $subject;
+    private UniqueLtiInstanceCollection $ltiInstanceCollection;
+    private UserGroupIdLtiInstanceLoadBalancer $subject;
 
     protected function setUp(): void
     {

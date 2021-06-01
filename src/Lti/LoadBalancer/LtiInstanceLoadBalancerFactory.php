@@ -36,7 +36,7 @@ class LtiInstanceLoadBalancerFactory
     ];
 
     /** @var LtiInstanceRepository */
-    private $ltiInstanceRepository;
+    private LtiInstanceRepository $ltiInstanceRepository;
 
     public function __construct(LtiInstanceRepository $ltiInstanceRepository)
     {

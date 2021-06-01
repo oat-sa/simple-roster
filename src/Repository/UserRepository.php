@@ -37,11 +37,8 @@ use Symfony\Component\Uid\UuidV6;
 
 class UserRepository extends AbstractRepository
 {
-    /** @var UserCacheIdGenerator */
-    private $userCacheIdGenerator;
-
-    /** @var int */
-    private $userCacheTtl;
+    private UserCacheIdGenerator $userCacheIdGenerator;
+    private int $userCacheTtl;
 
     public function __construct(
         ManagerRegistry $registry,

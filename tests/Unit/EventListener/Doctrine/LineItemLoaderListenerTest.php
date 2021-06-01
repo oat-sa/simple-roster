@@ -34,7 +34,7 @@ use Symfony\Component\Uid\UuidV6;
 class LineItemLoaderListenerTest extends TestCase
 {
     /** @var LineItemLoaderListener */
-    private $subject;
+    private LineItemLoaderListener $subject;
 
     /** @var LineItemRepository|MockObject */
     private $lineItemRepository;

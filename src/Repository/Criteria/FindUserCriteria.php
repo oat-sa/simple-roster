@@ -25,10 +25,10 @@ namespace OAT\SimpleRoster\Repository\Criteria;
 class FindUserCriteria
 {
     /** @var string[] */
-    private $usernames = [];
+    private array $usernames = [];
 
     /** @var string[] */
-    private $lineItemSlugs = [];
+    private array $lineItemSlugs = [];
 
     public function addUsernameCriterion(string ...$usernames): self
     {

@@ -49,7 +49,7 @@ class BulkCreateUsersAssignmentsService
     private $logger;
 
     /** @var array */
-    private $logBuffer = [];
+    private array $logBuffer = [];
 
     public function __construct(
         EntityManagerInterface $entityManager,

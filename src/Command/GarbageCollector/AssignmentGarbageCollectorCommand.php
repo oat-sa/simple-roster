@@ -43,14 +43,9 @@ class AssignmentGarbageCollectorCommand extends Command
 
     private const DEFAULT_BATCH_SIZE = '1000';
 
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var DateInterval */
-    private $cleanUpInterval;
+    private AssignmentRepository $assignmentRepository;
+    private LoggerInterface $logger;
+    private DateInterval $cleanUpInterval;
 
     /**
      * @throws Exception

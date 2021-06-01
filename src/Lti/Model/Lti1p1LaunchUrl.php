@@ -24,11 +24,8 @@ namespace OAT\SimpleRoster\Lti\Model;
 
 class Lti1p1LaunchUrl
 {
-    /** @var string */
-    private $ltiLink;
-
-    /** @var array */
-    private $ltiParameters;
+    private string $ltiLink;
+    private array $ltiParameters;
 
     public function __construct(string $ltiLink, array $ltiParameters)
     {

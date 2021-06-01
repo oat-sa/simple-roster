@@ -6,23 +6,31 @@
 - Added `status` column to `line_items` database table.
 - Added `status` column to `assignments` database table.
 - Added `groupId` column to `line_items` database table.
-- Added possibility to define (optionally) `status` of Line items during ingestion with default value `enabled` for backward compatibility. 
+- Added possibility to define (optionally) `status` of Line items during ingestion with default value `enabled` for backward compatibility.
 
 ### Changed
 - Changed availability logic of line items: From now on it is possible to set date restrictions by specifying only starting or ending date.
 - Changed identifier generation strategy of all entities from `auto increment` to `uuid`.
 - Updated commands to work with line item group id.
-- Renamed `roster:modify-entity:line-item:change-state` to `roster:modify-entity:line-item:change-status`. 
+- Renamed `roster:modify-entity:line-item:change-state` to `roster:modify-entity:line-item:change-status`.
 
 ### Removed
 - Removed `isActive` column from `line_items` database table.
 - Removed `state` column from `assignments` database table.
 - Removed synchronous parallel cache warmup feature from user cache warmer command.
 
+## 2.1.0 - To be released
+
+### Changed
+- Raised minimum required PHP version from `7.3` to `7.4`.
+
+### Fixed
+- Fixed [User enumeration in authentication mechanisms (GHSA-g2qj-pmxm-9f8f)](https://github.com/advisories/GHSA-g2qj-pmxm-9f8f) security vulnerability.
+
 ## 2.0.8 - 2021-04-20
 
 ### Fixed
-- Fixed [CVE-2021-30130](https://github.com/advisories/GHSA-vf4w-fg7r-5v94) security vulnerability.
+- Fixed [Improper Certificate Validation in phpseclib (CVE-2021-30130)](https://github.com/advisories/GHSA-vf4w-fg7r-5v94) security vulnerability.
 
 ## 2.0.7 - 2021-03-27
 

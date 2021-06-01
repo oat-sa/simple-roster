@@ -33,8 +33,7 @@ use Throwable;
 
 class SerializerResponderTest extends KernelTestCase
 {
-    /** @var bool */
-    private $debug = true;
+    private bool $debug = true;
 
     public function setUp(): void
     {

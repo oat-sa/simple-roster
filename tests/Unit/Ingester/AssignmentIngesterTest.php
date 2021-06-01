@@ -42,8 +42,7 @@ class AssignmentIngesterTest extends TestCase
     /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;
 
-    /** @var AssignmentIngester */
-    private $subject;
+    private AssignmentIngester $subject;
 
     protected function setUp(): void
     {

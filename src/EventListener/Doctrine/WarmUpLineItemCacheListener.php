@@ -31,14 +31,9 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 
 class WarmUpLineItemCacheListener implements EntityListenerInterface
 {
-    /** @var CacheProvider */
-    private $cacheProvider;
-
-    /** @var LineItemCacheIdGenerator */
-    private $lineItemCacheIdGenerator;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
+    private CacheProvider $cacheProvider;
+    private LineItemCacheIdGenerator $lineItemCacheIdGenerator;
+    private LineItemRepository $lineItemRepository;
 
     public function __construct(
         LineItemRepository $lineItemRepository,

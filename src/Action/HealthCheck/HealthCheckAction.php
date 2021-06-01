@@ -28,11 +28,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HealthCheckAction
 {
-    /** @var HealthCheckService */
-    private $healthCheckService;
-
-    /** @var SerializerResponder */
-    private $serializerResponder;
+    private HealthCheckService $healthCheckService;
+    private SerializerResponder $serializerResponder;
 
     public function __construct(HealthCheckService $healthCheckService, SerializerResponder $serializerResponder)
     {

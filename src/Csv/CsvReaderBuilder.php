@@ -35,16 +35,16 @@ class CsvReaderBuilder
     public const DEFAULT_CSV_ENCLOSURE = '"';
 
     /** @var StorageRegistry */
-    private $storageRegistry;
+    private StorageRegistry $storageRegistry;
 
     /** @var int */
-    private $headerOffset = 0;
+    private int $headerOffset = 0;
 
     /** @var string */
-    private $delimiter = self::DEFAULT_CSV_DELIMITER;
+    private string $delimiter = self::DEFAULT_CSV_DELIMITER;
 
     /** @var string */
-    private $enclosure = self::DEFAULT_CSV_ENCLOSURE;
+    private string $enclosure = self::DEFAULT_CSV_ENCLOSURE;
 
     public function __construct(StorageRegistry $storageRegistry)
     {

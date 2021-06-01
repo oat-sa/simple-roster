@@ -35,8 +35,7 @@ use RuntimeException;
 
 class BulkCreateUsersAssignmentsServiceTest extends TestCase
 {
-    /** @var BulkCreateUsersAssignmentsService */
-    private $subject;
+    private BulkCreateUsersAssignmentsService $subject;
 
     /** @var UserRepository|MockObject */
     private $userRepository;

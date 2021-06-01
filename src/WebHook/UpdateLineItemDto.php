@@ -33,23 +33,12 @@ class UpdateLineItemDto implements JsonSerializable
 
     public const NAME = 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent';
 
-    /** @var string */
-    private $id;
-
-    /** @var string */
-    private $name;
-
-    /** @var string|null */
-    private $slug;
-
-    /** @var string */
-    private $lineItemUri;
-
-    /** @var string */
-    private $status;
-
-    /** @var DateTimeInterface */
-    private $triggeredTime;
+    private string $id;
+    private string $name;
+    private ?string $slug;
+    private string $lineItemUri;
+    private string $status;
+    private DateTimeInterface $triggeredTime;
 
     public function __construct(
         string $id,

@@ -34,11 +34,10 @@ use OAT\SimpleRoster\Lti\Request\LtiRequest;
 
 class Lti1p3MessageBuilder
 {
-    /** @var LtiResourceLinkLaunchRequestBuilder */
-    private $ltiRequestBuilder;
+    private LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder;
 
     /** @var MessagePayloadClaimInterface[] */
-    private $claims = [];
+    private array $claims = [];
 
     public function __construct(LtiResourceLinkLaunchRequestBuilder $ltiRequestBuilder)
     {

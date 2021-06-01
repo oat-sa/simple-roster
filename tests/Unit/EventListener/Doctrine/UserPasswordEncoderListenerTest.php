@@ -31,8 +31,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
-    /** @var UserPasswordEncoderListener */
-    private $subject;
+    private UserPasswordEncoderListener $subject;
 
     /** @var UserPasswordEncoderInterface|MockObject */
     private $userPasswordEncoderMock;

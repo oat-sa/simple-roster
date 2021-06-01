@@ -32,32 +32,15 @@ class LineItem implements JsonSerializable, EntityInterface
     public const STATUS_ENABLED = 'enabled';
     public const STATUS_DISABLED = 'disabled';
 
-    /** @var UuidV6 */
-    private $id;
-
-    /** @var string */
-    private $label;
-
-    /** @var string */
-    private $uri;
-
-    /** @var string */
-    private $slug;
-
-    /** @var string */
-    private $status;
-
-    /** @var DateTimeInterface|null */
-    private $startAt;
-
-    /** @var DateTimeInterface|null */
-    private $endAt;
-
-    /** @var int */
-    private $maxAttempts;
-
-    /** @var string|null */
-    private $groupId;
+    private UuidV6 $id;
+    private string $label;
+    private string $uri;
+    private string $slug;
+    private string $status;
+    private int $maxAttempts;
+    private ?DateTimeInterface $startAt;
+    private ?DateTimeInterface $endAt;
+    private ?string $groupId;
 
     /**
      * @throws InvalidArgumentException

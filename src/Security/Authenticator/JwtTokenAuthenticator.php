@@ -38,14 +38,9 @@ use Throwable;
 
 class JwtTokenAuthenticator extends AbstractGuardAuthenticator
 {
-    /** @var AuthorizationHeaderTokenExtractor */
-    private $tokenExtractor;
-
-    /** @var JwtTokenVerifier */
-    private $tokenVerifier;
-
-    /** @var SerializerResponder */
-    private $responder;
+    private AuthorizationHeaderTokenExtractor $tokenExtractor;
+    private JwtTokenVerifier $tokenVerifier;
+    private SerializerResponder $responder;
 
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,

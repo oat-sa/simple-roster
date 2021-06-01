@@ -15,12 +15,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Security\Handler;
+namespace OAT\SimpleRoster\Security\Listener;
 
 use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
@@ -29,25 +29,15 @@ use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 
-class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
+class LogoutEventListener
 {
-    /** @var AuthorizationHeaderTokenExtractor */
-    private $tokenExtractor;
-
-    /** @var CacheItemPoolInterface */
-    private $tokenCache;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $tokenCacheIdGenerator;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var SerializerResponder */
-    private $serializerResponder;
+    private AuthorizationHeaderTokenExtractor $tokenExtractor;
+    private CacheItemPoolInterface $tokenCache;
+    private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
+    private LoggerInterface $logger;
+    private SerializerResponder $serializerResponder;
 
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,
@@ -63,8 +53,10 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
         $this->serializerResponder = $serializerResponder;
     }
 
-    public function onLogoutSuccess(Request $request): JsonResponse
+    public function onSymfonyComponentSecurityHttpEventLogoutEvent(LogoutEvent $event): void
     {
+        $request = $event->getRequest();
+
         $accessToken = $this->tokenExtractor->extract($request);
         $parsedToken = (new Parser())->parse($accessToken);
 
@@ -82,6 +74,6 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
             );
         }
 
-        return $this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT);
+        $event->setResponse($this->serializerResponder->createJsonResponse([], JsonResponse::HTTP_NO_CONTENT));
     }
 }

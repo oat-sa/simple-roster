@@ -37,14 +37,9 @@ class Lti1p1LaunchUrlBuilder
 {
     private const LTI_VERSION_REQUEST_STRING = 'LTI-1p0';
 
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var LtiInstanceLoadBalancerInterface */
-    private $loadBalancer;
-
-    /** @var LtiConfiguration */
-    private $ltiConfiguration;
+    private RouterInterface $router;
+    private LtiInstanceLoadBalancerInterface $loadBalancer;
+    private LtiConfiguration $ltiConfiguration;
 
     public function __construct(
         RouterInterface $router,

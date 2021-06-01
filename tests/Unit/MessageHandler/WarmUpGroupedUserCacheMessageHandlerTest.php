@@ -39,8 +39,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
 {
-    /** @var WarmUpGroupedUserCacheMessageHandler */
-    private $subject;
+    private WarmUpGroupedUserCacheMessageHandler $subject;
 
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;

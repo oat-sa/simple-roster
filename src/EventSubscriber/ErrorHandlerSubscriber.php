@@ -29,8 +29,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriber implements EventSubscriberInterface
 {
-    /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     public function __construct(SerializerResponder $responder)
     {
@@ -46,7 +45,7 @@ class ErrorHandlerSubscriber implements EventSubscriberInterface
 
     public function onKernelException(ExceptionEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

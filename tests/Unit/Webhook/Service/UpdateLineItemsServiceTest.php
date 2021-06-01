@@ -45,8 +45,7 @@ class UpdateLineItemsServiceTest extends TestCase
     /** @var MockObject|LoggerInterface */
     private $logger;
 
-    /** @var UpdateLineItemsService */
-    private $subject;
+    private UpdateLineItemsService $subject;
 
     protected function setUp(): void
     {

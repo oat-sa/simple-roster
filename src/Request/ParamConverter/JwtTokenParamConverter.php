@@ -33,8 +33,7 @@ use Throwable;
 
 class JwtTokenParamConverter implements ParamConverterInterface
 {
-    /** @var JwtTokenVerifier */
-    private $tokenVerifier;
+    private JwtTokenVerifier $tokenVerifier;
 
     public function __construct(JwtTokenVerifier $tokenVerifier)
     {

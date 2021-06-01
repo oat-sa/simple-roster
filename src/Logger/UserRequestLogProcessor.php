@@ -22,13 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Logger;
 
+use OAT\SimpleRoster\Entity\User;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserRequestLogProcessor
 {
-    /** @var Security */
-    private $security;
+    private Security $security;
 
     public function __construct(Security $security)
     {
@@ -39,7 +38,7 @@ class UserRequestLogProcessor
     {
         $user = $this->security->getUser();
         $username = 'guest';
-        if ($user instanceof UserInterface) {
+        if ($user instanceof User) {
             $username = $user->getUsername();
         }
 

@@ -36,7 +36,7 @@ class LtiInstanceIngesterCommand extends AbstractCsvIngesterCommand
     public const NAME = 'roster:ingest:lti-instance';
 
     /** @var LtiInstanceRepository */
-    private $ltiInstanceRepository;
+    private LtiInstanceRepository $ltiInstanceRepository;
 
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,

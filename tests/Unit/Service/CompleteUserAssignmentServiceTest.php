@@ -37,7 +37,7 @@ use Symfony\Component\Uid\UuidV6;
 class CompleteUserAssignmentServiceTest extends TestCase
 {
     /** @var CompleteUserAssignmentService */
-    private $subject;
+    private CompleteUserAssignmentService $subject;
 
     /** @var AssignmentRepository|MockObject */
     private $assignmentRepository;

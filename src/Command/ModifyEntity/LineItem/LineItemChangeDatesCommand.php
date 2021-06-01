@@ -48,32 +48,24 @@ class LineItemChangeDatesCommand extends Command
     private const OPTION_END_DATE = 'end-date';
     private const OPTION_FORCE = 'force';
 
-    /** @var SymfonyStyle */
-    private $symfonyStyle;
+    private SymfonyStyle $symfonyStyle;
 
-    /** @var bool */
-    private $isDryRun;
+    private ?DateTime $startDate = null;
+    private ?DateTime $endDate = null;
+
+    private LineItemRepository $lineItemRepository;
+    private LoggerInterface $logger;
+
+    private bool $isDryRun;
 
     /** @var string[] */
-    private $lineItemSlugs;
+    private array $lineItemSlugs = [];
 
     /** @var UuidV6[] */
-    private $lineItemIds;
+    private array $lineItemIds = [];
 
     /** @var string[] */
-    private $lineItemGroupIds;
-
-    /** @var DateTime|null */
-    private $startDate;
-
-    /** @var DateTime|null */
-    private $endDate;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private array $lineItemGroupIds = [];
 
     public function __construct(LineItemRepository $lineItemRepository, LoggerInterface $logger)
     {

@@ -26,11 +26,8 @@ use League\Flysystem\Filesystem;
 
 class Storage
 {
-    /** @var string */
-    private $id;
-
-    /** @var Filesystem */
-    private $fileSystem;
+    private string $id;
+    private Filesystem $fileSystem;
 
     public function __construct(string $id, Filesystem $fileSystem)
     {

@@ -38,13 +38,13 @@ use Throwable;
 class BulkUpdateUsersAssignmentsStatusService
 {
     /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var array */
-    private $logBuffer = [];
+    private array $logBuffer = [];
 
     public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {

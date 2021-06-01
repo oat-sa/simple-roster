@@ -58,13 +58,13 @@ class LineItemChangeStatusCommand extends Command
     ];
 
     /** @var LineItemRepository */
-    private $lineItemRepository;
+    private LineItemRepository $lineItemRepository;
 
     /** @var SymfonyStyle */
-    private $symfonyStyle;
+    private SymfonyStyle $symfonyStyle;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LineItemRepository $lineItemRepository, LoggerInterface $logger)
     {

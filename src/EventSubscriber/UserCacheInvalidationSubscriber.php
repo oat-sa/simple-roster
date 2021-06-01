@@ -38,16 +38,16 @@ use Throwable;
 class UserCacheInvalidationSubscriber implements EventSubscriber
 {
     /** @var UserCacheWarmerService */
-    private $userCacheWarmerService;
+    private UserCacheWarmerService $userCacheWarmerService;
 
     /** @var UserCacheIdGenerator */
-    private $userCacheIdGenerator;
+    private UserCacheIdGenerator $userCacheIdGenerator;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var User[] */
-    private $usersToInvalidate = [];
+    private array $usersToInvalidate = [];
 
     public function __construct(
         UserCacheWarmerService $userCacheWarmerService,

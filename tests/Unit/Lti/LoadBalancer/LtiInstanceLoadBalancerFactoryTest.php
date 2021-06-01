@@ -37,7 +37,7 @@ class LtiInstanceLoadBalancerFactoryTest extends TestCase
     private $ltiInstanceRepository;
 
     /** @var LtiInstanceLoadBalancerFactory */
-    private $subject;
+    private LtiInstanceLoadBalancerFactory $subject;
 
     protected function setUp(): void
     {

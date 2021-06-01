@@ -26,31 +26,22 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV6;
 
-class User implements UserInterface, EntityInterface
+class User implements UserInterface, EntityInterface, PasswordAuthenticatedUserInterface
 {
-    /** @var UuidV6 */
-    private $id;
-
-    /** @var string */
-    private $username;
-
+    private UuidV6 $id;
+    private string $username;
     /** @var string|null */
-    private $plainPassword;
-
-    /** @var string */
-    private $password;
-
+    private ?string $plainPassword;
+    private string $password;
     /** @var string[] */
-    private $roles;
-
-    /** @var string|null */
-    private $groupId;
-
-    /** @var ArrayCollection|Assignment[] */
-    private $assignments;
+    private array $roles;
+    private ?string $groupId;
+    /** @var Collection|Assignment[] */
+    private Collection $assignments;
 
     public function __construct(
         UuidV6 $id,

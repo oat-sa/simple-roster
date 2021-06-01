@@ -26,20 +26,11 @@ use Symfony\Component\Uid\UuidV6;
 
 class LtiInstance implements EntityInterface
 {
-    /** @var UuidV6 */
-    private $id;
-
-    /** @var string */
-    private $label;
-
-    /** @var string */
-    private $ltiLink;
-
-    /** @var string */
-    private $ltiKey;
-
-    /** @var string */
-    private $ltiSecret;
+    private UuidV6 $id;
+    private string $label;
+    private string $ltiLink;
+    private string $ltiKey;
+    private string $ltiSecret;
 
     public function __construct(UuidV6 $id, string $label, string $ltiLink, string $ltiKey, string $ltiSecret)
     {

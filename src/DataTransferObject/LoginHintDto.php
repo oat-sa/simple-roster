@@ -27,6 +27,8 @@ use Symfony\Component\Uid\UuidV6;
 
 class LoginHintDto
 {
+    public const LOGIN_HINT_SEPARATOR = '::';
+
     /** @var string */
     private $username;
 
@@ -55,6 +57,6 @@ class LoginHintDto
 
     public function __toString(): string
     {
-        return sprintf('%s::%s', $this->username, (string)$this->assignmentId);
+        return implode(self::LOGIN_HINT_SEPARATOR, get_object_vars($this));
     }
 }

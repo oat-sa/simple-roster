@@ -41,8 +41,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
     use CsvIngestionTestingTrait;
     use CommandDisplayNormalizerTrait;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

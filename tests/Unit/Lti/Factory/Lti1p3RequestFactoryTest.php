@@ -39,8 +39,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class Lti1p3RequestFactoryTest extends TestCase
 {
-    /** @var Lti1p3RequestFactory */
-    private $subject;
+    private Lti1p3RequestFactory $subject;
 
     /** @var Lti1p3MessageBuilder|MockObject */
     private $ltiMessageBuilder;

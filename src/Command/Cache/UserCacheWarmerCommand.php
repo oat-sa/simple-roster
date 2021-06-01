@@ -49,23 +49,16 @@ class UserCacheWarmerCommand extends Command
 
     private const DEFAULT_BATCH_SIZE = '1000';
 
-    /** @var UserCacheWarmerService */
-    private $userCacheWarmerService;
-
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var SymfonyStyle */
-    private $symfonyStyle;
-
-    /** @var int */
-    private $batchSize;
+    private UserCacheWarmerService $userCacheWarmerService;
+    private UserRepository $userRepository;
+    private SymfonyStyle $symfonyStyle;
+    private int $batchSize;
 
     /** @var string[] */
-    private $usernames = [];
+    private array $usernames = [];
 
     /** @var array */
-    private $lineItemSlugs = [];
+    private array $lineItemSlugs = [];
 
     public function __construct(UserCacheWarmerService $userCacheWarmerService, UserRepository $userRepository)
     {

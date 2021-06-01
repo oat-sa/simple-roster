@@ -33,7 +33,7 @@ class BulkUpdateUsersAssignmentsStatusAction
     private $bulkAssignmentsStateService;
 
     /** @var SerializerResponder */
-    private $responder;
+    private SerializerResponder $responder;
 
     public function __construct(
         BulkUpdateUsersAssignmentsStatusService $bulkUpdateAssignmentsStateService,

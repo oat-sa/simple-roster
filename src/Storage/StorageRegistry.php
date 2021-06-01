@@ -31,7 +31,7 @@ class StorageRegistry
     public const DEFAULT_STORAGE = 'local';
 
     /** @var iterable|Storage[] */
-    private $storages;
+    private iterable $storages;
 
     /**
      * @throws LogicException

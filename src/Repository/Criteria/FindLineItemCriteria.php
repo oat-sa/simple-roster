@@ -30,7 +30,7 @@ class FindLineItemCriteria
     private $lineItemIds = [];
 
     /** @var string[] */
-    private $lineItemSlugs = [];
+    private array $lineItemSlugs = [];
 
     /** @var string[] */
     private $lineItemGroupIds = [];

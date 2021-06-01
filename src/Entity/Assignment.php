@@ -44,23 +44,12 @@ class Assignment implements JsonSerializable, EntityInterface
         self::STATUS_CANCELLED,
     ];
 
-    /** @var UuidV6 */
-    private $id;
-
-    /** @var string */
-    private $status;
-
-    /** @var User */
-    private $user;
-
-    /** @var LineItem */
-    private $lineItem;
-
-    /** @var DateTime|null */
-    private $updatedAt;
-
-    /** @var int */
-    private $attemptsCount;
+    private UuidV6 $id;
+    private string $status;
+    private ?User $user = null;
+    private LineItem $lineItem;
+    private ?DateTime $updatedAt;
+    private int $attemptsCount;
 
     public function __construct(
         UuidV6 $id,

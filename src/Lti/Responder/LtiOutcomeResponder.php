@@ -29,10 +29,10 @@ use Twig\Environment;
 class LtiOutcomeResponder
 {
     /** @var Environment */
-    private $twig;
+    private Environment $twig;
 
     /** @var UuidFactoryInterface */
-    private $uuidFactory;
+    private UuidFactoryInterface $uuidFactory;
 
     public function __construct(Environment $twig, UuidFactoryInterface $uuidFactory)
     {

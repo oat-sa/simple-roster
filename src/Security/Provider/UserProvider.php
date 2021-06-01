@@ -33,11 +33,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var RequestStack */
-    private $requestStack;
+    private UserRepository $userRepository;
+    private RequestStack $requestStack;
 
     public function __construct(UserRepository $userRepository, RequestStack $requestStack)
     {

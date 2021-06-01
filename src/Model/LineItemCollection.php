@@ -31,7 +31,7 @@ use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 class LineItemCollection implements Countable, IteratorAggregate
 {
     /** @var LineItem[] */
-    private $collection = [];
+    private array $collection = [];
 
     public function add(LineItem $lineItem): self
     {
