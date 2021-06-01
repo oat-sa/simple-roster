@@ -307,9 +307,6 @@
     "openlss/lib-array2xml": {
         "version": "1.0.0"
     },
-    "paragonie/constant_time_encoding": {
-        "version": "v2.4.0"
-    },
     "pdepend/pdepend": {
         "version": "2.7.1"
     },
