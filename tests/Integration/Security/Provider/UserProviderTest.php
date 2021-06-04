@@ -38,8 +38,7 @@ class UserProviderTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var UserProvider */
-    private $subject;
+    private UserProvider $subject;
 
     /** @var RequestStack|MockObject */
     private $requestStack;

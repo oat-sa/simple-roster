@@ -38,7 +38,7 @@ use Psr\Log\LoggerInterface;
 class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
 {
     /** @var BulkUpdateUsersAssignmentsStateService */
-    private $subject;
+    private BulkUpdateUsersAssignmentsStateService $subject;
 
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;

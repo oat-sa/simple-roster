@@ -2,7 +2,7 @@
 
 >REST back-end service intending to mimic a simplified version of OneRoster IMS specification.
 
-![current version](https://img.shields.io/badge/version-2.0.8-green.svg)
+![current version](https://img.shields.io/badge/version-2.1.0-green.svg)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 ![coverage](https://img.shields.io/badge/coverage-100%25-green.svg)
 

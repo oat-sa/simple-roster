@@ -37,7 +37,7 @@ class LtiInstanceRepositoryTest extends KernelTestCase
     private $subject;
 
     /** @var Cache */
-    private $doctrineResultCache;
+    private Cache $doctrineResultCache;
 
     protected function setUp(): void
     {

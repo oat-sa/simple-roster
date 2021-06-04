@@ -28,10 +28,8 @@ use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 class BulkResult implements JsonSerializable
 {
     /** @var bool[] */
-    private $results = [];
-
-    /** @var int */
-    private $failuresCount = 0;
+    private array $results = [];
+    private int $failuresCount = 0;
 
     public function addBulkOperationSuccess(BulkOperation $operation): self
     {

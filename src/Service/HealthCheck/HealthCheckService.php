@@ -22,18 +22,21 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\HealthCheck;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\HealthCheck\HealthCheckResult;
+use Psr\Log\LoggerInterface;
 
 class HealthCheckService
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -50,8 +53,24 @@ class HealthCheckService
 
         $cacheStatistics = $resultCacheImplementation->getStats();
 
+        $connection = $this->entityManager->getConnection();
+
+        try {
+            $testQuery = $connection->getDatabasePlatform()->getDummySelectSQL();
+            $testQueryResult = (bool)$connection->fetchOne($testQuery);
+        } catch (Exception $exception) {
+            $testQueryResult = $connection->isConnected();
+
+            $this->logger->critical(
+                sprintf(
+                    'DB connection unavailable. Got `%s` exception from DBAL',
+                    $exception->getMessage()
+                )
+            );
+        }
+
         return new HealthCheckResult(
-            $this->entityManager->getConnection()->ping(),
+            $testQueryResult,
             ($cacheStatistics['uptime'] ?? 0) > 0
         );
     }

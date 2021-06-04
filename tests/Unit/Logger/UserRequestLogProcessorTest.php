@@ -34,11 +34,8 @@ class UserRequestLogProcessorTest extends TestCase
     /** @var Security|MockObject */
     private $security;
 
-    /** @var RequestIdStorage */
-    private $requestIdStorage;
-
-    /** @var UserRequestLogProcessor */
-    private $subject;
+    private RequestIdStorage $requestIdStorage;
+    private UserRequestLogProcessor $subject;
 
     protected function setUp(): void
     {

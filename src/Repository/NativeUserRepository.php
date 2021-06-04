@@ -35,7 +35,7 @@ use Throwable;
 class NativeUserRepository extends AbstractRepository
 {
     /** @var string */
-    private $kernelEnvironment;
+    private string $kernelEnvironment;
 
     public function __construct(ManagerRegistry $registry, string $kernelEnvironment)
     {

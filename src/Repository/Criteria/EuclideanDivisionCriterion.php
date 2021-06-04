@@ -26,11 +26,8 @@ use InvalidArgumentException;
 
 class EuclideanDivisionCriterion
 {
-    /** @var int */
-    private $modulo;
-
-    /** @var int */
-    private $remainder;
+    private int $modulo;
+    private int $remainder;
 
     public function __construct(int $modulo, int $remainder)
     {

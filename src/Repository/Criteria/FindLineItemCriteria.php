@@ -25,10 +25,10 @@ namespace OAT\SimpleRoster\Repository\Criteria;
 class FindLineItemCriteria
 {
     /** @var int[] */
-    private $lineItemIds = [];
+    private array $lineItemIds = [];
 
     /** @var string[] */
-    private $lineItemSlugs = [];
+    private array $lineItemSlugs = [];
 
     public function addLineItemIds(int ...$lineItemIds): self
     {

@@ -30,26 +30,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface
 {
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $username;
-
-    /** @var string */
-    private $password;
+    private ?int $id = null;
+    private ?string $username = null;
+    private string $password;
 
     /** @var ArrayCollection|Assignment[] */
     private $assignments;
 
     /** @var string[] */
-    private $roles = [];
+    private array $roles = [];
 
-    /** @var string|null */
-    private $plainPassword;
-
-    /** @var string|null */
-    private $groupId;
+    private ?string $plainPassword = null;
+    private ?string $groupId = null;
 
     public function __construct()
     {

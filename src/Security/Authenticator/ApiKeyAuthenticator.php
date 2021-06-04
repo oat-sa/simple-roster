@@ -37,11 +37,8 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
     public const AUTH_REALM = 'SimpleRoster';
 
-    /** @var AuthorizationHeaderTokenExtractor */
-    private $tokenExtractor;
-
-    /** @var string */
-    private $appApiKey;
+    private AuthorizationHeaderTokenExtractor $tokenExtractor;
+    private string $appApiKey;
 
     public function __construct(AuthorizationHeaderTokenExtractor $tokenExtractor, string $appApiKey)
     {

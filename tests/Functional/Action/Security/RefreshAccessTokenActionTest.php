@@ -42,7 +42,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
     use UserAuthenticatorTrait;
 
     /** @var KernelBrowser */
-    private $kernelBrowser;
+    private KernelBrowser $kernelBrowser;
 
     /** @var UserRepository */
     private $userRepository;

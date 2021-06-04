@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
@@ -14,7 +14,6 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install pgsql \
     && docker-php-ext-install pdo_pgsql \
     && docker-php-ext-install pdo_sqlite \
-    && docker-php-ext-install mbstring \
     && docker-php-ext-install opcache \
     && docker-php-ext-install zip \
     && docker-php-ext-install calendar \

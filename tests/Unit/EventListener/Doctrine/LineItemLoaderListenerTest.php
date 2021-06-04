@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 class LineItemLoaderListenerTest extends TestCase
 {
     /** @var LineItemLoaderListener */
-    private $subject;
+    private LineItemLoaderListener $subject;
 
     /** @var LineItemRepository|MockObject */
     private $lineItemRepository;

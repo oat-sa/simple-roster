@@ -40,8 +40,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
+    private KernelBrowser $kernelBrowser;
 
     protected function setUp(): void
     {

@@ -35,8 +35,7 @@ use PHPUnit\Framework\TestCase;
 
 class GetUserAssignmentLtiRequestServiceTest extends TestCase
 {
-    /** @var GetUserAssignmentLtiRequestService */
-    private $subject;
+    private GetUserAssignmentLtiRequestService $subject;
 
     /** @var Lti1p1RequestFactory|MockObject  */
     private $ltiRequestFactory;

@@ -41,20 +41,11 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
 
-    /** @var JwtTokenAuthenticator */
-    private $subject;
-
-    /** @var JwtTokenGenerator */
-    private $tokenGenerator;
-
-    /** @var UserProvider */
-    private $userProvider;
-
-    /** @var string */
-    private $jwtPrivateKeyPath;
-
-    /** @var string */
-    private $jwtPassphrase;
+    private JwtTokenAuthenticator $subject;
+    private JwtTokenGenerator $tokenGenerator;
+    private UserProvider $userProvider;
+    private string $jwtPrivateKeyPath;
+    private string $jwtPassphrase;
 
     protected function setUp(): void
     {

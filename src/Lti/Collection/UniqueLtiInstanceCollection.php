@@ -32,7 +32,7 @@ use Traversable;
 class UniqueLtiInstanceCollection implements Countable, IteratorAggregate
 {
     /** @var LtiInstance[] */
-    private $ltiInstances = [];
+    private array $ltiInstances = [];
 
     public function __construct(LtiInstance ...$ltiInstances)
     {

@@ -28,11 +28,8 @@ use PHPUnit\Framework\TestCase;
 
 class AssignmentTest extends TestCase
 {
-    /** @var LineItem */
-    private $lineItem;
-
-    /** @var Assignment */
-    private $subject;
+    private LineItem $lineItem;
+    private Assignment $subject;
 
     protected function setUp(): void
     {

@@ -110,8 +110,7 @@ trait Lti1p3SecurityTestingTrait
     private function createTestIdGenerator(string $generatedId = null): IdGeneratorInterface
     {
         return new class ($generatedId) implements IdGeneratorInterface {
-            /** @var string */
-            private $generatedId;
+            private string $generatedId;
 
             public function __construct(string $generatedId = null)
             {

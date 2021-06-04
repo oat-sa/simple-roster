@@ -39,7 +39,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
     use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

@@ -38,8 +38,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

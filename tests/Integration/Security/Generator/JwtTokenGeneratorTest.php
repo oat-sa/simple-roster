@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Security\Generator;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
 use Lcobucci\JWT\Token\DataSet;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
@@ -96,8 +97,8 @@ class JwtTokenGeneratorTest extends KernelTestCase
     private function assertDatetimeClaim(DataSet $claims, string $claim, string $dateTimeAtom): void
     {
         $expectedDate = $claims->get($claim);
-        if (!$expectedDate instanceof \DateTimeImmutable) {
-            $this->fail(sprintf("Claim '%s' expected to be instace of %s", $claim, \DateTimeImmutable::class));
+        if (!$expectedDate instanceof DateTimeImmutable) {
+            self::fail(sprintf("Claim '%s' expected to be instace of %s", $claim, DateTimeImmutable::class));
         }
 
         self::assertSame($dateTimeAtom, $expectedDate->format(DATE_ATOM));

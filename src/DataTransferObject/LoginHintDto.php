@@ -28,11 +28,8 @@ class LoginHintDto
 {
     public const LOGIN_HINT_SEPARATOR = '::';
 
-    /** @var string */
-    private $username;
-
-    /** @var int */
-    private $assignmentId;
+    private string $username;
+    private int $assignmentId;
 
     public function __construct(string $username, int $assignmentId)
     {

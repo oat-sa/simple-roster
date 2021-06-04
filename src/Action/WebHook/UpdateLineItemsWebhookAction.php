@@ -29,11 +29,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLineItemsWebhookAction
 {
-    /** @var SerializerResponder */
-    private $responder;
-
-    /** @var UpdateLineItemsService */
-    private $service;
+    private SerializerResponder $responder;
+    private UpdateLineItemsService $service;
 
     public function __construct(SerializerResponder $responder, UpdateLineItemsService $service)
     {

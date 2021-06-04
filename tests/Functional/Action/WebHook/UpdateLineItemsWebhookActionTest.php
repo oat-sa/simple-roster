@@ -40,11 +40,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
-    private $kernelBrowser;
-
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
+    private KernelBrowser $kernelBrowser;
+    private CacheProvider $resultCacheImplementation;
 
     protected function setUp(): void
     {

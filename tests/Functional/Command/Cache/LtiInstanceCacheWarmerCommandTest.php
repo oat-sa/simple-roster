@@ -42,7 +42,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
     use CommandDisplayNormalizerTrait;
 
     /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     /** @var CacheProvider */
     private $resultCache;

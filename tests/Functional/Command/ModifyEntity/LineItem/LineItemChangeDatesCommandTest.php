@@ -45,7 +45,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     use LoggerTestingTrait;
 
     /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     /** @var CacheProvider */
     private $resultCache;

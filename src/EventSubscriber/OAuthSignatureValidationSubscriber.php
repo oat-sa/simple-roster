@@ -37,13 +37,13 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     public const AUTH_REALM = 'SimpleRoster';
 
     /** @var LtiInstanceRepository */
-    private $repository;
+    private LtiInstanceRepository $repository;
 
     /** @var OAuthSigner */
-    private $signer;
+    private OAuthSigner $signer;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         LtiInstanceRepository $repository,

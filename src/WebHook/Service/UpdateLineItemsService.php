@@ -32,14 +32,9 @@ use Psr\Log\LoggerInterface;
 
 class UpdateLineItemsService
 {
-    /** @var LineItemRepository */
-    private $lineItemRepository;
-
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private LineItemRepository $lineItemRepository;
+    private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         LineItemRepository $lineItemRepository,

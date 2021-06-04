@@ -1,9 +1,17 @@
 # Changelog
 
+## 2.1.0 - 2021-06-02
+
+### Changed
+- Raised minimum required PHP version from `7.3` to `7.4`.
+
+### Fixed
+- Fixed [User enumeration in authentication mechanisms (GHSA-g2qj-pmxm-9f8f)](https://github.com/advisories/GHSA-g2qj-pmxm-9f8f) security vulnerability.
+
 ## 2.0.8 - 2021-04-20
 
 ### Fixed
-- Fixed [CVE-2021-30130](https://github.com/advisories/GHSA-vf4w-fg7r-5v94) security vulnerability.
+- Fixed [Improper Certificate Validation in phpseclib (CVE-2021-30130)](https://github.com/advisories/GHSA-vf4w-fg7r-5v94) security vulnerability.
 
 ## 2.0.7 - 2021-03-27
 

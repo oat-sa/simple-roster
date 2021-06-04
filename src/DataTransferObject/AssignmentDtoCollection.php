@@ -29,7 +29,7 @@ use IteratorAggregate;
 class AssignmentDtoCollection implements Countable, IteratorAggregate
 {
     /** @var AssignmentDto[] */
-    private $assignments;
+    private array $assignments;
 
     public function __construct(AssignmentDto ...$assignments)
     {

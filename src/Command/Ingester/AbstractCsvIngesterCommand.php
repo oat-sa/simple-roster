@@ -44,26 +44,13 @@ abstract class AbstractCsvIngesterCommand extends Command
 
     private const DEFAULT_BATCH_SIZE = '1000';
 
-    /** @var CsvReaderBuilder */
-    protected $csvReaderBuilder;
-
-    /** @var StorageRegistry */
-    protected $storageRegistry;
-
-    /** @var Reader */
-    protected $csvReader;
-
-    /** @var SymfonyStyle */
-    protected $symfonyStyle;
-
-    /** @var bool */
-    protected $isDryRun;
-
-    /** @var int */
-    protected $batchSize;
-
-    /** @var ProgressBar */
-    protected $progressBar;
+    protected CsvReaderBuilder $csvReaderBuilder;
+    protected StorageRegistry $storageRegistry;
+    protected Reader $csvReader;
+    protected SymfonyStyle $symfonyStyle;
+    protected bool $isDryRun;
+    protected int $batchSize;
+    protected ProgressBar $progressBar;
 
     public function __construct(CsvReaderBuilder $csvReaderBuilder, StorageRegistry $storageRegistry)
     {

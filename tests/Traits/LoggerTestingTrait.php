@@ -29,8 +29,7 @@ use Psr\Log\LoggerInterface;
 
 trait LoggerTestingTrait
 {
-    /** @var TestHandler */
-    private $handler;
+    private TestHandler $handler;
 
     protected function setUp(): void
     {

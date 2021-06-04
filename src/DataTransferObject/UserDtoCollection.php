@@ -29,7 +29,7 @@ use IteratorAggregate;
 class UserDtoCollection implements Countable, IteratorAggregate
 {
     /** @var UserDto[] */
-    private $users = [];
+    private array $users = [];
 
     public function add(UserDto $user): self
     {

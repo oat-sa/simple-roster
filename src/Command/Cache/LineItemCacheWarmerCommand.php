@@ -43,22 +43,22 @@ class LineItemCacheWarmerCommand extends Command
     public const NAME = 'roster:cache-warmup:line-item';
 
     /** @var SymfonyStyle */
-    private $symfonyStyle;
+    private SymfonyStyle $symfonyStyle;
 
     /** @var CacheProvider */
     private $resultCacheImplementation;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var int */
-    private $lineItemCacheTtl;
+    private int $lineItemCacheTtl;
 
     /** @var LineItemRepository */
-    private $lineItemRepository;
+    private LineItemRepository $lineItemRepository;
 
     /** @var LineItemCacheIdGenerator */
-    private $lineItemCacheIdGenerator;
+    private LineItemCacheIdGenerator $lineItemCacheIdGenerator;
 
     public function __construct(
         LineItemRepository $lineItemRepository,

@@ -29,7 +29,7 @@ use IteratorAggregate;
 class BulkOperationCollection implements IteratorAggregate, Countable
 {
     /** @var BulkOperation[] */
-    private $operations = [];
+    private array $operations = [];
 
     public function add(BulkOperation $operation): self
     {
