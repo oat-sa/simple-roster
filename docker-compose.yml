@@ -6,7 +6,7 @@ services:
         image: nginx:stable
         networks:
             - simple-roster
-            - oat-docker
+            - depp
         volumes:
             - .:/var/www/html:cached
             - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
@@ -14,7 +14,7 @@ services:
         labels:
             - "traefik.backend=simple-roster-nginx"
             - "traefik.frontend.rule=Host:simple-roster.docker.localhost"
-            - "traefik.docker.network=oat-docker"
+            - "traefik.docker.network=depp"
             - "traefik.port=80"
 
     simple-roster-phpfpm:
@@ -23,16 +23,13 @@ services:
             - .env.docker
         build:
             context: ./docker/phpfpm
-        environment:
-            COMPOSER_AUTH: $COMPOSER_AUTH
         expose:
             - 9000
         networks:
             - simple-roster
-            - oat-docker
+            - depp
         volumes:
             - .:/var/www/html:cached
-            - $COMPOSER_HOME:/root/.composer
         working_dir: /var/www/html
 
     simple-roster-redis:
@@ -81,5 +78,5 @@ volumes:
 networks:
     simple-roster:
         driver: bridge
-    oat-docker:
+    depp:
         external: true
