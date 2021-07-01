@@ -3,8 +3,8 @@
 -   [Étapes de l'installation](#Étapes-de-linstallation)
 -   [Variables d'environnement](#Variables-denvironnement)
 -   [Configuration globale de LTI](#Configuration-globale-de-LTI)
--   [LTI 1.1.1](#LTI111)
-    -   [Stratégie d'équilibrage de la charge LTI](#Stratégie-d'équilibrage-de-la-charge-LTI)
+-   [LTI 1.1.1](#LTI-111)
+    -   [Stratégie d'équilibrage de la charge LTI](#Stratégie-déquilibrage-de-la-charge-LTI)
 -   [LTI 1.3.0](#LTI-130)
 -   [Commandes CLI](#Commandes-CLI)
     -   [Ingestion de données](#Ingestion-de-données)
@@ -14,8 +14,8 @@
         -   [Ingestion par les utilisateurs](#Ingestion-par-les-utilisateurs)
     -   [Réchauffement du cache](#Réchauffement-du-cache)
         -   [Réchauffement du cache des postes](#Réchauffement-du-cache-des-postes)
-        -   [Réchauffement du cache de l'instance LTI](#Réchauffement-du-cache-delinstance-LTI)
-        -   [Réchauffement du cache de l'utilisateur](#Réchauffement-du-cache-delutilisateur)
+        -   [Réchauffement du cache de l'instance LTI](#Réchauffement-du-cache-de-linstance-LTI)
+        -   [Réchauffement du cache de l'utilisateur](#Réchauffement-du-cache-de-lutilisateur)
     -   [Collecteur d'ordures - Assignations](#Collecteur-dordures---Assignations)
     -   [Modifier les dates des postes](#Modifier-les-dates-des-postes)
     -   [Modifier l'état des postes](#Modifier-létat-des-postes)
@@ -163,6 +163,7 @@ Le LTI 1.3.0 a été créé pour résoudre certaines failles de sécurité de se
 
 Configurez les variables d'environnement en fonction de l'outil que vous intégrez à l'application.
 
+|     |     |
 | --- | --- |
 | **Variable** | **Description** |
 | **LTI1P3\_SERVICE\_ENCRYPTION\_KEY** | Clé utilisée pour la signature de sécurité |
