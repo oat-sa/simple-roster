@@ -1,7 +1,7 @@
 -   [Introduction](#Introduction)
 -   [Conditions préalables](#Conditions-préalables)
--   [Étapes de l'installation](#Étapes-de-l'installation)
--   [Variables d'environnement](#Variables-d'environnement)
+-   [Étapes de l'installation](#Étapes-de-linstallation)
+-   [Variables d'environnement](#Variables-denvironnement)
 -   [Configuration globale de LTI](#Configuration-globale-de-LTI)
 -   [LTI 1.1.1](#LTI1.1.1)
     -   [Stratégie d'équilibrage de la charge LTI](#Stratégie-d'équilibrage-de-la-charge-LTI)
@@ -10,10 +10,10 @@
     -   [Ingestion de données](#Ingestion-de-données)
         -   [Ingestion de l'instance LTI](#Ingestion-de-l'instance-LTI)
         -   [Ingestion de postes](#Ingestion-de-postes)
-        -   [Ingestion des assignations](#Ingestion-de-sassignations)
+        -   [Ingestion des assignations](#Ingestion-des-assignations)
         -   [Ingestion par les utilisateurs](#Ingestion-par-les-utilisateurs)
     -   [Réchauffement du cache](#Réchauffement-du-cache)
-        -   [Réchauffement du cache des postes](#Réchauffement-du-cache-de-spostes)
+        -   [Réchauffement du cache des postes](#Réchauffement-du-cache-des-postes)
         -   [Réchauffement du cache de l'instance LTI](#Réchauffement-du-cache-del'instance-LTI)
         -   [Réchauffement du cache de l'utilisateur](#Réchauffement-du-cache-del'utilisateur)
     -   [Collecteur d'ordures - Assignations](#Collecteur-d'ordures---Assignations)
@@ -84,6 +84,7 @@ Veuillez vous assurer que le port 8004 est libre d'être utilisé (il n'est pas 
 Variables d'environnement
 =========================
 
+|     |     |
 | --- | --- |
 | **Variable** | **Description** |
 | **APP\_ENV** | Environnement d'application, `dev`, `prod`, `docker` ou `test` \[par défaut: `prod`\] |
@@ -115,6 +116,7 @@ Configuration globale de LTI
 
 Les variables d'environnement suivantes sont des configurations agnostiques de la version de LTI :
 
+|     |     |
 | --- | --- |
 | **Variable** | **Description** |
 | **LTI\_VERSION** | Versions supportées: `1.1.1`, `1.3.0`\[ défaut: `1.1.1` \] |
@@ -127,6 +129,7 @@ LTI 1.1.1
 
 Configurez les variables d'environnement en fonction de l'outil que vous intégrez à l'application.
 
+|     |     |
 | --- | --- |
 | **Variable** | **Description** |
 | **LTI\_INSTANCE\_LOAD\_BALANCING\_STRATEGY** | Stratégie d'équilibrage de la charge LTI. Valeurs possibles : `username`, `userGroupId`\] |
@@ -137,6 +140,7 @@ Une fois les variables d'environnement configurées, vous devez créer vos insta
 
 Il existe deux stratégies d'équilibrage de la charge qui peuvent être appliquées. Elles sont configurables via la variable d'environnement`LTI_INSTANCE_LOAD_BALANCING_STRATEGY` dans le fichier `.env` .
 
+|     |     |
 | --- | --- |
 | **Strategy** | **Description** |
 | **username** | Stratégie basée sur le nom d'utilisateur (par défaut) |
@@ -146,6 +150,7 @@ Il existe deux stratégies d'équilibrage de la charge qui peuvent être appliqu
 
 **Note 2:** Le paramètre de requête `contextId`  LTI est automatiquement ajusté en fonction de la stratégie d'équilibrage de charge active.
 
+|     |     |
 | --- | --- |
 | **Stratégie** | **Valeur du paramètre de requête LTI** `contextId` |
 | **username** | ID du  `LineItem` de la dernière affectation de l'utilisateur |
@@ -201,12 +206,14 @@ Les commandes d'ingestion sont responsables de l'ingestion des données `lti-in
 
 **Principaux arguments:**
 
+|     |     |
 | --- | --- |
 | **Option** | **Description** |
 | path | Chemin local pour ingérer les données à partir de |
 
 **Options principales :**
 
+|     |     |
 | --- | --- |
 | **Option** | **Description** |
 | \-d, --delimiter | Délimiteur CSV \[par défaut : `,`\] |
@@ -249,6 +256,7 @@ infra_2,http://infra_2.com,key2,secret2
 
 Voici l'exemple du **CSV**:
 
+|     |     |
 | --- | --- |
 | **Field** | **Description** |
 | **label** | L'étiquette de l'instance lti |
@@ -292,6 +300,7 @@ https://localhost:8002/ontologies/tao.rdf#i5e907210766ba35588c15f61dee6784,Éval
 
 Ce sont les champs décrits sur le **CSV**:
 
+|     |     |
 | --- | --- |
 | **Column** | **Description** |
 | **uri** | URI de livraison du poste. |
@@ -339,6 +348,7 @@ user_4,slug_2
 
 Ce sont les champs décrits sur le **CSV**:
 
+|     |     |
 | --- | --- |
 | **Column** | **Description** |
 | **username** | Identifiant unique de l'utilisateur. |
@@ -382,6 +392,7 @@ user_4,password_4,group_3
 
 Ce sont les champs décrits sur le **CSV**:
 
+|     |     |
 | --- | --- |
 | **Column** | **Description** |
 | **username** | Identifiant unique de l'utilisateur. |
@@ -436,6 +447,7 @@ docker-compose exec simple-roster-phpfpm \
 
 **Options principales**
 
+|     |     |
 | --- | --- |
 | Option | Description |
 | \-u, --usernames | Liste de noms d'utilisateurs séparés par des virgules pour le réchauffement du cache. |
@@ -485,6 +497,7 @@ docker-compose exec simple-roster-phpfpm \
 
 Options principales :
 
+|     |     |
 | --- | --- |
 | **Option** | **Description** |
 | *   b, --batch-size | Nombre d'affectations à traiter par lot \[par défaut : `1000`\] |
@@ -514,6 +527,7 @@ docker-compose exec simple-roster-phpfpm \
 
 **Options principales :**
 
+|     |     |
 | --- | --- |
 | **Option** | **Description** |
 | \-i, --line-item-ids | Liste d'identifiants de postes séparés par des virgules. |
@@ -580,6 +594,7 @@ docker-compose exec simple-roster-phpfpm \
 
 ### Principaux arguments
 
+|     |     |
 | --- | --- |
 | **Argument** | **Description** |
 | **toggle** | Deux valeurs acceptées "activate" pour activer un poste. "Désactiver" pour désactiver un poste. |
