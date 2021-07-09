@@ -182,12 +182,6 @@
     "laminas/laminas-code": {
         "version": "3.4.1"
     },
-    "laminas/laminas-eventmanager": {
-        "version": "3.3.0"
-    },
-    "laminas/laminas-zendframework-bridge": {
-        "version": "1.1.1"
-    },
     "lcobucci/jwt": {
         "version": "3.3.3"
     },
@@ -582,6 +576,9 @@
     "symfony/options-resolver": {
         "version": "v5.1.8"
     },
+    "symfony/password-hasher": {
+        "version": "v5.3.3"
+    },
     "symfony/phpunit-bridge": {
         "version": "5.1",
         "recipe": {
@@ -611,6 +608,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.17.0"
+    },
+    "symfony/polyfill-php81": {
+        "version": "v1.23.0"
     },
     "symfony/process": {
         "version": "v4.1.10"
