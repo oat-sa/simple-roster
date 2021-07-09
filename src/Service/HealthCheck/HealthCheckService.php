@@ -52,7 +52,6 @@ class HealthCheckService
         }
 
         $cacheStatistics = $resultCacheImplementation->getStats();
-
         $connection = $this->entityManager->getConnection();
 
         try {

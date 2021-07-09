@@ -20,14 +20,14 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         metadata_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
+            type: pool
+            pool: roster.result_cache
         query_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
+            type: pool
+            pool: roster.result_cache
         result_cache_driver:
-            type: service
-            id: app.doctrine_cache.provider
+            type: pool
+            pool: roster.result_cache
         mappings:
             OAT\SimpleRoster:
                 type: xml

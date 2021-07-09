@@ -235,4 +235,9 @@ class User implements UserInterface, EntityInterface
     {
         return $this->plainPassword;
     }
+
+    public function getUserIdentifier(): string
+    {
+        return (string)$this->username;
+    }
 }
