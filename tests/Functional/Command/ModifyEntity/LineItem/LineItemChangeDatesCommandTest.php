@@ -66,7 +66,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
@@ -74,8 +74,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
-        $this->lineItemCacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
-        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
+        $this->lineItemCacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
+        $this->lineItemRepository = self::getContainer()->get(LineItemRepository::class);
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler();

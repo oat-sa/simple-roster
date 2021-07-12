@@ -62,12 +62,12 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
         $this->setUpDatabase();
         $this->setUpTestLogHandler('cache_warmup');
 
-        $this->cacheWarmupTransport = self::$container->get('messenger.transport.cache-warmup');
-        $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
-        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->cacheWarmupTransport = self::getContainer()->get('messenger.transport.cache-warmup');
+        $this->userCacheIdGenerator = self::getContainer()->get(UserCacheIdGenerator::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {

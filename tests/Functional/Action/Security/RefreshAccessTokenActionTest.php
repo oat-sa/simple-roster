@@ -64,10 +64,10 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        $this->userRepository = static::$container->get(UserRepository::class);
-        $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
-        $this->tokenCache = static::$container->get('app.jwt_cache.adapter');
-        $this->tokenCacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
+        $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
+        $this->tokenCache = self::getContainer()->get('app.jwt_cache.adapter');
+        $this->tokenCacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
     }
 
     public function testIfAccessTokenCanBeRefreshed(): void

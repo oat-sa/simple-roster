@@ -59,14 +59,14 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(UserCacheWarmerCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
-        $this->cacheWarmupTransport = self::$container->get('messenger.transport.cache-warmup');
+        $this->cacheWarmupTransport = self::getContainer()->get('messenger.transport.cache-warmup');
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler('cache_warmup');

@@ -75,7 +75,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItReturns404IfAssignmentDoesNotBelongToAuthenticatedUser(): void
     {
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -104,7 +104,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow();
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
@@ -139,7 +139,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::now()->add(new DateInterval('P3Y')));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -171,7 +171,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         $this->loadFixtureByFilename('userWithUnavailableAssignment.yml');
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('username');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -199,7 +199,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         $this->loadFixtureByFilename('userWithAllAttemptsTaken.yml');
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('userWithAllAttemptsTaken');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -228,7 +228,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -290,7 +290,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -358,7 +358,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -419,7 +419,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -446,7 +446,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         /** @var Assignment $assignment */
@@ -498,7 +498,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 0, 0, 0));
 
-        $userRepository = static::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);

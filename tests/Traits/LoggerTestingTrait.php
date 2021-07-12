@@ -41,13 +41,13 @@ trait LoggerTestingTrait
         static::ensureKernelTestCase();
 
         /** @var Logger $logger */
-        $logger = static::$container->get(LoggerInterface::class);
+        $logger = self::getContainer()->get(LoggerInterface::class);
         $this->handler = new TestHandler();
 
         $logger->pushHandler($this->handler);
 
         foreach ($channels as $channel) {
-            $logger = static::$container->get(sprintf('monolog.logger.%s', $channel));
+            $logger = self::getContainer()->get(sprintf('monolog.logger.%s', $channel));
 
             if (!$logger instanceof Logger) {
                 throw new LogicException(sprintf("Logger 'monolog.logger.%s' is not defined.", $channel));
