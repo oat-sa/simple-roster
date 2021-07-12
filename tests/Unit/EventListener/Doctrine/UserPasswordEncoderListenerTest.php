@@ -26,21 +26,22 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
     private UserPasswordEncoderListener $subject;
 
-    /** @var UserPasswordEncoderInterface|MockObject */
-    private $userPasswordEncoderMock;
+    /** @var UserPasswordHasherInterface|MockObject */
+    private $userPasswordHasher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->userPasswordEncoderMock = $this->createMock(UserPasswordEncoderInterface::class);
-        $this->subject = new UserPasswordEncoderListener($this->userPasswordEncoderMock);
+        $this->userPasswordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $this->subject = new UserPasswordEncoderListener($this->userPasswordHasher);
     }
 
     public function testItDoesNothingIfTheUserPlainPasswordIsEmpty(): void
@@ -48,9 +49,9 @@ class UserPasswordEncoderListenerTest extends TestCase
         $entity = $this->createMock(User::class);
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::never())
-            ->method('encodePassword');
+            ->method('hashPassword');
 
         $entity
             ->expects(self::never())
@@ -65,9 +66,9 @@ class UserPasswordEncoderListenerTest extends TestCase
         $entity->setPlainPassword('password');
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
@@ -85,9 +86,9 @@ class UserPasswordEncoderListenerTest extends TestCase
         $entity->setPlainPassword('password');
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 

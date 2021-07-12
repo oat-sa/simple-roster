@@ -26,9 +26,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
 use OAT\SimpleRoster\Exception\AssignmentUnavailableException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class User implements UserInterface, EntityInterface
+class User implements UserInterface, EntityInterface, PasswordAuthenticatedUserInterface
 {
     private ?int $id = null;
     private ?string $username = null;

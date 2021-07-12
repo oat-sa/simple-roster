@@ -23,15 +23,15 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\EventListener\Doctrine;
 
 use OAT\SimpleRoster\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserPasswordEncoderListener implements EntityListenerInterface
 {
-    private UserPasswordEncoderInterface $userPasswordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserPasswordEncoderInterface $userPasswordEncoder)
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
-        $this->userPasswordEncoder = $userPasswordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function prePersist(User $user): void
@@ -48,7 +48,7 @@ class UserPasswordEncoderListener implements EntityListenerInterface
     {
         if (!empty($user->getPlainPassword())) {
             $user->setPassword(
-                $this->userPasswordEncoder->encodePassword($user, (string)$user->getPlainPassword())
+                $this->passwordHasher->hashPassword($user, (string)$user->getPlainPassword())
             );
         }
     }
