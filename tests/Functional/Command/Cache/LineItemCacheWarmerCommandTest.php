@@ -84,7 +84,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             ->method('findAllAsCollection')
             ->willThrowException(new LogicException('Yaaay'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemCacheWarmerCommand::NAME));

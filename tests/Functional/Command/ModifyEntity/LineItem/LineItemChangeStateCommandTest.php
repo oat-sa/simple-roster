@@ -189,7 +189,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             ->with(['id' => 1])
             ->willThrowException(new Exception('Database Error'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemChangeStateCommand::NAME));

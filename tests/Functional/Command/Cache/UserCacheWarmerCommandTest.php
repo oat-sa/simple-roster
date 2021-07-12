@@ -105,7 +105,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
             ->method('countByCriteria')
             ->willReturn(100);
 
-        self::$container->set('test.user_repository', $userRepository);
+        self::getContainer()->set('test.user_repository', $userRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(UserCacheWarmerCommand::NAME));

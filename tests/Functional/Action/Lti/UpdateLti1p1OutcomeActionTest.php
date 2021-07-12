@@ -106,7 +106,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $signature = $this->generateSignature($ltiInstance, (string)$time);
 
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::$container->set('test.uid_generator', $uidGenerator);
+        self::getContainer()->set('test.uid_generator', $uidGenerator);
 
         $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
 

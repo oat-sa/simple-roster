@@ -114,7 +114,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             ->method('flush')
             ->willThrowException(new ORMException('ErrorMessage'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
