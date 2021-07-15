@@ -25,3 +25,12 @@ parameters:
     # Symfony CLI parameter handling
     - message: '#^Cannot cast array<string>(\|bool)?\|string\|null to (int|string).$#'
       path: src/Command
+    # Monolog internal
+    - message: '#^Parameter \#(.+) \$level of method Monolog\\Handler\\TestHandler\:\:hasRecord|getLevelName|harRecordThatContains\(\) expects 100\|200\|250\|300\|400\|500\|550\|600\|string, int given.$#'
+      path: tests
+    # Doctrine internal
+    - message: '#^Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getRepository\(\) expects class-string\<object\>, string given.$#'
+      path: tests
+    # Doctrine internal
+    - message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getRepository\(\)$#'
+      path: tests

@@ -64,6 +64,11 @@ trait LoggerTestingTrait
 
     public function assertHasLogRecord(array $record, int $level): void
     {
+        $record = [
+            'message' => (string)$record['message'],
+            'context' => $record['context'] ?? [],
+        ];
+
         self::assertTrue(
             $this->handler->hasRecord($record, $level),
             sprintf(

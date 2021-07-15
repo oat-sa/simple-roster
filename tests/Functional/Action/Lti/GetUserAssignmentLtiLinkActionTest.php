@@ -412,6 +412,7 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
 
     public function testItDoesNotUpdateStateAndAttemptsCountIfStateIsStarted(): void
     {
+        /** @var Assignment $assignment */
         $assignment = $this->getRepository(Assignment::class)->find(1);
         $assignment->setState(Assignment::STATE_STARTED);
 

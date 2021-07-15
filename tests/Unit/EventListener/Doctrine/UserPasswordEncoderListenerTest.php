@@ -26,21 +26,20 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
     private UserPasswordEncoderListener $subject;
 
-    /** @var UserPasswordHasherInterface|MockObject */
+    /** @var UserPasswordHasher|MockObject */
     private $userPasswordHasher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->userPasswordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $this->userPasswordHasher = $this->createMock(UserPasswordHasher::class);
         $this->subject = new UserPasswordEncoderListener($this->userPasswordHasher);
     }
 
@@ -62,21 +61,21 @@ class UserPasswordEncoderListenerTest extends TestCase
 
     public function testItCorrectlyUpdatesTheEncodedPasswordUponPrePersist(): void
     {
-        $entity = new User();
-        $entity->setPlainPassword('password');
+        $user = new User();
+        $user->setPlainPassword('password');
 
         $this
             ->userPasswordHasher
             ->expects(self::once())
             ->method('hashPassword')
-            ->with($entity, 'password')
+            ->with($user, 'password')
             ->willReturn('encodedPassword');
 
-        $this->subject->prePersist($entity);
+        $this->subject->prePersist($user);
 
         self::assertSame(
             'encodedPassword',
-            $entity->getPassword()
+            $user->getPassword()
         );
     }
 
