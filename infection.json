@@ -27,9 +27,8 @@
             "ignoreSourceCodeByRegex": [
                 "\\$this->progressBar->.*",
                 "\\$this->symfonyStyle->title.*",
-                "\\$this->symfonyStyle->comment*",
-                ".*->entityManager->clear*",
-                ".*$->flush.*"
+                ".*\\$this->symfonyStyle->comment*",
+                ".*->entityManager->clear*"
             ]
         }
     },

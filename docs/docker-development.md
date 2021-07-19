@@ -83,7 +83,7 @@ and execute the command again.
 
 ### Infection
 
-To run infection suite execute:
+#### To run infection suite execute:
 
 ```shell script
 $ docker container exec -it simple-roster-phpfpm bash -c "XDEBUG_MODE=coverage && source .env.test && vendor/bin/infection --threads=$(nproc)"
@@ -100,3 +100,21 @@ $ docker container exec -it simple-roster-phpfpm rm -rf bin/.phpunit
 ```
 
 and execute the command again.
+
+#### To run infection suite without re-running the entire test suite every time:
+
+Make sure tests are in passing state and coverage report is generated:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEBUG_MODE=coverage bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --log-junit=var/log/phpunit/coverage/junit.xml"
+```
+
+Then run infection and provide the coverage xml files as parameters:
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc) --skip-initial-tests --coverage=var/log/phpunit/coverage"
+```
+
+**Tip 1:** If you want to run infection against individual files, you can use the [--filter](https://infection.github.io/guide/command-line-options.html#filter) option.
+
+**Tip 2:** If you want to run infection only on changed files, you can use the [--git-diff-filter](https://infection.github.io/guide/command-line-options.html#git-diff-filter) option.

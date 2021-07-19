@@ -143,7 +143,12 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->assertAssignmentStatus(Assignment::STATE_READY);
 
-        $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
+        $this->assertHasLogRecord([
+            'message' => 'Successful OAuth signature validation.',
+            'context' => [
+                'ltiInstance' => $ltiInstance,
+            ],
+        ], Logger::INFO);
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
