@@ -164,7 +164,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->assertCacheDoesNotExist($lineItemIds);
 
         $parameters['-f'] = null;
-        self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
+        self::assertSame(0, $this->commandTester->execute($parameters));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 
