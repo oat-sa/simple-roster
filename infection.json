@@ -18,17 +18,16 @@
         "CastBool": false,
         "CastInt": false,
         "DecrementInteger": false,
+        "Concat": false,
         "ConcatOperandRemoval": false,
-        "global-ignoreSourceCodeByRegex": [
-            "\\$this->symfonyStyle->newLine.*",
-            ".*->isDryRun.*"
-        ],
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
-                "\\$this->progressBar->.*",
-                "\\$this->symfonyStyle->title.*",
-                ".*\\$this->symfonyStyle->comment*",
-                ".*->entityManager->clear*"
+                ".*\\$this->entityManager->clear.*"
+            ]
+        },
+        "Finally_": {
+            "ignoreSourceCodeByRegex": [
+                ".*\\$this->entityManager->clear.*"
             ]
         }
     },
