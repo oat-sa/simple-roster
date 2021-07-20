@@ -18,6 +18,7 @@
         "CastBool": false,
         "CastInt": false,
         "DecrementInteger": false,
+        "IncrementInteger": false,
         "Concat": false,
         "ConcatOperandRemoval": false,
         "MethodCallRemoval": {
