@@ -22,7 +22,10 @@
         "ConcatOperandRemoval": false,
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
-                ".*\\$this->entityManager->clear.*"
+                ".*\\$this->entityManager->clear.*",
+                ".*\\$this->entityManager->commit.*",
+                ".*\\$this->entityManager->rollback.*",
+                ".*\\$this->symfonyStyle->comment.*"
             ]
         },
         "Finally_": {
