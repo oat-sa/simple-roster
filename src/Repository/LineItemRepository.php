@@ -92,6 +92,30 @@ class LineItemRepository extends AbstractRepository
                 ->setParameter('slugs', $criteria->getLineItemSlugs());
         }
 
+        if ($criteria->hasLineItemLabelsCriteria()) {
+            $queryBuilder
+                ->andWhere('l.label IN (:labels)')
+                ->setParameter('labels', $criteria->getLineItemLabels());
+        }
+
+        if ($criteria->hasLineItemUrisCriteria()) {
+            $queryBuilder
+                ->andWhere('l.uri IN (:uris)')
+                ->setParameter('uris', $criteria->getLineItemUris());
+        }
+
+        if ($criteria->hasLineItemStartAt()) {
+            $queryBuilder
+                ->andWhere('l.startAt >= (:startAt)')
+                ->setParameter('startAt', $criteria->getLineItemStartAt());
+        }
+
+        if ($criteria->hasLineItemEndAt()) {
+            $queryBuilder
+                ->andWhere('l.endAt >= (:endAt)')
+                ->setParameter('endAt', $criteria->getLineItemEndAt());
+        }
+
         $lineItemsCollection = new LineItemCollection();
         $result = $queryBuilder->getQuery()->getResult();
         foreach ($result as $row) {
