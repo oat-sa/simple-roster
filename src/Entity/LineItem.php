@@ -142,6 +142,7 @@ class LineItem implements JsonSerializable, EntityInterface
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->getId(),
             'uri' => $this->getUri(),
             'label' => $this->getLabel(),
             'isActive' => $this->isActive(),
