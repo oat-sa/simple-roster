@@ -92,7 +92,7 @@ and execute the command again.
 #### To run infection suite execute:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "XDEBUG_MODE=coverage && source .env.test && vendor/bin/infection --threads=$(nproc)"
+$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEBUG_MODE=coverage vendor/bin/infection --threads=$(nproc)"
 ```
 
 **Tip:** If you receive an error message about not finding the bootstrap files:
