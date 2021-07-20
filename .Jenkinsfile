@@ -33,7 +33,7 @@ pipeline {
                 )
                 sh(
                     label: 'Running test suite - PHPUnit',
-                    script: 'XDEBUG_MODE=coverage ./bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml'
+                    script: 'source .env.test && XDEBUG_MODE=coverage ./bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml'
                 )
                 sh(
                     label: 'Checking test coverage - PHPUnit',
@@ -41,7 +41,7 @@ pipeline {
                 )
                 sh(
                     label: 'Running mutation testing - Infection',
-                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --skip-initial-tests --coverage=var/log/phpunit/coverage'
+                    script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --skip-initial-tests --coverage=var/log/phpunit/coverage'
                 )
                 sh(
                     label: 'Running static code analysis - CodeSniffer',
