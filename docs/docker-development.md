@@ -69,7 +69,13 @@ To run the full test suite execute:
 $ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && bin/phpunit"
 ```
 
-If you receive an error message about not finding the bootstrap files:
+To run the full test suite with all the necessary coverage reports (for Infection and coverage checker):
+
+```shell script
+$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEBUG_MODE=coverage bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml"
+```
+
+**Tip:** If you receive an error message about not finding the bootstrap files:
 
 __(bin/.phpunit/phpunit-8.3-0/vendor/composer/../symfony/phpunit-bridge/bootstrap.php): failed to open stream: No such file or directory ...)__
 
@@ -89,7 +95,7 @@ and execute the command again.
 $ docker container exec -it simple-roster-phpfpm bash -c "XDEBUG_MODE=coverage && source .env.test && vendor/bin/infection --threads=$(nproc)"
 ```
 
-If you receive an error message about not finding the bootstrap files:
+**Tip:** If you receive an error message about not finding the bootstrap files:
 
 __(bin/.phpunit/phpunit-8.3-0/vendor/composer/../symfony/phpunit-bridge/bootstrap.php): failed to open stream: No such file or directory ...)__
 
