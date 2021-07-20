@@ -232,6 +232,64 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
+    /v1/line-items:
+        get:
+            summary: Gets a list of line items
+            tags:
+                - Line Items
+            security:
+                -   apiKeyAuth: []
+            parameters:
+                -   name: label
+                    in: query
+                    description: The label of the line-item
+                    required: false
+                    schema:
+                        type: string
+                -   name: slug
+                    in: query
+                    description: The slug of the line-item
+                    required: false
+                    schema:
+                        type: string
+                -   name: uri
+                    in: query
+                    description: The URI of the line-item
+                    required: false
+                    schema:
+                        type: string
+                -   name: startAt
+                    in: query
+                    description: The start date timestamp of the line-item
+                    required: false
+                    schema:
+                        type: integer
+                    example: '1542880258'
+                -   name: endAt
+                    in: query
+                    description: The end date timestamp of the line-item
+                    required: false
+                    schema:
+                        type: integer
+                    example: '1542880258'
+            responses:
+                200:
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LineItemList'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                404:
+                    $ref: '#/components/responses/AssignmentNotFoundResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                409:
+                    $ref: '#/components/responses/ConflictResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+
     /v1/lti/outcome:
         post:
             summary: LTI 1.1 Basic Outcomes Service
@@ -376,6 +434,22 @@ components:
                     type: integer
                     description: The maximum number of attempts
                     example: 1
+        LineItemList:
+            type: object
+            properties:
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/LineItem'
+                metadata:
+                    type: object
+                    properties:
+                        pagination:
+                            type: object
+                            properties:
+                                nextCursor:
+                                    type: integer
+                                    description: Id of next item
         BulkCreateOperation:
             type: object
             properties:
