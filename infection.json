@@ -26,7 +26,8 @@
                 ".*\\$this->entityManager->clear.*",
                 ".*\\$this->entityManager->commit.*",
                 ".*\\$this->entityManager->rollback.*",
-                ".*\\$this->symfonyStyle->comment.*"
+                ".*\\$this->symfonyStyle->comment.*",
+                ".*\\$this->getEntityManager()->createNativeQuery.*"
             ]
         },
         "Finally_": {

@@ -41,7 +41,7 @@ pipeline {
                 )
                 sh(
                     label: 'Running mutation testing - Infection',
-                    script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --skip-initial-tests --coverage=var/log/phpunit/coverage'
+                    script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
                 )
                 sh(
                     label: 'Running static code analysis - CodeSniffer',
