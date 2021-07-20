@@ -27,6 +27,8 @@
                 ".*\\$this->entityManager->commit.*",
                 ".*\\$this->entityManager->rollback.*",
                 ".*\\$this->symfonyStyle->comment.*",
+                ".*\\$this->symfonyStyle->newLine.*",
+                ".*\\$this->progressBar->advance.*",
                 ".*\\$this->getEntityManager()->createNativeQuery.*"
             ]
         },
