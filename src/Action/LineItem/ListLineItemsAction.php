@@ -22,22 +22,54 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LineItem;
 
+use Carbon\Carbon;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\LineItem\LineItemService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListLineItemsAction
 {
     private SerializerResponder $responder;
+    private LineItemService $lineItemService;
 
-    public function __construct(SerializerResponder $responder)
+    public function __construct(SerializerResponder $responder, LineItemService $lineItemService)
     {
         $this->responder = $responder;
+        $this->lineItemService = $lineItemService;
     }
 
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
+        $findLineItemCriteria = new FindLineItemCriteria();
+
+        if ($request->get('id')) {
+            $findLineItemCriteria->addLineItemIds((int)$request->get('id'));
+        }
+
+        if ($request->get('slug')) {
+            $findLineItemCriteria->addLineItemSlugs(...$request->get('slug'));
+        }
+
+        if ($request->get('label')) {
+            $findLineItemCriteria->addLineItemLabels(...$request->get('label'));
+        }
+
+        if ($request->get('uri')) {
+            $findLineItemCriteria->addLineItemUris(...$request->get('uri'));
+        }
+
+        if ($request->get('startAt')) {
+            $findLineItemCriteria->addLineItemStartAt(Carbon::createFromTimestamp($request->get('startAt')));
+        }
+
+        if ($request->get('endAt')) {
+            $findLineItemCriteria->addLineItemEndAt(Carbon::createFromTimestamp($request->get('endAt')));
+        }
+
         return $this->responder->createJsonResponse([
-            'data' => [],
+            'data' => $this->lineItemService->listLineItems($findLineItemCriteria),
             'metadata' => []
         ]);
     }

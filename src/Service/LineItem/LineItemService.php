@@ -22,12 +22,21 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\LineItem;
 
-/**
- * LineItemService
- *
- * @package OAT\SimpleRoster\Service\LineItem
- */
+use OAT\SimpleRoster\Model\LineItemCollection;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use OAT\SimpleRoster\Repository\LineItemRepository;
+
 class LineItemService
 {
+    private LineItemRepository $lineItemRepository;
 
+    public function __construct(LineItemRepository $lineItemRepository)
+    {
+        $this->lineItemRepository = $lineItemRepository;
+    }
+
+    public function listLineItems(FindLineItemCriteria $findLineItemCriteria): LineItemCollection
+    {
+        return $this->lineItemRepository->findLineItemsByCriteria($findLineItemCriteria);
+    }
 }
