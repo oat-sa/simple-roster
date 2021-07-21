@@ -15,14 +15,13 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\LineItem;
 
-use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
@@ -35,8 +34,24 @@ class LineItemService
         $this->lineItemRepository = $lineItemRepository;
     }
 
-    public function listLineItems(FindLineItemCriteria $findLineItemCriteria): LineItemCollection
-    {
-        return $this->lineItemRepository->findLineItemsByCriteria($findLineItemCriteria);
+    public function listLineItems(
+        FindLineItemCriteria $findLineItemCriteria,
+        int $limit,
+        int $cursor = null
+    ): array {
+        $lineItemResultSet = $this->lineItemRepository->findLineItemsByCriteria(
+            $findLineItemCriteria,
+            $limit,
+            $cursor
+        );
+
+        return [
+            'data' => $lineItemResultSet,
+            'metadata' => [
+                'pagination' => [
+                    'nextCursor' => $lineItemResultSet->getLastLineItemId()
+                ]
+            ]
+        ];
     }
 }

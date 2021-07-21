@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LineItem;
 
-use Carbon\Carbon;
-use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use OAT\SimpleRoster\Request\Criteria\LineItemFindCriteriaFactory;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,46 +30,33 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListLineItemsAction
 {
+    public const LINE_ITEM_LIMIT = 100;
+
     private SerializerResponder $responder;
+    private LineItemFindCriteriaFactory $lineItemFindCriteriaFactory;
     private LineItemService $lineItemService;
 
-    public function __construct(SerializerResponder $responder, LineItemService $lineItemService)
-    {
+    public function __construct(
+        SerializerResponder $responder,
+        LineItemFindCriteriaFactory $lineItemFindCriteriaFactory,
+        LineItemService $lineItemService
+    ) {
         $this->responder = $responder;
         $this->lineItemService = $lineItemService;
+        $this->lineItemFindCriteriaFactory = $lineItemFindCriteriaFactory;
     }
 
     public function __invoke(Request $request): Response
     {
-        $findLineItemCriteria = new FindLineItemCriteria();
+        $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 
-        if ($request->get('id')) {
-            $findLineItemCriteria->addLineItemIds((int)$request->get('id'));
-        }
+        $cursor = $request->get('cursor') ? (int) $request->get('cursor') : null;
+        $limit = ($request->get('limit') === null || (int) $request->get('limit') > self::LINE_ITEM_LIMIT)
+            ? self::LINE_ITEM_LIMIT
+            : (int) $request->get('limit');
 
-        if ($request->get('slug')) {
-            $findLineItemCriteria->addLineItemSlugs(...$request->get('slug'));
-        }
-
-        if ($request->get('label')) {
-            $findLineItemCriteria->addLineItemLabels(...$request->get('label'));
-        }
-
-        if ($request->get('uri')) {
-            $findLineItemCriteria->addLineItemUris(...$request->get('uri'));
-        }
-
-        if ($request->get('startAt')) {
-            $findLineItemCriteria->addLineItemStartAt(Carbon::createFromTimestamp($request->get('startAt')));
-        }
-
-        if ($request->get('endAt')) {
-            $findLineItemCriteria->addLineItemEndAt(Carbon::createFromTimestamp($request->get('endAt')));
-        }
-
-        return $this->responder->createJsonResponse([
-            'data' => $this->lineItemService->listLineItems($findLineItemCriteria),
-            'metadata' => []
-        ]);
+        return $this->responder->createJsonResponse(
+            $this->lineItemService->listLineItems($findLineItemCriteria, $limit, $cursor)
+        );
     }
 }

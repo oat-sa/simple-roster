@@ -23,11 +23,14 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 
 class LineItemRepository extends AbstractRepository
 {
@@ -75,11 +78,44 @@ class LineItemRepository extends AbstractRepository
         return $lineItem;
     }
 
-    public function findLineItemsByCriteria(FindLineItemCriteria $criteria): LineItemCollection
-    {
+    public function findLineItemsByCriteria(
+        FindLineItemCriteria $criteria,
+        int $limit,
+        ?int $lastLineItemId
+    ): LineItemResultSet {
         $queryBuilder = $this->createQueryBuilder('l')
-            ->select('l');
+            ->select('l')
+            ->setMaxResults($limit + 1);
 
+        if ($lastLineItemId !== null) {
+            $queryBuilder
+                ->andWhere('l.id > :lastLineItemId')
+                ->setParameter('lastLineItemId', $lastLineItemId);
+        }
+
+        $queryBuilder = $this->applyCriterias($criteria, $queryBuilder);
+
+        $lineItemIds = [];
+        $lineItemsCollection = new LineItemCollection();
+        $result = $queryBuilder->getQuery()->getResult();
+
+        /** @var LineItem $lineItem */
+        foreach ($result as $lineItem) {
+            if (count($lineItemsCollection) < $limit) {
+                $lineItemsCollection->add($lineItem);
+                $lineItemIds[] = $lineItem->getId();
+            }
+        }
+
+        return new LineItemResultSet(
+            $lineItemsCollection,
+            count($result) === $limit + 1,
+            $lineItemIds[$limit - 1] ?? null
+        );
+    }
+
+    private function applyCriterias(FindLineItemCriteria $criteria, QueryBuilder $queryBuilder): QueryBuilder
+    {
         if ($criteria->hasLineItemIdsCriteria()) {
             $queryBuilder
                 ->andWhere('l.id IN (:ids)')
@@ -116,12 +152,6 @@ class LineItemRepository extends AbstractRepository
                 ->setParameter('endAt', $criteria->getLineItemEndAt());
         }
 
-        $lineItemsCollection = new LineItemCollection();
-        $result = $queryBuilder->getQuery()->getResult();
-        foreach ($result as $row) {
-            $lineItemsCollection->add($row);
-        }
-
-        return $lineItemsCollection;
+        return $queryBuilder;
     }
 }
