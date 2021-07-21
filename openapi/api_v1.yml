@@ -240,34 +240,52 @@ paths:
             security:
                 -   apiKeyAuth: []
             parameters:
+                -   name: cursor
+                    in: query
+                    description: Cursor of the resultset
+                    required: false
+                    schema:
+                        type: integer
+                -   name: limit
+                    in: query
+                    description: Limit of the line items resultset
+                    required: false
+                    schema:
+                        type: integer
+                -   name: id
+                    in: query
+                    description: The Id(s) of the line-item. Can be a string or an array.
+                    required: false
+                    schema:
+                        type: string
                 -   name: label
                     in: query
-                    description: The label of the line-item
+                    description: The label(s) of the line-item(s). Can be a string or an array.
                     required: false
                     schema:
                         type: string
                 -   name: slug
                     in: query
-                    description: The slug of the line-item
+                    description: The slug(s) of the line-item(s). Can be a string or an array.
                     required: false
                     schema:
                         type: string
                 -   name: uri
                     in: query
-                    description: The URI of the line-item
+                    description: The URI(s) of the line-item(s). Can be a string or an array.
                     required: false
                     schema:
                         type: string
                 -   name: startAt
                     in: query
-                    description: The start date timestamp of the line-item
+                    description: The start date timestamp of the line-item(s)
                     required: false
                     schema:
                         type: integer
                     example: '1542880258'
                 -   name: endAt
                     in: query
-                    description: The end date timestamp of the line-item
+                    description: The end date timestamp of the line-item(s)
                     required: false
                     schema:
                         type: integer
