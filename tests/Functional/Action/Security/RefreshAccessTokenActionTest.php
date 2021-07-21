@@ -40,17 +40,10 @@ class RefreshAccessTokenActionTest extends WebTestCase
     use ApiTestingTrait;
     use DatabaseTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var JwtTokenGenerator */
-    private $tokenGenerator;
-
-    /** @var CacheItemPoolInterface */
-    private $tokenCache;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $tokenCacheIdGenerator;
+    private UserRepository $userRepository;
+    private JwtTokenGenerator $tokenGenerator;
+    private CacheItemPoolInterface $tokenCache;
+    private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
 
     protected function setUp(): void
     {

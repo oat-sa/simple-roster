@@ -45,11 +45,8 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private UserRepository $userRepository;
+    private AssignmentRepository $assignmentRepository;
 
     protected function setUp(): void
     {

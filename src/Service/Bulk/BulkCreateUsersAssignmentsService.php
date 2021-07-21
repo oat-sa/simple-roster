@@ -36,17 +36,10 @@ use Throwable;
 
 class BulkCreateUsersAssignmentsService
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var UserCacheWarmerService */
-    private $userCacheWarmerService;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private EntityManagerInterface $entityManager;
+    private UserRepository $userRepository;
+    private UserCacheWarmerService $userCacheWarmerService;
+    private LoggerInterface $logger;
 
     /** @var array */
     private array $logBuffer = [];

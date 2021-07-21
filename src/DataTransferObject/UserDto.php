@@ -27,20 +27,11 @@ use Symfony\Component\Uid\UuidV6;
 
 class UserDto
 {
-    /** @var UuidV6 */
-    private $id;
-
-    /** @var string */
-    private $username;
-
-    /** @var string */
-    private $password;
-
-    /** @var array */
-    private $roles;
-
-    /** @var string|null */
-    private $groupId;
+    private UuidV6 $id;
+    private string $username;
+    private string $password;
+    private array $roles;
+    private ?string $groupId;
 
     public function __construct(
         UuidV6 $id,

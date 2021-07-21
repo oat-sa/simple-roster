@@ -43,11 +43,8 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     use Lti1p3SecurityTestingTrait;
     use XmlTestingTrait;
 
-    /** @var RegistrationInterface */
-    private $registration;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private RegistrationInterface $registration;
+    private AssignmentRepository $assignmentRepository;
 
     protected function setUp(): void
     {

@@ -46,11 +46,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     use XmlTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var LtiInstanceRepository */
-    private $ltiInstanceRepository;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private LtiInstanceRepository $ltiInstanceRepository;
+    private AssignmentRepository $assignmentRepository;
 
     protected function setUp(): void
     {

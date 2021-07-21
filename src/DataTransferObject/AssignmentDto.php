@@ -26,6 +26,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class AssignmentDto
 {
+    // FIXME: PHP 7.4 format and status instead of state
     /** @var UuidV6 */
     private $id;
 

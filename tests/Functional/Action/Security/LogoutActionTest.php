@@ -39,11 +39,8 @@ class LogoutActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $jwtTokenCacheIdGenerator;
+    private UserRepository $userRepository;
+    private JwtTokenCacheIdGenerator $jwtTokenCacheIdGenerator;
 
     protected function setUp(): void
     {

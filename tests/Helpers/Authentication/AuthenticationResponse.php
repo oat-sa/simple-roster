@@ -26,11 +26,8 @@ use Lcobucci\JWT\Token;
 
 class AuthenticationResponse
 {
-    /** @var Token */
-    private $accessToken;
-
-    /** @var Token */
-    private $refreshToken;
+    private Token $accessToken;
+    private Token $refreshToken;
 
     public function __construct(Token $accessToken, Token $refreshToken)
     {

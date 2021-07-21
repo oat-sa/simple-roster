@@ -19,7 +19,7 @@
 - Removed `state` column from `assignments` database table.
 - Removed synchronous parallel cache warmup feature from user cache warmer command.
 
-## 2.1.0 - To be released
+## 2.1.0 - 2021-06-02
 
 ### Changed
 - Raised minimum required PHP version from `7.3` to `7.4`.

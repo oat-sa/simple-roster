@@ -40,11 +40,8 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
-
-    /** @var LineItemRepository */
-    private $lineItemRepository;
+    private CacheProvider $resultCacheImplementation;
+    private LineItemRepository $lineItemRepository;
 
     protected function setUp(): void
     {
