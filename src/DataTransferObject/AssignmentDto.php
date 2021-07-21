@@ -26,26 +26,16 @@ use Symfony\Component\Uid\UuidV6;
 
 class AssignmentDto
 {
-    // FIXME: PHP 7.4 format and status instead of state
-    /** @var UuidV6 */
-    private $id;
+    private UuidV6 $id;
+    private string $status;
+    private UuidV6 $lineItemId;
+    private string $username;
+    private ?UuidV6 $userId;
 
-    /** @var string */
-    private $state;
-
-    /** @var UuidV6 */
-    private $lineItemId;
-
-    /** @var string */
-    private $username;
-
-    /** @var UuidV6|null */
-    private $userId;
-
-    public function __construct(UuidV6 $id, string $state, UuidV6 $lineItemId, string $username, UuidV6 $userId = null)
+    public function __construct(UuidV6 $id, string $status, UuidV6 $lineItemId, string $username, UuidV6 $userId = null)
     {
         $this->id = $id;
-        $this->state = $state;
+        $this->status = $status;
         $this->lineItemId = $lineItemId;
         $this->username = $username;
         $this->userId = $userId;
@@ -56,9 +46,9 @@ class AssignmentDto
         return $this->id;
     }
 
-    public function getState(): string
+    public function getStatus(): string
     {
-        return $this->state;
+        return $this->status;
     }
 
     public function getLineItemId(): UuidV6
