@@ -102,6 +102,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     'state' => Assignment::STATE_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
+                        'id' => $lineItem->getId(),
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
                         'isActive' => $lineItem->isActive(),
@@ -146,6 +147,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                     'state' => Assignment::STATE_READY,
                     'attemptsCount' => $user->getLastAssignment()->getAttemptsCount(),
                     'lineItem' => [
+                        'id' => $lineItem->getId(),
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
                         'isActive' => $lineItem->isActive(),

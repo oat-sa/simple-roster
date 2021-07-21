@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
@@ -34,6 +33,8 @@ use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 
 class LineItemRepository extends AbstractRepository
 {
+    public const MAX_LINE_ITEM_LIMIT = 100;
+
     private int $lineItemCacheTtl;
     private LineItemCacheIdGenerator $cacheIdGenerator;
 
@@ -80,8 +81,8 @@ class LineItemRepository extends AbstractRepository
 
     public function findLineItemsByCriteria(
         FindLineItemCriteria $criteria,
-        int $limit,
-        ?int $lastLineItemId
+        int $limit = self::MAX_LINE_ITEM_LIMIT,
+        ?int $lastLineItemId = null
     ): LineItemResultSet {
         $queryBuilder = $this->createQueryBuilder('l')
             ->select('l')

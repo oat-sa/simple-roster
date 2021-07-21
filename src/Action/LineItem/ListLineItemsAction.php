@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LineItem;
 
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Request\Criteria\LineItemFindCriteriaFactory;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
@@ -30,8 +31,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListLineItemsAction
 {
-    public const LINE_ITEM_LIMIT = 100;
-
     private SerializerResponder $responder;
     private LineItemFindCriteriaFactory $lineItemFindCriteriaFactory;
     private LineItemService $lineItemService;
@@ -51,8 +50,8 @@ class ListLineItemsAction
         $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 
         $cursor = $request->get('cursor') ? (int) $request->get('cursor') : null;
-        $limit = ($request->get('limit') === null || (int) $request->get('limit') > self::LINE_ITEM_LIMIT)
-            ? self::LINE_ITEM_LIMIT
+        $limit = ($request->get('limit') === null || (int) $request->get('limit') > LineItemRepository::MAX_LINE_ITEM_LIMIT)
+            ? LineItemRepository::MAX_LINE_ITEM_LIMIT
             : (int) $request->get('limit');
 
         return $this->responder->createJsonResponse(

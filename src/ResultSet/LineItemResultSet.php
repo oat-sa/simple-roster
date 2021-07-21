@@ -50,7 +50,7 @@ class LineItemResultSet implements Countable, IteratorAggregate
         return $this->lastLineItemId;
     }
 
-    public function getUsernameCollection(): LineItemCollection
+    public function getLineItemCollection(): LineItemCollection
     {
         return $this->collection;
     }
