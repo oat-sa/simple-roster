@@ -93,7 +93,7 @@ class LineItemRepository extends AbstractRepository
                 ->setParameter('lastLineItemId', $lastLineItemId);
         }
 
-        $queryBuilder = $this->applyCriterias($criteria, $queryBuilder);
+        $this->applyCriterias($criteria, $queryBuilder);
 
         $lineItemIds = [];
         $lineItemsCollection = new LineItemCollection();
@@ -114,7 +114,7 @@ class LineItemRepository extends AbstractRepository
         );
     }
 
-    private function applyCriterias(FindLineItemCriteria $criteria, QueryBuilder $queryBuilder): QueryBuilder
+    private function applyCriterias(FindLineItemCriteria $criteria, QueryBuilder $queryBuilder): void
     {
         if ($criteria->hasLineItemIdsCriteria()) {
             $queryBuilder
@@ -148,10 +148,8 @@ class LineItemRepository extends AbstractRepository
 
         if ($criteria->hasLineItemEndAt()) {
             $queryBuilder
-                ->andWhere('l.endAt >= (:endAt)')
+                ->andWhere('l.endAt <= (:endAt)')
                 ->setParameter('endAt', $criteria->getLineItemEndAt());
         }
-
-        return $queryBuilder;
     }
 }

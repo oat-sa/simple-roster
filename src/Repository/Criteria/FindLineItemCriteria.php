@@ -39,7 +39,7 @@ class FindLineItemCriteria
     private array $lineItemUris = [];
 
     private DateTimeInterface $lineItemStartAt;
-    private DateTimeInterface $lineItemEndtAt;
+    private DateTimeInterface $lineItemEndAt;
 
     public function addLineItemIds(int ...$lineItemIds): self
     {
@@ -78,7 +78,7 @@ class FindLineItemCriteria
 
     public function addLineItemEndAt(DateTimeInterface $lineItemEndAt): self
     {
-        $this->lineItemEndtAt = $lineItemEndAt;
+        $this->lineItemEndAt = $lineItemEndAt;
 
         return $this;
     }
@@ -110,7 +110,7 @@ class FindLineItemCriteria
 
     public function getLineItemEndAt(): DateTimeInterface
     {
-        return $this->lineItemEndtAt;
+        return $this->lineItemEndAt;
     }
 
     public function hasLineItemIdsCriteria(): bool

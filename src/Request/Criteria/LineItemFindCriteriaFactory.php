@@ -23,39 +23,57 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Request\Criteria;
 
 use Carbon\Carbon;
+use InvalidArgumentException;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @throws InvalidArgumentException
+ */
 class LineItemFindCriteriaFactory
 {
     public function create(Request $request): FindLineItemCriteria
     {
         $findLineItemCriteria = new FindLineItemCriteria();
 
-        if ($request->get('id')) {
+        if ($request->get('id') !== null) {
             $findLineItemCriteria->addLineItemIds((int)$request->get('id'));
         }
 
-        if ($request->get('slug')) {
-            $findLineItemCriteria->addLineItemSlugs(...$request->get('slug'));
+        if ($request->get('slug') !== null) {
+            $findLineItemCriteria->addLineItemSlugs(...(array) $request->get('slug'));
         }
 
-        if ($request->get('label')) {
-            $findLineItemCriteria->addLineItemLabels(...$request->get('label'));
+        if ($request->get('label') !== null) {
+            $findLineItemCriteria->addLineItemLabels(...(array) $request->get('label'));
         }
 
-        if ($request->get('uri')) {
-            $findLineItemCriteria->addLineItemUris(...$request->get('uri'));
+        if ($request->get('uri') !== null) {
+            $findLineItemCriteria->addLineItemUris(...(array) $request->get('uri'));
         }
 
-        if ($request->get('startAt')) {
-            $findLineItemCriteria->addLineItemStartAt(Carbon::createFromTimestamp($request->get('startAt')));
-        }
-
-        if ($request->get('endAt')) {
-            $findLineItemCriteria->addLineItemEndAt(Carbon::createFromTimestamp($request->get('endAt')));
-        }
+        $this->applyDateFilter($request, $findLineItemCriteria, 'startAt', 'addLineItemStartAt');
+        $this->applyDateFilter($request, $findLineItemCriteria, 'endAt', 'addLineItemEndAt');
 
         return $findLineItemCriteria;
+    }
+
+    private function applyDateFilter(
+        Request $request,
+        FindLineItemCriteria $findLineItemCriteria,
+        string $field,
+        string $method
+    ): void {
+        if ($request->get($field) !== null) {
+            $timestamp = (int) $request->get($field);
+
+            if ($timestamp <= 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Invalid timestamp for %s: %s', $field, $request->get($field))
+                );
+            }
+
+            $findLineItemCriteria->{$method}(Carbon::createFromTimestamp($timestamp));
+        }
     }
 }
