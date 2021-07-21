@@ -160,8 +160,6 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
 
     public function testItCreatesNewAssignmentsWithValidUserProvided(): void
     {
-        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
-
         $user = $this->userRepository->findByUsernameWithAssignments('user1');
         $lastAssignment = $user->getLastAssignment();
 
