@@ -27,7 +27,7 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -43,20 +43,25 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * @throws UsernameNotFoundException
+     * @throws UserNotFoundException
      */
     public function loadUserByUsername(string $username): UserInterface
     {
         try {
             return $this->userRepository->findByUsernameWithAssignments($username);
         } catch (ORMException $exception) {
-            throw new UsernameNotFoundException(sprintf("Username '%s' does not exist", $username));
+            throw new UserNotFoundException(sprintf("Username '%s' does not exist", $username));
         }
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        return $this->loadUserByUsername($identifier);
     }
 
     /**
      * @throws UnsupportedUserException
-     * @throws UsernameNotFoundException
+     * @throws UserNotFoundException
      */
     public function refreshUser(UserInterface $user): UserInterface
     {
@@ -69,7 +74,7 @@ class UserProvider implements UserProviderInterface
             try {
                 return $this->userRepository->findByUsernameWithAssignments($user->getUsername());
             } catch (ORMException $exception) {
-                throw new UsernameNotFoundException(sprintf("User '%s' could not be reloaded", $user->getUsername()));
+                throw new UserNotFoundException(sprintf("User '%s' could not be reloaded", $user->getUsername()));
             }
         }
 

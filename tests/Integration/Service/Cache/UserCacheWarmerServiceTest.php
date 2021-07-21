@@ -52,8 +52,8 @@ class UserCacheWarmerServiceTest extends KernelTestCase
 
         $this->setUpTestLogHandler('messenger', 'cache_warmup');
 
-        $this->subject = self::$container->get(UserCacheWarmerService::class);
-        $this->cacheWarmupTransport = self::$container->get('messenger.transport.cache-warmup');
+        $this->subject = self::getContainer()->get(UserCacheWarmerService::class);
+        $this->cacheWarmupTransport = self::getContainer()->get('messenger.transport.cache-warmup');
     }
 
     public function testItLogsAndBubblesUpExceptions(): void

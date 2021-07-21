@@ -62,7 +62,7 @@ class JwtTokenGenerator
             // sub claim
             ->relatedTo($subjectClaim)
             // aud claim
-            ->permittedFor($user->getUsername())
+            ->permittedFor($user->getUserIdentifier())
             // jti claim
             ->identifiedBy($this->uuidFactory->uuid4()->toString())
             // iat claim

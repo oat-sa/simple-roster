@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BulkUpdateUsersAssignmentsStatusAction
 {
-    private BulkUpdateUsersAssignmentsStateService $bulkAssignmentsStateService;
+    private BulkUpdateUsersAssignmentsStatusService $bulkAssignmentsStateService;
 
     /** @var SerializerResponder */
     private SerializerResponder $responder;

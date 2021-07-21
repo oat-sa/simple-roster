@@ -44,7 +44,7 @@ class LtiOutcomeResponderTest extends KernelTestCase
     public function testCreateReplaceResultResponse(): void
     {
         /** @var Environment $twig */
-        $twig = self::$container->get(Environment::class);
+        $twig = self::getContainer()->get(Environment::class);
 
         $messageIdentifier = UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 

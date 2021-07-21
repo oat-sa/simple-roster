@@ -15,5 +15,7 @@ framework:
         #app: cache.adapter.apcu
 
         # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+        pools:
+            roster.result_cache:
+                adapter: cache.adapter.redis
+                provider: app.doctrine_cache.provider

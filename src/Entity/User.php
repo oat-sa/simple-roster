@@ -230,4 +230,9 @@ class User implements UserInterface, EntityInterface, PasswordAuthenticatedUserI
             sprintf("Assignment id '%s' not found for user '%s'.", $assignmentId, $this->getUsername())
         );
     }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
 }

@@ -39,7 +39,7 @@ class UserRequestLogProcessor
         $user = $this->security->getUser();
         $username = 'guest';
         if ($user instanceof User) {
-            $username = $user->getUsername();
+            $username = $user->getUserIdentifier();
         }
 
         $record['extra']['username'] = $username;

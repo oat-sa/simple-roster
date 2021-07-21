@@ -46,7 +46,7 @@ class HealthCheckActionTest extends WebTestCase
         $this->assertApiResponse(
             [
                 'isDoctrineConnectionAvailable' => true,
-                'isDoctrineCacheAvailable' => true,
+                'isDoctrineCacheAvailable' => false, // In test environment array cache adapter is configured.
             ]
         );
     }

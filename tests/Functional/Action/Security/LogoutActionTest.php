@@ -78,7 +78,7 @@ class LogoutActionTest extends WebTestCase
         $refreshToken = $authenticationResponse->getRefreshToken();
 
         /** @var CacheItemPoolInterface $cachePool */
-        $cachePool = self::$container->get('app.jwt_cache.adapter');
+        $cachePool = self::getContainer()->get('app.jwt_cache.adapter');
 
         $refreshTokenCacheItem = $cachePool->getItem($this->jwtTokenCacheIdGenerator->generate($refreshToken));
 

@@ -18,21 +18,23 @@
         "CastBool": false,
         "CastInt": false,
         "DecrementInteger": false,
-        "global-ignoreSourceCodeByRegex": [
-            "\\$this->symfonyStyle->newLine.*",
-            ".*->isDryRun.*"
-        ],
+        "IncrementInteger": false,
+        "Concat": false,
+        "ConcatOperandRemoval": false,
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
-                "\\$this->progressBar->.*",
-                "\\$this->symfonyStyle->title.*",
-                "\\$this->symfonyStyle->comment*",
-                ".*$->flush.*"
+                ".*\\$this->entityManager->clear.*",
+                ".*\\$this->entityManager->commit.*",
+                ".*\\$this->entityManager->rollback.*",
+                ".*\\$this->symfonyStyle->comment.*",
+                ".*\\$this->symfonyStyle->newLine.*",
+                ".*\\$this->progressBar->advance.*",
+                ".*\\$this->getEntityManager()->createNativeQuery.*"
             ]
         },
-        "OneZeroInteger": {
-            "ignore": [
-                "OAT\\SimpleRoster\\Repository\\NativeAssignmentRepository::insertMultiple"
+        "Finally_": {
+            "ignoreSourceCodeByRegex": [
+                ".*\\$this->entityManager->clear.*"
             ]
         }
     },

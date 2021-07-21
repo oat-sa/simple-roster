@@ -47,7 +47,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
         parent::setUp();
 
         $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer ' . 'testApiKey']);
-        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -142,7 +142,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                 'data' => [
                     'applied' => false,
                     'results' => [
-                        (string)$user->getUsername() => true,
+                        $user->getUsername() => true,
                         'nonExistingUser1' => false,
                     ],
                 ],
@@ -177,7 +177,7 @@ class BulkCreateUsersAssignmentsActionTest extends WebTestCase
                 'data' => [
                     'applied' => true,
                     'results' => [
-                        (string)$user->getUsername() => true,
+                        $user->getUsername() => true,
                     ],
                 ],
             ]

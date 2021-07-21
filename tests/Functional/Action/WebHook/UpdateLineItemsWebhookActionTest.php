@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 use Doctrine\Common\Cache\CacheProvider;
 use JsonException;
 use Monolog\Logger;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\ApiTestingTrait;
@@ -49,7 +50,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         $this->kernelBrowser = self::createClient();
 
-        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
+        $this->lineItemRepository = self::getContainer()->get(LineItemRepository::class);
         $ormConfiguration = $this->getEntityManager()->getConfiguration();
         $resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
 
@@ -127,6 +128,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
             (string)json_encode($this->getSuccessRequestBody())
         );
 
+        /** @var LineItem $lineItem */
         $lineItem = $this->lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
         $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.00000001-0000-6000-0000-000000000000');

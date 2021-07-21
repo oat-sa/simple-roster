@@ -68,20 +68,14 @@ services:
         arguments:
             $redisClient: '@app.jwt_cache.connection'
 
-    app.doctrine_cache.connection:
+    app.doctrine_cache.provider:
         class: Redis
+        lazy: true
         calls:
             -   method: connect
                 arguments:
                     - '%app.cache.host%'
                     - '%app.cache.port%'
-
-    app.doctrine_cache.provider:
-        class: Doctrine\Common\Cache\RedisCache
-        calls:
-            -   method: setRedis
-                arguments:
-                    - '@app.doctrine_cache.connection'
 
     OAT\SimpleRoster\:
         resource: '../src/*'

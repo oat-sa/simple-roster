@@ -39,13 +39,13 @@ trait LoggerTestingTrait
     protected function setUpTestLogHandler(string ...$channels): void
     {
         /** @var Logger $logger */
-        $logger = self::$container->get(LoggerInterface::class);
+        $logger = self::getContainer()->get(LoggerInterface::class);
         $this->handler = new TestHandler();
 
         $logger->pushHandler($this->handler);
 
         foreach ($channels as $channel) {
-            $logger = self::$container->get(sprintf('monolog.logger.%s', $channel));
+            $logger = self::getContainer()->get(sprintf('monolog.logger.%s', $channel));
 
             if (!$logger instanceof Logger) {
                 throw new LogicException(sprintf("Logger 'monolog.logger.%s' is not defined.", $channel));
@@ -62,6 +62,11 @@ trait LoggerTestingTrait
 
     public function assertHasLogRecord(array $record, int $level): void
     {
+        $record = [
+            'message' => (string)$record['message'],
+            'context' => $record['context'] ?? [],
+        ];
+
         self::assertTrue(
             $this->handler->hasRecord($record, $level),
             sprintf(

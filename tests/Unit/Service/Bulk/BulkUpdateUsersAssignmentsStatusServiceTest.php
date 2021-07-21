@@ -38,7 +38,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class BulkUpdateUsersAssignmentsStatusServiceTest extends TestCase
 {
-    private BulkUpdateUsersAssignmentsStateService $subject;
+    private BulkUpdateUsersAssignmentsStatusService $subject;
 
     /** @var EntityManagerInterface|MockObject */
     private $entityManager;
