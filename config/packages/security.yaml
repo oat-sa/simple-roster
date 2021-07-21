@@ -24,7 +24,7 @@ security:
 
         api_key:
             anonymous: ~
-            pattern: '^%app.route_prefix%/v1/bulk'
+            pattern: '^%app.route_prefix%/v1/(bulk|line-items)'
             provider: app_user_provider
             guard:
                 authenticators:
