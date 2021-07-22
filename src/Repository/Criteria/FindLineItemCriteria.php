@@ -133,12 +133,12 @@ class FindLineItemCriteria
         return !empty($this->lineItemUris);
     }
 
-    public function hasLineItemStartAt(): bool
+    public function hasLineItemStartAtCriteria(): bool
     {
         return !empty($this->lineItemStartAt);
     }
 
-    public function hasLineItemEndAt(): bool
+    public function hasLineItemEndAtCriteria(): bool
     {
         return !empty($this->lineItemEndAt);
     }

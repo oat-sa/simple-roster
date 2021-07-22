@@ -62,7 +62,7 @@ class LineItemResultSet implements Countable, IteratorAggregate
 
     public function count(): int
     {
-        return count($this->collection);
+        return $this->collection->count();
     }
 
     public function isEmpty(): bool

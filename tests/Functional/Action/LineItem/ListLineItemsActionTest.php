@@ -164,6 +164,9 @@ class ListLineItemsActionTest extends WebTestCase
         ];
     }
 
+    /**
+     * * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function provideValidParameters(): array
     {
         return [

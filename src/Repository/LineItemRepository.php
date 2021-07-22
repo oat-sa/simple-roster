@@ -141,13 +141,13 @@ class LineItemRepository extends AbstractRepository
                 ->setParameter('uris', $criteria->getLineItemUris());
         }
 
-        if ($criteria->hasLineItemStartAt()) {
+        if ($criteria->hasLineItemStartAtCriteria()) {
             $queryBuilder
                 ->andWhere('l.startAt >= (:startAt)')
                 ->setParameter('startAt', $criteria->getLineItemStartAt());
         }
 
-        if ($criteria->hasLineItemEndAt()) {
+        if ($criteria->hasLineItemEndAtCriteria()) {
             $queryBuilder
                 ->andWhere('l.endAt <= (:endAt)')
                 ->setParameter('endAt', $criteria->getLineItemEndAt());

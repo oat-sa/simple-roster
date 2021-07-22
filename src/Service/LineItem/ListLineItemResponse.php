@@ -15,36 +15,34 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\LineItem;
 
-use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
-use OAT\SimpleRoster\Repository\LineItemRepository;
+use JsonSerializable;
+use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 
-class LineItemService
+class ListLineItemResponse implements JsonSerializable
 {
-    private LineItemRepository $lineItemRepository;
+    private LineItemResultSet $lineItemResultSet;
 
-    public function __construct(LineItemRepository $lineItemRepository)
+    public function __construct(LineItemResultSet $lineItemResultSet)
     {
-        $this->lineItemRepository = $lineItemRepository;
+        $this->lineItemResultSet = $lineItemResultSet;
     }
 
-    public function listLineItems(
-        FindLineItemCriteria $findLineItemCriteria,
-        int $limit,
-        int $cursor = null
-    ): ListLineItemResponse {
-        $lineItemResultSet = $this->lineItemRepository->findLineItemsByCriteria(
-            $findLineItemCriteria,
-            $limit,
-            $cursor
-        );
-
-        return new ListLineItemResponse($lineItemResultSet);
+    public function jsonSerialize(): array
+    {
+        return [
+            'data' => $this->lineItemResultSet,
+            'metadata' => [
+                'pagination' => [
+                    'nextCursor' => $this->lineItemResultSet->getLastLineItemId()
+                ]
+            ]
+        ];
     }
 }
