@@ -50,7 +50,8 @@ class ListLineItemsAction
         $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 
         $cursor = $request->get('cursor') ? (int) $request->get('cursor') : null;
-        $limit = ($request->get('limit') === null || (int) $request->get('limit') > LineItemRepository::MAX_LINE_ITEM_LIMIT)
+        $limit = ($request->get('limit') === null
+            || (int) $request->get('limit') > LineItemRepository::MAX_LINE_ITEM_LIMIT)
             ? LineItemRepository::MAX_LINE_ITEM_LIMIT
             : (int) $request->get('limit');
 

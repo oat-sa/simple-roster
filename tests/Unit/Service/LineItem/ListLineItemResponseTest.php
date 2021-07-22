@@ -31,7 +31,7 @@ class ListLineItemResponseTest extends TestCase
 {
 
     /**
-     * @dataProvider provideResulSet
+     * @dataProvider provideResultSet
      */
     public function testJsonSerialization(LineItemResultSet $lineItemResultSet): void
     {
@@ -43,14 +43,14 @@ class ListLineItemResponseTest extends TestCase
         self::assertSame($lineItemResultSet->getLastLineItemId(), $result['metadata']['pagination']['nextCursor']);
     }
 
-    public function provideResulSet(): array
+    public function provideResultSet(): array
     {
         return [
             'withCursor' => [
-                new LineItemResultSet(new LineItemCollection, false, 10)
+                new LineItemResultSet(new LineItemCollection(), false, 10)
             ],
             'withoutCursor' => [
-                new LineItemResultSet(new LineItemCollection, false, null)
+                new LineItemResultSet(new LineItemCollection(), false, null)
             ],
         ];
     }
