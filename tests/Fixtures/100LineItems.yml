@@ -1,0 +1,13 @@
+OAT\SimpleRoster\Entity\LineItem:
+    line_item_{1..50}]:
+        label: 'label-<current()>'
+        uri: 'https://test.taocloud.fr/__n/<current()>'
+        slug: 'slug-<current()>'
+        maxAttempts: 0
+    line_item_{51..100}]:
+        label: 'label-<current()>'
+        uri: 'https://test.taocloud.fr/__n/<current()>'
+        slug: 'slug-<current()>'
+        startAt: '<(new \DateTime("2021-07-10"))>'
+        endAt: '<(new \DateTime("2021-07-15"))>'
+        maxAttempts: 1
