@@ -48,8 +48,8 @@ class NativeUserRepositoryTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = self::$container->get(NativeUserRepository::class);
-        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->subject = self::getContainer()->get(NativeUserRepository::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
     }
 
     public function testItCanInsertMultipleUsers(): void

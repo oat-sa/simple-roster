@@ -48,10 +48,10 @@ class LtiInstanceRepositoryTest extends KernelTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('5ltiInstances.yml');
 
-        $this->subject = self::$container->get(LtiInstanceRepository::class);
+        $this->subject = self::getContainer()->get(LtiInstanceRepository::class);
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $doctrineResultCache = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$doctrineResultCache instanceof Cache) {

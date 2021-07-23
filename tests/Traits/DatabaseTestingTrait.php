@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Traits;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
@@ -51,7 +52,7 @@ trait DatabaseTestingTrait
     protected function loadFixtureByFilename(string $filename): void
     {
         /** @var PurgerLoader $loader */
-        $loader = static::$container->get('fidry_alice_data_fixtures.loader.doctrine');
+        $loader = static::getContainer()->get('fidry_alice_data_fixtures.loader.doctrine');
 
         $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
     }
@@ -66,9 +67,6 @@ trait DatabaseTestingTrait
         return $this->getManagerRegistry()->getManager();
     }
 
-    /**
-     * @param class-string<mixed> $className
-     */
     protected function getRepository(string $className): ObjectRepository
     {
         return $this->getEntityManager()->getRepository($className);

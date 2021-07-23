@@ -86,7 +86,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->willReturn($request);
 
         $this->requestEvent
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->subject->onKernelRequest($this->requestEvent);
@@ -109,7 +109,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
             ->willReturn($request);
 
         $this->requestEvent
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->subject->onKernelRequest($this->requestEvent);
@@ -121,7 +121,7 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     public function testItWillNotSetRequestIdOnSubRequests(): void
     {
         $this->requestEvent
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(false);
 
         $this->uuidFactory

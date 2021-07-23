@@ -23,12 +23,15 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use Carbon\Carbon;
+use JsonException;
 use Lcobucci\JWT\Parser;
+use Monolog\Logger;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -40,21 +43,13 @@ class RefreshAccessTokenActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
+    use LoggerTestingTrait;
 
-    /** @var KernelBrowser */
     private KernelBrowser $kernelBrowser;
-
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var JwtTokenGenerator */
-    private $tokenGenerator;
-
-    /** @var CacheItemPoolInterface */
-    private $tokenCache;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $tokenCacheIdGenerator;
+    private UserRepository $userRepository;
+    private JwtTokenGenerator $tokenGenerator;
+    private CacheItemPoolInterface $tokenCache;
+    private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
 
     protected function setUp(): void
     {
@@ -62,12 +57,13 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $this->kernelBrowser = self::createClient();
 
+        $this->setUpTestLogHandler('security');
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
-        $this->userRepository = static::$container->get(UserRepository::class);
-        $this->tokenGenerator = static::$container->get(JwtTokenGenerator::class);
-        $this->tokenCache = static::$container->get('app.jwt_cache.adapter');
-        $this->tokenCacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
+        $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
+        $this->tokenCache = self::getContainer()->get('app.jwt_cache.adapter');
+        $this->tokenCacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
     }
 
     public function testIfAccessTokenCanBeRefreshed(): void
@@ -78,14 +74,12 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $initialAccessToken = $authenticationResponse['accessToken'];
 
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/refresh-token',
-            [],
-            [],
-            [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
-        );
+        // Reboot kernel for log assertion.
+        static::ensureKernelShutdown();
+        $this->kernelBrowser = self::createClient();
+        $this->setUpTestLogHandler('security');
+
+        $this->callRefreshTokenEndpoint($authenticationResponse['refreshToken']);
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -96,6 +90,19 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         self::assertArrayHasKey('accessToken', $decodedResponse);
         self::assertNotSame($initialAccessToken, $decodedResponse['accessToken']);
+
+        $accessToken = (new Parser())->parse($decodedResponse['accessToken']);
+
+        $this->assertHasLogRecord(
+            [
+                'message' => sprintf(
+                    "Access token has been refreshed for user '%s'. (token id = '%s')",
+                    $accessToken->getClaim('aud'),
+                    $accessToken->getClaim('jti')
+                ),
+            ],
+            Logger::INFO
+        );
     }
 
     public function testItReturnsExceptionIfRefreshTokenIsMissingFromRequest(): void
@@ -175,14 +182,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         Carbon::setTestNow('+2 years');
 
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/refresh-token',
-            [],
-            [],
-            [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
-        );
+        $this->callRefreshTokenEndpoint($authenticationResponse['refreshToken']);
 
         Carbon::setTestNow();
 
@@ -208,14 +208,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
         $cacheId = $this->tokenCacheIdGenerator->generate($refreshToken);
         $this->tokenCache->deleteItem($cacheId);
 
-        $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/auth/refresh-token',
-            [],
-            [],
-            [],
-            json_encode(['refreshToken' => $authenticationResponse['refreshToken']], JSON_THROW_ON_ERROR)
-        );
+        $this->callRefreshTokenEndpoint($authenticationResponse['refreshToken']);
 
         self::assertSame(Response::HTTP_FORBIDDEN, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -227,5 +220,21 @@ class RefreshAccessTokenActionTest extends WebTestCase
         );
 
         self::assertSame('Expired token.', $decodedResponse['error']['message']);
+    }
+
+
+    /**
+     * @throws JsonException
+     */
+    private function callRefreshTokenEndpoint(string $refreshToken): void
+    {
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/auth/refresh-token',
+            [],
+            [],
+            [],
+            json_encode(['refreshToken' => $refreshToken], JSON_THROW_ON_ERROR)
+        );
     }
 }

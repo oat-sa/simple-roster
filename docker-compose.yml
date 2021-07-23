@@ -24,7 +24,7 @@ services:
         build:
             context: ./docker/phpfpm
         environment:
-            COMPOSER_AUTH: $COMPOSER_AUTH
+            COMPOSER_AUTH: '$COMPOSER_AUTH'
         expose:
             - 9000
         networks:

@@ -57,7 +57,7 @@ class LogoutActionTest extends WebTestCase
 
     public function testItLogsOutProperlyTheUser(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
@@ -75,16 +75,16 @@ class LogoutActionTest extends WebTestCase
 
     public function testItRemovesTokenOnLogout(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
         $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
 
-        $cacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $cacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
 
         /** @var CacheItemPoolInterface $cachePool */
-        $cachePool = self::$container->get('app.jwt_cache.adapter');
+        $cachePool = self::getContainer()->get('app.jwt_cache.adapter');
 
         $refreshTokenCacheItem = $cachePool->getItem($cacheIdGenerator->generate($refreshToken));
         self::assertTrue($refreshTokenCacheItem->isHit());
@@ -105,13 +105,13 @@ class LogoutActionTest extends WebTestCase
 
     public function testItLogsRefreshTokenInvalidation(): void
     {
-        $userRepository = self::$container->get(UserRepository::class);
+        $userRepository = self::getContainer()->get(UserRepository::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
         $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
-        $cacheIdGenerator = static::$container->get(JwtTokenCacheIdGenerator::class);
+        $cacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
 
         self::ensureKernelShutdown();
         $this->kernelBrowser = self::createClient();

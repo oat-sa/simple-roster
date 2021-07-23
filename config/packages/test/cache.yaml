@@ -1,0 +1,6 @@
+framework:
+    cache:
+        pools:
+            roster.result_cache:
+                adapter: cache.adapter.array
+                provider: ~

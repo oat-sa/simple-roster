@@ -26,21 +26,21 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\EventListener\Doctrine\UserPasswordEncoderListener;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class UserPasswordEncoderListenerTest extends TestCase
 {
     private UserPasswordEncoderListener $subject;
 
-    /** @var UserPasswordEncoderInterface|MockObject */
-    private $userPasswordEncoderMock;
+    /** @var UserPasswordHasher|MockObject */
+    private $userPasswordHasher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->userPasswordEncoderMock = $this->createMock(UserPasswordEncoderInterface::class);
-        $this->subject = new UserPasswordEncoderListener($this->userPasswordEncoderMock);
+        $this->userPasswordHasher = $this->createMock(UserPasswordHasher::class);
+        $this->subject = new UserPasswordEncoderListener($this->userPasswordHasher);
     }
 
     public function testItDoesNothingIfTheUserPlainPasswordIsEmpty(): void
@@ -48,9 +48,9 @@ class UserPasswordEncoderListenerTest extends TestCase
         $entity = $this->createMock(User::class);
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::never())
-            ->method('encodePassword');
+            ->method('hashPassword');
 
         $entity
             ->expects(self::never())
@@ -61,21 +61,21 @@ class UserPasswordEncoderListenerTest extends TestCase
 
     public function testItCorrectlyUpdatesTheEncodedPasswordUponPrePersist(): void
     {
-        $entity = new User();
-        $entity->setPlainPassword('password');
+        $user = new User();
+        $user->setPlainPassword('password');
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::once())
-            ->method('encodePassword')
-            ->with($entity, 'password')
+            ->method('hashPassword')
+            ->with($user, 'password')
             ->willReturn('encodedPassword');
 
-        $this->subject->prePersist($entity);
+        $this->subject->prePersist($user);
 
         self::assertSame(
             'encodedPassword',
-            $entity->getPassword()
+            $user->getPassword()
         );
     }
 
@@ -85,9 +85,9 @@ class UserPasswordEncoderListenerTest extends TestCase
         $entity->setPlainPassword('password');
 
         $this
-            ->userPasswordEncoderMock
+            ->userPasswordHasher
             ->expects(self::once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->with($entity, 'password')
             ->willReturn('encodedPassword');
 
