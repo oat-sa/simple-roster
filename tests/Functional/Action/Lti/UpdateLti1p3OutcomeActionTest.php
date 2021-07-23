@@ -43,11 +43,8 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
     use Lti1p3SecurityTestingTrait;
     use XmlTestingTrait;
 
-    /** @var RegistrationInterface */
-    private $registration;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private RegistrationInterface $registration;
+    private AssignmentRepository $assignmentRepository;
 
     protected function setUp(): void
     {
@@ -81,7 +78,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $authorization = sprintf('Bearer %s', $accessToken);
 
         $uuidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::$container->set('test.uid_generator', $uuidGenerator);
+        self::getContainer()->set('test.uid_generator', $uuidGenerator);
 
         $messageIdentifier = UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 

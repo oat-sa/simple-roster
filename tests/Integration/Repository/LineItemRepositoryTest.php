@@ -53,9 +53,9 @@ class LineItemRepositoryTest extends KernelTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        $this->cacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
-        $this->doctrineResultCacheImplementation = self::$container->get('doctrine.orm.default_result_cache');
-        $this->subject = self::$container->get(LineItemRepository::class);
+        $this->cacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
+        $this->doctrineResultCacheImplementation = self::getContainer()->get('doctrine.orm.default_result_cache');
+        $this->subject = self::getContainer()->get(LineItemRepository::class);
     }
 
     public function testItCanFindAllAsCollection(): void

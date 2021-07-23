@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Entity;
 
+use Carbon\Carbon;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\AssignmentNotFoundException;
@@ -44,6 +45,8 @@ class UserTest extends KernelTestCase
 
     public function testItCanRetrieveAndRemoveAssignments(): void
     {
+        Carbon::setTestNow();
+
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         /** @var User $subject */

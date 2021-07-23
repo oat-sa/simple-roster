@@ -103,7 +103,7 @@ class AssignmentRepository extends AbstractRepository
                 $assignmentDto->getId(),
                 $assignmentDto->getUserId(),
                 $assignmentDto->getLineItemId(),
-                $assignmentDto->getState(),
+                $assignmentDto->getStatus(),
                 0
             );
         }

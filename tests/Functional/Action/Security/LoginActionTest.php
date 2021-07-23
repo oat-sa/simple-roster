@@ -39,8 +39,7 @@ class LoginActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     protected function setUp(): void
     {

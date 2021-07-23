@@ -67,7 +67,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
@@ -75,8 +75,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
-        $this->lineItemCacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
-        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
+        $this->lineItemCacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
+        $this->lineItemRepository = self::getContainer()->get(LineItemRepository::class);
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler();
@@ -113,7 +113,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             ->method('flush')
             ->willThrowException(new ORMException('ErrorMessage'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemChangeDatesCommand::NAME));
@@ -158,7 +158,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->assertCacheDoesNotExist($lineItemIds);
 
         $parameters['-f'] = null;
-        self::assertSame(0, $this->commandTester->execute($parameters, ['capture_stderr_separately' => true]));
+        self::assertSame(0, $this->commandTester->execute($parameters));
 
         $display = $this->normalizeDisplay($this->commandTester->getDisplay());
 

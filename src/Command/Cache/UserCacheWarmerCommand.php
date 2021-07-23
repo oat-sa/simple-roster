@@ -57,7 +57,7 @@ class UserCacheWarmerCommand extends Command
     /** @var string[] */
     private array $usernames = [];
 
-    /** @var array */
+    /** @var string[] */
     private array $lineItemSlugs = [];
 
     public function __construct(UserCacheWarmerService $userCacheWarmerService, UserRepository $userRepository)

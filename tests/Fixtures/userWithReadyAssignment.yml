@@ -15,7 +15,7 @@ OAT\SimpleRoster\Entity\LineItem:
             uri: 'http://lineitemuri.com'
             slug: 'lineItemSlug'
             status: 'enabled'
-            startAt: '<dateTimeInInterval("-2 years", "-1 years")>'
+            startAt: '<dateTimeInInterval("2018-01-01", "2019-01-01")>'
             endAt: '<dateTimeInInterval("+1 years", "+2 years")>'
             maxAttempts: 2
 

@@ -50,7 +50,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = self::$container->get(Lti1p3MessageBuilder::class);
+        $this->subject = self::getContainer()->get(Lti1p3MessageBuilder::class);
     }
 
     public function testItCanBuildLtiMessage(): void
@@ -58,7 +58,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         /** @var RegistrationRepository $registrationRepository */
-        $registrationRepository = self::$container->get(RegistrationRepository::class);
+        $registrationRepository = self::getContainer()->get(RegistrationRepository::class);
         /** @var Registration $registration */
         $registration = $registrationRepository->find('testRegistration');
 
@@ -82,7 +82,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         self::assertSame('test', $ltiParameters->get('client_id'));
 
         /** @var Parser $tokenParser */
-        $tokenParser = self::$container->get('test.jwt_parser');
+        $tokenParser = self::getContainer()->get('test.jwt_parser');
         $token = $tokenParser->parse($ltiParameters->get('lti_message_hint'));
 
         self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/launch_presentation'));

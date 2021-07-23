@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Extractor;
 
+use Exception;
 use LogicException;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use Symfony\Component\Uid\UuidV6;
@@ -30,28 +31,23 @@ class LoginHintExtractor
 {
     /**
      * @throws LogicException
+     * @throws Exception
      */
     public function extract(string $loginHint): LoginHintDto
     {
         $matches = [];
 
-        preg_match('/^(?P<username>.*)::(?P<assignmentId>.*)$/', $loginHint, $matches);
+        preg_match(
+            '/^(?P<username>[a-zA-Z0-9\-|_.]+)::' .
+            '(?P<assignmentId>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/',
+            $loginHint,
+            $matches
+        );
 
         if (empty($matches)) {
             throw new LogicException('Invalid Login hint format.');
         }
 
-        if (empty($matches['username'])) {
-            throw new LogicException('Missing username on login hint.');
-        }
-
-        if (empty($matches['assignmentId'])) {
-            throw new LogicException('Missing assignment ID on login hint.');
-        }
-
-        return new LoginHintDto(
-            $matches['username'],
-            new UuidV6($matches['assignmentId']),
-        );
+        return new LoginHintDto($matches['username'], new UuidV6($matches['assignmentId']));
     }
 }

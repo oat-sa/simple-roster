@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Command\ModifyEntity\LineItem;
 
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -46,7 +47,7 @@ class LineItemChangeStatusCommand extends Command
         self::FIELD_ID,
         self::FIELD_SLUG,
         self::FIELD_URI,
-        self::FIELD_GROUP_ID
+        self::FIELD_GROUP_ID,
     ];
 
     private const TOGGLE_ENABLE = 'enable';
@@ -183,6 +184,7 @@ EOF
 
             $lineItems = $this->lineItemRepository->findBy([$queryField => $queryValue]);
 
+            /** @var LineItem $lineItem */
             foreach ($lineItems as $lineItem) {
                 $toggle === self::TOGGLE_ENABLE ? $lineItem->enable() : $lineItem->disable();
 

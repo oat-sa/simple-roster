@@ -27,6 +27,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use InvalidArgumentException;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
+use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
@@ -55,9 +56,9 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = self::$container->get(UserRepository::class);
-        $this->doctrineResultCacheImplementation = self::$container->get('doctrine.orm.default_result_cache');
-        $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
+        $this->subject = self::getContainer()->get(UserRepository::class);
+        $this->doctrineResultCacheImplementation = self::getContainer()->get('doctrine.orm.default_result_cache');
+        $this->userCacheIdGenerator = self::getContainer()->get(UserCacheIdGenerator::class);
     }
 
     public function testItCanGetUserWithAssignmentsByUsername(): void
@@ -156,6 +157,7 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->subject->insertMultipleNatively($userCollection);
 
+        /** @var User[] $users */
         $users = $this->subject->findAll();
         self::assertCount(2, $users);
 

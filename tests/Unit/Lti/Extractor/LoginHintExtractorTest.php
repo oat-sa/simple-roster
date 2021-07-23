@@ -37,14 +37,18 @@ class LoginHintExtractorTest extends TestCase
         $this->subject = new LoginHintExtractor();
     }
 
-    public function testShouldExtractDataWhenLoginHintIsWellFormed(): void
-    {
-        $loginHint = 'user::00000001-0000-6000-0000-000000000000';
-
+    /**
+     * @dataProvider provideValidLoginHints
+     */
+    public function testItCanExtractLoginHint(
+        string $loginHint,
+        string $expectedUsername,
+        string $expectedAssignmentId
+    ): void {
         $loginHintDto = $this->subject->extract($loginHint);
 
-        self::assertSame('user', $loginHintDto->getUsername());
-        self::assertSame('00000001-0000-6000-0000-000000000000', (string)$loginHintDto->getAssignmentId());
+        self::assertSame($expectedUsername, $loginHintDto->getUsername());
+        self::assertSame($expectedAssignmentId, (string)$loginHintDto->getAssignmentId());
     }
 
     /**
@@ -56,6 +60,22 @@ class LoginHintExtractorTest extends TestCase
         $this->expectExceptionMessage($message);
 
         $this->subject->extract($loginHint);
+    }
+
+    public function provideValidLoginHints(): array
+    {
+        return [
+            'withAlphanumericUsername' => [
+                'loginHint' => 'user2134::00000001-0000-6000-0000-000000000000',
+                'expectedUsername' => 'user2134',
+                'expectedAssignmentId' => '00000001-0000-6000-0000-000000000000',
+            ],
+            'withUsernameWithSpecialCharacters' => [
+                'loginHint' => 'FIRSTNAME.LASTNAME-23_1::00000001-0000-6000-0000-000000000000',
+                'expectedUsername' => 'FIRSTNAME.LASTNAME-23_1',
+                'expectedAssignmentId' => '00000001-0000-6000-0000-000000000000',
+            ],
+        ];
     }
 
     public function provideInvalidLoginHints(): array
@@ -71,11 +91,19 @@ class LoginHintExtractorTest extends TestCase
             ],
             'withoutUsername' => [
                 'loginHint' => '::1',
-                'message' => 'Missing username on login hint.',
+                'message' => 'Invalid Login hint format.',
             ],
             'withoutAssignmentId' => [
-                'loginHint' => 'username::groupId::',
-                'message' => 'Missing assignment ID on login hint.',
+                'loginHint' => 'username::',
+                'message' => 'Invalid Login hint format.',
+            ],
+            'withInvalidStartingCharacterInUsername' => [
+                'loginHint' => '!username::1',
+                'message' => 'Invalid Login hint format.',
+            ],
+            'withInvalidEndingCharacterInAssignmentId' => [
+                'loginHint' => 'username::1a',
+                'message' => 'Invalid Login hint format.',
             ],
         ];
     }

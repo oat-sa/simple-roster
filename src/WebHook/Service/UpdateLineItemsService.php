@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\WebHook\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Exception;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
@@ -73,10 +74,11 @@ class UpdateLineItemsService
 
         $lineItems = $this->lineItemRepository->findBy(
             [
-                'slug' => $slugs
+                'slug' => $slugs,
             ]
         );
 
+        /** @var LineItem $lineItem */
         foreach ($lineItems as $lineItem) {
             $duplicatedUpdates = $knownUpdates
                 ->filter(
@@ -111,7 +113,7 @@ class UpdateLineItemsService
                 $this->logger->error(
                     sprintf('Impossible to update the line item. The slug %s does not exist.', $knownUpdate->getSlug()),
                     [
-                        'updateId' => $knownUpdate->getId()
+                        'updateId' => $knownUpdate->getId(),
                     ]
                 );
             }

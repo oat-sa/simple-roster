@@ -27,13 +27,13 @@ use Symfony\Component\Uid\UuidV6;
 class FindLineItemCriteria
 {
     /** @var UuidV6[] */
-    private $lineItemIds = [];
+    private array $lineItemIds = [];
 
     /** @var string[] */
     private array $lineItemSlugs = [];
 
     /** @var string[] */
-    private $lineItemGroupIds = [];
+    private array $lineItemGroupIds = [];
 
     public function addLineItemIds(UuidV6 ...$lineItemIds): self
     {

@@ -41,7 +41,7 @@ trait CsvIngestionTestingTrait
     ): void {
         try {
             /** @var StorageRegistry $storageRegistry */
-            $storageRegistry = self::$container->get(StorageRegistry::class);
+            $storageRegistry = self::getContainer()->get(StorageRegistry::class);
 
             $csv = Writer::createFromString();
             $csv->insertAll($csvContent);

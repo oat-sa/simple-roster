@@ -39,11 +39,8 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
 {
     public const NAME = 'roster:ingest:user';
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var UserPasswordEncoderInterface */
-    private $passwordEncoder;
+    private UserRepository $userRepository;
+    private UserPasswordEncoderInterface $passwordEncoder;
 
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,

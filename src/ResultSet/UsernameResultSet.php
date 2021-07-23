@@ -30,14 +30,9 @@ use Symfony\Component\Uid\UuidV6;
 
 class UsernameResultSet implements Countable, IteratorAggregate
 {
-    /** @var UsernameCollection */
-    private $collection;
-
-    /** @var bool */
-    private $hasMore;
-
-    /** @var UuidV6|null */
-    private $lastUserId;
+    private UsernameCollection $collection;
+    private bool $hasMore;
+    private ?UuidV6 $lastUserId;
 
     public function __construct(UsernameCollection $collection, bool $hasMore, ?UuidV6 $lastUserId)
     {

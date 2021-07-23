@@ -48,7 +48,7 @@ class AssignmentRepositoryTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = self::$container->get(AssignmentRepository::class);
+        $this->subject = self::getContainer()->get(AssignmentRepository::class);
     }
 
     public function testItCanFindAssignmentById(): void

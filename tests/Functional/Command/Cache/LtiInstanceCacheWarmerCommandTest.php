@@ -57,7 +57,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(LtiInstanceCacheWarmerCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
@@ -79,7 +79,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
             ->method('findAllAsCollection')
             ->willThrowException(new LogicException('Yaaay'));
 
-        self::$container->set('test.lti_repository', $ltiInstanceRepository);
+        self::getContainer()->set('test.lti_repository', $ltiInstanceRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LtiInstanceCacheWarmerCommand::NAME));

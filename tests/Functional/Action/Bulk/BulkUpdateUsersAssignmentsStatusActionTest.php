@@ -41,15 +41,14 @@ class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient([], ['HTTP_AUTHORIZATION' => 'Bearer testApiKey']);
-        $this->userRepository = self::$container->get(UserRepository::class);
+        $this->userRepository = self::getContainer()->get(UserRepository::class);
 
         $this->setUpDatabase();
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -124,7 +123,7 @@ class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
 
     public function testItDoesNotUpdateAssignmentsStateWithInvalidUsersProvided(): void
     {
-        Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
+        Carbon::setTestNow();
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
@@ -158,6 +157,7 @@ class BulkUpdateUsersAssignmentsStatusActionTest extends WebTestCase
         self::assertCount(1, $this->getRepository(Assignment::class)->findAll());
 
         $this->getEntityManager()->refresh($user->getLastAssignment());
+
         self::assertSame(Assignment::STATUS_READY, $user->getLastAssignment()->getStatus());
         self::assertCount(1, $user->getAvailableAssignments());
 

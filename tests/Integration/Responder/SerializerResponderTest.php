@@ -207,7 +207,7 @@ class SerializerResponderTest extends KernelTestCase
     {
         $kernel = new Kernel('test', $this->debug);
 
-        return new SerializerResponder(self::$container->get(SerializerInterface::class), $kernel);
+        return new SerializerResponder(self::getContainer()->get(SerializerInterface::class), $kernel);
     }
 
     private function createHttpException(string $message, int $statusCode): Throwable

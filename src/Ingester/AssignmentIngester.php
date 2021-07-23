@@ -31,11 +31,8 @@ use Throwable;
 
 class AssignmentIngester
 {
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private UserRepository $userRepository;
+    private AssignmentRepository $assignmentRepository;
 
     public function __construct(UserRepository $userRepository, AssignmentRepository $assignmentRepository)
     {

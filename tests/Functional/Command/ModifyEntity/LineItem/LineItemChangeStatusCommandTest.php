@@ -67,7 +67,7 @@ class LineItemChangeStatusCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
@@ -75,8 +75,8 @@ class LineItemChangeStatusCommandTest extends KernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
-        $this->lineItemCacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
-        $this->lineItemRepository = self::$container->get(LineItemRepository::class);
+        $this->lineItemCacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
+        $this->lineItemRepository = self::getContainer()->get(LineItemRepository::class);
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler();
@@ -192,7 +192,7 @@ class LineItemChangeStatusCommandTest extends KernelTestCase
             ->with(['id' => [(new UuidV6('00000001-0000-6000-0000-000000000000'))->toBinary()]])
             ->willThrowException(new Exception('Database Error'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemChangeStatusCommand::NAME));

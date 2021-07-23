@@ -46,11 +46,8 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
     use XmlTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var LtiInstanceRepository */
-    private $ltiInstanceRepository;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
+    private LtiInstanceRepository $ltiInstanceRepository;
+    private AssignmentRepository $assignmentRepository;
 
     protected function setUp(): void
     {
@@ -114,7 +111,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
         $signature = $this->generateSignature($ltiInstance, (string)$time);
 
         $uidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::$container->set('test.uid_generator', $uidGenerator);
+        self::getContainer()->set('test.uid_generator', $uidGenerator);
 
         $messageIdentifier = UuidV4::fromString('e36f227c-2946-11e8-b467-0ed5f89f718b');
 
@@ -157,7 +154,12 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         self::assertSame(Assignment::STATUS_READY, $assignment->getStatus());
 
-        $this->assertHasLogRecordWithMessage('Successful OAuth signature validation.', Logger::INFO);
+        $this->assertHasLogRecord([
+            'message' => 'Successful OAuth signature validation.',
+            'context' => [
+                'ltiInstance' => $ltiInstance,
+            ],
+        ], Logger::INFO);
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void

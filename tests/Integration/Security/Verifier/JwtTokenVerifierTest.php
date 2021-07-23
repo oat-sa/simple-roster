@@ -44,8 +44,8 @@ class JwtTokenVerifierTest extends KernelTestCase
 
         self::bootKernel();
 
-        $this->subject = self::$container->get(JwtTokenVerifier::class);
-        $this->tokenGenerator = self::$container->get(JwtTokenGenerator::class);
+        $this->subject = self::getContainer()->get(JwtTokenVerifier::class);
+        $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
     }
 
     public function testSuccessfulVerification(): void

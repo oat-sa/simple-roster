@@ -30,8 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 trait ApiTestingTrait
 {
-    /** @var KernelBrowser */
-    protected $kernelBrowser;
+    protected KernelBrowser $kernelBrowser;
 
     protected function authenticateAs(User $user): AuthenticationResponse
     {

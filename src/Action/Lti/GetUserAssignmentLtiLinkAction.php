@@ -38,17 +38,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class GetUserAssignmentLtiLinkAction
 {
-    /** @var SerializerResponder */
-    private $responder;
-
-    /** @var LtiRequestFactoryInterface */
-    private $ltiRequestFactory;
-
-    /** @var AssignmentRepository */
-    private $assignmentRepository;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private SerializerResponder $responder;
+    private LtiRequestFactoryInterface $ltiRequestFactory;
+    private AssignmentRepository $assignmentRepository;
+    private LoggerInterface $logger;
 
     public function __construct(
         SerializerResponder $responder,

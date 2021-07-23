@@ -55,12 +55,12 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         $this->setUpDatabase();
 
-        $this->subject = self::$container->get(JwtTokenAuthenticator::class);
+        $this->subject = self::getContainer()->get(JwtTokenAuthenticator::class);
 
-        $this->tokenGenerator = self::$container->get(JwtTokenGenerator::class);
-        $this->userProvider = self::$container->get(UserProvider::class);
-        $this->jwtPrivateKeyPath = self::$container->getParameter('app.jwt.private_key_path');
-        $this->jwtPassphrase = self::$container->getParameter('app.jwt.passphrase');
+        $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
+        $this->userProvider = self::getContainer()->get(UserProvider::class);
+        $this->jwtPrivateKeyPath = self::getContainer()->getParameter('app.jwt.private_key_path');
+        $this->jwtPassphrase = self::getContainer()->getParameter('app.jwt.passphrase');
     }
 
     public function testItSupportRequestOnlyWithAuthorizationBearerHeaderPresent(): void

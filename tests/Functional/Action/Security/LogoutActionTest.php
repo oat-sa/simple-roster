@@ -39,11 +39,8 @@ class LogoutActionTest extends WebTestCase
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
 
-    /** @var UserRepository */
-    private $userRepository;
-
-    /** @var JwtTokenCacheIdGenerator */
-    private $jwtTokenCacheIdGenerator;
+    private UserRepository $userRepository;
+    private JwtTokenCacheIdGenerator $jwtTokenCacheIdGenerator;
 
     protected function setUp(): void
     {
@@ -81,7 +78,7 @@ class LogoutActionTest extends WebTestCase
         $refreshToken = $authenticationResponse->getRefreshToken();
 
         /** @var CacheItemPoolInterface $cachePool */
-        $cachePool = self::$container->get('app.jwt_cache.adapter');
+        $cachePool = self::getContainer()->get('app.jwt_cache.adapter');
 
         $refreshTokenCacheItem = $cachePool->getItem($this->jwtTokenCacheIdGenerator->generate($refreshToken));
 
