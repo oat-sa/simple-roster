@@ -25,9 +25,10 @@ namespace OAT\SimpleRoster\ResultSet;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
 use OAT\SimpleRoster\Model\LineItemCollection;
 
-class LineItemResultSet implements Countable, IteratorAggregate
+class LineItemResultSet implements Countable, IteratorAggregate, JsonSerializable
 {
     private LineItemCollection $collection;
     private bool $hasMore;
@@ -68,5 +69,10 @@ class LineItemResultSet implements Countable, IteratorAggregate
     public function isEmpty(): bool
     {
         return $this->count() === 0;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->collection->jsonSerialize();
     }
 }

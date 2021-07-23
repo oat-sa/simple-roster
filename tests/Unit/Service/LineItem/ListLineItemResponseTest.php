@@ -29,7 +29,6 @@ use PHPUnit\Framework\TestCase;
 
 class ListLineItemResponseTest extends TestCase
 {
-
     /**
      * @dataProvider provideResultSet
      */

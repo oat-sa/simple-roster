@@ -44,6 +44,7 @@ class LineItemResultSetTest extends TestCase
         self::assertSame($lineItem1, $subject->getIterator()->offsetGet('slug1'));
         self::assertSame($lineItem2, $subject->getIterator()->offsetGet('slug2'));
         self::assertSame($expectedCollection, $subject->getLineItemCollection());
+        self::assertSame([$lineItem1, $lineItem2], $subject->jsonSerialize());
         self::assertTrue($subject->hasMore());
         self::assertNull($subject->getLastLineItemId());
         self::assertFalse($subject->isEmpty());

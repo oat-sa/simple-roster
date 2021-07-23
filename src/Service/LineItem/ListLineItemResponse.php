@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\LineItem;
 
+use Doctrine\Common\Collections\Collection;
 use JsonSerializable;
 use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 
