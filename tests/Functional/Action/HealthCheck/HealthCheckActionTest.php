@@ -39,7 +39,7 @@ class HealthCheckActionTest extends WebTestCase
         self::assertSame(
             [
                 'isDoctrineConnectionAvailable' => true,
-                'isDoctrineCacheAvailable' => true,
+                'isDoctrineCacheAvailable' => false, // In test environment array cache adapter is configured.
             ],
             json_decode($kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );

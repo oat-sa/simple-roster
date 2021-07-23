@@ -49,8 +49,8 @@ class NativeAssignmentRepositoryTest extends KernelTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('usersWithStartedButStuckAssignments.yml');
 
-        $this->subject = self::$container->get(NativeAssignmentRepository::class);
-        $this->assignmentRepository = self::$container->get(AssignmentRepository::class);
+        $this->subject = self::getContainer()->get(NativeAssignmentRepository::class);
+        $this->assignmentRepository = self::getContainer()->get(AssignmentRepository::class);
     }
 
     public function testItCanInsertMultipleAssignments(): void

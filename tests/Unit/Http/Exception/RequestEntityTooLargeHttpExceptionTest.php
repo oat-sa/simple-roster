@@ -31,7 +31,7 @@ class RequestEntityTooLargeHttpExceptionTest extends TestCase
 {
     public function testItIsException(): void
     {
-        self::assertInstanceOf(RuntimeException::class, new RequestEntityTooLargeHttpException());
+        self::assertInstanceOf(RuntimeException::class, new RequestEntityTooLargeHttpException('message'));
     }
 
     public function testDefaultValues(): void

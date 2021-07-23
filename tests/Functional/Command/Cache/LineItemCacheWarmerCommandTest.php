@@ -61,7 +61,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
         $this->commandTester = new CommandTester($application->find(LineItemCacheWarmerCommand::NAME));
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
 
         if (!$resultCacheImplementation instanceof CacheProvider) {
@@ -69,7 +69,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
-        $this->lineItemCacheIdGenerator = self::$container->get(LineItemCacheIdGenerator::class);
+        $this->lineItemCacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler('cache_warmup');
@@ -84,7 +84,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             ->method('findAllAsCollection')
             ->willThrowException(new LogicException('Yaaay'));
 
-        self::$container->set('test.line_item_repository', $lineItemRepository);
+        self::getContainer()->set('test.line_item_repository', $lineItemRepository);
 
         $application = new Application($kernel);
         $commandTester = new CommandTester($application->find(LineItemCacheWarmerCommand::NAME));
