@@ -54,9 +54,9 @@ class UserRepositoryTest extends KernelTestCase
         $this->setUpDatabase();
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        $this->subject = self::$container->get(UserRepository::class);
-        $this->doctrineResultCacheImplementation = self::$container->get('doctrine.orm.default_result_cache');
-        $this->userCacheIdGenerator = self::$container->get(UserCacheIdGenerator::class);
+        $this->subject = self::getContainer()->get(UserRepository::class);
+        $this->doctrineResultCacheImplementation = self::getContainer()->get('doctrine.orm.default_result_cache');
+        $this->userCacheIdGenerator = self::getContainer()->get(UserCacheIdGenerator::class);
     }
 
     public function testItCanGetUserWithAssignmentsByUsername(): void

@@ -24,7 +24,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\HealthCheck;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Configuration;
@@ -39,8 +38,11 @@ class HealthCheckServiceTest extends TestCase
 {
     private HealthCheckService $subject;
 
-    /** @var EntityManagerInterface|MockObject */
-    private $entityManager;
+    /** @var Connection|MockObject */
+    private $connection;
+
+    /** @var AbstractPlatform|MockObject */
+    private $databasePlatform;
 
     /** @var LoggerInterface|MockObject $logger */
     private $logger;
@@ -52,16 +54,26 @@ class HealthCheckServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->connection = $this->createMock(Connection::class);
+        $this->databasePlatform = $this->createMock(AbstractPlatform::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->ormConfiguration = $this->createMock(Configuration::class);
 
-        $this->entityManager
-            ->expects(self::once())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $entityManager
             ->method('getConfiguration')
             ->willReturn($this->ormConfiguration);
 
-        $this->subject = new HealthCheckService($this->entityManager, $this->logger);
+        $entityManager
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->connection
+            ->method('getDatabasePlatform')
+            ->willReturn($this->databasePlatform);
+
+        $this->subject = new HealthCheckService($entityManager, $this->logger);
     }
 
     public function testItThrowsExceptionIfResultCacheImplementationIsNotConfigured(): void
@@ -71,43 +83,24 @@ class HealthCheckServiceTest extends TestCase
         $this->subject->getHealthCheckResult();
     }
 
-    public function testGetHealthCheckResultSuccess(): void
+    public function testItCanReturnHealthCheckResult(): void
     {
-        $resultCacheImplMock = $this->createMock(Cache::class);
-        $resultCacheImplMock
-            ->expects(self::once())
+        $resultCacheImplementation = $this->createMock(Cache::class);
+        $resultCacheImplementation
             ->method('getStats')
             ->willReturn(['uptime' => 1]);
 
         $this->ormConfiguration
-            ->expects(self::once())
             ->method('getResultCacheImpl')
-            ->willReturn($resultCacheImplMock);
+            ->willReturn($resultCacheImplementation);
 
-        $platformMock = $this->createMock(AbstractPlatform::class);
-        $platformMock
-            ->expects(self::exactly(2))
+        $this->databasePlatform
             ->method('getDummySelectSQL')
-            ->willReturn('SELECT 1')
-        ;
+            ->willReturn('SELECT 1');
 
-        $connectionMock = $this->createMock(Connection::class);
-        $connectionMock
-            ->expects(self::once())
-            ->method('getDatabasePlatform')
-            ->willReturn($platformMock)
-        ;
-        $connectionMock
-            ->expects(self::once())
+        $this->connection
             ->method('fetchOne')
-            ->with($platformMock->getDummySelectSQL())
-            ->willReturn(1)
-        ;
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('getConnection')
-            ->willReturn($connectionMock);
+            ->willReturn(true);
 
         $output = $this->subject->getHealthCheckResult();
 
@@ -115,52 +108,33 @@ class HealthCheckServiceTest extends TestCase
         self::assertTrue($output->isDoctrineCacheAvailable());
     }
 
-    public function testGetHealthCheckResultFailure(): void
+    public function testItCanReturnIfDatabaseConnectionIsNotAvailable(): void
     {
-        $resultCacheImplMock = $this->createMock(Cache::class);
-        $resultCacheImplMock
-            ->expects(self::once())
+        $resultCacheImplementation = $this->createMock(Cache::class);
+        $resultCacheImplementation
             ->method('getStats')
-            ->willReturn(false);
+            ->willReturn(['uptime' => 1]);
 
         $this->ormConfiguration
-            ->expects(self::once())
             ->method('getResultCacheImpl')
-            ->willReturn($resultCacheImplMock);
+            ->willReturn($resultCacheImplementation);
 
-        $platformMock = $this->createMock(AbstractPlatform::class);
-        $platformMock
-            ->expects(self::exactly(2))
+        $this->databasePlatform
             ->method('getDummySelectSQL')
-            ->willReturn('SELECT 1')
-        ;
+            ->willThrowException(new Exception('Totally unexpected exception.'));
 
-        $connectionMock = $this->createMock(Connection::class);
-        $connectionMock
-            ->expects(self::once())
-            ->method('getDatabasePlatform')
-            ->willReturn($platformMock)
-        ;
-        $connectionMock
-            ->expects(self::once())
-            ->method('fetchOne')
-            ->with($platformMock->getDummySelectSQL())
-            ->willThrowException(new Exception())
-        ;
-        $connectionMock
-            ->expects(self::once())
+        $this->connection
             ->method('isConnected')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
-        $this->entityManager
+        $this->logger
             ->expects(self::once())
-            ->method('getConnection')
-            ->willReturn($connectionMock);
+            ->method('critical')
+            ->with('DB connection unavailable. Exception: Totally unexpected exception.');
 
         $output = $this->subject->getHealthCheckResult();
 
         self::assertFalse($output->isDoctrineConnectionAvailable());
-        self::assertFalse($output->isDoctrineCacheAvailable());
+        self::assertTrue($output->isDoctrineCacheAvailable());
     }
 }

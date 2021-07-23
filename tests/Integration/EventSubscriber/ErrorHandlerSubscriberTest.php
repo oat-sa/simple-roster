@@ -43,7 +43,7 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
 
         self::bootKernel();
 
-        $this->responder = self::$container->get(SerializerResponder::class);
+        $this->responder = self::getContainer()->get(SerializerResponder::class);
         $this->subject = new ErrorHandlerSubscriber($this->responder);
     }
 

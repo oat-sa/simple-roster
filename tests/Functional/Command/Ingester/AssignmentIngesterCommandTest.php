@@ -170,6 +170,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         ];
 
         foreach ($expectedAssignmentCounts as $username => $expectedAssignmentCount) {
+            /** @var User $user */
             $user = $this->getRepository(User::class)->findOneBy(['username' => $username]);
             $assignments = $user->getAssignments();
 
