@@ -72,15 +72,15 @@ class ListLineItemsActionTest extends WebTestCase
     }
 
     /**
-     * @dataProvider provideInvalidTimeStamps
+     * @dataProvider provideInvalidParameters
      */
-    public function testItThrowsInvalidArgumentExceptionIfDatesAreInvalid(string $timeStamp, string $field): void
+    public function testItThrowsInvalidArgumentExceptionForInvalidParameters(string $field, string $value, string $message): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/line-items',
             [
-                $field => $timeStamp
+                $field => $value
             ],
             [],
             [],
@@ -96,10 +96,7 @@ class ListLineItemsActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame(
-            sprintf('Invalid timestamp for %s: %s', $field, $timeStamp),
-            $decodedResponse['error']['message']
-        );
+        self::assertSame($message, $decodedResponse['error']['message']);
     }
 
     /**
@@ -128,38 +125,47 @@ class ListLineItemsActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        //dd($decodedResponse);
-
         self::assertCount($expectedSize, $decodedResponse['data']);
         self::assertSame($nextCursor, $decodedResponse['metadata']['pagination']['nextCursor']);
     }
 
-    public function provideInvalidTimeStamps(): array
+    public function provideInvalidParameters(): array
     {
         return [
             'startTimeStampIsZero' => [
-                'timestamp' => '0',
                 'field' => 'startAt',
+                'value' => '0',
+                'message' => 'Invalid timestamp for startAt: 0',
             ],
             'startTimeStampIsNegative' => [
-                'timestamp' => '-1',
                 'field' => 'startAt',
+                'value' => '-1',
+                'message' => 'Invalid timestamp for startAt: -1',
             ],
             'startTimeStampIsString' => [
-                'timestamp' => 'abc',
                 'field' => 'startAt',
+                'value' => 'abc',
+                'message' => 'Invalid timestamp for startAt: abc',
             ],
             'endTimeStampIsZero' => [
-                'timestamp' => '0',
                 'field' => 'endAt',
+                'value' => '0',
+                'message' => 'Invalid timestamp for endAt: 0',
             ],
             'endTimeStampIsNegative' => [
-                'timestamp' => '-1',
                 'field' => 'endAt',
+                'value' => '-1',
+                'message' => 'Invalid timestamp for endAt: -1',
             ],
             'endTimeStampIsString' => [
-                'timestamp' => 'abc',
                 'field' => 'endAt',
+                'value' => 'abc',
+                'message' => 'Invalid timestamp for endAt: abc',
+            ],
+            'limitIsHigherThan100' => [
+                'field' => 'limit',
+                'value' => '110',
+                'message' => 'Max limit is 100',
             ],
         ];
     }

@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LineItem;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Request\Criteria\LineItemFindCriteriaFactory;
 use OAT\SimpleRoster\Responder\SerializerResponder;
@@ -50,13 +51,16 @@ class ListLineItemsAction
         $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 
         $cursor = $request->get('cursor') ? (int) $request->get('cursor') : null;
-        $limit = ($request->get('limit') === null
-            || (int) $request->get('limit') > LineItemRepository::MAX_LINE_ITEM_LIMIT)
-            ? LineItemRepository::MAX_LINE_ITEM_LIMIT
-            : (int) $request->get('limit');
+        $limit = $request->get('limit') ?? LineItemRepository::MAX_LINE_ITEM_LIMIT;
+
+        if ((int) $limit > LineItemRepository::MAX_LINE_ITEM_LIMIT) {
+            throw new InvalidArgumentException(
+                sprintf('Max limit is %d', LineItemRepository::MAX_LINE_ITEM_LIMIT)
+            );
+        }
 
         return $this->responder->createJsonResponse(
-            $this->lineItemService->listLineItems($findLineItemCriteria, $limit, $cursor)
+            $this->lineItemService->listLineItems($findLineItemCriteria, (int) $limit, $cursor)
         );
     }
 }
