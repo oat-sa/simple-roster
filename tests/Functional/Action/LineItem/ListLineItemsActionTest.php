@@ -74,8 +74,11 @@ class ListLineItemsActionTest extends WebTestCase
     /**
      * @dataProvider provideInvalidParameters
      */
-    public function testItThrowsInvalidArgumentExceptionForInvalidParameters(string $field, string $value, string $message): void
-    {
+    public function testItThrowsInvalidArgumentExceptionForInvalidParameters(
+        string $field,
+        string $value,
+        string $message
+    ): void {
         $this->kernelBrowser->request(
             Request::METHOD_GET,
             '/api/v1/line-items',
