@@ -79,12 +79,12 @@ class LineItemRepositoryTest extends KernelTestCase
         $criteria = new FindLineItemCriteria();
         $criteria->addLineItemIds(1, 2, 3);
 
-        $collection = $this->subject->findLineItemsByCriteria($criteria);
+        $resultSet = $this->subject->findLineItemsByCriteria($criteria);
 
-        self::assertCount(3, $collection);
-        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
-        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
-        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+        self::assertCount(3, $resultSet);
+        self::assertSame(1, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug1')->getId());
+        self::assertSame(2, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug2')->getId());
+        self::assertSame(3, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug3')->getId());
     }
 
     public function testItCanFindLineItemsBySlugUsingCriteria(): void
@@ -92,12 +92,12 @@ class LineItemRepositoryTest extends KernelTestCase
         $criteria = new FindLineItemCriteria();
         $criteria->addLineItemSlugs('lineItemSlug1', 'lineItemSlug2', 'lineItemSlug3');
 
-        $collection = $this->subject->findLineItemsByCriteria($criteria);
+        $resultSet = $this->subject->findLineItemsByCriteria($criteria);
 
-        self::assertCount(3, $collection);
-        self::assertSame(1, $collection->getBySlug('lineItemSlug1')->getId());
-        self::assertSame(2, $collection->getBySlug('lineItemSlug2')->getId());
-        self::assertSame(3, $collection->getBySlug('lineItemSlug3')->getId());
+        self::assertCount(3, $resultSet);
+        self::assertSame(1, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug1')->getId());
+        self::assertSame(2, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug2')->getId());
+        self::assertSame(3, $resultSet->getLineItemCollection()->getBySlug('lineItemSlug3')->getId());
     }
 
     public function testItShouldReturnEmptyCollectionIfNoLineItemWasFoundUsingIdsCriteria(): void

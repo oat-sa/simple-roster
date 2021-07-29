@@ -50,6 +50,16 @@ class LineItemCollectionTest extends TestCase
         self::assertSame($lineItem, $subject->getIterator()->current());
     }
 
+    public function testJsonSerialization(): void
+    {
+        $lineItem1 = (new LineItem())->setSlug('slug-1');
+        $lineItem2 = (new LineItem())->setSlug('slug-2');
+
+        $subject = (new LineItemCollection())->add($lineItem1)->add($lineItem2);
+
+        self::assertSame([$lineItem1, $lineItem2], $subject->jsonSerialize());
+    }
+
     public function testItThrowsExceptionIfLineItemCannotBeFoundBySlug(): void
     {
         $this->expectException(LineItemNotFoundException::class);
