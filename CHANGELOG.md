@@ -1,11 +1,9 @@
 # Changelog
 
-## 2.2.0 - 2021-07-30
+## 2.2.0 - 2021-07-29
 
 ### Added
 - Added new endpoint for list line-items
-
-## 2.1.1 - 2021-07-20
 
 ### Fixed
 - Fixed [Time-of-check Time-of-use (TOCTOU) Race Condition in league/flysystem (CVE-2021-32708)](https://github.com/advisories/GHSA-9f46-5r25-5wfm) security vulnerability.
