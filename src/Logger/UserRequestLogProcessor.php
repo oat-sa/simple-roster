@@ -42,7 +42,7 @@ class UserRequestLogProcessor
     {
         $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
         $record['extra']['username'] = $this->security->getUser() !== null
-            ? $this->security->getUser()->getUsername()
+            ? $this->security->getUser()->getUserIdentifier()
             : 'guest';
 
         return $record;

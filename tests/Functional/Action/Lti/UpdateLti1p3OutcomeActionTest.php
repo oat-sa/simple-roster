@@ -74,7 +74,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $authorization = sprintf('Bearer %s', $accessToken);
 
         $uuidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::$container->set('test.uid_generator', $uuidGenerator);
+        self::getContainer()->set('test.uid_generator', $uuidGenerator);
 
         $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
 

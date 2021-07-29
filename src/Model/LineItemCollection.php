@@ -25,10 +25,11 @@ namespace OAT\SimpleRoster\Model;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 
-class LineItemCollection implements Countable, IteratorAggregate
+class LineItemCollection implements Countable, IteratorAggregate, JsonSerializable
 {
     /** @var LineItem[] */
     private array $collection = [];
@@ -70,5 +71,10 @@ class LineItemCollection implements Countable, IteratorAggregate
     public function isEmpty(): bool
     {
         return count($this->collection) === 0;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return array_values($this->collection);
     }
 }

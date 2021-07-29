@@ -52,7 +52,6 @@ class HealthCheckService
         }
 
         $cacheStatistics = $resultCacheImplementation->getStats();
-
         $connection = $this->entityManager->getConnection();
 
         try {
@@ -61,12 +60,7 @@ class HealthCheckService
         } catch (Exception $exception) {
             $testQueryResult = $connection->isConnected();
 
-            $this->logger->critical(
-                sprintf(
-                    'DB connection unavailable. Got `%s` exception from DBAL',
-                    $exception->getMessage()
-                )
-            );
+            $this->logger->critical(sprintf('DB connection unavailable. Exception: %s', $exception->getMessage()));
         }
 
         return new HealthCheckResult(

@@ -232,6 +232,82 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
+    /v1/line-items:
+        get:
+            summary: Gets a list of line items
+            tags:
+                - Line Items
+            security:
+                -   apiKeyAuth: []
+            parameters:
+                -   name: cursor
+                    in: query
+                    description: Cursor of the resultset
+                    required: false
+                    schema:
+                        type: integer
+                -   name: limit
+                    in: query
+                    description: Limit of the line items resultset
+                    required: false
+                    schema:
+                        type: integer
+                -   name: id
+                    in: query
+                    description: The Id(s) of the line-item. Can be a string or an array.
+                    required: false
+                    schema:
+                        type: string
+                -   name: label
+                    in: query
+                    description: The label(s) of the line-item(s). Can be a string or an array.
+                    required: false
+                    schema:
+                        type: string
+                -   name: slug
+                    in: query
+                    description: The slug(s) of the line-item(s). Can be a string or an array.
+                    required: false
+                    schema:
+                        type: string
+                -   name: uri
+                    in: query
+                    description: The URI(s) of the line-item(s). Can be a string or an array.
+                    required: false
+                    schema:
+                        type: string
+                -   name: startAt
+                    in: query
+                    description: The start date timestamp of the line-item(s)
+                    required: false
+                    schema:
+                        type: integer
+                    example: '1542880258'
+                -   name: endAt
+                    in: query
+                    description: The end date timestamp of the line-item(s)
+                    required: false
+                    schema:
+                        type: integer
+                    example: '1542880258'
+            responses:
+                200:
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LineItemList'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                404:
+                    $ref: '#/components/responses/AssignmentNotFoundResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                409:
+                    $ref: '#/components/responses/ConflictResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+
     /v1/lti/outcome:
         post:
             summary: LTI 1.1 Basic Outcomes Service
@@ -376,6 +452,22 @@ components:
                     type: integer
                     description: The maximum number of attempts
                     example: 1
+        LineItemList:
+            type: object
+            properties:
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/LineItem'
+                metadata:
+                    type: object
+                    properties:
+                        pagination:
+                            type: object
+                            properties:
+                                nextCursor:
+                                    type: integer
+                                    description: Id of next item
         BulkCreateOperation:
             type: object
             properties:

@@ -37,14 +37,18 @@ class LoginHintExtractorTest extends TestCase
         $this->subject = new LoginHintExtractor();
     }
 
-    public function testShouldExtractDataWhenLoginHintIsWellFormed(): void
-    {
-        $loginHint = 'user::1';
-
+    /**
+     * @dataProvider provideValidLoginHints
+     */
+    public function testItCanExtractLoginHint(
+        string $loginHint,
+        string $expectedUsername,
+        int $expectedAssignmentId
+    ): void {
         $loginHintDto = $this->subject->extract($loginHint);
 
-        self::assertSame('user', $loginHintDto->getUsername());
-        self::assertSame(1, $loginHintDto->getAssignmentId());
+        self::assertSame($expectedUsername, $loginHintDto->getUsername());
+        self::assertSame($expectedAssignmentId, $loginHintDto->getAssignmentId());
     }
 
     /**
@@ -56,6 +60,22 @@ class LoginHintExtractorTest extends TestCase
         $this->expectExceptionMessage($message);
 
         $this->subject->extract($loginHint);
+    }
+
+    public function provideValidLoginHints(): array
+    {
+        return [
+            'withAlphanumericUsername' => [
+                'loginHint' => 'user2134::12',
+                'expectedUsername' => 'user2134',
+                'expectedAssignmentId' => 12,
+            ],
+            'withUsernameWithSpecialCharacters' => [
+                'loginHint' => 'FIRSTNAME.LASTNAME-23_1::12',
+                'expectedUsername' => 'FIRSTNAME.LASTNAME-23_1',
+                'expectedAssignmentId' => 12,
+            ],
+        ];
     }
 
     public function provideInvalidLoginHints(): array
@@ -71,11 +91,19 @@ class LoginHintExtractorTest extends TestCase
             ],
             'withoutUsername' => [
                 'loginHint' => '::1',
-                'message' => 'Missing username on login hint.',
+                'message' => 'Invalid Login hint format.',
             ],
             'withoutAssignmentId' => [
-                'loginHint' => 'username::groupId::',
-                'message' => 'Missing assignment ID on login hint.',
+                'loginHint' => 'username::',
+                'message' => 'Invalid Login hint format.',
+            ],
+            'withInvalidStartingCharacterInUsername' => [
+                'loginHint' => '!username::1',
+                'message' => 'Invalid Login hint format.',
+            ],
+            'withInvalidEndingCharacterInAssignmentId' => [
+                'loginHint' => 'username::1a',
+                'message' => 'Invalid Login hint format.',
             ],
         ];
     }
