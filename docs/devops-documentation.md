@@ -38,6 +38,7 @@ The main configuration file is `.env`, located in root folder.
 | `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
 | `REDIS_JWT_CACHE_HOST` | Redis host for JWT cache storage. |
 | `REDIS_JWT_CACHE_PORT` | Redis port for JWT cache storage. |
+| `USER_CACHE_WARMUP_MESSAGE_PAYLOAD_BATCH_SIZE` | Number of users to include per event message payload for user cache warmup (batch size) |
 | `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
 | `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching entire collection of LTI instances. |
 | `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items. |

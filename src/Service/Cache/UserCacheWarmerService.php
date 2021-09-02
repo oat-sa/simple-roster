@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Cache;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use Psr\Log\LoggerInterface;
@@ -30,20 +31,26 @@ use Throwable;
 
 class UserCacheWarmerService
 {
-    private const MESSAGE_SIZE = 100;
-
     private MessageBusInterface $messageBus;
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
+    private int $messagePayloadSize;
 
     public function __construct(
         MessageBusInterface $messageBus,
         LoggerInterface $messengerLogger,
-        LoggerInterface $cacheWarmupLogger
+        LoggerInterface $cacheWarmupLogger,
+        int $userCacheWarmupMessagePayloadBatchSize
     ) {
         $this->messageBus = $messageBus;
         $this->messengerLogger = $messengerLogger;
         $this->cacheWarmupLogger = $cacheWarmupLogger;
+
+        if ($userCacheWarmupMessagePayloadBatchSize < 1) {
+            throw new InvalidArgumentException('Message payload size must be greater or equal to 1.');
+        }
+
+        $this->messagePayloadSize = $userCacheWarmupMessagePayloadBatchSize;
     }
 
     /**
@@ -55,7 +62,7 @@ class UserCacheWarmerService
         foreach ($usernames as $username) {
             $dispatchedUsernames[] = $username;
 
-            if (count($dispatchedUsernames) === self::MESSAGE_SIZE) {
+            if (count($dispatchedUsernames) === $this->messagePayloadSize) {
                 $this->dispatchEvents($dispatchedUsernames);
 
                 $dispatchedUsernames = [];

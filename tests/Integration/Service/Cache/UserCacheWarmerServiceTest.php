@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Service\Cache;
 
 use Exception;
+use InvalidArgumentException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
@@ -58,6 +59,18 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $this->cacheWarmupTransport = self::getContainer()->get('messenger.transport.cache-warmup');
     }
 
+    public function testItThrowsExceptionIfInvalidBatchSizeReceived(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Message payload size must be greater or equal to 1.');
+
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 0);
+    }
+
     public function testItLogsAndBubblesUpExceptions(): void
     {
         $this->expectException(Exception::class);
@@ -80,7 +93,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
             ->method('error')
             ->with("Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops...");
 
-        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger);
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100);
 
         $usernameCollection = (new UsernameCollection())
             ->add('testUsername1')
@@ -89,7 +102,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $subject->process($usernameCollection);
     }
 
-    public function testItSuccessfullyDispatchesEvents(): void
+    public function testItSuccessfullyDispatchesEventsInBatches(): void
     {
         $usernames = new UsernameCollection();
         $firstBatchOfUsernames = [];
