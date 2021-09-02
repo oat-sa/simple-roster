@@ -95,7 +95,6 @@ class UserRepository extends AbstractRepository
         }
 
         $queryBuilder = $this->createQueryBuilder('u')
-            ->distinct()
             ->select('u.id', 'u.username')
             ->orderBy('u.id', 'ASC')
             ->setMaxResults($limit + 1);
