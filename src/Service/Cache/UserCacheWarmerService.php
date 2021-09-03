@@ -44,14 +44,14 @@ class UserCacheWarmerService
         MessageBusInterface $messageBus,
         LoggerInterface $messengerLogger,
         LoggerInterface $cacheWarmupLogger,
-        int $userCacheWarmupMessagePayloadBatchSize,
+        int $cacheWarmupPayloadBatchSize,
         int $userCacheWarmupRetryWaitInterval
     ) {
         $this->messageBus = $messageBus;
         $this->messengerLogger = $messengerLogger;
         $this->cacheWarmupLogger = $cacheWarmupLogger;
 
-        if ($userCacheWarmupMessagePayloadBatchSize < 1) {
+        if ($cacheWarmupPayloadBatchSize < 1) {
             throw new InvalidArgumentException('Message payload size must be greater or equal to 1.');
         }
 
@@ -59,7 +59,7 @@ class UserCacheWarmerService
             throw new InvalidArgumentException('Retry wait time interval must be greater than equal to 1.');
         }
 
-        $this->messagePayloadSize = $userCacheWarmupMessagePayloadBatchSize;
+        $this->messagePayloadSize = $cacheWarmupPayloadBatchSize;
         $this->retryWaitInterval = $userCacheWarmupRetryWaitInterval;
     }
 
