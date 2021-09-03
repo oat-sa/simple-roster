@@ -25,12 +25,14 @@ namespace OAT\SimpleRoster\Tests\Integration\Service\Cache;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
+use OAT\SimpleRoster\Exception\CacheWarmupException;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -71,27 +73,84 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 0);
     }
 
-    public function testItLogsAndBubblesUpExceptions(): void
+    public function testItRetriesEventDispatchingInCaseOfException(): void
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Ooops...');
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus
+            ->method('dispatch')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('Ooops... Error 1')),
+                $this->throwException(new Exception('Ooops... Error 2')),
+                $this->throwException(new Exception('Ooops... Error 3')),
+                $this->throwException(new Exception('Ooops... Error 4')),
+                new Envelope(new stdClass())
+            );
+
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $messengerLogger
+            ->expects($this->exactly(4))
+            ->method('error')
+            ->withConsecutive(
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 1"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 2"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 3"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 4"]
+            );
+
+        $messengerLogger
+            ->expects($this->exactly(4))
+            ->method('warning')
+            ->withConsecutive(
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [1/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [2/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [3/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [4/5]'],
+            );
+
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger
+            ->expects($this->exactly(4))
+            ->method('error')
+            ->withConsecutive(
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 1"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 2"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 3"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 4"]
+            );
+
+        $cacheWarmupLogger
+            ->expects($this->exactly(4))
+            ->method('warning')
+            ->withConsecutive(
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [1/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [2/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [3/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [4/5]'],
+            );
+
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100);
+
+        $usernameCollection = (new UsernameCollection())
+            ->add('testUsername1')
+            ->add('testUsername2');
+
+        $subject->process($usernameCollection);
+    }
+
+    public function testItLogsAndBubblesUpExceptionsInCaseRetriesHaveFailed(): void
+    {
+        $this->expectException(CacheWarmupException::class);
+        $this->expectExceptionMessage(
+            'Unsuccessful cache warmup after 5 retry attempts. Last error message: Fatal error...'
+        );
 
         $messageBus = $this->createMock(MessageBusInterface::class);
         $messageBus
             ->method('dispatch')
-            ->willThrowException(new Exception('Ooops...'));
+            ->willThrowException(new Exception('Fatal error...'));
 
         $messengerLogger = $this->createMock(LoggerInterface::class);
-        $messengerLogger
-            ->expects(self::once())
-            ->method('error')
-            ->with("Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops...");
-
         $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
-        $cacheWarmupLogger
-            ->expects(self::once())
-            ->method('error')
-            ->with("Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops...");
 
         $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100);
 

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Cache;
 
 use InvalidArgumentException;
+use OAT\SimpleRoster\Exception\CacheWarmupException;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use Psr\Log\LoggerInterface;
@@ -31,6 +32,9 @@ use Throwable;
 
 class UserCacheWarmerService
 {
+    private const MAX_RETRY_COUNT = 5;
+    private const RETRY_USLEEP_INTERVAL = 1000;
+
     private MessageBusInterface $messageBus;
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
@@ -63,15 +67,60 @@ class UserCacheWarmerService
             $dispatchedUsernames[] = $username;
 
             if (count($dispatchedUsernames) === $this->messagePayloadSize) {
-                $this->dispatchEvents($dispatchedUsernames);
+                $this->dispatchEventsWithRetry($dispatchedUsernames);
 
                 $dispatchedUsernames = [];
             }
         }
 
         if ($dispatchedUsernames) {
-            $this->dispatchEvents($dispatchedUsernames);
+            $this->dispatchEventsWithRetry($dispatchedUsernames);
         }
+    }
+
+    /**
+     * @param string[] $usernames
+     *
+     * @throws CacheWarmupException
+     */
+    private function dispatchEventsWithRetry(array $usernames): void
+    {
+        $attemptCount = 0;
+        do {
+            $isSuccessfulDispatch = false;
+
+            try {
+                $this->dispatchEvents($usernames);
+
+                $isSuccessfulDispatch = true;
+            } catch (Throwable $previousException) {
+                if ($attemptCount === self::MAX_RETRY_COUNT) {
+                    throw new CacheWarmupException(
+                        sprintf(
+                            'Unsuccessful cache warmup after %d retry attempts. Last error message: %s',
+                            self::MAX_RETRY_COUNT,
+                            $previousException->getMessage()
+                        ),
+                        $previousException->getCode(),
+                        $previousException
+                    );
+                }
+
+                $attemptCount++;
+
+                $logMessage = sprintf(
+                    "Unsuccessful cache warmup attempt. Retrying after %d microseconds... [%d/%d]",
+                    self::RETRY_USLEEP_INTERVAL,
+                    $attemptCount,
+                    self::MAX_RETRY_COUNT
+                );
+
+                $this->messengerLogger->warning($logMessage);
+                $this->cacheWarmupLogger->warning($logMessage);
+
+                usleep(self::RETRY_USLEEP_INTERVAL);
+            }
+        } while (!$isSuccessfulDispatch);
     }
 
     /**
