@@ -33,18 +33,19 @@ use Throwable;
 class UserCacheWarmerService
 {
     private const MAX_RETRY_COUNT = 5;
-    private const RETRY_USLEEP_INTERVAL = 1000;
 
     private MessageBusInterface $messageBus;
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
     private int $messagePayloadSize;
+    private int $retryWaitInterval;
 
     public function __construct(
         MessageBusInterface $messageBus,
         LoggerInterface $messengerLogger,
         LoggerInterface $cacheWarmupLogger,
-        int $userCacheWarmupMessagePayloadBatchSize
+        int $userCacheWarmupMessagePayloadBatchSize,
+        int $userCacheWarmupRetryWaitInterval
     ) {
         $this->messageBus = $messageBus;
         $this->messengerLogger = $messengerLogger;
@@ -54,7 +55,12 @@ class UserCacheWarmerService
             throw new InvalidArgumentException('Message payload size must be greater or equal to 1.');
         }
 
+        if ($userCacheWarmupRetryWaitInterval < 1) {
+            throw new InvalidArgumentException('Retry wait time interval must be greater than equal to 1.');
+        }
+
         $this->messagePayloadSize = $userCacheWarmupMessagePayloadBatchSize;
+        $this->retryWaitInterval = $userCacheWarmupRetryWaitInterval;
     }
 
     /**
@@ -110,7 +116,7 @@ class UserCacheWarmerService
 
                 $logMessage = sprintf(
                     "Unsuccessful cache warmup attempt. Retrying after %d microseconds... [%d/%d]",
-                    self::RETRY_USLEEP_INTERVAL,
+                    $this->retryWaitInterval,
                     $attemptCount,
                     self::MAX_RETRY_COUNT
                 );
@@ -118,7 +124,7 @@ class UserCacheWarmerService
                 $this->messengerLogger->warning($logMessage);
                 $this->cacheWarmupLogger->warning($logMessage);
 
-                usleep(self::RETRY_USLEEP_INTERVAL);
+                usleep($this->retryWaitInterval);
             }
         } while (!$isSuccessfulDispatch);
     }

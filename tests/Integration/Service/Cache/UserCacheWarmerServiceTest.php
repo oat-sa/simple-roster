@@ -70,7 +70,19 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $messengerLogger = $this->createMock(LoggerInterface::class);
         $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
 
-        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 0);
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 0, 1000);
+    }
+
+    public function testItThrowsExceptionIfInvalidRetryTimeIntervalReceived(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Retry wait time interval must be greater than equal to 1.');
+
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 0);
     }
 
     public function testItRetriesEventDispatchingInCaseOfException(): void
@@ -128,7 +140,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
                 ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [4/5]'],
             );
 
-        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100);
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 1000);
 
         $usernameCollection = (new UsernameCollection())
             ->add('testUsername1')
@@ -152,7 +164,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $messengerLogger = $this->createMock(LoggerInterface::class);
         $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
 
-        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100);
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 1000);
 
         $usernameCollection = (new UsernameCollection())
             ->add('testUsername1')
