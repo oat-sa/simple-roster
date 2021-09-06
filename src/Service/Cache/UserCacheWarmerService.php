@@ -55,8 +55,10 @@ class UserCacheWarmerService
             throw new InvalidArgumentException('Message payload size must be greater or equal to 1.');
         }
 
-        if ($userCacheWarmupRetryWaitInterval < 1) {
-            throw new InvalidArgumentException('Retry wait time interval must be greater than equal to 1.');
+        if ($userCacheWarmupRetryWaitInterval < 1000) {
+            throw new InvalidArgumentException(
+                'Retry wait time interval must be greater than or equal to 1000 microseconds.'
+            );
         }
 
         $this->messagePayloadSize = $cacheWarmupPayloadBatchSize;

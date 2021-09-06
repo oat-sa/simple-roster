@@ -76,13 +76,13 @@ class UserCacheWarmerServiceTest extends KernelTestCase
     public function testItThrowsExceptionIfInvalidRetryTimeIntervalReceived(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Retry wait time interval must be greater than equal to 1.');
+        $this->expectExceptionMessage('Retry wait time interval must be greater than or equal to 1000 microseconds.');
 
         $messageBus = $this->createMock(MessageBusInterface::class);
         $messengerLogger = $this->createMock(LoggerInterface::class);
         $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
 
-        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 0);
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 999);
     }
 
     public function testItRetriesEventDispatchingInCaseOfException(): void
