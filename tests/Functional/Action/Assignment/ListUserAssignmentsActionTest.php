@@ -66,7 +66,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
 
         self::assertSame(
             'Full authentication is required to access this resource.',
-            $decodedResponse
+            $decodedResponse['error']['message']
         );
     }
 

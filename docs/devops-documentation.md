@@ -39,7 +39,7 @@ The main configuration file is `.env`, located in root folder.
 | `REDIS_JWT_CACHE_HOST` | Redis host for JWT cache storage. Example: `session.eu-west-3.frdep05srp.internal.` |
 | `REDIS_JWT_CACHE_PORT` | Redis port for JWT cache storage. Example: `6379` |
 | `USER_CACHE_WARMUP_MESSAGE_PAYLOAD_BATCH_SIZE` | Number of users to include per event message payload for user cache warmup (batch size) |
-| `USER_CACHE_WARMUP_RETRY_WAIT_INTERVAL` | Waiting time interval in microseconds between user cache warmup retry attempts |
+| `USER_CACHE_WARMUP_RETRY_WAIT_INTERVAL` | Waiting time interval in microseconds between user cache warmup retry attempts [Minimum: `1000`] |
 | `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments |
 | `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching entire collection of LTI instances |
 | `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items |

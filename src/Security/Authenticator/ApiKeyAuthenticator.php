@@ -29,11 +29,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class ApiKeyAuthenticator extends AbstractGuardAuthenticator
+class ApiKeyAuthenticator extends AbstractAuthenticator
 {
     public const AUTH_REALM = 'SimpleRoster';
 
@@ -46,35 +47,26 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
         $this->appApiKey = $appApiKey;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
     public function supports(Request $request): bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): PassportInterface
     {
-        return [
-            'token' => $this->tokenExtractor->extract($request),
-        ];
-    }
+        $apiToken = $this->tokenExtractor->extract($request);
+        if ($apiToken !== $this->appApiKey) {
+            throw $this->createUnauthorizedHttpException(null);
+        }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
-        return new User();
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        return $credentials['token'] === $this->appApiKey;
+        return new SelfValidatingPassport(
+            new UserBadge(
+                $apiToken,
+                static function () {
+                    return new User();
+                }
+            )
+        );
     }
 
     /**
@@ -88,22 +80,9 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         throw $this->createUnauthorizedHttpException($exception);
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        throw $this->createUnauthorizedHttpException($authException);
-    }
-
-    public function supportsRememberMe(): bool
-    {
-        return false;
     }
 
     private function createUnauthorizedHttpException(?AuthenticationException $exception): UnauthorizedHttpException

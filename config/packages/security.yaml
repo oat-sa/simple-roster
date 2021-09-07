@@ -1,4 +1,5 @@
 security:
+    enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     password_hashers:
         Symfony\Component\Security\Core\User\User: plaintext
@@ -25,12 +26,9 @@ security:
             security: false
 
         api_key:
-            anonymous: ~
             pattern: '^%app.route_prefix%/v1/(bulk|line-items)'
-            provider: app_user_provider
-            guard:
-                authenticators:
-                    - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
+            custom_authenticators:
+                - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
         lti1p3:
@@ -51,11 +49,9 @@ security:
         api:
             pattern:  '^%app.route_prefix%/v1'
             stateless: true
-            anonymous: true
             provider: app_user_provider
-            guard:
-                authenticators:
-                    - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
+            custom_authenticators:
+                - OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator
             json_login:
                 check_path: getAccessToken
                 remember_me: false
@@ -66,9 +62,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: '^%app.route_prefix%/v1$', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1$', roles: PUBLIC_ACCESS }
+        - { path: '^%app.route_prefix%/v1/lti1p1/outcome', roles: PUBLIC_ACCESS }
+        - { path: '^%app.route_prefix%/v1/lti1p3/outcome', roles: PUBLIC_ACCESS }
         - { path: '^%app.route_prefix%/v1/web-hooks/update-line-items', roles: ROLE_USER }
-        - { path: '^%app.route_prefix%/v1/auth/refresh-token', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^%app.route_prefix%/v1/auth/refresh-token', roles: PUBLIC_ACCESS }
         - { path: '^%app.route_prefix%/v1/(.)+', roles: IS_AUTHENTICATED_FULLY }

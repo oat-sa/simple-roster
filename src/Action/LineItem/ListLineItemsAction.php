@@ -50,17 +50,17 @@ class ListLineItemsAction
     {
         $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 
-        $cursor = $request->get('cursor') ? (int) $request->get('cursor') : null;
+        $cursor = $request->get('cursor') ? (int)$request->get('cursor') : null;
         $limit = $request->get('limit') ?? LineItemRepository::MAX_LINE_ITEM_LIMIT;
 
-        if ((int) $limit > LineItemRepository::MAX_LINE_ITEM_LIMIT) {
+        if ((int)$limit > LineItemRepository::MAX_LINE_ITEM_LIMIT) {
             throw new InvalidArgumentException(
                 sprintf('Max limit is %d', LineItemRepository::MAX_LINE_ITEM_LIMIT)
             );
         }
 
         return $this->responder->createJsonResponse(
-            $this->lineItemService->listLineItems($findLineItemCriteria, (int) $limit, $cursor)
+            $this->lineItemService->listLineItems($findLineItemCriteria, (int)$limit, $cursor)
         );
     }
 }

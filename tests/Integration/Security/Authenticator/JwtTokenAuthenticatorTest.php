@@ -26,16 +26,16 @@ use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Signer\Rsa\Sha512;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
-use OAT\SimpleRoster\Security\Provider\UserProvider;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class JwtTokenAuthenticatorTest extends KernelTestCase
 {
@@ -43,7 +43,6 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
     private JwtTokenAuthenticator $subject;
     private JwtTokenGenerator $tokenGenerator;
-    private UserProvider $userProvider;
     private string $jwtPrivateKeyPath;
     private string $jwtPassphrase;
 
@@ -58,7 +57,6 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->subject = self::getContainer()->get(JwtTokenAuthenticator::class);
 
         $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
-        $this->userProvider = self::getContainer()->get(UserProvider::class);
         $this->jwtPrivateKeyPath = self::getContainer()->getParameter('app.jwt.private_key_path');
         $this->jwtPassphrase = self::getContainer()->getParameter('app.jwt.passphrase');
     }
@@ -98,27 +96,22 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         self::assertFalse($this->subject->supports($request));
     }
 
-    public function testItCanReturnCredentialsFromRequest(): void
-    {
-        $request = Request::create(
-            '/test',
-            'GET',
-            [],
-            [],
-            [],
-            ['HTTP_AUTHORIZATION' => 'Bearer expectedCredentials']
-        );
-
-        self::assertSame('expectedCredentials', $this->subject->getCredentials($request));
-    }
-
     public function testItThrowsAuthenticationExceptionIfTokenCannotBeParsed(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser('invalidToken', $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer invalidToken'],
+        );
+
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfTokenIsNotValid(): void
@@ -127,7 +120,19 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionMessage('Invalid token.');
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser($this->createMock(Token::class), $this->userProvider);
+        // Signer should be Sha256() to get a valid token
+        $token = (new Builder())->getToken(new Sha512(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
+
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()],
+        );
+
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfAudClaimIsNotPresent(): void
@@ -138,7 +143,16 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         $token = (new Builder())->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
 
-        $this->subject->getUser((string)$token, $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()],
+        );
+
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfSubjectIsNotAccessToken(): void
@@ -151,7 +165,16 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             ->permittedFor('testAudience')
             ->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
 
-        $this->subject->getUser((string)$token, $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()],
+        );
+
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfTokenIsExpired(): void
@@ -167,29 +190,23 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $expiredToken->toString()],
+        );
+
         Carbon::setTestNow('+2 hours');
 
-        $this->subject->getUser((string)$expiredToken, $this->userProvider);
+        $this->subject->authenticate($request);
 
         Carbon::setTestNow();
     }
 
-    public function testItThrowsExceptionIfUserCannotBeFound(): void
-    {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage("Username 'testUser' does not exist");
-
-        $token = $this->tokenGenerator->create(
-            (new User())->setUsername('testUser'),
-            Request::create('/test'),
-            'accessToken',
-            3600
-        );
-
-        $this->subject->getUser((string)$token, $this->userProvider);
-    }
-
-    public function testItCanSuccessfullyReturnUser(): void
+    public function testItCanSuccessfullyAuthenticate(): void
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
@@ -200,9 +217,22 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
-        $user = $this->subject->getUser((string)$token, $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()],
+        );
 
-        self::assertSame('user1', $user->getUsername());
+        $passport = $this->subject->authenticate($request);
+
+        self::assertTrue($passport->hasBadge(UserBadge::class));
+
+        /** @var UserBadge $userBadge */
+        $userBadge = $passport->getBadge(UserBadge::class);
+        self::assertSame('user1', $userBadge->getUserIdentifier());
     }
 
     public function testItBubblesUpExceptionOnAuthenticationFailure(): void
@@ -211,11 +241,6 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionObject($expectedException);
 
         $this->subject->onAuthenticationFailure(Request::create('/test'), $expectedException);
-    }
-
-    public function testItDoesNotSupportRememberMe(): void
-    {
-        self::assertFalse($this->subject->supportsRememberMe());
     }
 
     public function provideUnsupportedAuthorizationHeaderPayload(): array
