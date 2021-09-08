@@ -91,7 +91,7 @@ class JwtTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritdoc
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }

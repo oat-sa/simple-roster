@@ -89,7 +89,7 @@ class ListLineItemsActionTest extends WebTestCase
             null
         );
 
-//        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -106,8 +106,8 @@ class ListLineItemsActionTest extends WebTestCase
      */
     public function testItReturnsValidResponseForMultipleParameters(
         array $parameters,
-        int   $expectedSize,
-        ?int  $nextCursor
+        int $expectedSize,
+        ?int $nextCursor
     ): void {
         $this->kernelBrowser->request(
             Request::METHOD_GET,
