@@ -156,8 +156,13 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "2.1",
-            "ref": "71822522faf7ed2792d86b7f94ce73443358ccb9"
-        }
+            "ref": "ff94d76b2ec0c552b5d67d401f59ab8fd62f3d5f"
+        },
+        "files": [
+            "config/packages/dev/hautelook_alice.yaml",
+            "config/packages/test/hautelook_alice.yaml",
+            "fixtures/.gitignore"
+        ]
     },
     "infection/abstract-testframework-adapter": {
         "version": "0.3.1"
