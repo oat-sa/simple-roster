@@ -6,6 +6,7 @@
 - Added more resiliency to user cache warmup process by introducing event dispatch retry mechanism in `UserCacheWarmerService` class.
 - Added `USER_CACHE_WARMUP_MESSAGE_PAYLOAD_BATCH_SIZE` environment variable to be able to control the number of users to include per cache warmup message payload.
 - Added `USER_CACHE_WARMUP_RETRY_WAIT_INTERVAL` environment variable to be able to control the waiting time interval between retry attempts during user cache warmup.
+- Added `updated_at` field to `line_items` database table.
 
 ### Fixed
 - Fixed scenario when user cache warmup is taking too much time to run in case of large volume of users due to poor DB query performance by removing unnecessary `distinct` call in `findAllUsernamesPaged` method of `UserRepository` class.
