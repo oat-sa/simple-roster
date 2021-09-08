@@ -24,13 +24,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
         api_key:
             pattern: '^%app.route_prefix%/v1/(bulk|line-items)'
             custom_authenticators:
                 - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
-
         lti1p3:
             pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
             stateless: true
@@ -38,14 +36,12 @@ security:
             lti1p3_service:
                 scopes:
                     - 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
-
         webhooks:
             pattern: '^%app.route_prefix%/v1/web-hooks'
             stateless: true
             provider: basic_auth_provider
             http_basic:
                 realm: 'Secured Webhooks'
-
         api:
             pattern:  '^%app.route_prefix%/v1'
             stateless: true
