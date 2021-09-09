@@ -39,7 +39,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Throwable;
-use function microtime;
 
 class UserCacheWarmerServiceTest extends KernelTestCase
 {
