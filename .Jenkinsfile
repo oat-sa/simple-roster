@@ -24,7 +24,7 @@ pipeline {
                 script: './bin/console cache:warmup --env=test'
             )
         }
-        parallel(
+        parallel {
             stage('Test suite') {
                 options {
                     skipDefaultCheckout()
@@ -62,6 +62,6 @@ pipeline {
                     script: './vendor/bin/phpstan analyse'
                 )
             }
-        )
+        }
     }
 }
