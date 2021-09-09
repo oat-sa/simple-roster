@@ -13,16 +13,18 @@ pipeline {
     }
     stages {
         stage('Setup') {
-            withCredentials([string(credentialsId: 'jenkins_github_token', variable: 'GIT_TOKEN')]) {
+            steps {
+                withCredentials([string(credentialsId: 'jenkins_github_token', variable: 'GIT_TOKEN')]) {
+                    sh(
+                        label: 'Install/Update sources from Composer',
+                        script: "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"$GIT_TOKEN\"}}\' composer install --no-interaction --no-ansi --no-progress"
+                    )
+                }
                 sh(
-                    label: 'Install/Update sources from Composer',
-                    script: "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"$GIT_TOKEN\"}}\' composer install --no-interaction --no-ansi --no-progress"
+                    label: 'Warming up application cache',
+                    script: './bin/console cache:warmup --env=test'
                 )
             }
-            sh(
-                label: 'Warming up application cache',
-                script: './bin/console cache:warmup --env=test'
-            )
         }
         parallel {
             stage('Test suite') {
