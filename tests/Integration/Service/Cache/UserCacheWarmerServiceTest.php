@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Service\Cache;
 
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
@@ -37,6 +38,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Throwable;
+use function microtime;
 
 class UserCacheWarmerServiceTest extends KernelTestCase
 {
@@ -147,6 +150,38 @@ class UserCacheWarmerServiceTest extends KernelTestCase
             ->add('testUsername2');
 
         $subject->process($usernameCollection);
+    }
+
+    public function testItWaitsBetweenRetries(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus
+            ->method('dispatch')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                new Envelope(new stdClass())
+            );
+
+        $expectedWaitingTime = 10000;
+
+        $subject = new UserCacheWarmerService($messageBus, $logger, $logger, 100, $expectedWaitingTime);
+
+        $usernameCollection = (new UsernameCollection())
+            ->add('testUsername1')
+            ->add('testUsername2');
+
+        $startTime = new DateTime();
+        try {
+            $subject->process($usernameCollection);
+
+            self::fail('Exception was expected to be thrown');
+        } catch (Throwable $throwable) {
+            self::assertGreaterThanOrEqual($expectedWaitingTime * 4, (new DateTime())->diff($startTime)->f * 1000000);
+        }
     }
 
     public function testItLogsAndBubblesUpExceptionsInCaseRetriesHaveFailed(): void
