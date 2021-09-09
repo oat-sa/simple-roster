@@ -6,6 +6,9 @@ pipeline {
             label 'builder'
         }
     }
+    options {
+        parallelsAlwaysFailFast()
+    }
     environment {
         HOME = '.'
         APP_ENV="test"
@@ -27,7 +30,6 @@ pipeline {
             }
         }
         stage('CI pipeline') {
-            failFast true
             parallel {
                 stage('Test suite') {
                     options {
