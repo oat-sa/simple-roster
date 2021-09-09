@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Entity;
 
 use Carbon\Carbon;
-use DateTime;
 use DateTimeInterface;
 use JsonSerializable;
 
@@ -37,7 +36,7 @@ class LineItem implements JsonSerializable, EntityInterface
     private ?DateTimeInterface $endAt = null;
     private int $maxAttempts = 0;
     private bool $isActive = true;
-    private ?DateTime $updatedAt;
+    private ?DateTimeInterface $updatedAt;
 
     public function getId(): ?int
     {
@@ -142,7 +141,7 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
