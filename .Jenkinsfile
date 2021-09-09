@@ -27,6 +27,7 @@ pipeline {
             }
         }
         stage('CI pipeline') {
+            failFast true
             parallel {
                 stage('Test suite') {
                     options {
