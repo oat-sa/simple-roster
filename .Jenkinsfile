@@ -58,14 +58,18 @@ pipeline {
                             script: './vendor/bin/phpmd src,tests json phpmd.xml'
                         )
                         sh(
-                            label: 'Running static code analysis - Psalm',
-                            script: './vendor/bin/psalm --threads=$(nproc)'
-                        )
-                        sh(
                             label: 'Running static code analysis - PHPStan',
                             script: './vendor/bin/phpstan analyse'
                         )
                     }
+                }
+            }
+            stage('Psalm') {
+                steps {
+                    sh(
+                        label: 'Running static code analysis - Psalm',
+                        script: './vendor/bin/psalm --threads=$(nproc)'
+                    )
                 }
             }
         }
