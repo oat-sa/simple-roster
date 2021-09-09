@@ -147,13 +147,6 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTime $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function refreshUpdatedAt(): self
     {
         $this->updatedAt = Carbon::now()->toDateTime();
