@@ -29,6 +29,7 @@
                 ".*\\$this->symfonyStyle->comment.*",
                 ".*\\$this->symfonyStyle->newLine.*",
                 ".*\\$this->progressBar->advance.*",
+                ".*\\$this->progressBar->finish.*",
                 ".*\\$this->getEntityManager()->createNativeQuery.*"
             ]
         },
