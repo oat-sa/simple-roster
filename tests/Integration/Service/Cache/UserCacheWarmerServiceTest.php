@@ -33,12 +33,10 @@ use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Throwable;
 
 class UserCacheWarmerServiceTest extends KernelTestCase
 {
@@ -97,7 +95,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
                 $this->throwException(new Exception('Ooops... Error 2')),
                 $this->throwException(new Exception('Ooops... Error 3')),
                 $this->throwException(new Exception('Ooops... Error 4')),
-                new Envelope(new stdClass())
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
             );
 
         $messengerLogger = $this->createMock(LoggerInterface::class);
@@ -162,7 +160,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
                 $this->throwException(new Exception('Ooops...')),
                 $this->throwException(new Exception('Ooops...')),
                 $this->throwException(new Exception('Ooops...')),
-                new Envelope(new stdClass())
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
             );
 
         $expectedWaitingTime = 10000;
@@ -178,7 +176,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
             $subject->process($usernameCollection);
 
             self::fail('Exception was expected to be thrown');
-        } catch (Throwable $throwable) {
+        } catch (Exception $throwable) {
             self::assertGreaterThanOrEqual($expectedWaitingTime * 4, (new DateTime())->diff($startTime)->f * 1000000);
         }
     }
