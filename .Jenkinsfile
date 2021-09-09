@@ -12,37 +12,39 @@ pipeline {
         APP_DEBUG="true"
     }
     stages {
-        stage('Tests') {
-            options {
-                skipDefaultCheckout()
-            }
-            steps {
+        stage('Setup') {
+            withCredentials([string(credentialsId: 'jenkins_github_token', variable: 'GIT_TOKEN')]) {
                 sh(
-                  label: 'Remove cache in var directory',
-                  script: 'rm -rf var/cache'
+                    label: 'Install/Update sources from Composer',
+                    script: "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"$GIT_TOKEN\"}}\' composer install --no-interaction --no-ansi --no-progress"
                 )
-                withCredentials([string(credentialsId: 'jenkins_github_token', variable: 'GIT_TOKEN')]) {
+            }
+            sh(
+                label: 'Warming up application cache',
+                script: './bin/console cache:warmup --env=test'
+            )
+        }
+        parallel(
+            stage('Test suite') {
+                options {
+                    skipDefaultCheckout()
+                }
+                steps {
                     sh(
-                        label: 'Install/Update sources from Composer',
-                        script: "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"$GIT_TOKEN\"}}\' composer install --no-interaction --no-ansi --no-progress"
+                        label: 'Running test suite - PHPUnit',
+                        script: 'source .env.test && XDEBUG_MODE=coverage ./bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml'
+                    )
+                    sh(
+                        label: 'Checking test coverage - PHPUnit',
+                        script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+                    )
+                    sh(
+                        label: 'Running mutation testing - Infection',
+                        script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
                     )
                 }
-                sh(
-                    label: 'Warming up application cache',
-                    script: './bin/console cache:warmup --env=test'
-                )
-                sh(
-                    label: 'Running test suite - PHPUnit',
-                    script: 'source .env.test && XDEBUG_MODE=coverage ./bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml'
-                )
-                sh(
-                    label: 'Checking test coverage - PHPUnit',
-                    script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
-                )
-                sh(
-                    label: 'Running mutation testing - Infection',
-                    script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
-                )
+            }
+            stage('Static code analysis') {
                 sh(
                     label: 'Running static code analysis - CodeSniffer',
                     script: './vendor/bin/phpcs -p'
@@ -60,6 +62,6 @@ pipeline {
                     script: './vendor/bin/phpstan analyse'
                 )
             }
-        }
+        )
     }
 }
