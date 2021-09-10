@@ -58,7 +58,7 @@ pipeline {
                         )
                     }
                 }
-                state('Static code analysis') {
+                stage('Static code analysis') {
                     steps {
                         sh(
                             label: 'Running static code analysis - CodeSniffer',
