@@ -55,7 +55,7 @@
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "ergebnis/composer-normalize": "2.9",
-        "theofidry/alice-bundle": "^2.9",
+        "hautelook/alice-bundle": "^2.3",
         "infection/infection": "^0.23",
         "league/flysystem-memory": "^1.0",
         "phpmd/phpmd": "^2.10",
