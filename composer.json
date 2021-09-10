@@ -51,6 +51,12 @@
     "conflict": {
         "symfony/symfony": "*"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/theofidry/AliceBundle"
+        }
+    ],
     "require-dev": {
         "ext-intl": "*",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
