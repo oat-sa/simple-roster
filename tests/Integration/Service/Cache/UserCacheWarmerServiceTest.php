@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Service\Cache;
 
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
@@ -32,7 +33,6 @@ use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -95,7 +95,7 @@ class UserCacheWarmerServiceTest extends KernelTestCase
                 $this->throwException(new Exception('Ooops... Error 2')),
                 $this->throwException(new Exception('Ooops... Error 3')),
                 $this->throwException(new Exception('Ooops... Error 4')),
-                new Envelope(new stdClass())
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
             );
 
         $messengerLogger = $this->createMock(LoggerInterface::class);
@@ -147,6 +147,38 @@ class UserCacheWarmerServiceTest extends KernelTestCase
             ->add('testUsername2');
 
         $subject->process($usernameCollection);
+    }
+
+    public function testItWaitsBetweenRetries(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus
+            ->method('dispatch')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
+            );
+
+        $expectedWaitingTime = 10000;
+
+        $subject = new UserCacheWarmerService($messageBus, $logger, $logger, 100, $expectedWaitingTime);
+
+        $usernameCollection = (new UsernameCollection())
+            ->add('testUsername1')
+            ->add('testUsername2');
+
+        $startTime = new DateTime();
+        try {
+            $subject->process($usernameCollection);
+
+            self::fail('Exception was expected to be thrown');
+        } catch (Exception $throwable) {
+            self::assertGreaterThanOrEqual($expectedWaitingTime * 4, (new DateTime())->diff($startTime)->f * 1000000);
+        }
     }
 
     public function testItLogsAndBubblesUpExceptionsInCaseRetriesHaveFailed(): void

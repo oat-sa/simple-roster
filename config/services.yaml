@@ -70,7 +70,7 @@ services:
     app.jwt_cache.adapter:
         class: Symfony\Component\Cache\Adapter\RedisAdapter
         arguments:
-            $redisClient: '@app.jwt_cache.connection'
+            $redis: '@app.jwt_cache.connection'
 
     app.doctrine_cache.provider:
         class: Redis

@@ -442,16 +442,20 @@ components:
                     example: Delivery of Test 1
                 startDateTime:
                     type: integer
-                    description: The start DateTime in UNIX timestamp
+                    description: The start DateTime as UNIX timestamp
                     example: 1542880258
                 endDateTime:
                     type: integer
-                    description: The end DateTime in UNIX timestamp
+                    description: The end DateTime as UNIX timestamp
                     example: 1542880258
                 maxAttempts:
                     type: integer
-                    description: The maximum number of attempts
+                    description: The maximum number of allowed attempts
                     example: 1
+                updatedAt:
+                    type: integer
+                    description: The DateTime of last update as UNIX timestamp
+                    example: 1542880258
         LineItemList:
             type: object
             properties:
