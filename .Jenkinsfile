@@ -6,6 +6,9 @@ pipeline {
             label 'builder'
         }
     }
+    options {
+        parallelsAlwaysFailFast()
+    }
     environment {
         HOME = '.'
         APP_ENV="test"
@@ -35,6 +38,24 @@ pipeline {
                     label: 'Initialize PHPUnit',
                     script: './bin/phpunit --version'
                 )
+            }
+        }
+        parallel {
+            stage('Test suite') {
+                steps {
+                    sh(
+                        label: 'Running test suite',
+                        script: 'XDEBUG_MODE=coverage ./bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --coverage-clover=var/log/phpunit/coverage.xml --log-junit=var/log/phpunit/coverage/junit.xml'
+                    )
+                    sh(
+                        label: 'Checking test coverage',
+                        script: './bin/coverage-checker var/log/phpunit/coverage.xml 100'
+                    )
+                    sh(
+                        label: 'Running mutation testing',
+                        script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
+                    )
+                }
             }
         }
     }
