@@ -59,4 +59,15 @@ class UserTest extends KernelTestCase
         self::assertEmpty($subject->getAssignments());
         self::assertEmpty($subject->getAvailableAssignments());
     }
+
+    public function testAssignmentCanBeRetrievedById(): void
+    {
+        /** @var User $subject */
+        $subject = $this->getRepository(User::class)->find(1);
+
+        /** @var Assignment $assignment */
+        $assignment = $this->getRepository(Assignment::class)->find(1);
+
+        self::assertEquals($assignment, $subject->getAssignmentById(1));
+    }
 }

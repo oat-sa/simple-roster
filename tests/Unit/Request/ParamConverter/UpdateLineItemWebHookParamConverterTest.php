@@ -106,7 +106,7 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
             ->method('info')
             ->with('UpdateLineItems payload.', json_decode($payload, true));
 
-        $this->subject->apply($request, $configuration);
+        self::assertTrue($this->subject->apply($request, $configuration));
 
         self::assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
 

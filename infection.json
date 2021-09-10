@@ -23,12 +23,9 @@
         "ConcatOperandRemoval": false,
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
-                ".*\\$this->entityManager->clear.*",
-                ".*\\$this->entityManager->commit.*",
-                ".*\\$this->entityManager->rollback.*",
-                ".*\\$this->symfonyStyle->comment.*",
-                ".*\\$this->symfonyStyle->newLine.*",
-                ".*\\$this->progressBar->advance.*",
+                ".*\\$this->entityManager->.*",
+                ".*\\$this->symfonyStyle->.*",
+                ".*\\$this->progressBar->.*",
                 ".*\\$this->getEntityManager()->createNativeQuery.*"
             ]
         },
