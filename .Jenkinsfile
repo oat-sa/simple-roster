@@ -60,7 +60,7 @@ pipeline {
                             steps {
                                 sh(
                                     label: 'Running mutation testing',
-                                    script: 'source .env.test && ./vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
+                                    script: './vendor/bin/infection --threads=$(nproc) --min-msi=99 --no-progress --show-mutations --skip-initial-tests --coverage=var/log/phpunit/coverage'
                                 )
                             }
                         }
