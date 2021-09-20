@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 - To be released
+## 2.3.0 - 2021-09-21
 
 ### Added
 - Added more resiliency to user cache warmup process by introducing event dispatch retry mechanism in `UserCacheWarmerService` class.
