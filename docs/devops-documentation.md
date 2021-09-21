@@ -26,26 +26,28 @@ The main configuration file is `.env`, located in root folder.
 | `APP_ENV` | Application environment [Values: `dev`, `docker`, `test`, `prod`] |
 | `APP_DEBUG` | Application debug mode [Values: `true`, `false`] |
 | `APP_SECRET` | Application secret (use a secure random value, not a passphrase) |
-| `APP_ROUTE_PREFIX` | To apply custom API route prefix [default: `/api` ]. More information [here](#applying-custom-route-prefix). |
-| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
-| `JWT_SECRET_KEY` | Path to RSA private key for JWT authentication flow |
-| `JWT_PUBLIC_KEY` | Path to RSA public key for JWT authentication flow |
+| `APP_ROUTE_PREFIX` | To apply custom API route prefix [default: `/api` ]. More information [here](#applying-custom-route-prefix) |
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). Example: `postgresql://dbuser:dbpassword@rdstao.eu-west-3.frdep05srp.internal.:5432/taodb?serverVersion=13&charset=utf8` |
+| `JWT_SECRET_KEY` | Path to RSA private key for JWT authentication flow. Example: `file://%kernel.project_dir%/config/secrets/prod/jwt_private.pem` |
+| `JWT_PUBLIC_KEY` | Path to RSA public key for JWT authentication flow. `Example: file://%kernel.project_dir%/config/secrets/prod/jwt_public.pem` |
 | `JWT_PASSPHRASE` | Passphrase for JWT keypair |
 | `JWT_ACCESS_TOKEN_TTL` | TTL for JWT access token in seconds |
 | `JWT_REFRESH_TOKEN_TTL` | TTL for JWT refresh token in seconds |
 | `CORS_ALLOW_ORIGIN` | Allowed origin domain for cross-origin resource sharing. Example: `^https?://test-taker-portal.com$` |
-| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
-| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
-| `REDIS_JWT_CACHE_HOST` | Redis host for JWT cache storage. |
-| `REDIS_JWT_CACHE_PORT` | Redis port for JWT cache storage. |
-| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
-| `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching entire collection of LTI instances. |
-| `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items. |
-| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](cli/user-cache-warmer-command.md#asynchronous-cache-warmup-with-amazon-sqs). |
-| `WEBHOOK_BASIC_AUTH_USERNAME` | Basic auth username for [webhook](features/update-line-items-webhook.md). |
-| `WEBHOOK_BASIC_AUTH_PASSWORD` | Basic auth password for [webhook](features/update-line-items-webhook.md). |
-| `APP_API_KEY` | API key used by [Lambda Assignment Manager](https://github.com/oat-sa/lambda-assignment-manager) to access bulk API endpoints. |
-| `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` | Threshold for assignment garbage collection. [Example: `P1D`] Supported formats can be found [here](http://php.net/manual/en/dateinterval.format.php). |
+| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. Example: `dccache.eu-west-3.frdep05srp.internal.` |
+| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. Example: `6379` |
+| `REDIS_JWT_CACHE_HOST` | Redis host for JWT cache storage. Example: `session.eu-west-3.frdep05srp.internal.` |
+| `REDIS_JWT_CACHE_PORT` | Redis port for JWT cache storage. Example: `6379` |
+| `USER_CACHE_WARMUP_MESSAGE_PAYLOAD_BATCH_SIZE` | Number of users to include per event message payload for user cache warmup (batch size) |
+| `USER_CACHE_WARMUP_RETRY_WAIT_INTERVAL` | Waiting time interval in microseconds between user cache warmup retry attempts |
+| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments |
+| `CACHE_TTL_LTI_INSTANCES` | Cache TTL (in seconds) for caching entire collection of LTI instances |
+| `CACHE_TTL_LINE_ITEM` | Cache TTL (in seconds) for caching individual line items |
+| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](cli/user-cache-warmer-command.md#asynchronous-cache-warmup-with-amazon-sqs) Example: `https://sqs.eu-west-3.amazonaws.com/0123456789/frdep05srp-WorkerStack-11R1YT4PQBG9V-RosterCacheWarmup-2JN1K2H4ABCG?auto_setup=false` |
+| `WEBHOOK_BASIC_AUTH_USERNAME` | Basic auth username for [webhook](features/update-line-items-webhook.md) |
+| `WEBHOOK_BASIC_AUTH_PASSWORD` | Basic auth password for [webhook](features/update-line-items-webhook.md) |
+| `APP_API_KEY` | API key used by [Lambda Assignment Manager](https://github.com/oat-sa/lambda-assignment-manager) to access bulk API endpoints |
+| `ASSIGNMENT_STATE_INTERVAL_THRESHOLD` | Threshold for assignment garbage collection. [Example: `P1D`] Supported formats can be found [here](http://php.net/manual/en/dateinterval.format.php) |
 
 **Note: LTI specific variables can be found [here](features/lti.md).**
 

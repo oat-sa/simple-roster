@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Cache;
 
+use InvalidArgumentException;
+use OAT\SimpleRoster\Exception\CacheWarmupException;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use Psr\Log\LoggerInterface;
@@ -30,20 +32,37 @@ use Throwable;
 
 class UserCacheWarmerService
 {
-    private const MESSAGE_SIZE = 100;
+    private const MAX_RETRY_COUNT = 5;
 
     private MessageBusInterface $messageBus;
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
+    private int $messagePayloadSize;
+    private int $retryWaitInterval;
 
     public function __construct(
         MessageBusInterface $messageBus,
         LoggerInterface $messengerLogger,
-        LoggerInterface $cacheWarmupLogger
+        LoggerInterface $cacheWarmupLogger,
+        int $cacheWarmupPayloadBatchSize,
+        int $userCacheWarmupRetryWaitInterval
     ) {
         $this->messageBus = $messageBus;
         $this->messengerLogger = $messengerLogger;
         $this->cacheWarmupLogger = $cacheWarmupLogger;
+
+        if ($cacheWarmupPayloadBatchSize < 1) {
+            throw new InvalidArgumentException('Message payload size must be greater or equal to 1.');
+        }
+
+        if ($userCacheWarmupRetryWaitInterval < 1000) {
+            throw new InvalidArgumentException(
+                'Retry wait time interval must be greater than or equal to 1000 microseconds.'
+            );
+        }
+
+        $this->messagePayloadSize = $cacheWarmupPayloadBatchSize;
+        $this->retryWaitInterval = $userCacheWarmupRetryWaitInterval;
     }
 
     /**
@@ -55,16 +74,61 @@ class UserCacheWarmerService
         foreach ($usernames as $username) {
             $dispatchedUsernames[] = $username;
 
-            if (count($dispatchedUsernames) === self::MESSAGE_SIZE) {
-                $this->dispatchEvents($dispatchedUsernames);
+            if (count($dispatchedUsernames) === $this->messagePayloadSize) {
+                $this->dispatchEventsWithRetry($dispatchedUsernames);
 
                 $dispatchedUsernames = [];
             }
         }
 
         if ($dispatchedUsernames) {
-            $this->dispatchEvents($dispatchedUsernames);
+            $this->dispatchEventsWithRetry($dispatchedUsernames);
         }
+    }
+
+    /**
+     * @param string[] $usernames
+     *
+     * @throws CacheWarmupException
+     */
+    private function dispatchEventsWithRetry(array $usernames): void
+    {
+        $attemptCount = 0;
+        do {
+            $isSuccessfulDispatch = false;
+
+            try {
+                $this->dispatchEvents($usernames);
+
+                $isSuccessfulDispatch = true;
+            } catch (Throwable $previousException) {
+                if ($attemptCount === self::MAX_RETRY_COUNT) {
+                    throw new CacheWarmupException(
+                        sprintf(
+                            'Unsuccessful cache warmup after %d retry attempts. Last error message: %s',
+                            self::MAX_RETRY_COUNT,
+                            $previousException->getMessage()
+                        ),
+                        $previousException->getCode(),
+                        $previousException
+                    );
+                }
+
+                $attemptCount++;
+
+                $logMessage = sprintf(
+                    "Unsuccessful cache warmup attempt. Retrying after %d microseconds... [%d/%d]",
+                    $this->retryWaitInterval,
+                    $attemptCount,
+                    self::MAX_RETRY_COUNT
+                );
+
+                $this->messengerLogger->warning($logMessage);
+                $this->cacheWarmupLogger->warning($logMessage);
+
+                usleep($this->retryWaitInterval);
+            }
+        } while (!$isSuccessfulDispatch);
     }
 
     /**

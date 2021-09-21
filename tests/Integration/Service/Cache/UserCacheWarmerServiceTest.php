@@ -22,8 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Service\Cache;
 
+use DateTime;
 use Exception;
+use InvalidArgumentException;
 use Monolog\Logger;
+use OAT\SimpleRoster\Exception\CacheWarmupException;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
@@ -58,29 +61,86 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $this->cacheWarmupTransport = self::getContainer()->get('messenger.transport.cache-warmup');
     }
 
-    public function testItLogsAndBubblesUpExceptions(): void
+    public function testItThrowsExceptionIfInvalidBatchSizeReceived(): void
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Ooops...');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Message payload size must be greater or equal to 1.');
 
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 0, 1000);
+    }
+
+    public function testItThrowsExceptionIfInvalidRetryTimeIntervalReceived(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Retry wait time interval must be greater than or equal to 1000 microseconds.');
+
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+
+        new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 999);
+    }
+
+    public function testItRetriesEventDispatchingInCaseOfException(): void
+    {
         $messageBus = $this->createMock(MessageBusInterface::class);
         $messageBus
             ->method('dispatch')
-            ->willThrowException(new Exception('Ooops...'));
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('Ooops... Error 1')),
+                $this->throwException(new Exception('Ooops... Error 2')),
+                $this->throwException(new Exception('Ooops... Error 3')),
+                $this->throwException(new Exception('Ooops... Error 4')),
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
+            );
 
         $messengerLogger = $this->createMock(LoggerInterface::class);
         $messengerLogger
-            ->expects(self::once())
+            ->expects($this->exactly(4))
             ->method('error')
-            ->with("Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops...");
+            ->withConsecutive(
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 1"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 2"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 3"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 4"]
+            );
+
+        $messengerLogger
+            ->expects($this->exactly(4))
+            ->method('warning')
+            ->withConsecutive(
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [1/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [2/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [3/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [4/5]'],
+            );
 
         $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
         $cacheWarmupLogger
-            ->expects(self::once())
+            ->expects($this->exactly(4))
             ->method('error')
-            ->with("Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops...");
+            ->withConsecutive(
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 1"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 2"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 3"],
+                ["Unsuccessful cache warmup for user 'testUsername1, testUsername2'. Error: Ooops... Error 4"]
+            );
 
-        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger);
+        $cacheWarmupLogger
+            ->expects($this->exactly(4))
+            ->method('warning')
+            ->withConsecutive(
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [1/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [2/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [3/5]'],
+                ['Unsuccessful cache warmup attempt. Retrying after 1000 microseconds... [4/5]'],
+            );
+
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 1000);
 
         $usernameCollection = (new UsernameCollection())
             ->add('testUsername1')
@@ -89,7 +149,63 @@ class UserCacheWarmerServiceTest extends KernelTestCase
         $subject->process($usernameCollection);
     }
 
-    public function testItSuccessfullyDispatchesEvents(): void
+    public function testItWaitsBetweenRetries(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus
+            ->method('dispatch')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                $this->throwException(new Exception('Ooops...')),
+                new Envelope($this->createMock(WarmUpGroupedUserCacheMessage::class))
+            );
+
+        $expectedWaitingTime = 10000;
+
+        $subject = new UserCacheWarmerService($messageBus, $logger, $logger, 100, $expectedWaitingTime);
+
+        $usernameCollection = (new UsernameCollection())
+            ->add('testUsername1')
+            ->add('testUsername2');
+
+        $startTime = new DateTime();
+        try {
+            $subject->process($usernameCollection);
+
+            self::fail('Exception was expected to be thrown');
+        } catch (Exception $throwable) {
+            self::assertGreaterThanOrEqual($expectedWaitingTime * 4, (new DateTime())->diff($startTime)->f * 1000000);
+        }
+    }
+
+    public function testItLogsAndBubblesUpExceptionsInCaseRetriesHaveFailed(): void
+    {
+        $this->expectException(CacheWarmupException::class);
+        $this->expectExceptionMessage(
+            'Unsuccessful cache warmup after 5 retry attempts. Last error message: Fatal error...'
+        );
+
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus
+            ->method('dispatch')
+            ->willThrowException(new Exception('Fatal error...'));
+
+        $messengerLogger = $this->createMock(LoggerInterface::class);
+        $cacheWarmupLogger = $this->createMock(LoggerInterface::class);
+
+        $subject = new UserCacheWarmerService($messageBus, $messengerLogger, $cacheWarmupLogger, 100, 1000);
+
+        $usernameCollection = (new UsernameCollection())
+            ->add('testUsername1')
+            ->add('testUsername2');
+
+        $subject->process($usernameCollection);
+    }
+
+    public function testItSuccessfullyDispatchesEventsInBatches(): void
     {
         $usernames = new UsernameCollection();
         $firstBatchOfUsernames = [];

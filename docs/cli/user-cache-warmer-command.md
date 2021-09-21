@@ -36,11 +36,13 @@ $ sudo -u www-data bin/console roster:cache-warmup:user -h
 
 | Variable | Description |
 |----------|-------------|
-| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url). |
-| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage. |
-| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage. |
-| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments. |
-| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](#asynchronous-cache-warmup-with-amazon-sqs). |
+| `DATABASE_URL` | Database connection string. Supported formats are described [here](https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url) |
+| `REDIS_DOCTRINE_CACHE_HOST` | Redis host for doctrine cache storage |
+| `REDIS_DOCTRINE_CACHE_PORT` | Redis port for doctrine cache storage |
+| `USER_CACHE_WARMUP_MESSAGE_PAYLOAD_BATCH_SIZE` | Number of users to include per event message payload for user cache warmup (batch size) |
+| `USER_CACHE_WARMUP_RETRY_WAIT_INTERVAL` | Waiting time interval in microseconds between user cache warmup retry attempts |
+| `CACHE_TTL_GET_USER_WITH_ASSIGNMENTS` | Cache TTL (in seconds) for caching individual users with assignments |
+| `MESSENGER_TRANSPORT_DSN` | Messenger transport DSN for [asynchronous cache warmup](#asynchronous-cache-warmup-with-amazon-sqs) |
 
 
 ## Examples
