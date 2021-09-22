@@ -22,14 +22,15 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
+use OAT\Library\Lti1p3BasicOutcome\Service\BasicOutcomeServiceInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Lti\BasicOutcome\DummyBasicOutcomeMessageIdGenerator;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\Lti1p3SecurityTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
-use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,22 +74,13 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         );
         $authorization = sprintf('Bearer %s', $accessToken);
 
-        $uuidGenerator = $this->createMock(UuidFactoryInterface::class);
-        self::getContainer()->set('test.uid_generator', $uuidGenerator);
-
-        $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
-
-        $uuidGenerator
-            ->method('uuid4')
-            ->willReturn($messageIdentifier);
-
         $this->kernelBrowser->request(
             'POST',
             '/api/v1/lti1p3/outcome',
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
                 'HTTP_AUTHORIZATION' => $authorization
             ],
             $this->getValidReplaceResultRequestXml()
@@ -96,7 +88,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame(
-            $this->getValidReplaceResultResponseXml($messageIdentifier),
+            $this->getValidReplaceResultResponseXml(DummyBasicOutcomeMessageIdGenerator::TEST_MESSAGE_IDENTIFIER),
             $this->kernelBrowser->getResponse()->getContent()
         );
         $this->assertAssignmentStatus(Assignment::STATE_READY);
@@ -113,7 +105,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
                 'HTTP_AUTHORIZATION' => $authorization
             ],
             $this->getValidReplaceResultRequestXml()
@@ -134,7 +126,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
             ],
             $this->getValidReplaceResultRequestXml()
         );
@@ -156,7 +148,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
                 'HTTP_AUTHORIZATION' => 'Bearer invalid'
             ],
             $this->getValidReplaceResultRequestXml()
@@ -168,7 +160,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         self::assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
     }
 
-    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
+    public function testItReturns500IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
         $accessToken = $this->createTestClientAccessToken(
             $this->registration,
@@ -182,17 +174,17 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
                 'HTTP_AUTHORIZATION' => $authorization
             ],
             'invalidXml'
         );
 
-        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 
-    public function testItReturns404IfTheAuthenticationWorksButTheAssignmentDoesNotExist(): void
+    public function testItReturnsSuccessfulResponseIfAssignmentDoesNotExist(): void
     {
         $accessToken = $this->createTestClientAccessToken(
             $this->registration,
@@ -206,13 +198,13 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             [],
             [],
             [
-                'CONTENT_TYPE' => 'text/xml',
+                'CONTENT_TYPE' => BasicOutcomeServiceInterface::CONTENT_TYPE_BASIC_OUTCOME,
                 'HTTP_AUTHORIZATION' => $authorization
             ],
             $this->getValidReplaceResultRequestXmlWithWrongAssignment()
         );
 
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 }
