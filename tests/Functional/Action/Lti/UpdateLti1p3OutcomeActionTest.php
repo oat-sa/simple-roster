@@ -160,7 +160,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         self::assertStringContainsString('The JWT string must have two dots', (string)$response->getContent());
     }
 
-    public function testItReturns500IfTheAuthenticationWorksButTheXmlIsInvalid(): void
+    public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void
     {
         $accessToken = $this->createTestClientAccessToken(
             $this->registration,
@@ -180,7 +180,7 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
             'invalidXml'
         );
 
-        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->kernelBrowser->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
         $this->assertAssignmentStatus(Assignment::STATE_READY);
     }
 

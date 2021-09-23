@@ -55,7 +55,7 @@ class Lti1p3BasicOutcomeProcessorTest extends TestCase
     public function testItDoesNotProcessBasicOutcomeReadResult(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Not supported basic outcome result type');
+        $this->expectExceptionMessage('Basic outcome read result operation is not supported');
 
         $this->subject->processReadResult($this->createMock(RegistrationInterface::class), 'sourcedId');
     }
@@ -63,7 +63,7 @@ class Lti1p3BasicOutcomeProcessorTest extends TestCase
     public function testItDoesNotProcessBasicOutcomeDeleteResult(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Not supported basic outcome result type');
+        $this->expectExceptionMessage('Basic outcome delete result operation is not supported');
 
         $this->subject->processDeleteResult($this->createMock(RegistrationInterface::class), 'sourcedId');
     }

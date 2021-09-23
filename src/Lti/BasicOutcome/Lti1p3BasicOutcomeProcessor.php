@@ -52,7 +52,7 @@ class Lti1p3BasicOutcomeProcessor implements BasicOutcomeServiceServerProcessorI
         RegistrationInterface $registration,
         string $sourcedId
     ): BasicOutcomeServiceServerProcessorResult {
-        throw new LogicException('Not supported basic outcome result type');
+        throw new LogicException('Basic outcome read result operation is not supported');
     }
 
     /**
@@ -91,6 +91,6 @@ class Lti1p3BasicOutcomeProcessor implements BasicOutcomeServiceServerProcessorI
         RegistrationInterface $registration,
         string $sourcedId
     ): BasicOutcomeServiceServerProcessorResult {
-        throw new LogicException('Not supported basic outcome result type');
+        throw new LogicException('Basic outcome delete result operation is not supported');
     }
 }
