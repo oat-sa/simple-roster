@@ -33,14 +33,15 @@ security:
                     - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator
             stateless: true
 
-        lti1p3:
-            pattern: '^%app.route_prefix%/v1/lti1p3/outcome'
+        platform_service_basic_outcome_area:
+            pattern: '%app.route_prefix%/v1/lti1p3/outcome'
             stateless: true
             provider: app_user_provider
-            lti1p3_service:
-                scopes:
-                    - 'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
-
+            lti1p3_service: {
+                scopes: [
+                        'https://purl.imsglobal.org/spec/lti-bo/scope/basicoutcome'
+                ]
+            }
         webhooks:
             pattern: '^%app.route_prefix%/v1/web-hooks'
             stateless: true
@@ -49,7 +50,7 @@ security:
                 realm: 'Secured Webhooks'
 
         api:
-            pattern:  '^%app.route_prefix%/v1'
+            pattern: '^%app.route_prefix%/v1'
             stateless: true
             anonymous: true
             provider: app_user_provider
