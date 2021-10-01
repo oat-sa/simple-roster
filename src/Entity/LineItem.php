@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Entity;
 
+use Carbon\Carbon;
 use DateTimeInterface;
 use JsonSerializable;
 
@@ -35,6 +36,7 @@ class LineItem implements JsonSerializable, EntityInterface
     private ?DateTimeInterface $endAt = null;
     private int $maxAttempts = 0;
     private bool $isActive = true;
+    private ?DateTimeInterface $updatedAt;
 
     public function getId(): ?int
     {
@@ -139,6 +141,18 @@ class LineItem implements JsonSerializable, EntityInterface
         return $this;
     }
 
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function refreshUpdatedAt(): self
+    {
+        $this->updatedAt = Carbon::now()->toDateTime();
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -149,6 +163,7 @@ class LineItem implements JsonSerializable, EntityInterface
             'startDateTime' => $this->getStartAt() !== null ? $this->getStartAt()->getTimestamp() : '',
             'endDateTime' => $this->getEndAt() !== null ? $this->getEndAt()->getTimestamp() : '',
             'maxAttempts' => $this->getMaxAttempts(),
+            'updatedAt' => $this->getUpdatedAt() !== null ? $this->getUpdatedAt()->getTimestamp() : '',
         ];
     }
 }

@@ -48,7 +48,6 @@ class ListUserAssignmentsActionTest extends WebTestCase
         $this->kernelBrowser = self::createClient();
 
         $this->setUpDatabase();
-        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
     }
 
     public function testWithNonAuthenticatedUser(): void
@@ -74,6 +73,8 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::createFromDate(2019, 1, 1));
 
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
@@ -109,6 +110,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
                         'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                         'maxAttempts' => $lineItem->getMaxAttempts(),
+                        'updatedAt' => Carbon::getTestNow()->timestamp,
                     ],
                 ],
             ],
@@ -119,6 +121,8 @@ class ListUserAssignmentsActionTest extends WebTestCase
     {
         Carbon::setTestNow(Carbon::createFromDate(2022, 1, 1));
 
+        $this->loadFixtureByFilename('userWithReadyAssignment.yml');
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->getRepository(User::class);
         $user = $userRepository->findByUsernameWithAssignments('user1');
@@ -154,6 +158,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
                         'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
                         'maxAttempts' => $lineItem->getMaxAttempts(),
+                        'updatedAt' => Carbon::getTestNow()->timestamp,
                     ],
                 ],
             ],

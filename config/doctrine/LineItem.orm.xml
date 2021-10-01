@@ -40,6 +40,11 @@
                 <option name="default">0</option>
             </options>
         </field>
+        <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="refreshUpdatedAt"/>
+            <lifecycle-callback type="prePersist" method="refreshUpdatedAt"/>
+        </lifecycle-callbacks>
         <entity-listeners>
             <entity-listener class="OAT\SimpleRoster\EventListener\Doctrine\WarmUpLineItemCacheListener">
                 <lifecycle-callback type="postUpdate" method="postUpdate"/>
