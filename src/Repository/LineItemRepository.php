@@ -59,6 +59,16 @@ class LineItemRepository extends AbstractRepository
         return $collection;
     }
 
+    public function findAllSlugsAsArray(): Array
+    {
+        $lineItem = $this->createQueryBuilder('l')
+            ->select('l.slug')
+            ->getQuery()
+            ->enableResultCache($this->lineItemCacheTtl)
+            ->getArrayResult();
+        return $lineItem;
+    }
+
     /**
      * @throws EntityNotFoundException
      */
