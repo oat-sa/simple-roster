@@ -291,7 +291,6 @@ class CreateUserCommand extends Command
                 return !empty($value) && (int)$value > 0;
             }
         );
-        
         if (empty($lineItemIds)) {
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
@@ -311,7 +310,6 @@ class CreateUserCommand extends Command
                 }
             );
         }
-
         if (empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
                 sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_SLUGS)
