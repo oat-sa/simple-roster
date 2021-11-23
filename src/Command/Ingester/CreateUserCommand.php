@@ -173,9 +173,11 @@ class CreateUserCommand extends Command
             }
         }
 
-        if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS) && !empty($this->lineItemSlugs)) {
+        if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS) && empty($this->lineItemSlugs)) {
             $this->initializeLineItemSlugsOption($input->getOption(self::OPTION_LINE_ITEM_SLUGS));
-        } else {
+        } 
+        
+        if (empty($this->lineItemSlugs)) {
             $this->getAllLineItemSlugs();
         }
 
@@ -212,6 +214,7 @@ class CreateUserCommand extends Command
             $automateCsvPath = $_ENV['AUTOMATE_USER_LIST_PATH'].date("Y-m-d");
             $userCsvHead = ['username','password','groupId'];
             $assignmentCsvHead = ['username','lineItemSlug'];
+            $noOfUsersCreated = 0;
 
             $userAggregratedCsvDt = $assgAggregratedCsvDt = [];
             $userDtoCollection = new UserDtoCollection();
@@ -241,6 +244,7 @@ class CreateUserCommand extends Command
                         
                         $userDtoCollection->add($this->createUserDto($username, $userPassword, $userGroupId));
                         $assignmentDtoCollection->add($this->createAssignmentDto($lineItems, $lineSlugs, $username));
+                        $noOfUsersCreated++;
                     }
                     $this->writeCsvData($path = $csvPath."/".$csv_filename, $userCsvHead, $csvDt);
                     $this->writeCsvData($path = $csvPath."/"."Assignments-".$lineSlugs."-".$prefix.".csv", $assignmentCsvHead, $assignmentCsvDt);
@@ -266,7 +270,7 @@ class CreateUserCommand extends Command
             
             $this->symfonyStyle->success(
                 sprintf(
-                    'Users have been successfully added.'
+                    "'%s' Users have been successfully added.", $noOfUsersCreated
                 )
             );
 
