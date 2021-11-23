@@ -46,6 +46,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Helper\ProgressBar;
 use OAT\SimpleRoster\Command\CommandProgressBarFormatterTrait;
+use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use League\Csv\Writer;
 use Throwable;
 
@@ -147,19 +148,7 @@ class CreateUserCommand extends Command
         $this->symfonyStyle = new SymfonyStyle($input, $output);
         $this->symfonyStyle->title('Simple Roster - Automate the user-generation');
 
-        $this->progressBar = $this->createFormattedProgressBar($output);
-
-        // if ($input->getOption(self::OPTION_LINE_ITEM_IDS)) {
-        //     $this->initializeLineItemIdsOption($input);
-        // }
-
-        if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS)) {
-            $this->initializeLineItemSlugsOption($input->getOption(self::OPTION_LINE_ITEM_SLUGS));
-        } else {
-            $this->getAllLineItemSlugs();
-        }
-
-        if (!empty($this->lineItemIds) && !empty($this->lineItemSlugs)) {
+        if (!empty($input->getOption(self::OPTION_LINE_ITEM_IDS)) && !empty($input->getOption(self::OPTION_LINE_ITEM_SLUGS))) {
             throw new InvalidArgumentException(
                 sprintf(
                     "Option '%s' and '%s' are exclusive options.",
@@ -169,12 +158,33 @@ class CreateUserCommand extends Command
             );
         }
 
+        if ($input->getOption(self::OPTION_LINE_ITEM_IDS)) {
+            $this->initializeLineItemIdsOption($input);
+            $criteria = $this->getFindLineItemCriteria();
+            $lineItemsCollection = $this->lineItemRepository->findLineItemsByCriteria($criteria);
+            if(!empty($lineItemsCollection)) {
+                $slugArr = [];
+                foreach($lineItemsCollection as $lineVal){
+                    array_push($slugArr, $lineVal->getSlug());
+                }
+                if(!empty($slugArr)) {
+                    $this->lineItemSlugs = $slugArr;
+                }
+            }
+        }
+
+        if ($input->getOption(self::OPTION_LINE_ITEM_SLUGS) && !empty($this->lineItemSlugs)) {
+            $this->initializeLineItemSlugsOption($input->getOption(self::OPTION_LINE_ITEM_SLUGS));
+        } else {
+            $this->getAllLineItemSlugs();
+        }
+
         if ($input->getArguments('user-prefix')) {
             $this->initializeUserPrefixOption($input);
         }
         
         $this->batchSize = (int)$input->getOption('batch') ?? self::DEFAULT_BATCH_SIZE;
-        $this->progressBar->setMaxSteps($this->batchSize);
+        
     }
 
     /**
@@ -185,8 +195,7 @@ class CreateUserCommand extends Command
         $this->symfonyStyle->comment('Executing Automation...');
 
         try {
-            $this->progressBar->start();
-
+            
             $lineItems = $this->lineItemRepository->findAllAsCollection();
             if ($lineItems->isEmpty()) {
                 throw new LineItemNotFoundException("No line items were found in database.");
@@ -203,17 +212,18 @@ class CreateUserCommand extends Command
             $automateCsvPath = $_ENV['AUTOMATE_USER_LIST_PATH'].date("Y-m-d");
             $userCsvHead = ['username','password','groupId'];
             $assignmentCsvHead = ['username','lineItemSlug'];
+
             $userAggregratedCsvDt = $assgAggregratedCsvDt = [];
             $userDtoCollection = new UserDtoCollection();
             $assignmentDtoCollection = new AssignmentDtoCollection();
 
-            if (!file_exists($automateCsvPath)) {
+            if (!$this->filesystem->exists($automateCsvPath)) {
                 $this->filesystem->mkdir($automateCsvPath);
             }
             
             foreach ($this->userPrefix as $prefix) {
                 $csvPath = $automateCsvPath. "/" . $prefix;
-                if (!file_exists($csvPath)) {
+                if (!$this->filesystem->exists($csvPath)) {
                     $this->filesystem->mkdir($csvPath);
                 }
                 foreach ($this->lineItemSlugs as $lineSlugs) {
@@ -253,7 +263,7 @@ class CreateUserCommand extends Command
             if (!$assignmentDtoCollection->isEmpty()) {
                 $this->assignmentIngester->ingest($assignmentDtoCollection);
             }
-            $this->progressBar->finish();
+            
             $this->symfonyStyle->success(
                 sprintf(
                     'Users have been successfully added.'
@@ -287,9 +297,6 @@ class CreateUserCommand extends Command
         $this->lineItemIds = array_map('intval', $lineItemIds);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     private function initializeLineItemSlugsOption(string $lineItemSlugs): void
     {
         if (!empty($lineItemSlugs)) {
@@ -308,9 +315,6 @@ class CreateUserCommand extends Command
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     private function initializeUserPrefixOption(InputInterface $input): void
     {
         $this->userPrefix = array_filter(
@@ -334,7 +338,7 @@ class CreateUserCommand extends Command
 
     /**
      *
-     * @throws InvalidArgumentException
+     * Function to create user data
      */
     private function createUserDto(string $username, string $userPassword, string $userGroupId): UserDto
     {
@@ -346,7 +350,7 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @throws LineItemNotFoundException
+     * Function to create user assignment data
      */
     private function createAssignmentDto(
         LineItemCollection $lineItems,
@@ -354,8 +358,17 @@ class CreateUserCommand extends Command
         string $username
     ): AssignmentDto {
         $lineItem = $lineItems->getBySlug($lineItemSlug);
-
         return new AssignmentDto(Assignment::STATE_READY, (int)$lineItem->getId(), $username);
+    }
+
+    private function getFindLineItemCriteria(): FindLineItemCriteria
+    {
+        $criteria = new FindLineItemCriteria();
+
+        if (!empty($this->lineItemIds)) {
+            $criteria->addLineItemIds(...$this->lineItemIds);
+        }
+        return $criteria;
     }
 
     /**
@@ -370,7 +383,8 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @throws LineItemNotFoundException
+     * Function to check whether a user exist for a Line Item Slug and returns last increment no of it
+     * 
      */
     private function checkLineItemSlugUserExist(
         LineItemCollection $lineItems,
@@ -378,36 +392,46 @@ class CreateUserCommand extends Command
     ): Array {
         $userNameIncArr = [];
         foreach ($lineItemSlugs as $slug) {
-            $lineItem = $lineItems->getBySlug($slug);
-            $lineItemId = (int)$lineItem->getId();
-            $assignment = $this->assignmentRepository->findByLineItemId($lineItemId);
-            if (!empty($assignment)) {
-                $userInfo = $assignment->getUser()->getUsername();
-                $userNameArr = explode('_', $userInfo);
-                $userNameLastNo = preg_match("/^\d+$/", end($userNameArr)) ? (int)end($userNameArr) : self::DEFAULT_USERNAME_INCREMENT_NO;
-                $userNameIncArr[$slug] = $userNameLastNo;
+            $lineItem = $lineItems->checkSlugExistOrNot($slug);
+            if(!empty($lineItem)) {
+                $lineItemId = (int)$lineItem->getId();
+                $assignment = $this->assignmentRepository->findByLineItemId($lineItemId);
+                if (!empty($assignment)) {
+                    $userInfo = $assignment->getUser()->getUsername();
+                    $userNameArr = explode('_', $userInfo);
+                    $userNameLastNo = preg_match("/^\d+$/", end($userNameArr)) ? (int)end($userNameArr) : self::DEFAULT_USERNAME_INCREMENT_NO;
+                    $userNameIncArr[$slug] = $userNameLastNo;
+                } else {
+                    $userNameIncArr[$slug] = self::DEFAULT_USERNAME_INCREMENT_NO;
+                }
             } else {
-                $userNameIncArr[$slug] = self::DEFAULT_USERNAME_INCREMENT_NO;
+                $this->symfonyStyle->note($slug. " LineItem Slug not exist in the system");
+                $this->lineItemSlugs = array_diff( $this->lineItemSlugs, [$slug] );
             }
         }
         return $userNameIncArr;
     }
 
+    /**
+     * Function to create new groupIds based on LTI Instance count 
+     */
     public function getLoadBalanceGroupID(string $groupPrefix): Array
     {
-        $lineInstances = $this->ltiInstanceRepository->findAllAsCollection();
-        $totalInstance = count($lineInstances);
+        $totalInstance = $this->ltiInstanceRepository->findAllAsCollection()->count();
         $targetId = 1;
         $groupIds = [];
         while ($targetId <= $totalInstance) {
             $random = substr(md5(random_bytes(10)), 0, 10);
-            $groupId = sprintf($groupPrefix.'%d_%s', $targetId, $random);
+            $groupId = sprintf($groupPrefix.'_%s', $random);
             array_push($groupIds, $groupId);
             $targetId++;
         }
         return $groupIds;
     }
 
+    /**
+     * Function to create a new csv and save data to it
+     */
     private function writeCsvData(string $path, array $head, array $data): Void
     {
         $csv = Writer::createFromPath($path, "w");
@@ -415,6 +439,9 @@ class CreateUserCommand extends Command
         $csv->insertAll($data);
     }
 
+    /**
+     * Function to create groupId for each new created user
+     */
     private function createUserGroupId(array $userGroupIds, int $userGroupAssignCount): String
     {
         if ($userGroupAssignCount != 0){
