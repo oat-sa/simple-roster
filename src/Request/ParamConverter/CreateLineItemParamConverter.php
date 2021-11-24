@@ -15,15 +15,18 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
+use Carbon\Carbon;
 use DateTime;
+use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Request\Validator\CreateLineItemValidator;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
@@ -31,18 +34,21 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CreateLineItemParamConverter implements ParamConverterInterface
 {
-
-
+    private CreateLineItemValidator $createLineItemValidator;
     private LoggerInterface $requestLogger;
 
-    public function __construct(LoggerInterface $requestLogger)
-    {
+    public function __construct(
+        CreateLineItemValidator $createLineItemValidator,
+        LoggerInterface $requestLogger
+    ) {
+        $this->createLineItemValidator = $createLineItemValidator;
         $this->requestLogger = $requestLogger;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        //Add Request Validator
+        $this->createLineItemValidator->validate($request);
+
         $responseBody = json_decode($request->getContent(), true);
 
         $this->requestLogger->info('UpdateLineItems payload.', $responseBody);
@@ -52,7 +58,6 @@ class CreateLineItemParamConverter implements ParamConverterInterface
         return true;
     }
 
-    //TODO Move to separate component
     private function createLineItem(array $rawLineItem): LineItem
     {
         $lineItem =
@@ -63,13 +68,20 @@ class CreateLineItemParamConverter implements ParamConverterInterface
                 ->setIsActive($rawLineItem['isActive'])
                 ->setMaxAttempts((int)$rawLineItem['maxAttempts']);
 
-        if (isset($rawLineItem['startTimestamp']) && $rawLineItem['endTimestamp']) {
+        if (isset($rawLineItem['startDateTime']) && $rawLineItem['endDateTime']) {
             $lineItem
-                ->setStartAt((new DateTime())->setTimestamp((int)$rawLineItem['startTimestamp']))
-                ->setEndAt((new DateTime())->setTimestamp((int)$rawLineItem['endTimestamp']));
+                ->setStartAt($this->formatDate($rawLineItem['startDateTime']))
+                ->setEndAt($this->formatDate($rawLineItem['endDateTime']));
         }
 
         return $lineItem;
+    }
+
+    private function formatDate(string $dateTime): DateTimeInterface
+    {
+        return Carbon::createFromFormat(Carbon::ATOM, $dateTime)
+            ->setTimezone('UTC')
+            ->toDateTime();
     }
 
     public function supports(ParamConverter $configuration): bool
