@@ -118,7 +118,7 @@ class BulkUserCreationService
         $userGroupIds = [];
         if ($groupPrefix) {
             $userGroupIds = $this->getLoadBalanceGroupID($groupPrefix);
-            $userGroupAssignCount = (int)ceil(
+            $userGroupAssignCount = ceil(
                 count($userPrefix) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
             );
         }
@@ -288,7 +288,7 @@ class BulkUserCreationService
         return $groupIds;
     }
 
-    private function createUserGroupId(array $userGroupIds, int $userGroupAssignCount): string
+    private function createUserGroupId(array $userGroupIds, float $userGroupAssignCount): string
     {
         $userGroupId = '';
         if ($userGroupAssignCount !== 0) {
