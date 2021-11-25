@@ -97,15 +97,15 @@ class BulkUserCreationService
             $criteria = $this->getFindLineItemCriteria();
             $lineItemsArray = ($this->lineItemRepository->findLineItemsByCriteria($criteria))->jsonSerialize();
             if (empty($lineItemsArray)) {
-                return ['message' => $this->lineItemIds ?
-                    implode(',', $this->lineItemIds) . ' LineItem Ids not exist in the system' :
-                    implode(',', $this->lineItemSlugs) . ' LineItem Slugs not exist in the system',
+                return ['message' => $this->lineItemIds
+                    ? implode(',', $this->lineItemIds) . ' LineItem Ids not exist in the system'
+                    : implode(',', $this->lineItemSlugs) . ' LineItem Slugs not exist in the system',
                     'status' => 2];
             }
             $lineItemSlugArray = $this->generateSlugData($lineItemsArray);
-            $notExistLineItemsArray = $this->lineItemIds ?
-                array_diff($lineItemIds, array_keys($lineItemSlugArray)) :
-                array_diff($lineItemSlugs, array_values($lineItemSlugArray));
+            $notExistLineItemsArray = $this->lineItemIds
+                ? array_diff($lineItemIds, array_keys($lineItemSlugArray))
+                : array_diff($lineItemSlugs, array_values($lineItemSlugArray));
         }
 
         if (empty($lineItemIds) && empty($lineItemSlugs)) {
@@ -146,9 +146,9 @@ class BulkUserCreationService
                 foreach (range(1, $batchSize) as $inc) {
                     $username = sprintf('%s_%s_%d', $lineSlugs, $prefix, ((int)$userIncrNo[$lineSlugs] + $inc));
                     $userPassword = $this->createUserPassword();
-                    $userGroupId = $groupPrefix ?
-                        $this->createUserGroupId($userGroupIds, $userGroupAssignCount) :
-                        '';
+                    $userGroupId = $groupPrefix
+                        ? $this->createUserGroupId($userGroupIds, $userGroupAssignCount)
+                        : '';
                     $csvDt[] = [$username, $userPassword,$userGroupId];
                     $assignmentCsvDt[] = [$username, $lineSlugs];
                     $userDtoCollection->add($this->createUserDto($username, $userPassword, $userGroupId));
@@ -265,9 +265,9 @@ class BulkUserCreationService
             if (!empty($assignment)) {
                 $userInfo = $assignment->getUser()->getUsername();
                 $userNameArr = explode('_', (string)$userInfo);
-                $userNameLastNo = preg_match('/^\d+$/', end($userNameArr)) ?
-                    (int)end($userNameArr) :
-                    self::DEFAULT_USERNAME_INCREMENT_VALUE;
+                $userNameLastNo = preg_match('/^\d+$/', end($userNameArr))
+                    ? (int)end($userNameArr)
+                    : self::DEFAULT_USERNAME_INCREMENT_VALUE;
                 $userNameIncArr[$slug] = $userNameLastNo;
             }
         }
