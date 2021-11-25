@@ -64,7 +64,7 @@ class AssignmentRepository extends AbstractRepository
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      */
-    public function findByLineItemId(int $lineItemId):?Assignment
+    public function findByLineItemId(int $lineItemId): ?Assignment
     {
         $assignment = $this
             ->createQueryBuilder('a')

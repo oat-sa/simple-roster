@@ -59,10 +59,10 @@ class LineItemRepository extends AbstractRepository
         return $collection;
     }
 
-    public function findAllSlugsAsArray(): Array
+    public function findAllSlugsAsArray(): array
     {
         $lineItem = $this->createQueryBuilder('l')
-            ->select('l.slug')
+            ->select('l.id,l.slug')
             ->getQuery()
             ->enableResultCache($this->lineItemCacheTtl)
             ->getArrayResult();
