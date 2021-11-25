@@ -166,7 +166,7 @@ class CreateUserCommand extends Command
                     sprintf(
                         '%s %s',
                         implode(',', $processDataResult['notExistLineItemsArray']),
-                        "Line Items not exist in the system"
+                        'Line Items not exist in the system'
                     )
                 );
             }
@@ -227,7 +227,7 @@ class CreateUserCommand extends Command
 
         if (empty($this->userPrefix)) {
             throw new InvalidArgumentException(
-                sprintf("User Prefix is a required argument")
+                sprintf('User Prefix is a required argument')
             );
         }
     }
@@ -239,7 +239,7 @@ class CreateUserCommand extends Command
         }
         if (empty($this->batchSize)) {
             throw new InvalidArgumentException(
-                sprintf("Batch Size should be a valid number")
+                sprintf('Batch Size should be a valid number')
             );
         }
     }

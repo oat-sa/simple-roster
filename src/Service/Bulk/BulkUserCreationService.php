@@ -123,7 +123,7 @@ class BulkUserCreationService
             );
         }
 
-        $automateCsvPath = $_ENV['AUTOMATE_USER_LIST_PATH'] . date("Y-m-d");
+        $automateCsvPath = $_ENV['AUTOMATE_USER_LIST_PATH'] . date('Y-m-d');
         $userCsvHead = ['username','password','groupId'];
         $assignmentCsvHead = ['username','lineItemSlug'];
         $noOfUsersCreated = 0;
@@ -203,7 +203,7 @@ class BulkUserCreationService
 
     private function createUserPassword(): string
     {
-        return substr(str_shuffle("0123456789abcdefghijklmnopqrstvwxyz"), 0, 8);
+        return substr(str_shuffle('0123456789abcdefghijklmnopqrstvwxyz'), 0, 8);
     }
 
     private function createUserDto(string $username, string $userPassword, string $userGroupId): UserDto
@@ -265,7 +265,7 @@ class BulkUserCreationService
             if (!empty($assignment)) {
                 $userInfo = $assignment->getUser()->getUsername();
                 $userNameArr = explode('_', (string)$userInfo);
-                $userNameLastNo = preg_match("/^\d+$/", end($userNameArr)) ?
+                $userNameLastNo = preg_match('/^\d+$/', end($userNameArr)) ?
                     (int)end($userNameArr) :
                     self::DEFAULT_USERNAME_INCREMENT_VALUE;
                 $userNameIncArr[$slug] = $userNameLastNo;
