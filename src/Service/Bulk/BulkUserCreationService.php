@@ -50,6 +50,7 @@ class BulkUserCreationService
     /** @var int */
     private int $userGroupBatchCount = 0;
     private int $groupIndex = 0;
+    private string $automateUserListPath;
 
     /** @var array */
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
@@ -71,7 +72,8 @@ class BulkUserCreationService
         NativeUserRepository $userRepository,
         AssignmentIngester $assignmentIngester,
         Filesystem $filesystem,
-        CsvWriterBuilder $csvWriterBuilder
+        CsvWriterBuilder $csvWriterBuilder,
+        string $automateUserListPath
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -81,8 +83,12 @@ class BulkUserCreationService
         $this->assignmentIngester = $assignmentIngester;
         $this->filesystem = $filesystem;
         $this->csvWriterBuilder = $csvWriterBuilder;
+        $this->automateUserListPath = $automateUserListPath;
     }
 
+    /**
+     * @throws LineItemNotFoundException
+     */
     public function processData(
         array $lineItemIds,
         array $lineItemSlugs,
@@ -90,18 +96,21 @@ class BulkUserCreationService
         int $batchSize,
         string $groupPrefix
     ): array {
-        $notExistLineItemsArray = [];
+
+        $notExistLineItemsArray = $userGroupIds = [];
+
         if (!empty($lineItemIds) || !empty($lineItemSlugs)) {
             $this->lineItemIds = $lineItemIds;
             $this->lineItemSlugs = $lineItemSlugs;
             $criteria = $this->getFindLineItemCriteria();
             $lineItemsArray = ($this->lineItemRepository->findLineItemsByCriteria($criteria))->jsonSerialize();
             if (empty($lineItemsArray)) {
-                return ['message' => $this->lineItemIds
+                $exceptionMessage = $this->lineItemIds
                     ? implode(',', $this->lineItemIds) . ' LineItem Ids not exist in the system'
-                    : implode(',', $this->lineItemSlugs) . ' LineItem Slugs not exist in the system',
-                    'status' => 2];
+                    : implode(',', $this->lineItemSlugs) . ' LineItem Slugs not exist in the system';
+                throw new LineItemNotFoundException($exceptionMessage);
             }
+
             $lineItemSlugArray = $this->generateSlugData($lineItemsArray);
             $notExistLineItemsArray = $this->lineItemIds
                 ? array_diff($lineItemIds, array_keys($lineItemSlugArray))
@@ -115,7 +124,6 @@ class BulkUserCreationService
         $userIncrNo = $this->getLastUserAssignedToLineItems($this->lineItemSlugs);
 
         $userGroupAssignCount = 0;
-        $userGroupIds = [];
         if ($groupPrefix) {
             $userGroupIds = $this->getLoadBalanceGroupID($groupPrefix);
             $userGroupAssignCount = (int) ceil(
@@ -123,10 +131,45 @@ class BulkUserCreationService
             );
         }
 
-        $automateCsvPath = $_ENV['AUTOMATE_USER_LIST_PATH'] . date('Y-m-d');
+        $totalUsersCreated = $this->createBulkUserAssignmentData(
+            $userIncrNo,
+            $userGroupIds,
+            $userPrefix,
+            $userGroupAssignCount,
+            $groupPrefix,
+            $batchSize
+        );
+
+        return [
+            'message' => $totalUsersCreated . ' Users have been successfully added',
+            'notExistLineItemsArray' => $notExistLineItemsArray,
+            'status' => 1
+        ];
+    }
+
+    private function generateSlugData(array $lineData): array
+    {
+        $lineItemArray = [];
+        foreach ($lineData as $lineItem) {
+            $lineItemArray[$lineItem->getId()] = $lineItem->getSlug();
+        }
+        $this->lineItemSlugs = $lineItemArray;
+
+        return $lineItemArray;
+    }
+
+    private function createBulkUserAssignmentData(
+        array $userIncrNo,
+        array $userGroupIds,
+        array $userPrefix,
+        int $userGroupAssignCount,
+        string $groupPrefix,
+        int $batchSize
+    ): int {
+        $noOfUsersCreated = 0;
+        $automateCsvPath = $this->automateUserListPath . date('Y-m-d');
         $userCsvHead = ['username','password','groupId'];
         $assignmentCsvHead = ['username','lineItemSlug'];
-        $noOfUsersCreated = 0;
 
         $userDtoCollection = new UserDtoCollection();
         $assignmentDtoCollection = new AssignmentDtoCollection();
@@ -140,6 +183,7 @@ class BulkUserCreationService
             if (!$this->filesystem->exists($csvPath)) {
                 $this->filesystem->mkdir($csvPath);
             }
+
             foreach ($this->lineItemSlugs as $lineKey => $lineSlugs) {
                 $csvFilename = sprintf('%s-%s.csv', $lineSlugs, $prefix);
                 $csvDt = $assignmentCsvDt = [];
@@ -173,32 +217,13 @@ class BulkUserCreationService
                 );
             }
         }
-        if (!$userDtoCollection->isEmpty()) {
+
+        if (!$userDtoCollection->isEmpty() && !$assignmentDtoCollection->isEmpty()) {
             $this->userRepository->insertMultiple($userDtoCollection);
-        }
-        if (!$assignmentDtoCollection->isEmpty()) {
             $this->assignmentIngester->ingest($assignmentDtoCollection);
         }
-        if ($noOfUsersCreated === 0) {
-            return ['message' => 'An unexpected error occurred', 'status' => 0];
-        }
-        return [
-            'message' => $noOfUsersCreated . ' Users have been successfully added',
-            'notExistLineItemsArray' => $notExistLineItemsArray,
-            'status' => 1
-        ];
-    }
 
-    private function generateSlugData(array $lineData): array
-    {
-        $lineItemArray = [];
-        $lineData = json_decode(json_encode($lineData), true);
-        foreach ($lineData as $lineItem) {
-            $lineItemArray[$lineItem['id']] = $lineItem['slug'];
-        }
-        $this->lineItemSlugs = $lineItemArray;
-
-        return $lineItemArray;
+        return $noOfUsersCreated;
     }
 
     private function createUserPassword(): string
@@ -244,15 +269,11 @@ class BulkUserCreationService
      */
     private function getAllLineItemSlugs(): void
     {
-        $lineItems = $this->lineItemRepository->findAllSlugsAsArray();
+        $lineItems = $this->lineItemRepository->findAllAsCollection()->jsonSerialize();
         if (empty($lineItems)) {
             throw new LineItemNotFoundException('No line items were found in database.');
         }
-        $lineItemArray = [];
-        foreach ($lineItems as $litem) {
-            $lineItemArray[$litem['id']] = $litem['slug'];
-        }
-        $this->lineItemSlugs = $lineItemArray;
+        $this->generateSlugData($lineItems);
     }
 
     private function getLastUserAssignedToLineItems(
@@ -295,11 +316,11 @@ class BulkUserCreationService
             if ($this->userGroupBatchCount < $userGroupAssignCount) {
                 $userGroupId = $userGroupIds[$this->groupIndex];
                 $this->userGroupBatchCount++;
-            } else {
-                $this->userGroupBatchCount = 1;
-                $this->groupIndex++;
-                $userGroupId = $userGroupIds[$this->groupIndex];
+                return $userGroupId;
             }
+            $this->userGroupBatchCount = 1;
+            $this->groupIndex++;
+            $userGroupId = $userGroupIds[$this->groupIndex];
         }
         return $userGroupId;
     }

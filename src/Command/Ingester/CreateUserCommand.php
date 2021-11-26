@@ -125,7 +125,7 @@ class CreateUserCommand extends Command
         ) {
             throw new InvalidArgumentException(
                 sprintf(
-                    "Option '%s' and '%s' are exclusive options.",
+                    'Option %s and %s are exclusive options.',
                     self::OPTION_LINE_ITEM_IDS,
                     self::OPTION_LINE_ITEM_SLUGS
                 )
@@ -154,13 +154,6 @@ class CreateUserCommand extends Command
                 $this->batchSize,
                 $input->getOption(self::OPTION_GROUP_PREFIX)
             );
-            $responseType = 'success';
-            if ($processDataResult['status'] === 0) {
-                $responseType = 'error';
-            }
-            if ($processDataResult['status'] === 2) {
-                $responseType = 'note';
-            }
             if ($processDataResult['status'] === 1 && !empty($processDataResult['notExistLineItemsArray'])) {
                 $this->symfonyStyle->note(
                     sprintf(
@@ -170,7 +163,7 @@ class CreateUserCommand extends Command
                     )
                 );
             }
-            $this->symfonyStyle->$responseType(
+            $this->symfonyStyle->success(
                 sprintf('%s', $processDataResult['message'])
             );
         } catch (Throwable $exception) {
@@ -192,7 +185,7 @@ class CreateUserCommand extends Command
         );
         if (empty($lineItemIds)) {
             throw new InvalidArgumentException(
-                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_IDS)
+                sprintf('Invalid %s option received.', self::OPTION_LINE_ITEM_IDS)
             );
         }
 
@@ -211,7 +204,7 @@ class CreateUserCommand extends Command
         }
         if (empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
-                sprintf("Invalid '%s' option received.", self::OPTION_LINE_ITEM_SLUGS)
+                sprintf('Invalid %s option received.', self::OPTION_LINE_ITEM_SLUGS)
             );
         }
     }

@@ -28,6 +28,7 @@ parameters:
     app.jwt.refresh_token_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
+    app.automate_user_list_path: '%env(resolve:AUTOMATE_USER_LIST_PATH)%'
 
 services:
     # default configuration for services in *this* file
@@ -54,6 +55,7 @@ services:
             $jwtAccessTokenTtl: '%app.jwt.access_token_ttl%'
             $jwtRefreshTokenTtl: '%app.jwt.refresh_token_ttl%'
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
+            $automateUserListPath: '%app.automate_user_list_path%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
