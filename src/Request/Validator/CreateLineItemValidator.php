@@ -78,7 +78,7 @@ class CreateLineItemValidator
                 'fields' => [
                     'slug' => new Assert\Type('string'),
                     'uri' => new Assert\Type('string'),
-                    'label' => new Assert\Optional([new Assert\Type('string')]),
+                    'label' => new Assert\Type('string'),
                     'isActive' => new Assert\Type('bool'),
                     'startAt' => new Assert\Optional([new Assert\DateTime(\DateTimeInterface::ATOM)]),
                     'endAt' => new Assert\Optional([new Assert\DateTime(\DateTimeInterface::ATOM)]),
