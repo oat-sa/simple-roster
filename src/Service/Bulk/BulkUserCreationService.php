@@ -34,10 +34,10 @@ use OAT\SimpleRoster\Repository\NativeUserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
-use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Symfony\Component\Filesystem\Filesystem;
+use OAT\SimpleRoster\Lti\Factory\GroupIdLoadBalancerFactory;;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
-use OAT\SimpleRoster\Csv\CsvWriterBuilder;
+use OAT\SimpleRoster\Csv\CsvWriter;
 
 class BulkUserCreationService
 {
@@ -50,46 +50,46 @@ class BulkUserCreationService
     /** @var int */
     private int $userGroupBatchCount = 0;
     private int $groupIndex = 0;
-    private string $automateUserListPath;
+    private string $generatedUsersFilePath;
 
     /** @var array */
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     private LineItemRepository $lineItemRepository;
     private AssignmentRepository $assignmentRepository;
-    private LtiInstanceRepository $ltiInstanceRepository;
     private UserPasswordHasherInterface $passwordHasher;
     private NativeUserRepository $userRepository;
     private AssignmentIngester $assignmentIngester;
     private Filesystem $filesystem;
-    private CsvWriterBuilder $csvWriterBuilder;
+    private GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory;
+    private CsvWriter $csvWriter;
 
     public function __construct(
         LineItemRepository $lineItemRepository,
         AssignmentRepository $assignmentRepository,
-        LtiInstanceRepository $ltiInstanceRepository,
         UserPasswordHasherInterface $passwordHasher,
         NativeUserRepository $userRepository,
         AssignmentIngester $assignmentIngester,
+        GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory,
         Filesystem $filesystem,
-        CsvWriterBuilder $csvWriterBuilder,
-        string $automateUserListPath
+        CsvWriter $csvWriter,
+        string $generatedUsersFilePath
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
-        $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
         $this->assignmentIngester = $assignmentIngester;
         $this->filesystem = $filesystem;
-        $this->csvWriterBuilder = $csvWriterBuilder;
-        $this->automateUserListPath = $automateUserListPath;
+        $this->groupIdLoadBalancerFactory = $groupIdLoadBalancerFactory;
+        $this->csvWriter = $csvWriter;
+        $this->generatedUsersFilePath = $generatedUsersFilePath;
     }
 
     /**
      * @throws LineItemNotFoundException
      */
-    public function processData(
+    public function createUsers(
         array $lineItemIds,
         array $lineItemSlugs,
         array $userPrefix,
@@ -125,7 +125,7 @@ class BulkUserCreationService
 
         $userGroupAssignCount = 0;
         if ($groupPrefix) {
-            $userGroupIds = $this->getLoadBalanceGroupID($groupPrefix);
+            $userGroupIds = $this->groupIdLoadBalancerFactory->getLoadBalanceGroupID($groupPrefix);
             $userGroupAssignCount = (int) ceil(
                 count($userPrefix) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
             );
@@ -167,7 +167,7 @@ class BulkUserCreationService
         int $batchSize
     ): int {
         $noOfUsersCreated = 0;
-        $automateCsvPath = $this->automateUserListPath . date('Y-m-d');
+        $automateCsvPath = $this->generatedUsersFilePath . date('Y-m-d');
         $userCsvHead = ['username','password','groupId'];
         $assignmentCsvHead = ['username','lineItemSlug'];
 
@@ -199,18 +199,18 @@ class BulkUserCreationService
                     $assignmentDtoCollection->add($this->createAssignmentDto($lineKey, $username));
                     $noOfUsersCreated++;
                 }
-                $this->csvWriterBuilder->writeCsv(sprintf('%s/%s', $csvPath, $csvFilename), $userCsvHead, $csvDt);
-                $this->csvWriterBuilder->writeCsv(
+                $this->csvWriter->writeCsv(sprintf('%s/%s', $csvPath, $csvFilename), $userCsvHead, $csvDt);
+                $this->csvWriter->writeCsv(
                     sprintf('%s/Assignments-%s-%s.csv', $csvPath, $lineSlugs, $prefix),
                     $assignmentCsvHead,
                     $assignmentCsvDt
                 );
-                $this->csvWriterBuilder->writeCsv(
+                $this->csvWriter->writeCsv(
                     sprintf('%s/users_aggregated.csv', $automateCsvPath),
                     $userCsvHead,
                     $csvDt
                 );
-                $this->csvWriterBuilder->writeCsv(
+                $this->csvWriter->writeCsv(
                     sprintf('%s/assignments_aggregated.csv', $automateCsvPath),
                     $assignmentCsvHead,
                     $assignmentCsvDt
@@ -294,19 +294,6 @@ class BulkUserCreationService
         }
 
         return $userNameIncArr;
-    }
-
-    private function getLoadBalanceGroupID(string $groupPrefix): array
-    {
-        $totalInstance = $this->ltiInstanceRepository->findAllAsCollection()->count();
-        $targetId = 1;
-        $groupIds = [];
-        while ($targetId <= $totalInstance) {
-            $random = substr(md5(random_bytes(10)), 0, 10);
-            $groupIds[] = sprintf($groupPrefix . '_%s', $random);
-            $targetId++;
-        }
-        return $groupIds;
     }
 
     private function createUserGroupId(array $userGroupIds, int $userGroupAssignCount): string

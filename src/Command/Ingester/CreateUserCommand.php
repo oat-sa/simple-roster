@@ -147,7 +147,7 @@ class CreateUserCommand extends Command
         $this->symfonyStyle->comment('Executing Automation...');
 
         try {
-            $processDataResult = $this->bulkUserCreationService->processData(
+            $processDataResult = $this->bulkUserCreationService->createUsers(
                 $this->lineItemIds,
                 $this->lineItemSlugs,
                 $this->userPrefix,

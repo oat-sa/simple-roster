@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Csv;
 use League\Csv\Writer;
 use Symfony\Component\Filesystem\Filesystem;
 
-class CsvWriterBuilder
+class CsvWriter
 {
     public const DEFAULT_CSV_CREATE_MODE = 'w';
 
@@ -41,9 +41,12 @@ class CsvWriterBuilder
         if (!$this->filesystem->exists($path)) {
             $csv = Writer::createFromPath($path, self::DEFAULT_CSV_CREATE_MODE);
             $csv->insertOne($head);
-        } else {
-            $csv = Writer::createFromPath($path, 'a+');
+            $csv->insertAll($data);
+
+            return;
         }
+
+        $csv = Writer::createFromPath($path, 'a+');
         $csv->insertAll($data);
     }
 }
