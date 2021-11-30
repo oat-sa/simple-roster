@@ -287,21 +287,21 @@ class BulkUserCreationService
     private function getLastUserAssignedToLineItems(
         array $lineItemSlugs
     ): array {
-        $userNameIncArr = [];
+        $userNameIncrementArray = [];
         foreach ($lineItemSlugs as $slugKey => $slug) {
             $assignment = $this->assignmentRepository->findByLineItemId($slugKey);
-            $userNameIncArr[$slug] = self::DEFAULT_USERNAME_INCREMENT_VALUE;
+            $userNameIncrementArray[$slug] = self::DEFAULT_USERNAME_INCREMENT_VALUE;
             if (!empty($assignment)) {
                 $userInfo = $assignment->getUser()->getUsername();
                 $userNameArray = explode('_', (string)$userInfo);
                 $userNameLastNo = preg_match('/^\d+$/', end($userNameArray))
                     ? (int)end($userNameArray)
                     : self::DEFAULT_USERNAME_INCREMENT_VALUE;
-                $userNameIncArr[$slug] = $userNameLastNo;
+                $userNameIncrementArray[$slug] = $userNameLastNo;
             }
         }
 
-        return $userNameIncArr;
+        return $userNameIncrementArray;
     }
 
     private function createUserGroupId(array $userGroupIds, int $userGroupAssignCount): string
