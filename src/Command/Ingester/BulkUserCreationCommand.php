@@ -33,14 +33,14 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use OAT\SimpleRoster\Service\Bulk\BulkUserCreationService;
 use Throwable;
 
-class CreateUserCommand extends Command
+class BulkUserCreationCommand extends Command
 {
     public const NAME = 'roster:create:user';
 
     protected ProgressBar $progressBar;
     private BulkUserCreationService $bulkUserCreationService;
 
-    private const DEFAULT_BATCH_SIZE = 10;
+    private const DEFAULT_BATCH_SIZE = 100;
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_GROUP_PREFIX = 'group-prefix';
@@ -99,7 +99,7 @@ class CreateUserCommand extends Command
 
         $this->addOption(
             self::OPTION_GROUP_PREFIX,
-            'p',
+            'g',
             InputOption::VALUE_REQUIRED,
             'Group Prefix',
         );
@@ -108,7 +108,7 @@ class CreateUserCommand extends Command
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->symfonyStyle = new SymfonyStyle($input, $output);
-        $this->symfonyStyle->title('Simple Roster - Automate the user-generation');
+        $this->symfonyStyle->title('Simple Roster - Bulk User Creation');
 
         $inputLineItemIds = $input->getOption(self::OPTION_LINE_ITEM_IDS) ?? '';
         $inputLineItemSlugs = $input->getOption(self::OPTION_LINE_ITEM_SLUGS) ?? '';
@@ -144,7 +144,7 @@ class CreateUserCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle->comment('Executing Automation...');
+        $this->symfonyStyle->comment('Executing Bulk user creation');
 
         try {
             $processDataResult = $this->bulkUserCreationService->createUsers(

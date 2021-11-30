@@ -25,13 +25,12 @@ namespace OAT\SimpleRoster\Lti\Factory;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 
 class GroupIdLoadBalancerFactory
-{ 
+{
     private LtiInstanceRepository $ltiInstanceRepository;
 
     public function __construct(
         LtiInstanceRepository $ltiInstanceRepository
     ) {
-        
         $this->ltiInstanceRepository = $ltiInstanceRepository;
     }
 
