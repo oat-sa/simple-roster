@@ -135,6 +135,27 @@ class CreateLineItemActionTest extends WebTestCase
                     'maxAttempts' => 1,
                 ]
             ],
+            'withExistingSlug' => [
+                'request' => json_encode([
+                    'slug' => 'slug-1',
+                    'uri' => 'my-uri',
+                    'label' => 'my-label',
+                    'isActive' => true,
+                    'startDateTime' => '2021-01-01T00:00:00+0000',
+                    'endDateTime' => '2021-01-31T00:00:00+0000',
+                    'maxAttempts' => 3
+
+                ]),
+                'response' => [
+                    'slug' => 'slug-1',
+                    'uri' => 'my-uri',
+                    'label' => 'my-label',
+                    'isActive' => true,
+                    'startDateTime' => 1609459200,
+                    'endDateTime' => 1612051200,
+                    'maxAttempts' => 3,
+                ]
+            ],
             'withoutAllDates' => [
                 'request' => json_encode([
                     'slug' => 'my-slug',

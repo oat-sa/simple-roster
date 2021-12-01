@@ -70,13 +70,9 @@ class LineItemServiceTest extends TestCase
 
         $this->lineItemRepository
             ->expects(self::once())
-            ->method('persist')
+            ->method('createOrUpdate')
             ->with($lineItem);
 
-        $this->lineItemRepository
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->subject->createLineItem($lineItem);
+        $this->subject->createOrUpdateLineItem($lineItem);
     }
 }

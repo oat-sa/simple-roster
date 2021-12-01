@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,6 +36,7 @@ class LineItemRepository extends AbstractRepository
 {
     public const MAX_LINE_ITEM_LIMIT = 100;
 
+    private ManagerRegistry $registry;
     private int $lineItemCacheTtl;
     private LineItemCacheIdGenerator $cacheIdGenerator;
 
@@ -44,6 +46,7 @@ class LineItemRepository extends AbstractRepository
         int $lineItemCacheTtl
     ) {
         parent::__construct($registry, LineItem::class);
+        $this->registry = $registry;
         $this->cacheIdGenerator = $cacheIdGenerator;
         $this->lineItemCacheTtl = $lineItemCacheTtl;
     }
@@ -151,6 +154,33 @@ class LineItemRepository extends AbstractRepository
             $queryBuilder
                 ->andWhere('l.endAt <= (:endAt)')
                 ->setParameter('endAt', $criteria->getLineItemEndAt());
+        }
+    }
+
+    public function createOrUpdate(LineItem $lineItem): LineItem
+    {
+        try {
+            $this->persist($lineItem);
+            $this->flush();
+
+            return $lineItem;
+        } catch (UniqueConstraintViolationException $exception) {
+            $this->registry->resetManager();
+
+            /** @var LineItem $stored */
+            $stored = $this->findOneBy(['slug' => $lineItem->getSlug()]);
+
+            $stored->setUri($lineItem->getUri());
+            $stored->setLabel($lineItem->getLabel() ? : '');
+            $stored->setIsActive($lineItem->isActive());
+            $stored->setMaxAttempts($lineItem->getMaxAttempts());
+            $stored->setStartAt($lineItem->getStartAt());
+            $stored->setEndAt($lineItem->getEndAt());
+
+            $this->persist($stored);
+            $this->flush();
+
+            return $stored;
         }
     }
 }

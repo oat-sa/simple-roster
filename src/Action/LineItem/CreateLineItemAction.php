@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LineItem;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
@@ -42,14 +40,10 @@ class CreateLineItemAction
         $this->responder = $responder;
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     public function __invoke(LineItem $lineItem): Response
     {
         return $this->responder->createJsonResponse(
-            $this->lineItemService->createLineItem($lineItem),
+            $this->lineItemService->createOrUpdateLineItem($lineItem),
             Response::HTTP_CREATED
         );
     }

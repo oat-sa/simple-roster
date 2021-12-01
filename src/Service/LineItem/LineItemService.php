@@ -51,15 +51,8 @@ class LineItemService
         return new ListLineItemResponse($lineItemResultSet);
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
-    public function createLineItem(LineItem $lineItem): LineItem
+    public function createOrUpdateLineItem(LineItem $lineItem): LineItem
     {
-        $this->lineItemRepository->persist($lineItem);
-        $this->lineItemRepository->flush();
-
-        return $lineItem;
+        return $this->lineItemRepository->createOrUpdate($lineItem);
     }
 }
