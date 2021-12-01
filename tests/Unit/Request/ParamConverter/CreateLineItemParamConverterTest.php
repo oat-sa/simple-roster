@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
-use Carbon\Carbon;
 use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\ParamConverter\CreateLineItemParamConverter;
