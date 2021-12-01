@@ -77,17 +77,11 @@ class CreateLineItemParamConverter implements ParamConverterInterface
         return $lineItem;
     }
 
-    private function formatDate(string $dateTime): ?DateTimeInterface
+    private function formatDate(string $dateTime): DateTimeInterface
     {
         $dateTimeObject = Carbon::createFromFormat(Carbon::ATOM, $dateTime);
 
-        if ($dateTimeObject) {
-            $dateTimeObject->setTimezone('UTC')->toDateTime();
-
-            return $dateTimeObject;
-        }
-
-        return null;
+        return $dateTimeObject->setTimezone('UTC')->toDateTime();
     }
 
     public function supports(ParamConverter $configuration): bool

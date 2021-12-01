@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\ParamConverter\CreateLineItemParamConverter;
 use OAT\SimpleRoster\Request\Validator\CreateLineItemValidator;
@@ -86,7 +87,6 @@ class CreateLineItemParamConverterTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-
         $payload = json_encode([
             'slug' => 'my-slug',
             'uri' => 'my-uri',
@@ -126,7 +126,7 @@ class CreateLineItemParamConverterTest extends TestCase
         self::assertSame('my-slug', $lineItem->getSlug());
         self::assertTrue($lineItem->isActive());
         self::assertSame(1, $lineItem->getMaxAttempts());
-        self::assertSame('2021-01-01T00:00:00+00:00', $lineItem->getStartAt()->format(Carbon::ATOM));
-        self::assertSame('2021-01-31T00:00:00+00:00', $lineItem->getEndAt()->format(Carbon::ATOM));
+        self::assertSame('2021-01-01T00:00:00+00:00', $lineItem->getStartAt()->format(DateTimeInterface::ATOM));
+        self::assertSame('2021-01-31T00:00:00+00:00', $lineItem->getEndAt()->format(DateTimeInterface::ATOM));
     }
 }
