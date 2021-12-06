@@ -90,10 +90,10 @@ class ListUserAssignmentsActionTest extends WebTestCase
         );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
-
+        
         $startDate = $lineItem->getStartAt();
         $endDate = $lineItem->getEndAt();
-
+        
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame([
             'assignments' => [
@@ -106,6 +106,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'id' => $lineItem->getId(),
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
+                        'slug' => $lineItem->getSlug(),
                         'isActive' => $lineItem->isActive(),
                         'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
                         'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
@@ -154,6 +155,7 @@ class ListUserAssignmentsActionTest extends WebTestCase
                         'id' => $lineItem->getId(),
                         'uri' => $lineItem->getUri(),
                         'label' => $lineItem->getLabel(),
+                        'slug' => $lineItem->getSlug(),
                         'isActive' => $lineItem->isActive(),
                         'startDateTime' => $startDate instanceof DateTimeInterface ? $startDate->getTimestamp() : '',
                         'endDateTime' => $endDate instanceof DateTimeInterface ? $endDate->getTimestamp() : '',
