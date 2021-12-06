@@ -242,7 +242,6 @@ class BulkUserCreationCommandTest extends KernelTestCase
             '-g' => 'TestCollege',
         ]);
         self::assertSame(1, $output);
-
     }
 
     /**
