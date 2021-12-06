@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Lti\Factory;
 
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Exception\LtiInstanceNotFoundException;
 
 class GroupIdLoadBalancerFactory
 {
@@ -36,12 +37,15 @@ class GroupIdLoadBalancerFactory
 
     public function getLoadBalanceGroupID(string $groupPrefix): array
     {
-        $totalInstance = $this->ltiInstanceRepository->findAllAsCollection()->count();
+        $totalInstances = $this->ltiInstanceRepository->findAllAsCollection()->count();
+        if (empty($totalInstances)) {
+            throw new LtiInstanceNotFoundException('No Lti instance were found in database.');
+        }
         $targetId = 1;
         $groupIds = [];
-        while ($targetId <= $totalInstance) {
-            $random = substr(md5(random_bytes(10)), 0, 10);
-            $groupIds[] = sprintf($groupPrefix . '_%s', $random);
+        while ($targetId <= $totalInstances) {
+            $randomNumber = substr(md5(random_bytes(10)), 0, 10);
+            $groupIds[] = sprintf($groupPrefix . '_%s', $randomNumber);
             $targetId++;
         }
         return $groupIds;

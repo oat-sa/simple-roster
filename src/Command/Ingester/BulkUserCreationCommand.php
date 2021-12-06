@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -40,22 +40,21 @@ class BulkUserCreationCommand extends Command
     protected ProgressBar $progressBar;
     private BulkUserCreationService $bulkUserCreationService;
 
-    private const DEFAULT_BATCH_SIZE = 100;
+    private const DEFAULT_BATCH_SIZE = '100';
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_GROUP_PREFIX = 'group-prefix';
     private const OPTION_BATCH_SIZE = 'batch-size';
 
     private SymfonyStyle $symfonyStyle;
-    /** @var string[] */
+
     private array $lineItemSlugs = [];
     private array $userPrefix;
-
-    /** @var int[] */
     private array $lineItemIds = [];
 
     /** @var int */
     private int $batchSize;
+
     public function __construct(
         BulkUserCreationService $bulkUserCreationService
     ) {

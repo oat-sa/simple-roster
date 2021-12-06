@@ -20,30 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\DataTransferObject;
+namespace OAT\SimpleRoster\Exception;
 
-class UserCreationResponse
+use RuntimeException;
+
+class LtiInstanceNotFoundException extends RuntimeException
 {
-    /** @var int */
-    private const DEFAULT_SUCCESS_RESPONSE_VALUE = 1;
 
-    public function getresponseMessage(array $slugTotalUsers, array $userPrefix): string
-    {
-        $responseMessage = '';
-        $userPrefixString = implode(',', $userPrefix);
-        foreach ($slugTotalUsers as $slugKey => $slugData) {
-            $responseMessage .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
-                $slugData,
-                $slugKey,
-                $userPrefixString
-            );
-        }
-        return $responseMessage;
-    }
-
-    public function getResponsStatus(): int
-    {
-        return self::DEFAULT_SUCCESS_RESPONSE_VALUE;
-    }
 }
