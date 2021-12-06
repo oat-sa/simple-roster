@@ -20,58 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Request\Validator;
+namespace OAT\SimpleRoster\Request\Validator\LineItem;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use OAT\SimpleRoster\Request\Validator\AbstractRequestValidator;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Throwable;
 
-class UpdateLineItemValidator
+class UpdateLineItemValidator extends AbstractRequestValidator
 {
-    private ValidatorInterface $validator;
-
     public function __construct(ValidatorInterface $validator)
     {
-        $this->validator = $validator;
+        parent::__construct($validator);
     }
 
-    public function validate(Request $request): void
-    {
-        try {
-            $responseBody = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (Throwable $jsonException) {
-            throw new BadRequestHttpException(
-                sprintf(
-                    'Invalid JSON request body received. Error: %s.',
-                    $jsonException->getMessage()
-                ),
-                $jsonException
-            );
-        }
-
-        $errors = $this->validator->validate($responseBody, $this->getConstraints());
-
-        if ($errors->count() === 0) {
-            return;
-        }
-
-        $rawErrors = [];
-        /** @var ConstraintViolationInterface $error */
-        foreach ($errors as $error) {
-            $rawErrors[] = sprintf(
-                "%s -> %s",
-                $error->getPropertyPath(),
-                $error->getMessage()
-            );
-        }
-
-        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $rawErrors)));
-    }
-
-    private function getConstraints(): Assert\Collection
+    protected function getConstraints(): Assert\Collection
     {
         return new Assert\Collection(
             [

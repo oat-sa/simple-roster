@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\ParamConverter\CreateLineItemParamConverter;
-use OAT\SimpleRoster\Request\Validator\CreateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

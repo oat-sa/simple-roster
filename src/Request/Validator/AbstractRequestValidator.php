@@ -24,12 +24,12 @@ namespace OAT\SimpleRoster\Request\Validator;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Throwable;
 
-class CreateLineItemValidator
+abstract class AbstractRequestValidator
 {
     private ValidatorInterface $validator;
 
@@ -71,21 +71,5 @@ class CreateLineItemValidator
         throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $rawErrors)));
     }
 
-    private function getConstraints(): Assert\Collection
-    {
-        return new Assert\Collection(
-            [
-                'fields' => [
-                    'slug' => new Assert\Type('string'),
-                    'uri' => new Assert\Type('string'),
-                    'label' => new Assert\Type('string'),
-                    'isActive' => new Assert\Type('bool'),
-                    'startAt' => new Assert\Optional([new Assert\DateTime(\DateTimeInterface::ATOM)]),
-                    'endAt' => new Assert\Optional([new Assert\DateTime(\DateTimeInterface::ATOM)]),
-                    'maxAttempts' => new Assert\PositiveOrZero(),
-                ],
-                'allowExtraFields' => true,
-            ],
-        );
-    }
+    abstract protected function getConstraints(): Assert\Collection;
 }

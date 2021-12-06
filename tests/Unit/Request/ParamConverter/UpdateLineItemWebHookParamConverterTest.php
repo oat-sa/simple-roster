@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
 use ArrayIterator;
 use OAT\SimpleRoster\Request\ParamConverter\UpdateLineItemWebHookParamConverter;
-use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;

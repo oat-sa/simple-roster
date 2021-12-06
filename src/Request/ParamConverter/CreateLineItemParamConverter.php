@@ -26,7 +26,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Request\Validator\CreateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
@@ -45,7 +45,7 @@ class CreateLineItemParamConverter implements ParamConverterInterface
         $this->requestLogger = $requestLogger;
     }
 
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
         $this->createLineItemValidator->validate($request);
 

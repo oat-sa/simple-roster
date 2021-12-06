@@ -1,29 +1,29 @@
 <?php
 
 /**
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; under version 2
- *  of the License (non-upgradable).
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Unit\Request\Validator;
+namespace OAT\SimpleRoster\Tests\Unit\Request\Validator\LineItem;
 
 use ArrayIterator;
-use OAT\SimpleRoster\Request\Validator\CreateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,17 +31,17 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CreateLineItemValidatorTest extends TestCase
+class UpdateLineItemValidatorTest extends TestCase
 {
     /** @var MockObject|ValidatorInterface */
     private $validator;
 
-    private CreateLineItemValidator $subject;
+    private UpdateLineItemValidator $subject;
 
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->subject = new CreateLineItemValidator($this->validator);
+        $this->subject = new UpdateLineItemValidator($this->validator);
     }
 
     public function testItValidatesSuccessfully(): void
@@ -92,6 +92,7 @@ class CreateLineItemValidatorTest extends TestCase
 
         $this->subject->validate($request);
     }
+
 
     public function testItThrowsExceptionForInvalidJson(): void
     {
