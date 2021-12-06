@@ -1,6 +1,6 @@
 # Bulk user assignment creation command
 
-[CreateUserCommand](../../src/Command/Ingester/CreateUserCommand.php) is responsible for creating bulk `users` and `assignments` data into the application based on Line Items.
+[BulkUserCreationCommand](../../src/Command/Ingester/BulkUserCreationCommand.php) is responsible for creating bulk `users` and `assignments` data into the application based on Line Items.
 
 - [Usage](#usage)
     - [Main arguments](#main-arguments)
@@ -10,14 +10,14 @@
 
 ## Usage
 ```shell script
-$ sudo -u www-data bin/console roster:create:user [-i|--line-item-ids] [-s|--line-item-slugs] [-b|--batch-size] [-g|--group-prefix] [--] <user-prefix>
+$ sudo -u www-data bin/console roster:create:user [-i|--line-item-ids] [-s|--line-item-slugs] [-b|--batch-size] [-g|--group-prefix] <user-prefix>
 ```
 
 ### Main arguments
 
 | Argument | Description                                          |
 | ---------|:-----------------------------------------------------|
-| user-prefix     | Names of users (Ex: QA,LQA,OAT) |
+| user-prefix     | Names of users (Ex: QA,OAT,CUSTOMER) |
 
 ### Main options
 
