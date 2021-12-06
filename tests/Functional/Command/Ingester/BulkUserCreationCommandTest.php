@@ -30,6 +30,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\BulkUserCreationGeneratedFileRemovalTrait;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\LineItem;
 use InvalidArgumentException;
@@ -38,8 +39,9 @@ use ReflectionException;
 class BulkUserCreationCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    use CsvIngestionTestingTrait;
+    //use CsvIngestionTestingTrait;
     use CommandDisplayNormalizerTrait;
+    use BulkUserCreationGeneratedFileRemovalTrait;
     use LoggerTestingTrait;
 
     private CommandTester $commandTester;
@@ -55,6 +57,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
         $this->setUpDatabase();
         $this->setUpTestLogHandler();
+        $this->removeGeneratedUsersFilePath();
     }
 
     /**
