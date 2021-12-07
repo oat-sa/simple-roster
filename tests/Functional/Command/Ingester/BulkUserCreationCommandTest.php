@@ -144,7 +144,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
         ]);
         self::assertSame(1, $output);
         self::assertStringContainsString(
-            '[ERROR] slug-100,slug-200 Line item slugs not exist in the system',
+            '[ERROR] slug-100,slug-200 Line item slug(s) not exist in the system',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
     }
@@ -160,7 +160,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
         ]);
         self::assertSame(1, $output);
         self::assertStringContainsString(
-            '[ERROR] 100,1000 Line item ids not exist in the system',
+            '[ERROR] 100,1000 Line item id(s) not exist in the system',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
     }
@@ -176,7 +176,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
         ]);
         self::assertSame(0, $output);
         self::assertStringContainsString(
-            '[NOTE] slug-200 Line Items not exist in the system',
+            '[NOTE] Line Items with slugs/ids \'slug-200\' were not found in the system',
             $this->normalizeDisplay($this->commandTester->getDisplay(true))
         );
         self::assertStringContainsString(
