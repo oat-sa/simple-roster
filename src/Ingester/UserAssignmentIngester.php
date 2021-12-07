@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\UserAssignment\Factory;
+namespace OAT\SimpleRoster\Ingester;
 
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
@@ -32,7 +32,7 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
 
-class UserAssignmentFactory
+class UserAssignmentIngester
 {
     private UserPasswordHasherInterface $passwordHasher;
     private NativeUserRepository $userRepository;
@@ -78,6 +78,11 @@ class UserAssignmentFactory
         );
     }
 
+    /**
+     * @throws Throwable
+     * @throws MappingException
+     * @throws ORMException
+     */
     public function saveBulkUserAssignmentData(
         UserDtoCollection $userDtoCollection,
         AssignmentDtoCollection $assignmentDtoCollection

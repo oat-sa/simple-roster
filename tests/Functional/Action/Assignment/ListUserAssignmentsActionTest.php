@@ -90,10 +90,10 @@ class ListUserAssignmentsActionTest extends WebTestCase
         );
 
         $lineItem = $user->getLastAssignment()->getLineItem();
-        
+
         $startDate = $lineItem->getStartAt();
         $endDate = $lineItem->getEndAt();
-        
+
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
         self::assertSame([
             'assignments' => [

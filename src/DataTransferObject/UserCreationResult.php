@@ -20,27 +20,34 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Service\Bulk;
+namespace OAT\SimpleRoster\DataTransferObject;
 
-use Psr\Log\LoggerInterface;
-
-class BulkUserCreationLoggerService
+class UserCreationResult
 {
-    private LoggerInterface $userAssignmentLogger;
+    /** @var int */
+    private int $status;
+    private string $message;
+    private array $nonExistLineItems;
 
-    public function __construct(
-        LoggerInterface $userAssignmentLogger
-    ) {
-        $this->userAssignmentLogger = $userAssignmentLogger;
+    public function __construct(int $status, string $message, array $nonExistLineItems)
+    {
+        $this->status = $status;
+        $this->message = $message;
+        $this->nonExistLineItems = $nonExistLineItems;
     }
 
-    public function userDataLogger(
-        string $username,
-        string $lineSlugs
-    ): void {
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
 
-        $this->userAssignmentLogger->info(
-            sprintf('%s user has created successfully and assigned a line item slug %s', $username, $lineSlugs)
-        );
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    public function getNonExistLineItems(): array
+    {
+        return $this->nonExistLineItems;
     }
 }

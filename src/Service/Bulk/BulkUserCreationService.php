@@ -29,18 +29,17 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use OAT\SimpleRoster\Lti\Factory\GroupIdLoadBalancerFactory;
-use OAT\SimpleRoster\UserAssignment\Factory\UserAssignmentFactory;
+use OAT\SimpleRoster\Ingester\UserAssignmentIngester;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
-use OAT\SimpleRoster\DataTransferObject\UserCreationResponse;
-use OAT\SimpleRoster\Service\Bulk\BulkUserCreationCsvWriterService;
-use OAT\SimpleRoster\Service\Bulk\BulkUserCreationLoggerService;
+use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
+use OAT\SimpleRoster\Csv\BulkUserCreationCsvWriter;
+use Psr\Log\LoggerInterface;
 
 class BulkUserCreationService
 {
     private array $lineItemIds = [];
     private array $lineItemSlugs = [];
 
-    /** @var int */
     private int $userGroupBatchCount = 0;
     private int $groupIndex = 0;
 
@@ -50,10 +49,9 @@ class BulkUserCreationService
     private AssignmentRepository $assignmentRepository;
     private Filesystem $filesystem;
     private GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory;
-    private UserAssignmentFactory $userAssignmentFactory;
-    private UserCreationResponse $userCreationResponse;
-    private BulkUserCreationCsvWriterService $csvWriterService;
-    private BulkUserCreationLoggerService $bulkUserCreationLoggerService;
+    private UserAssignmentIngester $userAssignmentIngester;
+    private BulkUserCreationCsvWriter $csvWriter;
+    private LoggerInterface $logger;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
@@ -61,20 +59,18 @@ class BulkUserCreationService
         LineItemRepository $lineItemRepository,
         AssignmentRepository $assignmentRepository,
         GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory,
-        UserAssignmentFactory $userAssignmentFactory,
-        UserCreationResponse $userCreationResponse,
-        BulkUserCreationCsvWriterService $csvWriterService,
-        BulkUserCreationLoggerService $bulkUserCreationLoggerService,
+        UserAssignmentIngester $userAssignmentIngester,
+        BulkUserCreationCsvWriter $csvWriter,
+        LoggerInterface $logger,
         Filesystem $filesystem,
         string $generatedUsersFilePath
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
         $this->groupIdLoadBalancerFactory = $groupIdLoadBalancerFactory;
-        $this->userAssignmentFactory = $userAssignmentFactory;
-        $this->userCreationResponse = $userCreationResponse;
-        $this->csvWriterService = $csvWriterService;
-        $this->bulkUserCreationLoggerService = $bulkUserCreationLoggerService;
+        $this->userAssignmentIngester = $userAssignmentIngester;
+        $this->csvWriter = $csvWriter;
+        $this->logger = $logger;
         $this->generatedUsersFilePath = $generatedUsersFilePath;
         $this->filesystem = $filesystem;
     }
@@ -85,10 +81,10 @@ class BulkUserCreationService
     public function createUsers(
         array $lineItemIds,
         array $lineItemSlugs,
-        array $userPrefix,
+        array $userPrefixes,
         int $batchSize,
         ?string $groupPrefix
-    ): array {
+    ): UserCreationResult {
 
         $notExistLineItemsArray = $userGroupIds = [];
 
@@ -99,8 +95,8 @@ class BulkUserCreationService
             $lineItems = $this->lineItemRepository->findLineItemsByCriteria($criteria)->jsonSerialize();
             if (empty($lineItems)) {
                 $exceptionMessage = $this->lineItemIds
-                    ? implode(',', $this->lineItemIds) . ' Line item ids not exist in the system'
-                    : implode(',', $this->lineItemSlugs) . ' Line item slugs not exist in the system';
+                    ? implode(',', $this->lineItemIds) . ' Line item id(s) not exist in the system'
+                    : implode(',', $this->lineItemSlugs) . ' Line item slug(s) not exist in the system';
                 throw new LineItemNotFoundException($exceptionMessage);
             }
 
@@ -114,31 +110,47 @@ class BulkUserCreationService
             $this->getAllLineItemSlugs();
         }
 
-        $userNameLastIndexArray = $this->getLastUserAssignedToLineItems($this->lineItemSlugs);
+        $userNameLastIndexes = $this->getLastUserAssignedToLineItems($this->lineItemSlugs);
 
         $userGroupAssignCount = 0;
         if ($groupPrefix) {
             $userGroupIds = $this->groupIdLoadBalancerFactory->getLoadBalanceGroupID($groupPrefix);
             $userGroupAssignCount = (int) ceil(
-                count($userPrefix) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
+                count($userPrefixes) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
             );
         }
 
         $slugTotalUsers = $this->createBulkUserAssignmentData(
-            $userNameLastIndexArray,
+            $userNameLastIndexes,
             $userGroupIds,
-            $userPrefix,
+            $userPrefixes,
             $userGroupAssignCount,
             $groupPrefix,
             $batchSize
         );
 
-        return [
-            'status' => $this->userCreationResponse->getResponsStatus(),
-            'message' => $this->userCreationResponse->getResponseMessage($slugTotalUsers, $userPrefix),
-            'notExistLineItemsArray' => $notExistLineItemsArray,
-        ];
+        $message = $this->getOperationResultMessage($slugTotalUsers, $userPrefixes);
+
+        return new UserCreationResult(1, $message, $notExistLineItemsArray);
     }
+
+    public function getOperationResultMessage(array $slugTotalUsers, array $userPrefix): string
+    {
+        $message = '';
+        $userPrefixString = implode(',', $userPrefix);
+
+        foreach ($slugTotalUsers as $slug => $totalUsers) {
+            $message .= sprintf(
+                "%s users created for line item %s for user prefix %s \n",
+                $totalUsers,
+                $slug,
+                $userPrefixString
+            );
+        }
+
+        return $message;
+    }
+
 
     private function generateSlugData(array $lineItems): void
     {
@@ -150,7 +162,7 @@ class BulkUserCreationService
     }
 
     private function createBulkUserAssignmentData(
-        array $userNameLastIndexArray,
+        array $userNameLastIndexes,
         array $userGroupIds,
         array $userPrefix,
         int $userGroupAssignCount,
@@ -183,7 +195,7 @@ class BulkUserCreationService
                         $lineSlugs,
                         $prefix,
                         (
-                            (int)$userNameLastIndexArray[$lineSlugs] + $batchIncremntValue
+                            (int)$userNameLastIndexes[$lineSlugs] + $batchIncremntValue
                         )
                     );
                     $userPassword = $this->createUserPassword();
@@ -194,23 +206,28 @@ class BulkUserCreationService
                     $csvData[] = [$username, $userPassword,$userGroupId];
                     $assignmentCsvData[] = [$username, $lineSlugs];
 
-                    $this->userAssignmentFactory->createUserDtoCollection(
+                    $this->userAssignmentIngester->createUserDtoCollection(
                         $userDtoCollection,
                         $username,
                         $userPassword,
                         $userGroupId
                     );
-                    $this->userAssignmentFactory->createAssignmentDtoCollection(
+                    $this->userAssignmentIngester->createAssignmentDtoCollection(
                         $assignmentDtoCollection,
                         $lineKey,
                         $username
                     );
-                    $this->bulkUserCreationLoggerService->userDataLogger($username, $lineSlugs);
-
+                    $this->logger->info(
+                        sprintf(
+                            'User %s has been created and assigned to line item %s successfully',
+                            $username,
+                            $lineSlugs
+                        )
+                    );
                     $slugTotalUsersCreated++;
                 }
 
-                $this->csvWriterService->writeCsvData(
+                $this->csvWriter->writeCsvData(
                     $lineSlugs,
                     $prefix,
                     $csvPath,
@@ -225,7 +242,7 @@ class BulkUserCreationService
                     : $slugTotalUsersCreated;
             }
         }
-        $this->userAssignmentFactory->saveBulkUserAssignmentData($userDtoCollection, $assignmentDtoCollection);
+        $this->userAssignmentIngester->saveBulkUserAssignmentData($userDtoCollection, $assignmentDtoCollection);
 
         return $slugWiseTotalUsersArray;
     }
@@ -264,9 +281,8 @@ class BulkUserCreationService
         $this->generateSlugData($lineItems);
     }
 
-    private function getLastUserAssignedToLineItems(
-        array $lineItemSlugs
-    ): array {
+    private function getLastUserAssignedToLineItems(array $lineItemSlugs): array
+    {
         $userNameIncrementArray = [];
 
         foreach ($lineItemSlugs as $slugKey => $slug) {
@@ -275,7 +291,7 @@ class BulkUserCreationService
 
             if (!empty($assignment)) {
                 $userData = $assignment->getUser()->getUsername();
-                $userNameArray = explode('_', (string)$userData);
+                $userNameArray = explode('_', (string) $userData);
                 $userNameLastIndex = preg_match('/^\d+$/', end($userNameArray))
                     ? (int)end($userNameArray)
                     : self::DEFAULT_USERNAME_INCREMENT_VALUE;

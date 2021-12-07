@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -20,30 +20,15 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\DataTransferObject;
+namespace OAT\SimpleRoster\Tests\Traits;
 
-class UserCreationResponse
+use Symfony\Component\Filesystem\Filesystem;
+
+trait FileRemovalTrait
 {
-    /** @var int */
-    private const DEFAULT_SUCCESS_RESPONSE_VALUE = 1;
-
-    public function getresponseMessage(array $slugTotalUsers, array $userPrefix): string
+    protected function removeGeneratedUsersFilePath(): void
     {
-        $responseMessage = '';
-        $userPrefixString = implode(',', $userPrefix);
-        foreach ($slugTotalUsers as $slugKey => $slugData) {
-            $responseMessage .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
-                $slugData,
-                $slugKey,
-                $userPrefixString
-            );
-        }
-        return $responseMessage;
-    }
-
-    public function getResponsStatus(): int
-    {
-        return self::DEFAULT_SUCCESS_RESPONSE_VALUE;
+        $filesystem = new Filesystem();
+        $filesystem->remove($_ENV['GENERATED_USERS_FILE_PATH']);
     }
 }

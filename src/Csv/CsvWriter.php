@@ -31,9 +31,8 @@ class CsvWriter
 
     private Filesystem $filesystem;
 
-    public function __construct(
-        Filesystem $filesystem
-    ) {
+    public function __construct(Filesystem $filesystem)
+    {
         $this->filesystem = $filesystem;
     }
     public function writeCsv(string $path, array $head, array $data): void

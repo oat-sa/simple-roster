@@ -20,20 +20,19 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Service\Bulk;
+namespace OAT\SimpleRoster\Csv;
 
 use OAT\SimpleRoster\Csv\CsvWriter;
 
-class BulkUserCreationCsvWriterService
+class BulkUserCreationCsvWriter
 {
     private CsvWriter $csvWriter;
 
-    private array $userCsvHead = ['username','password','groupId'];
-    private array $assignmentCsvHead = ['username','lineItemSlug'];
+    private const USER_CSV_HEAD = ['username', 'password', 'groupId'];
+    private const ASSIGNMENT_CSV_HEAD = ['username', 'lineItemSlug'];
 
-    public function __construct(
-        CsvWriter $csvWriter
-    ) {
+    public function __construct(CsvWriter $csvWriter)
+    {
         $this->csvWriter = $csvWriter;
     }
 
@@ -47,20 +46,24 @@ class BulkUserCreationCsvWriterService
         array $assignmentCsvData
     ): void {
 
-        $this->csvWriter->writeCsv(sprintf('%s/%s', $csvPath, $csvFilename), $this->userCsvHead, $csvData);
+        $this->csvWriter->writeCsv(
+            sprintf('%s/%s', $csvPath, $csvFilename),
+            self::USER_CSV_HEAD,
+            $csvData
+        );
         $this->csvWriter->writeCsv(
             sprintf('%s/Assignments-%s-%s.csv', $csvPath, $lineSlugs, $prefix),
-            $this->assignmentCsvHead,
+            self::ASSIGNMENT_CSV_HEAD,
             $assignmentCsvData
         );
         $this->csvWriter->writeCsv(
             sprintf('%s/users_aggregated.csv', $automateCsvPath),
-            $this->userCsvHead,
+            self::USER_CSV_HEAD,
             $csvData
         );
         $this->csvWriter->writeCsv(
             sprintf('%s/assignments_aggregated.csv', $automateCsvPath),
-            $this->assignmentCsvHead,
+            self::ASSIGNMENT_CSV_HEAD,
             $assignmentCsvData
         );
     }

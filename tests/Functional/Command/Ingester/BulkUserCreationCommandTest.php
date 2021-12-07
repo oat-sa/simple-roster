@@ -24,24 +24,21 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\BulkUserCreationCommand;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
-use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\BulkUserCreationGeneratedFileRemovalTrait;
+use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\LineItem;
 use InvalidArgumentException;
-use ReflectionException;
 
 class BulkUserCreationCommandTest extends KernelTestCase
 {
     use DatabaseTestingTrait;
-    //use CsvIngestionTestingTrait;
     use CommandDisplayNormalizerTrait;
-    use BulkUserCreationGeneratedFileRemovalTrait;
+    use FileRemovalTrait;
     use LoggerTestingTrait;
 
     private CommandTester $commandTester;
@@ -60,12 +57,9 @@ class BulkUserCreationCommandTest extends KernelTestCase
         $this->removeGeneratedUsersFilePath();
     }
 
-    /**
-     * @throws ReflectionException
-     */
     public function testItCanCreateBulkUserAssignments(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-s' => 'slug-qqyw,slug-qwer',
             'user-prefix' => 'QA,LQA',
@@ -94,7 +88,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItCanCreateBulkUserAssignmentsWithoutSlugs(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             'user-prefix' => 'QA,LQA',
             '-b' => '4',
@@ -110,7 +104,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItCanCreateBulkUserAssignmentsWithoutBatchSize(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             'user-prefix' => 'QA,LQA',
             '-g' => 'TestCollege',
@@ -125,7 +119,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItCanCreateBulkUserAssignmentsWithLineItemIds(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-i' => '1,2',
             'user-prefix' => 'QA,LQA',
@@ -141,7 +135,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItThrowsExceptionForNonExistSlugs(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-s' => 'slug-100,slug-200',
             'user-prefix' => 'QA,LQA',
@@ -157,7 +151,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItThrowsExceptionForNonExistLineItemIds(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-i' => '100,1000',
             'user-prefix' => 'QA,LQA',
@@ -173,7 +167,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItThrowsNoteForNonExistSlug(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-s' => 'slug-1,slug-200',
             'user-prefix' => 'QA,LQA',
@@ -226,7 +220,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 
     public function testItCreateBulkUserAssignmentsHavingExistingUser(): void
     {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $output = $this->commandTester->execute([
             '-s' => 'slug-qqyw,slug-qwer',
             'user-prefix' => 'QA,LQA',
@@ -254,7 +248,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
         array $parameters,
         string $expectedOutput
     ): void {
-        $this->loadFixtureByFilename('lineItemsLineInstances.yml');
+        $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedOutput);
 
