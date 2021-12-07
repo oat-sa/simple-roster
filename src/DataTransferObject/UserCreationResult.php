@@ -22,28 +22,32 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\DataTransferObject;
 
-class UserCreationResponse
+class UserCreationResult
 {
-    /** @var int */
-    private const DEFAULT_SUCCESS_RESPONSE_VALUE = 1;
+    private int $status;
+    private string $message;
+    private array $nonExistLineItems;
 
-    public function getresponseMessage(array $slugTotalUsers, array $userPrefix): string
+    public function __construct(int $status, string $message, array $nonExistLineItems)
     {
-        $responseMessage = '';
-        $userPrefixString = implode(',', $userPrefix);
-        foreach ($slugTotalUsers as $slugKey => $slugData) {
-            $responseMessage .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
-                $slugData,
-                $slugKey,
-                $userPrefixString
-            );
-        }
-        return $responseMessage;
+        $this->status = $status;
+        $this->message = $message;
+        $this->nonExistLineItems = $nonExistLineItems;
     }
 
-    public function getResponsStatus(): int
+    public function getStatus(): int
     {
-        return self::DEFAULT_SUCCESS_RESPONSE_VALUE;
+        return $this->status;
+    }
+
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    public function getNonExistLineItems(): array
+    {
+        return $this->nonExistLineItems;
     }
 }

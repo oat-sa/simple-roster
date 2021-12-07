@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
@@ -51,7 +52,6 @@ class BulkUserCreationService
     private Filesystem $filesystem;
     private GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory;
     private UserAssignmentFactory $userAssignmentFactory;
-    private UserCreationResponse $userCreationResponse;
     private BulkUserCreationCsvWriterService $csvWriterService;
     private BulkUserCreationLoggerService $bulkUserCreationLoggerService;
 
@@ -62,7 +62,6 @@ class BulkUserCreationService
         AssignmentRepository $assignmentRepository,
         GroupIdLoadBalancerFactory $groupIdLoadBalancerFactory,
         UserAssignmentFactory $userAssignmentFactory,
-        UserCreationResponse $userCreationResponse,
         BulkUserCreationCsvWriterService $csvWriterService,
         BulkUserCreationLoggerService $bulkUserCreationLoggerService,
         Filesystem $filesystem,
@@ -72,7 +71,6 @@ class BulkUserCreationService
         $this->assignmentRepository = $assignmentRepository;
         $this->groupIdLoadBalancerFactory = $groupIdLoadBalancerFactory;
         $this->userAssignmentFactory = $userAssignmentFactory;
-        $this->userCreationResponse = $userCreationResponse;
         $this->csvWriterService = $csvWriterService;
         $this->bulkUserCreationLoggerService = $bulkUserCreationLoggerService;
         $this->generatedUsersFilePath = $generatedUsersFilePath;
@@ -83,12 +81,12 @@ class BulkUserCreationService
      * @throws LineItemNotFoundException
      */
     public function createUsers(
-        array $lineItemIds,
-        array $lineItemSlugs,
-        array $userPrefix,
-        int $batchSize,
+        array   $lineItemIds,
+        array   $lineItemSlugs,
+        array   $userPrefixes,
+        int     $batchSize,
         ?string $groupPrefix
-    ): array {
+    ): UserCreationResult {
 
         $notExistLineItemsArray = $userGroupIds = [];
 
@@ -114,30 +112,45 @@ class BulkUserCreationService
             $this->getAllLineItemSlugs();
         }
 
-        $userNameLastIndexArray = $this->getLastUserAssignedToLineItems($this->lineItemSlugs);
+        $userNameLastIndexes = $this->getLastUserAssignedToLineItems($this->lineItemSlugs);
 
         $userGroupAssignCount = 0;
         if ($groupPrefix) {
             $userGroupIds = $this->groupIdLoadBalancerFactory->getLoadBalanceGroupID($groupPrefix);
             $userGroupAssignCount = (int) ceil(
-                count($userPrefix) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
+                count($userPrefixes) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
             );
         }
 
         $slugTotalUsers = $this->createBulkUserAssignmentData(
-            $userNameLastIndexArray,
+            $userNameLastIndexes,
             $userGroupIds,
-            $userPrefix,
+            $userPrefixes,
             $userGroupAssignCount,
             $groupPrefix,
             $batchSize
         );
 
-        return [
-            'status' => $this->userCreationResponse->getResponsStatus(),
-            'message' => $this->userCreationResponse->getResponseMessage($slugTotalUsers, $userPrefix),
-            'notExistLineItemsArray' => $notExistLineItemsArray,
-        ];
+        $message = $this->getOperationResultMessage($slugTotalUsers, $userPrefixes);
+
+        return new UserCreationResult(1, $message, $notExistLineItemsArray);
+    }
+
+    public function getOperationResultMessage(array $slugTotalUsers, array $userPrefix): string
+    {
+        $message = '';
+        $userPrefixString = implode(',', $userPrefix);
+
+        foreach ($slugTotalUsers as $slug => $totalUsers) {
+            $message .= sprintf(
+                "%s users created for line item %s for user prefix %s \n",
+                $totalUsers,
+                $slug,
+                $userPrefixString
+            );
+        }
+
+        return $message;
     }
 
     private function generateSlugData(array $lineItems): void

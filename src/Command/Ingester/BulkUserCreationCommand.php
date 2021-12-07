@@ -153,17 +153,17 @@ class BulkUserCreationCommand extends Command
                 $this->batchSize,
                 $input->getOption(self::OPTION_GROUP_PREFIX)
             );
-            if ($processDataResult['status'] === 1 && !empty($processDataResult['notExistLineItemsArray'])) {
+
+            if ($processDataResult->getStatus() === 1 && !empty($processDataResult->getNonExistLineItems())) {
                 $this->symfonyStyle->note(
                     sprintf(
-                        '%s %s',
-                        implode(',', $processDataResult['notExistLineItemsArray']),
-                        'Line Items not exist in the system'
+                        'Line Items with slugs/ids \'%s\' were found in the system.',
+                        implode(',', $processDataResult->getNonExistLineItems()),
                     )
                 );
             }
             $this->symfonyStyle->success(
-                sprintf('%s', $processDataResult['message'])
+                sprintf('%s', $processDataResult->getMessage())
             );
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
