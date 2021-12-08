@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\Tests\Unit\Ingester;
 use OAT\SimpleRoster\Ingester\UserAssignmentIngester;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
-use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
@@ -33,7 +32,6 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
-use phpDocumentor\Reflection\Types\Void_;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -42,8 +40,11 @@ class UserAssignmentIngesterTest extends TestCase
     /** @var NativeUserRepository|MockObject */
     private $userRepository;
 
-    /** @var NativeAssignmentRepository|MockObject */
+    /** @var AssignmentIngester|MockObject */
     private $assignmentIngester;
+
+    /** @var UserPasswordHasher|MockObject */
+    private $userPasswordHasher;
 
     private UserAssignmentIngester $subject;
 
