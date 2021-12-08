@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Ingester;
 
+use Doctrine\ORM\ORMException;
+use Doctrine\Persistence\Mapping\MappingException;
 use OAT\SimpleRoster\DataTransferObject\UserDto;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
 use OAT\SimpleRoster\Entity\User;
@@ -31,6 +33,7 @@ use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Ingester\AssignmentIngester;
+use Throwable;
 
 class UserAssignmentIngester
 {
@@ -79,9 +82,9 @@ class UserAssignmentIngester
     }
 
     /**
-     * @throws Throwable
-     * @throws MappingException
      * @throws ORMException
+     * @throws MappingException
+     * @throws Throwable
      */
     public function saveBulkUserAssignmentData(
         UserDtoCollection $userDtoCollection,

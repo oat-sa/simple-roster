@@ -29,7 +29,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Helper\ProgressBar;
 use OAT\SimpleRoster\Service\Bulk\BulkUserCreationService;
 use Throwable;
 
@@ -37,7 +36,6 @@ class BulkUserCreationCommand extends Command
 {
     public const NAME = 'roster:create:user';
 
-    protected ProgressBar $progressBar;
     private BulkUserCreationService $bulkUserCreationService;
 
     private const DEFAULT_BATCH_SIZE = '100';
@@ -54,9 +52,8 @@ class BulkUserCreationCommand extends Command
 
     private int $batchSize;
 
-    public function __construct(
-        BulkUserCreationService $bulkUserCreationService
-    ) {
+    public function __construct(BulkUserCreationService $bulkUserCreationService)
+    {
         parent::__construct(self::NAME);
         $this->bulkUserCreationService = $bulkUserCreationService;
     }
