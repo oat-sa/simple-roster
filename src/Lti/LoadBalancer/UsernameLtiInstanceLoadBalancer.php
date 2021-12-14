@@ -38,7 +38,8 @@ class UsernameLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
         return (string)$assignment->getLineItem()->getId();
     }
 
-    public function generateGroupIds(string $groupPrefix): array{
+    public function generateGroupIds(string $groupPrefix): array
+    {
         return [];
     }
 }

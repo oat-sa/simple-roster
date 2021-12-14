@@ -263,7 +263,7 @@ class BulkCreateUsersService
                 $userNameArray = explode('_', (string) $userData);
                 $userNameLastIndex = self::DEFAULT_USERNAME_INCREMENT_VALUE;
                 $index = end($userNameArray);
-                if (count($userNameArray) > 0 && is_numeric ($index)) {
+                if (count($userNameArray) > 0 && is_numeric($index)) {
                     $userNameLastIndex = (int) $index;
                 }
                 $userNameIncrementArray[$slug] = $userNameLastIndex;
