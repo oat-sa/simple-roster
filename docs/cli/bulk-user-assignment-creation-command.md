@@ -1,6 +1,6 @@
 # Bulk user assignment creation command
 
-[BulkUserCreationCommand](../../src/Command/Ingester/BulkUserCreationCommand.php) is responsible for creating bulk `users` and `assignments` data into the application based on Line Items.
+[BulkUserCreationCommand](../../src/Command/CreateEntity/User/BulkUserCreationCommand.php) is responsible for creating bulk `users` and `assignments` data into the application based on Line Items.
 
 - [Usage](#usage)
     - [Main arguments](#main-arguments)
