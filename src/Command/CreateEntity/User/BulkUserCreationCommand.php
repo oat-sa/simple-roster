@@ -20,23 +20,23 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Command\Ingester;
+namespace OAT\SimpleRoster\Command\CreateEntity\User;
 
 use InvalidArgumentException;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use OAT\SimpleRoster\Service\Bulk\BulkUserCreationService;
 use Throwable;
 
 class BulkUserCreationCommand extends Command
 {
     public const NAME = 'roster:create:user';
 
-    private BulkUserCreationService $bulkUserCreationService;
+    private BulkCreateUsersService $bulkCreateUsersService;
 
     private const DEFAULT_BATCH_SIZE = '100';
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
@@ -52,10 +52,10 @@ class BulkUserCreationCommand extends Command
 
     private int $batchSize;
 
-    public function __construct(BulkUserCreationService $bulkUserCreationService)
+    public function __construct(BulkCreateUsersService $bulkCreateUsersService)
     {
         parent::__construct(self::NAME);
-        $this->bulkUserCreationService = $bulkUserCreationService;
+        $this->bulkCreateUsersService = $bulkCreateUsersService;
     }
 
     protected function configure(): void
@@ -67,21 +67,21 @@ class BulkUserCreationCommand extends Command
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
             'i',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Comma separated list of line item IDs',
         );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_SLUGS,
             's',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Comma separated list of line item slugs',
         );
 
         $this->addOption(
             self::OPTION_BATCH_SIZE,
             'b',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'User Create Batch size',
             self::DEFAULT_BATCH_SIZE
         );
@@ -95,7 +95,7 @@ class BulkUserCreationCommand extends Command
         $this->addOption(
             self::OPTION_GROUP_PREFIX,
             'g',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Group Prefix',
         );
     }
@@ -142,18 +142,18 @@ class BulkUserCreationCommand extends Command
         $this->symfonyStyle->comment('Executing Bulk user creation');
 
         try {
-            $processDataResult = $this->bulkUserCreationService->createUsers(
+            $processDataResult = $this->bulkCreateUsersService->createUsers(
                 $this->lineItemIds,
                 $this->lineItemSlugs,
                 $this->userPrefix,
                 $this->batchSize,
                 $input->getOption(self::OPTION_GROUP_PREFIX)
             );
-            if ($processDataResult->getStatus() === 1 && !empty($processDataResult->getNonExistLineItems())) {
+            if (!empty($processDataResult->getNonExistingLineItems())) {
                 $this->symfonyStyle->note(
                     sprintf(
                         'Line Items with slugs/ids \'%s\' were not found in the system.',
-                        implode(',', $processDataResult->getNonExistLineItems()),
+                        implode(',', $processDataResult->getNonExistingLineItems()),
                     )
                 );
             }
@@ -179,7 +179,7 @@ class BulkUserCreationCommand extends Command
         );
         if (empty($lineItemIds)) {
             throw new InvalidArgumentException(
-                sprintf('Invalid %s option received.', self::OPTION_LINE_ITEM_IDS)
+                sprintf('Invalid %s option value received.', self::OPTION_LINE_ITEM_IDS)
             );
         }
 

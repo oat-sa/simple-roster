@@ -24,21 +24,13 @@ namespace OAT\SimpleRoster\DataTransferObject;
 
 class UserCreationResult
 {
-    /** @var int */
-    private int $status;
     private string $message;
-    private array $nonExistLineItems;
+    private array $nonExistingLineItems;
 
-    public function __construct(int $status, string $message, array $nonExistLineItems)
+    public function __construct(string $message, array $nonExistingLineItems)
     {
-        $this->status = $status;
         $this->message = $message;
-        $this->nonExistLineItems = $nonExistLineItems;
-    }
-
-    public function getStatus(): int
-    {
-        return $this->status;
+        $this->nonExistingLineItems = $nonExistingLineItems;
     }
 
     public function getMessage(): string
@@ -46,8 +38,8 @@ class UserCreationResult
         return $this->message;
     }
 
-    public function getNonExistLineItems(): array
+    public function getNonExistingLineItems(): array
     {
-        return $this->nonExistLineItems;
+        return $this->nonExistingLineItems;
     }
 }

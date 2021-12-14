@@ -27,6 +27,7 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
+use OAT\SimpleRoster\Lti\Exception\LtiInstanceNotFoundException;
 
 interface LtiInstanceLoadBalancerInterface
 {
@@ -39,4 +40,8 @@ interface LtiInstanceLoadBalancerInterface
      * @throws IndeterminableLtiRequestContextIdException
      */
     public function getLtiRequestContextId(Assignment $assignment): string;
+    /**
+     * @throws LtiInstanceNotFoundException
+     */
+    public function generateGroupIds(string $groupPrefix): array;
 }

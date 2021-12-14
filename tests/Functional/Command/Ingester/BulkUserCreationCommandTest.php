@@ -22,17 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
-use OAT\SimpleRoster\Command\Ingester\BulkUserCreationCommand;
+use InvalidArgumentException;
+use OAT\SimpleRoster\Command\CreateEntity\User\BulkUserCreationCommand;
+use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
-use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Entity\LineItem;
-use InvalidArgumentException;
 
 class BulkUserCreationCommandTest extends KernelTestCase
 {
@@ -269,7 +269,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
                 'parameters' => [
                     '-i' => 'a,b,c',
                 ],
-                'expectedOutput' => 'Invalid line-item-ids option received.',
+                'expectedOutput' => 'Invalid line-item-ids option value received.',
             ],
             'invalidLineItemSlugs' => [
                 'parameters' => [
