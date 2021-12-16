@@ -67,24 +67,24 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
             throw new LtiInstanceNotFoundException('No Lti instance were found in database.');
         }
 
-        $targetId = 1;
         $groupIds = [];
-        while ($targetId <= $totalInstances) {
-            $newGroupId = sprintf($groupPrefix . '_%s', substr(md5(random_bytes(10)), 0, 10));
+        for ($targetId = 1; $targetId <= $totalInstances; ++$targetId) {
+            $newGroupId = $this->getNewGroupId($groupPrefix);
             $possibleIndex = (int) $this->computeLtiInstanceByString($newGroupId)->getId();
 
-            if (array_key_exists($possibleIndex, $groupIds)) {
-                while (array_key_exists($possibleIndex, $groupIds)) {
-                    $newGroupId = sprintf($groupPrefix . '_%s', substr(md5(random_bytes(10)), 0, 10));
+            while (array_key_exists($possibleIndex, $groupIds)) {
+                    $newGroupId = $this->getNewGroupId($groupPrefix);
                     $possibleIndex = (int) $this->computeLtiInstanceByString($newGroupId)->getId();
-                }
             }
 
             $groupIds[$possibleIndex] = $newGroupId;
-
-            $targetId++;
         }
 
         return array_values($groupIds);
+    }
+
+    private function getNewGroupId(string $groupPrefix): string
+    {
+        return sprintf($groupPrefix . '_%s', substr(md5(random_bytes(10)), 0, 10));
     }
 }
