@@ -34,11 +34,11 @@ use Throwable;
 
 class BulkUserCreationCommand extends Command
 {
-    public const NAME = 'roster:create:user';
+    public const NAME = 'roster:create-entity:user';
 
     private BulkCreateUsersService $bulkCreateUsersService;
 
-    private const DEFAULT_BATCH_SIZE = '100';
+    private const DEFAULT_BATCH_SIZE = 100;
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
     private const OPTION_LINE_ITEM_SLUGS = 'line-item-slugs';
     private const OPTION_GROUP_PREFIX = 'group-prefix';
@@ -67,23 +67,23 @@ class BulkUserCreationCommand extends Command
         $this->addOption(
             self::OPTION_LINE_ITEM_IDS,
             'i',
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_REQUIRED,
             'Comma separated list of line item IDs',
         );
 
         $this->addOption(
             self::OPTION_LINE_ITEM_SLUGS,
             's',
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_REQUIRED,
             'Comma separated list of line item slugs',
         );
 
         $this->addOption(
             self::OPTION_BATCH_SIZE,
             'b',
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_REQUIRED,
             'User Create Batch size',
-            self::DEFAULT_BATCH_SIZE
+            (string) self::DEFAULT_BATCH_SIZE
         );
 
         $this->addArgument(
@@ -95,7 +95,7 @@ class BulkUserCreationCommand extends Command
         $this->addOption(
             self::OPTION_GROUP_PREFIX,
             'g',
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_REQUIRED,
             'Group Prefix',
         );
     }
@@ -174,31 +174,30 @@ class BulkUserCreationCommand extends Command
         $lineItemIds = array_filter(
             explode(',', $inputLineItemIds),
             static function (string $value): bool {
-                return !empty($value) && (int)$value > 0;
+                return !empty($value) && filter_var($value, FILTER_VALIDATE_INT);
             }
         );
+
         if (empty($lineItemIds)) {
             throw new InvalidArgumentException(
                 sprintf('Invalid %s option value received.', self::OPTION_LINE_ITEM_IDS)
             );
         }
-
         $this->lineItemIds = array_map('intval', $lineItemIds);
     }
 
     private function initializeLineItemSlugsOption(string $inputLineItemSlugs): void
     {
-        if (!empty($inputLineItemSlugs)) {
-            $this->lineItemSlugs = array_filter(
-                explode(',', $inputLineItemSlugs),
-                static function (string $value): bool {
-                    return !empty($value);
-                }
-            );
-        }
+        $this->lineItemSlugs = array_filter(
+            explode(',', $inputLineItemSlugs),
+            static function (string $value): bool {
+                return !empty($value);
+            }
+        );
+
         if (empty($this->lineItemSlugs)) {
             throw new InvalidArgumentException(
-                sprintf('Invalid %s option received.', self::OPTION_LINE_ITEM_SLUGS)
+                sprintf('Invalid %s option value received.', self::OPTION_LINE_ITEM_SLUGS)
             );
         }
     }
@@ -206,7 +205,7 @@ class BulkUserCreationCommand extends Command
     private function initializeUserPrefixOption(string $inputUserPrefix): void
     {
         $this->userPrefix = array_filter(
-            explode(',', (string)$inputUserPrefix),
+            explode(',', $inputUserPrefix),
             static function (string $value): bool {
                 return !empty($value);
             }
@@ -221,9 +220,10 @@ class BulkUserCreationCommand extends Command
 
     private function initializeBatchOption(string $inputBatchSize): void
     {
-        if (is_numeric($inputBatchSize)) {
-            $this->batchSize = (int)$inputBatchSize;
+        if (filter_var($inputBatchSize, FILTER_VALIDATE_INT)) {
+            $this->batchSize = (int) $inputBatchSize;
         }
+
         if (empty($this->batchSize)) {
             throw new InvalidArgumentException(
                 sprintf('Batch Size should be a valid number')

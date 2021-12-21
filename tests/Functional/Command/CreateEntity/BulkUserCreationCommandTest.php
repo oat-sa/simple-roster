@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
+namespace OAT\SimpleRoster\Tests\Functional\Command\CreateEntity;
 
 use InvalidArgumentException;
 use OAT\SimpleRoster\Command\CreateEntity\User\BulkUserCreationCommand;
@@ -275,7 +275,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
                 'parameters' => [
                     '-s' => ',',
                 ],
-                'expectedOutput' => 'Invalid line-item-slugs option received.',
+                'expectedOutput' => 'Invalid line-item-slugs option value received.',
             ],
             'informedBothSlugsAndIds' => [
                 'parameters' => [

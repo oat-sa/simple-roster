@@ -27,7 +27,6 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiInstanceUrlException;
 use OAT\SimpleRoster\Lti\Exception\IndeterminableLtiRequestContextIdException;
-use OAT\SimpleRoster\Lti\Exception\LtiInstanceNotFoundException;
 
 class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
 {
@@ -58,33 +57,5 @@ class UserGroupIdLtiInstanceLoadBalancer extends AbstractLtiInstanceLoadBalancer
         }
 
         return (string)$user->getGroupId();
-    }
-
-    public function generateGroupIds(string $groupPrefix): array
-    {
-        $totalInstances = $this->ltiInstanceCollection->count();
-        if ($this->ltiInstanceCollection->isEmpty()) {
-            throw new LtiInstanceNotFoundException('No Lti instance were found in database.');
-        }
-
-        $groupIds = [];
-        for ($targetId = 1; $targetId <= $totalInstances; ++$targetId) {
-            $newGroupId = $this->getNewGroupId($groupPrefix);
-            $possibleIndex = (int) $this->computeLtiInstanceByString($newGroupId)->getId();
-
-            while (array_key_exists($possibleIndex, $groupIds)) {
-                    $newGroupId = $this->getNewGroupId($groupPrefix);
-                    $possibleIndex = (int) $this->computeLtiInstanceByString($newGroupId)->getId();
-            }
-
-            $groupIds[$possibleIndex] = $newGroupId;
-        }
-
-        return array_values($groupIds);
-    }
-
-    private function getNewGroupId(string $groupPrefix): string
-    {
-        return sprintf($groupPrefix . '_%s', substr(md5(random_bytes(10)), 0, 10));
     }
 }
