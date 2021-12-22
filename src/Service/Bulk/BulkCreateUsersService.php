@@ -44,6 +44,7 @@ class BulkCreateUsersService
     private int $groupIndex = 0;
 
     private string $generatedUsersFilePath;
+    private string $projectDir;
 
     private const USER_CSV_HEAD = ['username', 'password', 'groupId'];
     private const ASSIGNMENT_CSV_HEAD = ['username', 'lineItemSlug'];
@@ -64,7 +65,8 @@ class BulkCreateUsersService
         CsvWriter $csvWriter,
         LtiInstanceRepository $ltiInstanceRepository,
         Filesystem $filesystem,
-        string $generatedUsersFilePath
+        string $generatedUsersFilePath,
+        string $projectDir
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -73,6 +75,7 @@ class BulkCreateUsersService
         $this->generatedUsersFilePath = $generatedUsersFilePath;
         $this->filesystem = $filesystem;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -83,8 +86,7 @@ class BulkCreateUsersService
         array $lineItemSlugs,
         array $userPrefixes,
         int $batchSize,
-        ?string $groupPrefix,
-        string $serviceInvokedFrom = ''
+        ?string $groupPrefix
     ): UserCreationResult {
         $notExistLineItemsArray = $userGroupIds = [];
 
@@ -129,8 +131,7 @@ class BulkCreateUsersService
             $userPrefixes,
             $userGroupAssignCount,
             $groupPrefix,
-            $batchSize,
-            $serviceInvokedFrom
+            $batchSize
         );
 
         $message = $this->getOperationResultMessage($slugTotalUsers, $userPrefixes);
@@ -171,14 +172,10 @@ class BulkCreateUsersService
         array $userPrefixes,
         int $userGroupAssignCount,
         ?string $groupPrefix,
-        int $batchSize,
-        $serviceInvokedFrom
+        int $batchSize
     ): array {
         $slugWiseTotalUsersArray = [];
-        $automateCsvPath = $this->generatedUsersFilePath . date('Y-m-d');
-        if ($serviceInvokedFrom) {
-            $automateCsvPath = sprintf('../%s', $automateCsvPath);
-        }
+        $automateCsvPath = sprintf('%s/%s%s', $this->projectDir, $this->generatedUsersFilePath, date('Y-m-d'));
         $this->createDirectoryIfNotExist($automateCsvPath);
         foreach ($userPrefixes as $prefix) {
             $csvPath = sprintf('%s/%s', $automateCsvPath, $prefix);

@@ -56,6 +56,7 @@ services:
             $jwtRefreshTokenTtl: '%app.jwt.refresh_token_ttl%'
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
             $generatedUsersFilePath: '%app.generated_users_file_path%'
+            $projectDir: '%kernel.project_dir%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
