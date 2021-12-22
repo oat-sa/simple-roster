@@ -28,6 +28,9 @@ use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
 
 trait GenerateGroupIdsTriat
 {
+    /**
+     * @return string[]
+     */
     public function generateGroupIds(
         string $groupPrefix,
         UniqueLtiInstanceCollection $ltiInstanceCollection

@@ -56,7 +56,6 @@ class BulkCreateUsersAction
                 $requestPayLoad['userPrefixes'],
                 $requestPayLoad['quantity'],
                 $requestPayLoad['groupIdPrefix'],
-                self::SERVICE_INVOKED_FROM
             ),
             Response::HTTP_CREATED
         );

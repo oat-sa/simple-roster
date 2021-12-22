@@ -38,6 +38,9 @@ class UserCreationResult
         return $this->message;
     }
 
+    /**
+     * @return string[]
+     */
     public function getNonExistingLineItems(): array
     {
         return $this->nonExistingLineItems;
