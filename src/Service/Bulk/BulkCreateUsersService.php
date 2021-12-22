@@ -44,6 +44,7 @@ class BulkCreateUsersService
     private int $groupIndex = 0;
 
     private string $generatedUsersFilePath;
+    private string $projectDir;
 
     private const USER_CSV_HEAD = ['username', 'password', 'groupId'];
     private const ASSIGNMENT_CSV_HEAD = ['username', 'lineItemSlug'];
