@@ -142,7 +142,7 @@ class BulkCreateUserActionTest extends WebTestCase
                     'groupIdPrefix' => 'TestCollege',
                 ]),
                 'response' => [
-                    'message' => '8 users created for line item slug-qqyw for user prefix QA,LQA',
+                    'message' => "8 users created for line item slug-qqyw for user prefix QA,LQA \n",
                     'nonExistingLineItems' => [],
                 ]
             ]
