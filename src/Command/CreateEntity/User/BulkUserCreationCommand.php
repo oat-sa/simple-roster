@@ -163,10 +163,10 @@ class BulkUserCreationCommand extends Command
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function initializeLineItemIdsOption(string $inputLineItemIds): void
@@ -189,10 +189,7 @@ class BulkUserCreationCommand extends Command
     private function initializeLineItemSlugsOption(string $inputLineItemSlugs): void
     {
         $this->lineItemSlugs = array_filter(
-            explode(',', $inputLineItemSlugs),
-            static function (string $value): bool {
-                return !empty($value);
-            }
+            explode(',', $inputLineItemSlugs)
         );
 
         if (empty($this->lineItemSlugs)) {
@@ -205,10 +202,7 @@ class BulkUserCreationCommand extends Command
     private function initializeUserPrefixOption(string $inputUserPrefix): void
     {
         $this->userPrefix = array_filter(
-            explode(',', $inputUserPrefix),
-            static function (string $value): bool {
-                return !empty($value);
-            }
+            explode(',', $inputUserPrefix)
         );
 
         if (empty($this->userPrefix)) {

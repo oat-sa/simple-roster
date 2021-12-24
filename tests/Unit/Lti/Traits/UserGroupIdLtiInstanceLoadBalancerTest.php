@@ -114,12 +114,4 @@ class UserGroupIdLtiInstanceLoadBalancerTest extends TestCase
 
         self::assertSame('group_5', $this->subject->getLtiRequestContextId($assignment));
     }
-    public function testItCanGenerateGroupIds(): void
-    {
-        $this->ltiInstanceCollection
-            ->add(new LtiInstance(1, 'infra_1', 'http://lb_infra_1', 'key', 'secret'))
-            ->add(new LtiInstance(2, 'infra_2', 'http://lb_infra_2', 'key', 'secret'));
-        $output = $this->subject->generateGroupIds('testGroup');
-        self::assertIsArray($output);
-    }
 }

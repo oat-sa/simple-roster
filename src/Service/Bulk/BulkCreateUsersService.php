@@ -24,9 +24,9 @@ namespace OAT\SimpleRoster\Service\Bulk;
 
 use OAT\SimpleRoster\Csv\CsvWriter;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
+use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
-use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
-use OAT\SimpleRoster\Lti\Traits\GenerateGroupIdsTriat;
+use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -35,8 +35,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class BulkCreateUsersService
 {
-    use GenerateGroupIdsTriat;
-
     private array $lineItemIds = [];
     private array $lineItemSlugs = [];
 
@@ -52,25 +50,28 @@ class BulkCreateUsersService
     private LineItemRepository $lineItemRepository;
     private AssignmentRepository $assignmentRepository;
     private Filesystem $filesystem;
-    private LtiInstanceLoadBalancerFactory $ltiInstanceLoadBalancerFactory;
+    private GenerateGroupIdsService $generateGroupIdsService;
     private CsvWriter $csvWriter;
     private LtiInstanceRepository $ltiInstanceRepository;
+    private UserCreationResultMessage $userCreationMessage;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     public function __construct(
         LineItemRepository $lineItemRepository,
         AssignmentRepository $assignmentRepository,
-        LtiInstanceLoadBalancerFactory $ltiInstanceLoadBalancerFactory,
+        GenerateGroupIdsService $generateGroupIdsService,
         CsvWriter $csvWriter,
         LtiInstanceRepository $ltiInstanceRepository,
+        UserCreationResultMessage $userCreationMessage,
         Filesystem $filesystem,
         string $generatedUsersFilePath,
         string $projectDir
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
-        $this->ltiInstanceLoadBalancerFactory = $ltiInstanceLoadBalancerFactory;
+        $this->generateGroupIdsService = $generateGroupIdsService;
+        $this->userCreationMessage = $userCreationMessage;
         $this->csvWriter = $csvWriter;
         $this->generatedUsersFilePath = $generatedUsersFilePath;
         $this->filesystem = $filesystem;
@@ -116,7 +117,7 @@ class BulkCreateUsersService
 
         $userGroupAssignCount = 0;
         if ($groupPrefix) {
-            $userGroupIds = $this->generateGroupIds(
+            $userGroupIds = $this->generateGroupIdsService->generateGroupIds(
                 $groupPrefix,
                 $this->ltiInstanceRepository->findAllAsCollection()
             );
@@ -134,28 +135,10 @@ class BulkCreateUsersService
             $batchSize
         );
 
-        $message = $this->getOperationResultMessage($slugTotalUsers, $userPrefixes);
+        $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
 
         return new UserCreationResult($message, $notExistLineItemsArray);
     }
-
-    public function getOperationResultMessage(array $slugTotalUsers, array $userPrefix): string
-    {
-        $message = '';
-        $userPrefixString = implode(',', $userPrefix);
-
-        foreach ($slugTotalUsers as $slug => $totalUsers) {
-            $message .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
-                $totalUsers,
-                $slug,
-                $userPrefixString
-            );
-        }
-
-        return $message;
-    }
-
 
     private function setLineItemSlugData(array $lineItems): void
     {

@@ -20,13 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Lti\Traits;
+namespace OAT\SimpleRoster\Lti\Service;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Lti\Exception\LtiInstanceNotFoundException;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
+use RuntimeException;
 
-trait GenerateGroupIdsTriat
+class GenerateGroupIdsService
 {
     /**
      * @return string[]
@@ -42,11 +43,17 @@ trait GenerateGroupIdsTriat
         $groupIds = [];
         for ($targetId = 1; $targetId <= $totalInstances; ++$targetId) {
             $newGroupId = $this->getNewGroupId($groupPrefix);
-            $possibleIndex = (int) $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
+            $possibleIndex = $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
 
+            if ($possibleIndex === null) {
+                throw new RuntimeException('Index cannot be null');
+            }
             while (array_key_exists($possibleIndex, $groupIds)) {
                 $newGroupId = $this->getNewGroupId($groupPrefix);
-                $possibleIndex = (int) $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
+                $possibleIndex = $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
+                if ($possibleIndex === null) {
+                    throw new RuntimeException('Index cannot be null');
+                }
             }
 
             $groupIds[$possibleIndex] = $newGroupId;
@@ -71,6 +78,7 @@ trait GenerateGroupIdsTriat
         }
 
         $index = $asciiSum % count($ltiInstanceCollection);
+
         return $ltiInstanceCollection->getByIndex($index);
     }
 }
