@@ -140,24 +140,6 @@ class BulkCreateUsersService
         return new UserCreationResult($message, $notExistLineItemsArray);
     }
 
-    public function getOperationResultMessage(array $slugTotalUsers, array $userPrefix): string
-    {
-        $message = '';
-        $userPrefixString = implode(',', $userPrefix);
-
-        foreach ($slugTotalUsers as $slug => $totalUsers) {
-            $message .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
-                $totalUsers,
-                $slug,
-                $userPrefixString
-            );
-        }
-
-        return $message;
-    }
-
-
     private function setLineItemSlugData(array $lineItems): void
     {
         $lineItemSlugs = [];
