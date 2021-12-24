@@ -34,8 +34,6 @@ class BulkCreateUsersAction
     private BulkCreateUserValidator $bulkCreateUserValidator;
     private BulkCreateUsersService $bulkCreateUsersService;
 
-    private const SERVICE_INVOKED_FROM = 'api';
-
     public function __construct(
         BulkCreateUsersService $bulkCreateUsersService,
         BulkCreateUserValidator $bulkCreateUserValidator,
@@ -48,7 +46,7 @@ class BulkCreateUsersAction
 
     public function __invoke(Request $request): Response
     {
-        $requestPayLoad = $this->bulkCreateUserValidator->validate($request);
+        $requestPayLoad = $this->bulkCreateUserValidator->validateAndInitializeData($request);
         return $this->responder->createJsonResponse(
             $this->bulkCreateUsersService->createUsers(
                 $requestPayLoad['lineItemIds'],

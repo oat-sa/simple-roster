@@ -40,7 +40,7 @@ class BulkCreateUserValidator
         $this->validator = $validator;
     }
 
-    public function validate(Request $request): ?array
+    public function validateAndInitializeData(Request $request): ?array
     {
         try {
             $requestPayLoad = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
