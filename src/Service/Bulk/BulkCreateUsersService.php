@@ -28,14 +28,13 @@ use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
-use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
+use OAT\SimpleRoster\Factory\LineItemCriteriaFactory;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Symfony\Component\Filesystem\Filesystem;
 
 class BulkCreateUsersService
 {
-    private array $lineItemIds = [];
     private array $lineItemSlugs = [];
 
     private int $userGroupBatchCount = 0;
@@ -54,6 +53,7 @@ class BulkCreateUsersService
     private CsvWriter $csvWriter;
     private LtiInstanceRepository $ltiInstanceRepository;
     private UserCreationResultMessage $userCreationMessage;
+    private LineItemCriteriaFactory $lineItemCriteriaFactory;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
@@ -64,6 +64,7 @@ class BulkCreateUsersService
         CsvWriter $csvWriter,
         LtiInstanceRepository $ltiInstanceRepository,
         UserCreationResultMessage $userCreationMessage,
+        LineItemCriteriaFactory $lineItemCriteriaFactory,
         Filesystem $filesystem,
         string $generatedUsersFilePath,
         string $projectDir
@@ -76,6 +77,7 @@ class BulkCreateUsersService
         $this->generatedUsersFilePath = $generatedUsersFilePath;
         $this->filesystem = $filesystem;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
+        $this->lineItemCriteriaFactory = $lineItemCriteriaFactory;
         $this->projectDir = $projectDir;
     }
 
@@ -92,19 +94,17 @@ class BulkCreateUsersService
         $notExistLineItemsArray = $userGroupIds = [];
 
         if (!empty($lineItemIds) || !empty($lineItemSlugs)) {
-            $this->lineItemIds = $lineItemIds;
-            $this->lineItemSlugs = $lineItemSlugs;
-            $criteria = $this->getFindLineItemCriteria();
+            $criteria = $this->lineItemCriteriaFactory->getFindLineItemCriteria($lineItemIds, $lineItemSlugs);
             $lineItems = $this->lineItemRepository->findLineItemsByCriteria($criteria)->jsonSerialize();
             if (empty($lineItems)) {
-                $exceptionMessage = $this->lineItemIds
-                    ? implode(',', $this->lineItemIds) . ' Line item id(s) not exist in the system'
-                    : implode(',', $this->lineItemSlugs) . ' Line item slug(s) not exist in the system';
+                $exceptionMessage = $lineItemIds
+                    ? implode(',', $lineItemIds) . ' Line item id(s) not exist in the system'
+                    : implode(',', $lineItemSlugs) . ' Line item slug(s) not exist in the system';
                 throw new LineItemNotFoundException($exceptionMessage);
             }
 
             $this->setLineItemSlugData($lineItems);
-            $notExistLineItemsArray = $this->lineItemIds
+            $notExistLineItemsArray = $lineItemIds
                 ? array_diff($lineItemIds, array_keys($this->lineItemSlugs))
                 : array_diff($lineItemSlugs, array_values($this->lineItemSlugs));
         }
@@ -212,21 +212,6 @@ class BulkCreateUsersService
     private function createUserPassword(): string
     {
         return substr(str_shuffle('0123456789abcdefghijklmnopqrstvwxyz'), 0, 8);
-    }
-
-    private function getFindLineItemCriteria(): FindLineItemCriteria
-    {
-        $criteria = new FindLineItemCriteria();
-
-        if (!empty($this->lineItemIds)) {
-            $criteria->addLineItemIds(...$this->lineItemIds);
-        }
-
-        if (!empty($this->lineItemSlugs)) {
-            $criteria->addLineItemSlugs(...$this->lineItemSlugs);
-        }
-
-        return $criteria;
     }
 
     /**
