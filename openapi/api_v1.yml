@@ -728,7 +728,7 @@ components:
         BulkCreateUserRequest:
             type: object
             properties:
-                lineItemSlugs:
+                lineItemSlug:
                     type: string
                     description: Slugs of line items seperated by commas
                     example: slug-1

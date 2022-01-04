@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Action\CreateEntity;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\Request\Validator\BulkCreateUserValidator;
+use OAT\SimpleRoster\Request\Initialize\BulkCreateUserRequestInitialize;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,20 +34,24 @@ class BulkCreateUsersAction
     private SerializerResponder $responder;
     private BulkCreateUserValidator $bulkCreateUserValidator;
     private BulkCreateUsersService $bulkCreateUsersService;
+    private BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize;
 
     public function __construct(
         BulkCreateUsersService $bulkCreateUsersService,
         BulkCreateUserValidator $bulkCreateUserValidator,
+        BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize,
         SerializerResponder $responder
     ) {
         $this->bulkCreateUserValidator = $bulkCreateUserValidator;
         $this->bulkCreateUsersService = $bulkCreateUsersService;
+        $this->bulkCreateUserRequestInitialize = $bulkCreateUserRequestInitialize;
         $this->responder = $responder;
     }
 
     public function __invoke(Request $request): Response
     {
-        $requestPayLoad = $this->bulkCreateUserValidator->validateAndInitializeData($request);
+        $this->bulkCreateUserValidator->validate($request);
+        $requestPayLoad = $this->bulkCreateUserRequestInitialize->initializeRequestData($request);
         return $this->responder->createJsonResponse(
             $this->bulkCreateUsersService->createUsers(
                 $requestPayLoad['lineItemIds'],

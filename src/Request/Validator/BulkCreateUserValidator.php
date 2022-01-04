@@ -33,14 +33,12 @@ class BulkCreateUserValidator
 {
     private ValidatorInterface $validator;
 
-    private const DEFAULT_BATCH_SIZE = 100;
-
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
     }
 
-    public function validateAndInitializeData(Request $request): ?array
+    public function validate(Request $request): void
     {
         try {
             $requestPayLoad = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -56,7 +54,7 @@ class BulkCreateUserValidator
 
         $errors = $this->validator->validate($requestPayLoad, $this->getConstraints());
         if ($errors->count() === 0) {
-            return $this->initializeBulkCreateUserData($requestPayLoad);
+            return;
         }
 
         $rawErrors = [];
@@ -77,7 +75,7 @@ class BulkCreateUserValidator
         return new Assert\Collection(
             [
                 'fields' => [
-                    'lineItemSlugs' => new Assert\Required([new Assert\Type('string')]),
+                    'lineItemSlug' => new Assert\Required([new Assert\Type('string')]),
                     'quantity' => new Assert\Optional([new Assert\Type('int')]),
                     'groupIdPrefix' => new Assert\Optional([new Assert\Type('string')]),
                     'userPrefixes' => new Assert\Sequentially(
@@ -90,16 +88,5 @@ class BulkCreateUserValidator
                 'allowExtraFields' => true,
             ],
         );
-    }
-
-    private function initializeBulkCreateUserData(array $responseBody): array
-    {
-        return [
-                'lineItemIds' => [],
-                'lineItemSlugs' => explode(',', $responseBody['lineItemSlugs']),
-                'quantity' => $responseBody['quantity'] ?? self::DEFAULT_BATCH_SIZE,
-                'groupIdPrefix' => $responseBody['groupIdPrefix'] ?? '',
-                'userPrefixes' => $responseBody['userPrefixes'] ?? '',
-            ];
     }
 }

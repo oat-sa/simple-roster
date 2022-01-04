@@ -136,13 +136,13 @@ class BulkCreateUserActionTest extends WebTestCase
         return [
             'withAllFields' => [
                 'request' => json_encode([
-                    'lineItemSlugs' => 'slug-qqyw',
+                    'lineItemSlug' => 'slug-qqyw',
                     'userPrefixes' => ['QA','LQA'],
                     'quantity' => 4,
                     'groupIdPrefix' => 'TestCollege',
                 ]),
                 'response' => [
-                    'message' => "8 users created for line item slug-qqyw for user prefix QA,LQA \n",
+                    'message' => "8 users created for line item slug-qqyw for user prefix QA,LQA",
                     'nonExistingLineItems' => [],
                 ]
             ]
@@ -154,7 +154,7 @@ class BulkCreateUserActionTest extends WebTestCase
         return [
             'withoutExistingSlug' => [
                 'request' => json_encode([
-                    'lineItemSlugs' => 'my-slug',
+                    'lineItemSlug' => 'my-slug',
                     'userPrefixes' => ['QA','LQA'],
                     'quantity' => 4,
                     'groupIdPrefix' => 'TestCollege',
@@ -170,20 +170,20 @@ class BulkCreateUserActionTest extends WebTestCase
             'emptyBody' => [
                 'request' => json_encode([]),
                 'message' => 'Invalid Request Body: '
-                    . '[lineItemSlugs] -> This field is missing. '
+                    . '[lineItemSlug] -> This field is missing. '
                     . '[userPrefixes] -> This field is missing.'
             ],
-            'missingLineItemSlugs' => [
+            'missingLineItemSlug' => [
                 'request' => json_encode([
                     'userPrefixes' => ["OAT", "QA"],
                     'groupIdPrefix' => 'fdfdf',
                     'quantity' => 4,
                 ]),
-                'message' => 'Invalid Request Body: [lineItemSlugs] -> This field is missing.'
+                'message' => 'Invalid Request Body: [lineItemSlug] -> This field is missing.'
             ],
             'missingUserPrefixes' => [
                 'request' => json_encode([
-                    'lineItemSlugs' => 'my-slug',
+                    'lineItemSlug' => 'my-slug',
                     'groupIdPrefix' => 'fdfdf',
                     'quantity' => 4,
                 ]),
