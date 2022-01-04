@@ -26,9 +26,25 @@ class UserCreationResultMessage
 {
     public function normalizeMessage(array $slugTotalUsers, array $userPrefix): string
     {
-        $message = '';
         $userPrefixString = implode(',', $userPrefix);
+        return count($slugTotalUsers) > 1
+            ? $this->multipleSlugNormalizeMessage($slugTotalUsers, $userPrefixString)
+            : $this->singleSlugNormalizeMessage($slugTotalUsers, $userPrefixString);
+    }
 
+    private function singleSlugNormalizeMessage(array $slugTotalUsers, string $userPrefixString): string
+    {
+        return sprintf(
+            "%s users created for line item %s for user prefix %s",
+            array_values($slugTotalUsers)[0],
+            array_keys($slugTotalUsers)[0],
+            $userPrefixString
+        );
+    }
+
+    private function multipleSlugNormalizeMessage(array $slugTotalUsers, string $userPrefixString): string
+    {
+        $message = '';
         foreach ($slugTotalUsers as $slug => $totalUsers) {
             $message .= sprintf(
                 "%s users created for line item %s for user prefix %s \n",
