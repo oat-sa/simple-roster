@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\CreateEntity;
 
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +34,7 @@ class BulkCreateUserActionTest extends WebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
+    use FileRemovalTrait;
 
     private KernelBrowser $kernelBrowser;
 
@@ -46,6 +48,7 @@ class BulkCreateUserActionTest extends WebTestCase
         $this->loadFixtureByFilename('lineItemsAndLtiInstances.yml');
 
         $this->setUpTestLogHandler();
+        $this->removeGeneratedUsersFilePath();
     }
 
     public function testItThrowsUnauthorizedHttpExceptionIfRequestApiKeyIsInvalid(): void

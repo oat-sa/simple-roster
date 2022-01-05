@@ -52,6 +52,7 @@ class BulkCreateUsersAction
     {
         $this->bulkCreateUserValidator->validate($request);
         $requestPayLoad = $this->bulkCreateUserRequestInitialize->initializeRequestData($request);
+
         return $this->responder->createJsonResponse(
             $this->bulkCreateUsersService->createUsers(
                 $requestPayLoad['lineItemIds'],

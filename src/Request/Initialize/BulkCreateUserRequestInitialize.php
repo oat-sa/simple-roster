@@ -31,6 +31,7 @@ class BulkCreateUserRequestInitialize
     public function initializeRequestData(Request $request): array
     {
         $requestPayLoad = json_decode($request->getContent(), true);
+
         return [
                 'lineItemIds' => [],
                 'lineItemSlugs' => explode(',', $requestPayLoad['lineItemSlug']),
