@@ -36,9 +36,9 @@ class UserCreationResultMessage
     private function singleSlugNormalizeMessage(array $slugTotalUsers, string $userPrefixString): string
     {
         return sprintf(
-            "%s users created for line item %s for user prefix %s",
-            array_values($slugTotalUsers)[0],
-            array_keys($slugTotalUsers)[0],
+            '%s users created for line item %s for user prefix %s',
+            reset($slugTotalUsers),
+            array_key_first($slugTotalUsers),
             $userPrefixString
         );
     }
