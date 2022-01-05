@@ -26,7 +26,7 @@ use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 
 class LineItemCriteriaFactory
 {
-    public function getFindLineItemCriteria(
+    public function create(
         array $lineItemIds,
         array $lineItemSlugs
     ): FindLineItemCriteria {

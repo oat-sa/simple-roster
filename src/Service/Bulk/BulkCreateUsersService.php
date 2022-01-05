@@ -94,7 +94,7 @@ class BulkCreateUsersService
         $notExistLineItemsArray = $userGroupIds = [];
 
         if (!empty($lineItemIds) || !empty($lineItemSlugs)) {
-            $criteria = $this->lineItemCriteriaFactory->getFindLineItemCriteria($lineItemIds, $lineItemSlugs);
+            $criteria = $this->lineItemCriteriaFactory->create($lineItemIds, $lineItemSlugs);
             $lineItems = $this->lineItemRepository->findLineItemsByCriteria($criteria)->jsonSerialize();
             if (empty($lineItems)) {
                 $exceptionMessage = $lineItemIds

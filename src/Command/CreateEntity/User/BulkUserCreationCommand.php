@@ -214,12 +214,14 @@ class BulkUserCreationCommand extends Command
 
     private function initializeBatchOption(string $inputBatchSize): void
     {
-        if (filter_var($inputBatchSize, FILTER_VALIDATE_INT) === false) {
+        $batchSize = filter_var($inputBatchSize, FILTER_VALIDATE_INT);
+
+        if ($batchSize === false) {
             throw new InvalidArgumentException(
                 sprintf('Batch Size should be a valid number')
             );
         }
 
-        $this->batchSize = (int) $inputBatchSize;
+        $this->batchSize = $batchSize;
     }
 }
