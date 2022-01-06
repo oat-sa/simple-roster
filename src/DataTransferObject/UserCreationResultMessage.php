@@ -48,10 +48,11 @@ class UserCreationResultMessage
         $message = '';
         foreach ($slugTotalUsers as $slug => $totalUsers) {
             $message .= sprintf(
-                "%s users created for line item %s for user prefix %s \n",
+                '%s users created for line item %s for user prefix %s %s',
                 $totalUsers,
                 $slug,
-                $userPrefixString
+                $userPrefixString,
+                PHP_EOL
             );
         }
 
