@@ -29,6 +29,8 @@ trait FileRemovalTrait
     protected function removeGeneratedUsersFilePath(): void
     {
         $filesystem = new Filesystem();
-        $filesystem->remove(getenv('GENERATED_USERS_FILE_PATH'));
+        $filesystem->remove(
+            self::getContainer()->getParameter('app.generated_users_file_path')
+        );
     }
 }
