@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Csv;
 
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
+use Aws\Sts\StsClient;
 
 class AwsS3CsvWriter
 {
@@ -53,6 +54,21 @@ class AwsS3CsvWriter
     public function writeCsv(string $sourcePath): void
     {
         try {
+
+            // $stsClient = new StsClient([
+            //     'profile' => 'jeethks-api',
+            //     'region'  => $this->awsS3Region,
+            //     'version' => $this->awsS3Version,
+            // ]);
+            
+            // $ARN = "arn:aws:iam::218090532482:role/oat/operation-lvl2";
+            // $sessionName = "s3-access-example";
+            // $duration = 3600;
+            // $result = $stsClient->AssumeRole([
+            //     'RoleArn' => $ARN,
+            //     'RoleSessionName' => $sessionName,
+            // ]);
+            
             $s3Client = new S3Client([
                 'version'     => $this->awsS3Version,
                 'region'      => $this->awsS3Region,
@@ -61,6 +77,11 @@ class AwsS3CsvWriter
                     'secret' => $this->awsS3AccessSecretKey,
                 ]
             ]);
+
+            // $buckets = $s3Client->listBuckets();
+            // foreach ($buckets['Buckets'] as $bucket) {
+            //     echo $bucket['Name'] . "\n";
+            // }
 
             $destinationPath = sprintf('%s/%s', $this->awsS3FilePath, date('Y-m-d'));
             $s3Client->uploadDirectory(

@@ -32,6 +32,7 @@ use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Symfony\Component\Filesystem\Filesystem;
+use OAT\SimpleRoster\Csv\AwsS3CsvWriter;
 
 class BulkCreateUsersService
 {
@@ -54,6 +55,7 @@ class BulkCreateUsersService
     private LtiInstanceRepository $ltiInstanceRepository;
     private UserCreationResultMessage $userCreationMessage;
     private LineItemCriteriaFactory $lineItemCriteriaFactory;
+    private AwsS3CsvWriter $awsS3CsvWriter;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
@@ -67,7 +69,8 @@ class BulkCreateUsersService
         LineItemCriteriaFactory $lineItemCriteriaFactory,
         Filesystem $filesystem,
         string $generatedUsersFilePath,
-        string $projectDir
+        string $projectDir,
+        AwsS3CsvWriter $awsS3CsvWriter
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -79,6 +82,7 @@ class BulkCreateUsersService
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemCriteriaFactory = $lineItemCriteriaFactory;
         $this->projectDir = $projectDir;
+        $this->awsS3CsvWriter = $awsS3CsvWriter;
     }
 
     /**
@@ -205,6 +209,8 @@ class BulkCreateUsersService
                     : $slugTotalUsersCreated;
             }
         }
+
+        $this->awsS3CsvWriter->writeCsv($automateCsvPath);
 
         return $slugWiseTotalUsersArray;
     }
