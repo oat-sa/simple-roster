@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Csv;
 
-
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
@@ -62,7 +61,7 @@ class AwsS3CsvWriter
                     'secret' => $this->awsS3AccessSecretKey,
                 ]
             ]);
-            
+
             $destinationPath = sprintf('%s/%s', $this->awsS3FilePath, date('Y-m-d'));
             $s3Client->uploadDirectory(
                 $sourcePath,
