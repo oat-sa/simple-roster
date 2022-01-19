@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use OAT\SimpleRoster\Csv\AwsS3CsvWriter;
 use OAT\SimpleRoster\Csv\CsvWriter;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
@@ -32,7 +33,6 @@ use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Symfony\Component\Filesystem\Filesystem;
-use OAT\SimpleRoster\Csv\AwsS3CsvWriter;
 
 class BulkCreateUsersService
 {
