@@ -56,8 +56,8 @@ class AwsS3CsvWriter
         try {
 
             // $stsClient = new StsClient([
-            //     'profile' => 'jeethks-api',
-            //     'region'  => $this->awsS3Region,
+            //     'profile' => 'operation-lvl2@itinv',
+            //     'region'  => 'eu-west-1',
             //     'version' => $this->awsS3Version,
             // ]);
             
@@ -71,7 +71,7 @@ class AwsS3CsvWriter
             
             $s3Client = new S3Client([
                 'version'     => $this->awsS3Version,
-                'region'      => $this->awsS3Region,
+                'region'      => 'eu-west-1',
                 'credentials' =>  [
                     'key'    => $this->awsS3AccessKey,
                     'secret' => $this->awsS3AccessSecretKey,
