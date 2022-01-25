@@ -27,6 +27,7 @@ class UserCreationResultMessage
     public function normalizeMessage(array $slugTotalUsers, array $userPrefix): string
     {
         $userPrefixString = implode(',', $userPrefix);
+
         return count($slugTotalUsers) > 1
             ? $this->multipleSlugNormalizeMessage($slugTotalUsers, $userPrefixString)
             : $this->singleSlugNormalizeMessage($slugTotalUsers, $userPrefixString);

@@ -53,3 +53,8 @@ updateLineItems:
   path: '%app.route_prefix%/v1/web-hooks/update-line-items'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\WebHook\UpdateLineItemsWebhookAction }
+
+bulkCreateUsers:
+  path: '%app.route_prefix%/v1/bulk-create-users'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\CreateEntity\BulkCreateUsersAction }
