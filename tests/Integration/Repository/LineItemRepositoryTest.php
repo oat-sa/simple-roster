@@ -157,8 +157,8 @@ class LineItemRepositoryTest extends KernelTestCase
     {
         $lineItem = (new LineItem())
             ->setSlug('lineItemSlug1')
-            ->setLabel('my-label')
-            ->setUri('my-uri');
+            ->setLabel('The first line item')
+            ->setUri('http://lineitemuri.com');
 
         $result = $this->subject->createOrUpdate($lineItem);
 

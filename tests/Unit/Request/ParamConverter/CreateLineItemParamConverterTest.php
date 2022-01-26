@@ -89,11 +89,11 @@ class CreateLineItemParamConverterTest extends TestCase
         $payload = json_encode([
             'slug' => 'my-slug',
             'uri' => 'my-uri',
-            'label' => 'my-label',
+            'label' => 'my-slug',
             'isActive' => true,
             'startDateTime' => '2021-01-01T00:00:00+0000',
             'endDateTime' => '2021-01-31T00:00:00+0000',
-            'maxAttempts' => 1
+            'maxAttempts' => 0
         ]);
 
         $request->expects(self::once())
@@ -121,10 +121,10 @@ class CreateLineItemParamConverterTest extends TestCase
 
         self::assertInstanceOf(LineItem::class, $lineItem);
         self::assertSame('my-uri', $lineItem->getUri());
-        self::assertSame('my-label', $lineItem->getLabel());
+        self::assertSame('my-slug', $lineItem->getLabel());
         self::assertSame('my-slug', $lineItem->getSlug());
         self::assertTrue($lineItem->isActive());
-        self::assertSame(1, $lineItem->getMaxAttempts());
+        self::assertSame(0, $lineItem->getMaxAttempts());
         self::assertSame('2021-01-01T00:00:00+00:00', $lineItem->getStartAt()->format(DateTimeInterface::ATOM));
         self::assertSame('2021-01-31T00:00:00+00:00', $lineItem->getEndAt()->format(DateTimeInterface::ATOM));
     }

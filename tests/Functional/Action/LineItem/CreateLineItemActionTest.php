@@ -119,59 +119,50 @@ class CreateLineItemActionTest extends WebTestCase
                 'request' => json_encode([
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
                     'startDateTime' => '2021-01-01T00:00:00+0000',
                     'endDateTime' => '2021-01-31T00:00:00+0000',
-                    'maxAttempts' => 1
                 ]),
                 'response' => [
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
+                    'label' => 'my-slug',
                     'isActive' => true,
                     'startDateTime' => 1609459200,
                     'endDateTime' => 1612051200,
-                    'maxAttempts' => 1,
+                    'maxAttempts' => 0,
                 ]
             ],
             'withExistingSlug' => [
                 'request' => json_encode([
                     'slug' => 'slug-1',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
                     'startDateTime' => '2021-01-01T00:00:00+0000',
                     'endDateTime' => '2021-01-31T00:00:00+0000',
-                    'maxAttempts' => 3
-
                 ]),
                 'response' => [
-                    'slug' => 'slug-1',
-                    'uri' => 'my-uri',
-                    'label' => 'my-label',
+                    'id' => 1,
+                    'uri' => "https://test.taocloud.fr/__n/1",
+                    'label' => "label-1",
+                    'slug' => "slug-1",
                     'isActive' => true,
-                    'startDateTime' => 1609459200,
-                    'endDateTime' => 1612051200,
-                    'maxAttempts' => 3,
+                    'startDateTime' => "",
+                    'endDateTime' => "",
+                    'maxAttempts' => 0,
                 ]
             ],
             'withoutAllDates' => [
                 'request' => json_encode([
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                    'maxAttempts' => 1
                 ]),
                 'response' => [
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
+                    'label' => 'my-slug',
                     'isActive' => true,
                     'startDateTime' => '',
                     'endDateTime' => '',
-                    'maxAttempts' => 1,
+                    'maxAttempts' => 0,
                 ]
             ]
         ];
@@ -182,75 +173,24 @@ class CreateLineItemActionTest extends WebTestCase
         return [
             'emptyBody' => [
                 'request' => json_encode([]),
-                'message' => 'Invalid Request Body: '
-                    . '[slug] -> This field is missing. '
-                    . '[uri] -> This field is missing. '
-                    . '[label] -> This field is missing. '
-                    . '[isActive] -> This field is missing. '
-                    . '[maxAttempts] -> This field is missing.'
+                'message' => 'Invalid Request Body: [slug] -> This field is missing. [uri] -> This field is missing.'
             ],
             'missingSlug' => [
                 'request' => json_encode([
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                    'maxAttempts' => 1
                 ]),
                 'message' => 'Invalid Request Body: [slug] -> This field is missing.'
             ],
             'missingUri' => [
                 'request' => json_encode([
                     'slug' => 'my-slug',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                    'maxAttempts' => 1
                 ]),
                 'message' => 'Invalid Request Body: [uri] -> This field is missing.'
-            ],
-            'missingLabel' => [
-                'request' => json_encode([
-                    'slug' => 'my-slug',
-                    'uri' => 'my-uri',
-                    'isActive' => true,
-                    'maxAttempts' => 1
-                ]),
-                'message' => 'Invalid Request Body: [label] -> This field is missing.'
-            ],
-            'missingIsActive' => [
-                'request' => json_encode([
-                    'slug' => 'my-slug',
-                    'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'maxAttempts' => 1
-                ]),
-                'message' => 'Invalid Request Body: [isActive] -> This field is missing.'
-            ],
-            'missingMaxAttempts' => [
-                'request' => json_encode([
-                    'slug' => 'my-slug',
-                    'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                ]),
-                'message' => 'Invalid Request Body: [maxAttempts] -> This field is missing.'
-            ],
-            'negativeMaxAttempts' => [
-                'request' => json_encode([
-                    'slug' => 'my-slug',
-                    'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                    'maxAttempts' => -1,
-                ]),
-                'message' => 'Invalid Request Body: [maxAttempts] -> This value should be either positive or zero.'
             ],
             'withInvalidDates' => [
                 'request' => json_encode([
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'label' => 'my-label',
-                    'isActive' => true,
-                    'maxAttempts' => 1,
                     'startDateTime' => '2021-01-01',
                     'endDateTime' => '2021-01-31',
                 ]),
