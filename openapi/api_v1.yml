@@ -514,14 +514,6 @@ components:
                     type: string
                     description: TAO Instance URI
                     example: my-tao-instance.com/tao.rdf#123456789
-                label:
-                    type: string
-                    description: Label for assignment
-                    example: Delivery of Test 1
-                isActive:
-                    type: boolean
-                    description: Defines if Line Item is active/inactive
-                    example: true
                 startDateTime:
                     type: string
                     format: date-time
@@ -532,10 +524,6 @@ components:
                     format: date-time
                     description: The start DateTime as UNIX timestamp
                     example: 2021-01-01T00:00:00+0000
-                maxAttempts:
-                    type: integer
-                    description: The maximum number of allowed attempts
-                    example: 1
         BulkCreateOperation:
             type: object
             properties:
