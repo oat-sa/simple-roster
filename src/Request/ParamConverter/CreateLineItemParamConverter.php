@@ -37,6 +37,9 @@ class CreateLineItemParamConverter implements ParamConverterInterface
     private CreateLineItemValidator $createLineItemValidator;
     private LoggerInterface $requestLogger;
 
+    private const DEFAULT_LINE_ITEM_MAX_ATTEMPTS_COUNT = 0;
+    private const DEFAULT_LINE_ITEM_ACTIVE_STATUS = true;
+
     public function __construct(
         CreateLineItemValidator $createLineItemValidator,
         LoggerInterface $requestLogger
@@ -63,10 +66,10 @@ class CreateLineItemParamConverter implements ParamConverterInterface
         $lineItem =
             (new LineItem())
                 ->setUri($rawLineItem['uri'])
-                ->setLabel($rawLineItem['label'])
+                ->setLabel($rawLineItem['slug'])
                 ->setSlug($rawLineItem['slug'])
-                ->setIsActive($rawLineItem['isActive'])
-                ->setMaxAttempts((int)$rawLineItem['maxAttempts']);
+                ->setIsActive(self::DEFAULT_LINE_ITEM_ACTIVE_STATUS)
+                ->setMaxAttempts(self::DEFAULT_LINE_ITEM_MAX_ATTEMPTS_COUNT);
 
         if (isset($rawLineItem['startDateTime']) && $rawLineItem['endDateTime']) {
             $lineItem

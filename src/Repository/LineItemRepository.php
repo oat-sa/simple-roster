@@ -170,16 +170,6 @@ class LineItemRepository extends AbstractRepository
             /** @var LineItem $stored */
             $stored = $this->findOneBy(['slug' => $lineItem->getSlug()]);
 
-            $stored->setUri($lineItem->getUri());
-            $stored->setLabel($lineItem->getLabel() ? : '');
-            $stored->setIsActive($lineItem->isActive());
-            $stored->setMaxAttempts($lineItem->getMaxAttempts());
-            $stored->setStartAt($lineItem->getStartAt());
-            $stored->setEndAt($lineItem->getEndAt());
-
-            $this->persist($stored);
-            $this->flush();
-
             return $stored;
         }
     }
