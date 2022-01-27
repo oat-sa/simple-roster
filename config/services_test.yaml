@@ -24,3 +24,17 @@ services:
 
     app.jwt_cache.adapter:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+
+    test.lti_outcome.message_id_generator:
+        class: OAT\SimpleRoster\Lti\BasicOutcome\DummyBasicOutcomeMessageIdGenerator
+
+    test.lti_outcome.response_factory:
+        class: OAT\Library\Lti1p3BasicOutcome\Factory\Response\BasicOutcomeResponseFactory
+        arguments: [ '@test.lti_outcome.message_id_generator' ]
+
+    OAT\Library\Lti1p3BasicOutcome\Service\Server\Handler\BasicOutcomeServiceServerRequestHandler:
+        arguments:
+            $processor: '@OAT\SimpleRoster\Lti\BasicOutcome\Lti1p3BasicOutcomeProcessor'
+            $basicOutcomeRequestSerializer: null
+            $basicOutcomeResponseSerializer: null
+            $basicOutcomeResponseFactory: '@test.lti_outcome.response_factory'

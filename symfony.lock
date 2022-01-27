@@ -286,6 +286,9 @@
             "config/routes/lti1p3.yaml"
         ]
     },
+    "oat-sa/lib-lti1p3-basic-outcome": {
+        "version": "4.1.0"
+    },
     "oat-sa/lib-lti1p3-core": {
         "version": "3.2.1"
     },
