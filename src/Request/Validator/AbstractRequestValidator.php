@@ -62,13 +62,13 @@ abstract class AbstractRequestValidator
         /** @var ConstraintViolationInterface $error */
         foreach ($errors as $error) {
             $rawErrors[] = sprintf(
-                "%s -> %s",
+                '%s -> %s',
                 $error->getPropertyPath(),
                 $error->getMessage()
             );
         }
 
-        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(" ", $rawErrors)));
+        throw new BadRequestHttpException(sprintf('Invalid Request Body: %s', implode(' ', $rawErrors)));
     }
 
     abstract protected function getConstraints(): Assert\Collection;

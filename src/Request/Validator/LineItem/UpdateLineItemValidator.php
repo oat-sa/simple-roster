@@ -24,15 +24,9 @@ namespace OAT\SimpleRoster\Request\Validator\LineItem;
 
 use OAT\SimpleRoster\Request\Validator\AbstractRequestValidator;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UpdateLineItemValidator extends AbstractRequestValidator
 {
-    public function __construct(ValidatorInterface $validator)
-    {
-        parent::__construct($validator);
-    }
-
     protected function getConstraints(): Assert\Collection
     {
         return new Assert\Collection(

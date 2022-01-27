@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use Carbon\Carbon;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
@@ -31,6 +30,8 @@ use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Throwable;
 
 class CreateLineItemParamConverter implements ParamConverterInterface
 {
@@ -52,13 +53,23 @@ class CreateLineItemParamConverter implements ParamConverterInterface
     {
         $this->createLineItemValidator->validate($request);
 
-        $responseBody = json_decode($request->getContent(), true);
+        try {
+            $responseBody = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->requestLogger->info('UpdateLineItems payload.', $responseBody);
+            $this->requestLogger->info('UpdateLineItems payload.', $responseBody);
 
-        $request->attributes->set($configuration->getName(), $this->createLineItem($responseBody));
+            $request->attributes->set($configuration->getName(), $this->createLineItem($responseBody));
 
-        return true;
+            return true;
+        } catch (Throwable $jsonException) {
+            throw new BadRequestHttpException(
+                sprintf(
+                    'Invalid JSON request body received. Error: %s.',
+                    $jsonException->getMessage()
+                ),
+                $jsonException
+            );
+        }
     }
 
     private function createLineItem(array $rawLineItem): LineItem
@@ -82,9 +93,7 @@ class CreateLineItemParamConverter implements ParamConverterInterface
 
     private function formatDate(string $dateTime): DateTimeInterface
     {
-        $dateTimeObject = Carbon::createFromFormat(Carbon::ATOM, $dateTime);
-
-        return $dateTimeObject->setTimezone('UTC')->toDateTime();
+        return new DateTimeImmutable($dateTime);
     }
 
     public function supports(ParamConverter $configuration): bool

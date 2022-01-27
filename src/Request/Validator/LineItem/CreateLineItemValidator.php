@@ -25,22 +25,16 @@ namespace OAT\SimpleRoster\Request\Validator\LineItem;
 use DateTimeInterface;
 use OAT\SimpleRoster\Request\Validator\AbstractRequestValidator;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateLineItemValidator extends AbstractRequestValidator
 {
-    public function __construct(ValidatorInterface $validator)
-    {
-        parent::__construct($validator);
-    }
-
     protected function getConstraints(): Assert\Collection
     {
         return new Assert\Collection(
             [
                 'fields' => [
-                    'slug' => new Assert\Type('string'),
-                    'uri' => new Assert\Type('string'),
+                    'slug' => new Assert\Required([new Assert\Type('string')]),
+                    'uri' => new Assert\Required([new Assert\Type('string')]),
                     'startAt' => new Assert\Optional([new Assert\DateTime(DateTimeInterface::ATOM)]),
                     'endAt' => new Assert\Optional([new Assert\DateTime(DateTimeInterface::ATOM)]),
                 ],

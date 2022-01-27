@@ -167,10 +167,7 @@ class LineItemRepository extends AbstractRepository
         } catch (UniqueConstraintViolationException $exception) {
             $this->registry->resetManager();
 
-            /** @var LineItem $stored */
-            $stored = $this->findOneBy(['slug' => $lineItem->getSlug()]);
-
-            return $stored;
+            return $this->findOneBy(['slug' => $lineItem->getSlug()]);
         }
     }
 }
