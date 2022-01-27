@@ -191,10 +191,12 @@ class CreateLineItemActionTest extends WebTestCase
                 'request' => json_encode([
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'startDateTime' => '2021-01-01',
-                    'endDateTime' => '2021-01-31',
+                    'startDateTime' => '2021-20-15',
+                    'endDateTime' => '2021-20-25',
                 ]),
-                'message' => 'Data missing'
+                'message' => 'Invalid JSON request body received. ' .
+                    'Error: DateTimeImmutable::__construct(): ' .
+                    'Failed to parse time string (2021-20-15) at position 6 (0): Unexpected character.'
             ],
         ];
     }
