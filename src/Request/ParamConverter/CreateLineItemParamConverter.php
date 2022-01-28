@@ -23,7 +23,9 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use DateTimeInterface;
+use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use Psr\Log\LoggerInterface;
@@ -93,7 +95,16 @@ class CreateLineItemParamConverter implements ParamConverterInterface
 
     private function formatDate(string $dateTime): DateTimeInterface
     {
-        return new DateTimeImmutable($dateTime);
+        $dateTimeObject = new DateTimeImmutable($dateTime);
+        $dateTimeObject = $dateTimeObject->createFromFormat(DATE_ATOM, $dateTime);
+
+        if ($dateTimeObject === false) {
+            throw new InvalidArgumentException(
+                'Invalid Date Time format'
+            );
+        }
+
+        return $dateTimeObject->setTimezone(new DateTimeZone('UTC'));
     }
 
     public function supports(ParamConverter $configuration): bool
