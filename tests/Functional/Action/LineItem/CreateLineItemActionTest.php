@@ -191,12 +191,10 @@ class CreateLineItemActionTest extends WebTestCase
                 'request' => json_encode([
                     'slug' => 'my-slug',
                     'uri' => 'my-uri',
-                    'startDateTime' => '2021-20-15',
-                    'endDateTime' => '2021-20-25',
+                    'startDateTime' => '2022-01-01',
+                    'endDateTime' => '2022-10-30',
                 ]),
-                'message' => 'Invalid JSON request body received. ' .
-                    'Error: DateTimeImmutable::__construct(): ' .
-                    'Failed to parse time string (2021-20-15) at position 6 (0): Unexpected character.'
+                'message' => 'Invalid JSON request body received. Error: Invalid Date Time format.'
             ],
         ];
     }
