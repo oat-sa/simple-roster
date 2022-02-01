@@ -18,6 +18,7 @@
                 <value>
                     \Monolog\Logger,
                     \Carbon\Carbon,
+                    \DateTimeImmutable,
                     \League\Csv\Reader,
                     \Symfony\Component\HttpFoundation\JsonResponse,
                     \Symfony\Component\HttpFoundation\Request,
