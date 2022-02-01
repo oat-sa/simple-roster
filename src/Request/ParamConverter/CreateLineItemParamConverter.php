@@ -95,9 +95,7 @@ class CreateLineItemParamConverter implements ParamConverterInterface
 
     private function formatDate(string $dateTime): DateTimeInterface
     {
-
-        $dateTimeObject = new DateTimeImmutable();
-        $newDateTimeFormat = $dateTimeObject->createFromFormat(DATE_ATOM, $dateTime);
+        $newDateTimeFormat = DateTimeImmutable::createFromFormat(DATE_ATOM, $dateTime);
 
         if ($newDateTimeFormat === false) {
             throw new InvalidArgumentException(
