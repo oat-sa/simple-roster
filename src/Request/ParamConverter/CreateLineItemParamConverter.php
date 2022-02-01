@@ -95,16 +95,17 @@ class CreateLineItemParamConverter implements ParamConverterInterface
 
     private function formatDate(string $dateTime): DateTimeInterface
     {
-        $dateTimeObject = new DateTimeImmutable($dateTime);
-        $dateTimeObject = $dateTimeObject->createFromFormat(DATE_ATOM, $dateTime);
 
-        if ($dateTimeObject === false) {
+        $dateTimeObject = new DateTimeImmutable();
+        $newDateTimeFormat = $dateTimeObject->createFromFormat(DATE_ATOM, $dateTime);
+
+        if ($newDateTimeFormat === false) {
             throw new InvalidArgumentException(
                 'Invalid Date Time format'
             );
         }
 
-        return $dateTimeObject->setTimezone(new DateTimeZone('UTC'));
+        return $newDateTimeFormat->setTimezone(new DateTimeZone('UTC'));
     }
 
     public function supports(ParamConverter $configuration): bool
