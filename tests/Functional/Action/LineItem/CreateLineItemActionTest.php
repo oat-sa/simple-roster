@@ -130,7 +130,7 @@ class CreateLineItemActionTest extends WebTestCase
                     'startDateTime' => 1609459200,
                     'endDateTime' => 1612051200,
                     'maxAttempts' => 0,
-                ]
+                ],
             ],
             'withExistingSlug' => [
                 'request' => json_encode([
@@ -148,7 +148,7 @@ class CreateLineItemActionTest extends WebTestCase
                     'startDateTime' => "",
                     'endDateTime' => "",
                     'maxAttempts' => 0,
-                ]
+                ],
             ],
             'withoutAllDates' => [
                 'request' => json_encode([
@@ -163,8 +163,8 @@ class CreateLineItemActionTest extends WebTestCase
                     'startDateTime' => '',
                     'endDateTime' => '',
                     'maxAttempts' => 0,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -173,19 +173,19 @@ class CreateLineItemActionTest extends WebTestCase
         return [
             'emptyBody' => [
                 'request' => json_encode([]),
-                'message' => 'Invalid Request Body: [slug] -> This field is missing. [uri] -> This field is missing.'
+                'message' => 'Invalid Request Body: [slug] -> This field is missing. [uri] -> This field is missing.',
             ],
             'missingSlug' => [
                 'request' => json_encode([
                     'uri' => 'my-uri',
                 ]),
-                'message' => 'Invalid Request Body: [slug] -> This field is missing.'
+                'message' => 'Invalid Request Body: [slug] -> This field is missing.',
             ],
             'missingUri' => [
                 'request' => json_encode([
                     'slug' => 'my-slug',
                 ]),
-                'message' => 'Invalid Request Body: [uri] -> This field is missing.'
+                'message' => 'Invalid Request Body: [uri] -> This field is missing.',
             ],
             'withInvalidDates' => [
                 'request' => json_encode([
@@ -194,7 +194,7 @@ class CreateLineItemActionTest extends WebTestCase
                     'startDateTime' => '2022-01-01',
                     'endDateTime' => '2022-10-30',
                 ]),
-                'message' => 'Invalid JSON request body received. Error: Invalid Date Time format.'
+                'message' => 'Invalid JSON request body received. Error: Invalid Date Time format.',
             ],
         ];
     }

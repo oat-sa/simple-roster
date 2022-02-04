@@ -82,13 +82,7 @@ class CreateLineItemValidatorTest extends TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
-            ->willReturn(
-                new ArrayIterator(
-                    [
-                        $error
-                    ]
-                )
-            );
+            ->willReturn(new ArrayIterator([$error]));
 
         $this->subject->validate($request);
     }

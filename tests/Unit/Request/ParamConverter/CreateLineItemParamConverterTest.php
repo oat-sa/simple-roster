@@ -93,7 +93,7 @@ class CreateLineItemParamConverterTest extends TestCase
             'isActive' => true,
             'startDateTime' => '2021-01-01T00:00:00+0000',
             'endDateTime' => '2021-01-31T00:00:00+0000',
-            'maxAttempts' => 0
+            'maxAttempts' => 0,
         ]);
 
         $request->expects(self::once())
