@@ -31,11 +31,15 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 
     private LoggerInterface $logger;
 
+    private bool $enabled;
+
     public function __construct(
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        bool            $enabled
     )
     {
         $this->logger = $logger;
+        $this->enabled = $enabled;
     }
 
     public static function getSubscribedEvents(): array
@@ -48,5 +52,11 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     public function onLineItemUpdated(LineItemUpdated $event): void
     {
         $this->logger->info("line-item-updated event fired.");
+        if (!$this->enabled) {
+            $this->logger->info("line-item-updated feature disabled.");
+            return;
+        }
+
+        $this->logger->info("line-item-updated feature enabled.");
     }
 }

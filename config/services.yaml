@@ -29,6 +29,8 @@ parameters:
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
     app.generated_users_file_path: '%env(resolve:GENERATED_USERS_FILE_PATH)%'
+    app.feature.generate_users_on_lineitem_updated.enabled: '%env(default:app.feature.generate_users_on_lineitem_updated.enabled.default:bool:FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED)%'
+    app.feature.generate_users_on_lineitem_updated.enabled.default: false
 
 services:
     # default configuration for services in *this* file
@@ -162,3 +164,7 @@ services:
         arguments:
             - '@OAT\Library\Lti1p3BasicOutcome\Service\Server\Handler\BasicOutcomeServiceServerRequestHandler'
         tags: [ 'controller.service_arguments' ]
+
+    OAT\SimpleRoster\EventSubscriber\GeneratedUserIngestControllerSubscriber:
+        arguments:
+            $enabled: '%app.feature.generate_users_on_lineitem_updated.enabled%'
