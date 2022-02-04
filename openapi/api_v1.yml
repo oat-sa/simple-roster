@@ -391,7 +391,7 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
-    /v1/bulk-create-users
+    /v1/bulk-create-users:
         post:
             summary: Bulk create user and assignments
             tags:
