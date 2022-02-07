@@ -1,5 +1,10 @@
 # Changelog
 
+## Not yet released
+
+### Fixed
+- .htaccess restored
+
 ## 2.3.0 - 2021-09-21
 
 ### Added
