@@ -22,76 +22,46 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Csv;
 
-use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
-use Aws\Sts\StsClient;
+use League\Flysystem\MountManager;
+use League\Flysystem\Filesystem;
 
 class AwsS3CsvWriter
 {
-    private string $awsS3AccessKey;
-    private string $awsS3AccessSecretKey;
-    private string $awsS3Version;
-    private string $awsS3Region;
-    private string $awsS3BucketName;
-    private string $awsS3FilePath;
-
     public function __construct(
-        string $awsS3AccessKey,
-        string $awsS3AccessSecretKey,
-        string $awsS3Version,
-        string $awsS3Region,
-        string $awsS3BucketName,
-        string $awsS3FilePath
+        Filesystem $publicUploadsFilesystem,
+        Filesystem $localUploadsFilesystem
     ) {
-        $this->awsS3AccessKey = $awsS3AccessKey;
-        $this->awsS3AccessSecretKey = $awsS3AccessSecretKey;
-        $this->awsS3Version = $awsS3Version;
-        $this->awsS3Region = $awsS3Region;
-        $this->awsS3BucketName = $awsS3BucketName;
-        $this->awsS3FilePath = $awsS3FilePath;
+        $this->filesystemS3 = $publicUploadsFilesystem;
+        $this->filesystemLocal = $localUploadsFilesystem;
     }
 
-    public function writeCsv(string $sourcePath): void
+    public function writeCsv(): void
     {
         try {
-
-            // $stsClient = new StsClient([
-            //     'profile' => 'operation-lvl2@itinv',
-            //     'region'  => 'eu-west-1',
-            //     'version' => $this->awsS3Version,
-            // ]);
-            
-            // $ARN = "arn:aws:iam::218090532482:role/oat/operation-lvl2";
-            // $sessionName = "s3-access-example";
-            // $duration = 3600;
-            // $result = $stsClient->AssumeRole([
-            //     'RoleArn' => $ARN,
-            //     'RoleSessionName' => $sessionName,
-            // ]);
-            
-            $s3Client = new S3Client([
-                'version'     => $this->awsS3Version,
-                'region'      => 'eu-west-1',
-                'credentials' =>  [
-                    'key'    => $this->awsS3AccessKey,
-                    'secret' => $this->awsS3AccessSecretKey,
-                ]
+            $mountManager = new MountManager([
+                'local' => $this->filesystemLocal,
+                's3' => $this->filesystemS3,
             ]);
 
-            // $buckets = $s3Client->listBuckets();
-            // foreach ($buckets['Buckets'] as $bucket) {
-            //     echo $bucket['Name'] . "\n";
-            // }
+            $contents = $this->filesystemLocal->listContents(date('Y-m-d'), true);
+            foreach ($contents as $item) {
+                if ('file' === $item['type']) {
+                    $sourcePath = sprintf('local://%s', $item['path']);
+                    $destinationPath = sprintf('s3://%s', $item['path']);
 
-            $destinationPath = sprintf('%s/%s', $this->awsS3FilePath, date('Y-m-d'));
-            $s3Client->uploadDirectory(
-                $sourcePath,
-                $this->awsS3BucketName,
-                $destinationPath,
-                ['params' => array('ACL' => 'public-read')],
-            );
+                    if ($mountManager->has($destinationPath)) {
+                        $resource = $mountManager->readStream($sourcePath);
+                        $mountManager->putStream($destinationPath, $resource);
+                    } else {
+                        $mountManager->copy($sourcePath, $destinationPath);
+                    }
+                }
+            }
         } catch (S3Exception $e) {
-            throw $e;
+            return;
         }
+
+        return;
     }
 }

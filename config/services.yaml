@@ -69,6 +69,8 @@ services:
             $awsS3Region: '%app.aws_s3_region%'
             $awsS3BucketName: '%app.aws_s3_bucket_name%'
             $awsS3FilePath: '%app.aws_s3_file_path%'
+            $publicUploadsFilesystem: '@oneup_flysystem.public_uploads_filesystem_filesystem'
+            $localUploadsFilesystem: '@oneup_flysystem.default_uploads_filesystem_filesystem'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -174,3 +176,12 @@ services:
         arguments:
             - '@OAT\Library\Lti1p3BasicOutcome\Service\Server\Handler\BasicOutcomeServiceServerRequestHandler'
         tags: [ 'controller.service_arguments' ]
+
+    Aws\S3\S3Client:
+        arguments:
+            -
+                version: 'latest'
+                region: 'eu-west-1'
+                credentials:
+                    key: '%env(AWS_S3_ACCESS_KEY)%'
+                    secret: '%env(AWS_S3_ACCESS_SECRET_KEY)%'

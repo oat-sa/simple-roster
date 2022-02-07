@@ -210,7 +210,7 @@ class BulkCreateUsersService
             }
         }
 
-        $this->awsS3CsvWriter->writeCsv($automateCsvPath);
+        $this->awsS3CsvWriter->writeCsv();
 
         return $slugWiseTotalUsersArray;
     }
