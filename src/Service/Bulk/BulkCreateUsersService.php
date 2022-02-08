@@ -22,75 +22,67 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
-use OAT\SimpleRoster\Csv\CsvWriter;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Factory\LineItemCriteriaFactory;
+use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
+use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
+use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use Symfony\Component\Filesystem\Filesystem;
+use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
+use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
 class BulkCreateUsersService
 {
     private array $lineItemSlugs = [];
 
-    private int $userGroupBatchCount = 0;
-    private int $groupIndex = 0;
-
-    private string $generatedUsersFilePath;
-    private string $projectDir;
-
-    private const USER_CSV_HEAD = ['username', 'password', 'groupId'];
-    private const ASSIGNMENT_CSV_HEAD = ['username', 'lineItemSlug'];
-
     private LineItemRepository $lineItemRepository;
     private AssignmentRepository $assignmentRepository;
-    private Filesystem $filesystem;
     private GenerateGroupIdsService $generateGroupIdsService;
-    private CsvWriter $csvWriter;
     private LtiInstanceRepository $ltiInstanceRepository;
     private UserCreationResultMessage $userCreationMessage;
     private LineItemCriteriaFactory $lineItemCriteriaFactory;
+    private AssigmentFactoryInterface $assigmentFactory;
+    private StorageInterface $storage;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     public function __construct(
-        LineItemRepository $lineItemRepository,
-        AssignmentRepository $assignmentRepository,
-        GenerateGroupIdsService $generateGroupIdsService,
-        CsvWriter $csvWriter,
-        LtiInstanceRepository $ltiInstanceRepository,
+        LineItemRepository        $lineItemRepository,
+        AssignmentRepository      $assignmentRepository,
+        GenerateGroupIdsService   $generateGroupIdsService,
+        LtiInstanceRepository     $ltiInstanceRepository,
         UserCreationResultMessage $userCreationMessage,
-        LineItemCriteriaFactory $lineItemCriteriaFactory,
-        Filesystem $filesystem,
-        string $generatedUsersFilePath,
-        string $projectDir
-    ) {
+        LineItemCriteriaFactory   $lineItemCriteriaFactory,
+        AssigmentFactoryInterface $assigmentFactory,
+        StorageInterface          $storage
+    )
+    {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->userCreationMessage = $userCreationMessage;
-        $this->csvWriter = $csvWriter;
-        $this->generatedUsersFilePath = $generatedUsersFilePath;
-        $this->filesystem = $filesystem;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemCriteriaFactory = $lineItemCriteriaFactory;
-        $this->projectDir = $projectDir;
+        $this->assigmentFactory = $assigmentFactory;
+        $this->storage = $storage;
     }
 
     /**
      * @throws LineItemNotFoundException
      */
     public function createUsers(
-        array $lineItemIds,
-        array $lineItemSlugs,
-        array $userPrefixes,
-        int $batchSize,
+        array   $lineItemIds,
+        array   $lineItemSlugs,
+        array   $userPrefixes,
+        int     $batchSize,
         ?string $groupPrefix
-    ): UserCreationResult {
+    ): UserCreationResult
+    {
         $notExistLineItemsArray = $userGroupIds = [];
 
         if (!empty($lineItemIds) || !empty($lineItemSlugs)) {
@@ -121,18 +113,20 @@ class BulkCreateUsersService
                 $groupPrefix,
                 $this->ltiInstanceRepository->findAllAsCollection()
             );
-            $userGroupAssignCount = (int) ceil(
+            $userGroupAssignCount = (int)ceil(
                 count($userPrefixes) * count($this->lineItemSlugs) * $batchSize / count($userGroupIds)
             );
         }
 
+        $resolver = $groupPrefix
+            ? new ColumnGroupResolver($userGroupIds, $userGroupAssignCount)
+            : null;
+
         $slugTotalUsers = $this->createBulkUserAssignmentData(
             $userNameLastIndexes,
-            $userGroupIds,
             $userPrefixes,
-            $userGroupAssignCount,
-            $groupPrefix,
-            $batchSize
+            $batchSize,
+            $resolver
         );
 
         $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
@@ -150,68 +144,44 @@ class BulkCreateUsersService
     }
 
     private function createBulkUserAssignmentData(
-        array $userNameLastIndexes,
-        array $userGroupIds,
-        array $userPrefixes,
-        int $userGroupAssignCount,
-        ?string $groupPrefix,
-        int $batchSize
-    ): array {
-        $slugWiseTotalUsersArray = [];
-        $automateCsvPath = sprintf('%s/%s%s', $this->projectDir, $this->generatedUsersFilePath, date('Y-m-d'));
-        $this->createDirectoryIfNotExist($automateCsvPath);
+        array                   $userNameLastIndexes,
+        array                   $userPrefixes,
+        int                     $batchSize,
+        ?GroupResolverInterface $groupResolver
+    ): array
+    {
+        $slugWiseTotalUsersArray = array_fill_keys($this->lineItemSlugs, 0);
+        $data = date('Y-m-d');
+
         foreach ($userPrefixes as $prefix) {
-            $csvPath = sprintf('%s/%s', $automateCsvPath, $prefix);
-            $this->createDirectoryIfNotExist($csvPath);
+            $csvPath = sprintf('%s/%s', $data, $prefix);
 
-            foreach ($this->lineItemSlugs as $lineSlugs) {
-                $slugTotalUsersCreated = 0;
-                $csvFilename = sprintf('%s-%s.csv', $lineSlugs, $prefix);
-                $csvData = $assignmentCsvData = [];
-                for ($batchIncrementValue = 1; $batchIncrementValue <= $batchSize; $batchIncrementValue++) {
-                    $username = sprintf(
-                        '%s_%s_%d',
-                        $lineSlugs,
-                        $prefix,
-                        (
-                            (int)$userNameLastIndexes[$lineSlugs] + $batchIncrementValue
-                        )
-                    );
-                    $userPassword = $this->createUserPassword();
-                    $userGroupId = $groupPrefix
-                        ? $this->getUserGroupId($userGroupIds, $userGroupAssignCount)
-                        : '';
+            foreach ($this->lineItemSlugs as $lineSlug) {
+                $csvFilename = sprintf('%s-%s.csv', $lineSlug, $prefix);
 
-                    $csvData[] = [$username, $userPassword,$userGroupId];
-                    $assignmentCsvData[] = [$username, $lineSlugs];
-
-                    $slugTotalUsersCreated++;
-                }
-                $this->writeUserAssignmentCsvData(
-                    $csvPath,
-                    $lineSlugs,
+                $generator = new StateDrivenUserGenerator(
+                    $lineSlug,
                     $prefix,
-                    $csvFilename,
-                    $csvData,
-                    $assignmentCsvData
+                    (int)$userNameLastIndexes[$lineSlug] + 1,
+                    $groupResolver
                 );
-                $this->writeUserAssignmentAggregratedCsvData(
-                    $automateCsvPath,
-                    $csvData,
-                    $assignmentCsvData
-                );
-                $slugWiseTotalUsersArray[$lineSlugs] = array_key_exists($lineSlugs, $slugWiseTotalUsersArray)
-                    ? $slugWiseTotalUsersArray[$lineSlugs] +  $slugTotalUsersCreated
-                    : $slugTotalUsersCreated;
+
+                $users = $generator->makeBatch($batchSize);
+
+                $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineSlug);
+
+                $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $users);
+                $this->storage->persistAssignments(sprintf('%s/Assignments-%s.csv', $csvPath, $csvFilename), $assignments);
+
+                $this->storage->persistUsers(sprintf('%s/users_aggregated.csv', $data), $users);
+                $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $data), $assignments);
+
+
+                $slugWiseTotalUsersArray[$lineSlug] += count($users);
             }
         }
 
         return $slugWiseTotalUsersArray;
-    }
-
-    private function createUserPassword(): string
-    {
-        return substr(str_shuffle('0123456789abcdefghijklmnopqrstvwxyz'), 0, 8);
     }
 
     /**
@@ -238,81 +208,16 @@ class BulkCreateUsersService
 
             if (!empty($assignment)) {
                 $userData = $assignment->getUser()->getUsername();
-                $userNameArray = explode('_', (string) $userData);
+                $userNameArray = explode('_', (string)$userData);
                 $userNameLastIndex = self::DEFAULT_USERNAME_INCREMENT_VALUE;
                 $index = end($userNameArray);
                 if (count($userNameArray) > 0 && is_numeric($index)) {
-                    $userNameLastIndex = (int) $index;
+                    $userNameLastIndex = (int)$index;
                 }
                 $userNameIncrementArray[$slug] = $userNameLastIndex;
             }
         }
 
         return $userNameIncrementArray;
-    }
-
-    private function createDirectoryIfNotExist(string $path): void
-    {
-        if (!$this->filesystem->exists($path)) {
-            $this->filesystem->mkdir($path);
-        }
-    }
-
-    private function getUserGroupId(array $userGroupIds, int $userGroupAssignCount): string
-    {
-        $userGroupId = '';
-        if ($userGroupAssignCount !== 0) {
-            if ($this->userGroupBatchCount < $userGroupAssignCount) {
-                $userGroupId = $userGroupIds[$this->groupIndex];
-                $this->userGroupBatchCount++;
-
-                return $userGroupId;
-            }
-
-            $this->userGroupBatchCount = 1;
-            $this->groupIndex++;
-            $userGroupId = $userGroupIds[$this->groupIndex];
-        }
-
-        return $userGroupId;
-    }
-
-    private function writeUserAssignmentCsvData(
-        string $csvPath,
-        string $lineSlugs,
-        string $prefix,
-        string $csvFilename,
-        array $csvData,
-        array $assignmentCsvData
-    ): void {
-
-        $this->csvWriter->writeCsv(
-            sprintf('%s/%s', $csvPath, $csvFilename),
-            self::USER_CSV_HEAD,
-            $csvData
-        );
-        $this->csvWriter->writeCsv(
-            sprintf('%s/Assignments-%s-%s.csv', $csvPath, $lineSlugs, $prefix),
-            self::ASSIGNMENT_CSV_HEAD,
-            $assignmentCsvData
-        );
-    }
-
-    private function writeUserAssignmentAggregratedCsvData(
-        string $automateCsvPath,
-        array $csvData,
-        array $assignmentCsvData
-    ): void {
-
-        $this->csvWriter->writeCsv(
-            sprintf('%s/users_aggregated.csv', $automateCsvPath),
-            self::USER_CSV_HEAD,
-            $csvData
-        );
-        $this->csvWriter->writeCsv(
-            sprintf('%s/assignments_aggregated.csv', $automateCsvPath),
-            self::ASSIGNMENT_CSV_HEAD,
-            $assignmentCsvData
-        );
     }
 }

@@ -33,28 +33,25 @@ class GenerateGroupIdsService
      * @return string[]
      */
     public function generateGroupIds(
-        string $groupPrefix,
+        string                      $groupPrefix,
         UniqueLtiInstanceCollection $ltiInstanceCollection
-    ): array {
+    ): array
+    {
         $totalInstances = $ltiInstanceCollection->count();
         if ($totalInstances <= 0) {
             throw new LtiInstanceNotFoundException('No Lti instance were found in database.');
         }
         $groupIds = [];
-        for ($targetId = 1; $targetId <= $totalInstances; ++$targetId) {
-            $newGroupId = $this->getNewGroupId($groupPrefix);
-            $possibleIndex = $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
 
-            if ($possibleIndex === null) {
-                throw new RuntimeException('Index cannot be null');
-            }
-            while (array_key_exists($possibleIndex, $groupIds)) {
+        foreach ($ltiInstanceCollection as $ignored) {
+            do {
                 $newGroupId = $this->getNewGroupId($groupPrefix);
-                $possibleIndex = $this->computeLtiInstance($newGroupId, $ltiInstanceCollection)->getId();
+                $possibleIndex = $ltiInstanceCollection->getByIndex($this->getHashIndex($newGroupId, $totalInstances))->getId();
+
                 if ($possibleIndex === null) {
                     throw new RuntimeException('Index cannot be null');
                 }
-            }
+            } while (array_key_exists($possibleIndex, $groupIds));
 
             $groupIds[$possibleIndex] = $newGroupId;
         }
@@ -67,18 +64,14 @@ class GenerateGroupIdsService
         return sprintf($groupPrefix . '_%s', substr(md5(random_bytes(10)), 0, 10));
     }
 
-    private function computeLtiInstance(
-        string $groupId,
-        UniqueLtiInstanceCollection $ltiInstanceCollection
-    ): LtiInstance {
+    private function getHashIndex(string $groupId, int $size): int
+    {
         $asciiSum = 0;
         $groupId = hash('md5', $groupId);
         for ($i = 0, $iMax = strlen($groupId); $i < $iMax; $i++) {
             $asciiSum += ord($groupId[$i]);
         }
 
-        $index = $asciiSum % count($ltiInstanceCollection);
-
-        return $ltiInstanceCollection->getByIndex($index);
+        return $asciiSum % $size;
     }
 }

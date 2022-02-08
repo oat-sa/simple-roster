@@ -50,7 +50,7 @@ class UpdateLineItemsWebhookAction
     {
         $updatedCollection = $this->service->handleUpdates($collection);
 
-        $this->eventDispatcher->dispatch(new LineItemUpdated(), LineItemUpdated::NAME);
+        $this->eventDispatcher->dispatch(new LineItemUpdated());
 
         return $this->responder->createJsonResponse($updatedCollection);
     }
