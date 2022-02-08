@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Command\CreateEntity\User;
 
 use InvalidArgumentException;
-use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,7 +36,7 @@ class BulkUserCreationCommand extends Command
 {
     public const NAME = 'roster:create-entity:user';
 
-    private BulkCreateUsersService $bulkCreateUsersService;
+    private BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService;
 
     private const DEFAULT_BATCH_SIZE = 100;
     private const OPTION_LINE_ITEM_IDS = 'line-item-ids';
@@ -52,7 +52,7 @@ class BulkUserCreationCommand extends Command
 
     private int $batchSize;
 
-    public function __construct(BulkCreateUsersService $bulkCreateUsersService)
+    public function __construct(BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService)
     {
         parent::__construct(self::NAME);
         $this->bulkCreateUsersService = $bulkCreateUsersService;

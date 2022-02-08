@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\CreateEntity;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
 use OAT\SimpleRoster\Request\Validator\BulkCreateUserValidator;
 use OAT\SimpleRoster\Request\Initialize\BulkCreateUserRequestInitialize;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,14 +33,14 @@ class BulkCreateUsersAction
 {
     private SerializerResponder $responder;
     private BulkCreateUserValidator $bulkCreateUserValidator;
-    private BulkCreateUsersService $bulkCreateUsersService;
+    private BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService;
     private BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize;
 
     public function __construct(
-        BulkCreateUsersService $bulkCreateUsersService,
-        BulkCreateUserValidator $bulkCreateUserValidator,
-        BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize,
-        SerializerResponder $responder
+        BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService,
+        BulkCreateUserValidator            $bulkCreateUserValidator,
+        BulkCreateUserRequestInitialize    $bulkCreateUserRequestInitialize,
+        SerializerResponder                $responder
     ) {
         $this->bulkCreateUserValidator = $bulkCreateUserValidator;
         $this->bulkCreateUsersService = $bulkCreateUsersService;
