@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -26,47 +26,26 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
-use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Exception\LineItemNotFoundException;
+use OAT\SimpleRoster\Entity\Assignment;
 
-class LineItemCollection implements Countable, IteratorAggregate, JsonSerializable
+class AssignmentCollection implements Countable, IteratorAggregate, JsonSerializable
 {
-    /** @var LineItem[] */
-    private array $collection = [];
-
+    /** @var Assignment[] */
+    private array $collection;
 
     /**
-     * @param LineItem[] $data
+     * @param Assignment[] $data
      */
-    public function __construct(array $data = [])
+    public function __construct(array $data)
     {
-        foreach ($data as $lineItem) {
-            $this->collection[$lineItem->getSlug()] = $lineItem;
-        }
+        $this->collection = $data;
     }
 
-    public function add(LineItem $lineItem): self
+    public function add(Assignment $lineItem): self
     {
-        $this->collection[$lineItem->getSlug()] = $lineItem;
+        $this->collection[] = $lineItem;
 
         return $this;
-    }
-
-    /**
-     * @throws LineItemNotFoundException
-     */
-    public function getBySlug(string $slug): LineItem
-    {
-        if (isset($this->collection[$slug])) {
-            return $this->collection[$slug];
-        }
-
-        throw new LineItemNotFoundException(
-            sprintf(
-                "Line item with slug = '%s' cannot be found in collection.",
-                $slug
-            )
-        );
     }
 
     public function getIterator(): ArrayIterator

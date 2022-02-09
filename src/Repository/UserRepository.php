@@ -24,12 +24,14 @@ namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Model\UserCollection;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
@@ -40,10 +42,11 @@ class UserRepository extends AbstractRepository
     private int $userCacheTtl;
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry      $registry,
         UserCacheIdGenerator $userCacheIdGenerator,
-        int $userCacheTtl
-    ) {
+        int                  $userCacheTtl
+    )
+    {
         parent::__construct($registry, User::class);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
@@ -78,14 +81,26 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
+    public function findAllByCriteria(FindUserCriteria $criteria): UserCollection
+    {
+        $queryBuilder = $this
+            ->createQueryBuilder('u')
+            ->select('u');
+
+        $this->applyFindCriteria($queryBuilder, $criteria);
+
+        return new UserCollection($queryBuilder->getQuery()->getResult());
+    }
+
     /**
      * @throws Exception
      */
     public function findAllUsernamesPaged(
-        int $limit,
-        ?int $lastUserId,
+        int              $limit,
+        ?int             $lastUserId,
         FindUserCriteria $criteria = null
-    ): UsernameResultSet {
+    ): UsernameResultSet
+    {
         if ($limit < 1) {
             throw new InvalidArgumentException("Invalid 'limit' parameter received.");
         }
@@ -105,26 +120,7 @@ class UserRepository extends AbstractRepository
                 ->setParameter('lastUserId', $lastUserId);
         }
 
-        if ($criteria->hasUsernameCriterion()) {
-            $queryBuilder
-                ->andWhere('u.username IN (:usernames)')
-                ->setParameter('usernames', $criteria->getUsernameCriterion());
-        }
-
-        if ($criteria->hasLineItemSlugCriterion()) {
-            $queryBuilder
-                ->innerJoin('u.assignments', 'a')
-                ->innerJoin('a.lineItem', 'l')
-                ->andWhere('l.slug IN (:lineItemSlugs)')
-                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
-        }
-
-        if ($criteria->hasEuclideanDivisionCriterion()) {
-            $queryBuilder
-                ->andWhere('MOD(u.id, :modulo) = :remainder')
-                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
-                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
-        }
+        $this->applyFindCriteria($queryBuilder, $criteria);
 
         $userIds = [];
         $usernameCollection = new UsernameCollection();
@@ -178,5 +174,29 @@ class UserRepository extends AbstractRepository
             ->getOneOrNullResult();
 
         return null === $result ? 0 : (int)$result['number_of_users'];
+    }
+
+    protected function applyFindCriteria(QueryBuilder $queryBuilder, FindUserCriteria $criteria): void
+    {
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->innerJoin('u.assignments', 'a')
+                ->innerJoin('a.lineItem', 'l')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
+        }
     }
 }
