@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Service;
 
+use RuntimeException;
+
 /**
  * Returns first group_id until limit is reached then starts return second with the same strategy.
  * */
@@ -48,7 +50,7 @@ final class ColumnGroupResolver implements GroupResolverInterface
     public function resolve(): string
     {
         if ($this->cursor >= count($this->idList)) {
-            throw new \RuntimeException("Group ids limit is reached. Cannot resolve group id anymore.");
+            throw new RuntimeException("Group ids limit is reached. Cannot resolve group id anymore.");
         }
 
         $res = $this->idList[$this->cursor];

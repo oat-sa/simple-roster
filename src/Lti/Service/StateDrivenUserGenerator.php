@@ -61,7 +61,7 @@ class StateDrivenUserGenerator implements UserGeneratorInterface
     public function makeBatch(int $count): array
     {
         $res = [];
-        foreach (range(1, $count) as $ignored) {
+        for ($index = 0; $index < $count; $index++) {
             $res[] = $this->make();
         }
 

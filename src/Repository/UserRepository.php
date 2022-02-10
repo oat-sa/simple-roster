@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
@@ -53,8 +52,8 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws EntityNotFoundException
-     * @throws NonUniqueResultException
+     * @throws \Doctrine\ORM\EntityNotFoundException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findByUsernameWithAssignments(string $username): User
     {

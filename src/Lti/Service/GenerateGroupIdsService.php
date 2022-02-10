@@ -42,7 +42,7 @@ class GenerateGroupIdsService
         }
         $groupIds = [];
 
-        foreach ($ltiInstanceCollection as $ignored) {
+        for ($index = 0; $index < $totalInstances; $index++) {
             do {
                 $newGroupId = $this->getNewGroupId($groupPrefix);
                 $possibleIndex = $ltiInstanceCollection->getByIndex(
