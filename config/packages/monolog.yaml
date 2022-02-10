@@ -1,15 +1,21 @@
 monolog:
-    channels: ["cache_warmup"]
+    channels: ["cache_warmup", "user_folder_s3_sync"]
     handlers:
         main:
             type: rotating_file
             max_files: 5
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event", "!messenger"]
+            channels: ["!event", "!messenger", "!user_folder_s3_sync"]
         cache_warmup:
             type: rotating_file
             max_files: 5
             path: '%kernel.logs_dir%/cache-warmup.%kernel.environment%.log'
             level: debug
             channels: ['cache_warmup']
+        user_folder_s3_sync_handler:
+            type: rotating_file
+            max_files: 5
+            path: '%kernel.logs_dir%/user_folder_s3_sync.%kernel.environment%.log'
+            level: debug
+            channels: ['user_folder_s3_sync']

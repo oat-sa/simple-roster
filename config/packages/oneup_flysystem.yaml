@@ -1,20 +1,16 @@
 # Read the documentation: https://github.com/1up-lab/OneupFlysystemBundle/blob/release/3.x/Resources/doc/index.md
-parameters:
-    env(FILESYSTEM_ITEM_IMAGES_ADAPTER_S3_BUCKET): ''
-    env(FILESYSTEM_ITEM_IMAGES_ADAPTER_S3_PREFIX): ''
-    
 oneup_flysystem:
     adapters:
-        default_uploads_adapter:
+        user_files_adapter_local:
             local:
                 directory: '%kernel.project_dir%/var/user-files'
-        public_uploads_adapter:
+        user_files_adapter_s3:
             awss3v3:
                 client: Aws\S3\S3Client
-                bucket: '%env(AWS_S3_BUCKET_NAME)%'
-                prefix: '%env(AWS_S3_FILE_PATH)%'
+                bucket: '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_BUCKET)%'
+                prefix: '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_PREFIX)%'
     filesystems:
-        default_uploads_filesystem:
-            adapter: default_uploads_adapter
-        public_uploads_filesystem:
-            adapter: public_uploads_adapter
+        user_files_local_filesystem:
+            adapter: user_files_adapter_local
+        user_files_s3_filesystem:
+            adapter: user_files_adapter_s3

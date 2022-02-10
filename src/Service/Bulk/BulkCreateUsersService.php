@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
-use OAT\SimpleRoster\Csv\AwsS3CsvWriter;
 use OAT\SimpleRoster\Csv\CsvWriter;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
@@ -32,6 +31,7 @@ use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use Symfony\Component\Filesystem\Filesystem;
 
 class BulkCreateUsersService
@@ -55,7 +55,7 @@ class BulkCreateUsersService
     private LtiInstanceRepository $ltiInstanceRepository;
     private UserCreationResultMessage $userCreationMessage;
     private LineItemCriteriaFactory $lineItemCriteriaFactory;
-    private AwsS3CsvWriter $awsS3CsvWriter;
+    private FolderSyncService $userFolderSync;
 
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
@@ -70,7 +70,7 @@ class BulkCreateUsersService
         Filesystem $filesystem,
         string $generatedUsersFilePath,
         string $projectDir,
-        AwsS3CsvWriter $awsS3CsvWriter
+        FolderSyncService $userFolderSync
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -82,7 +82,7 @@ class BulkCreateUsersService
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemCriteriaFactory = $lineItemCriteriaFactory;
         $this->projectDir = $projectDir;
-        $this->awsS3CsvWriter = $awsS3CsvWriter;
+        $this->userFolderSync = $userFolderSync;
     }
 
     /**
@@ -210,7 +210,7 @@ class BulkCreateUsersService
             }
         }
 
-        $this->awsS3CsvWriter->writeCsv();
+        $this->userFolderSync->copyUserFiles();
 
         return $slugWiseTotalUsersArray;
     }

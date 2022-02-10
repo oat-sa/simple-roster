@@ -29,12 +29,6 @@ parameters:
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
     app.generated_users_file_path: '%env(resolve:GENERATED_USERS_FILE_PATH)%'
-    app.aws_s3_access_key: '%env(resolve:AWS_S3_ACCESS_KEY)%'
-    app.aws_s3_access_secret_key: '%env(resolve:AWS_S3_ACCESS_SECRET_KEY)%'
-    app.aws_s3_version: '%env(resolve:AWS_S3_VERSION)%'
-    app.aws_s3_region: '%env(resolve:AWS_S3_REGION)%'
-    app.aws_s3_bucket_name: '%env(resolve:AWS_S3_BUCKET_NAME)%'
-    app.aws_s3_file_path: '%env(resolve:AWS_S3_FILE_PATH)%'
 
 services:
     # default configuration for services in *this* file
@@ -63,14 +57,6 @@ services:
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
             $generatedUsersFilePath: '%app.generated_users_file_path%'
             $projectDir: '%kernel.project_dir%'
-            $awsS3AccessKey: '%app.aws_s3_access_key%'
-            $awsS3AccessSecretKey: '%app.aws_s3_access_secret_key%'
-            $awsS3Version: '%app.aws_s3_version%'
-            $awsS3Region: '%app.aws_s3_region%'
-            $awsS3BucketName: '%app.aws_s3_bucket_name%'
-            $awsS3FilePath: '%app.aws_s3_file_path%'
-            $publicUploadsFilesystem: '@oneup_flysystem.public_uploads_filesystem_filesystem'
-            $localUploadsFilesystem: '@oneup_flysystem.default_uploads_filesystem_filesystem'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -176,6 +162,16 @@ services:
         arguments:
             - '@OAT\Library\Lti1p3BasicOutcome\Service\Server\Handler\BasicOutcomeServiceServerRequestHandler'
         tags: [ 'controller.service_arguments' ]
+
+    OAT\SimpleRoster\Service\AwsS3\FolderSyncService:
+        arguments:
+            - '@oneup_flysystem.user_files_local_filesystem_filesystem'
+            - '@oneup_flysystem.user_files_s3_filesystem_filesystem'
+            - '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_BUCKET)%'
+            - '@monolog.logger.user_folder_s3_sync'
+
+    app.s3_folder_sync:
+        alias: OAT\SimpleRoster\Service\AwsS3\FolderSyncService
 
     Aws\S3\S3Client:
         arguments:

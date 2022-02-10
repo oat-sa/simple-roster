@@ -20,45 +20,68 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Csv;
+namespace OAT\SimpleRoster\Service\AwsS3;
 
 use Aws\S3\Exception\S3Exception;
 use League\Flysystem\MountManager;
 use League\Flysystem\Filesystem;
+use Monolog\Logger;
 
-class AwsS3CsvWriter
+class FolderSyncService
 {
+    private const FILESYSTEM_MOUNT_LOCAL_PREFIX = 'local';
+    private const FILESYSTEM_MOUNT_S3_PREFIX = 's3';
+
+    private Filesystem $filesystemLocal;
+    private Filesystem $filesystemS3;
+    private Logger $userFolderS3SyncLogger;
+    private string $awsS3Bucket;
+
     public function __construct(
-        Filesystem $publicUploadsFilesystem,
-        Filesystem $localUploadsFilesystem
+        Filesystem $filesystemLocal,
+        Filesystem $filesystemS3,
+        string $awsS3Bucket,
+        Logger $userFolderS3SyncLogger
     ) {
-        $this->filesystemS3 = $publicUploadsFilesystem;
-        $this->filesystemLocal = $localUploadsFilesystem;
+        $this->filesystemLocal = $filesystemLocal;
+        $this->filesystemS3 = $filesystemS3;
+        $this->awsS3Bucket = $awsS3Bucket;
+        $this->userFolderS3SyncLogger = $userFolderS3SyncLogger;
     }
 
-    public function writeCsv(): void
+    public function copyUserFiles(): void
     {
         try {
+            if (! $this->awsS3Bucket) {
+                $this->userFolderS3SyncLogger->info('S3 Bucket name should be valid');
+
+                return;
+            }
+
             $mountManager = new MountManager([
-                'local' => $this->filesystemLocal,
-                's3' => $this->filesystemS3,
+                self::FILESYSTEM_MOUNT_LOCAL_PREFIX => $this->filesystemLocal,
+                self::FILESYSTEM_MOUNT_S3_PREFIX => $this->filesystemS3,
             ]);
 
             $contents = $this->filesystemLocal->listContents(date('Y-m-d'), true);
             foreach ($contents as $item) {
                 if ('file' === $item['type']) {
-                    $sourcePath = sprintf('local://%s', $item['path']);
-                    $destinationPath = sprintf('s3://%s', $item['path']);
+                    $sourcePath = sprintf('%s://%s', self::FILESYSTEM_MOUNT_LOCAL_PREFIX, $item['path']);
+                    $destinationPath = sprintf('%s://%s', self::FILESYSTEM_MOUNT_S3_PREFIX, $item['path']);
 
                     if ($mountManager->has($destinationPath)) {
                         $resource = $mountManager->readStream($sourcePath);
-                        $mountManager->putStream($destinationPath, $resource);
+                        if ($resource !== false) {
+                            $mountManager->putStream($destinationPath, $resource);
+                        }
                     } else {
                         $mountManager->copy($sourcePath, $destinationPath);
                     }
                 }
             }
-        } catch (S3Exception $e) {
+        } catch (S3Exception $exception) {
+            $this->userFolderS3SyncLogger->info($exception->getMessage());
+
             return;
         }
 
