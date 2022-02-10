@@ -32,7 +32,7 @@ class UserCollection implements Countable, IteratorAggregate, JsonSerializable
 {
     /** @var User[] */
     private array $collection;
-    
+
     /**
      * @param User[] $data
      */

@@ -45,13 +45,12 @@ class BulkCreateUsersServiceConsoleProxy
     private BulkCreateUsersService $service;
 
     public function __construct(
-        LineItemRepository        $lineItemRepository,
-        GenerateGroupIdsService   $generateGroupIdsService,
-        LtiInstanceRepository     $ltiInstanceRepository,
+        LineItemRepository $lineItemRepository,
+        GenerateGroupIdsService $generateGroupIdsService,
+        LtiInstanceRepository $ltiInstanceRepository,
         UserCreationResultMessage $userCreationMessage,
-        BulkCreateUsersService    $service
-    )
-    {
+        BulkCreateUsersService $service
+    ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->userCreationMessage = $userCreationMessage;
@@ -63,13 +62,12 @@ class BulkCreateUsersServiceConsoleProxy
      * @throws LineItemNotFoundException
      */
     public function createUsers(
-        array   $lineItemIds,
-        array   $lineItemSlugs,
-        array   $userPrefixes,
-        int     $batchSize,
+        array $lineItemIds,
+        array $lineItemSlugs,
+        array $userPrefixes,
+        int $batchSize,
         ?string $groupPrefix
-    ): UserCreationResult
-    {
+    ): UserCreationResult {
         $notExistLineItemsArray = [];
 
         $lineItems = [];

@@ -46,13 +46,12 @@ class BulkCreateUsersService
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     public function __construct(
-        AssignmentRepository         $assignmentRepository,
-        UserRepository               $userRepository,
-        AssigmentFactoryInterface    $assigmentFactory,
-        StorageInterface             $storage,
+        AssignmentRepository $assignmentRepository,
+        UserRepository $userRepository,
+        AssigmentFactoryInterface $assigmentFactory,
+        StorageInterface $storage,
         UserPasswordEncoderInterface $hasher
-    )
-    {
+    ) {
         $this->assignmentRepository = $assignmentRepository;
         $this->assigmentFactory = $assigmentFactory;
         $this->storage = $storage;
@@ -66,12 +65,11 @@ class BulkCreateUsersService
      * @param GroupResolverInterface|null $groupResolver
      */
     public function generate(
-        array                   $lineItems,
-        array                   $userPrefixes,
-        int                     $batchSize,
+        array $lineItems,
+        array $userPrefixes,
+        int $batchSize,
         ?GroupResolverInterface $groupResolver = null
-    ): void
-    {
+    ): void {
         $data = date('Y-m-d');
         $userNameLastIndexes = $this->getLastUserAssignedToLineItems($lineItems);
 

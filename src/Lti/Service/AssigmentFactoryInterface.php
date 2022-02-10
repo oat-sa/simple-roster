@@ -28,5 +28,5 @@ use OAT\SimpleRoster\Model\UserCollection;
 
 interface AssigmentFactoryInterface
 {
-    function fromUsersWithLineItem(UserCollection $users, LineItem $lineItem): AssignmentCollection;
+    public function fromUsersWithLineItem(UserCollection $users, LineItem $lineItem): AssignmentCollection;
 }

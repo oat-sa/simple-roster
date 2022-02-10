@@ -32,12 +32,11 @@ class StateDrivenUserGenerator implements UserGeneratorInterface
     protected ?GroupResolverInterface $groupResolver;
 
     public function __construct(
-        string                 $lineItemSlug,
-        string                 $prefix,
-        int                    $indexShift,
+        string $lineItemSlug,
+        string $prefix,
+        int $indexShift,
         ?GroupResolverInterface $groupResolver = null
-    )
-    {
+    ) {
         $this->lineItemSlug = $lineItemSlug;
         $this->prefix = $prefix;
         $this->indexShift = $indexShift;

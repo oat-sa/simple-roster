@@ -33,10 +33,9 @@ class GenerateGroupIdsService
      * @return string[]
      */
     public function generateGroupIds(
-        string                      $groupPrefix,
+        string $groupPrefix,
         UniqueLtiInstanceCollection $ltiInstanceCollection
-    ): array
-    {
+    ): array {
         $totalInstances = $ltiInstanceCollection->count();
         if ($totalInstances <= 0) {
             throw new LtiInstanceNotFoundException('No Lti instance were found in database.');

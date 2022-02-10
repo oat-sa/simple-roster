@@ -24,5 +24,5 @@ namespace OAT\SimpleRoster\Lti\Service;
 
 interface GroupResolverInterface
 {
-    function resolve(): string;
+    public function resolve(): string;
 }

@@ -36,11 +36,10 @@ class UpdateLineItemsWebhookAction
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
-        SerializerResponder    $responder,
+        SerializerResponder $responder,
         UpdateLineItemsService $service,
-        EventDispatcher        $eventDispatcher
-    )
-    {
+        EventDispatcher $eventDispatcher
+    ) {
         $this->responder = $responder;
         $this->service = $service;
         $this->eventDispatcher = $eventDispatcher;

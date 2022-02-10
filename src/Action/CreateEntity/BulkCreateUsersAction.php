@@ -38,9 +38,9 @@ class BulkCreateUsersAction
 
     public function __construct(
         BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService,
-        BulkCreateUserValidator            $bulkCreateUserValidator,
-        BulkCreateUserRequestInitialize    $bulkCreateUserRequestInitialize,
-        SerializerResponder                $responder
+        BulkCreateUserValidator $bulkCreateUserValidator,
+        BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize,
+        SerializerResponder $responder
     ) {
         $this->bulkCreateUserValidator = $bulkCreateUserValidator;
         $this->bulkCreateUsersService = $bulkCreateUsersService;
