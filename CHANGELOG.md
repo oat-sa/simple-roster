@@ -4,7 +4,6 @@
 
 ### Added
 - Added `(POST) /api/v1/line-items` endpoint for create/update line items
-## Not yet released
 
 ### Fixed
 - .htaccess restored
