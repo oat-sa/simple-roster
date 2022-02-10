@@ -95,7 +95,10 @@ class BulkCreateUsersService
                 $this->persistAssignment($assignments);
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
-                $this->storage->persistAssignments(sprintf('%s/Assignments-%s.csv', $csvPath, $csvFilename), $assignments);
+                $this->storage->persistAssignments(
+                    sprintf('%s/Assignments-%s.csv', $csvPath, $csvFilename),
+                    $assignments
+                );
 
                 $this->storage->persistUsers(sprintf('%s/users_aggregated.csv', $data), $generatedUsers);
                 $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $data), $assignments);

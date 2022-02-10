@@ -72,7 +72,9 @@ class BulkCreateUsersServiceConsoleProxy
 
         $lineItems = [];
         if (!empty($lineItemIds) || !empty($lineItemSlugs)) {
-            $criteria = (new FindLineItemCriteria())->addLineItemIds(...$lineItemIds)->addLineItemSlugs(...$lineItemSlugs);
+            $criteria = (new FindLineItemCriteria())
+                ->addLineItemIds(...$lineItemIds)
+                ->addLineItemSlugs(...$lineItemSlugs);
             $lineItems = $this->lineItemRepository->findLineItemsByCriteria($criteria)->jsonSerialize();
 
             if (empty($lineItems)) {
@@ -106,7 +108,9 @@ class BulkCreateUsersServiceConsoleProxy
             $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
         }
 
-        $slugTotalUsers = array_fill_keys(array_map(fn($item) => $item->getSlug(), $lineItems), $batchSize * count($userPrefixes));
+        $slugTotalUsers = array_fill_keys(
+            array_map(fn($item) => $item->getSlug(), $lineItems), $batchSize * count($userPrefixes)
+        );
 
         $this->service->generate(
             $lineItems,

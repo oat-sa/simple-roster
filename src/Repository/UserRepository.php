@@ -42,11 +42,10 @@ class UserRepository extends AbstractRepository
     private int $userCacheTtl;
 
     public function __construct(
-        ManagerRegistry      $registry,
+        ManagerRegistry $registry,
         UserCacheIdGenerator $userCacheIdGenerator,
-        int                  $userCacheTtl
-    )
-    {
+        int $userCacheTtl
+    ) {
         parent::__construct($registry, User::class);
 
         $this->userCacheIdGenerator = $userCacheIdGenerator;
@@ -96,11 +95,10 @@ class UserRepository extends AbstractRepository
      * @throws Exception
      */
     public function findAllUsernamesPaged(
-        int              $limit,
-        ?int             $lastUserId,
+        int $limit,
+        ?int $lastUserId,
         FindUserCriteria $criteria = null
-    ): UsernameResultSet
-    {
+    ): UsernameResultSet {
         if ($limit < 1) {
             throw new InvalidArgumentException("Invalid 'limit' parameter received.");
         }

@@ -45,7 +45,9 @@ class GenerateGroupIdsService
         foreach ($ltiInstanceCollection as $ignored) {
             do {
                 $newGroupId = $this->getNewGroupId($groupPrefix);
-                $possibleIndex = $ltiInstanceCollection->getByIndex($this->getHashIndex($newGroupId, $totalInstances))->getId();
+                $possibleIndex = $ltiInstanceCollection->getByIndex(
+                    $this->getHashIndex($newGroupId, $totalInstances)
+                )->getId();
 
                 if ($possibleIndex === null) {
                     throw new RuntimeException('Index cannot be null');

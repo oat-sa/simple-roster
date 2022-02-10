@@ -17,6 +17,7 @@
  *
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA;
  */
+
 declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventSubscriber;
@@ -45,14 +46,13 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private bool $enabled;
 
     public function __construct(
-        LoggerInterface         $logger,
-        BulkCreateUsersService  $createService,
+        LoggerInterface $logger,
+        BulkCreateUsersService $createService,
         GenerateGroupIdsService $generateGroupIdsService,
-        LtiInstanceRepository   $ltiInstanceRepository,
-        LineItemRepository      $lineItemRepository,
-        bool                    $enabled
-    )
-    {
+        LtiInstanceRepository $ltiInstanceRepository,
+        LineItemRepository $lineItemRepository,
+        bool $enabled
+    ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
         $this->createService = $createService;
@@ -86,7 +86,9 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
         $this->createService->generate(
-            $this->lineItemRepository->findLineItemsByCriteria((new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs))->jsonSerialize(),
+            $this->lineItemRepository->findLineItemsByCriteria(
+                (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
+            )->jsonSerialize(),
             ['QA1', 'QA2'],
             $batchSize,
             new ColumnGroupResolver(
