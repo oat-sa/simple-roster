@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -56,6 +57,24 @@ class AssignmentRepository extends AbstractRepository
             );
         }
 
+        return $assignment;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    public function findByLineItemId(int $lineItemId): ?Assignment
+    {
+        $assignment = $this
+            ->createQueryBuilder('a')
+            ->select('a')
+            ->where('a.lineItemId = :line_item_id')
+            ->setParameter('line_item_id', $lineItemId)
+            ->orderBy('a.user', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
         return $assignment;
     }
 

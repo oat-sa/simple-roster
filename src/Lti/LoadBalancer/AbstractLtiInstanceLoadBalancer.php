@@ -30,7 +30,7 @@ use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
  */
 abstract class AbstractLtiInstanceLoadBalancer implements LtiInstanceLoadBalancerInterface
 {
-    private UniqueLtiInstanceCollection $ltiInstanceCollection;
+    protected UniqueLtiInstanceCollection $ltiInstanceCollection;
 
     public function __construct(UniqueLtiInstanceCollection $ltiInstanceCollection)
     {
