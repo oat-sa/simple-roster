@@ -109,7 +109,8 @@ class BulkCreateUsersServiceConsoleProxy
         }
 
         $slugTotalUsers = array_fill_keys(
-            array_map(fn($item) => $item->getSlug(), $lineItems), $batchSize * count($userPrefixes)
+            array_map(fn($item) => $item->getSlug(), $lineItems),
+            $batchSize * count($userPrefixes)
         );
 
         $this->service->generate(
