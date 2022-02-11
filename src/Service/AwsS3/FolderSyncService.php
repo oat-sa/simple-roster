@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Service\AwsS3;
 use Aws\S3\Exception\S3Exception;
 use League\Flysystem\MountManager;
 use League\Flysystem\Filesystem;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class FolderSyncService
 {
@@ -34,30 +34,24 @@ class FolderSyncService
 
     private Filesystem $filesystemLocal;
     private Filesystem $filesystemS3;
-    private Logger $userFolderS3SyncLogger;
+    private LoggerInterface $logger;
     private string $awsS3Bucket;
 
     public function __construct(
         Filesystem $filesystemLocal,
         Filesystem $filesystemS3,
         string $awsS3Bucket,
-        Logger $userFolderS3SyncLogger
+        LoggerInterface $logger
     ) {
         $this->filesystemLocal = $filesystemLocal;
         $this->filesystemS3 = $filesystemS3;
         $this->awsS3Bucket = $awsS3Bucket;
-        $this->userFolderS3SyncLogger = $userFolderS3SyncLogger;
+        $this->logger = $logger;
     }
 
-    public function copyUserFiles(): void
+    public function copyUserFiles(): ?string
     {
         try {
-            if (! $this->awsS3Bucket) {
-                $this->userFolderS3SyncLogger->info('S3 Bucket name should be valid');
-
-                return;
-            }
-
             $mountManager = new MountManager([
                 self::FILESYSTEM_MOUNT_LOCAL_PREFIX => $this->filesystemLocal,
                 self::FILESYSTEM_MOUNT_S3_PREFIX => $this->filesystemS3,
@@ -80,11 +74,11 @@ class FolderSyncService
                 }
             }
         } catch (S3Exception $exception) {
-            $this->userFolderS3SyncLogger->info($exception->getMessage());
+            $this->logger->info($exception->getMessage());
 
-            return;
+            return $exception->getMessage();
         }
 
-        return;
+        return null;
     }
 }
