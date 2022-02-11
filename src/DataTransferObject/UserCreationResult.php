@@ -26,13 +26,13 @@ class UserCreationResult
 {
     private string $message;
     private array $nonExistingLineItems;
-    private ?string $userFolderSyncResponseMessage;
+    private ?string $userFolderS3SyncMessage;
 
-    public function __construct(string $message, array $nonExistingLineItems, ?string $userFolderSyncResponseMessage)
+    public function __construct(string $message, array $nonExistingLineItems, ?string $userFolderS3SyncMessage)
     {
         $this->message = $message;
         $this->nonExistingLineItems = $nonExistingLineItems;
-        $this->userFolderSyncResponseMessage = $userFolderSyncResponseMessage;
+        $this->userFolderS3SyncMessage = $userFolderS3SyncMessage;
     }
 
     public function getMessage(): string
@@ -48,8 +48,8 @@ class UserCreationResult
         return $this->nonExistingLineItems;
     }
 
-    public function getUserFolderSyncResponseMessage(): ?string
+    public function getUserFolderS3SyncMessage(): ?string
     {
-        return $this->userFolderSyncResponseMessage;
+        return $this->userFolderS3SyncMessage;
     }
 }

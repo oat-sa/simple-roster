@@ -157,8 +157,8 @@ class BulkUserCreationCommand extends Command
                     )
                 );
             }
-            if (!empty($processDataResult->getUserFolderSyncResponseMessage())) {
-                $this->symfonyStyle->note($processDataResult->getUserFolderSyncResponseMessage());
+            if (!empty($processDataResult->getUserFolderS3SyncMessage())) {
+                $this->symfonyStyle->note($processDataResult->getUserFolderS3SyncMessage());
             }
             $this->symfonyStyle->success(
                 sprintf('%s', $processDataResult->getMessage())
