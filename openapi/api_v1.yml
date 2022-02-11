@@ -391,6 +391,29 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
+    /v1/bulk-create-users
+        post:
+            summary: Bulk create user and assignments
+            tags:
+                - Bulk Create Users
+            security:
+                -   apiKeyAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BulkCreateUserRequest'
+            responses:
+                201:
+                    $ref: '#/components/responses/BulkCreateUserResponse'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
 components:
     securitySchemes:
         apiKeyAuth:
@@ -702,6 +725,25 @@ components:
             xml:
                 name: 'imsx_POXEnvelopeResponse'
                 namespace: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'
+        BulkCreateUserRequest:
+            type: object
+            properties:
+                lineItemSlug:
+                    type: string
+                    description: Slugs of line items seperated by commas
+                    example: slug-1
+                userPrefixes:
+                    type: array
+                    description: Names of users
+                    example: QA,OAT,CUSTOMER
+                quantity:
+                    type: integer
+                    description: Batch size is the number of users created for each  user-prefix
+                    example: 100
+                groupIdPrefix:
+                    type: string
+                    description: Group prefix to be used if load balancing configured to userGroupId
+                    example: TestCollege
         Error:
             type: object
             properties:
@@ -777,3 +819,16 @@ components:
                 application/xml:
                     schema:
                         $ref: '#/components/schemas/LtiOutcomeResponse'
+        BulkCreateUserResponse:
+            description: Bulk create user response
+            content:
+                application/json:
+                    properties:
+                        message:
+                            type: string
+                            description: Total number of users created message
+                            example: '100 users created for line item slug-1 for user prefix DEPP,OAT,QA'
+                        nonExistingLineItems:
+                            type: array
+                            description: Names of non existing line item slugs
+                            example: LQA
