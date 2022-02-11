@@ -180,4 +180,3 @@ services:
                 credentials:
                     key: '%env(AWS_S3_ACCESS_KEY)%'
                     secret: '%env(AWS_S3_ACCESS_SECRET_KEY)%'
-                    token: 'FwoGZXIvYXdzEAMaDO2P3DEMwZwp6g6pkCK1AbVfNrPWemXMv4LVHZmviBlXxBs+B0wUeHx5D9FeUB4aRg1gHkEjH1NWBZTN34NezaFInyM1ILqvcwcWuyxPiVPZ7hTtHK5agjru5olL98EN4qJgnyj68fwaWA+ljWdoYMj8GSHGUiLbRTsIB4ywvv3iLh3UZy1n9hUf21NJpnRLX7SnbxwEXFxKupAxfT1Xc193/DIehhXmvSw3JJMKBNyKT7Be4UcKwKSknh0CC9RqxnzH4vooofWWkAYyLXwFB/cPIII3+OKd2wwiPn/0O7F5oAIMvpw+lLHZGm/ZSei7wIYiRaUUtwGLQA=='
