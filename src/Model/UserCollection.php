@@ -36,7 +36,7 @@ class UserCollection implements Countable, IteratorAggregate, JsonSerializable
     /**
      * @param User[] $data
      */
-    public function __construct(array $data)
+    public function __construct(array $data = [])
     {
         $this->collection = $data;
     }

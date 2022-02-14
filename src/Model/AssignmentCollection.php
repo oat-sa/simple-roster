@@ -36,7 +36,7 @@ class AssignmentCollection implements Countable, IteratorAggregate, JsonSerializ
     /**
      * @param Assignment[] $data
      */
-    public function __construct(array $data)
+    public function __construct(array $data = [])
     {
         $this->collection = $data;
     }

@@ -44,6 +44,10 @@ final class ColumnGroupResolver implements GroupResolverInterface
         $this->idList = $idList;
         $this->chunkSize = $chunkSize;
 
+        if ($chunkSize < 1) {
+            throw new RuntimeException("Chunk size cannot be less then 1.");
+        }
+
         $this->sizeMap = array_fill(0, count($this->idList), 0);
     }
 
