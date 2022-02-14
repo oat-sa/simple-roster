@@ -34,17 +34,6 @@ class LineItemCollection implements Countable, IteratorAggregate, JsonSerializab
     /** @var LineItem[] */
     private array $collection = [];
 
-
-    /**
-     * @param LineItem[] $data
-     */
-    public function __construct(array $data = [])
-    {
-        foreach ($data as $lineItem) {
-            $this->collection[$lineItem->getSlug()] = $lineItem;
-        }
-    }
-
     public function add(LineItem $lineItem): self
     {
         $this->collection[$lineItem->getSlug()] = $lineItem;
