@@ -44,6 +44,9 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private LineItemRepository $lineItemRepository;
 
     private bool $enabled;
+    private array $prefixes;
+    private int $batchSize;
+    private string $group;
 
     public function __construct(
         LoggerInterface $logger,
@@ -51,7 +54,10 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         GenerateGroupIdsService $generateGroupIdsService,
         LtiInstanceRepository $ltiInstanceRepository,
         LineItemRepository $lineItemRepository,
-        bool $enabled
+        bool $enabled,
+        array $prefixes,
+        int $batchSize,
+        string $group
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
@@ -59,6 +65,9 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
+        $this->prefixes = $prefixes;
+        $this->batchSize = $batchSize;
+        $this->group = $group;
     }
 
     public static function getSubscribedEvents(): array
@@ -82,19 +91,22 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             ->filter(fn($dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
             ->map(fn($dto) => $dto->getSlug());
 
-        $batchSize = 20;
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
+        $lineItems = $this->lineItemRepository->findLineItemsByCriteria(
+            (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
+        )->jsonSerialize();
+
+        $groupResolver = empty($this->group) ? null : new ColumnGroupResolver(
+            $this->generateGroupIdsService->generateGroupIds($this->group, $ltiCollection),
+            $this->batchSize * count($this->prefixes)
+        );
+
         $this->createService->generate(
-            $this->lineItemRepository->findLineItemsByCriteria(
-                (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
-            )->jsonSerialize(),
-            ['QA1', 'QA2'],
-            $batchSize,
-            new ColumnGroupResolver(
-                $this->generateGroupIdsService->generateGroupIds("TestGroup", $ltiCollection),
-                $batchSize * 2
-            )
+            $lineItems,
+            $this->prefixes,
+            $this->batchSize,
+            $groupResolver
         );
     }
 }
