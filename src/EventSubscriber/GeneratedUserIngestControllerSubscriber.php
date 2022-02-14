@@ -74,7 +74,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        $this->logger->info("Got LineItemUpdate event", [
+        $this->logger->info('Got LineItemUpdate event', [
             'line_items_slugs' => $event->getUpdateLineItemCollection()->map(fn($dto) => $dto->getSlug())
         ]);
 

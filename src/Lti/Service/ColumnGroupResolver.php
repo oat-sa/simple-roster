@@ -45,7 +45,7 @@ final class ColumnGroupResolver implements GroupResolverInterface
         $this->chunkSize = $chunkSize;
 
         if ($chunkSize < 1) {
-            throw new RuntimeException("Chunk size cannot be less then 1.");
+            throw new RuntimeException('Chunk size cannot be less then 1.');
         }
 
         $this->sizeMap = array_fill(0, count($this->idList), 0);
@@ -54,7 +54,7 @@ final class ColumnGroupResolver implements GroupResolverInterface
     public function resolve(): string
     {
         if ($this->cursor >= count($this->idList)) {
-            throw new RuntimeException("Group ids limit is reached. Cannot resolve group id anymore.");
+            throw new RuntimeException('Group ids limit is reached. Cannot resolve group id anymore.');
         }
 
         $res = $this->idList[$this->cursor];
