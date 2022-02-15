@@ -4,7 +4,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use PHPUnit\Framework\TestCase;
-use \RuntimeException;
+use RuntimeException;
 
 class ColumnGroupResolverTest extends TestCase
 {
