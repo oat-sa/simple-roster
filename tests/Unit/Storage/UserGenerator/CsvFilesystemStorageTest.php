@@ -72,17 +72,17 @@ class CsvFilesystemStorageTest extends TestCase
 
     protected function makeAssignments(): AssignmentCollection
     {
-        $u = new User();
-        $u->setUsername('n1');
+        $user = new User();
+        $user->setUsername('n1');
 
-        $li = new LineItem();
-        $li->setSlug('s1');
+        $listItem = new LineItem();
+        $listItem->setSlug('s1');
 
-        $a = new Assignment();
-        $a->setUser($u);
-        $a->setLineItem($li);
+        $assignment = new Assignment();
+        $assignment->setUser($user);
+        $assignment->setLineItem($listItem);
 
-        return new AssignmentCollection([$a]);
+        return new AssignmentCollection([$assignment]);
     }
 
     protected function makeAssignmentsArray(): array

@@ -10,7 +10,7 @@ class StateDrivenUserGeneratorTest extends TestCase
 {
     public function testMakeBatch(): void
     {
-        $obj = new StateDrivenUserGenerator("slug", "pref", $shift = 2);
+        $obj = new StateDrivenUserGenerator("slug", "pref", 2);
         $res = $obj->makeBatch($count = 25);
 
         $this->assertEquals($count, count($res));
