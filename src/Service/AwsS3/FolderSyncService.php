@@ -74,7 +74,7 @@ class FolderSyncService
                 }
             }
         } catch (S3Exception $exception) {
-            $this->logger->info($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
             return $exception->getMessage();
         }
