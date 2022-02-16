@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\CreateEntity;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\Request\Validator\BulkCreateUserValidator;
 use OAT\SimpleRoster\Request\Initialize\BulkCreateUserRequestInitialize;
@@ -35,16 +36,19 @@ class BulkCreateUsersAction
     private BulkCreateUserValidator $bulkCreateUserValidator;
     private BulkCreateUsersService $bulkCreateUsersService;
     private BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize;
+    private FolderSyncService $userFolderSync;
 
     public function __construct(
         BulkCreateUsersService $bulkCreateUsersService,
         BulkCreateUserValidator $bulkCreateUserValidator,
         BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize,
+        FolderSyncService $userFolderSync,
         SerializerResponder $responder
     ) {
         $this->bulkCreateUserValidator = $bulkCreateUserValidator;
         $this->bulkCreateUsersService = $bulkCreateUsersService;
         $this->bulkCreateUserRequestInitialize = $bulkCreateUserRequestInitialize;
+        $this->userFolderSync = $userFolderSync;
         $this->responder = $responder;
     }
 
@@ -53,15 +57,19 @@ class BulkCreateUsersAction
         $this->bulkCreateUserValidator->validate($request);
         $requestPayLoad = $this->bulkCreateUserRequestInitialize->initializeRequestData($request);
 
-        return $this->responder->createJsonResponse(
-            $this->bulkCreateUsersService->createUsers(
-                $requestPayLoad['lineItemIds'],
-                $requestPayLoad['lineItemSlugs'],
-                $requestPayLoad['userPrefixes'],
-                $requestPayLoad['quantity'],
-                $requestPayLoad['groupIdPrefix'],
-            ),
-            Response::HTTP_CREATED
+        $folderName = date('Y-m-d');
+
+        $response = $this->bulkCreateUsersService->createUsers(
+            $requestPayLoad['lineItemIds'],
+            $requestPayLoad['lineItemSlugs'],
+            $requestPayLoad['userPrefixes'],
+            $requestPayLoad['quantity'],
+            $requestPayLoad['groupIdPrefix'],
+            $folderName
         );
+
+        $this->userFolderSync->sync($folderName);
+
+        return $this->responder->createJsonResponse($response, Response::HTTP_CREATED);
     }
 }

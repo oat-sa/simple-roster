@@ -55,8 +55,6 @@ class BulkCreateUsersService
     private LtiInstanceRepository $ltiInstanceRepository;
     private UserCreationResultMessage $userCreationMessage;
     private LineItemCriteriaFactory $lineItemCriteriaFactory;
-    private FolderSyncService $userFolderSync;
-
     private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     public function __construct(
@@ -69,8 +67,7 @@ class BulkCreateUsersService
         LineItemCriteriaFactory $lineItemCriteriaFactory,
         Filesystem $filesystem,
         string $generatedUsersFilePath,
-        string $projectDir,
-        FolderSyncService $userFolderSync
+        string $projectDir
     ) {
         $this->lineItemRepository = $lineItemRepository;
         $this->assignmentRepository = $assignmentRepository;
@@ -82,7 +79,6 @@ class BulkCreateUsersService
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemCriteriaFactory = $lineItemCriteriaFactory;
         $this->projectDir = $projectDir;
-        $this->userFolderSync = $userFolderSync;
     }
 
     /**
@@ -93,7 +89,8 @@ class BulkCreateUsersService
         array $lineItemSlugs,
         array $userPrefixes,
         int $batchSize,
-        ?string $groupPrefix
+        ?string $groupPrefix,
+        string $folder
     ): UserCreationResult {
         $notExistLineItemsArray = $userGroupIds = [];
 
@@ -136,14 +133,13 @@ class BulkCreateUsersService
             $userPrefixes,
             $userGroupAssignCount,
             $groupPrefix,
-            $batchSize
+            $batchSize,
+            $folder
         );
-
-        $this->userFolderSync->sync(date('Y-m-d'));
 
         $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
 
-        return new UserCreationResult($message, $notExistLineItemsArray, 'test');
+        return new UserCreationResult($message, $notExistLineItemsArray);
     }
 
     private function setLineItemSlugData(array $lineItems): void
@@ -161,10 +157,11 @@ class BulkCreateUsersService
         array $userPrefixes,
         int $userGroupAssignCount,
         ?string $groupPrefix,
-        int $batchSize
+        int $batchSize,
+        string $folderName
     ): array {
         $slugWiseTotalUsersArray = [];
-        $automateCsvPath = sprintf('%s/%s%s', $this->projectDir, $this->generatedUsersFilePath, date('Y-m-d'));
+        $automateCsvPath = sprintf('%s/%s%s', $this->projectDir, $this->generatedUsersFilePath, $folderName);
         $this->createDirectoryIfNotExist($automateCsvPath);
         foreach ($userPrefixes as $prefix) {
             $csvPath = sprintf('%s/%s', $automateCsvPath, $prefix);
