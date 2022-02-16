@@ -35,17 +35,14 @@ class FolderSyncService
     private Filesystem $filesystemLocal;
     private Filesystem $filesystemS3;
     private LoggerInterface $logger;
-    private string $awsS3Bucket;
 
     public function __construct(
         Filesystem $filesystemLocal,
         Filesystem $filesystemS3,
-        string $awsS3Bucket,
         LoggerInterface $logger
     ) {
         $this->filesystemLocal = $filesystemLocal;
         $this->filesystemS3 = $filesystemS3;
-        $this->awsS3Bucket = $awsS3Bucket;
         $this->logger = $logger;
     }
 

@@ -173,7 +173,6 @@ services:
         arguments:
             - '@oneup_flysystem.user_files_local_filesystem_filesystem'
             - '@oneup_flysystem.user_files_s3_filesystem_filesystem'
-            - '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_BUCKET)%'
 
     app.s3_folder_sync:
         alias: OAT\SimpleRoster\Service\AwsS3\FolderSyncService
