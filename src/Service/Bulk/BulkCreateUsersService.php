@@ -139,7 +139,7 @@ class BulkCreateUsersService
             $batchSize
         );
 
-        $this->userFolderSync->copyUserFiles();
+        $this->userFolderSync->sync(date('Y-m-d'));
 
         $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
 

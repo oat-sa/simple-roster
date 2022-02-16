@@ -31,39 +31,39 @@ use League\Flysystem\{
 
 class FolderSyncService
 {
-    private const FILESYSTEM_MOUNT_LOCAL_PREFIX = 'local';
-    private const FILESYSTEM_MOUNT_S3_PREFIX = 's3';
+    private const FILESYSTEM_SOURCE = 'source';
+    private const FILESYSTEM_DEST = 'dest';
 
-    private Filesystem $filesystemLocal;
-    private Filesystem $filesystemS3;
+    private Filesystem $sourceFS;
+    private Filesystem $destFS;
 
     public function __construct(
-        Filesystem $filesystemLocal,
-        Filesystem $filesystemS3
+        Filesystem $sourceFS,
+        Filesystem $destFS
     ) {
-        $this->filesystemLocal = $filesystemLocal;
-        $this->filesystemS3 = $filesystemS3;
+        $this->sourceFS = $sourceFS;
+        $this->destFS = $destFS;
     }
 
     /**
      * @throws FileNotFoundException
      * @throws FileExistsException
      */
-    public function copyUserFiles(): void
+    public function sync(string $dir): void
     {
         $mountManager = new MountManager([
-            self::FILESYSTEM_MOUNT_LOCAL_PREFIX => $this->filesystemLocal,
-            self::FILESYSTEM_MOUNT_S3_PREFIX => $this->filesystemS3,
+            self::FILESYSTEM_SOURCE => $this->sourceFS,
+            self::FILESYSTEM_DEST => $this->destFS,
         ]);
 
-        $contents = $this->filesystemLocal->listContents(date('Y-m-d'), true);
+        $contents = $this->sourceFS->listContents($dir, true);
         foreach ($contents as $item) {
             if ('file' !== $item['type']) {
                 continue;
             }
 
-            $from = sprintf('%s://%s', self::FILESYSTEM_MOUNT_LOCAL_PREFIX, $item['path']);
-            $to = sprintf('%s://%s', self::FILESYSTEM_MOUNT_S3_PREFIX, $item['path']);
+            $from = sprintf('%s://%s', self::FILESYSTEM_SOURCE, $item['path']);
+            $to = sprintf('%s://%s', self::FILESYSTEM_DEST, $item['path']);
 
             if ($mountManager->has($to)) {
                 $resource = $mountManager->readStream($from);
