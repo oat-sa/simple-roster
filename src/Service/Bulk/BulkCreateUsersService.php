@@ -139,11 +139,11 @@ class BulkCreateUsersService
             $batchSize
         );
 
-        $userFolderS3SyncResponse = $this->userFolderSync->copyUserFiles();
+        $this->userFolderSync->copyUserFiles();
 
         $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
 
-        return new UserCreationResult($message, $notExistLineItemsArray, $userFolderS3SyncResponse);
+        return new UserCreationResult($message, $notExistLineItemsArray, 'test');
     }
 
     private function setLineItemSlugData(array $lineItems): void

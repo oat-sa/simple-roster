@@ -22,10 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\AwsS3;
 
-use Aws\S3\Exception\S3Exception;
-use League\Flysystem\MountManager;
-use League\Flysystem\Filesystem;
-use Psr\Log\LoggerInterface;
+use League\Flysystem\{
+    FileExistsException,
+    FileNotFoundException,
+    MountManager,
+    Filesystem
+};
 
 class FolderSyncService
 {
@@ -34,48 +36,43 @@ class FolderSyncService
 
     private Filesystem $filesystemLocal;
     private Filesystem $filesystemS3;
-    private LoggerInterface $logger;
 
     public function __construct(
         Filesystem $filesystemLocal,
-        Filesystem $filesystemS3,
-        LoggerInterface $logger
+        Filesystem $filesystemS3
     ) {
         $this->filesystemLocal = $filesystemLocal;
         $this->filesystemS3 = $filesystemS3;
-        $this->logger = $logger;
     }
 
-    public function copyUserFiles(): ?string
+    /**
+     * @throws FileNotFoundException
+     * @throws FileExistsException
+     */
+    public function copyUserFiles(): void
     {
-        try {
-            $mountManager = new MountManager([
-                self::FILESYSTEM_MOUNT_LOCAL_PREFIX => $this->filesystemLocal,
-                self::FILESYSTEM_MOUNT_S3_PREFIX => $this->filesystemS3,
-            ]);
+        $mountManager = new MountManager([
+            self::FILESYSTEM_MOUNT_LOCAL_PREFIX => $this->filesystemLocal,
+            self::FILESYSTEM_MOUNT_S3_PREFIX => $this->filesystemS3,
+        ]);
 
-            $contents = $this->filesystemLocal->listContents(date('Y-m-d'), true);
-            foreach ($contents as $item) {
-                if ('file' === $item['type']) {
-                    $sourcePath = sprintf('%s://%s', self::FILESYSTEM_MOUNT_LOCAL_PREFIX, $item['path']);
-                    $destinationPath = sprintf('%s://%s', self::FILESYSTEM_MOUNT_S3_PREFIX, $item['path']);
-
-                    if ($mountManager->has($destinationPath)) {
-                        $resource = $mountManager->readStream($sourcePath);
-                        if ($resource !== false) {
-                            $mountManager->putStream($destinationPath, $resource);
-                        }
-                    } else {
-                        $mountManager->copy($sourcePath, $destinationPath);
-                    }
-                }
+        $contents = $this->filesystemLocal->listContents(date('Y-m-d'), true);
+        foreach ($contents as $item) {
+            if ('file' !== $item['type']) {
+                continue;
             }
-        } catch (S3Exception $exception) {
-            $this->logger->error($exception->getMessage());
 
-            return $exception->getMessage();
+            $from = sprintf('%s://%s', self::FILESYSTEM_MOUNT_LOCAL_PREFIX, $item['path']);
+            $to = sprintf('%s://%s', self::FILESYSTEM_MOUNT_S3_PREFIX, $item['path']);
+
+            if ($mountManager->has($to)) {
+                $resource = $mountManager->readStream($from);
+                if ($resource !== false) {
+                    $mountManager->putStream($to, $resource);
+                }
+            } else {
+                $mountManager->copy($from, $to);
+            }
         }
-
-        return null;
     }
 }
