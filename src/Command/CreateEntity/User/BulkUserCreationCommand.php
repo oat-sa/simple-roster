@@ -169,7 +169,7 @@ class BulkUserCreationCommand extends Command
 
             try {
                 $this->userFolderSync->sync($folderName);
-            } catch (FileExistsException|FileExistsException $exception) {
+            } catch (FileExistsException | FileExistsException $exception) {
                 $this->symfonyStyle->note($exception->getMessage());
             }
 

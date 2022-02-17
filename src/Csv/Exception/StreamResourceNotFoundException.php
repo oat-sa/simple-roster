@@ -26,5 +26,4 @@ use RuntimeException;
 
 class StreamResourceNotFoundException extends RuntimeException
 {
-
 }

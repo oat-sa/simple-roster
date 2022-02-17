@@ -26,5 +26,4 @@ use LogicException;
 
 class RegistrationNotFoundException extends LogicException
 {
-
 }

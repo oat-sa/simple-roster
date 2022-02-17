@@ -26,5 +26,4 @@ use RuntimeException;
 
 class IndeterminableLtiRequestContextIdException extends RuntimeException
 {
-
 }
