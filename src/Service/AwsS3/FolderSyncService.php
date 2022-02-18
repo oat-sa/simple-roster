@@ -63,16 +63,16 @@ class FolderSyncService
             }
 
             $from = sprintf('%s://%s', self::FILESYSTEM_SOURCE, $item['path']);
-            $to = sprintf('%s://%s', self::FILESYSTEM_DEST, $item['path']);
+            $dest = sprintf('%s://%s', self::FILESYSTEM_DEST, $item['path']);
 
-            if ($mountManager->has($to)) {
+            if ($mountManager->has($dest)) {
                 $resource = $mountManager->readStream($from);
                 if ($resource !== false) {
-                    $mountManager->putStream($to, $resource);
+                    $mountManager->putStream($dest, $resource);
                 }
-            } else {
-                $mountManager->copy($from, $to);
+                continue;
             }
+            $mountManager->copy($from, $dest);
         }
     }
 }
