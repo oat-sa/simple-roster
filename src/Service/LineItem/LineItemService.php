@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\LineItem;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 
@@ -46,5 +49,10 @@ class LineItemService
         );
 
         return new ListLineItemResponse($lineItemResultSet);
+    }
+
+    public function createOrUpdateLineItem(LineItem $lineItem): LineItem
+    {
+        return $this->lineItemRepository->createOrUpdate($lineItem);
     }
 }

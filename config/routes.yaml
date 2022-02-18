@@ -44,6 +44,11 @@ getLineItems:
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\LineItem\ListLineItemsAction }
 
+createLineItem:
+  path: '%app.route_prefix%/v1/line-items'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\LineItem\CreateLineItemAction }
+
 updateLti1p3Outcome:
   path: '%app.route_prefix%/v1/lti1p3/outcome'
   methods: POST

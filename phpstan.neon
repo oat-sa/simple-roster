@@ -31,3 +31,6 @@ parameters:
     # Doctrine internal
     - message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getRepository\(\)$#'
       path: tests
+    # Possible null date time formatting
+    - message: '#^Cannot call method format\(\) on DateTimeInterface\|null\.$#'
+      path: tests
