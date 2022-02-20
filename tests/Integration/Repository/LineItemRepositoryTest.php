@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -138,5 +139,31 @@ class LineItemRepositoryTest extends KernelTestCase
         $this->expectException(EntityNotFoundException::class);
 
         $this->subject->findOneById(10);
+    }
+
+    public function testItCreatesNewLineItem(): void
+    {
+        $lineItem = (new LineItem())
+            ->setSlug('my-slug')
+            ->setLabel('my-label')
+            ->setUri('my-uri');
+
+        $result = $this->subject->createOrUpdate($lineItem);
+
+        self::assertSame($lineItem, $result);
+    }
+
+    public function testUpdatesExistingLineItem(): void
+    {
+        $lineItem = (new LineItem())
+            ->setSlug('lineItemSlug1')
+            ->setLabel('The first line item')
+            ->setUri('http://lineitemuri.com');
+
+        $result = $this->subject->createOrUpdate($lineItem);
+
+        self::assertSame($lineItem->getSlug(), $result->getSlug());
+        self::assertSame($lineItem->getLabel(), $result->getLabel());
+        self::assertSame($lineItem->getUri(), $result->getUri());
     }
 }

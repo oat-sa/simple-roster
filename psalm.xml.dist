@@ -33,6 +33,7 @@
             <errorLevel type="suppress">
                 <file name="src/Entity/LineItem.php"/>
                 <file name="src/Logger/UserRequestLogProcessor.php"/>
+                <file name="tests/Unit/Request/ParamConverter/CreateLineItemParamConverterTest.php"/>
             </errorLevel>
         </PossiblyNullReference>
     </issueHandlers>

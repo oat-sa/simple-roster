@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
 use DateTimeImmutable;
-use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
