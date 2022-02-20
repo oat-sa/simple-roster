@@ -26,5 +26,4 @@ use RuntimeException;
 
 class StorageNotFoundException extends RuntimeException
 {
-
 }

@@ -13,3 +13,4 @@ monolog:
             path: '%kernel.logs_dir%/cache-warmup.%kernel.environment%.log'
             level: debug
             channels: ['cache_warmup']
+        

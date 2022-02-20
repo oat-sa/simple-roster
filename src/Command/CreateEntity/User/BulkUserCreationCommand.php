@@ -24,6 +24,9 @@ namespace OAT\SimpleRoster\Command\CreateEntity\User;
 
 use InvalidArgumentException;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
+use League\Flysystem\FileExistsException;
+use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,6 +48,7 @@ class BulkUserCreationCommand extends Command
     private const OPTION_BATCH_SIZE = 'batch-size';
 
     private SymfonyStyle $symfonyStyle;
+    private FolderSyncService $userFolderSync;
 
     private array $lineItemSlugs = [];
     private array $userPrefix;
@@ -52,10 +56,13 @@ class BulkUserCreationCommand extends Command
 
     private int $batchSize;
 
-    public function __construct(BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService)
-    {
+    public function __construct(
+        BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService,
+        FolderSyncService $userFolderSync
+    ) {
         parent::__construct(self::NAME);
         $this->bulkCreateUsersService = $bulkCreateUsersService;
+        $this->userFolderSync = $userFolderSync;
     }
 
     protected function configure(): void
@@ -83,7 +90,7 @@ class BulkUserCreationCommand extends Command
             'b',
             InputOption::VALUE_REQUIRED,
             'User Create Batch size',
-            (string) self::DEFAULT_BATCH_SIZE
+            (string)self::DEFAULT_BATCH_SIZE
         );
 
         $this->addArgument(
@@ -142,12 +149,15 @@ class BulkUserCreationCommand extends Command
         $this->symfonyStyle->comment('Executing Bulk user creation');
 
         try {
+            $folderName = date('Y-m-d');
+
             $processDataResult = $this->bulkCreateUsersService->createUsers(
                 $this->lineItemIds,
                 $this->lineItemSlugs,
                 $this->userPrefix,
                 $this->batchSize,
-                $input->getOption(self::OPTION_GROUP_PREFIX)
+                $input->getOption(self::OPTION_GROUP_PREFIX),
+                date('Y-m-d')
             );
             if (!empty($processDataResult->getNonExistingLineItems())) {
                 $this->symfonyStyle->note(
@@ -157,6 +167,13 @@ class BulkUserCreationCommand extends Command
                     )
                 );
             }
+
+            try {
+                $this->userFolderSync->sync($folderName);
+            } catch (FileExistsException | FileExistsException $exception) {
+                $this->symfonyStyle->note($exception->getMessage());
+            }
+
             $this->symfonyStyle->success(
                 sprintf('%s', $processDataResult->getMessage())
             );
