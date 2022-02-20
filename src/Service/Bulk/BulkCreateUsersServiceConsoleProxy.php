@@ -66,7 +66,8 @@ class BulkCreateUsersServiceConsoleProxy
         array $lineItemSlugs,
         array $userPrefixes,
         int $batchSize,
-        ?string $groupPrefix
+        ?string $groupPrefix,
+        string $date
     ): UserCreationResult {
         $notExistLineItemsArray = [];
 
@@ -117,6 +118,7 @@ class BulkCreateUsersServiceConsoleProxy
             $lineItems,
             $userPrefixes,
             $batchSize,
+            $date,
             $resolver
         );
 

@@ -68,13 +68,13 @@ class BulkCreateUsersService
         array $lineItems,
         array $userPrefixes,
         int $batchSize,
+        string $date,
         ?GroupResolverInterface $groupResolver = null
     ): void {
-        $data = date('Y-m-d');
         $userNameLastIndexes = $this->getLastUserAssignedToLineItems($lineItems);
 
         foreach ($userPrefixes as $prefix) {
-            $csvPath = sprintf('%s/%s', $data, $prefix);
+            $csvPath = sprintf('%s/%s', $date, $prefix);
 
             foreach ($lineItems as $lineItem) {
                 $slug = $lineItem->getSlug();
@@ -100,8 +100,8 @@ class BulkCreateUsersService
                     $assignments
                 );
 
-                $this->storage->persistUsers(sprintf('%s/users_aggregated.csv', $data), $generatedUsers);
-                $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $data), $assignments);
+                $this->storage->persistUsers(sprintf('%s/users_aggregated.csv', $date), $generatedUsers);
+                $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $date), $assignments);
             }
         }
     }

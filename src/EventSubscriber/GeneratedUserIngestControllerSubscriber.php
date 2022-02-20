@@ -106,6 +106,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             $lineItems,
             $this->prefixes,
             $this->batchSize,
+            date('Y-m-d'),
             $groupResolver
         );
     }
