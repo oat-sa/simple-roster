@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
@@ -42,6 +43,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private GenerateGroupIdsService $generateGroupIdsService;
     private LtiInstanceRepository $ltiInstanceRepository;
     private LineItemRepository $lineItemRepository;
+    private FolderSyncService $userFolderSync;
 
     private bool $enabled;
     private array $prefixes;
@@ -54,6 +56,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         GenerateGroupIdsService $generateGroupIdsService,
         LtiInstanceRepository $ltiInstanceRepository,
         LineItemRepository $lineItemRepository,
+        FolderSyncService $userFolderSync,
         bool $enabled,
         array $prefixes,
         int $batchSize,
@@ -65,6 +68,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
+        $this->userFolderSync = $userFolderSync;
         $this->prefixes = $prefixes;
         $this->batchSize = $batchSize;
         $this->group = $group;
@@ -102,12 +106,16 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             $this->batchSize * count($this->prefixes)
         );
 
+        $date = date('Y-m-d');
+
         $this->createService->generate(
             $lineItems,
             $this->prefixes,
             $this->batchSize,
-            date('Y-m-d'),
+            $date,
             $groupResolver
         );
+
+        $this->userFolderSync->sync($date);
     }
 }
