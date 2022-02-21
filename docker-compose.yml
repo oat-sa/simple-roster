@@ -72,6 +72,27 @@ services:
             - BLACKFIRE_SERVER_ID
             - BLACKFIRE_SERVER_TOKEN
 
+    simple-roster-localstack:
+        container_name: simple-roster-localstack
+        image: localstack/localstack
+        ports:
+            #- "4510-4559:4510-4559"
+            - "4566:4566"
+        environment:
+            - SERVICES=s3
+            - DEBUG=1
+        networks:
+            - simple-roster
+            - oat-docker
+        volumes:
+            - "./localstack:/tmp/localstack"
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        labels:
+            - "traefik.backend=simple-roster-localstack"
+            - "traefik.frontend.rule=Host:simple-roster.localstack.localhost"
+            - "traefik.docker.network=oat-docker"
+            - "traefik.port=4566"
+
 volumes:
     simple-roster-redis-volume:
         driver: local

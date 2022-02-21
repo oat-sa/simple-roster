@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,15 +15,14 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Csv\Exception;
+namespace OAT\SimpleRoster\Lti\Service;
 
-use RuntimeException;
-
-class StreamResourceNotFoundException extends RuntimeException
+interface GroupResolverInterface
 {
+    public function resolve(): string;
 }
