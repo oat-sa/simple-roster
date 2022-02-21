@@ -92,8 +92,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         ]);
 
         $acceptedSlugs = $event->getUpdateLineItemCollection()
-            ->filter(fn($dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
-            ->map(fn($dto) => $dto->getSlug());
+            ->filter(fn(UpdateLineItemDto $dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
+            ->map(fn(UpdateLineItemDto $dto) => $dto->getSlug());
 
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
