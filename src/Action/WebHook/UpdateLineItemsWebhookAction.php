@@ -22,26 +22,35 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\WebHook;
 
+use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\WebHook\Service\UpdateLineItemsService;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLineItemsWebhookAction
 {
     private SerializerResponder $responder;
     private UpdateLineItemsService $service;
+    private EventDispatcher $eventDispatcher;
 
-    public function __construct(SerializerResponder $responder, UpdateLineItemsService $service)
-    {
+    public function __construct(
+        SerializerResponder $responder,
+        UpdateLineItemsService $service,
+        EventDispatcher $eventDispatcher
+    ) {
         $this->responder = $responder;
         $this->service = $service;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function __invoke(UpdateLineItemCollection $collection): Response
     {
-        return $this->responder->createJsonResponse(
-            $this->service->handleUpdates($collection)
-        );
+        $updatedCollection = $this->service->handleUpdates($collection);
+
+        $this->eventDispatcher->dispatch(new LineItemUpdated($updatedCollection), LineItemUpdated::NAME);
+
+        return $this->responder->createJsonResponse($updatedCollection);
     }
 }

@@ -24,12 +24,14 @@ namespace OAT\SimpleRoster\Repository;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Model\UserCollection;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
@@ -78,6 +80,17 @@ class UserRepository extends AbstractRepository
         return $user;
     }
 
+    public function findAllByCriteria(FindUserCriteria $criteria): UserCollection
+    {
+        $queryBuilder = $this
+            ->createQueryBuilder('u')
+            ->select('u');
+
+        $this->applyFindCriteria($queryBuilder, $criteria);
+
+        return new UserCollection($queryBuilder->getQuery()->getResult());
+    }
+
     /**
      * @throws Exception
      */
@@ -105,26 +118,7 @@ class UserRepository extends AbstractRepository
                 ->setParameter('lastUserId', $lastUserId);
         }
 
-        if ($criteria->hasUsernameCriterion()) {
-            $queryBuilder
-                ->andWhere('u.username IN (:usernames)')
-                ->setParameter('usernames', $criteria->getUsernameCriterion());
-        }
-
-        if ($criteria->hasLineItemSlugCriterion()) {
-            $queryBuilder
-                ->innerJoin('u.assignments', 'a')
-                ->innerJoin('a.lineItem', 'l')
-                ->andWhere('l.slug IN (:lineItemSlugs)')
-                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
-        }
-
-        if ($criteria->hasEuclideanDivisionCriterion()) {
-            $queryBuilder
-                ->andWhere('MOD(u.id, :modulo) = :remainder')
-                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
-                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
-        }
+        $this->applyFindCriteria($queryBuilder, $criteria);
 
         $userIds = [];
         $usernameCollection = new UsernameCollection();
@@ -178,5 +172,29 @@ class UserRepository extends AbstractRepository
             ->getOneOrNullResult();
 
         return null === $result ? 0 : (int)$result['number_of_users'];
+    }
+
+    protected function applyFindCriteria(QueryBuilder $queryBuilder, FindUserCriteria $criteria): void
+    {
+        if ($criteria->hasUsernameCriterion()) {
+            $queryBuilder
+                ->andWhere('u.username IN (:usernames)')
+                ->setParameter('usernames', $criteria->getUsernameCriterion());
+        }
+
+        if ($criteria->hasLineItemSlugCriterion()) {
+            $queryBuilder
+                ->innerJoin('u.assignments', 'a')
+                ->innerJoin('a.lineItem', 'l')
+                ->andWhere('l.slug IN (:lineItemSlugs)')
+                ->setParameter('lineItemSlugs', $criteria->getLineItemSlugCriterion());
+        }
+
+        if ($criteria->hasEuclideanDivisionCriterion()) {
+            $queryBuilder
+                ->andWhere('MOD(u.id, :modulo) = :remainder')
+                ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
+                ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
+        }
     }
 }

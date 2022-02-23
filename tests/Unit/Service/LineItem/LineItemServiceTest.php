@@ -22,34 +22,57 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service\LineItem;
 
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
 use OAT\SimpleRoster\Service\LineItem\ListLineItemResponse;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LineItemServiceTest extends TestCase
 {
+    /** @var LineItemRepository|MockObject */
+    private $lineItemRepository;
+
+    private LineItemService $subject;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->lineItemRepository = $this->createMock(LineItemRepository::class);
+        $this->subject = new LineItemService($this->lineItemRepository);
+    }
+
     public function testListLineItems(): void
     {
-        $lineItemRepository = $this->createMock(LineItemRepository::class);
-
         $criteria = new FindLineItemCriteria();
         $lineItemCollection = new LineItemCollection();
         $lineItemResultSet = new LineItemResultSet($lineItemCollection, false, null);
 
-        $subject = new LineItemService($lineItemRepository);
-
-        $lineItemRepository
+        $this->lineItemRepository
             ->expects(self::once())
             ->method('findLineItemsByCriteria')
             ->with($criteria, 10, null)
             ->willReturn($lineItemResultSet);
 
-        $result = $subject->listLineItems($criteria, 10, null);
+        $result = $this->subject->listLineItems($criteria, 10, null);
 
         self::assertSame(ListLineItemResponse::class, get_class($result));
+    }
+
+    public function testCreateLineItem(): void
+    {
+        $lineItem = $this->createMock(LineItem::class);
+
+        $this->lineItemRepository
+            ->expects(self::once())
+            ->method('createOrUpdate')
+            ->with($lineItem);
+
+        $this->subject->createOrUpdateLineItem($lineItem);
     }
 }

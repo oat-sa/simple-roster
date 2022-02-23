@@ -26,5 +26,4 @@ use RuntimeException;
 
 class InvalidLtiVersionException extends RuntimeException
 {
-
 }

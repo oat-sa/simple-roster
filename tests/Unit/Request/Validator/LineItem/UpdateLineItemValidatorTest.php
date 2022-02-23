@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Tests\Unit\Request\Validator;
+namespace OAT\SimpleRoster\Tests\Unit\Request\Validator\LineItem;
 
 use ArrayIterator;
-use OAT\SimpleRoster\Request\Validator\UpdateLineItemValidator;
+use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

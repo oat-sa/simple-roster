@@ -35,9 +35,11 @@ class CsvWriter
     {
         $this->filesystem = $filesystem;
     }
+
     public function writeCsv(string $path, array $head, array $data): void
     {
         if (!$this->filesystem->exists($path)) {
+            $this->filesystem->mkdir(dirname($path));
             $csv = Writer::createFromPath($path, self::DEFAULT_CSV_CREATE_MODE);
             $csv->insertOne($head);
             $csv->insertAll($data);

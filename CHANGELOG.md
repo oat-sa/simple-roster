@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Added `(POST) /api/v1/line-items` endpoint for create/update line items
+
+### Fixed
+- .htaccess restored
+
 ## 2.3.0 - 2021-09-21
 
 ### Added

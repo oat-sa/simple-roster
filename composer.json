@@ -23,6 +23,7 @@
         "nesbot/carbon": "^2.11",
         "oat-sa/bundle-lti1p3": "^6.0",
         "oat-sa/lib-lti1p3-basic-outcome": "^4.1",
+        "oneup/flysystem-bundle": "3.7.0",
         "ramsey/uuid": "^3.8",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/amazon-sqs-messenger": "^5.0",

@@ -294,9 +294,9 @@ paths:
                 200:
                     description: Success
                     content:
-                        application/json:
+                        application/xml:
                             schema:
-                                $ref: '#/components/schemas/LineItemList'
+                                $ref: '#/components/schemas/LineItemListResponse'
                 401:
                     $ref: '#/components/responses/UnauthorizedResponse'
                 404:
@@ -305,6 +305,28 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 409:
                     $ref: '#/components/responses/ConflictResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+        post:
+            summary: Creates or update an existing line item
+            tags:
+                - Line Items
+            security:
+                -   apiKeyAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LineItemCreateRequest'
+            responses:
+                201:
+                    $ref: '#/components/responses/LineItemResponse'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -327,7 +349,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LtiOutcomeRequest'
             responses:
-                204:
+                200:
                     $ref: '#/components/responses/UpdateOutcomeSuccessful'
                 400:
                     $ref: '#/components/responses/BadRequestResponse'
@@ -357,7 +379,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LtiOutcomeRequest'
             responses:
-                204:
+                200:
                     $ref: '#/components/responses/UpdateOutcomeSuccessful'
                 400:
                     $ref: '#/components/responses/BadRequestResponse'
@@ -391,7 +413,7 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
-    /v1/bulk-create-users
+    /v1/bulk-create-users:
         post:
             summary: Bulk create user and assignments
             tags:
@@ -452,17 +474,26 @@ components:
                     description: Number of time this assignment has been attempted.
                     example: 2
                 lineItem:
-                    $ref: '#/components/schemas/LineItem'
-        LineItem:
+                    $ref: '#/components/schemas/LineItemResponse'
+        LineItemResponse:
             type: object
             properties:
+                slug:
+                    type: string
+                    description: Line Item external identifier
+                    example: slug-1
                 uri:
                     type: string
+                    description: TAO Instance URI
                     example: my-tao-instance.com/tao.rdf#123456789
                 label:
                     type: string
                     description: Label for assignment
                     example: Delivery of Test 1
+                isActive:
+                    type: boolean
+                    description: Defines if Line Item is active/inactive
+                    example: true
                 startDateTime:
                     type: integer
                     description: The start DateTime as UNIX timestamp
@@ -479,13 +510,13 @@ components:
                     type: integer
                     description: The DateTime of last update as UNIX timestamp
                     example: 1542880258
-        LineItemList:
+        LineItemListResponse:
             type: object
             properties:
                 data:
                     type: array
                     items:
-                        $ref: '#/components/schemas/LineItem'
+                        $ref: '#/components/schemas/LineItemResponse'
                 metadata:
                     type: object
                     properties:
@@ -495,6 +526,27 @@ components:
                                 nextCursor:
                                     type: integer
                                     description: Id of next item
+        LineItemCreateRequest:
+            type: object
+            properties:
+                slug:
+                    type: string
+                    description: Line Item external identifier
+                    example: slug-1
+                uri:
+                    type: string
+                    description: TAO Instance URI
+                    example: my-tao-instance.com/tao.rdf#123456789
+                startDateTime:
+                    type: string
+                    format: date-time
+                    description: The start DateTime as UNIX timestamp
+                    example: 2021-01-01T00:00:00+0000
+                endDateTime:
+                    type: string
+                    format: date-time
+                    description: The start DateTime as UNIX timestamp
+                    example: 2021-01-01T00:00:00+0000
         BulkCreateOperation:
             type: object
             properties:
@@ -819,6 +871,18 @@ components:
                 application/xml:
                     schema:
                         $ref: '#/components/schemas/LtiOutcomeResponse'
+        LineItemResponse:
+            description: Line Item response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/LineItemResponse'
+        LineItemListResponse:
+            description: Line Item list response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/LineItemListResponse'
         BulkCreateUserResponse:
             description: Bulk create user response
             content:
