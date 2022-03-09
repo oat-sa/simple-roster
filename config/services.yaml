@@ -42,7 +42,7 @@ parameters:
     app.aws.endpoint: '%env(default:app.aws.endpoint.default:string:AWS_ENDPOINT)%'
     app.aws.endpoint.default: ''
     app.aws.path_style: '%env(default:app.aws.path_style.default:bool:AWS_PATH_STYLE)%'
-    app.aws.path_style.default: 0
+    app.aws.path_style.default: false
 
 services:
     # default configuration for services in *this* file
