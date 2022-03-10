@@ -40,7 +40,7 @@ parameters:
     app.aws.version: 'latest'
     app.aws.region: '%env(AWS_REGION)%'
     app.aws.endpoint: '%env(default:app.aws.endpoint.default:string:AWS_ENDPOINT)%'
-    app.aws.endpoint.default: ''
+    app.aws.endpoint.default: null
     app.aws.path_style: '%env(default:app.aws.path_style.default:bool:AWS_PATH_STYLE)%'
     app.aws.path_style.default: false
 
