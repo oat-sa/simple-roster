@@ -18,3 +18,4 @@
 - [OpenAPI documentation](openapi/api_v1.yml) 
 - [Continuous integration](docs/continuous-integration.md)
 - [Profiling with Blackfire](docs/blackfire.md)
+- [Upgrade](docs/upgrade.md)

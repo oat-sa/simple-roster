@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+- Fixed outdated field type
+
+## 2.5.0 - 2022-02-23
+
 ### Added
 - Added `(POST) /api/v1/line-items` endpoint for create/update line items
 
