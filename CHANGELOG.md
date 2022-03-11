@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.5.0 - 2022-03-11
 
 ### Fixed
 - Fixed outdated field type
