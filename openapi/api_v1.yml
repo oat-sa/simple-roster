@@ -65,7 +65,7 @@ paths:
             tags:
                 - Authentication
             security:
-                - bearerAuth: []
+                -   bearerAuth: []
             responses:
                 204:
                     description: Logout success
@@ -109,7 +109,7 @@ paths:
             tags:
                 - Assignments
             security:
-                - bearerAuth: []
+                -   bearerAuth: []
             responses:
                 200:
                     description: Success
@@ -206,7 +206,7 @@ paths:
             tags:
                 - LTI
             security:
-                - bearerAuth: []
+                -   bearerAuth: []
             parameters:
                 -   name: assignmentId
                     in: path
@@ -365,7 +365,7 @@ paths:
             tags:
                 - LTI
             security:
-                -   bearerAuth: [ ]
+                -   bearerAuth: []
             parameters:
                 -   name: Authorization
                     description: OAuth authorization header
@@ -395,7 +395,7 @@ paths:
             tags:
                 - web-hook
             security:
-                -   basicAuth: [ ]
+                -   basicAuth: []
             requestBody:
                 required: true
                 content:
@@ -436,6 +436,112 @@ paths:
                     $ref: '#/components/responses/MethodNotAllowedResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
+
+    /v1/iti-instance/list:
+        get:
+            summary: Get list of LTI instances (with no secret data)
+            tags:
+                - LTI instance
+            security:
+                -   basicAuth: []
+            responses:
+                200:
+                    $ref: '#/components/schemas/LtiInstanceList'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+
+    /v1/iti-instance:
+        post:
+            summary: Create new LTI instance
+            tags:
+                - LTI instance
+            security:
+                -   basicAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LtiInstanceWrite'
+            responses:
+                201:
+                    $ref: '#/components/schemas/LtiInstanceRead'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+
+    /v1/iti-instance/{ltiInstanceId}:
+        put:
+            summary: Update LTI instance
+            tags:
+                - LTI instance
+            security:
+                -   basicAuth: []
+            parameters:
+                -   name: ltiInstanceId
+                    in: path
+                    description: The ID of the LTI instance
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LtiInstanceWrite'
+            responses:
+                201:
+                    $ref: '#/components/schemas/LtiInstanceRead'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+        delete:
+            summary: Delete LTI instance
+            tags:
+                - LTI instance
+            security:
+                -   basicAuth: []
+            parameters:
+                -   name: ltiInstanceId
+                    in: path
+                    description: The ID of the LTI instance
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                200:
+                    description: test
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                405:
+                    $ref: '#/components/responses/MethodNotAllowedResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
+
 components:
     securitySchemes:
         apiKeyAuth:
@@ -809,6 +915,34 @@ components:
                         trace:
                             description: Error trace.
                             example: 'error trace (if debug activated)'
+                            type: string
+
+        LtiInstanceCommonProperties:
+            type: object
+            properties:
+                label:
+                    type: string
+                lti_link:
+                    type: string
+        LtiInstanceRead:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            type: integer
+                -   $ref: '#/components/schemas/LtiInstanceCommonProperties'
+        LtiInstanceList:
+            type: array
+            items:
+                $ref: '#/components/schemas/LtiInstanceRead'
+        LtiInstanceWrite:
+            allOf:
+                -   $ref: '#/components/schemas/LtiInstanceCommonProperties'
+                -   type: object
+                    properties:
+                        lti_key:
+                            type: string
+                        lti_secret:
                             type: string
     responses:
         BadRequestResponse:
