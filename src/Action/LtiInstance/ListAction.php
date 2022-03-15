@@ -31,8 +31,10 @@ class ListAction
     private LtiInstanceRepository $repository;
     private Serializer $serializer;
 
-    public function __construct(LtiInstanceRepository $repository, Serializer $serializer)
-    {
+    public function __construct(
+        LtiInstanceRepository $repository,
+        Serializer $serializer
+    ) {
         $this->repository = $repository;
         $this->serializer = $serializer;
     }

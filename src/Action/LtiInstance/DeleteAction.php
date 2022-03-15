@@ -23,22 +23,27 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Events\LtiInstanceUpdated;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Responder\LtiInstance\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 
 class DeleteAction
 {
     private LtiInstanceRepository $repository;
     private Serializer $serializer;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         LtiInstanceRepository $repository,
-        Serializer $serializer
+        Serializer $serializer,
+        EventDispatcher $eventDispatcher
     ) {
         $this->repository = $repository;
         $this->serializer = $serializer;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function __invoke(Request $request, string $ltiInstanceId): Response
@@ -48,6 +53,8 @@ class DeleteAction
 
         $this->repository->remove($model);
         $this->repository->flush();
+
+        $this->eventDispatcher->dispatch(new LtiInstanceUpdated(), LtiInstanceUpdated::NAME);
 
         return $this->serializer->json(['message' => 'Deleted.'], Response::HTTP_ACCEPTED);
     }
