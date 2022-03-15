@@ -63,3 +63,23 @@ bulkCreateUsers:
   path: '%app.route_prefix%/v1/bulk-create-users'
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\CreateEntity\BulkCreateUsersAction }
+
+listLtiInstances:
+  path: '%app.route_prefix%/v1/lti-instance/list'
+  methods: GET
+  defaults: { _controller: OAT\SimpleRoster\Action\LtiInstance\ListAction }
+
+createLtiInstances:
+  path: '%app.route_prefix%/v1/lti-instance'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\LtiInstance\CreateAction }
+
+updateLtiInstance:
+  path: '%app.route_prefix%/v1/lti-instance/{ltiInstanceId}'
+  methods: PUT
+  defaults: { _controller: OAT\SimpleRoster\Action\LtiInstance\UpdateAction }
+
+deleteLtiInstance:
+  path: '%app.route_prefix%/v1/lti-instance/{ltiInstanceId}'
+  methods: DELETE
+  defaults: { _controller: OAT\SimpleRoster\Action\LtiInstance\DeleteAction }

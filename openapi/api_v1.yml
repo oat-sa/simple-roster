@@ -437,7 +437,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/iti-instance/list:
+    /v1/lti-instance/list:
         get:
             summary: Get list of LTI instances (with no secret data)
             tags:
@@ -456,7 +456,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/iti-instance:
+    /v1/lti-instance:
         post:
             summary: Create new LTI instance
             tags:
@@ -480,7 +480,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/iti-instance/{ltiInstanceId}:
+    /v1/lti-instance/{ltiInstanceId}:
         put:
             summary: Update LTI instance
             tags:
