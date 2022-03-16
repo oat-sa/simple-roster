@@ -26,7 +26,6 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Events\LtiInstanceUpdated;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Responder\LtiInstance\Serializer;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 
@@ -46,7 +45,7 @@ class DeleteAction
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function __invoke(Request $request, string $ltiInstanceId): Response
+    public function __invoke(string $ltiInstanceId): Response
     {
         /** @var LtiInstance $model */
         $model = $this->repository->find($ltiInstanceId);

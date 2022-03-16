@@ -51,7 +51,7 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onLtiInstanceUpdated(LtiInstanceUpdated $event): void
+    public function onLtiInstanceUpdated(): void
     {
         $this->logger->info("Got LtiInstanceUpdated event. Try to update cache.");
 

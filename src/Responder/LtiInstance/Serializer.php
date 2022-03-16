@@ -47,7 +47,7 @@ class Serializer
 
     public function createJsonFromInstance(LtiInstance $entity, int $code): JsonResponse
     {
-        return $this->responder->createJsonResponse(Model::fromEntity($entity), $code);
+        return $this->responder->createJsonResponse((new Model())->fillFromEntity($entity), $code);
     }
 
     public function createJsonFromCollection(array $collection, int $code): JsonResponse
@@ -55,7 +55,7 @@ class Serializer
         $res = [];
 
         foreach ($collection as $item) {
-            $res[] = Model::fromEntity($item);
+            $res[] = (new Model())->fillFromEntity($item);
         }
 
         return $this->responder->createJsonResponse($res, $code);

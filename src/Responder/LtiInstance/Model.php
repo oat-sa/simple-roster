@@ -87,13 +87,11 @@ class Model implements \JsonSerializable
         ];
     }
 
-    public static function fromEntity(LtiInstance $entity): Model
+    public function fillFromEntity(LtiInstance $entity): self
     {
-        $obj = new static();
-        $obj->id = $entity->getId();
-        $obj->ltiLink = $entity->getLtiLink();
-        $obj->label = $entity->getLabel();
-
-        return $obj;
+        $this->id = $entity->getId();
+        $this->ltiLink = $entity->getLtiLink();
+        $this->label = $entity->getLabel();
+        return $this;
     }
 }
