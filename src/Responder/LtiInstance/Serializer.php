@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -35,9 +35,14 @@ class Serializer
         $this->responder = $responder;
     }
 
-    public function json($data, int $code)
+    public function json($data, int $code): JsonResponse
     {
         return $this->responder->createJsonResponse($data, $code);
+    }
+
+    public function error(string $message, int $code): JsonResponse
+    {
+        return $this->responder->createJsonResponse(['message' => $message], $code);
     }
 
     public function createJsonFromInstance(LtiInstance $entity, int $code): JsonResponse

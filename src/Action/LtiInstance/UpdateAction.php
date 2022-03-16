@@ -24,7 +24,9 @@ namespace OAT\SimpleRoster\Action\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Events\LtiInstanceUpdated;
+use OAT\SimpleRoster\Repository\Criteria\LtiInstanceCriteria;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Request\Validator\LtiInstance\Validator;
 use OAT\SimpleRoster\Responder\LtiInstance\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,23 +37,58 @@ class UpdateAction
     private LtiInstanceRepository $repository;
     private Serializer $serializer;
     private EventDispatcher $eventDispatcher;
+    private Validator $validator;
 
     public function __construct(
         LtiInstanceRepository $repository,
         Serializer $serializer,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        Validator $validator
     ) {
         $this->repository = $repository;
         $this->serializer = $serializer;
         $this->eventDispatcher = $eventDispatcher;
+        $this->validator = $validator;
+    }
+
+    /**
+     * @param LtiInstance[] $data
+     */
+    protected function checkUniqueness(array $data, LtiInstance $model): bool
+    {
+        foreach ($data as $instance) {
+            if ($instance->getId() != $model->getId()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function __invoke(Request $request, string $ltiInstanceId): Response
     {
+        $this->validator->validate($request);
+
         $content = json_decode($request->getContent(), true);
 
         /** @var LtiInstance $model */
         $model = $this->repository->find($ltiInstanceId);
+
+        if (!$model) {
+            return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
+        }
+
+        $criteria = (new LtiInstanceCriteria())
+            ->addLtiLinks($content['lti_link'])
+            ->addLtiLabels($content['label']);
+        $existed = $this->repository->findAllByCriteria($criteria);
+
+        if (!$this->checkUniqueness($existed, $model)) {
+            return $this->serializer->error(
+                'LtiInstance with provided link or label already exists.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
 
         $model->setLabel($content['label']);
         $model->setLtiLink($content['lti_link']);

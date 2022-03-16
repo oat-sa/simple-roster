@@ -51,6 +51,10 @@ class DeleteAction
         /** @var LtiInstance $model */
         $model = $this->repository->find($ltiInstanceId);
 
+        if (!$model) {
+            return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
+        }
+
         $this->repository->remove($model);
         $this->repository->flush();
 
