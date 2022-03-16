@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,8 +45,7 @@ class LineItemCacheWarmerCommand extends Command
     /** @var SymfonyStyle */
     private SymfonyStyle $symfonyStyle;
 
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
+    private CacheItemPoolInterface $resultCacheImplementation;
 
     /** @var LoggerInterface */
     private LoggerInterface $logger;
@@ -72,9 +71,9 @@ class LineItemCacheWarmerCommand extends Command
         $this->logger = $cacheWarmupLogger;
         $this->lineItemCacheTtl = $lineItemCacheTtl;
 
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
@@ -120,7 +119,7 @@ class LineItemCacheWarmerCommand extends Command
                 $id = (int)$lineItem->getId();
                 $lineItemCacheKey = $this->lineItemCacheIdGenerator->generate($id);
 
-                $this->resultCacheImplementation->delete($lineItemCacheKey);
+                $this->resultCacheImplementation->deleteItem($lineItemCacheKey);
                 $this->lineItemRepository->findOneById($id);
 
                 $this->logger->info(
@@ -142,9 +141,9 @@ class LineItemCacheWarmerCommand extends Command
         } catch (Throwable $exception) {
             $this->symfonyStyle->error(sprintf('An unexpected error occurred: %s', $exception->getMessage()));
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 }

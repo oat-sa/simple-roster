@@ -90,9 +90,8 @@ class NativeUserRepository extends AbstractRepository
         );
 
         $statement = $this->_em->getConnection()->prepare($query);
-        $statement->execute();
 
-        return $statement->fetchAllAssociative();
+        return $statement->executeQuery()->fetchAllAssociative();
     }
 
     /**

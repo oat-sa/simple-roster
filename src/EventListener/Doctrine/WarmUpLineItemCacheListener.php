@@ -22,16 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventListener\Doctrine;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 
 class WarmUpLineItemCacheListener implements EntityListenerInterface
 {
-    private CacheProvider $cacheProvider;
+    private CacheItemPoolInterface $resultCache;
     private LineItemCacheIdGenerator $lineItemCacheIdGenerator;
     private LineItemRepository $lineItemRepository;
 
@@ -40,23 +42,27 @@ class WarmUpLineItemCacheListener implements EntityListenerInterface
         EntityManagerInterface $entityManager,
         LineItemCacheIdGenerator $lineItemCacheIdGenerator
     ) {
-        $cacheProvider = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCache = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$cacheProvider instanceof CacheProvider) {
+        if (!$resultCache instanceof CacheItemPoolInterface) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
         }
 
-        $this->cacheProvider = $cacheProvider;
+        $this->resultCache = $resultCache;
         $this->lineItemCacheIdGenerator = $lineItemCacheIdGenerator;
         $this->lineItemRepository = $lineItemRepository;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws EntityNotFoundException
+     */
     public function postUpdate(LineItem $lineItem): void
     {
         $id = (int)$lineItem->getId();
-        $this->cacheProvider->delete($this->lineItemCacheIdGenerator->generate($id));
+        $this->resultCache->deleteItem($this->lineItemCacheIdGenerator->generate($id));
 
         // Refresh the cache by query
         $this->lineItemRepository->findOneById($id);
