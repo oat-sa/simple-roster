@@ -22,9 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\ModifyEntity\LineItem;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Exception;
+use JsonException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
@@ -33,6 +34,8 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -46,7 +49,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
     /** @var CommandTester */
     private CommandTester $commandTester;
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $resultCache;
 
     /** @var LineItemCacheIdGenerator */
@@ -66,9 +69,9 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
@@ -90,7 +93,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
             self::assertTrue($lineItem->isActive());
 
-            $lineItemCache = $this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId));
+            $lineItemCache = $this->resultCache->getItem($this->lineItemCacheIdGenerator->generate($lineItemId))->get();
             $cache = current(current($lineItemCache));
             self::assertSame('1', $cache['is_active_3']);
         }
@@ -293,6 +296,11 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         );
     }
 
+    /**
+     * @throws JsonException
+     * @throws InvalidArgumentException
+     * @throws EntityNotFoundException
+     */
     private function assertLineItems(array $lineItemIds, string $toggle, bool $isActive): void
     {
         foreach ($lineItemIds as $lineItemId) {
@@ -316,7 +324,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
             self::assertSame($isActive, $lineItem->isActive());
 
             $cache = current(
-                current($this->resultCache->fetch($this->lineItemCacheIdGenerator->generate($lineItemId)))
+                current($this->resultCache->getItem($this->lineItemCacheIdGenerator->generate($lineItemId))->get())
             );
             self::assertEquals((int)$isActive, $cache['is_active_3']);
         }

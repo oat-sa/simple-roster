@@ -22,10 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\ModifyEntity\LineItem;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
+use JsonException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
@@ -34,6 +35,8 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -47,7 +50,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     /** @var CommandTester */
     private CommandTester $commandTester;
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $resultCache;
 
     /** @var LineItemCacheIdGenerator */
@@ -67,9 +70,9 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
@@ -192,6 +195,11 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertStringContainsString('[WARNING] No line items found with specified criteria.', $display);
     }
 
+    /**
+     * @throws PsrInvalidArgumentException
+     * @throws JsonException
+     * @throws EntityNotFoundException
+     */
     private function assertLineItems(array $persistedData): void
     {
         foreach ($persistedData['lineItemIds'] as $lineItemId) {
@@ -209,9 +217,9 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
             );
 
             $lineItemCacheId = $this->lineItemCacheIdGenerator->generate($lineItemId);
-            $lineItemCache = current(current($this->resultCache->fetch($lineItemCacheId)));
+            $lineItemCache = current(current($this->resultCache->getItem($lineItemCacheId)->get()));
 
-            self::assertTrue($this->resultCache->contains($lineItemCacheId));
+            self::assertTrue($this->resultCache->hasItem($lineItemCacheId));
             self::assertSame($persistedData['start_at'], $lineItemCache['start_at_4']);
             self::assertSame($persistedData['end_at'], $lineItemCache['end_at_5']);
         }
@@ -306,12 +314,15 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @throws PsrInvalidArgumentException
+     */
     private function assertCacheDoesNotExist(array $lineItemIds): void
     {
         foreach ($lineItemIds as $lineItemId) {
             $lineItemCacheId = $this->lineItemCacheIdGenerator->generate($lineItemId);
 
-            self::assertFalse($this->resultCache->fetch($lineItemCacheId));
+            self::assertFalse($this->resultCache->getItem($lineItemCacheId)->isHit());
         }
     }
 

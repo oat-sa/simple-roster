@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Command\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Command\BlackfireProfilerTrait;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,8 +46,7 @@ class LtiInstanceCacheWarmerCommand extends Command
     /** @var SymfonyStyle */
     private SymfonyStyle $symfonyStyle;
 
-    /** @var CacheProvider */
-    private $resultCacheImplementation;
+    private CacheItemPoolInterface $resultCache;
 
     /** @var LoggerInterface */
     private LoggerInterface $logger;
@@ -65,15 +64,15 @@ class LtiInstanceCacheWarmerCommand extends Command
         $this->logger = $cacheWarmupCacheWarmupLogger;
         $this->ltiInstancesCacheTtl = $ltiInstancesCacheTtl;
 
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
         }
 
-        $this->resultCacheImplementation = $resultCacheImplementation;
+        $this->resultCache = $resultCacheImplementation;
 
         parent::__construct(self::NAME);
     }
@@ -101,7 +100,7 @@ class LtiInstanceCacheWarmerCommand extends Command
         try {
             $this->symfonyStyle->comment('Executing cache warmup...');
 
-            $this->resultCacheImplementation->delete(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
+            $this->resultCache->deleteItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
 
             // Refresh by query
             $ltiInstances = $this->ltiInstanceRepository->findAllAsCollection();
@@ -109,7 +108,7 @@ class LtiInstanceCacheWarmerCommand extends Command
             if ($ltiInstances->isEmpty()) {
                 $this->symfonyStyle->warning('There are no LTI instances found in the database.');
 
-                return 0;
+                return self::SUCCESS;
             }
 
             $this->logger->info(
@@ -130,9 +129,9 @@ class LtiInstanceCacheWarmerCommand extends Command
         } catch (Throwable $exception) {
             $this->symfonyStyle->error(sprintf('An unexpected error occurred: %s', $exception->getMessage()));
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 }

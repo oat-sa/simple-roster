@@ -22,8 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\EventSubscriber;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use JsonException;
 use LogicException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\Assignment;
@@ -32,6 +36,8 @@ use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -44,7 +50,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
     /** @var TransportInterface */
     private $cacheWarmupTransport;
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $resultCache;
 
     /** @var UserCacheIdGenerator */
@@ -68,15 +74,23 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
         $this->resultCache = $resultCacheImplementation;
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws InvalidArgumentException
+     * @throws NonUniqueResultException
+     * @throws EntityNotFoundException
+     * @throws JsonException
+     */
     public function testItInvalidatesCacheUponUserEntityUpdate(): void
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -86,7 +100,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
 
         // Trigger cache by query
         $user = $this->userRepository->findByUsernameWithAssignments($username);
-        self::assertTrue($this->resultCache->contains($cacheId));
+        self::assertTrue($this->resultCache->hasItem($cacheId));
 
         $user->setGroupId('letsChangeIt');
 
@@ -95,6 +109,14 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
         $this->assertCacheInvalidation($username);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws InvalidArgumentException
+     * @throws ORMException
+     * @throws NonUniqueResultException
+     * @throws JsonException
+     * @throws EntityNotFoundException
+     */
     public function testItInvalidatesCacheUponAssignmentEntityUpdate(): void
     {
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
@@ -104,7 +126,7 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
 
         // Trigger cache by query
         $user = $this->userRepository->findByUsernameWithAssignments($username);
-        self::assertTrue($this->resultCache->contains($cacheId));
+        self::assertTrue($this->resultCache->hasItem($cacheId));
 
         $user->getLastAssignment()->setState(Assignment::STATE_COMPLETED);
 
@@ -113,10 +135,14 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
         $this->assertCacheInvalidation($username);
     }
 
+    /**
+     * @throws JsonException
+     * @throws InvalidArgumentException
+     */
     private function assertCacheInvalidation(string $username): void
     {
         $cacheId = $this->userCacheIdGenerator->generate($username);
-        self::assertFalse($this->resultCache->contains($cacheId));
+        self::assertFalse($this->resultCache->hasItem($cacheId));
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
