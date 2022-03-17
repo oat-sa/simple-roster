@@ -23,12 +23,16 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LineItemRepositoryTest extends KernelTestCase
@@ -38,7 +42,7 @@ class LineItemRepositoryTest extends KernelTestCase
     /** @var LineItemRepository */
     private $subject;
 
-    /** @var Cache */
+    /** @var CacheItemPoolInterface */
     private $doctrineResultCacheImplementation;
 
     /** @var LineItemCacheIdGenerator */
@@ -54,7 +58,8 @@ class LineItemRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
         $this->cacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
-        $this->doctrineResultCacheImplementation = self::getContainer()->get('doctrine.orm.default_result_cache');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $this->doctrineResultCacheImplementation = $em->getConfiguration()->getResultCache();
         $this->subject = self::getContainer()->get(LineItemRepository::class);
     }
 
@@ -121,17 +126,21 @@ class LineItemRepositoryTest extends KernelTestCase
         self::assertTrue($collection->isEmpty());
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws EntityNotFoundException
+     */
     public function testItUsesResultCacheImplementationForFindingLineItemById(): void
     {
         $id = 1;
 
         $expectedResultCacheId = $this->cacheIdGenerator->generate($id);
 
-        self::assertFalse($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertFalse($this->doctrineResultCacheImplementation->hasItem($expectedResultCacheId));
 
         $this->subject->findOneById($id);
 
-        self::assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertTrue($this->doctrineResultCacheImplementation->hasItem($expectedResultCacheId));
     }
 
     public function testItThrowsExceptionIfLineItemCannotBeFound(): void

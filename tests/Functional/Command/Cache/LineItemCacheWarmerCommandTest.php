@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Monolog\Logger;
@@ -32,6 +31,8 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -45,8 +46,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private CommandTester $commandTester;
 
-    /** @var CacheProvider */
-    private $resultCache;
+    private CacheItemPoolInterface $resultCache;
 
     /** @var LineItemCacheIdGenerator */
     private $lineItemCacheIdGenerator;
@@ -62,9 +62,9 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
@@ -106,13 +106,16 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testItCanWarmUpLineItemsCache(): void
     {
         $this->loadFixtureByFilename('3LineItems.yml');
 
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(1)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(2)));
-        self::assertFalse($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(3)));
+        self::assertFalse($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(1)));
+        self::assertFalse($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(2)));
+        self::assertFalse($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(3)));
 
         self::assertSame(0, $this->commandTester->execute([], ['capture_stderr_separately' => true]));
 
@@ -123,9 +126,9 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(1)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(2)));
-        self::assertTrue($this->resultCache->contains($this->lineItemCacheIdGenerator->generate(3)));
+        self::assertTrue($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(1)));
+        self::assertTrue($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(2)));
+        self::assertTrue($this->resultCache->hasItem($this->lineItemCacheIdGenerator->generate(3)));
     }
 
     public function testItLogsSuccessfulCacheWarmup(): void

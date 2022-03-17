@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\EventListener\Doctrine;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Entity\LineItem;
@@ -33,6 +32,7 @@ use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 
 class WarmUpLineItemCacheListenerTest extends TestCase
 {
@@ -75,8 +75,8 @@ class WarmUpLineItemCacheListenerTest extends TestCase
     public function testItIsDoctrineEntityListener(): void
     {
         $this->doctrineConfiguration->expects(self::once())
-            ->method('getResultCacheImpl')
-            ->willReturn($this->createMock(CacheProvider::class));
+            ->method('getResultCache')
+            ->willReturn($this->createMock(CacheItemPoolInterface::class));
 
         $subject = new WarmUpLineItemCacheListener(
             $this->lineItemRepository,
@@ -93,13 +93,13 @@ class WarmUpLineItemCacheListenerTest extends TestCase
             ->method('findOneById')
             ->with(1);
 
-        $cacheProvider = $this->createMock(CacheProvider::class);
+        $cacheProvider = $this->createMock(CacheItemPoolInterface::class);
         $cacheProvider->expects(self::once())
             ->method('delete')
             ->with('line_item_1');
 
         $this->doctrineConfiguration->expects(self::once())
-            ->method('getResultCacheImpl')
+            ->method('getResultCache')
             ->willReturn($cacheProvider);
 
         $this->lineItemCacheIdGenerator->expects(self::once())
