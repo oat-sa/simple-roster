@@ -22,16 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventSubscriber;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Service\Cache\UserCacheWarmerService;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -86,26 +88,33 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
 
     /**
      * @throws Throwable
+     * @throws InvalidArgumentException
      */
     public function postFlush(PostFlushEventArgs $eventArgs): void
     {
         $entityManager = $eventArgs->getEntityManager();
-        /** @var CacheProvider $resultCacheImplementation */
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCache = $entityManager->getConfiguration()->getResultCache();
+
+        if (!$resultCache instanceof CacheItemPoolInterface) {
+            throw new DoctrineResultCacheImplementationNotFoundException(
+                'Doctrine result cache implementation is not configured.'
+            );
+        }
 
         foreach ($this->usersToInvalidate as $user) {
-            $this->clearUserCache($user, $resultCacheImplementation);
+            $this->clearUserCache($user, $resultCache);
         }
     }
 
     /**
      * @throws Throwable
+     * @throws InvalidArgumentException
      */
-    private function clearUserCache(User $user, CacheProvider $resultCacheImplementation): void
+    private function clearUserCache(User $user, CacheItemPoolInterface $resultCacheImplementation): void
     {
         $username = (string)$user->getUsername();
         $cacheKey = $this->userCacheIdGenerator->generate($username);
-        $resultCacheImplementation->delete($cacheKey);
+        $resultCacheImplementation->deleteItem($cacheKey);
 
         $this->logger->info(
             sprintf(

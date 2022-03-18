@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 2.5.2 - 2022-03-18
+
+### Fixed
+- Fixed cache issues after updating doctrine
+
+## 2.5.1 - 2022-03-11
 
 ### Fixed
 - Fixed outdated field type

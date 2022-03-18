@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use LogicException;
@@ -32,6 +31,7 @@ use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -60,9 +60,9 @@ class UserCacheWarmerCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
@@ -80,12 +80,15 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedOutput);
 
-        self::assertSame(0, $this->commandTester->execute(
-            $input,
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                $input,
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay());
     }
@@ -116,12 +119,15 @@ class UserCacheWarmerCommandTest extends KernelTestCase
 
     public function testItDetectsIfThereAreNoUsersIngested(): void
     {
-        self::assertSame(0, $this->commandTester->execute(
-            [],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         self::assertStringContainsString(
             '[WARNING] There are no users found in the database.',
@@ -133,12 +139,15 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        self::assertSame(0, $this->commandTester->execute(
-            [],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
@@ -162,14 +171,17 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        self::assertSame(0, $this->commandTester->execute(
-            [
-                '--batch' => 3,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--batch' => 3,
+                ],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
@@ -197,14 +209,17 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        self::assertSame(0, $this->commandTester->execute(
-            [
-                '--usernames' => 'user_1,user_20,user_67,user_89',
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--usernames' => 'user_1,user_20,user_67,user_89',
+                ],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
@@ -226,14 +241,17 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        self::assertSame(0, $this->commandTester->execute(
-            [
-                '--line-item-slugs' => 'lineItemSlug1,lineItemSlug3',
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--line-item-slugs' => 'lineItemSlug1,lineItemSlug3',
+                ],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
@@ -262,15 +280,18 @@ class UserCacheWarmerCommandTest extends KernelTestCase
     {
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
-        self::assertSame(0, $this->commandTester->execute(
-            [
-                '--modulo' => 20,
-                '--remainder' => 4,
-            ],
-            [
-                'capture_stderr_separately' => true,
-            ]
-        ));
+        self::assertSame(
+            0,
+            $this->commandTester->execute(
+                [
+                    '--modulo' => 20,
+                    '--remainder' => 4,
+                ],
+                [
+                    'capture_stderr_separately' => true,
+                ]
+            )
+        );
 
         /** @var Envelope[] $queueMessages */
         $queueMessages = $this->cacheWarmupTransport->get();
