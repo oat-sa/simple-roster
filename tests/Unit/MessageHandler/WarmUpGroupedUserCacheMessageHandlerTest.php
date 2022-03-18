@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\MessageHandler;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -34,6 +33,7 @@ use OAT\SimpleRoster\MessageHandler\WarmUpGroupedUserCacheMessageHandler;
 use OAT\SimpleRoster\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -50,7 +50,7 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
     /** @var UserCacheIdGenerator|MockObject */
     private $cacheIdGenerator;
 
-    /** @var CacheProvider|MockObject */
+    /** @var CacheItemPoolInterface|MockObject */
     private $resultCacheImplementation;
 
     /** @var LoggerInterface|MockObject */
@@ -67,10 +67,10 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->cacheIdGenerator = $this->createMock(UserCacheIdGenerator::class);
 
-        $this->resultCacheImplementation = $this->createMock(CacheProvider::class);
+        $this->resultCacheImplementation = $this->createMock(CacheItemPoolInterface::class);
         $ormConfiguration = $this->createMock(Configuration::class);
         $ormConfiguration
-            ->method('getResultCacheImpl')
+            ->method('getResultCache')
             ->willReturn($this->resultCacheImplementation);
 
         $this->entityManager
@@ -158,12 +158,12 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
 
         $this->resultCacheImplementation
             ->expects(self::once())
-            ->method('delete')
+            ->method('deleteItem')
             ->with('testCacheId');
 
         $this->resultCacheImplementation
             ->expects(self::once())
-            ->method('contains')
+            ->method('hasItem')
             ->willReturn(false);
 
         $message = new WarmUpGroupedUserCacheMessage(['testUsername']);

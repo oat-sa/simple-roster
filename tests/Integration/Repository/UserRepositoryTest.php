@@ -24,12 +24,15 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\NonUniqueResultException;
 use InvalidArgumentException;
 use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
@@ -39,7 +42,7 @@ class UserRepositoryTest extends KernelTestCase
     /** @var UserRepository */
     private $subject;
 
-    /** @var Cache */
+    /** @var CacheItemPoolInterface */
     private $doctrineResultCacheImplementation;
 
     /** @var UserCacheIdGenerator */
@@ -55,7 +58,10 @@ class UserRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
         $this->subject = self::getContainer()->get(UserRepository::class);
-        $this->doctrineResultCacheImplementation = self::getContainer()->get('doctrine.orm.default_result_cache');
+        $em = self::getContainer()->get('doctrine.orm.entity_manager');
+
+        $this->doctrineResultCacheImplementation = $em->getConfiguration()->getResultCache();
+
         $this->userCacheIdGenerator = self::getContainer()->get(UserCacheIdGenerator::class);
     }
 
@@ -67,16 +73,21 @@ class UserRepositoryTest extends KernelTestCase
         self::assertCount(1, $user->getAssignments());
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws EntityNotFoundException
+     * @throws PsrInvalidArgumentException
+     */
     public function testItUsesResultCacheImplementationForGettingTheUserWithAssignments(): void
     {
         $username = 'user_1';
         $expectedResultCacheId = $this->userCacheIdGenerator->generate($username);
 
-        self::assertFalse($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertFalse($this->doctrineResultCacheImplementation->hasItem($expectedResultCacheId));
 
         $this->subject->findByUsernameWithAssignments($username);
 
-        self::assertTrue($this->doctrineResultCacheImplementation->contains($expectedResultCacheId));
+        self::assertTrue($this->doctrineResultCacheImplementation->hasItem($expectedResultCacheId));
     }
 
     public function testItThrowsExceptionIfWeTryToGetUserWithAssignmentsWithEmptyUsername(): void

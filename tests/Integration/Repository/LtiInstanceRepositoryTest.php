@@ -22,11 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LtiInstanceRepositoryTest extends KernelTestCase
@@ -36,8 +37,7 @@ class LtiInstanceRepositoryTest extends KernelTestCase
     /** @var LtiInstanceRepository */
     private $subject;
 
-    /** @var Cache */
-    private Cache $doctrineResultCache;
+    private CacheItemPoolInterface $doctrineResultCache;
 
     protected function setUp(): void
     {
@@ -52,9 +52,9 @@ class LtiInstanceRepositoryTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $doctrineResultCache = $entityManager->getConfiguration()->getResultCacheImpl();
+        $doctrineResultCache = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$doctrineResultCache instanceof Cache) {
+        if (!$doctrineResultCache instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
         $this->doctrineResultCache = $doctrineResultCache;
@@ -65,15 +65,18 @@ class LtiInstanceRepositoryTest extends KernelTestCase
         self::assertCount(5, $this->subject->findAllAsCollection());
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testItCachesAllLtiInstances(): void
     {
-        self::assertFalse($this->doctrineResultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
+        self::assertFalse($this->doctrineResultCache->hasItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
 
         $this->subject->findAllAsCollection();
 
-        self::assertTrue($this->doctrineResultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
+        self::assertTrue($this->doctrineResultCache->hasItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
 
-        $cacheValue = $this->doctrineResultCache->fetch(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
+        $cacheValue = $this->doctrineResultCache->getItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES)->get();
         self::assertCount(1, $cacheValue);
         self::assertCount(5, array_values($cacheValue)[0]);
     }

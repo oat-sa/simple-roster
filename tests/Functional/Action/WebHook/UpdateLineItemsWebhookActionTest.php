@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 
-use Doctrine\Common\Cache\CacheProvider;
 use JsonException;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\LineItem;
@@ -30,6 +29,7 @@ use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundExceptio
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +41,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     use LoggerTestingTrait;
 
     private KernelBrowser $kernelBrowser;
-    private CacheProvider $resultCacheImplementation;
+    private CacheItemPoolInterface $resultCacheImplementation;
 
     protected function setUp(): void
     {
@@ -50,9 +50,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         $this->kernelBrowser = self::createClient();
 
         $ormConfiguration = $this->getEntityManager()->getConfiguration();
-        $resultCacheImplementation = $ormConfiguration->getResultCacheImpl();
+        $resultCacheImplementation = $ormConfiguration->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
@@ -132,6 +132,10 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         );
     }
 
+    /**
+     * @throws JsonException
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     public function testItAcceptLineItemsToBeUpdated(): void
     {
         $this->kernelBrowser->request(
@@ -154,7 +158,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
         /** @var LineItem $lineItem */
         $lineItem = $lineItemRepository->findOneBy(['slug' => 'lineItemSlug']);
 
-        $lineItemCache = $this->resultCacheImplementation->fetch('lineItem.1');
+        $lineItemCache = $this->resultCacheImplementation->getItem('lineItem.1')->get();
 
         $this->assertHasLogRecord(
             [

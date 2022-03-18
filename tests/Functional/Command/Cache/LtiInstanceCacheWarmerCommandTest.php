@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Monolog\Logger;
@@ -31,6 +30,8 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -44,7 +45,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
     /** @var CommandTester */
     private CommandTester $commandTester;
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $resultCache;
 
     protected function setUp(): void
@@ -58,9 +59,9 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
 
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
             throw new LogicException('Doctrine result cache is not configured.');
         }
 
@@ -101,11 +102,14 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testItCanWarmUpLtiInstanceCache(): void
     {
         $this->loadFixtureByFilename('5ltiInstances.yml');
 
-        self::assertFalse($this->resultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
+        self::assertFalse($this->resultCache->hasItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
 
         self::assertSame(0, $this->commandTester->execute([], ['capture_stderr_separately' => true]));
 
@@ -116,7 +120,7 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
             $this->normalizeDisplay($this->commandTester->getDisplay())
         );
 
-        self::assertTrue($this->resultCache->contains(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
+        self::assertTrue($this->resultCache->hasItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES));
     }
 
     public function testItLogsSuccessfulCacheWarmup(): void

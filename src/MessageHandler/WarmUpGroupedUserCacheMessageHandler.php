@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\MessageHandler;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -31,6 +30,8 @@ use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundExceptio
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Repository\UserRepository;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Throwable;
@@ -40,7 +41,7 @@ class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
     private EntityManagerInterface $entityManager;
     private UserRepository $userRepository;
     private UserCacheIdGenerator $cacheIdGenerator;
-    private CacheProvider $resultCacheImplementation;
+    private CacheItemPoolInterface $resultCache;
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
     private int $cacheTtl;
@@ -63,19 +64,20 @@ class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
         $this->cacheWarmupLogger = $cacheWarmupLogger;
         $this->cacheTtl = $userWithAssignmentsCacheTtl;
 
-        $resultCacheImplementation = $entityManager->getConfiguration()->getResultCacheImpl();
+        $resultCache = $entityManager->getConfiguration()->getResultCache();
 
-        if (!$resultCacheImplementation instanceof CacheProvider) {
+        if (!$resultCache instanceof CacheItemPoolInterface) {
             throw new DoctrineResultCacheImplementationNotFoundException(
                 'Doctrine result cache implementation is not configured.'
             );
         }
 
-        $this->resultCacheImplementation = $resultCacheImplementation;
+        $this->resultCache = $resultCache;
     }
 
     /**
      * @throws Throwable
+     * @throws InvalidArgumentException
      */
     public function __invoke(WarmUpGroupedUserCacheMessage $message): void
     {
@@ -103,16 +105,17 @@ class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
      * @throws EntityNotFoundException
      * @throws NonUniqueResultException
      * @throws CacheWarmupException
+     * @throws InvalidArgumentException
      */
     private function refreshCacheForUsername(string $username): void
     {
         $resultCacheId = $this->cacheIdGenerator->generate($username);
-        $this->resultCacheImplementation->delete($resultCacheId);
+        $this->resultCache->deleteItem($resultCacheId);
 
         // Refresh by query
         $this->userRepository->findByUsernameWithAssignments($username);
 
-        if (!$this->resultCacheImplementation->contains($resultCacheId)) {
+        if (!$this->resultCache->hasItem($resultCacheId)) {
             throw new CacheWarmupException(
                 sprintf(
                     "Result cache does not contain key '%s' after warmup.",
