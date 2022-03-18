@@ -65,7 +65,7 @@ bulkCreateUsers:
   defaults: { _controller: OAT\SimpleRoster\Action\CreateEntity\BulkCreateUsersAction }
 
 listLtiInstances:
-  path: '%app.route_prefix%/v1/lti-instance/list'
+  path: '%app.route_prefix%/v1/lti-instances'
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\LtiInstance\ListAction }
 

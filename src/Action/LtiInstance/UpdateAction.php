@@ -57,7 +57,7 @@ class UpdateAction
     protected function checkUniqueness(array $data, LtiInstance $model): bool
     {
         foreach ($data as $instance) {
-            if ($instance->getId() != $model->getId()) {
+            if ($instance->getId() !== $model->getId()) {
                 return false;
             }
         }

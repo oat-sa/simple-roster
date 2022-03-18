@@ -437,7 +437,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/lti-instance/list:
+    /v1/lti-instances:
         get:
             summary: Get list of LTI instances (with no secret data)
             tags:

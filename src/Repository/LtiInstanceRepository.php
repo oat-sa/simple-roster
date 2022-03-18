@@ -69,11 +69,6 @@ class LtiInstanceRepository extends AbstractRepository
                 ->setParameter('labels', $criteria->getLtiLabels());
         }
 
-        $res = $builder->getQuery()->getResult();
-        if (!$res) {
-            return [];
-        }
-
-        return $res;
+        return $builder->getQuery()->getResult() ?? [];
     }
 }

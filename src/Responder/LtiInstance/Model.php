@@ -30,52 +30,37 @@ class Model implements \JsonSerializable
     private string $label;
     private string $ltiLink;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId(int $id): void
+    public function setId(int $id): self
     {
         $this->id = $id;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     */
-    public function setLabel(string $label): void
+    public function setLabel(string $label): self
     {
         $this->label = $label;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getLtiLink(): string
     {
         return $this->ltiLink;
     }
 
-    /**
-     * @param string $ltiLink
-     */
-    public function setLtiLink(string $ltiLink): void
+    public function setLtiLink(string $ltiLink): self
     {
         $this->ltiLink = $ltiLink;
+        return $this;
     }
 
     public function jsonSerialize(): array

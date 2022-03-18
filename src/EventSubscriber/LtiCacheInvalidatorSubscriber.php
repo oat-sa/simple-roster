@@ -53,12 +53,12 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
 
     public function onLtiInstanceUpdated(): void
     {
-        $this->logger->info("Got LtiInstanceUpdated event. Try to update cache.");
+        $this->logger->info('Got LtiInstanceUpdated event. Try to update cache.');
 
         $cache = $this->entityManager->getConfiguration()->getResultCacheImpl();
 
         if (null == $cache) {
-            $this->logger->error("Cannot get cache driver from doctrine config. Abort cache updating.");
+            $this->logger->error('Cannot get cache driver from doctrine config. Abort cache updating.');
             return;
         }
 
@@ -67,6 +67,6 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
         //warmup by getting all from db
         $this->ltiInstanceRepository->findAllAsCollection();
 
-        $this->logger->info("LtiInstance cache successfully updated.");
+        $this->logger->info('LtiInstance cache successfully updated.');
     }
 }
