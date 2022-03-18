@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use OAT\SimpleRoster\Events\LtiInstanceUpdated;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -55,14 +56,23 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
     {
         $this->logger->info('Got LtiInstanceUpdated event. Try to update cache.');
 
-        $cache = $this->entityManager->getConfiguration()->getResultCacheImpl();
+        $cache = $this->entityManager->getConfiguration()->getResultCache();
 
         if (null == $cache) {
             $this->logger->error('Cannot get cache driver from doctrine config. Abort cache updating.');
             return;
         }
 
-        $cache->delete(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
+        try {
+            $cache->deleteItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
+        } catch (InvalidArgumentException $e) {
+
+            $this->logger->error(
+                sprintf('Delete cache error - [%s].  Abort cache updating.', $e->getMessage()),
+                ['trace' => $e->getTraceAsString()]
+            );
+            return;
+        }
 
         //warmup by getting all from db
         $this->ltiInstanceRepository->findAllAsCollection();
