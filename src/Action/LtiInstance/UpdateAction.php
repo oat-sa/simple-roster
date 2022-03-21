@@ -69,7 +69,7 @@ class UpdateAction
     {
         $this->validator->validate($request);
 
-        $content = json_decode($request->getContent(), true);
+        $updateActionContent = json_decode($request->getContent(), true);
 
         /** @var LtiInstance $model */
         $model = $this->repository->find($ltiInstanceId);
@@ -79,21 +79,21 @@ class UpdateAction
         }
 
         $criteria = (new LtiInstanceCriteria())
-            ->addLtiLinks($content['lti_link'])
-            ->addLtiLabels($content['label']);
-        $existed = $this->repository->findAllByCriteria($criteria);
+            ->addLtiLinks($updateActionContent['lti_link'])
+            ->addLtiLabels($updateActionContent['label']);
+        $existedLtiInstances = $this->repository->findAllByCriteria($criteria);
 
-        if (!$this->checkUniqueness($existed, $model)) {
+        if (!$this->checkUniqueness($existedLtiInstances, $model)) {
             return $this->serializer->error(
                 'LtiInstance with provided link or label already exists.',
                 Response::HTTP_BAD_REQUEST
             );
         }
 
-        $model->setLabel($content['label']);
-        $model->setLtiLink($content['lti_link']);
-        $model->setLtiKey($content['lti_key']);
-        $model->setLtiSecret($content['lti_secret']);
+        $model->setLabel($updateActionContent['label']);
+        $model->setLtiLink($updateActionContent['lti_link']);
+        $model->setLtiKey($updateActionContent['lti_key']);
+        $model->setLtiSecret($updateActionContent['lti_secret']);
 
         $this->repository->persist($model);
         $this->repository->flush();

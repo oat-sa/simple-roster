@@ -38,6 +38,7 @@ class Model implements \JsonSerializable
     public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -49,6 +50,7 @@ class Model implements \JsonSerializable
     public function setLabel(string $label): self
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -60,6 +62,7 @@ class Model implements \JsonSerializable
     public function setLtiLink(string $ltiLink): self
     {
         $this->ltiLink = $ltiLink;
+
         return $this;
     }
 
@@ -77,6 +80,7 @@ class Model implements \JsonSerializable
         $this->id = $entity->getId();
         $this->ltiLink = $entity->getLtiLink();
         $this->label = $entity->getLabel();
+
         return $this;
     }
 }

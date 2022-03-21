@@ -55,11 +55,11 @@ class CreateAction
     {
         $this->validator->validate($request);
 
-        $content = json_decode($request->getContent(), true);
+        $createActionContent = json_decode($request->getContent(), true);
 
         $criteria = (new LtiInstanceCriteria())
-            ->addLtiLinks($content['lti_link'])
-            ->addLtiLabels($content['label']);
+            ->addLtiLinks($createActionContent['lti_link'])
+            ->addLtiLabels($createActionContent['label']);
         $existed = $this->repository->findAllByCriteria($criteria);
 
         if (count($existed) > 0) {
@@ -71,10 +71,10 @@ class CreateAction
 
         $model = new LtiInstance(
             0,
-            $content['label'],
-            $content['lti_link'],
-            $content['lti_key'],
-            $content['lti_secret'],
+            $createActionContent['label'],
+            $createActionContent['lti_link'],
+            $createActionContent['lti_key'],
+            $createActionContent['lti_secret'],
         );
 
         $this->repository->persist($model);
