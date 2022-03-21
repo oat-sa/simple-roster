@@ -29,11 +29,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DeleteActionTest extends AbstractLtiInstanceTest
 {
+    protected string $url = '/api/v1/lti-instances';
+    protected string $method = Request::METHOD_DELETE;
+
     public function testInvalidAuth(): void
     {
         $this->kernelBrowser->request(
-            Request::METHOD_DELETE,
-            '/api/v1/lti-instance/1',
+            $this->method,
+            $this->url . '/1',
             [],
             [],
             ['PHP_AUTH_USER' => 'wrong', 'PHP_AUTH_PW' => 'invalid'],
@@ -49,8 +52,8 @@ class DeleteActionTest extends AbstractLtiInstanceTest
     public function testInvalidIndex(): void
     {
         $this->kernelBrowser->request(
-            Request::METHOD_DELETE,
-            '/api/v1/lti-instance/777'
+            $this->method,
+            $this->url . '/777'
         );
 
         self::assertEquals(
@@ -64,8 +67,8 @@ class DeleteActionTest extends AbstractLtiInstanceTest
         $index = current($this->data)->getId();
 
         $this->kernelBrowser->request(
-            Request::METHOD_DELETE,
-            "/api/v1/lti-instance/{$index}"
+            $this->method,
+            $this->url . "/{$index}"
         );
 
         self::assertEquals(

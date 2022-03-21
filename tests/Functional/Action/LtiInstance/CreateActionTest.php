@@ -29,11 +29,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CreateActionTest extends AbstractLtiInstanceTest
 {
+    protected string $url = '/api/v1/lti-instances';
+    protected string $method = Request::METHOD_POST;
+
     public function testInvalidAuth(): void
     {
         $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/lti-instance',
+            $this->method,
+            $this->url,
             [],
             [],
             ['PHP_AUTH_USER' => 'wrong', 'PHP_AUTH_PW' => 'invalid'],
@@ -52,8 +55,8 @@ class CreateActionTest extends AbstractLtiInstanceTest
     public function testValidation(array $body): void
     {
         $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/lti-instance',
+            $this->method,
+            $this->url,
             [],
             [],
             [],
@@ -69,8 +72,8 @@ class CreateActionTest extends AbstractLtiInstanceTest
     public function testValidRequest(): void
     {
         $this->kernelBrowser->request(
-            Request::METHOD_POST,
-            '/api/v1/lti-instance',
+            $this->method,
+            $this->url,
             [],
             [],
             [],

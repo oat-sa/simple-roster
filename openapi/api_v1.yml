@@ -456,7 +456,6 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/lti-instance:
         post:
             summary: Create new LTI instance
             tags:
@@ -480,7 +479,7 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
-    /v1/lti-instance/{ltiInstanceId}:
+    /v1/lti-instances/{ltiInstanceId}:
         put:
             summary: Update LTI instance
             tags:
