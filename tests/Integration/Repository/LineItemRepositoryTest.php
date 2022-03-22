@@ -58,8 +58,9 @@ class LineItemRepositoryTest extends KernelTestCase
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
 
         $this->cacheIdGenerator = self::getContainer()->get(LineItemCacheIdGenerator::class);
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->doctrineResultCacheImplementation = $em->getConfiguration()->getResultCache();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+
+        $this->doctrineResultCacheImplementation = $entityManager->getConfiguration()->getResultCache();
         $this->subject = self::getContainer()->get(LineItemRepository::class);
     }
 
