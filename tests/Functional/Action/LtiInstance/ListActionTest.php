@@ -67,7 +67,7 @@ class ListActionTest extends AbstractLtiInstanceTest
     {
         $result = [];
         foreach ($this->data as $item) {
-            $result[] = (new Model)->fillFromEntity($item);
+            $result[] = (new Model())->fillFromEntity($item);
         }
 
         return json_encode($result);
