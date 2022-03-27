@@ -30,11 +30,6 @@ class Model implements \JsonSerializable
     private string $label;
     private string $ltiLink;
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
     public function setId(int $id): self
     {
         $this->id = $id;
@@ -42,21 +37,11 @@ class Model implements \JsonSerializable
         return $this;
     }
 
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
     public function setLabel(string $label): self
     {
         $this->label = $label;
 
         return $this;
-    }
-
-    public function getLtiLink(): string
-    {
-        return $this->ltiLink;
     }
 
     public function setLtiLink(string $ltiLink): self

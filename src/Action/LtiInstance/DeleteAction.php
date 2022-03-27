@@ -47,14 +47,14 @@ class DeleteAction
 
     public function __invoke(string $ltiInstanceId): Response
     {
-        /** @var LtiInstance $model */
-        $model = $this->repository->find($ltiInstanceId);
+        /** @var LtiInstance $ltiInstance */
+        $ltiInstance = $this->repository->find($ltiInstanceId);
 
-        if (!$model) {
+        if (!$ltiInstance) {
             return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
         }
 
-        $this->repository->remove($model);
+        $this->repository->remove($ltiInstance);
         $this->repository->flush();
 
         $this->eventDispatcher->dispatch(new LtiInstanceUpdated(), LtiInstanceUpdated::NAME);

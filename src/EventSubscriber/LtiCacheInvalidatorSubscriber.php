@@ -66,7 +66,6 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
         try {
             $cache->deleteItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
         } catch (InvalidArgumentException $e) {
-
             $this->logger->error(
                 sprintf('Delete cache error - [%s].  Abort cache updating.', $e->getMessage()),
                 ['trace' => $e->getTraceAsString()]

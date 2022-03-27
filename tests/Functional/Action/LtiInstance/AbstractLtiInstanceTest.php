@@ -42,7 +42,10 @@ abstract class AbstractLtiInstanceTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->kernelBrowser = self::createClient([], ['PHP_AUTH_USER' => 'testUsername', 'PHP_AUTH_PW' => 'testPassword']);
+        $this->kernelBrowser = self::createClient([], [
+            'PHP_AUTH_USER' => 'testUsername',
+            'PHP_AUTH_PW' => 'testPassword'
+        ]);
 
         $this->setUpDatabase();
 

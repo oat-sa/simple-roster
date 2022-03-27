@@ -52,12 +52,12 @@ class UpdateAction
     }
 
     /**
-     * @param LtiInstance[] $data
+     * @param LtiInstance[] $ltiInstances
      */
-    protected function checkUniqueness(array $data, LtiInstance $model): bool
+    protected function checkUniqueness(array $ltiInstances, LtiInstance $ltiInstance): bool
     {
-        foreach ($data as $instance) {
-            if ($instance->getId() !== $model->getId()) {
+        foreach ($ltiInstances as $instance) {
+            if ($instance->getId() !== $ltiInstance->getId()) {
                 return false;
             }
         }
@@ -65,16 +65,21 @@ class UpdateAction
         return true;
     }
 
-    public function __invoke(Request $request, string $ltiInstanceId): Response
+    public function __invoke(Request $updateActionRequest, string $ltiInstanceId): Response
     {
-        $this->validator->validate($request);
+        $this->validator->validate($updateActionRequest);
 
-        $updateActionContent = json_decode($request->getContent(), true);
+        $updateActionContent = json_decode(
+            $updateActionRequest->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
-        /** @var LtiInstance $model */
-        $model = $this->repository->find($ltiInstanceId);
+        /** @var LtiInstance $ltiInstance */
+        $ltiInstance = $this->repository->find($ltiInstanceId);
 
-        if (!$model) {
+        if (!$ltiInstance) {
             return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
         }
 
@@ -83,23 +88,23 @@ class UpdateAction
             ->addLtiLabels($updateActionContent['label']);
         $existedLtiInstances = $this->repository->findAllByCriteria($criteria);
 
-        if (!$this->checkUniqueness($existedLtiInstances, $model)) {
+        if (!$this->checkUniqueness($existedLtiInstances, $ltiInstance)) {
             return $this->serializer->error(
                 'LtiInstance with provided link or label already exists.',
                 Response::HTTP_BAD_REQUEST
             );
         }
 
-        $model->setLabel($updateActionContent['label']);
-        $model->setLtiLink($updateActionContent['lti_link']);
-        $model->setLtiKey($updateActionContent['lti_key']);
-        $model->setLtiSecret($updateActionContent['lti_secret']);
+        $ltiInstance->setLabel($updateActionContent['label']);
+        $ltiInstance->setLtiLink($updateActionContent['lti_link']);
+        $ltiInstance->setLtiKey($updateActionContent['lti_key']);
+        $ltiInstance->setLtiSecret($updateActionContent['lti_secret']);
 
-        $this->repository->persist($model);
+        $this->repository->persist($ltiInstance);
         $this->repository->flush();
 
         $this->eventDispatcher->dispatch(new LtiInstanceUpdated(), LtiInstanceUpdated::NAME);
 
-        return $this->serializer->createJsonFromInstance($model, Response::HTTP_ACCEPTED);
+        return $this->serializer->createJsonFromInstance($ltiInstance, Response::HTTP_ACCEPTED);
     }
 }

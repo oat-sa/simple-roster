@@ -60,7 +60,7 @@ trait DatabaseTestingTrait
     /**
      * @param string $filename Relative filename to tests/Fixtures directory.
      */
-    protected function loadFixtureByFilenameWithDataReturn(string $filename) : array
+    protected function loadFixtureByFilenameWithDataReturn(string $filename): array
     {
         /** @var PurgerLoader $loader */
         $loader = static::getContainer()->get('fidry_alice_data_fixtures.loader.doctrine');

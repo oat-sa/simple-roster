@@ -51,25 +51,30 @@ class CreateAction
         $this->validator = $validator;
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $createActionRequest): Response
     {
-        $this->validator->validate($request);
+        $this->validator->validate($createActionRequest);
 
-        $createActionContent = json_decode($request->getContent(), true);
+        $createActionContent = json_decode(
+            $createActionRequest->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
         $criteria = (new LtiInstanceCriteria())
             ->addLtiLinks($createActionContent['lti_link'])
             ->addLtiLabels($createActionContent['label']);
-        $existed = $this->repository->findAllByCriteria($criteria);
+        $existedLtiInstances = $this->repository->findAllByCriteria($criteria);
 
-        if (count($existed) > 0) {
+        if (count($existedLtiInstances) > 0) {
             return $this->serializer->error(
                 'LtiInstance with provided link or label already exists.',
                 Response::HTTP_BAD_REQUEST
             );
         }
 
-        $model = new LtiInstance(
+        $ltiInstance = new LtiInstance(
             0,
             $createActionContent['label'],
             $createActionContent['lti_link'],
@@ -77,11 +82,11 @@ class CreateAction
             $createActionContent['lti_secret'],
         );
 
-        $this->repository->persist($model);
+        $this->repository->persist($ltiInstance);
         $this->repository->flush();
 
         $this->eventDispatcher->dispatch(new LtiInstanceUpdated(), LtiInstanceUpdated::NAME);
 
-        return $this->serializer->createJsonFromInstance($model, Response::HTTP_ACCEPTED);
+        return $this->serializer->createJsonFromInstance($ltiInstance, Response::HTTP_ACCEPTED);
     }
 }
