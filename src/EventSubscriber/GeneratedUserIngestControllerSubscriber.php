@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
+use OAT\SimpleRoster\Lti\Service\UserGenerator\ParametersBag;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -38,17 +39,15 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 {
     public const NAME = 'line-item.updated';
 
+    private bool $enabled;
+
     private LoggerInterface $logger;
     private BulkCreateUsersService $createService;
     private GenerateGroupIdsService $generateGroupIdsService;
     private LtiInstanceRepository $ltiInstanceRepository;
     private LineItemRepository $lineItemRepository;
     private FolderSyncService $userFolderSync;
-
-    private bool $enabled;
-    private array $prefixes;
-    private int $batchSize;
-    private string $group;
+    private ParametersBag $parametersBag;
 
     public function __construct(
         LoggerInterface $logger,
@@ -57,10 +56,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LtiInstanceRepository $ltiInstanceRepository,
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
-        bool $enabled,
-        array $prefixes,
-        int $batchSize,
-        string $group
+        ParametersBag $parametersBag,
+        bool $enabled
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
@@ -69,9 +66,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->userFolderSync = $userFolderSync;
-        $this->prefixes = $prefixes;
-        $this->batchSize = $batchSize;
-        $this->group = $group;
+        $this->parametersBag = $parametersBag;
     }
 
     public static function getSubscribedEvents(): array
@@ -101,17 +96,19 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
         )->jsonSerialize();
 
-        $groupResolver = empty($this->group) ? null : new ColumnGroupResolver(
-            $this->generateGroupIdsService->generateGroupIds($this->group, $ltiCollection),
-            $this->batchSize * count($this->prefixes)
+        $groupPrefix = $this->parametersBag->getGroupPrefix();
+
+        $groupResolver = empty($groupPrefix) ? null : new ColumnGroupResolver(
+            $this->generateGroupIdsService->generateGroupIds($groupPrefix, $ltiCollection),
+            $this->parametersBag->getBatchSize() * count($this->parametersBag->getPrefixes())
         );
 
         $date = date('Y-m-d');
 
         $this->createService->generate(
             $lineItems,
-            $this->prefixes,
-            $this->batchSize,
+            $this->parametersBag->getPrefixes(),
+            $this->parametersBag->getBatchSize(),
             $date,
             $groupResolver
         );
