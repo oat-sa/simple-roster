@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Events;
 
-use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**

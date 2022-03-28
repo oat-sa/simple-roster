@@ -31,7 +31,6 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
-use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
