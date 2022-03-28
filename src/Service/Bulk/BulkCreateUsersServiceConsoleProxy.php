@@ -64,6 +64,8 @@ class BulkCreateUsersServiceConsoleProxy
         ?string $groupPrefix,
         string $date
     ): UserCreationResult {
+        $this->checkLineItemsExists($lineItemIds, $lineItemSlugs);
+
         $notExistLineItemsArray = [];
 
         $lineItems = [];
@@ -85,25 +87,6 @@ class BulkCreateUsersServiceConsoleProxy
                 : array_diff($lineItemSlugs, array_map(fn($item) => $item->getSlug(), $lineItems));
         }
 
-        if (empty($lineItemIds) && empty($lineItemSlugs)) {
-            $lineItems = $this->lineItemRepository->findAllAsCollection()->jsonSerialize();
-            if (empty($lineItems)) {
-                throw new LineItemNotFoundException('No line items were found in database.');
-            }
-        }
-
-        $resolver = null;
-        if ($groupPrefix) {
-            $userGroupIds = $this->generateGroupIdsService->generateGroupIds(
-                $groupPrefix,
-                $this->ltiInstanceRepository->findAllAsCollection()
-            );
-            $userGroupAssignCount = (int)ceil(
-                count($userPrefixes) * count($lineItems) * $batchSize / count($userGroupIds)
-            );
-            $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
-        }
-
         $slugTotalUsers = array_fill_keys(
             array_map(fn($item) => $item->getSlug(), $lineItems),
             $batchSize * count($userPrefixes)
@@ -114,11 +97,42 @@ class BulkCreateUsersServiceConsoleProxy
             $userPrefixes,
             $batchSize,
             $date,
-            $resolver
+            $this->buildGroupResolver($groupPrefix, count($userPrefixes), count($lineItems), $batchSize)
         );
 
         $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
 
         return new UserCreationResult($message, $notExistLineItemsArray);
+    }
+
+    protected function checkLineItemsExists(array $lineItemIds, array $lineItemSlugs)
+    {
+        if (empty($lineItemIds) && empty($lineItemSlugs)) {
+            $lineItems = $this->lineItemRepository->findAllAsCollection()->jsonSerialize();
+            if (empty($lineItems)) {
+                throw new LineItemNotFoundException('No line items were found in database.');
+            }
+        }
+    }
+
+    protected function buildGroupResolver(
+        ?string $groupPrefix,
+        int $userPrefixesCount,
+        int $lineItemsCount,
+        int $batchSize
+    ): ColumnGroupResolver {
+        $resolver = null;
+        if ($groupPrefix) {
+            $userGroupIds = $this->generateGroupIdsService->generateGroupIds(
+                $groupPrefix,
+                $this->ltiInstanceRepository->findAllAsCollection()
+            );
+            $userGroupAssignCount = (int)ceil(
+                $userPrefixesCount * $lineItemsCount * $batchSize / count($userGroupIds)
+            );
+            $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
+        }
+
+        return $resolver;
     }
 }
