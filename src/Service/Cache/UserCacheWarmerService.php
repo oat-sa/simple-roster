@@ -127,7 +127,9 @@ class UserCacheWarmerService
                 $this->messengerLogger->warning($logMessage);
                 $this->cacheWarmupLogger->warning($logMessage);
 
-                usleep($this->retryWaitInterval);
+                if ($this->retryWaitInterval > 0) {
+                    usleep($this->retryWaitInterval);
+                }
             }
         } while (!$isSuccessfulDispatch);
     }
