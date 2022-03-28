@@ -27,14 +27,9 @@ use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
-use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
-use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
-use OAT\SimpleRoster\Entity\LineItem;
 
 class BulkCreateUsersServiceConsoleProxy
 {
@@ -64,8 +59,7 @@ class BulkCreateUsersServiceConsoleProxy
     public function createUsers(
         array $lineItemIds,
         array $lineItemSlugs,
-        array $userPrefixes,
-        int $batchSize,
+        CreateUserServiceContext $createUserServiceContext,
         ?string $groupPrefix,
         string $date
     ): UserCreationResult {
@@ -104,25 +98,27 @@ class BulkCreateUsersServiceConsoleProxy
                 $this->ltiInstanceRepository->findAllAsCollection()
             );
             $userGroupAssignCount = (int)ceil(
-                count($userPrefixes) * count($lineItems) * $batchSize / count($userGroupIds)
+                $createUserServiceContext->getPrefixesCount() / count($userGroupIds)
             );
             $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
         }
 
         $slugTotalUsers = array_fill_keys(
             array_map(fn($item) => $item->getSlug(), $lineItems),
-            $batchSize * count($userPrefixes)
+            $createUserServiceContext->getPrefixesCount()
         );
 
         $this->service->generate(
             $lineItems,
-            $userPrefixes,
-            $batchSize,
             $date,
+            $createUserServiceContext,
             $resolver
         );
 
-        $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
+        $message = $this->userCreationMessage->normalizeMessage(
+            $slugTotalUsers,
+            $createUserServiceContext->getPrefixes()
+        );
 
         return new UserCreationResult($message, $notExistLineItemsArray);
     }
