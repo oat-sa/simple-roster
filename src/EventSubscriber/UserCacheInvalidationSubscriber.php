@@ -37,6 +37,9 @@ use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class UserCacheInvalidationSubscriber implements EventSubscriber
 {
     /** @var UserCacheWarmerService */
