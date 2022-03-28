@@ -38,6 +38,7 @@ class UserCacheWarmerService
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
     private int $messagePayloadSize;
+    /**@var positive-int $retryWaitInterval */
     private int $retryWaitInterval;
 
     public function __construct(
