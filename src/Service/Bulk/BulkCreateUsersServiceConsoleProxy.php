@@ -27,14 +27,9 @@ use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
-use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
-use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
-use OAT\SimpleRoster\Entity\LineItem;
 
 class BulkCreateUsersServiceConsoleProxy
 {
