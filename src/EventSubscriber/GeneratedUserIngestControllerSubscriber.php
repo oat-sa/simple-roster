@@ -83,17 +83,13 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         }
 
         $this->logger->info('Got LineItemUpdate event', [
-            'line_items_slugs' => $event->getUpdateLineItemCollection()->map(fn($dto) => $dto->getSlug())
+            'line_items_slugs' => $event->getLineItemSlugs()
         ]);
-
-        $acceptedSlugs = $event->getUpdateLineItemCollection()
-            ->filter(fn(UpdateLineItemDto $dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
-            ->map(fn(UpdateLineItemDto $dto) => $dto->getSlug());
 
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
         $lineItems = $this->lineItemRepository->findLineItemsByCriteria(
-            (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
+            (new FindLineItemCriteria())->addLineItemSlugs(...$event->getLineItemSlugs())
         )->jsonSerialize();
 
         $groupPrefix = $this->parametersBag->getGroupPrefix();
