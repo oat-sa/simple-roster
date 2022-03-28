@@ -38,7 +38,7 @@
         </PossiblyNullReference>
         <InvalidThrow>
           <errorLevel type="suppress">
-            <referencedClass>Psr\SimpleCache\InvalidArgumentException</referencedClass>
+            <referencedClass name="Psr\SimpleCache\InvalidArgumentException"/>
           </errorLevel>
         </InvalidThrow>
     </issueHandlers>
