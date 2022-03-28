@@ -120,7 +120,7 @@ class BulkCreateUsersServiceConsoleProxy
         int $userPrefixesCount,
         int $lineItemsCount,
         int $batchSize
-    ): ColumnGroupResolver {
+    ): ?ColumnGroupResolver {
         $resolver = null;
         if ($groupPrefix) {
             $userGroupIds = $this->generateGroupIdsService->generateGroupIds(
