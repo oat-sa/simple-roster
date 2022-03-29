@@ -35,5 +35,5 @@ parameters:
     - message: '#^Cannot call method format\(\) on DateTimeInterface\|null\.$#'
       path: tests
     # Psr\Cache\InvalidArgumentException doesn't impliment Throwable
-    - message: '#^PHPDoc tag @throws with type (.+)Psr\Cache\InvalidArgumentException(.+) is not subtype of Throwable$#'
+    - message: '#^PHPDoc tag @throws with type (.*)Psr\\Cache\\InvalidArgumentException(.*) is not subtype of Throwable$#'
       path: src
