@@ -43,7 +43,7 @@ class UserRepositoryTest extends KernelTestCase
     /** @var UserRepository */
     private $subject;
 
-    /** @var CacheItemPoolInterface|null */
+    /** @var CacheItemPoolInterface */
     private $doctrineResultCacheImplementation;
 
     /** @var UserCacheIdGenerator */
