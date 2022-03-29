@@ -105,7 +105,7 @@ class BulkCreateUsersServiceConsoleProxy
         return new UserCreationResult($message, $notExistLineItemsArray);
     }
 
-    protected function checkLineItemsExists(array $lineItemIds, array $lineItemSlugs)
+    protected function checkLineItemsExists(array $lineItemIds, array $lineItemSlugs): void
     {
         if (empty($lineItemIds) && empty($lineItemSlugs)) {
             $lineItems = $this->lineItemRepository->findAllAsCollection()->jsonSerialize();

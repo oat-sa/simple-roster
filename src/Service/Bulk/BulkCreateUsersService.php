@@ -117,7 +117,7 @@ class BulkCreateUsersService
                 $userData = $assignment->getUser()->getUsername();
                 $userNameArray = explode('_', (string)$userData);
                 $index = end($userNameArray);
-                if (count($userNameArray) > 0 && is_numeric($index)) {
+                if (is_numeric($index)) {
                     $userNameIncrementArray[$lineItem->getSlug()] = (int)$index;
                 }
             }
