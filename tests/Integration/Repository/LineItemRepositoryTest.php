@@ -42,7 +42,7 @@ class LineItemRepositoryTest extends KernelTestCase
     /** @var LineItemRepository */
     private $subject;
 
-    /** @var CacheItemPoolInterface */
+    /** @var CacheItemPoolInterface|null */
     private $doctrineResultCacheImplementation;
 
     /** @var LineItemCacheIdGenerator */
