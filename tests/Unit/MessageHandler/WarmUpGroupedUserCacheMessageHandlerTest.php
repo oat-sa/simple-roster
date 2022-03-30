@@ -181,12 +181,12 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
 
         $this->resultCacheImplementation
             ->expects(self::once())
-            ->method('delete')
+            ->method('deleteItem')
             ->with('testCacheId');
 
         $this->resultCacheImplementation
             ->expects(self::once())
-            ->method('contains')
+            ->method('hasItem')
             ->willReturn(true);
 
         $this->userRepository
