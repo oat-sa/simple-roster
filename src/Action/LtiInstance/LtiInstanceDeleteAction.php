@@ -22,25 +22,43 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Action\LtiInstance;
 
+use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Events\LtiInstanceUpdatedEvent;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use OAT\SimpleRoster\Responder\LtiInstance\Serializer;
+use OAT\SimpleRoster\Responder\LtiInstance\LtiInstanceSerializer;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 
-class ListAction
+class LtiInstanceDeleteAction
 {
     private LtiInstanceRepository $repository;
-    private Serializer $serializer;
+    private LtiInstanceSerializer $serializer;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         LtiInstanceRepository $repository,
-        Serializer $serializer
+        LtiInstanceSerializer $serializer,
+        EventDispatcher $eventDispatcher
     ) {
         $this->repository = $repository;
         $this->serializer = $serializer;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function __invoke(): Response
+    public function __invoke(string $ltiInstanceId): Response
     {
-        return $this->serializer->createJsonFromCollection($this->repository->findAll(), 200);
+        /** @var LtiInstance $ltiInstance */
+        $ltiInstance = $this->repository->find($ltiInstanceId);
+
+        if (!$ltiInstance) {
+            return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
+        }
+
+        $this->repository->remove($ltiInstance);
+        $this->repository->flush();
+
+        $this->eventDispatcher->dispatch(new LtiInstanceUpdatedEvent(), LtiInstanceUpdatedEvent::NAME);
+
+        return $this->serializer->json(['message' => 'Deleted.'], Response::HTTP_ACCEPTED);
     }
 }

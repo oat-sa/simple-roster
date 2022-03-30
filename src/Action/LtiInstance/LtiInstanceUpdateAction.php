@@ -23,27 +23,27 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
-use OAT\SimpleRoster\Events\LtiInstanceUpdated;
+use OAT\SimpleRoster\Events\LtiInstanceUpdatedEvent;
 use OAT\SimpleRoster\Repository\Criteria\LtiInstanceCriteria;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
-use OAT\SimpleRoster\Request\Validator\LtiInstance\Validator;
-use OAT\SimpleRoster\Responder\LtiInstance\Serializer;
+use OAT\SimpleRoster\Request\Validator\LtiInstance\LtiInstanceValidator;
+use OAT\SimpleRoster\Responder\LtiInstance\LtiInstanceSerializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 
-class CreateAction
+class LtiInstanceUpdateAction
 {
     private LtiInstanceRepository $repository;
-    private Serializer $serializer;
+    private LtiInstanceSerializer $serializer;
     private EventDispatcher $eventDispatcher;
-    private Validator $validator;
+    private LtiInstanceValidator $validator;
 
     public function __construct(
         LtiInstanceRepository $repository,
-        Serializer $serializer,
+        LtiInstanceSerializer $serializer,
         EventDispatcher $eventDispatcher,
-        Validator $validator
+        LtiInstanceValidator $validator
     ) {
         $this->repository = $repository;
         $this->serializer = $serializer;
@@ -51,41 +51,59 @@ class CreateAction
         $this->validator = $validator;
     }
 
-    public function __invoke(Request $createActionRequest): Response
+    /**
+     * @param LtiInstance[] $ltiInstances
+     */
+    protected function checkUniqueness(array $ltiInstances, LtiInstance $ltiInstance): bool
     {
-        $this->validator->validate($createActionRequest);
+        foreach ($ltiInstances as $instance) {
+            if ($instance->getId() !== $ltiInstance->getId()) {
+                return false;
+            }
+        }
 
-        $createActionContent = json_decode(
-            $createActionRequest->getContent(),
+        return true;
+    }
+
+    public function __invoke(Request $updateActionRequest, string $ltiInstanceId): Response
+    {
+        $this->validator->validate($updateActionRequest);
+
+        $updateActionContent = json_decode(
+            $updateActionRequest->getContent(),
             true,
             512,
             JSON_THROW_ON_ERROR
         );
 
+        /** @var LtiInstance $ltiInstance */
+        $ltiInstance = $this->repository->find($ltiInstanceId);
+
+        if (!$ltiInstance) {
+            return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
+        }
+
         $criteria = (new LtiInstanceCriteria())
-            ->addLtiLinks($createActionContent['lti_link'])
-            ->addLtiLabels($createActionContent['label']);
+            ->addLtiLinks($updateActionContent['lti_link'])
+            ->addLtiLabels($updateActionContent['label']);
         $existedLtiInstances = $this->repository->findAllByCriteria($criteria);
 
-        if (count($existedLtiInstances) > 0) {
+        if (!$this->checkUniqueness($existedLtiInstances, $ltiInstance)) {
             return $this->serializer->error(
                 'LtiInstance with provided link or label already exists.',
                 Response::HTTP_BAD_REQUEST
             );
         }
 
-        $ltiInstance = new LtiInstance(
-            0,
-            $createActionContent['label'],
-            $createActionContent['lti_link'],
-            $createActionContent['lti_key'],
-            $createActionContent['lti_secret'],
-        );
+        $ltiInstance->setLabel($updateActionContent['label']);
+        $ltiInstance->setLtiLink($updateActionContent['lti_link']);
+        $ltiInstance->setLtiKey($updateActionContent['lti_key']);
+        $ltiInstance->setLtiSecret($updateActionContent['lti_secret']);
 
         $this->repository->persist($ltiInstance);
         $this->repository->flush();
 
-        $this->eventDispatcher->dispatch(new LtiInstanceUpdated(), LtiInstanceUpdated::NAME);
+        $this->eventDispatcher->dispatch(new LtiInstanceUpdatedEvent(), LtiInstanceUpdatedEvent::NAME);
 
         return $this->serializer->createJsonFromInstance($ltiInstance, Response::HTTP_ACCEPTED);
     }

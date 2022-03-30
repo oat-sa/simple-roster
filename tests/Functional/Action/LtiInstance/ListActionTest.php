@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\LtiInstance;
 
-use OAT\SimpleRoster\Responder\LtiInstance\Model;
+use OAT\SimpleRoster\Responder\LtiInstance\LtiInstanceModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -67,7 +67,7 @@ class ListActionTest extends AbstractLtiInstanceTest
     {
         $result = [];
         foreach ($this->data as $item) {
-            $result[] = (new Model())->fillFromEntity($item);
+            $result[] = (new LtiInstanceModel())->fillFromEntity($item);
         }
 
         return json_encode($result);

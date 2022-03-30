@@ -58,10 +58,10 @@ class UpdateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             json_encode([
-                "label" => "TestLabel",
-                "lti_link" => "http://test.test",
-                "lti_key" => "test1",
-                "lti_secret" => "test2"
+                'label' => 'TestLabel',
+                'lti_link' => 'http://test.test',
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
             ])
         );
 
@@ -102,10 +102,10 @@ class UpdateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             json_encode([
-                "label" => "TestLabel",
-                "lti_link" => "http://test.test",
-                "lti_key" => "test1",
-                "lti_secret" => "test2"
+                'label' => 'TestLabel',
+                'lti_link' => 'http://test.test',
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
             ])
         );
 
@@ -131,31 +131,31 @@ class UpdateActionTest extends AbstractLtiInstanceTest
         return [
             'no_lti_secret' => [
                 'body' => [
-                    "label" => "TestLabel",
-                    "lti_link" => "http://test.test",
-                    "lti_key" => "test1",
-                ]
+                    'label' => 'TestLabel',
+                    'lti_link' => 'http://test.test',
+                    'lti_key' => 'test1',
+                ],
             ],
             'no_lti_key' => [
                 'body' => [
-                    "label" => "TestLabel",
-                    "lti_link" => "http://test.test",
-                    "lti_secret" => "test2"
-                ]
+                    'label' => 'TestLabel',
+                    'lti_link' => 'http://test.test',
+                    'lti_secret' => 'test2',
+                ],
             ],
             'no_lti_link' => [
                 'body' => [
-                    "label" => "TestLabel",
-                    "lti_key" => "test1",
-                    "lti_secret" => "test2"
-                ]
+                    'label' => 'TestLabel',
+                    'lti_key' => 'test1',
+                    'lti_secret' => 'test2',
+                ],
             ],
             'no_lti_label' => [
                 'body' => [
-                    "lti_link" => "http://test.test",
-                    "lti_key" => "test1",
-                    "lti_secret" => "test2"
-                ]
+                    'lti_link' => 'http://test.test',
+                    'lti_key' => 'test1',
+                    'lti_secret' => 'test2',
+                ],
             ],
         ];
     }

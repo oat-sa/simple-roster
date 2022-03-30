@@ -27,7 +27,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @see \OAT\SimpleRoster\Action\LtiInstance\
  */
-class LtiInstanceUpdated extends Event
+class LtiInstanceUpdatedEvent extends Event
 {
     public const NAME = 'lti-instance.updated';
 }

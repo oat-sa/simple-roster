@@ -26,7 +26,7 @@ use DateTimeInterface;
 use OAT\SimpleRoster\Request\Validator\AbstractRequestValidator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class Validator extends AbstractRequestValidator
+class LtiInstanceValidator extends AbstractRequestValidator
 {
     protected function getConstraints(): Assert\Collection
     {

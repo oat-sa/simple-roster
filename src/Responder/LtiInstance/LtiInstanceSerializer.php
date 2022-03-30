@@ -26,7 +26,7 @@ use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class Serializer
+class LtiInstanceSerializer
 {
     private SerializerResponder $responder;
 
@@ -47,7 +47,7 @@ class Serializer
 
     public function createJsonFromInstance(LtiInstance $entity, int $code): JsonResponse
     {
-        return $this->responder->createJsonResponse((new Model())->fillFromEntity($entity), $code);
+        return $this->responder->createJsonResponse((new LtiInstanceModel())->fillFromEntity($entity), $code);
     }
 
     public function createJsonFromCollection(array $collection, int $code): JsonResponse
@@ -55,7 +55,7 @@ class Serializer
         $res = [];
 
         foreach ($collection as $item) {
-            $res[] = (new Model())->fillFromEntity($item);
+            $res[] = (new LtiInstanceModel())->fillFromEntity($item);
         }
 
         return $this->responder->createJsonResponse($res, $code);

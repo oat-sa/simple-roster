@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\EventSubscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
-use OAT\SimpleRoster\Events\LtiInstanceUpdated;
+use OAT\SimpleRoster\Events\LtiInstanceUpdatedEvent;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -48,7 +48,7 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LtiInstanceUpdated::NAME => ['onLtiInstanceUpdated', 10],
+            LtiInstanceUpdatedEvent::NAME => ['onLtiInstanceUpdated', 10],
         ];
     }
 
@@ -58,7 +58,7 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
 
         $cache = $this->entityManager->getConfiguration()->getResultCache();
 
-        if (null == $cache) {
+        if (null === $cache) {
             $this->logger->error('Cannot get cache driver from doctrine config. Abort cache updating.');
             return;
         }

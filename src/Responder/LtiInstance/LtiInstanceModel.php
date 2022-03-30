@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Responder\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
 
-class Model implements \JsonSerializable
+class LtiInstanceModel implements \JsonSerializable
 {
     private int $id;
     private string $label;
