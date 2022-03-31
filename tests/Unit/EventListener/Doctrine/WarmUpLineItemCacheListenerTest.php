@@ -95,7 +95,7 @@ class WarmUpLineItemCacheListenerTest extends TestCase
 
         $cacheProvider = $this->createMock(CacheItemPoolInterface::class);
         $cacheProvider->expects(self::once())
-            ->method('delete')
+            ->method('deleteItem')
             ->with('line_item_1');
 
         $this->doctrineConfiguration->expects(self::once())

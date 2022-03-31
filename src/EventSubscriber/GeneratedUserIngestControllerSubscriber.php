@@ -30,6 +30,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -39,16 +40,15 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     public const NAME = 'line-item.updated';
 
     private LoggerInterface $logger;
-    private BulkCreateUsersService $createService;
+    private BulkCreateUsersService $createUsersService;
     private GenerateGroupIdsService $generateGroupIdsService;
     private LtiInstanceRepository $ltiInstanceRepository;
     private LineItemRepository $lineItemRepository;
     private FolderSyncService $userFolderSync;
 
     private bool $enabled;
-    private array $prefixes;
-    private int $batchSize;
     private string $group;
+    private CreateUserServiceContext $createUserServiceContext;
 
     public function __construct(
         LoggerInterface $logger,
@@ -57,21 +57,19 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LtiInstanceRepository $ltiInstanceRepository,
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
+        CreateUserServiceContext $createUserServiceContext,
         bool $enabled,
-        array $prefixes,
-        int $batchSize,
         string $group
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
-        $this->createService = $createService;
+        $this->createUsersService = $createService;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->userFolderSync = $userFolderSync;
-        $this->prefixes = $prefixes;
-        $this->batchSize = $batchSize;
         $this->group = $group;
+        $this->createUserServiceContext = $createUserServiceContext;
     }
 
     public static function getSubscribedEvents(): array
@@ -103,16 +101,15 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 
         $groupResolver = empty($this->group) ? null : new ColumnGroupResolver(
             $this->generateGroupIdsService->generateGroupIds($this->group, $ltiCollection),
-            $this->batchSize * count($this->prefixes)
+            $this->createUserServiceContext->getPrefixesCount()
         );
 
         $date = date('Y-m-d');
 
-        $this->createService->generate(
+        $this->createUsersService->generate(
             $lineItems,
-            $this->prefixes,
-            $this->batchSize,
             $date,
+            $this->createUserServiceContext,
             $groupResolver
         );
 

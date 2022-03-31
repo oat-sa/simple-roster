@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.3 - 2022-03-31
+
+### Fixed
+- Added a configurable level of subdirectories for generated QA users
+
 ## 2.5.2 - 2022-03-18
 
 ### Fixed
