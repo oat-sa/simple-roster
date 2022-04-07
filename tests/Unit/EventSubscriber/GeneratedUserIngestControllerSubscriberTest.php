@@ -21,6 +21,7 @@
 namespace OAT\SimpleRoster\Tests\Unit\EventSubscriber;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\EventSubscriber\GeneratedUserIngestControllerSubscriber;
@@ -151,7 +152,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
         return $this->setLineItemUpdatedAt($lineItem, Carbon::today());
     }
 
-    public function setLineItemId(LineItem $object, $value): LineItem
+    public function setLineItemId(LineItem $object, int $value): LineItem
     {
         $reflection = new ReflectionClass($object);
         $reflectionProperty = $reflection->getProperty('id');
@@ -161,7 +162,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
         return $object;
     }
 
-    public function setLineItemUpdatedAt(LineItem $object, $value): LineItem
+    public function setLineItemUpdatedAt(LineItem $object, DateTimeInterface $value): LineItem
     {
         $reflection = new ReflectionClass($object);
         $reflectionProperty = $reflection->getProperty('updatedAt');

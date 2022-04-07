@@ -157,7 +157,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         ];
     }
 
-    public function setLineItemId(LineItem $object, $value): LineItem
+    public function setLineItemId(LineItem $object, int $value): LineItem
     {
         $reflection = new ReflectionClass($object);
         $reflectionProperty = $reflection->getProperty('id');

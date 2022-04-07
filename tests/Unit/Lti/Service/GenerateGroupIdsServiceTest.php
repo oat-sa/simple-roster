@@ -30,7 +30,7 @@ use RuntimeException;
 
 class GenerateGroupIdsServiceTest extends TestCase
 {
-    public function testGenerateGroupIds()
+    public function testGenerateGroupIds(): void
     {
         $service = new GenerateGroupIdsService();
         $collection = new UniqueLtiInstanceCollection(
@@ -44,7 +44,7 @@ class GenerateGroupIdsServiceTest extends TestCase
         }
     }
 
-    public function testGenerateGroupIdsExceptionOnEmptyCollection()
+    public function testGenerateGroupIdsExceptionOnEmptyCollection(): void
     {
         self::expectException(LtiInstanceNotFoundException::class);
 
@@ -54,14 +54,13 @@ class GenerateGroupIdsServiceTest extends TestCase
         $service->generateGroupIds('test', $collection);
     }
 
-    public function testGenerateGroupIdsExceptionOnInvalidIndex()
+    public function testGenerateGroupIdsExceptionOnInvalidIndex(): void
     {
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('Index cannot be null');
 
         $service = new GenerateGroupIdsService();
 
-        /** @var MockObject */
         $mock = self::getMockBuilder(LtiInstance::class)
             ->setConstructorArgs([1, 'test_label', 'test_link', 'test_key', 'test_secret'])
             ->getMock();
