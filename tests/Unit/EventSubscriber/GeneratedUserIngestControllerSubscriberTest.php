@@ -37,8 +37,14 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class GeneratedUserIngestControllerSubscriberTest extends TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function testGetSubscribedEvents(): void
     {
         self::assertEquals([
@@ -148,9 +154,9 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
     public function setLineItemId(LineItem $object, $value): LineItem
     {
         $reflection = new ReflectionClass($object);
-        $reflection_property = $reflection->getProperty('id');
-        $reflection_property->setAccessible(true);
-        $reflection_property->setValue($object, $value);
+        $reflectionProperty = $reflection->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $value);
 
         return $object;
     }
@@ -158,9 +164,9 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
     public function setLineItemUpdatedAt(LineItem $object, $value): LineItem
     {
         $reflection = new ReflectionClass($object);
-        $reflection_property = $reflection->getProperty('updatedAt');
-        $reflection_property->setAccessible(true);
-        $reflection_property->setValue($object, $value);
+        $reflectionProperty = $reflection->getProperty('updatedAt');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $value);
 
         return $object;
     }

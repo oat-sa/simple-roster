@@ -35,6 +35,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 {
     public function testCreateUsers(): void
@@ -157,9 +160,9 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
     public function setLineItemId(LineItem $object, $value): LineItem
     {
         $reflection = new ReflectionClass($object);
-        $reflection_property = $reflection->getProperty('id');
-        $reflection_property->setAccessible(true);
-        $reflection_property->setValue($object, $value);
+        $reflectionProperty = $reflection->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $value);
 
         return $object;
     }
