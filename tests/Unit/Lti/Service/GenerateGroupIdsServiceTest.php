@@ -18,6 +18,8 @@
  *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
+use OAT\SimpleRoster\Entity\LtiInstance;
+
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
@@ -61,13 +63,14 @@ class GenerateGroupIdsServiceTest extends TestCase
 
         $service = new GenerateGroupIdsService();
 
-        /** @var LtiInstance|MockObject $mock */
+        /** @var MockObject */
         $mock = self::getMockBuilder(LtiInstance::class)
             ->setConstructorArgs([1, 'test_label', 'test_link', 'test_key', 'test_secret'])
             ->getMock();
 
         $mock->method('getId')->willReturn(null);
 
+        /**@var LtiInstance $mock */
         $service->generateGroupIds('test', new UniqueLtiInstanceCollection($mock));
     }
 }
