@@ -18,8 +18,6 @@
  *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
-use OAT\SimpleRoster\Entity\LtiInstance;
-
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Service;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
