@@ -137,12 +137,12 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
 
     protected function buildDefaultLineItem(int $index): LineItem
     {
-        return $this->setLineItemUpdatedAt(
-            (new LineItem())
-                ->setUri("test_uri{$index}")
-                ->setLabel("test_label{$index}")
-                ->setSlug("test_slug{$index}"),
-            Carbon::today());
+        $lineItem = (new LineItem())
+            ->setUri("test_uri{$index}")
+            ->setLabel("test_label{$index}")
+            ->setSlug("test_slug{$index}");
+
+        return $this->setLineItemUpdatedAt($lineItem, Carbon::today());
     }
 
     public function setLineItemId(LineItem $object, $value): LineItem

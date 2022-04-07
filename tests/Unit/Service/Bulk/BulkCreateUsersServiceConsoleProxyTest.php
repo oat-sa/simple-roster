@@ -39,7 +39,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 {
     public function testCreateUsers(): void
     {
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);;
+        $createServiceMock = self::createMock(BulkCreateUsersService::class);
         $createServiceMock->expects(self::once())->method('generate');
 
         $service = new BulkCreateUsersServiceConsoleProxy(
@@ -51,7 +51,12 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         );
 
         $service->createUsers(
-            [1, 2], [], ['QA', 'LQA'], 20, 'testGroup', date('Y-m-d')
+            [1, 2],
+            [],
+            ['QA', 'LQA'],
+            20,
+            'testGroup',
+            date('Y-m-d')
         );
     }
 
@@ -59,7 +64,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
     {
         self::expectException(LineItemNotFoundException::class);
 
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);;
+        $createServiceMock = self::createMock(BulkCreateUsersService::class);
 
         $service = new BulkCreateUsersServiceConsoleProxy(
             $this->makeLineItemRepositoryMock(),
@@ -70,7 +75,12 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         );
 
         $service->createUsers(
-            [777], [], ['QA', 'LQA'], 20, 'testGroup', date('Y-m-d')
+            [777],
+            [],
+            ['QA', 'LQA'],
+            20,
+            'testGroup',
+            date('Y-m-d')
         );
     }
 
@@ -78,7 +88,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
     {
         self::expectException(LineItemNotFoundException::class);
 
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);;
+        $createServiceMock = self::createMock(BulkCreateUsersService::class);
 
         $service = new BulkCreateUsersServiceConsoleProxy(
             $this->makeLineItemRepositoryMock(),
@@ -89,7 +99,12 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         );
 
         $service->createUsers(
-            [], [], ['QA', 'LQA'], 20, 'testGroup', date('Y-m-d')
+            [],
+            [],
+            ['QA', 'LQA'],
+            20,
+            'testGroup',
+            date('Y-m-d')
         );
     }
 
