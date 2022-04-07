@@ -38,3 +38,13 @@ services:
             $basicOutcomeRequestSerializer: null
             $basicOutcomeResponseSerializer: null
             $basicOutcomeResponseFactory: '@test.lti_outcome.response_factory'
+
+    OAT\SimpleRoster\Service\AwsS3\FolderSyncService:
+        public: true
+        arguments:
+            - '@oneup_flysystem.user_files_local_filesystem_filesystem'
+            - '@oneup_flysystem.user_files_s3_filesystem_filesystem'
+
+    OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy:
+        public: true
+        autowire: true
