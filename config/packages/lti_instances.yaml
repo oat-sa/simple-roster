@@ -1,5 +1,3 @@
 parameters:
     ltiInstances:
-        - http://lb_infra_1
-        - http://lb_infra_2
-        - http://lb_infra_3
+        - https://nec-deploy.docker.localhost/ltiDeliveryProvider/DeliveryTool/launch

@@ -11,6 +11,65 @@ OneRoster supports the commonly used .csv mode for exchange and the latest real-
 
 To learn more about `OneRoster`, please refer to the official specification at [IMS Global](https://www.imsglobal.org/activity/onerosterlis).
 
+### Instructions for PUPP Campaign
+
+Restore schema
+
+```shell
+./bin/console doctrine:schema:drop --force
+./bin/console doctrine:schema:create --force
+```
+
+Ingest the infrastructure:
+
+```shell
+docker-compose exec simple-roster-phpfpm \
+./bin/console roster:ingest \
+infrastructure \
+local \
+/var/www/html/samples/infrastructure.csv \
+--force
+```
+
+Creates the line items:
+
+```shell
+docker-compose exec simple-roster-phpfpm \
+./bin/console roster:ingest \
+line-item \
+local \
+/var/www/html/samples/line-items.csv \
+--force
+```
+Create test-takers
+
+```shell
+docker-compose exec simple-roster-phpfpm \
+./bin/console roster:ingest \
+user \
+local \
+/var/www/html/samples/users.csv \
+--force
+```
+
+Create the assignments
+
+```shell
+docker-compose exec simple-roster-phpfpm \
+./bin/console roster:assignments:bulk-create \
+local \
+/var/www/html/samples/assignments.csv \
+--force
+```
+
+Add your LTI lunch URL to `config/packages/lti_instances.yaml`:
+
+```yaml
+parameters:
+    ltiInstances:
+        - https://nec-deploy.docker.localhost/ltiDeliveryProvider/DeliveryTool/launch
+```
+
 ## Table of Contents
 
 - [Development environment](#development-environment)
