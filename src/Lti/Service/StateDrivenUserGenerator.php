@@ -60,12 +60,12 @@ class StateDrivenUserGenerator implements UserGeneratorInterface
      */
     public function makeBatch(int $count): array
     {
-        $res = [];
+        $result = [];
         for ($index = 0; $index < $count; $index++) {
-            $res[] = $this->make();
+            $result[] = $this->make();
         }
 
-        return $res;
+        return $result;
     }
 
     protected function newPassword(): string

@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\CreateEntity;
 
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
+use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,9 +87,11 @@ class BulkCreateUserActionTest extends WebTestCase
             [],
             $body
         );
-        $this->assertArrayValues(
-            json_decode($this->kernelBrowser->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR),
+        $content = $this->kernelBrowser->getResponse()->getContent();
+
+        $this->assertSame(
             $response,
+            json_decode($content, true, 512, JSON_THROW_ON_ERROR),
         );
     }
 
@@ -106,7 +108,13 @@ class BulkCreateUserActionTest extends WebTestCase
             [],
             $body
         );
-        $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         self::assertSame(
             $message,
             $decodedResponse['error']['message']
@@ -140,12 +148,12 @@ class BulkCreateUserActionTest extends WebTestCase
             'withAllFields' => [
                 'request' => json_encode([
                     'lineItemSlug' => 'slug-qqyw',
-                    'userPrefixes' => ['QA','LQA'],
+                    'userPrefixes' => ['QA', 'LQA'],
                     'quantity' => 4,
                     'groupIdPrefix' => 'TestCollege',
                 ]),
                 'response' => [
-                    'message' => "8 users created for line item slug-qqyw for user prefix QA,LQA",
+                    'message' => '16 users created for line item slug-qqyw for user prefix QA,LQA',
                     'nonExistingLineItems' => [],
                 ]
             ]
@@ -158,7 +166,7 @@ class BulkCreateUserActionTest extends WebTestCase
             'withoutExistingSlug' => [
                 'request' => json_encode([
                     'lineItemSlug' => 'my-slug',
-                    'userPrefixes' => ['QA','LQA'],
+                    'userPrefixes' => ['QA', 'LQA'],
                     'quantity' => 4,
                     'groupIdPrefix' => 'TestCollege',
                 ]),
@@ -178,7 +186,7 @@ class BulkCreateUserActionTest extends WebTestCase
             ],
             'missingLineItemSlug' => [
                 'request' => json_encode([
-                    'userPrefixes' => ["OAT", "QA"],
+                    'userPrefixes' => ['OAT', 'QA'],
                     'groupIdPrefix' => 'fdfdf',
                     'quantity' => 4,
                 ]),
@@ -193,12 +201,5 @@ class BulkCreateUserActionTest extends WebTestCase
                 'message' => 'Invalid Request Body: [userPrefixes] -> This field is missing.'
             ],
         ];
-    }
-
-    private function assertArrayValues(array $response, array $keyValues): void
-    {
-        foreach ($keyValues as $key => $value) {
-            self::assertSame($response[$key], $value);
-        }
     }
 }
