@@ -8,6 +8,8 @@ framework:
     # Remove or comment this section to explicitly disable session support.
     session:
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        cookie_samesite: 'none'
+        cookie_secure: true
 
     #esi: true
     #fragments: true

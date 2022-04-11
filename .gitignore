@@ -22,3 +22,5 @@
 .phpunit.result.cache
 bin/.phpunit
 ###< phpunit/phpunit ###
+
+.DS_Store

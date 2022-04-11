@@ -16,8 +16,9 @@ To learn more about `OneRoster`, please refer to the official specification at [
 Restore schema
 
 ```shell
-./bin/console doctrine:schema:drop --force
-./bin/console doctrine:schema:create --force
+docker-compose exec simple-roster-phpfpm \
+./bin/console doctrine:schema:drop --force && \
+./bin/console doctrine:schema:create
 ```
 
 Ingest the infrastructure:
@@ -52,14 +53,15 @@ local \
 --force
 ```
 
-Create the assignments
+Clear cache: 
 
 ```shell
 docker-compose exec simple-roster-phpfpm \
-./bin/console roster:assignments:bulk-create \
-local \
-/var/www/html/samples/assignments.csv \
---force
+./bin/console doctrine:cache:clear-result && \
+./bin/console doctrine:cache:clear-metadata && \
+./bin/console cache:clear && \
+./bin/console roster:doctrine-result-cache:warmup && \
+./bin/console cache:warmup
 ```
 
 Add your LTI lunch URL to `config/packages/lti_instances.yaml`:
