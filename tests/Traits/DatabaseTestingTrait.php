@@ -57,6 +57,17 @@ trait DatabaseTestingTrait
         $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
     }
 
+    /**
+     * @param string $filename Relative filename to tests/Fixtures directory.
+     */
+    protected function loadFixtureByFilenameWithDataReturn(string $filename): array
+    {
+        /** @var PurgerLoader $loader */
+        $loader = static::getContainer()->get('fidry_alice_data_fixtures.loader.doctrine');
+
+        return $loader->load([sprintf('%s/../../tests/Fixtures/%s', __DIR__, $filename)]);
+    }
+
     protected function getManagerRegistry(): ManagerRegistry
     {
         return self::$kernel->getContainer()->get('doctrine');
