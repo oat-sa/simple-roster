@@ -63,4 +63,24 @@ class LtiInstance implements EntityInterface
     {
         return $this->ltiSecret;
     }
+
+    public function setLabel(string $label): void
+    {
+        $this->label = $label;
+    }
+
+    public function setLtiLink(string $ltiLink): void
+    {
+        $this->ltiLink = $ltiLink;
+    }
+
+    public function setLtiKey(string $ltiKey): void
+    {
+        $this->ltiKey = $ltiKey;
+    }
+
+    public function setLtiSecret(string $ltiSecret): void
+    {
+        $this->ltiSecret = $ltiSecret;
+    }
 }
