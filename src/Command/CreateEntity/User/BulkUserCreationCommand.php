@@ -23,10 +23,10 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Command\CreateEntity\User;
 
 use InvalidArgumentException;
-use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
 use League\Flysystem\FileExistsException;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
-use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,14 +55,17 @@ class BulkUserCreationCommand extends Command
     private array $lineItemIds = [];
 
     private int $batchSize;
+    private CreateUserServiceContext $createUserServiceContext;
 
     public function __construct(
         BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService,
-        FolderSyncService $userFolderSync
+        FolderSyncService $userFolderSync,
+        CreateUserServiceContext $createUserServiceContext
     ) {
         parent::__construct(self::NAME);
         $this->bulkCreateUsersService = $bulkCreateUsersService;
         $this->userFolderSync = $userFolderSync;
+        $this->createUserServiceContext = $createUserServiceContext;
     }
 
     protected function configure(): void
@@ -151,18 +154,21 @@ class BulkUserCreationCommand extends Command
         try {
             $folderName = date('Y-m-d');
 
+            $context = $this->createUserServiceContext
+                ->withBatch($this->batchSize)
+                ->withPrefixes($this->userPrefix);
+
             $processDataResult = $this->bulkCreateUsersService->createUsers(
                 $this->lineItemIds,
                 $this->lineItemSlugs,
-                $this->userPrefix,
-                $this->batchSize,
+                $context,
                 $input->getOption(self::OPTION_GROUP_PREFIX),
                 date('Y-m-d')
             );
             if (!empty($processDataResult->getNonExistingLineItems())) {
                 $this->symfonyStyle->note(
                     sprintf(
-                        'Line Items with slugs/ids \'%s\' were not found in the system.',
+                        'Line Items with slugs/ids "%s" were not found in the system.',
                         implode(',', $processDataResult->getNonExistingLineItems()),
                     )
                 );
@@ -179,6 +185,7 @@ class BulkUserCreationCommand extends Command
             );
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getTraceAsString());
 
             return self::FAILURE;
         }

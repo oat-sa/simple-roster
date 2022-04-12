@@ -15,39 +15,32 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2019 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Repository;
+namespace OAT\SimpleRoster\Action\LtiInstance;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
-use OAT\SimpleRoster\Entity\EntityInterface;
+use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Responder\LtiInstance\LtiInstanceSerializer;
+use Symfony\Component\HttpFoundation\Response;
 
-abstract class AbstractRepository extends ServiceEntityRepository
+class LtiInstanceListAction
 {
-    /**
-     * @throws ORMException
-     */
-    public function persist(EntityInterface $entity): void
-    {
-        $this->_em->persist($entity);
+    private LtiInstanceRepository $repository;
+    private LtiInstanceSerializer $serializer;
+
+    public function __construct(
+        LtiInstanceRepository $repository,
+        LtiInstanceSerializer $serializer
+    ) {
+        $this->repository = $repository;
+        $this->serializer = $serializer;
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function flush(): void
+    public function __invoke(): Response
     {
-        $this->_em->flush();
-    }
-
-    public function remove(object $object): void
-    {
-        $this->_em->remove($object);
+        return $this->serializer->createJsonFromCollection($this->repository->findAll(), 200);
     }
 }

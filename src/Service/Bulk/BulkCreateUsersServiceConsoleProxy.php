@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
@@ -54,13 +56,13 @@ class BulkCreateUsersServiceConsoleProxy
     }
 
     /**
-     * @throws LineItemNotFoundException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function createUsers(
         array $lineItemIds,
         array $lineItemSlugs,
-        array $userPrefixes,
-        int $batchSize,
+        CreateUserServiceContext $createUserServiceContext,
         ?string $groupPrefix,
         string $date
     ): UserCreationResult {
@@ -89,18 +91,25 @@ class BulkCreateUsersServiceConsoleProxy
 
         $slugTotalUsers = array_fill_keys(
             array_map(fn($item) => $item->getSlug(), $lineItems),
-            $batchSize * count($userPrefixes)
+            $createUserServiceContext->getPrefixesCount()
+        );
+
+        $groupResolver = $this->buildGroupResolver(
+            $groupPrefix,
+            $createUserServiceContext
         );
 
         $this->service->generate(
             $lineItems,
-            $userPrefixes,
-            $batchSize,
             $date,
-            $this->buildGroupResolver($groupPrefix, count($userPrefixes), count($lineItems), $batchSize)
+            $createUserServiceContext,
+            $groupResolver
         );
 
-        $message = $this->userCreationMessage->normalizeMessage($slugTotalUsers, $userPrefixes);
+        $message = $this->userCreationMessage->normalizeMessage(
+            $slugTotalUsers,
+            $createUserServiceContext->getPrefixes()
+        );
 
         return new UserCreationResult($message, $notExistLineItemsArray);
     }
@@ -117,9 +126,7 @@ class BulkCreateUsersServiceConsoleProxy
 
     protected function buildGroupResolver(
         ?string $groupPrefix,
-        int $userPrefixesCount,
-        int $lineItemsCount,
-        int $batchSize
+        CreateUserServiceContext $createUserServiceContext
     ): ?ColumnGroupResolver {
         $resolver = null;
         if ($groupPrefix) {
@@ -128,7 +135,7 @@ class BulkCreateUsersServiceConsoleProxy
                 $this->ltiInstanceRepository->findAllAsCollection()
             );
             $userGroupAssignCount = (int)ceil(
-                $userPrefixesCount * $lineItemsCount * $batchSize / count($userGroupIds)
+                $createUserServiceContext->getPrefixesCount() / count($userGroupIds)
             );
             $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
         }

@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Repository;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Lti\Collection\UniqueLtiInstanceCollection;
+use OAT\SimpleRoster\Repository\Criteria\LtiInstanceCriteria;
 
 class LtiInstanceRepository extends AbstractRepository
 {
@@ -49,5 +50,25 @@ class LtiInstanceRepository extends AbstractRepository
             ->getResult();
 
         return new UniqueLtiInstanceCollection(...$ltiInstances);
+    }
+
+    public function findAllByCriteria(LtiInstanceCriteria $criteria): array
+    {
+        $builder = $this->createQueryBuilder('l')
+            ->select('l');
+
+        if ($criteria->hasLtiLinks()) {
+            $builder
+                ->andWhere('l.ltiLink IN (:links)')
+                ->setParameter('links', $criteria->getLtiLinks());
+        }
+
+        if ($criteria->hasLtiLabels()) {
+            $builder
+                ->andWhere('l.label IN (:labels)')
+                ->setParameter('labels', $criteria->getLtiLabels());
+        }
+
+        return $builder->getQuery()->getResult() ?? [];
     }
 }
