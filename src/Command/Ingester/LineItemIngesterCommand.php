@@ -162,10 +162,10 @@ EOF
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function createLineItem(array $rawLineItem): LineItem

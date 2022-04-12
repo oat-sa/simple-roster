@@ -31,6 +31,7 @@ use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,11 +42,13 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private bool $enabled;
 
     private LoggerInterface $logger;
-    private BulkCreateUsersService $createService;
+    private BulkCreateUsersService $createUsersService;
     private GenerateGroupIdsService $generateGroupIdsService;
     private LtiInstanceRepository $ltiInstanceRepository;
     private LineItemRepository $lineItemRepository;
     private FolderSyncService $userFolderSync;
+
+    private CreateUserServiceContext $createUserServiceContext;
     private ParametersBag $parametersBag;
 
     public function __construct(
@@ -55,16 +58,18 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LtiInstanceRepository $ltiInstanceRepository,
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
+        CreateUserServiceContext $createUserServiceContext,
         ParametersBag $parametersBag,
         bool $enabled
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
-        $this->createService = $createService;
+        $this->createUsersService = $createService;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->userFolderSync = $userFolderSync;
+        $this->createUserServiceContext = $createUserServiceContext;
         $this->parametersBag = $parametersBag;
     }
 
@@ -95,16 +100,15 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 
         $groupResolver = empty($groupPrefix) ? null : new ColumnGroupResolver(
             $this->generateGroupIdsService->generateGroupIds($groupPrefix, $ltiCollection),
-            $this->parametersBag->getBatchSize() * count($this->parametersBag->getPrefixes())
+            $this->createUserServiceContext->getPrefixesCount()
         );
 
         $date = date('Y-m-d');
 
-        $this->createService->generate(
+        $this->createUsersService->generate(
             $lineItems,
-            $this->parametersBag->getPrefixes(),
-            $this->parametersBag->getBatchSize(),
             $date,
+            $this->createUserServiceContext,
             $groupResolver
         );
 

@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
@@ -32,55 +34,63 @@ use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
 class BulkCreateUsersService
 {
+    private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
+
     private AssignmentRepository $assignmentRepository;
     private AssigmentFactoryInterface $assigmentFactory;
     private StorageInterface $storage;
+    private CreateUserServiceContext $createUserServiceContext;
     private StateStorageInterface $stateStorage;
-
-    private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
 
     public function __construct(
         StateStorageInterface $stateStorage,
         AssignmentRepository $assignmentRepository,
         AssigmentFactoryInterface $assigmentFactory,
-        StorageInterface $storage
+        StorageInterface $storage,
+        CreateUserServiceContext $createUserServiceContext
     ) {
         $this->assignmentRepository = $assignmentRepository;
         $this->assigmentFactory = $assigmentFactory;
         $this->storage = $storage;
+        $this->createUserServiceContext = $createUserServiceContext;
         $this->stateStorage = $stateStorage;
     }
 
     /**
      * @param LineItem[] $lineItems
-     * @param string[] $userPrefixes
+     * @param string $path
+     * @param CreateUserServiceContext|null $createUserServiceContext
      * @param GroupResolverInterface|null $groupResolver
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function generate(
         array $lineItems,
-        array $userPrefixes,
-        int $batchSize,
         string $path,
+        ?CreateUserServiceContext $createUserServiceContext = null,
         ?GroupResolverInterface $groupResolver = null
     ): void {
+        $createUserServiceContext = $createUserServiceContext ?? $this->createUserServiceContext;
         $userNameLastIndexes = $this->getLastUserAssignedToLineItems($lineItems);
 
-        foreach ($userPrefixes as $prefix) {
-            $csvPath = sprintf('%s/%s', $path, $prefix);
+        foreach ($createUserServiceContext->iteratePrefixes() as $prefixes) {
+            $csvPath = sprintf('%s/%s/%s', $path, $prefixes->getGroup(), $prefixes->getPrefix());
 
             foreach ($lineItems as $lineItem) {
                 $slug = $lineItem->getSlug();
 
-                $csvFilename = sprintf('%s-%s.csv', $slug, $prefix);
+                $csvFilename = sprintf('%s-%s-%s.csv', $slug, $prefixes->getGroup(), $prefixes->getPrefix());
 
                 $generator = new StateDrivenUserGenerator(
                     $slug,
-                    $prefix,
+                    sprintf('%s-%s', $prefixes->getGroup(), $prefixes->getPrefix()),
                     (int)$userNameLastIndexes[$slug] + 1,
                     $groupResolver
                 );
 
-                $users = $this->stateStorage->persistUsers($generatedUsers = $generator->makeBatch($batchSize));
+                $generatedUsers = $generator->makeBatch($createUserServiceContext->getBatchSize());
+                $users = $this->stateStorage->persistUsers($generatedUsers);
 
                 $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineItem);
 

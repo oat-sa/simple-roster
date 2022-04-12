@@ -97,7 +97,7 @@ EOF
         $this->symfonyStyle->comment('Executing ingestion...');
 
         try {
-            $this->progressBar->start();
+            $this->progressBar->start(1);
 
             $numberOfProcessedRows = 0;
             foreach ($this->csvReader->getRecords() as $rawLtiInstance) {

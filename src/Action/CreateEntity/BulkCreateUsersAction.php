@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\Request\Validator\BulkCreateUserValidator;
 use OAT\SimpleRoster\Request\Initialize\BulkCreateUserRequestInitialize;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,19 +39,22 @@ class BulkCreateUsersAction
     private BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService;
     private BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize;
     private FolderSyncService $userFolderSync;
+    private CreateUserServiceContext $createUserServiceContext;
 
     public function __construct(
         BulkCreateUsersServiceConsoleProxy $bulkCreateUsersService,
         BulkCreateUserValidator $bulkCreateUserValidator,
         BulkCreateUserRequestInitialize $bulkCreateUserRequestInitialize,
         FolderSyncService $userFolderSync,
-        SerializerResponder $responder
+        SerializerResponder $responder,
+        CreateUserServiceContext $createUserServiceContext
     ) {
         $this->bulkCreateUserValidator = $bulkCreateUserValidator;
         $this->bulkCreateUsersService = $bulkCreateUsersService;
         $this->bulkCreateUserRequestInitialize = $bulkCreateUserRequestInitialize;
         $this->userFolderSync = $userFolderSync;
         $this->responder = $responder;
+        $this->createUserServiceContext = $createUserServiceContext;
     }
 
     public function __invoke(Request $request): Response
@@ -60,11 +64,14 @@ class BulkCreateUsersAction
 
         $folderName = date('Y-m-d');
 
+        $context = $this->createUserServiceContext
+            ->withBatch($requestPayLoad['quantity'])
+            ->withPrefixes($requestPayLoad['userPrefixes']);
+
         $response = $this->bulkCreateUsersService->createUsers(
             $requestPayLoad['lineItemIds'],
             $requestPayLoad['lineItemSlugs'],
-            $requestPayLoad['userPrefixes'],
-            $requestPayLoad['quantity'],
+            $context,
             $requestPayLoad['groupIdPrefix'],
             $folderName
         );

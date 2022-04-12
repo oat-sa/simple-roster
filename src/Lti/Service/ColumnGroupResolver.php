@@ -57,13 +57,13 @@ final class ColumnGroupResolver implements GroupResolverInterface
             throw new RuntimeException('Group ids limit is reached. Cannot resolve group id anymore.');
         }
 
-        $res = $this->idList[$this->cursor];
+        $result = $this->idList[$this->cursor];
         $this->sizeMap[$this->cursor]++;
 
         if ($this->sizeMap[$this->cursor] >= $this->chunkSize) {
             $this->cursor++;
         }
 
-        return $res;
+        return $result;
     }
 }
