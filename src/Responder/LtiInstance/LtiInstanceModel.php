@@ -62,7 +62,7 @@ class LtiInstanceModel implements \JsonSerializable
 
     public function fillFromEntity(LtiInstance $entity): self
     {
-        $this->id = $entity->getId();
+        $this->id = (int)$entity->getId();
         $this->ltiLink = $entity->getLtiLink();
         $this->label = $entity->getLabel();
 

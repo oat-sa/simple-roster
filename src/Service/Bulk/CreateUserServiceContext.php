@@ -82,7 +82,7 @@ class CreateUserServiceContext
     }
 
     /**
-     * @return PrefixesVO[]
+     * @return PrefixesVO[]|Generator
      */
     public function iteratePrefixes(): Generator
     {

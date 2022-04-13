@@ -60,7 +60,7 @@ class CreateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             [],
-            json_encode($body)
+            (string)json_encode($body)
         );
 
         self::assertEquals(
@@ -77,7 +77,7 @@ class CreateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             [],
-            json_encode([
+            (string)json_encode([
                 'label' => 'TestLabel',
                 'lti_link' => 'http://test.test',
                 'lti_key' => 'test1',
