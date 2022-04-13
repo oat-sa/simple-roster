@@ -57,7 +57,7 @@ class UpdateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             [],
-            json_encode([
+            (string)json_encode([
                 'label' => 'TestLabel',
                 'lti_link' => 'http://test.test',
                 'lti_key' => 'test1',
@@ -82,7 +82,7 @@ class UpdateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             [],
-            json_encode($body)
+            (string)json_encode($body)
         );
 
         self::assertEquals(
@@ -93,7 +93,9 @@ class UpdateActionTest extends AbstractLtiInstanceTest
 
     public function testValidRequest(): void
     {
-        $index = current($this->data)->getId();
+        /** @var LtiInstance */
+        $firstLtiInstance = current($this->data);
+        $index = $firstLtiInstance->getId();
 
         $this->kernelBrowser->request(
             $this->method,
@@ -101,7 +103,7 @@ class UpdateActionTest extends AbstractLtiInstanceTest
             [],
             [],
             [],
-            json_encode([
+            (string)json_encode([
                 'label' => 'TestLabel',
                 'lti_link' => 'http://test.test',
                 'lti_key' => 'test1',

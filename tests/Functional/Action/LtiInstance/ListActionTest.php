@@ -70,6 +70,6 @@ class ListActionTest extends AbstractLtiInstanceTest
             $result[] = (new LtiInstanceModel())->fillFromEntity($item);
         }
 
-        return json_encode($result);
+        return (string)json_encode($result);
     }
 }
