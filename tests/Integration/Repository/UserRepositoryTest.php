@@ -63,7 +63,7 @@ class UserRepositoryTest extends KernelTestCase
 
         $resultCache = $entityManager->getConfiguration()->getResultCache();
         if ($resultCache === null) {
-            throw new Error("`getResultCache` returned null. Cannot setUp", 0, __FILE__, __LINE__);
+            throw new Error('`getResultCache` returned null. Cannot setUp', 0, __FILE__, __LINE__);
         }
         $this->doctrineResultCacheImplementation = $resultCache;
 
