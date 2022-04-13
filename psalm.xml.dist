@@ -42,6 +42,9 @@
           </errorLevel>
         </InvalidThrow>
     </issueHandlers>
+    <ignoreExceptions>
+        <class name="Psr\Cache\InvalidArgumentException" />
+    </ignoreExceptions>
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">
