@@ -33,6 +33,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -71,6 +72,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $ltiInstanceRepositoryMock,
             $lineItemRepositoryMock,
             $userFolderSyncMock,
+            new CreateUserServiceContext(['test1'], ['tao1'], 10),
             new ParametersBag('test', ['test1'], 10),
             false
         );
@@ -102,6 +104,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $ltiInstanceRepositoryMock,
             $lineItemRepositoryMock,
             $userFolderSyncMock,
+            new CreateUserServiceContext(['test1'], ['tao1'], 10),
             new ParametersBag('test', ['test1'], 10),
             true
         );

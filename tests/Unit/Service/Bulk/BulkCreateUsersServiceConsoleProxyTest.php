@@ -31,6 +31,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
+use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -56,8 +57,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [1, 2],
             [],
-            ['QA', 'LQA'],
-            20,
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
             'testGroup',
             date('Y-m-d')
         );
@@ -80,8 +80,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [777],
             [],
-            ['QA', 'LQA'],
-            20,
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
             'testGroup',
             date('Y-m-d')
         );
@@ -104,8 +103,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [],
             [],
-            ['QA', 'LQA'],
-            20,
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
             'testGroup',
             date('Y-m-d')
         );
