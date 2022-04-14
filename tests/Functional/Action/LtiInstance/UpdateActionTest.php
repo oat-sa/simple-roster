@@ -91,6 +91,84 @@ class UpdateActionTest extends AbstractLtiInstanceTest
         );
     }
 
+    public function testUpdateWithExitedLink(): void
+    {
+        $link = 'http://link.test';
+
+        $ltiInstance = new LtiInstance(
+            0,
+            'TestLabel',
+            $link,
+            'test_key',
+            'test_secrete'
+        );
+
+        $this->getEntityManager()->persist($ltiInstance);
+        $this->getEntityManager()->flush();
+
+        /** @var LtiInstance */
+        $firstLtiInstance = current($this->data);
+        $index = $firstLtiInstance->getId();
+
+        $this->kernelBrowser->request(
+            $this->method,
+            $this->url . "/{$index}",
+            [],
+            [],
+            [],
+            (string)json_encode([
+                'label' => 'TestLabel777',
+                'lti_link' => $link,
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
+            ])
+        );
+
+        self::assertEquals(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
+    }
+
+    public function testUpdateWithExitedLabel(): void
+    {
+        $label = 'lalalabel';
+
+        $ltiInstance = new LtiInstance(
+            0,
+            $label,
+            'http://ttt.ttt',
+            'test_key',
+            'test_secrete'
+        );
+
+        $this->getEntityManager()->persist($ltiInstance);
+        $this->getEntityManager()->flush();
+
+        /** @var LtiInstance */
+        $firstLtiInstance = current($this->data);
+        $index = $firstLtiInstance->getId();
+
+        $this->kernelBrowser->request(
+            $this->method,
+            $this->url . "/{$index}",
+            [],
+            [],
+            [],
+            (string)json_encode([
+                'label' => $label,
+                'lti_link' => 'http://litk.test',
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
+            ])
+        );
+
+        self::assertEquals(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
+    }
+
     public function testValidRequest(): void
     {
         /** @var LtiInstance */
