@@ -87,7 +87,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         }
 
         $this->logger->info('Got LineItemUpdate event', [
-            'line_items_slugs' => $event->getLineItemSlugs()
+            'line_items_slugs' => $event->getLineItemSlugs(),
         ]);
 
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();

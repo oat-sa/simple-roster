@@ -50,7 +50,7 @@ class LtiInstanceDeleteAction
         /** @var LtiInstance $ltiInstance */
         $ltiInstance = $this->repository->find($ltiInstanceId);
 
-        if ($ltiInstance == null) {
+        if ($ltiInstance === null) {
             return $this->serializer->error('Not found.', Response::HTTP_NOT_FOUND);
         }
 
