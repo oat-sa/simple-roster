@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Lti\Service\UserGenerator;
 
-class ParametersBag
+class UserGeneratorParametersBag
 {
     private string $groupPrefix;
     /** @var string[] $prefixes */

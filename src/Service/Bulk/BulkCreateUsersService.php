@@ -28,7 +28,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
-use OAT\SimpleRoster\Lti\Service\UserGenerator\StateStorageInterface;
+use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
 use OAT\SimpleRoster\Service\LineItem\LineItemAssignedIndexResolver;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
@@ -37,11 +37,11 @@ class BulkCreateUsersService
     private AssigmentFactoryInterface $assigmentFactory;
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
-    private StateStorageInterface $stateStorage;
+    private UserGeneratorStateStorageInterface $stateStorage;
     private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
 
     public function __construct(
-        StateStorageInterface $stateStorage,
+        UserGeneratorStateStorageInterface $stateStorage,
         LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
@@ -96,7 +96,7 @@ class BulkCreateUsersService
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
                 $this->storage->persistAssignments(
-                    sprintf('%s/Assignments-%s.csv', $csvPath, $csvFilename),
+                    sprintf('%s/Assignments-%s', $csvPath, $csvFilename),
                     $assignments
                 );
 
