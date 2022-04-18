@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\EventSubscriber;
 use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
-use OAT\SimpleRoster\Lti\Service\UserGenerator\ParametersBag;
+use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorParametersBag;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -49,7 +49,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private FolderSyncService $userFolderSync;
 
     private CreateUserServiceContext $createUserServiceContext;
-    private ParametersBag $parametersBag;
+    private UserGeneratorParametersBag $parametersBag;
 
     public function __construct(
         LoggerInterface $logger,
@@ -59,7 +59,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
         CreateUserServiceContext $createUserServiceContext,
-        ParametersBag $parametersBag,
+        UserGeneratorParametersBag $parametersBag,
         bool $enabled
     ) {
         $this->logger = $logger;
