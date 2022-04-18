@@ -32,7 +32,7 @@ use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class DatabaseStorage implements StateStorageInterface
+class UserGeneratorDatabaseStorage implements UserGeneratorStateStorageInterface
 {
     private AssignmentRepository $assignmentRepository;
     private UserRepository $userRepository;

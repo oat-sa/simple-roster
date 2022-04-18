@@ -28,7 +28,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
-use OAT\SimpleRoster\Lti\Service\UserGenerator\StateStorageInterface;
+use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
@@ -40,10 +40,10 @@ class BulkCreateUsersService
     private AssigmentFactoryInterface $assigmentFactory;
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
-    private StateStorageInterface $stateStorage;
+    private UserGeneratorStateStorageInterface $stateStorage;
 
     public function __construct(
-        StateStorageInterface $stateStorage,
+        UserGeneratorStateStorageInterface $stateStorage,
         AssignmentRepository $assignmentRepository,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,

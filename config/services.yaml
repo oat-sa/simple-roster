@@ -189,8 +189,8 @@ services:
             $prefixes: '%app.feature.generate_users.prefixes%'
             $batchSize: '%app.feature.generate_users.batch_size%'
 
-    OAT\SimpleRoster\Lti\Service\UserGenerator\StateStorageInterface:
-        class: OAT\SimpleRoster\Lti\Service\UserGenerator\DatabaseStorage
+    OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface:
+        class: OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorDatabaseStorage
 
     OAT\SimpleRoster\Storage\UserGenerator\StorageInterface:
         class: OAT\SimpleRoster\Storage\UserGenerator\CsvFilesystemStorage
