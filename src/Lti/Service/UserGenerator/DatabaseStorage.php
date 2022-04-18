@@ -54,7 +54,7 @@ class DatabaseStorage implements StateStorageInterface
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function persistUsers(array $users): UserCollection
+    public function persistUsers(iterable $users): UserCollection
     {
         $usernames = [];
         foreach ($users as $user) {
