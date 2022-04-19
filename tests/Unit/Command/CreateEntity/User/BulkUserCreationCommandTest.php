@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use InvalidArgumentException;
 
@@ -35,7 +36,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
 {
     public function testBasicWithSlug(): void
     {
-        $this->getCommandForBasicPipeline()->execute(
+        $code = $this->getCommandForBasicPipeline()->execute(
             [
                 '-s' => '21LINUM_NUM',
                 '-b' => '10',
@@ -44,11 +45,13 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::SUCCESS, $code);
     }
 
     public function testBasicWithId(): void
     {
-        $this->getCommandForBasicPipeline()->execute(
+        $code = $this->getCommandForBasicPipeline()->execute(
             [
                 '-i' => '5',
                 '-b' => '10',
@@ -57,12 +60,15 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::SUCCESS, $code);
     }
 
     public function testInvalidSlugIdCombination(): void
     {
         self::expectException(InvalidArgumentException::class);
-        $this->getCommandForOptionTest()->execute(
+
+        $code = $this->getCommandForOptionTest()->execute(
             [
                 '-s' => '21LINUM_NUM',
                 '-i' => '10',
@@ -72,12 +78,15 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::FAILURE, $code);
     }
 
     public function testInvalidBatch(): void
     {
         self::expectException(InvalidArgumentException::class);
-        $this->getCommandForOptionTest()->execute(
+
+        $code = $this->getCommandForOptionTest()->execute(
             [
                 '-s' => '21LINUM_NUM',
                 '-b' => 'zagzag',
@@ -86,12 +95,15 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::FAILURE, $code);
     }
 
     public function testInvalidBatchUserPrefixes(): void
     {
         self::expectException(InvalidArgumentException::class);
-        $this->getCommandForOptionTest()->execute(
+
+        $code = $this->getCommandForOptionTest()->execute(
             [
                 '-s' => '21LINUM_NUM',
                 '-b' => '10',
@@ -100,12 +112,15 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::FAILURE, $code);
     }
 
     public function testInvalidBatchItemSlugs(): void
     {
         self::expectException(InvalidArgumentException::class);
-        $this->getCommandForOptionTest()->execute(
+
+        $code = $this->getCommandForOptionTest()->execute(
             [
                 '-s' => ',,,,',
                 '-b' => '10',
@@ -114,12 +129,15 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::FAILURE, $code);
     }
 
     public function testInvalidBatchItemIds(): void
     {
         self::expectException(InvalidArgumentException::class);
-        $this->getCommandForOptionTest()->execute(
+
+        $code = $this->getCommandForOptionTest()->execute(
             [
                 '-i' => ',,,,',
                 '-b' => '10',
@@ -128,6 +146,8 @@ class BulkUserCreationCommandTest extends KernelTestCase
             ],
             ['capture_stderr_separately' => true]
         );
+
+        self::assertEquals(Command::FAILURE, $code);
     }
 
     public function testFilesystemException(): void
