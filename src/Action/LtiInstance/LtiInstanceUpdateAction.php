@@ -76,7 +76,7 @@ class LtiInstanceUpdateAction
             JSON_THROW_ON_ERROR
         );
 
-        /** @var LtiInstance $ltiInstance */
+        /** @var LtiInstance|null $ltiInstance */
         $ltiInstance = $this->repository->find($ltiInstanceId);
 
         if ($ltiInstance === null) {
