@@ -27,8 +27,9 @@ class LineItemUpdatedTest extends TestCase
 {
     public function testGetLineItemSlugs(): void
     {
-        $obj = new LineItemUpdated($list = ['str1', 'str2']);
+        $lineItems = ['str1', 'str2'];
+        $obj = new LineItemUpdated($lineItems);
 
-        $this->assertEquals($list, $obj->getLineItemSlugs());
+        $this->assertEquals($lineItems, $obj->getLineItemSlugs());
     }
 }

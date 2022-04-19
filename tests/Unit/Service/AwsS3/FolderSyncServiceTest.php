@@ -36,8 +36,10 @@ class FolderSyncServiceTest extends TestCase
 
         $dir = 'some_dir';
 
-        $source->put($path1 = $this->path($dir, 'path/one.txt'), $content1 = 'some_data1');
-        $source->put($path2 = $this->path($dir, 'path/two/file.txt'), $content2 = 'some_data2');
+        $path1 = $this->path($dir, 'path/one.txt');
+        $source->put($path1, $content1 = 'some_data1');
+        $path2 = $this->path($dir, 'path/two/file.txt');
+        $source->put($path2, $content2 = 'some_data2');
 
         $service->sync($dir);
 
@@ -56,8 +58,10 @@ class FolderSyncServiceTest extends TestCase
 
         $dir = 'some_dir';
 
-        $source->put($path1 = $this->path($dir, 'path/one.txt'), $content1 = 'some_data1');
-        $source->put($path2 = $this->path($dir, 'path/two/file.txt'), $content2 = 'some_data2');
+        $path1 = $this->path($dir, 'path/one.txt');
+        $source->put($path1, $content1 = 'some_data1');
+        $path2 = $this->path($dir, 'path/two/file.txt');
+        $source->put($path2, $content2 = 'some_data2');
 
         $dest->put($path1, 'some_old_data1');
 

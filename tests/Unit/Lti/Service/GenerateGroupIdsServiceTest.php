@@ -37,7 +37,7 @@ class GenerateGroupIdsServiceTest extends TestCase
             new LtiInstance(1, 'test_label', 'test_link', 'test_key', 'test_secret')
         );
 
-        $groupIds = $service->generateGroupIds("test", $collection);
+        $groupIds = $service->generateGroupIds('test', $collection);
 
         foreach ($groupIds as $groupId) {
             self::assertMatchesRegularExpression('~^test_[a-z0-9]+$~', $groupId);

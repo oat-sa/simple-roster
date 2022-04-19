@@ -20,17 +20,21 @@
 
 namespace OAT\SimpleRoster\Tests\Unit\Lti\Service\UserGenerator;
 
-use OAT\SimpleRoster\Lti\Service\UserGenerator\ParametersBag;
+use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorParametersBag;
 use PHPUnit\Framework\TestCase;
 
-class ParametersBagTest extends TestCase
+class UserGeneratorParametersBagTest extends TestCase
 {
     public function testConstruction(): void
     {
-        $obj = new ParametersBag(
-            $prefix = 'test_prefix',
-            $prefixes = ['test1', 'test2'],
-            $batchSize = 777,
+        $prefix = 'test_prefix';
+        $prefixes = ['test1', 'test2'];
+        $batchSize = 777;
+
+        $obj = new UserGeneratorParametersBag(
+            $prefix,
+            $prefixes,
+            $batchSize,
         );
 
         self::assertEquals($prefix, $obj->getGroupPrefix());
