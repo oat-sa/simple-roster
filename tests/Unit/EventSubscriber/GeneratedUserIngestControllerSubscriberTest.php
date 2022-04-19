@@ -120,7 +120,9 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
         $lineItemRepositoryMock = self::createMock(LineItemRepository::class);
 
         $lineItemRepositoryMock->method('findAllAsCollection')->willReturn($collection);
-        $lineItemRepositoryMock->method('findLineItemsByCriteria')->willReturn(new LineItemResultSet($collection, false, 777));
+        $lineItemRepositoryMock
+            ->method('findLineItemsByCriteria')
+            ->willReturn(new LineItemResultSet($collection, false, 777));
 
         return $lineItemRepositoryMock;
     }
