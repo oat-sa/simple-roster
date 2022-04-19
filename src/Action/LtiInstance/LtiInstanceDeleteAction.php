@@ -47,7 +47,7 @@ class LtiInstanceDeleteAction
 
     public function __invoke(string $ltiInstanceId): Response
     {
-        /** @var LtiInstance $ltiInstance */
+        /** @var LtiInstance|null $ltiInstance */
         $ltiInstance = $this->repository->find($ltiInstanceId);
 
         if ($ltiInstance === null) {
