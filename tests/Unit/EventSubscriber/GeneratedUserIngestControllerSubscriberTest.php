@@ -26,7 +26,6 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\EventSubscriber\GeneratedUserIngestControllerSubscriber;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
-use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorParametersBag;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -73,7 +72,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $lineItemRepositoryMock,
             $userFolderSyncMock,
             new CreateUserServiceContext(['test1'], ['tao1'], 10),
-            new UserGeneratorParametersBag('test', ['test1'], 10),
+            'test',
             false
         );
 
@@ -105,7 +104,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $lineItemRepositoryMock,
             $userFolderSyncMock,
             new CreateUserServiceContext(['test1'], ['tao1'], 10),
-            new UserGeneratorParametersBag('test', ['test1'], 10),
+            'test',
             true
         );
 
