@@ -25,7 +25,6 @@ namespace OAT\SimpleRoster\EventSubscriber;
 use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\Lti\Service\ColumnGroupResolver;
 use OAT\SimpleRoster\Lti\Service\GenerateGroupIdsService;
-use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorParametersBag;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
@@ -41,6 +40,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 
     private bool $enabled;
 
+    private string $groupPrefix;
+
     private LoggerInterface $logger;
     private BulkCreateUsersService $createUsersService;
     private GenerateGroupIdsService $generateGroupIdsService;
@@ -49,7 +50,6 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private FolderSyncService $userFolderSync;
 
     private CreateUserServiceContext $createUserServiceContext;
-    private UserGeneratorParametersBag $parametersBag;
 
     public function __construct(
         LoggerInterface $logger,
@@ -59,7 +59,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
         CreateUserServiceContext $createUserServiceContext,
-        UserGeneratorParametersBag $parametersBag,
+        string $groupPrefix,
         bool $enabled
     ) {
         $this->logger = $logger;
@@ -70,7 +70,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $this->lineItemRepository = $lineItemRepository;
         $this->userFolderSync = $userFolderSync;
         $this->createUserServiceContext = $createUserServiceContext;
-        $this->parametersBag = $parametersBag;
+        $this->groupPrefix = $groupPrefix;
     }
 
     public static function getSubscribedEvents(): array
@@ -96,10 +96,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             (new FindLineItemCriteria())->addLineItemSlugs(...$event->getLineItemSlugs())
         )->jsonSerialize();
 
-        $groupPrefix = $this->parametersBag->getGroupPrefix();
-
-        $groupResolver = empty($groupPrefix) ? null : new ColumnGroupResolver(
-            $this->generateGroupIdsService->generateGroupIds($groupPrefix, $ltiCollection),
+        $groupResolver = empty($this->groupPrefix) ? null : new ColumnGroupResolver(
+            $this->generateGroupIdsService->generateGroupIds($this->groupPrefix, $ltiCollection),
             $this->createUserServiceContext->getPrefixesCount()
         );
 
