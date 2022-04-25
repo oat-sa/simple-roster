@@ -59,13 +59,13 @@ class LtiInstanceRepository extends AbstractRepository
 
         if ($criteria->hasLtiLinks()) {
             $builder
-                ->andWhere('l.ltiLink IN (:links)')
+                ->orWhere('l.ltiLink IN (:links)')
                 ->setParameter('links', $criteria->getLtiLinks());
         }
 
         if ($criteria->hasLtiLabels()) {
             $builder
-                ->andWhere('l.label IN (:labels)')
+                ->orWhere('l.label IN (:labels)')
                 ->setParameter('labels', $criteria->getLtiLabels());
         }
 

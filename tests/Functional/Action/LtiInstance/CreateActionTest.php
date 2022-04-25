@@ -98,6 +98,76 @@ class CreateActionTest extends AbstractLtiInstanceTest
         self::assertEquals(count($this->data) + 1, count($repository->findAll()));
     }
 
+    public function testLabelExists(): void
+    {
+        $label = 'TestLabel';
+
+        $ltiInstance = new LtiInstance(
+            0,
+            $label,
+            'http://link.test',
+            'test_key',
+            'test_secrete'
+        );
+
+        $this->getEntityManager()->persist($ltiInstance);
+        $this->getEntityManager()->flush();
+
+        $this->kernelBrowser->request(
+            $this->method,
+            $this->url,
+            [],
+            [],
+            [],
+            (string)json_encode([
+                'label' => $label,
+                'lti_link' => 'http://test.test',
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
+            ])
+        );
+
+        self::assertEquals(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
+    }
+
+    public function testLtiLinkExists(): void
+    {
+        $link = 'http://link.test';
+
+        $ltiInstance = new LtiInstance(
+            0,
+            'TestLabel',
+            $link,
+            'test_key',
+            'test_secrete'
+        );
+
+        $this->getEntityManager()->persist($ltiInstance);
+        $this->getEntityManager()->flush();
+
+        $this->kernelBrowser->request(
+            $this->method,
+            $this->url,
+            [],
+            [],
+            [],
+            (string)json_encode([
+                'label' => 'lalabel',
+                'lti_link' => $link,
+                'lti_key' => 'test1',
+                'lti_secret' => 'test2'
+            ])
+        );
+
+        self::assertEquals(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode()
+        );
+    }
+
     public function provideInvalidRequests(): array
     {
         return [

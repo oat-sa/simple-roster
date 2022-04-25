@@ -29,31 +29,29 @@ use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
 use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
-use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Service\LineItem\LineItemAssignedIndexResolver;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
 class BulkCreateUsersService
 {
-    private const DEFAULT_USERNAME_INCREMENT_VALUE = 0;
-
-    private AssignmentRepository $assignmentRepository;
     private AssigmentFactoryInterface $assigmentFactory;
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
     private UserGeneratorStateStorageInterface $stateStorage;
+    private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
 
     public function __construct(
         UserGeneratorStateStorageInterface $stateStorage,
-        AssignmentRepository $assignmentRepository,
+        LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
         CreateUserServiceContext $createUserServiceContext
     ) {
-        $this->assignmentRepository = $assignmentRepository;
         $this->assigmentFactory = $assigmentFactory;
         $this->storage = $storage;
         $this->createUserServiceContext = $createUserServiceContext;
         $this->stateStorage = $stateStorage;
+        $this->lineItemAssignedIndexResolver = $lineItemAssignedIndexResolver;
     }
 
     /**
@@ -72,7 +70,7 @@ class BulkCreateUsersService
         ?GroupResolverInterface $groupResolver = null
     ): void {
         $createUserServiceContext = $createUserServiceContext ?? $this->createUserServiceContext;
-        $userNameLastIndexes = $this->getLastUserAssignedToLineItems($lineItems);
+        $userNameLastIndexes = $this->lineItemAssignedIndexResolver->getLastUserAssignedToLineItems($lineItems);
 
         foreach ($createUserServiceContext->iteratePrefixes() as $prefixes) {
             $csvPath = sprintf('%s/%s/%s', $path, $prefixes->getGroup(), $prefixes->getPrefix());
@@ -106,33 +104,5 @@ class BulkCreateUsersService
                 $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $path), $assignments);
             }
         }
-    }
-
-    /**
-     * @param LineItem[] $lineItems
-     */
-    private function getLastUserAssignedToLineItems(array $lineItems): array
-    {
-        /*
-         * TODO: replace with uuid or something similar? current solution is not consistency safe
-         * */
-
-        $userNameIncrementArray = [];
-
-        foreach ($lineItems as $lineItem) {
-            $assignment = $this->assignmentRepository->findByLineItemId((int)$lineItem->getId());
-            $userNameIncrementArray[$lineItem->getSlug()] = self::DEFAULT_USERNAME_INCREMENT_VALUE;
-
-            if (!empty($assignment)) {
-                $userData = $assignment->getUser()->getUsername();
-                $userNameArray = explode('_', (string)$userData);
-                $index = end($userNameArray);
-                if (is_numeric($index)) {
-                    $userNameIncrementArray[$lineItem->getSlug()] = (int)$index;
-                }
-            }
-        }
-
-        return $userNameIncrementArray;
     }
 }
