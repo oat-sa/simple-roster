@@ -86,14 +86,19 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             return;
         }
 
+        $lineItemsSlugs = $event->getLineItemSlugs();
+        if (empty($lineItemsSlugs)) {
+            return;
+        }
+
         $this->logger->info('Got LineItemUpdate event', [
-            'line_items_slugs' => $event->getLineItemSlugs(),
+            'line_items_slugs' => $lineItemsSlugs,
         ]);
 
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
         $lineItems = $this->lineItemRepository->findLineItemsByCriteria(
-            (new FindLineItemCriteria())->addLineItemSlugs(...$event->getLineItemSlugs())
+            (new FindLineItemCriteria())->addLineItemSlugs(...$lineItemsSlugs)
         )->jsonSerialize();
 
         $groupResolver = empty($this->groupPrefix) ? null : new ColumnGroupResolver(

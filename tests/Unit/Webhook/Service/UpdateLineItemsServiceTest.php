@@ -200,25 +200,28 @@ class UpdateLineItemsServiceTest extends TestCase
         self::assertSame('ignored', $updateLineItemDtoDuplicated->getStatus());
     }
 
-    public function testErrorForUpdatesWithNotFoundSlug(): void
+    public function testCreatedForUpdatesWithNotFoundSlug(): void
     {
+        $slug = 'qti-interactions-delivery';
+        $uri = 'https://tao.instance/ontologies/tao.rdf#i5fb5';
         $this->lineItemRepository->expects(self::once())
             ->method('findBy')
             ->with(
                 [
-                    'slug' => ['qti-interactions-delivery']
+                    'slug' => [$slug]
                 ]
             )
             ->willReturn([]);
 
-        $this->entityManager->expects(self::never())->method('persist');
+        $this->entityManager->expects(self::once())->method('persist');
 
         $this->logger->expects(self::once())
-            ->method('error')
+            ->method('info')
             ->with(
-                'Impossible to update the line item. The slug qti-interactions-delivery does not exist.',
+                'The line item was created',
                 [
-                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f'
+                    'slug' => $slug,
+                    'uri' => $uri,
                 ]
             );
 
@@ -228,9 +231,9 @@ class UpdateLineItemsServiceTest extends TestCase
             new UpdateLineItemDto(
                 '52a3de8dd0f270fd193f9f4bff05232f',
                 'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
-                'https://tao.instance/ontologies/tao.rdf#i5fb5',
+                $uri,
                 (new DateTimeImmutable())->setTimestamp(1565602371),
-                'qti-interactions-delivery'
+                $slug
             )
         );
 
@@ -239,6 +242,6 @@ class UpdateLineItemsServiceTest extends TestCase
         /** @var UpdateLineItemDto $updateLineItemDto */
         $updateLineItemDto = $result->getIterator()[0];
 
-        self::assertSame('error', $updateLineItemDto->getStatus());
+        self::assertSame('accepted', $updateLineItemDto->getStatus());
     }
 }

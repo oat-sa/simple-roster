@@ -79,6 +79,32 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
         $service->onLineItemUpdated(new LineItemUpdated(['test1']));
     }
 
+    public function testOnLineItemUpdatedIgnoreOnEmptyList(): void
+    {
+        $logerMock = self::createMock(LoggerInterface::class);
+        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $createServiceMock->expects(self::never())->method('generate');
+
+        $generateGroupIdsServiceMock = self::createMock(GenerateGroupIdsService::class);
+        $ltiInstanceRepositoryMock = self::createMock(LtiInstanceRepository::class);
+        $lineItemRepositoryMock = self::createMock(LineItemRepository::class);
+        $userFolderSyncMock = self::createMock(FolderSyncService::class);
+
+        $service = new GeneratedUserIngestControllerSubscriber(
+            $logerMock,
+            $createServiceMock,
+            $generateGroupIdsServiceMock,
+            $ltiInstanceRepositoryMock,
+            $lineItemRepositoryMock,
+            $userFolderSyncMock,
+            new CreateUserServiceContext(['test1'], ['tao1'], 10),
+            'test',
+            true
+        );
+
+        $service->onLineItemUpdated(new LineItemUpdated([]));
+    }
+
     public function testOnLineItemUpdatedBasicPipeline(): void
     {
         $logerMock = self::createMock(LoggerInterface::class);
