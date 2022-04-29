@@ -35,6 +35,9 @@ class LtiInstanceSerializer
         $this->responder = $responder;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function json($data, int $code): JsonResponse
     {
         return $this->responder->createJsonResponse($data, $code);

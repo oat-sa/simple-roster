@@ -94,7 +94,7 @@ class CsvFilesystemStorage implements StorageInterface
         $res = [];
         foreach ($assignments as $assignment) {
             /** @var Assignment $assignment */
-            $res[] = [$assignment->getUser()->getUsername(), $assignment->getLineItem()->getSlug()];
+            $res[] = [(string)$assignment->getUser()->getUsername(), $assignment->getLineItem()->getSlug()];
         }
 
         return $res;

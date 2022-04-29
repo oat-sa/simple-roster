@@ -36,6 +36,9 @@ use OAT\SimpleRoster\Model\UsernameCollection;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\ResultSet\UsernameResultSet;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class UserRepository extends AbstractRepository
 {
     private UserCacheIdGenerator $userCacheIdGenerator;

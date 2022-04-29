@@ -182,7 +182,10 @@ services:
     OAT\SimpleRoster\EventSubscriber\GeneratedUserIngestControllerSubscriber:
         arguments:
             $enabled: '%app.feature.generate_users_on_lineitem_updated.enabled%'
-            $group: '%app.feature.generate_users.group%'
+            $groupPrefix: '%app.feature.generate_users.group%'
+
+    OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface:
+        class: OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorDatabaseStorage
 
     OAT\SimpleRoster\Storage\UserGenerator\StorageInterface:
         class: OAT\SimpleRoster\Storage\UserGenerator\CsvFilesystemStorage

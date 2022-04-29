@@ -63,6 +63,7 @@ class LtiCacheInvalidatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @psalm-suppress InvalidCatch */
         try {
             $cache->deleteItem(LtiInstanceRepository::CACHE_ID_ALL_LTI_INSTANCES);
         } catch (InvalidArgumentException $e) {

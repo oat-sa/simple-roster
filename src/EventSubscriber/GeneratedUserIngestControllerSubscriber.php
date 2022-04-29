@@ -31,13 +31,16 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
 use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
-use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterface
 {
     public const NAME = 'line-item.updated';
+
+    private bool $enabled;
+
+    private string $groupPrefix;
 
     private LoggerInterface $logger;
     private BulkCreateUsersService $createUsersService;
@@ -46,8 +49,6 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private LineItemRepository $lineItemRepository;
     private FolderSyncService $userFolderSync;
 
-    private bool $enabled;
-    private string $group;
     private CreateUserServiceContext $createUserServiceContext;
 
     public function __construct(
@@ -58,8 +59,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         LineItemRepository $lineItemRepository,
         FolderSyncService $userFolderSync,
         CreateUserServiceContext $createUserServiceContext,
-        bool $enabled,
-        string $group
+        string $groupPrefix,
+        bool $enabled
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
@@ -68,8 +69,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         $this->ltiInstanceRepository = $ltiInstanceRepository;
         $this->lineItemRepository = $lineItemRepository;
         $this->userFolderSync = $userFolderSync;
-        $this->group = $group;
         $this->createUserServiceContext = $createUserServiceContext;
+        $this->groupPrefix = $groupPrefix;
     }
 
     public static function getSubscribedEvents(): array
@@ -86,21 +87,17 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         }
 
         $this->logger->info('Got LineItemUpdate event', [
-            'line_items_slugs' => $event->getUpdateLineItemCollection()->map(fn($dto) => $dto->getSlug())
+            'line_items_slugs' => $event->getLineItemSlugs(),
         ]);
-
-        $acceptedSlugs = $event->getUpdateLineItemCollection()
-            ->filter(fn(UpdateLineItemDto $dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
-            ->map(fn(UpdateLineItemDto $dto) => $dto->getSlug());
 
         $ltiCollection = $this->ltiInstanceRepository->findAllAsCollection();
 
         $lineItems = $this->lineItemRepository->findLineItemsByCriteria(
-            (new FindLineItemCriteria())->addLineItemSlugs(...$acceptedSlugs)
+            (new FindLineItemCriteria())->addLineItemSlugs(...$event->getLineItemSlugs())
         )->jsonSerialize();
 
-        $groupResolver = empty($this->group) ? null : new ColumnGroupResolver(
-            $this->generateGroupIdsService->generateGroupIds($this->group, $ltiCollection),
+        $groupResolver = empty($this->groupPrefix) ? null : new ColumnGroupResolver(
+            $this->generateGroupIdsService->generateGroupIds($this->groupPrefix, $ltiCollection),
             $this->createUserServiceContext->getPrefixesCount()
         );
 

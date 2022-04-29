@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Events;
 
-use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -33,14 +32,15 @@ class LineItemUpdated extends Event
 {
     public const NAME = 'line-item.updated';
 
-    protected UpdateLineItemCollection $updateLineItemCollection;
+    /** @var string[] $updateLineItemCollection */
+    protected array $updateLineItemCollection;
 
-    public function __construct(UpdateLineItemCollection $updateLineItemCollection)
+    public function __construct(array $updateLineItemCollection)
     {
         $this->updateLineItemCollection = $updateLineItemCollection;
     }
 
-    public function getUpdateLineItemCollection(): UpdateLineItemCollection
+    public function getLineItemSlugs(): array
     {
         return $this->updateLineItemCollection;
     }

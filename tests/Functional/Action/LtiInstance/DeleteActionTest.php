@@ -64,7 +64,9 @@ class DeleteActionTest extends AbstractLtiInstanceTest
 
     public function testValidRequest(): void
     {
-        $index = current($this->data)->getId();
+        /** @var LtiInstance */
+        $firstLtiInstance = current($this->data);
+        $index = $firstLtiInstance->getId();
 
         $this->kernelBrowser->request(
             $this->method,
