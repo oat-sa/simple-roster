@@ -29,12 +29,14 @@ class CreateUserServiceContext
     private array $prefix;
     private array $prefixGroup;
     private int $batchSize;
+    private bool $recreateQAUsers;
 
-    public function __construct(array $prefix, array $prefixGroup, int $batchSize)
+    public function __construct(array $prefix, array $prefixGroup, int $batchSize, bool $recreateQAUsers)
     {
         $this->prefix = $prefix;
         $this->prefixGroup = $prefixGroup;
         $this->batchSize = $batchSize;
+        $this->recreateQAUsers = $recreateQAUsers;
     }
 
     /**
@@ -68,7 +70,8 @@ class CreateUserServiceContext
         return new self(
             $this->prefix,
             $this->prefixGroup,
-            $batchSize
+            $batchSize,
+            $this->recreateQAUsers
         );
     }
 
@@ -77,7 +80,18 @@ class CreateUserServiceContext
         return new self(
             $prefix,
             $this->prefixGroup,
-            $this->batchSize
+            $this->batchSize,
+            $this->recreateQAUsers
+        );
+    }
+
+    public function withRecreateUsers(bool $recreateUsers): self
+    {
+        return new self(
+            $this->prefix,
+            $this->prefixGroup,
+            $this->batchSize,
+            $recreateUsers
         );
     }
 
@@ -91,5 +105,13 @@ class CreateUserServiceContext
                 yield new PrefixesVO($prefix, $prefixGroup);
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRecreateQAUsers(): bool
+    {
+        return $this->recreateQAUsers;
     }
 }

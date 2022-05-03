@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
@@ -169,5 +170,28 @@ class LineItemRepository extends AbstractRepository
 
             return $this->findOneBy(['slug' => $lineItem->getSlug()]);
         }
+    }
+
+    /**
+
+     * @throws Exception
+     */
+    public function hasLineItemQAUsers(LineItem $lineItem): bool
+    {
+        $sql = <<<'SQL'
+SELECT u.id
+FROM assignments a
+JOIN users u ON u.id = a.user_id AND u.roles::jsonb ??& array['ROLE_QA']
+WHERE a.line_item_id = :lineItemId
+LIMIT 1
+SQL;
+
+        $result = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->prepare($sql)
+            ->executeQuery(['lineItemId' => $lineItem->getId()]);
+
+        return !empty($result->fetchAllAssociative());
     }
 }
