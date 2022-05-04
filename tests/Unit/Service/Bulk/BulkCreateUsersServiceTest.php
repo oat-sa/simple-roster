@@ -85,7 +85,7 @@ class BulkCreateUsersServiceTest extends TestCase
         $this->bulkCreateUsersService->generate($lineItems, 'path');
     }
 
-    public function testDoGenerateQAUsersWhen(): void
+    public function testDoNotGenerateQAUsersWhenNotNeeded(): void
     {
         $this->storage->expects(self::never())->method('persistUsers');
         $this->storage->expects(self::never())->method('persistAssignments');
