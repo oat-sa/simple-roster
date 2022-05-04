@@ -173,7 +173,8 @@ class LineItemRepository extends AbstractRepository
     }
 
     /**
-
+     * @codeCoverageIgnore
+     *
      * @throws Exception
      */
     public function hasLineItemQAUsers(LineItem $lineItem): bool
