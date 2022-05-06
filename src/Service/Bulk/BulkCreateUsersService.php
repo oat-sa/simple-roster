@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
@@ -118,15 +119,16 @@ class BulkCreateUsersService
         }
     }
 
+    /**
+     * @param LineItem[] $lineItems
+     *
+     * @throws Exception
+     */
     private function filterLineItems(array $lineItems): array
     {
-        $result = [];
-        foreach ($lineItems as $lineItem) {
-            if (!$this->lineItemRepository->hasLineItemQAUsers($lineItem)) {
-                $result[] = $lineItem;
-            }
-        }
-
-        return $result;
+        return array_filter(
+            $lineItems,
+            fn($lineItem) => !$this->lineItemRepository->hasLineItemQAUsers($lineItem)
+        );
     }
 }
