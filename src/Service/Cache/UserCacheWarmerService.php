@@ -38,6 +38,7 @@ class UserCacheWarmerService
     private LoggerInterface $messengerLogger;
     private LoggerInterface $cacheWarmupLogger;
     private int $messagePayloadSize;
+    /**@var positive-int $retryWaitInterval */
     private int $retryWaitInterval;
 
     public function __construct(
@@ -126,7 +127,9 @@ class UserCacheWarmerService
                 $this->messengerLogger->warning($logMessage);
                 $this->cacheWarmupLogger->warning($logMessage);
 
-                usleep($this->retryWaitInterval);
+                if ($this->retryWaitInterval > 0) {
+                    usleep($this->retryWaitInterval);
+                }
             }
         } while (!$isSuccessfulDispatch);
     }

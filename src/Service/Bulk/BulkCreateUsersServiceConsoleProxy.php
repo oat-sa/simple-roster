@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResultMessage;
 use OAT\SimpleRoster\Exception\LineItemNotFoundException;
@@ -54,7 +56,8 @@ class BulkCreateUsersServiceConsoleProxy
     }
 
     /**
-     * @throws LineItemNotFoundException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function createUsers(
         array $lineItemIds,
@@ -63,6 +66,8 @@ class BulkCreateUsersServiceConsoleProxy
         ?string $groupPrefix,
         string $date
     ): UserCreationResult {
+        $this->checkLineItemsExists($lineItemIds, $lineItemSlugs);
+
         $notExistLineItemsArray = [];
 
         $lineItems = [];
@@ -84,13 +89,45 @@ class BulkCreateUsersServiceConsoleProxy
                 : array_diff($lineItemSlugs, array_map(fn($item) => $item->getSlug(), $lineItems));
         }
 
+        $slugTotalUsers = array_fill_keys(
+            array_map(fn($item) => $item->getSlug(), $lineItems),
+            $createUserServiceContext->getPrefixesCount()
+        );
+
+        $groupResolver = $this->buildGroupResolver(
+            $groupPrefix,
+            $createUserServiceContext
+        );
+
+        $this->service->generate(
+            $lineItems,
+            $date,
+            $createUserServiceContext,
+            $groupResolver
+        );
+
+        $message = $this->userCreationMessage->normalizeMessage(
+            $slugTotalUsers,
+            $createUserServiceContext->getPrefixes()
+        );
+
+        return new UserCreationResult($message, $notExistLineItemsArray);
+    }
+
+    protected function checkLineItemsExists(array $lineItemIds, array $lineItemSlugs): void
+    {
         if (empty($lineItemIds) && empty($lineItemSlugs)) {
             $lineItems = $this->lineItemRepository->findAllAsCollection()->jsonSerialize();
             if (empty($lineItems)) {
                 throw new LineItemNotFoundException('No line items were found in database.');
             }
         }
+    }
 
+    protected function buildGroupResolver(
+        ?string $groupPrefix,
+        CreateUserServiceContext $createUserServiceContext
+    ): ?ColumnGroupResolver {
         $resolver = null;
         if ($groupPrefix) {
             $userGroupIds = $this->generateGroupIdsService->generateGroupIds(
@@ -103,23 +140,6 @@ class BulkCreateUsersServiceConsoleProxy
             $resolver = new ColumnGroupResolver($userGroupIds, $userGroupAssignCount);
         }
 
-        $slugTotalUsers = array_fill_keys(
-            array_map(fn($item) => $item->getSlug(), $lineItems),
-            $createUserServiceContext->getPrefixesCount()
-        );
-
-        $this->service->generate(
-            $lineItems,
-            $date,
-            $createUserServiceContext,
-            $resolver
-        );
-
-        $message = $this->userCreationMessage->normalizeMessage(
-            $slugTotalUsers,
-            $createUserServiceContext->getPrefixes()
-        );
-
-        return new UserCreationResult($message, $notExistLineItemsArray);
+        return $resolver;
     }
 }

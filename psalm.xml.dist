@@ -36,7 +36,15 @@
                 <file name="tests/Unit/Request/ParamConverter/CreateLineItemParamConverterTest.php"/>
             </errorLevel>
         </PossiblyNullReference>
+        <InvalidThrow>
+          <errorLevel type="suppress">
+            <referencedClass name="Psr\Cache\InvalidArgumentException"/>
+          </errorLevel>
+        </InvalidThrow>
     </issueHandlers>
+    <ignoreExceptions>
+        <class name="Psr\Cache\InvalidArgumentException" />
+    </ignoreExceptions>
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">

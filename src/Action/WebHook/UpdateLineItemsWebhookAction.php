@@ -26,6 +26,7 @@ use OAT\SimpleRoster\Events\LineItemUpdated;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\WebHook\Service\UpdateLineItemsService;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
+use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -49,7 +50,11 @@ class UpdateLineItemsWebhookAction
     {
         $updatedCollection = $this->service->handleUpdates($collection);
 
-        $this->eventDispatcher->dispatch(new LineItemUpdated($updatedCollection), LineItemUpdated::NAME);
+        $acceptedSlugs = $updatedCollection
+            ->filter(fn(UpdateLineItemDto $dto) => $dto->getStatus() === UpdateLineItemDto::STATUS_ACCEPTED)
+            ->map(fn(UpdateLineItemDto $dto) => $dto->getSlug());
+
+        $this->eventDispatcher->dispatch(new LineItemUpdated($acceptedSlugs), LineItemUpdated::NAME);
 
         return $this->responder->createJsonResponse($updatedCollection);
     }

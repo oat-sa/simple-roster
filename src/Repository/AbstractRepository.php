@@ -45,4 +45,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
     {
         $this->_em->flush();
     }
+
+    public function remove(object $object): void
+    {
+        $this->_em->remove($object);
+    }
 }

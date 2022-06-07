@@ -49,6 +49,13 @@ security:
             http_basic:
                 realm: 'Secured Webhooks'
 
+        lti-instance-api:
+            pattern: '^%app.route_prefix%/v1/lti-instance'
+            stateless: true
+            provider: basic_auth_provider
+            http_basic:
+                realm: 'Secured Webhooks'
+
         api:
             pattern: '^%app.route_prefix%/v1'
             stateless: true

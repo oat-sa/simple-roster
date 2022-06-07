@@ -36,20 +36,20 @@ class LineItemFindCriteriaFactory
     {
         $findLineItemCriteria = new FindLineItemCriteria();
 
-        if ($request->get('id') !== null) {
-            $findLineItemCriteria->addLineItemIds((int)$request->get('id'));
+        if ($request->query->get('id') !== null) {
+            $findLineItemCriteria->addLineItemIds((int)$request->query->get('id'));
         }
 
-        if ($request->get('slug') !== null) {
-            $findLineItemCriteria->addLineItemSlugs(...(array) $request->get('slug'));
+        if ($request->query->get('slug') !== null) {
+            $findLineItemCriteria->addLineItemSlugs(...(array)$request->query->get('slug'));
         }
 
-        if ($request->get('label') !== null) {
-            $findLineItemCriteria->addLineItemLabels(...(array) $request->get('label'));
+        if ($request->query->get('label') !== null) {
+            $findLineItemCriteria->addLineItemLabels(...(array)$request->query->get('label'));
         }
 
-        if ($request->get('uri') !== null) {
-            $findLineItemCriteria->addLineItemUris(...(array) $request->get('uri'));
+        if ($request->query->get('uri') !== null) {
+            $findLineItemCriteria->addLineItemUris(...(array)$request->query->get('uri'));
         }
 
         $this->applyDateFilter($request, $findLineItemCriteria, 'startAt', 'addLineItemStartAt');
@@ -64,12 +64,12 @@ class LineItemFindCriteriaFactory
         string $field,
         string $method
     ): void {
-        if ($request->get($field) !== null) {
-            $timestamp = (int) $request->get($field);
+        if ($request->query->get($field) !== null) {
+            $timestamp = (int) $request->query->get($field);
 
             if ($timestamp <= 0) {
                 throw new InvalidArgumentException(
-                    sprintf('Invalid timestamp for %s: %s', $field, $request->get($field))
+                    sprintf('Invalid timestamp for %s: %s', $field, $request->query->get($field))
                 );
             }
 

@@ -185,6 +185,7 @@ class BulkUserCreationCommand extends Command
             );
         } catch (Throwable $exception) {
             $this->symfonyStyle->error($exception->getMessage());
+            $this->symfonyStyle->error($exception->getTraceAsString());
 
             return self::FAILURE;
         }
