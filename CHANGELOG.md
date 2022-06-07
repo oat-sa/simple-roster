@@ -1,8 +1,12 @@
 # Changelog
 
 ## 2.6.0 - 2022-07-07
+
+### Added
 - Added LTI Instance CRUD API
-- Code style fixes to make pipeline pass
+
+### Fixed
+- Code style to make pipeline pass
 - Test coverage to 100%
 
 ## 2.5.3 - 2022-03-31
