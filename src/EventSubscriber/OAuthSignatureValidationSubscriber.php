@@ -134,7 +134,17 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
     private function parseParams(Request $request)
     {
-        $possibleBodyHash = (string)$request->query->get('oauth_body_hash');
+        $decoded = [
+            'oauth_body_hash' => $request->query->get('oauth_body_hash'),
+            'oauth_consumer_key' => $request->query->get('oauth_consumer_key'),
+            'oauth_nonce' => $request->query->get('oauth_nonce'),
+            'oauth_signature_method' => $request->query->get('oauth_signature_method'),
+            'oauth_timestamp' => $request->query->get('oauth_timestamp'),
+            'oauth_version' => $request->query->get('oauth_version'),
+            'oauth_signature' => $request->query->get('oauth_signature'),
+        ];
+
+        $possibleBodyHash = $decoded['oauth_body_hash'];
         if (empty($possibleBodyHash)) {
             $authHeader = $request->headers->get('authorization');
 
@@ -147,16 +157,6 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
                     unset($decoded['realm']);
                 }
             }
-        } else {
-            $decoded = [
-                'oauth_body_hash' => $request->query->get('oauth_body_hash'),
-                'oauth_consumer_key' => $request->query->get('oauth_consumer_key'),
-                'oauth_nonce' => $request->query->get('oauth_nonce'),
-                'oauth_signature_method' => $request->query->get('oauth_signature_method'),
-                'oauth_timestamp' => $request->query->get('oauth_timestamp'),
-                'oauth_version' => $request->query->get('oauth_version'),
-                'oauth_signature' => $request->query->get('oauth_signature'),
-            ];
         }
 
         $this->requestParams = $decoded;
