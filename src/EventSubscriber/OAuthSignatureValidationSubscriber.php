@@ -46,7 +46,8 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
     /** @var LoggerInterface */
     private LoggerInterface $logger;
 
-    private $requestParams = [];
+    /** @var array $requestParams */
+    private array $requestParams = [];
 
     public function __construct(
         LtiInstanceRepository $repository,
@@ -132,7 +133,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function parseParams(Request $request)
+    private function parseParams(Request $request): void
     {
         $decoded = [
             'oauth_body_hash' => $request->query->get('oauth_body_hash'),
@@ -146,7 +147,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $possibleBodyHash = $decoded['oauth_body_hash'];
         if (empty($possibleBodyHash)) {
-            $authHeader = $request->headers->get('authorization');
+            $authHeader = (string)$request->headers->get('authorization');
 
             $decoded = [];
             if (preg_match_all('/(' . ('oauth_') . '[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $authHeader, $matches)) {
