@@ -28,6 +28,7 @@ use OAT\SimpleRoster\Security\OAuth\OAuthSignatureValidatedActionInterface;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -44,6 +45,8 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
     /** @var LoggerInterface */
     private LoggerInterface $logger;
+
+    private $requestParams = [];
 
     public function __construct(
         LtiInstanceRepository $repository,
@@ -73,16 +76,11 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $context = new OAuthContext(
-            (string)$request->query->get('oauth_body_hash'),
-            (string)$request->query->get('oauth_consumer_key'),
-            (string)$request->query->get('oauth_nonce'),
-            (string)$request->query->get('oauth_signature_method'),
-            (string)$request->query->get('oauth_timestamp'),
-            (string)$request->query->get('oauth_version')
-        );
+        $this->parseParams($request);
 
-        $ltiKeyToValidate = (string)$request->query->get('oauth_consumer_key');
+        $context = $this->createContext($request);
+
+        $ltiKeyToValidate = $context->getConsumerKey();
         $possibleLtiInstances = $this->repository
             ->findAllAsCollection()
             ->filterByLtiKey($ltiKeyToValidate);
@@ -100,7 +98,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
             );
         }
 
-        $signatureToValidate = $request->query->get('oauth_signature');
+        $signatureToValidate = $this->requestParams['oauth_signature'];
         foreach ($possibleLtiInstances as $ltiInstance) {
             $signature = $this->signer->sign(
                 $context,
@@ -131,6 +129,48 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         throw new UnauthorizedHttpException(
             sprintf('realm="%s", oauth_error="access token invalid"', static::AUTH_REALM)
+        );
+    }
+
+    private function parseParams(Request $request)
+    {
+        $possibleBodyHash = (string)$request->query->get('oauth_body_hash');
+        if (empty($possibleBodyHash)) {
+            $authHeader = $request->headers->get('authorization');
+
+            $decoded = [];
+            if (preg_match_all('/('.('oauth_').'[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $authHeader, $matches)) {
+                foreach ($matches[1] as $key => $val) {
+                    $decoded[$val] = urldecode(empty($matches[3][$key]) ? $matches[4][$key] : $matches[3][$key]);
+                }
+                if (isset($decoded['realm'])) {
+                    unset($decoded['realm']);
+                }
+            }
+        } else {
+            $decoded = [
+                'oauth_body_hash' => $request->query->get('oauth_body_hash'),
+                'oauth_consumer_key' => $request->query->get('oauth_consumer_key'),
+                'oauth_nonce' => $request->query->get('oauth_nonce'),
+                'oauth_signature_method' => $request->query->get('oauth_signature_method'),
+                'oauth_timestamp' => $request->query->get('oauth_timestamp'),
+                'oauth_version' => $request->query->get('oauth_version'),
+                'oauth_signature' => $request->query->get('oauth_signature'),
+            ];
+        }
+
+        $this->requestParams = $decoded;
+    }
+
+    private function createContext(): OAuthContext
+    {
+        return new OAuthContext(
+            (string)$this->requestParams['oauth_body_hash'],
+            (string)$this->requestParams['oauth_consumer_key'],
+            (string)$this->requestParams['oauth_nonce'],
+            (string)$this->requestParams['oauth_signature_method'],
+            (string)$this->requestParams['oauth_timestamp'],
+            (string)$this->requestParams['oauth_version']
         );
     }
 }
