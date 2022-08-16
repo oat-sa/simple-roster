@@ -78,7 +78,7 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
 
         $this->parseParams($request);
 
-        $context = $this->createContext($request);
+        $context = $this->createContext();
 
         $ltiKeyToValidate = $context->getConsumerKey();
         $possibleLtiInstances = $this->repository
