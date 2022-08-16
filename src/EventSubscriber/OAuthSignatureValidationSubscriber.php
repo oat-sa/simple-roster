@@ -149,7 +149,6 @@ class OAuthSignatureValidationSubscriber implements EventSubscriberInterface
         if (empty($possibleBodyHash)) {
             $authHeader = (string)$request->headers->get('authorization');
 
-            $decoded = [];
             if (preg_match_all('/(' . ('oauth_') . '[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $authHeader, $matches)) {
                 foreach ($matches[1] as $key => $val) {
                     $decoded[$val] = urldecode(empty($matches[3][$key]) ? $matches[4][$key] : $matches[3][$key]);
