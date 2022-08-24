@@ -37,6 +37,7 @@ use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 class UserGeneratorDatabaseStorage implements UserGeneratorStateStorageInterface
 {
     private UserRepository $userRepository;
@@ -101,9 +102,8 @@ class UserGeneratorDatabaseStorage implements UserGeneratorStateStorageInterface
         $this->nativeAssignmentRepository->insertMultiple($this->assignmentDtoCollection);
     }
 
-    public function createUserDtoCollection(
-        object $user
-    ): void {
+    public function createUserDtoCollection(object $user): void
+    {
         $this->userDtoCollection->add(
             new UserDto(
                 $user->getName(),
