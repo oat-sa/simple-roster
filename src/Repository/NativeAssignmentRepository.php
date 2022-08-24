@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Carbon\Carbon;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
@@ -54,19 +55,20 @@ class NativeAssignmentRepository extends AbstractRepository
 
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "(%s, %s, %s, '%s', %s)",
+                "(%s, %s, %s, '%s', %s, '%s')",
                 $assignmentIndex,
                 $assignmentDto->getUserId(),
                 $assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
-                0
+                0,
+                Carbon::now()->toDateTime()->format('Y-m-d H:i:s')
             );
 
             $assignmentIndex++;
         }
 
         $query = sprintf(
-            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
+            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count, updated_at) VALUES %s',
             implode(',', $queryParts)
         );
 

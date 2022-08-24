@@ -88,11 +88,11 @@ class BulkCreateUsersService
                 );
 
                 $generatedUsers = $generator->makeBatch($createUserServiceContext->getBatchSize());
-                $users = $this->stateStorage->persistUsers($generatedUsers);
+                $users = $this->stateStorage->insertUsers($generatedUsers);
 
                 $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineItem);
 
-                $this->stateStorage->persistAssignment($assignments);
+                $this->stateStorage->insertAssignment($assignments);
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
                 $this->storage->persistAssignments(

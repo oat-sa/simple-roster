@@ -36,7 +36,7 @@ interface UserGeneratorStateStorageInterface
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function persistUsers(array $users): UserCollection;
+    public function insertUsers(array $users): UserCollection;
 
-    public function persistAssignment(AssignmentCollection $assignments): void;
+    public function insertAssignment(AssignmentCollection $assignments): void;
 }
