@@ -94,7 +94,7 @@ class UserGeneratorDatabaseStorage implements UserGeneratorStateStorageInterface
                     $assignment->getState(),
                     $assignment->getLineItem()->getId(),
                     $assignment->getUser()->getUsername(),
-                    $assignment->getUser()->getId(),
+                    $assignment->getUser()->getId()
                 )
             );
         }
