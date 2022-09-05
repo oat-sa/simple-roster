@@ -55,14 +55,14 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
 
     public function testOnLineItemUpdatedIgnoreOnDisabled(): void
     {
-        $logerMock = self::createMock(LoggerInterface::class);
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $logerMock = $this->createMock(LoggerInterface::class);
+        $createServiceMock = $this->createMock(BulkCreateUsersService::class);
         $createServiceMock->expects(self::never())->method('generate');
 
-        $generateGroupIdsServiceMock = self::createMock(GenerateGroupIdsService::class);
-        $ltiInstanceRepositoryMock = self::createMock(LtiInstanceRepository::class);
-        $lineItemRepositoryMock = self::createMock(LineItemRepository::class);
-        $userFolderSyncMock = self::createMock(FolderSyncService::class);
+        $generateGroupIdsServiceMock = $this->createMock(GenerateGroupIdsService::class);
+        $ltiInstanceRepositoryMock = $this->createMock(LtiInstanceRepository::class);
+        $lineItemRepositoryMock = $this->createMock(LineItemRepository::class);
+        $userFolderSyncMock = $this->createMock(FolderSyncService::class);
 
         $service = new GeneratedUserIngestControllerSubscriber(
             $logerMock,
@@ -71,7 +71,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $ltiInstanceRepositoryMock,
             $lineItemRepositoryMock,
             $userFolderSyncMock,
-            new CreateUserServiceContext(['test1'], ['tao1'], 10),
+            new CreateUserServiceContext(['test1'], ['tao1'], 10, true),
             'test',
             false
         );
@@ -81,20 +81,20 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
 
     public function testOnLineItemUpdatedBasicPipeline(): void
     {
-        $logerMock = self::createMock(LoggerInterface::class);
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $logerMock = $this->createMock(LoggerInterface::class);
+        $createServiceMock = $this->createMock(BulkCreateUsersService::class);
         $createServiceMock
             ->expects(self::once())
             ->method('generate')
             ->with($this->makeLineItemCollection($this->getDefaultLineItems())->jsonSerialize());
 
-        $generateGroupIdsServiceMock = self::createMock(GenerateGroupIdsService::class);
-        $ltiInstanceRepositoryMock = self::createMock(LtiInstanceRepository::class);
+        $generateGroupIdsServiceMock = $this->createMock(GenerateGroupIdsService::class);
+        $ltiInstanceRepositoryMock = $this->createMock(LtiInstanceRepository::class);
 
         $lineItemRepositoryMock = $this->makeLineItemRepositoryMock(
             $this->makeLineItemCollection($this->getDefaultLineItems())
         );
-        $userFolderSyncMock = self::createMock(FolderSyncService::class);
+        $userFolderSyncMock = $this->createMock(FolderSyncService::class);
 
         $service = new GeneratedUserIngestControllerSubscriber(
             $logerMock,
@@ -103,7 +103,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
             $ltiInstanceRepositoryMock,
             $lineItemRepositoryMock,
             $userFolderSyncMock,
-            new CreateUserServiceContext(['test1'], ['tao1'], 10),
+            new CreateUserServiceContext(['test1'], ['tao1'], 10, true),
             'test',
             true
         );
@@ -116,7 +116,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
      */
     protected function makeLineItemRepositoryMock(LineItemCollection $collection): MockObject
     {
-        $lineItemRepositoryMock = self::createMock(LineItemRepository::class);
+        $lineItemRepositoryMock = $this->createMock(LineItemRepository::class);
 
         $lineItemRepositoryMock->method('findAllAsCollection')->willReturn($collection);
         $lineItemRepositoryMock

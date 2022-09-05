@@ -46,10 +46,10 @@ class CsvFilesystemStorage implements StorageInterface
     /**
      * @inheritdoc
      */
-    public function persistUsers(string $key, array $data): void
+    public function persistUsers(string $path, array $data): void
     {
         $this->csvWriter->writeCsv(
-            $this->getPath($key),
+            $this->getPath($path),
             self::USER_CSV_HEAD,
             $this->castUsers($data)
         );
@@ -58,10 +58,10 @@ class CsvFilesystemStorage implements StorageInterface
     /**
      * @inheritdoc
      */
-    public function persistAssignments(string $key, AssignmentCollection $data): void
+    public function persistAssignments(string $path, AssignmentCollection $data): void
     {
         $this->csvWriter->writeCsv(
-            $this->getPath($key),
+            $this->getPath($path),
             self::ASSIGNMENT_CSV_HEAD,
             $this->castAssignments($data)
         );
