@@ -29,7 +29,6 @@ use OAT\SimpleRoster\Model\AssignmentCollection;
 interface AssignmentGeneratorStateStorageInterface
 {
     /**
-     *
      * @throws ORMException
      * @throws OptimisticLockException
      */

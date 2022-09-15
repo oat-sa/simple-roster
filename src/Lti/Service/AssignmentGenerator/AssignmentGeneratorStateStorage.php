@@ -39,7 +39,6 @@ class AssignmentGeneratorStateStorage implements AssignmentGeneratorStateStorage
     }
 
     /**
-     *
      * @throws OptimisticLockException
      */
     public function insertAssignment(AssignmentCollection $assignments): void
