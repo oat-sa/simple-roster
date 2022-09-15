@@ -29,6 +29,7 @@ use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
 use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
+use OAT\SimpleRoster\Lti\Service\AssignmentGenerator\AssignmentGeneratorStateStorageInterface;
 use OAT\SimpleRoster\Service\LineItem\LineItemAssignedIndexResolver;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
@@ -37,11 +38,13 @@ class BulkCreateUsersService
     private AssigmentFactoryInterface $assigmentFactory;
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
-    private UserGeneratorStateStorageInterface $stateStorage;
+    private UserGeneratorStateStorageInterface $userStateStorage;
+    private AssignmentGeneratorStateStorageInterface $assignmentStateStorage;
     private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
 
     public function __construct(
-        UserGeneratorStateStorageInterface $stateStorage,
+        UserGeneratorStateStorageInterface $userStateStorage,
+        AssignmentGeneratorStateStorageInterface $assignmentStateStorage,
         LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
@@ -50,7 +53,8 @@ class BulkCreateUsersService
         $this->assigmentFactory = $assigmentFactory;
         $this->storage = $storage;
         $this->createUserServiceContext = $createUserServiceContext;
-        $this->stateStorage = $stateStorage;
+        $this->userStateStorage = $userStateStorage;
+        $this->assignmentStateStorage = $assignmentStateStorage;
         $this->lineItemAssignedIndexResolver = $lineItemAssignedIndexResolver;
     }
 
@@ -88,11 +92,11 @@ class BulkCreateUsersService
                 );
 
                 $generatedUsers = $generator->makeBatch($createUserServiceContext->getBatchSize());
-                $users = $this->stateStorage->insertUsers($generatedUsers);
+                $users = $this->userStateStorage->insertUsers($generatedUsers);
 
                 $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineItem);
 
-                $this->stateStorage->insertAssignment($assignments);
+                $this->assignmentStateStorage->insertAssignment($assignments);
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
                 $this->storage->persistAssignments(

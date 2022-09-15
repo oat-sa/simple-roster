@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
-use Carbon\Carbon;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\ORMException;
@@ -52,6 +51,7 @@ class NativeAssignmentRepository extends AbstractRepository
     {
         $queryParts = [];
         $assignmentIndex = $this->getAvailableAssignmentStartIndex();
+        $assignmentUpdatedAt = date('Y-m-d H:i:s');
 
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
@@ -61,7 +61,7 @@ class NativeAssignmentRepository extends AbstractRepository
                 $assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
                 0,
-                Carbon::now()->toDateTime()->format('Y-m-d H:i:s')
+                $assignmentUpdatedAt
             );
 
             $assignmentIndex++;
