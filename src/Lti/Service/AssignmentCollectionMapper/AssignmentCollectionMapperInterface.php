@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Lti\Service\AssignmentDecorator;
+namespace OAT\SimpleRoster\Lti\Service\AssignmentCollectionMapper;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Model\AssignmentCollection;
 
-interface AssignmentCollectionDecoratorInterface
+interface AssignmentCollectionMapperInterface
 {
     /**
      * @throws ORMException

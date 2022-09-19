@@ -24,9 +24,8 @@ namespace OAT\SimpleRoster\Service\Bulk;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
-use OAT\SimpleRoster\Lti\Service\AssignmentDecorator\AssignmentCollectionDecoratorInterface;
+use OAT\SimpleRoster\Lti\Service\AssignmentCollectionMapper\AssignmentCollectionMapperInterface;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
@@ -41,13 +40,13 @@ class BulkCreateUsersService
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
     private UserGeneratorStateStorageInterface $userStateStorage;
-    private AssignmentCollectionDecoratorInterface $assignmentDecorator;
+    private AssignmentCollectionMapperInterface $assignmentMapper;
     private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
     private LineItemRepository $lineItemRepository;
 
     public function __construct(
         UserGeneratorStateStorageInterface $userStateStorage,
-        AssignmentCollectionDecoratorInterface $assignmentDecorator,
+        AssignmentCollectionMapperInterface $assignmentMapper,
         LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
@@ -58,7 +57,7 @@ class BulkCreateUsersService
         $this->storage = $storage;
         $this->createUserServiceContext = $createUserServiceContext;
         $this->userStateStorage = $userStateStorage;
-        $this->assignmentDecorator = $assignmentDecorator;
+        $this->assignmentMapper = $assignmentMapper;
         $this->lineItemAssignedIndexResolver = $lineItemAssignedIndexResolver;
         $this->lineItemRepository = $itemRepository;
     }
@@ -69,7 +68,6 @@ class BulkCreateUsersService
      * @param CreateUserServiceContext|null $createUserServiceContext
      * @param GroupResolverInterface|null $groupResolver
      *
-     * @throws ORMException
      * @throws OptimisticLockException
      */
     public function generate(
@@ -109,7 +107,7 @@ class BulkCreateUsersService
 
                 $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineItem);
 
-                $this->assignmentDecorator->insertAssignment($assignments);
+                $this->assignmentMapper->insertAssignment($assignments);
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
                 $this->storage->persistAssignments(

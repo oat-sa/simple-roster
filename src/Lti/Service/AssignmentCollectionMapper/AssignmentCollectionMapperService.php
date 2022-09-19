@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Lti\Service\AssignmentDecorator;
+namespace OAT\SimpleRoster\Lti\Service\AssignmentCollectionMapper;
 
 use Doctrine\ORM\OptimisticLockException;
 use OAT\SimpleRoster\DataTransferObject\AssignmentDto;
@@ -28,7 +28,7 @@ use OAT\SimpleRoster\DataTransferObject\AssignmentDtoCollection;
 use OAT\SimpleRoster\Model\AssignmentCollection;
 use OAT\SimpleRoster\Repository\NativeAssignmentRepository;
 
-class AssignmentCollectionDecoratorService implements AssignmentCollectionDecoratorInterface
+class AssignmentCollectionMapperService implements AssignmentCollectionMapperInterface
 {
     private NativeAssignmentRepository $nativeAssignmentRepository;
 
