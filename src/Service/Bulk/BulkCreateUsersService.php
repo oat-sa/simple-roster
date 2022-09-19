@@ -25,11 +25,11 @@ namespace OAT\SimpleRoster\Service\Bulk;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
+use OAT\SimpleRoster\Lti\Service\AssignmentDecorator\AssignmentCollectionDecoratorInterface;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
 use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
-use OAT\SimpleRoster\Lti\Service\AssignmentGenerator\AssignmentGeneratorStateStorageInterface;
 use OAT\SimpleRoster\Service\LineItem\LineItemAssignedIndexResolver;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
@@ -39,12 +39,12 @@ class BulkCreateUsersService
     private StorageInterface $storage;
     private CreateUserServiceContext $createUserServiceContext;
     private UserGeneratorStateStorageInterface $userStateStorage;
-    private AssignmentGeneratorStateStorageInterface $assignmentStateStorage;
+    private AssignmentCollectionDecoratorInterface $assignmentDecorator;
     private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
 
     public function __construct(
         UserGeneratorStateStorageInterface $userStateStorage,
-        AssignmentGeneratorStateStorageInterface $assignmentStateStorage,
+        AssignmentCollectionDecoratorInterface $assignmentDecorator,
         LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
@@ -54,7 +54,7 @@ class BulkCreateUsersService
         $this->storage = $storage;
         $this->createUserServiceContext = $createUserServiceContext;
         $this->userStateStorage = $userStateStorage;
-        $this->assignmentStateStorage = $assignmentStateStorage;
+        $this->assignmentDecorator = $assignmentDecorator;
         $this->lineItemAssignedIndexResolver = $lineItemAssignedIndexResolver;
     }
 
@@ -96,7 +96,7 @@ class BulkCreateUsersService
 
                 $assignments = $this->assigmentFactory->fromUsersWithLineItem($users, $lineItem);
 
-                $this->assignmentStateStorage->insertAssignment($assignments);
+                $this->assignmentDecorator->insertAssignment($assignments);
 
                 $this->storage->persistUsers(sprintf('%s/%s', $csvPath, $csvFilename), $generatedUsers);
                 $this->storage->persistAssignments(

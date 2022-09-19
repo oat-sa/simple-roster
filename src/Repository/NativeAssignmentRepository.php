@@ -51,8 +51,7 @@ class NativeAssignmentRepository extends AbstractRepository
     {
         $queryParts = [];
         $assignmentIndex = $this->getAvailableAssignmentStartIndex();
-        $assignmentUpdatedAt = date('Y-m-d H:i:s');
-
+        $assignmentUpdatedAt = date('c');
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
                 "(%s, %s, %s, '%s', %s, '%s')",
