@@ -31,14 +31,14 @@ class CsvFilesystemStorageTest extends TestCase
 
     public function testPersistUsers(): void
     {
-        $mock = $this->createMock(CsvWriter::class);
-        $mock->expects($this->once())
+        $csvWriter = $this->createMock(CsvWriter::class);
+        $csvWriter->expects($this->once())
             ->method('writeCsv')
             ->with($this->key(), $this->anything(), $this->makeUsersArray());
 
-        $obj = new CsvFilesystemStorage($mock, $this->dir, $this->path);
+        $csvFilesystemStorage = new CsvFilesystemStorage($csvWriter, $this->dir, $this->path);
 
-        $obj->persistUsers($this->key, $this->makeUsers());
+        $csvFilesystemStorage->persistUsers($this->key, $this->makeUsers());
     }
 
     protected function key(): string

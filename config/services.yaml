@@ -4,6 +4,15 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    env(RECREATE_QA_USERS): 'false'
+    env(GENERATED_USERS_GROUP): 'TestGroup'
+    env(GENERATED_USERS_BATCH_SIZE): '100'
+    env(GENERATED_USERS_PREFIXES): 'QA1,QA2'
+    env(GENERATED_USERS_GROUP_PREFIXES): 'OAT,QA'
+    env(FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED): 'false'
+    env(AWS_ENDPOINT): 'null'
+    env(AWS_PATH_STYLE): 'false'
+
     locale: 'en'
     app.api_key: '%env(resolve:APP_API_KEY)%'
     app.route_prefix: '%env(resolve:APP_ROUTE_PREFIX)%'
@@ -29,22 +38,16 @@ parameters:
     app.jwt.cache.host: '%env(resolve:REDIS_JWT_CACHE_HOST)%'
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
     app.generated_users_file_path: '%env(resolve:GENERATED_USERS_FILE_PATH)%'
-    app.feature.generate_users_on_lineitem_updated.enabled: '%env(default:app.feature.generate_users_on_lineitem_updated.enabled.default:bool:FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED)%'
-    app.feature.generate_users_on_lineitem_updated.enabled.default: false
-    app.feature.generate_users_group.prefixes: '%env(default:app.feature.generate_users.prefixes.default:csv:GENERATED_USERS_GROUP_PREFIXES)%'
-    app.feature.generate_users_group.prefixes.default: 'OAT,QA'
-    app.feature.generate_users.prefixes: '%env(default:app.feature.generate_users.prefixes.default:csv:GENERATED_USERS_PREFIXES)%'
-    app.feature.generate_users.prefixes.default: 'QA1,QA2'
-    app.feature.generate_users.group: '%env(default:app.feature.generate_users.group.default:string:GENERATED_USERS_GROUP)%'
-    app.feature.generate_users.group.default: 'TestGroup'
-    app.feature.generate_users.batch_size: '%env(default:app.feature.generate_users.batch_size.default:int:GENERATED_USERS_BATCH_SIZE)%'
-    app.feature.generate_users.batch_size.default: 100
+    app.feature.generate_users_on_lineitem_updated.enabled: '%env(bool:FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED)%'
+    app.feature.generate_users_group.prefixes: '%env(csv:GENERATED_USERS_GROUP_PREFIXES)%'
+    app.feature.generate_users.prefixes: '%env(csv:GENERATED_USERS_PREFIXES)%'
+    app.feature.generate_users.group: '%env(string:GENERATED_USERS_GROUP)%'
+    app.feature.generate_users.batch_size: '%env(int:GENERATED_USERS_BATCH_SIZE)%'
     app.aws.version: 'latest'
     app.aws.region: '%env(AWS_REGION)%'
-    app.aws.endpoint: '%env(default:app.aws.endpoint.default:string:AWS_ENDPOINT)%'
-    app.aws.endpoint.default: null
-    app.aws.path_style: '%env(default:app.aws.path_style.default:bool:AWS_PATH_STYLE)%'
-    app.aws.path_style.default: false
+    app.aws.endpoint: '%env(string:AWS_ENDPOINT)%'
+    app.aws.path_style: '%env(bool:AWS_PATH_STYLE)%'
+    app.recreate_users: '%env(bool:RECREATE_QA_USERS)%'
 
 services:
     # default configuration for services in *this* file
@@ -209,3 +212,4 @@ services:
             $prefix: '%app.feature.generate_users.prefixes%'
             $prefixGroup: '%app.feature.generate_users_group.prefixes%'
             $batchSize: '%app.feature.generate_users.batch_size%'
+            $recreateQAUsers: '%app.recreate_users%'

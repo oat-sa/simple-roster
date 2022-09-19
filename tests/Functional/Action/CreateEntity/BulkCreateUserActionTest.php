@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\CreateEntity;
 
+use Doctrine\Persistence\ManagerRegistry;
+use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
@@ -79,6 +82,22 @@ class BulkCreateUserActionTest extends WebTestCase
      */
     public function testItCreateBulkUserWithCorrectData(string $body, array $response): void
     {
+        $container = self::getContainer();
+        $lineItemRepository = $this->getMockBuilder(LineItemRepository::class)
+            ->onlyMethods(['hasLineItemQAUsers'])
+            ->setConstructorArgs([
+                $container->get(ManagerRegistry::class),
+                $container->get(LineItemCacheIdGenerator::class),
+                1000
+            ])
+            ->getMock();
+
+        $lineItemRepository
+            ->method('hasLineItemQAUsers')
+            ->willReturn(false);
+
+        $container->set('test.line_item_repository', $lineItemRepository);
+
         $this->kernelBrowser->request(
             Request::METHOD_POST,
             '/api/v1/bulk-create-users',

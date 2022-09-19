@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Bulk;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use OAT\SimpleRoster\Entity\LineItem;
@@ -30,6 +31,7 @@ use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
 use OAT\SimpleRoster\Lti\Service\GroupResolverInterface;
 use OAT\SimpleRoster\Lti\Service\StateDrivenUserGenerator;
 use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
+use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Service\LineItem\LineItemAssignedIndexResolver;
 use OAT\SimpleRoster\Storage\UserGenerator\StorageInterface;
 
@@ -41,6 +43,7 @@ class BulkCreateUsersService
     private UserGeneratorStateStorageInterface $userStateStorage;
     private AssignmentCollectionDecoratorInterface $assignmentDecorator;
     private LineItemAssignedIndexResolver $lineItemAssignedIndexResolver;
+    private LineItemRepository $lineItemRepository;
 
     public function __construct(
         UserGeneratorStateStorageInterface $userStateStorage,
@@ -48,7 +51,8 @@ class BulkCreateUsersService
         LineItemAssignedIndexResolver $lineItemAssignedIndexResolver,
         AssigmentFactoryInterface $assigmentFactory,
         StorageInterface $storage,
-        CreateUserServiceContext $createUserServiceContext
+        CreateUserServiceContext $createUserServiceContext,
+        LineItemRepository $itemRepository
     ) {
         $this->assigmentFactory = $assigmentFactory;
         $this->storage = $storage;
@@ -56,6 +60,7 @@ class BulkCreateUsersService
         $this->userStateStorage = $userStateStorage;
         $this->assignmentDecorator = $assignmentDecorator;
         $this->lineItemAssignedIndexResolver = $lineItemAssignedIndexResolver;
+        $this->lineItemRepository = $itemRepository;
     }
 
     /**
@@ -74,6 +79,14 @@ class BulkCreateUsersService
         ?GroupResolverInterface $groupResolver = null
     ): void {
         $createUserServiceContext = $createUserServiceContext ?? $this->createUserServiceContext;
+
+        if (!$createUserServiceContext->isRecreateQAUsers()) {
+            $filteredLineItems = $this->filterLineItems($lineItems);
+            if (empty($filteredLineItems)) {
+                return;
+            }
+        }
+
         $userNameLastIndexes = $this->lineItemAssignedIndexResolver->getLastUserAssignedToLineItems($lineItems);
 
         foreach ($createUserServiceContext->iteratePrefixes() as $prefixes) {
@@ -108,5 +121,18 @@ class BulkCreateUsersService
                 $this->storage->persistAssignments(sprintf('%s/assignments_aggregated.csv', $path), $assignments);
             }
         }
+    }
+
+    /**
+     * @param LineItem[] $lineItems
+     *
+     * @throws Exception
+     */
+    private function filterLineItems(array $lineItems): array
+    {
+        return array_filter(
+            $lineItems,
+            fn($lineItem) => !$this->lineItemRepository->hasLineItemQAUsers($lineItem)
+        );
     }
 }
