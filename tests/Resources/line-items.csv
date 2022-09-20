@@ -1,0 +1,3 @@
+uri,label,slug,startTimestamp,endTimestamp,maxAttempts
+https://localhost:8002/ontologies/tao.rdf#i5e907210766ba35588c15f61dee6785,Évaluation sixième - Français,21EVA6_FR,1546682400,1546713000,1
+https://localhost:8002/ontologies/tao.rdf#i5e907210766ba35588c15f61dee6784,Évaluation sixième - Mathématiques,21EVA6_MA,1546682400,1546713000,1
