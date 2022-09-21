@@ -43,7 +43,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 {
     public function testCreateUsers(): void
     {
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $createServiceMock = $this->createMock(BulkCreateUsersService::class);
         $createServiceMock->expects(self::once())->method('generate');
 
         $service = new BulkCreateUsersServiceConsoleProxy(
@@ -57,7 +57,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [1, 2],
             [],
-            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20, true),
             'testGroup',
             date('Y-m-d')
         );
@@ -65,9 +65,9 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 
     public function testLineItemNotFound(): void
     {
-        self::expectException(LineItemNotFoundException::class);
+        $this->expectException(LineItemNotFoundException::class);
 
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $createServiceMock = $this->createMock(BulkCreateUsersService::class);
 
         $service = new BulkCreateUsersServiceConsoleProxy(
             $this->makeLineItemRepositoryMock(),
@@ -80,7 +80,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [777],
             [],
-            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20, true),
             'testGroup',
             date('Y-m-d')
         );
@@ -88,9 +88,9 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 
     public function testThereIsNoLineItems(): void
     {
-        self::expectException(LineItemNotFoundException::class);
+        $this->expectException(LineItemNotFoundException::class);
 
-        $createServiceMock = self::createMock(BulkCreateUsersService::class);
+        $createServiceMock = $this->createMock(BulkCreateUsersService::class);
 
         $service = new BulkCreateUsersServiceConsoleProxy(
             $this->makeLineItemRepositoryMock(),
@@ -103,7 +103,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         $service->createUsers(
             [],
             [],
-            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20),
+            new CreateUserServiceContext(['QA', 'LQA'], ['TAO', 'OAT'], 20, true),
             'testGroup',
             date('Y-m-d')
         );
@@ -114,7 +114,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
      */
     protected function makeLtiInstanceRepositoryMock(): MockObject
     {
-        $mock = self::createMock(LtiInstanceRepository::class);
+        $mock = $this->createMock(LtiInstanceRepository::class);
         $mock->method('findAllAsCollection')->willReturn(new UniqueLtiInstanceCollection());
         return $mock;
     }
@@ -124,7 +124,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
      */
     protected function makeGenerateGroupIdsServiceMock(): MockObject
     {
-        $mock = self::createMock(GenerateGroupIdsService::class);
+        $mock = $this->createMock(GenerateGroupIdsService::class);
         $mock->method('generateGroupIds')->willReturn(['test_test1']);
         return $mock;
     }
@@ -135,7 +135,7 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
      */
     protected function makeLineItemRepositoryMock(array $items = []): MockObject
     {
-        $mock = self::createMock(LineItemRepository::class);
+        $mock = $this->createMock(LineItemRepository::class);
 
         $collection = new LineItemCollection();
         foreach ($items as $item) {

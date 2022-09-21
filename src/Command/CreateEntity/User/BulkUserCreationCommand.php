@@ -156,7 +156,8 @@ class BulkUserCreationCommand extends Command
 
             $context = $this->createUserServiceContext
                 ->withBatch($this->batchSize)
-                ->withPrefixes($this->userPrefix);
+                ->withPrefixes($this->userPrefix)
+                ->withRecreateUsers(true);
 
             $processDataResult = $this->bulkCreateUsersService->createUsers(
                 $this->lineItemIds,

@@ -31,6 +31,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface, EntityInterface, PasswordAuthenticatedUserInterface
 {
+    public const ROLE_QA = 'ROLE_QA';
+
     private ?int $id = null;
     private ?string $username = null;
     private string $password;
@@ -213,6 +215,15 @@ class User implements UserInterface, EntityInterface, PasswordAuthenticatedUserI
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
+    }
+
+    public function addRole(string $role): self
+    {
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
     }
 
     /**

@@ -12,7 +12,8 @@ class CreateUserServiceContextTest extends TestCase
         $context = new CreateUserServiceContext(
             ['test1', 'test2'],
             ['test3', 'test4'],
-            20
+            20,
+            true
         );
 
         self::assertEquals(['test1', 'test2'], $context->getPrefixes());
