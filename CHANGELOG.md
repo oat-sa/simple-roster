@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Make SQL request compatible with PostgresSQL 10
+
+## 2.7.0 - 2022-09-21
+
+### Added
+- Do not create new QA users if not required 
+
 ## 2.6.0 - 2022-07-07
 
 ### Added
