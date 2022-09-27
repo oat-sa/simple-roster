@@ -182,7 +182,7 @@ class LineItemRepository extends AbstractRepository
         $sql = <<<'SQL'
 SELECT u.id
 FROM assignments a
-JOIN users u ON u.id = a.user_id AND u.roles::jsonb ??& array['ROLE_QA']
+JOIN users u ON u.id = a.user_id AND u.roles::jsonb ?? 'ROLE_QA'
 WHERE a.line_item_id = :lineItemId
 LIMIT 1
 SQL;
