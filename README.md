@@ -61,20 +61,25 @@ Ensuite, faites un checkout sur la branche. Veuillez remplacer `＜branch-name�
 ```
 git checkout ＜branch-name＞
 ```
-L'application est fournie avec un environnement de développement conteneurisé intégré.	
-Veuillez mettre à jour votre fichier `.env.docker` dans le répertoire racine de l'application avec les paramètres de Composer tels que le chemin d'accès à vos informations d'identification GitHub `COMPOSER_HOME` et `COMPOSER_AUTH` .	
+L'application est fournie avec un environnement de développement conteneurisé intégré.
+
+Veuillez mettre à jour votre fichier `.env.docker` dans le répertoire racine de l'application avec les paramètres de Composer tels que le chemin d'accès à vos informations d'identification GitHub `COMPOSER_HOME` et `COMPOSER_AUTH` .
+
 Cela devrait ressembler à quelque chose comme ça :	
 ```
 COMPOSER_AUTH={"github-oauth":{"github.com":"your token here"}}
 COMPOSER_HOME=~/.composer`
 ```
 
-veuillez mettre à jour `CORS_ALLOW_ORIGIN` dans `.env.dockerenv.docker`  au cas où il serait appelé par un service externe.	
-L'environnement est préconfiguré avec le fichier `.env.docker` il ne vous reste donc plus qu'à configurer les conteneurs :	
+veuillez mettre à jour `CORS_ALLOW_ORIGIN` dans `.env.docker`  au cas où il serait appelé par un service externe.
+
+L'environnement est préconfiguré avec le fichier `.env.docker` il ne vous reste donc plus qu'à configurer les conteneurs :
+
 ```
 docker-compose up -d
 ```	
-L'application utilise des jetons JWT pour l'authentification de l'API. Vous devez générer votre paire de clés privée/publique pour que cela fonctionne.	
+L'application utilise des jetons JWT pour l'authentification de l'API. Vous devez générer votre paire de clés privée/publique pour que cela fonctionne.
+
 Pour générer la clé privée :	
 ```
 docker container exec -it simple-roster-phpfpm openssl genpkey -aes-256-cbc -algorithm RSA -pass pass:devpassphrase -out config/secrets/docker/jwt_private.pem
