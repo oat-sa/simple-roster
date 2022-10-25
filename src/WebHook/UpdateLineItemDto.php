@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\WebHook;
 
 use DateTimeInterface;
+use DateTimeImmutable;
 use JsonSerializable;
 
 class UpdateLineItemDto implements JsonSerializable
@@ -36,6 +37,10 @@ class UpdateLineItemDto implements JsonSerializable
     private string $id;
     private string $name;
     private ?string $slug;
+    private string $label;
+    private ?int $startAt;
+    private ?int $endAt;
+    private int $maxAttempts;
     private string $lineItemUri;
     private string $status;
     private DateTimeInterface $triggeredTime;
@@ -45,7 +50,11 @@ class UpdateLineItemDto implements JsonSerializable
         string $name,
         string $lineItemUri,
         DateTimeInterface $triggeredTime,
-        string $slug = null,
+        string $slug,
+        string $label,
+        ?int $startAt,
+        ?int $endAt,
+        int $maxExecution,
         string $status = self::STATUS_IGNORED
     ) {
         $this->id = $id;
@@ -54,6 +63,10 @@ class UpdateLineItemDto implements JsonSerializable
         $this->triggeredTime = $triggeredTime;
         $this->slug = $slug;
         $this->status = $status;
+        $this->label = $label;
+        $this->startAt = $startAt;
+        $this->endAt = $endAt;
+        $this->maxAttempts = $maxExecution;
     }
 
     public function getId(): string
@@ -66,7 +79,7 @@ class UpdateLineItemDto implements JsonSerializable
         return $this->name;
     }
 
-    public function getSlug(): ?string
+    public function getSlug(): string
     {
         return $this->slug;
     }
@@ -99,5 +112,33 @@ class UpdateLineItemDto implements JsonSerializable
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getStartAt(): ?DateTimeInterface
+    {
+        if ($this->startAt !== null) {
+            return (new DateTimeImmutable())->setTimestamp($this->startAt);
+        }
+
+        return $this->startAt;
+    }
+
+    public function getEndAt(): ?DateTimeInterface
+    {
+        if ($this->endAt !== null) {
+            return (new DateTimeImmutable())->setTimestamp($this->endAt);
+        }
+
+        return $this->endAt;
+    }
+
+    public function getMaxAttempts(): int
+    {
+        return $this->maxAttempts;
     }
 }
