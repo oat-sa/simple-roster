@@ -36,7 +36,7 @@ class UpdateLineItemDto implements JsonSerializable
 
     private string $id;
     private string $name;
-    private ?string $slug;
+    private string $slug;
     private string $label;
     private ?int $startAt;
     private ?int $endAt;
