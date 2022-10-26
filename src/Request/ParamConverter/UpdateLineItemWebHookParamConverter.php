@@ -58,7 +58,7 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
                 (string)$event['eventName'],
                 (string)$event['eventData']['remoteDeliveryId'],
                 (new DateTimeImmutable())->setTimestamp($event['triggeredTimestamp']),
-                $event['eventData']['alias'] ?? null,
+                $event['eventData']['alias'],
                 isset($event['eventData']['label']) ?
                     (string)$event['eventData']['label'] :
                     (string)$event['eventData']['alias'],

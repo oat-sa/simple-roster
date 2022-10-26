@@ -64,7 +64,7 @@ class UpdateLineItemsService
         $slugs = $knownUpdates
             ->map(
                 function (UpdateLineItemDto $dto): string {
-                    return (string)$dto->getSlug();
+                    return $dto->getSlug();
                 }
             );
 
