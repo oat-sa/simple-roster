@@ -4,7 +4,7 @@
     "description": "REST back-end service that handles authentication and eligibilities",
     "license": "GPL-2.0",
     "require": {
-        "php": "^7.4",
+        "php": "^8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
@@ -15,7 +15,7 @@
         "blackfire/php-sdk": "^1.23",
         "doctrine/doctrine-bundle": "^2.0",
         "doctrine/orm": "^2.7",
-        "lcobucci/jwt": "^3.3",
+        "lcobucci/jwt": "^4.2.1",
         "league/csv": "^9.0",
         "league/flysystem-aws-s3-v3": "1.0.27",
         "league/flysystem-bundle": "^1.5",
@@ -87,7 +87,13 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "infection/extension-installer": true,
+            "symfony/flex": true,
+            "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true
+        }
     },
     "extra": {
         "symfony": {
