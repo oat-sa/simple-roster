@@ -23,12 +23,10 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Security\Authenticator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Provider\UserProvider;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -44,8 +42,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
     private JwtTokenAuthenticator $subject;
     private JwtTokenGenerator $tokenGenerator;
     private UserProvider $userProvider;
-    private string $jwtPrivateKeyPath;
-    private string $jwtPassphrase;
+    private JwtConfiguration $jwtConfig;
 
     protected function setUp(): void
     {
@@ -59,8 +56,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
         $this->userProvider = self::getContainer()->get(UserProvider::class);
-        $this->jwtPrivateKeyPath = self::getContainer()->getParameter('app.jwt.private_key_path');
-        $this->jwtPassphrase = self::getContainer()->getParameter('app.jwt.passphrase');
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
     }
 
     public function testItSupportRequestOnlyWithAuthorizationBearerHeaderPresent(): void
@@ -132,13 +128,15 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
     public function testItThrowsAuthenticationExceptionIfAudClaimIsNotPresent(): void
     {
+        $jwtConfigInitialize = $this->jwtConfig->initialise();
+        $builder = $jwtConfigInitialize->builder();
+        $token = $builder->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
+
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $token = (new Builder())->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
-
-        $this->subject->getUser((string)$token, $this->userProvider);
+        $this->subject->getUser($token->toString(), $this->userProvider);
     }
 
     public function testItThrowsAuthenticationExceptionIfSubjectIsNotAccessToken(): void
@@ -147,11 +145,12 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         $this->expectExceptionMessage('Invalid token.');
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $token = (new Builder())
+        $jwtConfigInitialize = $this->jwtConfig->initialise();
+        $token = $jwtConfigInitialize->builder()
             ->permittedFor('testAudience')
-            ->getToken(new Sha256(), new Key($this->jwtPrivateKeyPath, $this->jwtPassphrase));
+            ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
 
-        $this->subject->getUser((string)$token, $this->userProvider);
+        $this->subject->getUser($token->toString(), $this->userProvider);
     }
 
     public function testItThrowsAuthenticationExceptionIfTokenIsExpired(): void
@@ -169,7 +168,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         Carbon::setTestNow('+2 hours');
 
-        $this->subject->getUser((string)$expiredToken, $this->userProvider);
+        $this->subject->getUser($expiredToken->toString(), $this->userProvider);
 
         Carbon::setTestNow();
     }
@@ -186,7 +185,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
-        $this->subject->getUser((string)$token, $this->userProvider);
+        $this->subject->getUser($token->toString(), $this->userProvider);
     }
 
     public function testItCanSuccessfullyReturnUser(): void
@@ -200,7 +199,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
-        $user = $this->subject->getUser((string)$token, $this->userProvider);
+        $user = $this->subject->getUser($token->toString(), $this->userProvider);
 
         self::assertSame('user1', $user->getUsername());
     }

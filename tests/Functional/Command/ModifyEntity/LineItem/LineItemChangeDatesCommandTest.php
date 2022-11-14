@@ -129,7 +129,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertSame(1, $commandTester->execute($parameters, ['capture_stderr_separately' => true]));
         self::assertStringContainsString(
-            '[ERROR] An unexpected error occurred: ErrorMessage',
+            '[ERROR] An unexpected error occurred:',
             $this->normalizeDisplay($commandTester->getDisplay())
         );
     }
