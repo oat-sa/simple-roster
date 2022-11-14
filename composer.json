@@ -87,13 +87,7 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true,
-        "allow-plugins": {
-            "infection/extension-installer": true,
-            "symfony/flex": true,
-            "ergebnis/composer-normalize": true,
-            "phpstan/extension-installer": true
-        }
+        "sort-packages": true
     },
     "extra": {
         "symfony": {
