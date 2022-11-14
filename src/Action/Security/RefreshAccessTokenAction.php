@@ -31,7 +31,7 @@ use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
@@ -76,10 +76,13 @@ class RefreshAccessTokenAction
         $this->accessTokenTtl = $jwtAccessTokenTtl;
     }
 
-    public function __invoke(Request $request, Token $refreshToken): Response
+    public function __invoke(Request $request, Token $refreshToken): JsonResponse
     {
         try {
-            $user = $this->userRepository->findByUsernameWithAssignments($refreshToken->getClaim('aud'));
+            assert($refreshToken instanceof Token\Plain);
+            $user = $this->userRepository->findByUsernameWithAssignments(
+                (string)$refreshToken->claims()->get('aud')[0]
+            );
         } catch (Throwable $exception) {
             throw new AccessDeniedHttpException('Invalid token.');
         }
@@ -89,7 +92,7 @@ class RefreshAccessTokenAction
 
         if (
             !$refreshTokenCacheItem->isHit()
-            || $refreshTokenCacheItem->get() !== (string)$refreshToken
+            || $refreshTokenCacheItem->get() !== $refreshToken->toString()
             || $refreshToken->isExpired(Carbon::now())
         ) {
             throw new AccessDeniedHttpException('Expired token.');
@@ -100,11 +103,11 @@ class RefreshAccessTokenAction
         $this->logger->info(
             sprintf(
                 "Access token has been refreshed for user '%s'. (token id = '%s')",
-                $accessToken->getClaim('aud'),
-                $accessToken->getClaim('jti'),
+                $accessToken->claims()->get('aud')[0],
+                $accessToken->claims()->get('jti'),
             )
         );
 
-        return $this->responder->createJsonResponse(['accessToken' => (string)$accessToken]);
+        return $this->responder->createJsonResponse(['accessToken' => $accessToken->toString()]);
     }
 }

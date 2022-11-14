@@ -22,29 +22,28 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Verifier;
 
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
-use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use Lcobucci\JWT\Validation\Validator;
 use Throwable;
 
 class JwtTokenVerifier
 {
     private Validator $tokenValidator;
-    private string $publicKeyPath;
+    private JwtConfiguration $jwtConfig;
 
-    public function __construct(Validator $tokenValidator, string $jwtPublicKeyPath)
-    {
+    public function __construct(
+        Validator $tokenValidator,
+        JwtConfiguration $jwtConfig
+    ) {
         $this->tokenValidator = $tokenValidator;
-        $this->publicKeyPath = $jwtPublicKeyPath;
+        $this->jwtConfig = $jwtConfig;
     }
 
     public function isValid(Token $token): bool
     {
         try {
-            $signedWithConstraint = new SignedWith(new Sha256(), new Key($this->publicKeyPath));
-
+            $signedWithConstraint = $this->jwtConfig->verifyJwtKey();
             return $this->tokenValidator->validate($token, $signedWithConstraint);
         } catch (Throwable $throwable) {
             return false;

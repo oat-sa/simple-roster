@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Generator;
 
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 
 class JwtTokenCacheIdGenerator
 {
-    public function generate(Token $token, string $subject = null): string
+    public function generate(Plain $token, string $subject = null): string
     {
         $subjectClaim = $subject ?? $token->claims()->get('sub');
 
