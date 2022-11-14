@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Action\HealthCheck;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\HealthCheck\HealthCheckService;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class HealthCheckAction
 {
@@ -37,7 +37,7 @@ class HealthCheckAction
         $this->serializerResponder = $serializerResponder;
     }
 
-    public function __invoke(): Response
+    public function __invoke(): JsonResponse
     {
         return $this->serializerResponder->createJsonResponse($this->healthCheckService->getHealthCheckResult());
     }

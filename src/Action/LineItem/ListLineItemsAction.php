@@ -28,7 +28,7 @@ use OAT\SimpleRoster\Request\Criteria\LineItemFindCriteriaFactory;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ListLineItemsAction
 {
@@ -46,7 +46,7 @@ class ListLineItemsAction
         $this->lineItemFindCriteriaFactory = $lineItemFindCriteriaFactory;
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): JsonResponse
     {
         $findLineItemCriteria = $this->lineItemFindCriteriaFactory->create($request);
 

@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\LineItem;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\LineItem\LineItemService;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CreateLineItemAction
 {
@@ -40,11 +40,11 @@ class CreateLineItemAction
         $this->responder = $responder;
     }
 
-    public function __invoke(LineItem $lineItem): Response
+    public function __invoke(LineItem $lineItem): JsonResponse
     {
         return $this->responder->createJsonResponse(
             $this->lineItemService->createOrUpdateLineItem($lineItem),
-            Response::HTTP_CREATED
+            JsonResponse::HTTP_CREATED
         );
     }
 }
