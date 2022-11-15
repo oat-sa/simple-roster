@@ -23,21 +23,20 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Authenticator;
 
 use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use ReflectionClass;
+use InvalidArgumentException;
 
+/**
+* This will suppress StaticAccess
+* warnings in this method
+*
+* @SuppressWarnings(PHPMD.StaticAccess)
+*/
 class JwtConfiguration
 {
-    /** @var Configuration object */
-    private object $jwtConfig;
-
-    /** @var InMemory object */
-    private object $jwtInMemoryFilePath;
-
     private string $privateKeyPath;
     private string $passphrase;
     private string $publicKeyPath;
@@ -50,32 +49,32 @@ class JwtConfiguration
         $this->privateKeyPath = $jwtPrivateKeyPath;
         $this->passphrase = $jwtPassphrase;
         $this->publicKeyPath = $jwtPublicKeyPath;
-
-        $this->jwtConfig  = (new ReflectionClass(Configuration::class))->newInstanceWithoutConstructor();
-        $this->jwtInMemoryFilePath = (new ReflectionClass(InMemory::class))->newInstanceWithoutConstructor();
     }
 
     public function initialise(): Configuration
     {
-        return $this->jwtConfig->forAsymmetricSigner(
+        return Configuration::forAsymmetricSigner(
             new Sha256(),
-            $this->jwtInMemoryFilePath->file($this->privateKeyPath, $this->passphrase),
-            $this->jwtInMemoryFilePath->file($this->publicKeyPath, $this->passphrase)
+            InMemory::file($this->privateKeyPath, $this->passphrase),
+            InMemory::file($this->publicKeyPath, $this->passphrase)
         );
     }
 
     public function parseJwtCredentials(string $credentials): Plain
     {
-        $parsedToken =  $this->jwtConfig->forUnsecuredSigner()
+        $parsedToken = Configuration::forUnsecuredSigner()
             ->parser()->parse($credentials);
-        assert($parsedToken instanceof Token\Plain);
 
-        return $parsedToken;
+        if ($parsedToken instanceof plain) {
+            return $parsedToken;
+        }
+
+        throw new InvalidArgumentException('Invalid token provided');
     }
 
     public function verifyJwtKey(): SignedWith
     {
-        $key = $this->jwtInMemoryFilePath->file($this->publicKeyPath);
+        $key = InMemory::file($this->publicKeyPath);
 
         return new SignedWith(new Sha256(), $key);
     }

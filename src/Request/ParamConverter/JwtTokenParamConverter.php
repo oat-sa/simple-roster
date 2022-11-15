@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -66,6 +66,6 @@ class JwtTokenParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration): bool
     {
-        return Token::class === $configuration->getClass();
+        return Plain::class === $configuration->getClass();
     }
 }

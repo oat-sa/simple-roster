@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Action\Security;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
@@ -76,10 +76,9 @@ class RefreshAccessTokenAction
         $this->accessTokenTtl = $jwtAccessTokenTtl;
     }
 
-    public function __invoke(Request $request, Token $refreshToken): JsonResponse
+    public function __invoke(Request $request, Plain $refreshToken): JsonResponse
     {
         try {
-            assert($refreshToken instanceof Token\Plain);
             $user = $this->userRepository->findByUsernameWithAssignments(
                 (string)$refreshToken->claims()->get('aud')[0]
             );
