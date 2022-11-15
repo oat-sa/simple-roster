@@ -65,7 +65,7 @@ class JwtConfiguration
         $parsedToken = Configuration::forUnsecuredSigner()
             ->parser()->parse($credentials);
 
-        if ($parsedToken instanceof plain) {
+        if ($parsedToken instanceof Plain) {
             return $parsedToken;
         }
 
