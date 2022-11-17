@@ -80,7 +80,7 @@ class RefreshAccessTokenAction
     {
         try {
             $user = $this->userRepository->findByUsernameWithAssignments(
-                (string)$refreshToken->claims()->get('aud')[0]
+                $refreshToken->claims()->get('aud')[0]
             );
         } catch (Throwable $exception) {
             throw new AccessDeniedHttpException('Invalid token.');
