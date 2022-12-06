@@ -26,9 +26,6 @@ use DateTimeInterface;
 use DateTimeImmutable;
 use JsonSerializable;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveParameterList)
- */
 class UpdateLineItemDto implements JsonSerializable
 {
     public const STATUS_ACCEPTED = 'accepted';
