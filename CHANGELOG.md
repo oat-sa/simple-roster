@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 - 2022-10-30
+### Changed
+- Raised minimum required PHP version from `7.4` to `8.1`.
+- Upgraded lcobucci/jwt library from `3.3` to `4.2.1`
 ## 2.6.0 - 2022-07-07
 
 ### Added
