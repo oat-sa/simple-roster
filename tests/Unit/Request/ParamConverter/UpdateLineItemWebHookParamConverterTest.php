@@ -80,8 +80,8 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
                                 "alias":"qti-interactions-delivery",
                                 "remoteDeliveryId":"https://tao.instance/ontologies/tao.rdf#kkkkzk",
                                 "label":"qti-interactions-delivery-label",
-                                "startAt":"1665561600",
-                                "endAt":"1666094400",
+                                "startAt":1665561600,
+                                "endAt":1666094400,
                                 "maxExecutions":9
                             }
                         }
