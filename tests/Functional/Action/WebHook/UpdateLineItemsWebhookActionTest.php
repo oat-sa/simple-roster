@@ -162,12 +162,13 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
 
         $this->assertHasLogRecord(
             [
-                'message' => 'Impossible to update the line item. The slug wrong-alias does not exist.',
+                'message' => 'The line item was created',
                 'context' => [
-                    'updateId' => '52a3de8dd0f270fd193f9f4bff05232f',
+                    'slug' => 'wrong-alias',
+                    'uri' => 'https://docker.localhost/ontologies/tao.rdf#FFF'
                 ],
             ],
-            Logger::ERROR
+            Logger::INFO
         );
 
         $this->assertHasLogRecord(
@@ -196,7 +197,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                 ],
                 [
                     'eventId' => '52a3de8dd0f270fd193f9f4bff05232f',
-                    'status' => 'error',
+                    'status' => 'accepted',
                 ],
                 [
                     'eventId' => 'lastDuplicatedEvent',
