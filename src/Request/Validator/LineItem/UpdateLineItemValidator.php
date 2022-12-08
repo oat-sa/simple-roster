@@ -74,7 +74,7 @@ class UpdateLineItemValidator extends AbstractRequestValidator
                                                             ),
                                                             "maxExecutions" => new Assert\Optional(
                                                                 [
-                                                                    new Assert\Type('string'),
+                                                                    new Assert\Type('int'),
                                                                 ],
                                                             ),
                                                         ],
