@@ -23,11 +23,13 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Security\Verifier;
 
 use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use ReflectionClass;
 
 class JwtTokenVerifierTest extends KernelTestCase
 {
@@ -59,5 +61,12 @@ class JwtTokenVerifierTest extends KernelTestCase
     public function testUnsuccessfulVerification(): void
     {
         self::assertFalse($this->subject->isValid($this->createMock(Token::class)));
+    }
+
+
+    public function testUnsuccessfulToken(): void
+    {
+        $token = (new ReflectionClass(Plain::class))->newInstanceWithoutConstructor();
+        self::assertFalse($this->subject->isValid($token));
     }
 }
