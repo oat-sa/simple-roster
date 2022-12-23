@@ -13,7 +13,7 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="8.5" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
     </php>
 
     <testsuites>
@@ -28,16 +28,16 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory>src</directory>
-            <exclude>
-                <file>src/Kernel.php</file>
-                <file>src/.preload.php</file>
-                <file>src/DataFixtures/AppFixtures.php</file>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <file>src/Kernel.php</file>
+            <file>src/.preload.php</file>
+            <file>src/DataFixtures/AppFixtures.php</file>
+        </exclude>
+    </coverage>
 
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
