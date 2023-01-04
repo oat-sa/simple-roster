@@ -6,9 +6,8 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN yes | pecl install igbinary redis apcu xdebug
-
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && yes | pecl install igbinary apcu xdebug redis \
     && docker-php-ext-install pdo \
     && docker-php-ext-install intl \
     && docker-php-ext-install mysqli \
