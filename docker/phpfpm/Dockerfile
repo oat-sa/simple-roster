@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.1-fpm
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
