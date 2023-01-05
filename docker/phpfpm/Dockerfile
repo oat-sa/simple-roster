@@ -4,10 +4,11 @@ ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
 RUN apk add sqlite-dev libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev icu-dev bash
+    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
-RUN docker-php-ext-install intl
+RUN apk add icu-dev 
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN docker-php-ext-configure intl && docker-php-ext-install intl
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
