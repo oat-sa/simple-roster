@@ -1,37 +1,30 @@
-FROM php:8.1-fpm
+FROM php:8.1-fpm-alpine
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
-RUN apt-get update && apt-get install -y \	
-    debian-archive-keyring libonig-dev libpng-dev libjpeg-dev libpq-dev libzip-dev libzstd-dev \	
-    zip unzip \	
-    sudo wget \	
-    sqlite3 libsqlite3-dev && rm -rf /var/lib/apt/lists/*
+RUN apk add sqlite-dev libsodium-dev \
+    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN apt-get update && \	
-    apt-get install -y libsodium-dev zlib1g-dev libicu-dev g++ && \	
-      rm -rf /var/lib/apt/lists/*
+RUN yes | pecl install igbinary apcu xdebug redis
 
-RUN yes | pecl install igbinary redis apcu xdebug
-
-RUN docker-php-ext-install pdo && \	
-    docker-php-ext-install pdo_mysql && \	
-    docker-php-ext-install intl && \	
-    docker-php-ext-install mysqli && \	
-    docker-php-ext-install pgsql && \	
-    docker-php-ext-install pdo_pgsql && \	
-    docker-php-ext-install pdo_sqlite && \	
-    docker-php-ext-install opcache && \	
-    docker-php-ext-install zip && \	
-    docker-php-ext-install calendar && \	
-    docker-php-ext-install sockets && \	
-    docker-php-ext-install pcntl && \	
-    docker-php-ext-install sodium && \	
-    docker-php-ext-enable apcu && \	
-    docker-php-ext-enable igbinary && \	
-    docker-php-ext-enable redis && \	
-    docker-php-ext-enable xdebug
+RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && docker-php-ext-install pdo \
+    && docker-php-ext-install intl \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install pdo_sqlite \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install zip \
+    && docker-php-ext-install calendar \
+    && docker-php-ext-install sockets \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-install sodium \
+    && docker-php-ext-enable apcu \
+    && docker-php-ext-enable igbinary \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-enable xdebug
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
@@ -55,5 +48,6 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && rm -rf /var/www/html \
     && chmod 0777 /tmp/ \
+    && apk del g++ \
     && rm -rf /tmp/* \
     && rm -rf /var/cache/apk/*
