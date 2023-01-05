@@ -4,9 +4,13 @@ ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
 RUN apk add sqlite-dev libsodium-dev \
-    	icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN yes | pecl install igbinary apcu xdebug redis
+RUN yes | pecl install igbinary apcu redis
+
+RUN apk add --no-cache $PHPIZE_DEPS \
+    && pecl install xdebug-2.5.0 \
+    && docker-php-ext-enable xdebug
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install pdo \
@@ -23,8 +27,7 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install sodium \
     && docker-php-ext-enable apcu \
     && docker-php-ext-enable igbinary \
-    && docker-php-ext-enable redis \
-    && docker-php-ext-enable xdebug
+    && docker-php-ext-enable redis
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
