@@ -13,10 +13,6 @@ RUN apt-get update && \
     apt-get install -y libsodium-dev zlib1g-dev libicu-dev g++ && \	
       rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd	
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql	
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
-
 RUN yes | pecl install igbinary redis apcu xdebug
 
 RUN docker-php-ext-install pdo && \	
@@ -59,6 +55,5 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && rm -rf /var/www/html \
     && chmod 0777 /tmp/ \
-    && apk del g++ \
     && rm -rf /tmp/* \
     && rm -rf /var/cache/apk/*
