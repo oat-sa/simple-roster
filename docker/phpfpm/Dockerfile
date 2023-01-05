@@ -3,13 +3,16 @@ FROM php:8.1-fpm-alpine
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libzip-dev libzstd-dev libonig-dev && rm -rf /var/lib/apt/lists/*
+RUN apk add sqlite-dev libsodium-dev \
+    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+
 RUN usermod -u 1000 www-data
 RUN usermod -G staff www-data
 RUN docker-php-ext-configure gd
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
+
 
 RUN yes | pecl install igbinary apcu redis
 
