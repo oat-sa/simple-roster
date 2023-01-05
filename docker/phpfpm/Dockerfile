@@ -3,8 +3,19 @@ FROM php:8.1-fpm-alpine
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
-RUN apk add sqlite-dev libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libpq-dev zip unzip sudo wget sqlite3 libsqlite3-dev libzip-dev libzstd-dev libonig-dev && rm -rf /var/lib/apt/lists/*
+RUN usermod -u 1000 www-data
+RUN usermod -G staff www-data
+RUN docker-php-ext-configure gd
+RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
+RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
+
+RUN yes | pecl install igbinary apcu redis
+
+RUN apk add --no-cache $PHPIZE_DEPS \
+    && pecl install xdebug-2.5.0 \
+    && docker-php-ext-enable xdebug
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install pdo \
@@ -18,7 +29,10 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install calendar \
     && docker-php-ext-install sockets \
     && docker-php-ext-install pcntl \
-    && docker-php-ext-install sodium
+    && docker-php-ext-install sodium \
+    && docker-php-ext-enable apcu \
+    && docker-php-ext-enable igbinary \
+    && docker-php-ext-enable redis
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
