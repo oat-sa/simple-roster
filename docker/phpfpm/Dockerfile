@@ -6,13 +6,7 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN docker-php-ext-configure gd
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
-
-
-RUN yes | pecl install igbinary apcu redis
+# RUN yes | pecl install igbinary apcu redis
 
 RUN apk add --no-cache $PHPIZE_DEPS \
     && pecl install xdebug-2.5.0 \
