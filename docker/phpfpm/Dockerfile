@@ -6,8 +6,7 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && docker-php-ext-enable redis
+RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
