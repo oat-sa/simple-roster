@@ -6,8 +6,6 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN usermod -u 1000 www-data
-RUN usermod -G staff www-data
 RUN docker-php-ext-configure gd
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
