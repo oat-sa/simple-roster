@@ -6,11 +6,6 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN apk --no-cache add pcre-dev ${PHPIZE_DEPS} \ 
-  && pecl install xdebug \
-  && docker-php-ext-enable xdebug \
-  && apk del pcre-dev ${PHPIZE_DEPS}
-
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install pdo \
     && docker-php-ext-install intl \
