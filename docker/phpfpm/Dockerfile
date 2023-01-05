@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.1-fpm-alpine3.17
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
@@ -7,7 +7,23 @@ RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && docker-php-ext-install pdo
+    && yes | pecl install igbinary apcu xdebug redis \
+    && docker-php-ext-install pdo \
+    && docker-php-ext-install intl \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install pdo_sqlite \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install zip \
+    && docker-php-ext-install calendar \
+    && docker-php-ext-install sockets \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-install sodium \
+    && docker-php-ext-enable apcu \
+    && docker-php-ext-enable igbinary \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-enable xdebug
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
