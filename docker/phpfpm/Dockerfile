@@ -6,8 +6,6 @@ ENV XDEBUG_MODE=off
 RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
-RUN yes | pecl install igbinary apcu redis
-
 RUN apk add --no-cache $PHPIZE_DEPS \
     && pecl install xdebug-2.5.0 \
     && docker-php-ext-enable xdebug
@@ -24,10 +22,7 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install calendar \
     && docker-php-ext-install sockets \
     && docker-php-ext-install pcntl \
-    && docker-php-ext-install sodium \
-    && docker-php-ext-enable apcu \
-    && docker-php-ext-enable igbinary \
-    && docker-php-ext-enable redis
+    && docker-php-ext-install sodium
 
 RUN { \
     echo 'opcache.memory_consumption=128'; \
