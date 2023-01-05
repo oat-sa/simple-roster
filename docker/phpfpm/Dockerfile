@@ -4,7 +4,7 @@ ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
 RUN apk add sqlite-dev libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+    	icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
 RUN yes | pecl install igbinary apcu xdebug redis
 
