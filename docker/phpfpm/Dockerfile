@@ -7,6 +7,7 @@ RUN apk add sqlite-dev libsodium-dev \
     	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && yes | pecl install igbinary apcu xdebug redis \
     && docker-php-ext-enable igbinary \
     && docker-php-ext-enable redis \
     && docker-php-ext-enable xdebug 
