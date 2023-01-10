@@ -64,7 +64,7 @@ class JwtTokenVerifierTest extends KernelTestCase
         self::assertFalse($this->subject->isValid($this->createMock(Token::class)));
     }
 
-    private function createToken(): Plain
+    private function createNotValidToken(): Plain
     {
         return new Plain(
             new DataSet(['alg' => 'none'], 'headers'),
@@ -75,7 +75,7 @@ class JwtTokenVerifierTest extends KernelTestCase
 
     public function testUnsuccessfulToken(): void
     {
-        $token = $this->createToken();
+        $token = $this->createNotValidToken();
         self::assertFalse($this->subject->isValid($token));
     }
 }
