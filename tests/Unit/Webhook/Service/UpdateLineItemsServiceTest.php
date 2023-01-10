@@ -159,7 +159,7 @@ class UpdateLineItemsServiceTest extends TestCase
                 $lineItem->setUri('https://tao.instance/ontologies/tao.rdf#i5fb5')
             );
 
-        $this->logger->expects(self::at(0))
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'The line item id 0 was updated',
