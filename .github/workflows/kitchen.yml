@@ -1,0 +1,65 @@
+name: Kitchen
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+
+permissions: read-all
+
+env:
+  BUILD_NPM_TOKEN: ${{ secrets.BUILD_NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.BUILD_NPM_TOKEN }}
+  CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+  GITHUB_EVENT: "pull_request"
+  GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+  GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+  GITHUB_REPOSITORY_FULL_NAME: ${{ github.event.repository.full_name }}
+  GITHUB_REFERENCE: ${{ github.event.pull_request.head.ref }}
+  GITHUB_BRANCH: ${{ github.event.pull_request.head.ref }}
+  GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+  GITHUB_PULL_REQUEST_HEAD_REFERENCE: ${{ github.event.pull_request.head.ref }}
+  GITHUB_PULL_REQUEST_BASE_REFERENCE: ${{ github.event.pull_request.base.ref }}
+  GITHUB_PULL_REQUEST_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+  GITHUB_PULL_REQUEST_MERGED: ${{ github.event.pull_request.merged }}
+
+jobs:
+  test:
+    name: TEST
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'verified') && !contains(github.event.pull_request.labels.*.name, 'tested') }}
+    runs-on: [self-hosted, linux, kitchen, builder]
+    steps:
+    - name: Checkout package repository
+      uses: actions/checkout@v3
+    - name: Checkout TAO Enterprise Cookbook repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        repository: oat-sa/tao-enterprise-cookbook
+        ref: develop
+        path: _build
+    - name: Get runtime date
+      run: date
+  qa:
+    name: QA
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'verified') && contains(github.event.pull_request.labels.*.name, 'tested') }}
+    runs-on: [self-hosted, linux, kitchen, builder]
+    steps:
+    - name: Checkout package repository
+      uses: actions/checkout@v3
+  release:
+    name: RELEASE
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'verified') && contains(github.event.pull_request.labels.*.name, 'tested') && !contains(github.event.pull_request.labels.*.name, 'released') }}
+    runs-on: [self-hosted, linux, kitchen, builder]
+    steps:
+    - name: Checkout package repository
+      uses: actions/checkout@v3
+    - name: Checkout TAO Enterprise Cookbook repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        repository: oat-sa/tao-enterprise-cookbook
+        ref: develop
+        path: _build
+    - name: Get runtime date
+      run: date
