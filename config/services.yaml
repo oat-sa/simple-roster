@@ -10,6 +10,7 @@ parameters:
     env(GENERATED_USERS_PREFIXES): 'QA1,QA2'
     env(GENERATED_USERS_GROUP_PREFIXES): 'OAT,QA'
     env(FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED): 'false'
+    env(FEATURE_GENERATED_USERS_S3_FOLDER_SYNC_ON_LINEITEM_UPDATED_ENABLED): 'false'
     env(AWS_ENDPOINT): 'null'
     env(AWS_PATH_STYLE): 'false'
 
@@ -39,6 +40,7 @@ parameters:
     app.jwt.cache.port: '%env(int:REDIS_JWT_CACHE_PORT)%'
     app.generated_users_file_path: '%env(resolve:GENERATED_USERS_FILE_PATH)%'
     app.feature.generate_users_on_lineitem_updated.enabled: '%env(bool:FEATURE_GENERATE_USERS_ON_LINEITEM_UPDATED_ENABLED)%'
+    app.feature.generated_users_s3_folder_sync_on_lineitem_updated.enabled: '%env(bool:FEATURE_GENERATED_USERS_S3_FOLDER_SYNC_ON_LINEITEM_UPDATED_ENABLED)%'
     app.feature.generate_users_group.prefixes: '%env(csv:GENERATED_USERS_GROUP_PREFIXES)%'
     app.feature.generate_users.prefixes: '%env(csv:GENERATED_USERS_PREFIXES)%'
     app.feature.generate_users.group: '%env(string:GENERATED_USERS_GROUP)%'
@@ -186,6 +188,7 @@ services:
         arguments:
             $enabled: '%app.feature.generate_users_on_lineitem_updated.enabled%'
             $groupPrefix: '%app.feature.generate_users.group%'
+            $folderSyncEnabled: '%app.feature.generated_users_s3_folder_sync_on_lineitem_updated.enabled%'
 
     OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface:
         class: OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorDatabaseStorage

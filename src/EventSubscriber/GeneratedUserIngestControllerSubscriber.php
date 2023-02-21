@@ -34,6 +34,9 @@ use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterface
 {
     public const NAME = 'line-item.updated';
@@ -41,6 +44,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
     private bool $enabled;
 
     private string $groupPrefix;
+
+    private bool $folderSyncEnabled;
 
     private LoggerInterface $logger;
     private BulkCreateUsersService $createUsersService;
@@ -60,10 +65,12 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         FolderSyncService $userFolderSync,
         CreateUserServiceContext $createUserServiceContext,
         string $groupPrefix,
-        bool $enabled
+        bool $enabled,
+        bool $folderSyncEnabled
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
+        $this->folderSyncEnabled = $folderSyncEnabled;
         $this->createUsersService = $createService;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
@@ -109,6 +116,10 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             $this->createUserServiceContext,
             $groupResolver
         );
+
+        if (!$this->folderSyncEnabled) {
+            return;
+        }
 
         $this->userFolderSync->sync($date);
     }
