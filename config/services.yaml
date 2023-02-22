@@ -188,7 +188,7 @@ services:
         arguments:
             $enabled: '%app.feature.generate_users_on_lineitem_updated.enabled%'
             $groupPrefix: '%app.feature.generate_users.group%'
-            $folderSyncEnabled: '%app.feature.generated_users_s3_folder_sync_on_lineitem_updated.enabled%'
+            $isFolderSyncEnabled: '%app.feature.generated_users_s3_folder_sync_on_lineitem_updated.enabled%'
 
     OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface:
         class: OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorDatabaseStorage

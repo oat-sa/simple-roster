@@ -45,7 +45,7 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
 
     private string $groupPrefix;
 
-    private bool $folderSyncEnabled;
+    private bool $isFolderSyncEnabled;
 
     private LoggerInterface $logger;
     private BulkCreateUsersService $createUsersService;
@@ -66,11 +66,11 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
         CreateUserServiceContext $createUserServiceContext,
         string $groupPrefix,
         bool $enabled,
-        bool $folderSyncEnabled
+        bool $isFolderSyncEnabled
     ) {
         $this->logger = $logger;
         $this->enabled = $enabled;
-        $this->folderSyncEnabled = $folderSyncEnabled;
+        $this->isFolderSyncEnabled = $isFolderSyncEnabled;
         $this->createUsersService = $createService;
         $this->generateGroupIdsService = $generateGroupIdsService;
         $this->ltiInstanceRepository = $ltiInstanceRepository;
@@ -117,10 +117,8 @@ class GeneratedUserIngestControllerSubscriber implements EventSubscriberInterfac
             $groupResolver
         );
 
-        if (!$this->folderSyncEnabled) {
-            return;
+        if ($this->isFolderSyncEnabled) {
+            $this->userFolderSync->sync($date);
         }
-
-        $this->userFolderSync->sync($date);
     }
 }
