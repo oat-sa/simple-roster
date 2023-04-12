@@ -1,10 +1,10 @@
-FROM php:8.1-fpm-alpine3.14
+FROM php:8.1-fpm
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
-RUN apk add sqlite-dev libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+RUN apt-get update && apt-get install -y libsqlite3-dev libsodium-dev \
+    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzip-dev libzstd-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && yes | pecl install igbinary apcu xdebug-3.1.6 redis \
@@ -47,6 +47,6 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && rm -rf /var/www/html \
     && chmod 0777 /tmp/ \
-    && apk del g++ \
+    && apt-get remove -y g++ \
     && rm -rf /tmp/* \
     && rm -rf /var/cache/apk/*
