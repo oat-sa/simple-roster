@@ -4,7 +4,6 @@ pipeline {
             filename 'Dockerfile'
             dir 'docker/phpfpm'
             label 'builder'
-            additionalBuildArgs '--no-cache'
         }
     }
     options {
