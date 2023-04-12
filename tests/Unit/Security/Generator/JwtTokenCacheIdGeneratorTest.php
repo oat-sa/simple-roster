@@ -22,29 +22,37 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Security\Generator;
 
-use Lcobucci\JWT\Token;
-use Lcobucci\JWT\Token\DataSet;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 
-class JwtTokenCacheIdGeneratorTest extends TestCase
+class JwtTokenCacheIdGeneratorTest extends KernelTestCase
 {
+    private JwtConfiguration $jwtConfig;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        static::bootKernel();
+
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
+    }
+
     public function testCacheIdGeneration(): void
     {
         $subject = new JwtTokenCacheIdGenerator();
+        $user    = ['name' => 'testing', 'email' => 'testing@abc.com'];
 
-        $claims = new DataSet(
-            [
-                'sub' => 'testSubject',
-                'aud' => ['testUsername'],
-            ],
-            'test'
-        );
-
-        $token = $this->createMock(Token::class);
-        $token
-            ->method('claims')
-            ->willReturn($claims);
+        $jwtConfigInitialize = $this->jwtConfig->initialise();
+        $token = $jwtConfigInitialize->builder()
+            ->identifiedBy('1')
+            ->permittedFor('testUsername')
+            ->issuedBy('http://api.abc.com')
+            ->relatedTo('testSubject')
+            ->withClaim('user', $user)
+            ->withHeader('jki', '1234')
+            ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
 
         self::assertSame('jwt.testSubject.testUsername', $subject->generate($token));
     }
@@ -52,18 +60,17 @@ class JwtTokenCacheIdGeneratorTest extends TestCase
     public function testIfSubjectClaimCanBeForced(): void
     {
         $subject = new JwtTokenCacheIdGenerator();
+        $user    = ['name' => 'testing', 'email' => 'testing@abc.com'];
 
-        $claims = new DataSet(['aud' => ['testUsername']], 'test');
+        $jwtConfigInitialize = $this->jwtConfig->initialise();
+        $token = $jwtConfigInitialize->builder()
+            ->identifiedBy('1')
+            ->permittedFor('testUsername')
+            ->issuedBy('http://api.abc.com')
+            ->withClaim('user', $user)
+            ->withHeader('jki', '1234')
+            ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
 
-        $token = $this->createMock(Token::class);
-        $token
-            ->expects(self::once())
-            ->method('claims')
-            ->willReturn($claims);
-
-        self::assertSame(
-            'jwt.expectedSubject.testUsername',
-            $subject->generate($token, 'expectedSubject')
-        );
+        self::assertSame('jwt.expectedSubject.testUsername', $subject->generate($token, 'expectedSubject'));
     }
 }

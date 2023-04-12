@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; under version 2
@@ -15,21 +15,22 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
 
-namespace OAT\SimpleRoster\Security\Generator;
+namespace OAT\SimpleRoster\Lti\Service\AssignmentCollectionMapper;
 
-use Lcobucci\JWT\Token\Plain;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use OAT\SimpleRoster\Model\AssignmentCollection;
 
-class JwtTokenCacheIdGenerator
+interface AssignmentCollectionMapperInterface
 {
-    public function generate(Plain $token, string $subject = null): string
-    {
-        $subjectClaim = $subject ?? $token->claims()->get('sub');
-
-        return sprintf('jwt.%s.%s', $subjectClaim, $token->claims()->get('aud')[0]);
-    }
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function insertAssignment(AssignmentCollection $assignments): void;
 }

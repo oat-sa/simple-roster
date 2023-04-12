@@ -24,7 +24,7 @@ namespace OAT\SimpleRoster\Action\Assignment;
 
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ListUserAssignmentsAction
@@ -36,7 +36,7 @@ class ListUserAssignmentsAction
         $this->responder = $responder;
     }
 
-    public function __invoke(UserInterface $user): Response
+    public function __invoke(UserInterface $user): JsonResponse
     {
         /** @var User $user */
         return $this->responder->createJsonResponse(['assignments' => $user->getAssignments()]);

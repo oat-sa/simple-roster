@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Handler;
 
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -62,20 +62,19 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         $this->refreshTokenTtl = $jwtRefreshTokenTtl;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): JsonResponse
     {
         /** @var UserInterface $user */
         $user = $token->getUser();
         $accessToken = $this->jwtTokenGenerator->create($user, $request, 'accessToken', $this->accessTokenTtl);
         $refreshToken = $this->jwtTokenGenerator->create($user, $request, 'refreshToken', $this->refreshTokenTtl);
-
         $refreshTokenCacheId = $this->jwtTokenIdGenerator->generate($refreshToken);
 
         $cacheItem = $this->jwtTokenCache->getItem($refreshTokenCacheId);
 
         $cacheItem
-            ->set((string)$refreshToken)
-            ->expiresAfter($refreshToken->getClaim('exp'));
+            ->set($refreshToken->toString())
+            ->expiresAfter(($refreshToken->claims()->get('exp'))->getTimestamp());
 
         $this->jwtTokenCache->save($cacheItem);
 
@@ -88,19 +87,19 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         $this->logTokenGeneration($refreshToken, $refreshTokenLogContext);
 
         return $this->responder->createJsonResponse([
-            'accessToken' => (string)$accessToken,
-            'refreshToken' => (string)$refreshToken,
+            'accessToken' => $accessToken->toString(),
+            'refreshToken' => $refreshToken->toString()
         ]);
     }
 
-    private function logTokenGeneration(Token $token, array $logContext = []): void
+    private function logTokenGeneration(Plain $token, array $logContext = []): void
     {
         $this->logger->info(
             sprintf(
                 "Token '%s' with id '%s' has been generated for user '%s'.",
-                $token->getClaim('sub'),
-                $token->getClaim('jti'),
-                $token->getClaim('aud'),
+                $token->claims()->get('sub'),
+                $token->claims()->get('jti'),
+                $token->claims()->get('aud')[0],
             ),
             $logContext
         );

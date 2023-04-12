@@ -1,13 +1,13 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.1-fpm
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
-RUN apk add sqlite-dev libsodium-dev \
-    	zlib-dev icu-dev g++ libzip-dev postgresql-dev zstd-dev bash
+RUN apt-get update && apt-get install -y libsqlite3-dev libsodium-dev \
+    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzip-dev libzstd-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && yes | pecl install igbinary apcu xdebug redis \
+    && yes | pecl install igbinary apcu xdebug-3.1.6 redis \
     && docker-php-ext-install pdo \
     && docker-php-ext-install intl \
     && docker-php-ext-install mysqli \
@@ -38,15 +38,5 @@ RUN { \
 
 RUN curl -ksS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
 
-RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/amd64/$version \
-    && mkdir -p /tmp/blackfire \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
-    && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://simple-roster-blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
-    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
-    && rm -rf /var/www/html \
-    && chmod 0777 /tmp/ \
-    && apk del g++ \
-    && rm -rf /tmp/* \
-    && rm -rf /var/cache/apk/*
+RUN BLACKFIRE_INSTALL_METHOD=raw bash -c "$(curl -L https://installer.blackfire.io/installer.sh)" \
+    && blackfire php:install

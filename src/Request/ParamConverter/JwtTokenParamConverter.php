@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,9 +35,14 @@ class JwtTokenParamConverter implements ParamConverterInterface
 {
     private JwtTokenVerifier $tokenVerifier;
 
-    public function __construct(JwtTokenVerifier $tokenVerifier)
-    {
+    private JwtConfiguration $jwtConfig;
+
+    public function __construct(
+        JwtTokenVerifier $tokenVerifier,
+        JwtConfiguration $jwtConfig
+    ) {
         $this->tokenVerifier = $tokenVerifier;
+        $this->jwtConfig = $jwtConfig;
     }
 
     public function apply(Request $request, ParamConverter $configuration): bool
@@ -48,7 +53,7 @@ class JwtTokenParamConverter implements ParamConverterInterface
         }
 
         try {
-            $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
+            $refreshToken = $this->jwtConfig->parseJwtCredentials($decodedRequestBody['refreshToken']);
             $this->tokenVerifier->isValid($refreshToken);
         } catch (Throwable $exception) {
             throw new BadRequestHttpException('Invalid token.');
@@ -61,6 +66,6 @@ class JwtTokenParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration): bool
     {
-        return Token::class === $configuration->getClass();
+        return Plain::class === $configuration->getClass();
     }
 }

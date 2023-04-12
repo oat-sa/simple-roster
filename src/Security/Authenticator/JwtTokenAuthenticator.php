@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Authenticator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,14 +44,18 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
 
     private SerializerResponder $responder;
 
+    private JwtConfiguration $jwtConfig;
+
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,
         JwtTokenVerifier $tokenVerifier,
-        SerializerResponder $responder
+        SerializerResponder $responder,
+        JwtConfiguration $jwtConfig
     ) {
         $this->tokenExtractor = $tokenExtractor;
         $this->tokenVerifier = $tokenVerifier;
         $this->responder = $responder;
+        $this->jwtConfig = $jwtConfig;
     }
 
     /**
@@ -77,7 +81,7 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
     {
         try {
-            $token = (new Parser())->parse($credentials);
+            $token = $this->jwtConfig->parseJwtCredentials($credentials);
         } catch (Throwable $exception) {
             throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
         }

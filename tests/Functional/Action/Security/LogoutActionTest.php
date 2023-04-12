@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use Lcobucci\JWT\Parser;
 use Monolog\Logger;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
@@ -42,6 +42,7 @@ class LogoutActionTest extends WebTestCase
     use LoggerTestingTrait;
 
     private KernelBrowser $kernelBrowser;
+    private JwtConfiguration $jwtConfig;
 
     protected function setUp(): void
     {
@@ -53,6 +54,8 @@ class LogoutActionTest extends WebTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler('security');
+
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
     }
 
     public function testItLogsOutProperlyTheUser(): void
@@ -79,7 +82,7 @@ class LogoutActionTest extends WebTestCase
         $user = $userRepository->findByUsernameWithAssignments('user1');
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
+        $refreshToken = $this->jwtConfig->parseJwtCredentials($authenticationResponse['refreshToken']);
 
         $cacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
 
@@ -110,7 +113,7 @@ class LogoutActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
+        $refreshToken = $this->jwtConfig->parseJwtCredentials($authenticationResponse['refreshToken']);
         $cacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
 
         self::ensureKernelShutdown();

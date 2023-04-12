@@ -98,7 +98,8 @@ class UpdateLineItemValidatorTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage(
-            'Invalid JSON request body received. Error: json_decode() expects parameter 1 to be string, null given.'
+            'Invalid JSON request body received. '
+            . 'Error: json_decode(): Argument #1 ($json) must be of type string, null given.'
         );
 
         $request = $this->createMock(Request::class);

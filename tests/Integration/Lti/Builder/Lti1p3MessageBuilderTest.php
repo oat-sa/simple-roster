@@ -22,17 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Lti\Builder;
 
-use Lcobucci\JWT\Parser;
 use OAT\Bundle\Lti1p3Bundle\Repository\RegistrationRepository;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use ReflectionClass;
 
 class Lti1p3MessageBuilderTest extends KernelTestCase
 {
@@ -40,6 +41,8 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
 
     /** @var Lti1p3MessageBuilder */
     private $subject;
+
+    private JwtConfiguration $jwtConfig;
 
     protected function setUp(): void
     {
@@ -50,6 +53,7 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         $this->setUpDatabase();
 
         $this->subject = self::getContainer()->get(Lti1p3MessageBuilder::class);
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
     }
 
     public function testItCanBuildLtiMessage(): void
@@ -80,14 +84,15 @@ class Lti1p3MessageBuilderTest extends KernelTestCase
         self::assertSame('1', $ltiParameters->get('lti_deployment_id'));
         self::assertSame('test', $ltiParameters->get('client_id'));
 
-        /** @var Parser $tokenParser */
-        $tokenParser = self::getContainer()->get('test.jwt_parser');
-        $token = $tokenParser->parse($ltiParameters->get('lti_message_hint'));
+        $token = $this->jwtConfig->parseJwtCredentials($ltiParameters->get('lti_message_hint'));
 
-        self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/launch_presentation'));
-        self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/context'));
-        self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti-bo/claim/basicoutcome'));
-        self::assertTrue($token->hasClaim('https://purl.imsglobal.org/spec/lti/claim/roles'));
-        self::assertSame([LtiRequest::LTI_ROLE], $token->getClaim('https://purl.imsglobal.org/spec/lti/claim/roles'));
+        self::assertTrue($token->claims()->has('https://purl.imsglobal.org/spec/lti/claim/launch_presentation'));
+        self::assertTrue($token->claims()->has('https://purl.imsglobal.org/spec/lti/claim/context'));
+        self::assertTrue($token->claims()->has('https://purl.imsglobal.org/spec/lti-bo/claim/basicoutcome'));
+        self::assertTrue($token->claims()->has('https://purl.imsglobal.org/spec/lti/claim/roles'));
+        self::assertSame(
+            [LtiRequest::LTI_ROLE],
+            $token->claims()->get('https://purl.imsglobal.org/spec/lti/claim/roles')
+        );
     }
 }

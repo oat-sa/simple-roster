@@ -24,10 +24,8 @@ namespace OAT\SimpleRoster\Security\Generator;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,42 +33,31 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class JwtTokenGenerator
 {
     private UuidFactoryInterface $uuidFactory;
-    private Builder $builder;
-    private string $privateKeyPath;
-    private string $passphrase;
+    private JwtConfiguration $jwtConfig;
 
     public function __construct(
         UuidFactoryInterface $uuidFactory,
-        Builder $builder,
-        string $jwtPrivateKeyPath,
-        string $jwtPassphrase
+        JwtConfiguration $jwtConfig
     ) {
         $this->uuidFactory = $uuidFactory;
-        $this->builder = $builder;
-        $this->privateKeyPath = $jwtPrivateKeyPath;
-        $this->passphrase = $jwtPassphrase;
+        $this->jwtConfig = $jwtConfig;
     }
 
-    public function create(UserInterface $user, Request $request, string $subjectClaim, int $ttl): Token
+    public function create(UserInterface $user, Request $request, string $subjectClaim, int $ttl): Plain
     {
         $currentTime = Carbon::now()->unix();
         $currentTimeAsDateTime = (new DateTimeImmutable())->setTimestamp($currentTime);
 
-        return $this->builder
-            // iss claim
+        $jwtConfigInitialize = $this->jwtConfig->initialise();
+
+        return  $jwtConfigInitialize->builder()
             ->issuedBy($request->getSchemeAndHttpHost())
-            // sub claim
-            ->relatedTo($subjectClaim)
-            // aud claim
             ->permittedFor($user->getUserIdentifier())
-            // jti claim
             ->identifiedBy($this->uuidFactory->uuid4()->toString())
-            // iat claim
+            ->relatedTo($subjectClaim)
             ->issuedAt($currentTimeAsDateTime)
-            // nbf claim
             ->canOnlyBeUsedAfter($currentTimeAsDateTime)
-            // exp claim
             ->expiresAt((new DateTimeImmutable())->setTimestamp($currentTime + $ttl))
-            ->getToken(new Sha256(), new Key($this->privateKeyPath, $this->passphrase));
+            ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
     }
 }

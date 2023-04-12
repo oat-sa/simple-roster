@@ -51,22 +51,23 @@ class NativeAssignmentRepository extends AbstractRepository
     {
         $queryParts = [];
         $assignmentIndex = $this->getAvailableAssignmentStartIndex();
-
+        $assignmentUpdatedAt = date('c');
         foreach ($assignments as $assignmentDto) {
             $queryParts[] = sprintf(
-                "(%s, %s, %s, '%s', %s)",
+                "(%s, %s, %s, '%s', %s, '%s')",
                 $assignmentIndex,
                 $assignmentDto->getUserId(),
                 $assignmentDto->getLineItemId(),
                 $assignmentDto->getState(),
-                0
+                0,
+                $assignmentUpdatedAt
             );
 
             $assignmentIndex++;
         }
 
         $query = sprintf(
-            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count) VALUES %s',
+            'INSERT INTO assignments (id, user_id, line_item_id, state, attempts_count, updated_at) VALUES %s',
             implode(',', $queryParts)
         );
 

@@ -64,7 +64,7 @@ class UpdateLineItemsService
         $slugs = $knownUpdates
             ->map(
                 function (UpdateLineItemDto $dto): string {
-                    return (string)$dto->getSlug();
+                    return $dto->getSlug();
                 }
             );
 
@@ -110,12 +110,26 @@ class UpdateLineItemsService
         /** @var UpdateLineItemDto $knownUpdate */
         foreach ($knownUpdates as $knownUpdate) {
             if ($knownUpdate->getStatus() === UpdateLineItemDto::STATUS_ERROR) {
-                $this->logger->error(
-                    sprintf('Impossible to update the line item. The slug %s does not exist.', $knownUpdate->getSlug()),
+                $lineItem = (new LineItem())
+                    ->setLabel($knownUpdate->getLabel())
+                    ->setSlug($knownUpdate->getSlug())
+                    ->setIsActive(true)
+                    ->setStartAt($knownUpdate->getStartAt())
+                    ->setEndAt($knownUpdate->getEndAt())
+                    ->setMaxAttempts($knownUpdate->getMaxAttempts())
+                    ->setUri($knownUpdate->getLineItemUri());
+
+                $this->entityManager->persist($lineItem);
+
+                $this->logger->info(
+                    'The line item was created',
                     [
-                        'updateId' => $knownUpdate->getId(),
+                        'slug' => $lineItem->getSlug(),
+                        'uri' => $lineItem->getUri(),
                     ]
                 );
+
+                $knownUpdate->setStatus(UpdateLineItemDto::STATUS_ACCEPTED);
             }
         }
 

@@ -25,7 +25,7 @@ namespace OAT\SimpleRoster\Action\Bulk;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersAssignmentsService;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BulkCreateUsersAssignmentsAction
 {
@@ -40,11 +40,11 @@ class BulkCreateUsersAssignmentsAction
         $this->responder = $responder;
     }
 
-    public function __invoke(BulkOperationCollection $operationCollection): Response
+    public function __invoke(BulkOperationCollection $operationCollection): JsonResponse
     {
         return $this->responder->createJsonResponse(
             $this->bulkCreateAssignmentService->process($operationCollection),
-            Response::HTTP_CREATED
+            JsonResponse::HTTP_CREATED
         );
     }
 }

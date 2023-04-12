@@ -23,11 +23,10 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
 use Carbon\Carbon;
-use JsonException;
-use Lcobucci\JWT\Parser;
 use Monolog\Logger;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -50,6 +49,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
     private JwtTokenGenerator $tokenGenerator;
     private CacheItemPoolInterface $tokenCache;
     private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
+    private JwtConfiguration $jwtConfig;
 
     protected function setUp(): void
     {
@@ -64,6 +64,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
         $this->tokenGenerator = self::getContainer()->get(JwtTokenGenerator::class);
         $this->tokenCache = self::getContainer()->get('app.jwt_cache.adapter');
         $this->tokenCacheIdGenerator = self::getContainer()->get(JwtTokenCacheIdGenerator::class);
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
     }
 
     public function testIfAccessTokenCanBeRefreshed(): void
@@ -91,14 +92,14 @@ class RefreshAccessTokenActionTest extends WebTestCase
         self::assertArrayHasKey('accessToken', $decodedResponse);
         self::assertNotSame($initialAccessToken, $decodedResponse['accessToken']);
 
-        $accessToken = (new Parser())->parse($decodedResponse['accessToken']);
+        $accessToken = $this->jwtConfig->parseJwtCredentials($decodedResponse['accessToken']);
 
         $this->assertHasLogRecord(
             [
                 'message' => sprintf(
                     "Access token has been refreshed for user '%s'. (token id = '%s')",
-                    $accessToken->getClaim('aud'),
-                    $accessToken->getClaim('jti')
+                    $accessToken->claims()->get('aud')[0],
+                    $accessToken->claims()->get('jti')
                 ),
             ],
             Logger::INFO
@@ -159,7 +160,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
             [],
             [],
             [],
-            json_encode(['refreshToken' => (string)$tokenForNonExistingUser], JSON_THROW_ON_ERROR)
+            json_encode(['refreshToken' => $tokenForNonExistingUser->toString()], JSON_THROW_ON_ERROR)
         );
 
         self::assertSame(Response::HTTP_FORBIDDEN, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -204,7 +205,7 @@ class RefreshAccessTokenActionTest extends WebTestCase
 
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
 
-        $refreshToken = (new Parser())->parse($authenticationResponse['refreshToken']);
+        $refreshToken = $this->jwtConfig->parseJwtCredentials($authenticationResponse['refreshToken']);
         $cacheId = $this->tokenCacheIdGenerator->generate($refreshToken);
         $this->tokenCache->deleteItem($cacheId);
 
@@ -223,9 +224,6 @@ class RefreshAccessTokenActionTest extends WebTestCase
     }
 
 
-    /**
-     * @throws JsonException
-     */
     private function callRefreshTokenEndpoint(string $refreshToken): void
     {
         $this->kernelBrowser->request(

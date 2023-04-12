@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use Lcobucci\JWT\Parser;
 use Monolog\Logger;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -38,6 +38,7 @@ class LoginActionTest extends WebTestCase
     use LoggerTestingTrait;
 
     private KernelBrowser $kernelBrowser;
+    private JwtConfiguration $jwtConfig;
 
     protected function setUp(): void
     {
@@ -49,6 +50,8 @@ class LoginActionTest extends WebTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         $this->setUpTestLogHandler('security');
+
+        $this->jwtConfig = self::getContainer()->get(JwtConfiguration::class);
     }
 
     public function testItFailsWithWrongCredentials(): void
@@ -96,23 +99,21 @@ class LoginActionTest extends WebTestCase
         self::assertArrayHasKey('accessToken', $decodedResponse);
         self::assertArrayHasKey('refreshToken', $decodedResponse);
 
-        $jwtParser = new Parser();
-
         try {
-            $accessToken = $jwtParser->parse($decodedResponse['accessToken']);
-            $refreshToken = $jwtParser->parse($decodedResponse['refreshToken']);
+            $accessToken = $this->jwtConfig->parseJwtCredentials($decodedResponse['accessToken']);
+            $refreshToken = $this->jwtConfig->parseJwtCredentials($decodedResponse['refreshToken']);
 
             $this->assertHasLogRecord([
                 'message' => sprintf(
                     "Token 'accessToken' with id '%s' has been generated for user 'user1'.",
-                    $accessToken->getClaim('jti')
+                    $accessToken->claims()->get('jti')
                 ),
             ], Logger::INFO);
 
             $this->assertHasLogRecord([
                 'message' => sprintf(
                     "Token 'refreshToken' with id '%s' has been generated for user 'user1'.",
-                    $refreshToken->getClaim('jti')
+                    $refreshToken->claims()->get('jti')
                 ),
                 'context' => [
                     'cacheId' => 'jwt.refreshToken.user1',

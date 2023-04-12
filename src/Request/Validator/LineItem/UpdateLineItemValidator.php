@@ -48,12 +48,35 @@ class UpdateLineItemValidator extends AbstractRequestValidator
                                                 'eventData' => new Assert\Collection(
                                                     [
                                                         'fields' => [
-                                                            "alias" => new Assert\Optional(
+                                                            "alias" => new Assert\Required(
+                                                                [
+                                                                    new Assert\Type('string'),
+                                                                    new Assert\NotNull(array(
+                                                                        'message' => 'Alias should be a valid string'
+                                                                    ))
+                                                                ],
+                                                            ),
+                                                            "remoteDeliveryId" => new Assert\Type('string'),
+                                                            "label" => new Assert\Optional(
                                                                 [
                                                                     new Assert\Type('string'),
                                                                 ],
                                                             ),
-                                                            "remoteDeliveryId" => new Assert\Type('string'),
+                                                            "startAt" => new Assert\Optional(
+                                                                [
+                                                                    new Assert\Type('int'),
+                                                                ],
+                                                            ),
+                                                            "endAt" => new Assert\Optional(
+                                                                [
+                                                                    new Assert\Type('int'),
+                                                                ],
+                                                            ),
+                                                            "maxExecutions" => new Assert\Optional(
+                                                                [
+                                                                    new Assert\Type('int'),
+                                                                ],
+                                                            ),
                                                         ],
                                                         'allowExtraFields' => true,
                                                     ],
