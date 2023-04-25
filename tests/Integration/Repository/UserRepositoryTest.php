@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Integration\Repository;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use InvalidArgumentException;
@@ -31,7 +30,6 @@ use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use PHPUnit\Framework\Error\Error;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -63,7 +61,7 @@ class UserRepositoryTest extends KernelTestCase
 
         $resultCache = $entityManager->getConfiguration()->getResultCache();
         if ($resultCache === null) {
-            throw new Error('`getResultCache` returned null. Cannot setUp', 0, __FILE__, __LINE__);
+            $this->expectErrorMessage('`getResultCache` returned null. Cannot setUp');
         }
         $this->doctrineResultCacheImplementation = $resultCache;
 
