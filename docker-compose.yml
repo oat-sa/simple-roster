@@ -16,6 +16,7 @@ services:
             - "traefik.frontend.rule=Host:simple-roster.docker.localhost"
             - "traefik.docker.network=oat-docker"
             - "traefik.port=80"
+            - "traefik.http.routers.simple-roster-nginx.rule=Host(`simple-roster.docker.localhost`)"
 
     simple-roster-phpfpm:
         container_name: simple-roster-phpfpm

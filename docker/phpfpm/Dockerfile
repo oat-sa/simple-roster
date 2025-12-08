@@ -4,10 +4,10 @@ ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
 RUN apt-get update && apt-get install -y libsqlite3-dev libsodium-dev \
-    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzip-dev libzstd-dev bash
+    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzip-dev libzstd-dev liblz4-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && yes | pecl install igbinary apcu xdebug-3.1.6 redis \
+    && yes | pecl install igbinary apcu xdebug-3.1.6 msgpack redis \
     && docker-php-ext-install pdo \
     && docker-php-ext-install intl \
     && docker-php-ext-install mysqli \
@@ -22,6 +22,7 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-install sodium \
     && docker-php-ext-enable apcu \
     && docker-php-ext-enable igbinary \
+    && docker-php-ext-enable msgpack \
     && docker-php-ext-enable redis \
     && docker-php-ext-enable xdebug
 
