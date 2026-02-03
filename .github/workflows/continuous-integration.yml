@@ -1,0 +1,62 @@
+# Make a repository release after merging to develop branch
+
+name: Continuous integration for Simple Roster
+# This workflow is triggered when a pull request is merged into the develop branch
+
+on:
+  pull_request:
+    branches: [ master, develop, feat/*, feature/*, fix/*, integration/* ]
+
+jobs:
+  setup:
+    name: Setup environment
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
+          tools: composer, phpcs
+          coverage: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  build:
+    name: Build/test environment
+    runs-on: ubuntu-22.04
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - run: git fetch --tags --unshallow
+
+      - name: Check commit
+        if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
+        uses: oat-sa/conventional-commit-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN }}"}}'
+        run: composer install --no-interaction --optimize-autoloader --prefer-dist --no-progress
+
+      - name: Setup database
+        run: ./bin/console doctrine:schema:update --force --env=test
+
+      - name: Run phpunit tests
+        run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml
