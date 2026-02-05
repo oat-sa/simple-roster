@@ -195,10 +195,11 @@ services:
 
     OAT\SimpleRoster\Storage\UserGenerator\StorageInterface:
         class: OAT\SimpleRoster\Storage\UserGenerator\CsvFilesystemStorage
+
     OAT\SimpleRoster\Service\AwsS3\FolderSyncService:
         arguments:
-            - '@oneup_flysystem.user_files_local_filesystem_filesystem'
-            - '@oneup_flysystem.user_files_s3_filesystem_filesystem'
+            $sourceFS: '@oneup_flysystem.user_files_local_filesystem_filesystem'
+            $destFS: '@oneup_flysystem.user_files_s3_filesystem_filesystem'
 
     app.s3_folder_sync:
         alias: OAT\SimpleRoster\Service\AwsS3\FolderSyncService
