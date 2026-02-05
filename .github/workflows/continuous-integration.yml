@@ -1,6 +1,6 @@
 # Make a repository release after merging to develop branch
 
-name: Continuous integration for Simple Roster
+name: Simple Roster - Continuous Integration
 # This workflow is triggered when a pull request is merged into the develop branch
 
 on:
@@ -53,7 +53,7 @@ jobs:
       - name: Install Composer dependencies
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN }}"}}'
-        run: composer install --no-interaction --optimize-autoloader --prefer-dist --no-progress
+        run: composer install -n --ignore-platform-reqs
 
       - name: Setup database
         run: ./bin/console doctrine:schema:update --force --env=test
