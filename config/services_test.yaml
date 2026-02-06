@@ -42,8 +42,8 @@ services:
     OAT\SimpleRoster\Service\AwsS3\FolderSyncService:
         public: true
         arguments:
-            $sourceFS: '@oneup_flysystem.filesystems.user_files_local_filesystem'
-            $destFS: '@oneup_flysystem.filesystems.user_files_s3_filesystem'
+            $sourceFS: '@oneup_flysystem.user_files_local_filesystem'
+            $destFS: '@oneup_flysystem.user_files_s3_filesystem'
 
     OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy:
         public: true
