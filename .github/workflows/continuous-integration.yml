@@ -1,12 +1,12 @@
 # Make a repository release after merging to develop branch
 
 name: Simple Roster - Continuous Integration
-# This workflow is triggered when a pull request is opened into the develop branch
+# This workflow is triggered on pull request open/reopen events across multiple branches
 
 on:
   pull_request:
     branches: [ master, develop, feat/*, feature/*, fix/*, integration/* ]
-    types: [opened, reopened]
+    types: [synchronize, opened, reopened]
 
 jobs:
   setup:
