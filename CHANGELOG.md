@@ -1,5 +1,9 @@
 # Changelog
 
+## Unrelease
+### Fixed
+- Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
+
 ## 3.0.0 - 2022-10-30
 ### Changed
 - Raised minimum required PHP version from `7.4` to `8.1`.
