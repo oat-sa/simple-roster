@@ -72,7 +72,6 @@
         "phpstan/phpstan-doctrine": "^1.3.12",
         "phpstan/phpstan-phpunit": "^1.1.3",
         "phpstan/phpstan-symfony": "^1.2.6",
-        "phpunit/phpunit": "^9.6",
         "psalm/plugin-phpunit": "^0.15.1",
         "psalm/plugin-symfony": "^2.1",
         "roave/security-advisories": "dev-latest",
