@@ -301,6 +301,18 @@
     "ondram/ci-detector": {
         "version": "3.5.1"
     },
+    "oneup/flysystem-bundle": {
+        "version": "3.7",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "e6c6440b279273a468e1f570b0fc1d4ff54ad69e"
+        },
+        "files": [
+            "config/packages/oneup_flysystem.yaml"
+        ]
+    },
     "openlss/lib-array2xml": {
         "version": "1.0.0"
     },
