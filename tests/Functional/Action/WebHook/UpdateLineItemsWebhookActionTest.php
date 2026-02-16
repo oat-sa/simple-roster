@@ -66,11 +66,6 @@ class UpdateLineItemsWebhookActionTest extends AppWebTestCase
         $this->setUpTestLogHandler();
     }
 
-    public function testNothing(): void
-    {
-        self::assertSame(true, true);
-    }
-
     public function testItReturns401IfNoCredentialsInformed(): void
     {
         $this->kernelBrowser->request(
