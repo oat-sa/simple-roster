@@ -22,17 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class LoginActionTest extends WebTestCase
+class LoginActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -108,7 +108,7 @@ class LoginActionTest extends WebTestCase
                     "Token 'accessToken' with id '%s' has been generated for user 'user1'.",
                     $accessToken->claims()->get('jti')
                 ),
-            ], Logger::INFO);
+            ], Level::Info);
 
             $this->assertHasLogRecord([
                 'message' => sprintf(
@@ -119,7 +119,7 @@ class LoginActionTest extends WebTestCase
                     'cacheId' => 'jwt.refreshToken.user1',
                     'cacheTtl' => 86400,
                 ]
-            ], Logger::INFO);
+            ], Level::Info);
         } catch (Throwable $throwable) {
             self::fail('JWT token parsing error: ' . $throwable->getMessage());
         }

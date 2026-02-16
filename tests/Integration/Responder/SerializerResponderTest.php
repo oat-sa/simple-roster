@@ -25,13 +25,13 @@ namespace OAT\SimpleRoster\Tests\Integration\Responder;
 use Exception;
 use OAT\SimpleRoster\Kernel;
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
-class SerializerResponderTest extends KernelTestCase
+class SerializerResponderTest extends AppKernelTestCase
 {
     private bool $debug = true;
 
@@ -214,12 +214,12 @@ class SerializerResponderTest extends KernelTestCase
     {
         return new class ($message, $statusCode) extends Exception implements HttpExceptionInterface
         {
-            public function getStatusCode()
+            public function getStatusCode(): int
             {
                 return $this->code;
             }
 
-            public function getHeaders()
+            public function getHeaders(): array
             {
                 return ['some' => 'exceptionHeader'];
             }

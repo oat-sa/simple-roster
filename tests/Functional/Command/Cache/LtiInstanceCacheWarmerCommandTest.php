@@ -24,19 +24,19 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Command\Cache\LtiInstanceCacheWarmerCommand;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
+class LtiInstanceCacheWarmerCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -135,6 +135,6 @@ class LtiInstanceCacheWarmerCommandTest extends KernelTestCase
                 'cacheKey' => 'lti_instances.all',
                 'cacheTtl' => '3,600',
             ],
-        ], Logger::INFO);
+        ], Level::Info);
     }
 }

@@ -35,14 +35,11 @@ use Psr\Log\LoggerInterface;
 
 class UpdateLineItemsServiceTest extends TestCase
 {
-    /** @var EntityManagerInterface|MockObject */
-    private $entityManager;
+    private EntityManagerInterface&MockObject $entityManager;
 
-    /** @var LineItemRepository|MockObject */
-    private $lineItemRepository;
+    private LineItemRepository&MockObject $lineItemRepository;
 
-    /** @var MockObject|LoggerInterface */
-    private $logger;
+    private LoggerInterface&MockObject $logger;
 
     private UpdateLineItemsService $subject;
 

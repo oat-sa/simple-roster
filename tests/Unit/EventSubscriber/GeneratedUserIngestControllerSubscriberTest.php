@@ -146,10 +146,7 @@ class GeneratedUserIngestControllerSubscriberTest extends TestCase
         $service->onLineItemUpdated(new LineItemUpdated(['test1']));
     }
 
-    /**
-     * @return MockObject|LineItemRepository
-     */
-    protected function makeLineItemRepositoryMock(LineItemCollection $collection): MockObject
+    protected function makeLineItemRepositoryMock(LineItemCollection $collection): MockObject&LineItemRepository
     {
         $lineItemRepositoryMock = $this->createMock(LineItemRepository::class);
 

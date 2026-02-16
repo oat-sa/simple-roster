@@ -45,9 +45,9 @@ trait Lti1p3SecurityTestingTrait
     private function createTestKeyChain(
         string $identifier = 'keyChainIdentifier',
         string $keySetName = 'keySetName',
-        string $publicKey = null,
-        string $privateKey = null,
-        string $privateKeyPassPhrase = null,
+        ?string $publicKey = null,
+        ?string $privateKey = null,
+        ?string $privateKeyPassPhrase = null,
         string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface {
         return (new KeyChainFactory())->create(
@@ -63,7 +63,7 @@ trait Lti1p3SecurityTestingTrait
     private function buildJwt(
         array $headers = [],
         array $claims = [],
-        KeyInterface $key = null
+        ?KeyInterface $key = null
     ): TokenInterface {
         $key = $key ?? $this->createTestKeyChain()->getPrivateKey();
         if ($key === null) {
@@ -107,12 +107,12 @@ trait Lti1p3SecurityTestingTrait
         return $accessToken->toString();
     }
 
-    private function createTestIdGenerator(string $generatedId = null): IdGeneratorInterface
+    private function createTestIdGenerator(?string $generatedId = null): IdGeneratorInterface
     {
         return new class ($generatedId) implements IdGeneratorInterface {
             private string $generatedId;
 
-            public function __construct(string $generatedId = null)
+            public function __construct(?string $generatedId = null)
             {
                 $this->generatedId = $generatedId ?? 'id';
             }

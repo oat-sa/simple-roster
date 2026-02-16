@@ -114,7 +114,9 @@ services:
         tags: ['controller.service_arguments']
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
-        tags: ['doctrine.event_subscriber']
+      tags:
+        - { name: doctrine.event_listener, event: onFlush }
+        - { name: doctrine.event_listener, event: postFlush }
 
     OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand:
         arguments:

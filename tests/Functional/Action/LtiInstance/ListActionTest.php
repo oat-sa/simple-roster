@@ -26,7 +26,7 @@ use OAT\SimpleRoster\Responder\LtiInstance\LtiInstanceModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListActionTest extends AbstractLtiInstanceTest
+class ListActionTest extends AbstractLtiInstanceTestCase
 {
     protected string $url = '/api/v1/lti-instances';
     protected string $method = Request::METHOD_GET;

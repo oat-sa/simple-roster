@@ -22,14 +22,15 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\LineItem;
 
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CreateLineItemActionTest extends WebTestCase
+class CreateLineItemActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -71,10 +72,8 @@ class CreateLineItemActionTest extends WebTestCase
         self::assertSame('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
-    /**
-     * @dataProvider provideValidBody
-     */
-    public function testItCreateLineItemWithCorrectData(string $body, array $response): void
+    #[DataProvider('provideValidBody')]
+    public function testItCreateLineItemWithCorrectData(string $request, array $response): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -82,7 +81,7 @@ class CreateLineItemActionTest extends WebTestCase
             [],
             [],
             [],
-            $body
+            $request
         );
 
         $this->assertArrayValues(
@@ -91,10 +90,8 @@ class CreateLineItemActionTest extends WebTestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidBody
-     */
-    public function testItShouldValidateInformedFields(string $body, string $message): void
+    #[DataProvider('provideInvalidBody')]
+    public function testItShouldValidateInformedFields(string $request, string $message): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -102,7 +99,7 @@ class CreateLineItemActionTest extends WebTestCase
             [],
             [],
             [],
-            $body
+            $request
         );
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
@@ -112,7 +109,7 @@ class CreateLineItemActionTest extends WebTestCase
         );
     }
 
-    public function provideValidBody(): array
+    public static function provideValidBody(): array
     {
         return [
             'withAllFields' => [
@@ -168,7 +165,7 @@ class CreateLineItemActionTest extends WebTestCase
         ];
     }
 
-    public function provideInvalidBody(): array
+    public static function provideInvalidBody(): array
     {
         return [
             'emptyBody' => [

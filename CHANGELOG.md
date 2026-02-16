@@ -3,6 +3,7 @@
 ## Unrelease
 ### Fixed
 - Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
+- Updated Symfony to 7.4.5 and PHP to 8.4, including all dependencies
 
 ## 3.0.0 - 2022-10-30
 ### Changed

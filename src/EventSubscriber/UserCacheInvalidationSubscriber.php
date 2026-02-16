@@ -22,10 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\EventSubscriber;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Events;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
@@ -40,36 +38,16 @@ use Throwable;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class UserCacheInvalidationSubscriber implements EventSubscriber
+class UserCacheInvalidationSubscriber
 {
-    /** @var UserCacheWarmerService */
-    private UserCacheWarmerService $userCacheWarmerService;
-
-    /** @var UserCacheIdGenerator */
-    private UserCacheIdGenerator $userCacheIdGenerator;
-
-    /** @var LoggerInterface */
-    private LoggerInterface $logger;
-
     /** @var User[] */
     private array $usersToInvalidate = [];
 
     public function __construct(
-        UserCacheWarmerService $userCacheWarmerService,
-        UserCacheIdGenerator $userCacheIdGenerator,
-        LoggerInterface $cacheWarmupLogger
+        private readonly UserCacheWarmerService $userCacheWarmerService,
+        private readonly UserCacheIdGenerator $userCacheIdGenerator,
+        private readonly LoggerInterface $logger
     ) {
-        $this->userCacheWarmerService = $userCacheWarmerService;
-        $this->userCacheIdGenerator = $userCacheIdGenerator;
-        $this->logger = $cacheWarmupLogger;
-    }
-
-    public function getSubscribedEvents()
-    {
-        return [
-            Events::onFlush,
-            Events::postFlush,
-        ];
     }
 
     /**
@@ -77,7 +55,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
-        $entityManager = $eventArgs->getEntityManager();
+        $entityManager = $eventArgs->getObjectManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
@@ -95,7 +73,7 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
      */
     public function postFlush(PostFlushEventArgs $eventArgs): void
     {
-        $entityManager = $eventArgs->getEntityManager();
+        $entityManager = $eventArgs->getObjectManager();
         $resultCache = $entityManager->getConfiguration()->getResultCache();
 
         if (!$resultCache instanceof CacheItemPoolInterface) {
@@ -107,6 +85,8 @@ class UserCacheInvalidationSubscriber implements EventSubscriber
         foreach ($this->usersToInvalidate as $user) {
             $this->clearUserCache($user, $resultCache);
         }
+
+        $this->usersToInvalidate = [];
     }
 
     /**

@@ -26,12 +26,16 @@ use OAT\SimpleRoster\DependencyInjection\Compiler\StoragePass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use OAT\SimpleRoster\Storage\Storage;
+use Symfony\Component\DependencyInjection\Reference;
 
 class StoragePassTest extends TestCase
 {
     public function testItRegistersStorageDefinitionInContainer(): void
     {
+        /** @var ContainerBuilder&MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
+
         $containerBuilder
             ->expects(self::once())
             ->method('findTaggedServiceIds')
@@ -42,21 +46,40 @@ class StoragePassTest extends TestCase
                 'testService3.storage' => ['testTag'],
             ]);
 
-        $assertDefinitionCallback = static function (Definition $definition): bool {
-            return
-                $definition->hasTag('app.storage') &&
-                count($definition->getArguments()) === 2;
-        };
+        $calls = [];
 
         $containerBuilder
             ->expects(self::exactly(3))
             ->method('setDefinition')
-            ->withConsecutive(
-                [self::equalTo('app.storage.testService1'), self::callback($assertDefinitionCallback)],
-                [self::equalTo('app.storage.testService2'), self::callback($assertDefinitionCallback)],
-                [self::equalTo('app.storage.testService3'), self::callback($assertDefinitionCallback)],
-            );
+            ->willReturnCallback(function (string $id, Definition $definition) use (&$calls) {
+                $calls[$id] = $definition;
+                return $definition;
+            });
 
         (new StoragePass())->process($containerBuilder);
+
+        self::assertCount(3, $calls);
+
+        foreach (
+            [
+                'app.storage.testService1' => ['storageId' => 'testService1', 'ref' => 'testService1.storage'],
+                'app.storage.testService2' => ['storageId' => 'testService2', 'ref' => 'testService2.storage'],
+                'app.storage.testService3' => ['storageId' => 'testService3', 'ref' => 'testService3.storage'],
+            ] as $expectedServiceId => $expected
+        ) {
+            self::assertArrayHasKey($expectedServiceId, $calls);
+
+            $definition = $calls[$expectedServiceId];
+            self::assertSame(Storage::class, $definition->getClass());
+            self::assertTrue($definition->hasTag('app.storage'));
+
+            $args = $definition->getArguments();
+            self::assertCount(2, $args);
+            self::assertSame($expected['storageId'], $args[0]);
+
+            self::assertInstanceOf(Reference::class, $args[1]);
+            self::assertSame($expected['ref'], (string)$args[1]);
+        }
     }
+
 }

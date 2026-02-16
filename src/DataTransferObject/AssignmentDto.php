@@ -29,7 +29,7 @@ class AssignmentDto
     private string $username;
     private ?int $userId;
 
-    public function __construct(string $state, int $lineItemId, string $username, int $userId = null)
+    public function __construct(string $state, int $lineItemId, string $username, ?int $userId = null)
     {
         $this->state = $state;
         $this->lineItemId = $lineItemId;

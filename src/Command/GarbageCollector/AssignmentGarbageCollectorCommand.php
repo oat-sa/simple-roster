@@ -90,7 +90,7 @@ class AssignmentGarbageCollectorCommand extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
         try {
@@ -111,11 +111,11 @@ class AssignmentGarbageCollectorCommand extends Command
 
             $style->success($successMessage);
 
-            return 0;
+            return Command::SUCCESS;
         } catch (Throwable $exception) {
             $style->error($exception->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
     }
 

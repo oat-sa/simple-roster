@@ -109,20 +109,14 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
         );
     }
 
-    /**
-     * @return MockObject|LtiInstanceRepository
-     */
-    protected function makeLtiInstanceRepositoryMock(): MockObject
+    protected function makeLtiInstanceRepositoryMock(): MockObject&LtiInstanceRepository
     {
         $mock = $this->createMock(LtiInstanceRepository::class);
         $mock->method('findAllAsCollection')->willReturn(new UniqueLtiInstanceCollection());
         return $mock;
     }
 
-    /**
-     * @return MockObject|GenerateGroupIdsService
-     */
-    protected function makeGenerateGroupIdsServiceMock(): MockObject
+    protected function makeGenerateGroupIdsServiceMock(): MockObject&GenerateGroupIdsService
     {
         $mock = $this->createMock(GenerateGroupIdsService::class);
         $mock->method('generateGroupIds')->willReturn(['test_test1']);
@@ -131,9 +125,8 @@ class BulkCreateUsersServiceConsoleProxyTest extends TestCase
 
     /**
      * @param LineItem[] $items
-     * @return MockObject|LineItemRepository
      */
-    protected function makeLineItemRepositoryMock(array $items = []): MockObject
+    protected function makeLineItemRepositoryMock(array $items = []): MockObject&LineItemRepository
     {
         $mock = $this->createMock(LineItemRepository::class);
 

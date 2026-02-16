@@ -29,10 +29,10 @@ use Lcobucci\JWT\Token\Signature;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class JwtTokenVerifierTest extends KernelTestCase
+class JwtTokenVerifierTest extends AppKernelTestCase
 {
     /** @var JwtTokenVerifier */
     private $subject;

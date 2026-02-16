@@ -29,30 +29,29 @@ use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class CreateLineItemParamConverter implements ParamConverterInterface
+class CreateLineItemParamConverter implements ValueResolverInterface
 {
-    private CreateLineItemValidator $createLineItemValidator;
-    private LoggerInterface $requestLogger;
-
     private const DEFAULT_LINE_ITEM_MAX_ATTEMPTS_COUNT = 0;
     private const DEFAULT_LINE_ITEM_ACTIVE_STATUS = true;
 
     public function __construct(
-        CreateLineItemValidator $createLineItemValidator,
-        LoggerInterface $requestLogger
+        private readonly CreateLineItemValidator $createLineItemValidator,
+        private readonly LoggerInterface $requestLogger,
     ) {
-        $this->createLineItemValidator = $createLineItemValidator;
-        $this->requestLogger = $requestLogger;
     }
 
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if ($argument->getType() !== LineItem::class) {
+            return [];
+        }
+
         $this->createLineItemValidator->validate($request);
 
         try {
@@ -60,9 +59,7 @@ class CreateLineItemParamConverter implements ParamConverterInterface
 
             $this->requestLogger->info('UpdateLineItems payload.', $responseBody);
 
-            $request->attributes->set($configuration->getName(), $this->createLineItem($responseBody));
-
-            return true;
+            return [$this->createLineItem($responseBody)];
         } catch (Throwable $jsonException) {
             throw new BadRequestHttpException(
                 sprintf(
@@ -104,10 +101,5 @@ class CreateLineItemParamConverter implements ParamConverterInterface
         }
 
         return $newDateTimeFormat->setTimezone(new DateTimeZone('UTC'));
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return LineItem::class === $configuration->getClass();
     }
 }

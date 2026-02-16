@@ -23,10 +23,10 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Security\Generator;
 
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 
-class JwtTokenCacheIdGeneratorTest extends KernelTestCase
+class JwtTokenCacheIdGeneratorTest extends AppKernelTestCase
 {
     private JwtConfiguration $jwtConfig;
 

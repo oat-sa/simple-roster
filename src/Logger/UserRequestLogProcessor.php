@@ -22,29 +22,28 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Logger;
 
+use Monolog\LogRecord;
 use OAT\SimpleRoster\Request\RequestIdStorage;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class UserRequestLogProcessor
 {
-    private Security $security;
-    private RequestIdStorage $requestIdStorage;
-
     public function __construct(
-        Security $security,
-        RequestIdStorage $requestIdStorage
+        private Security $security,
+        private RequestIdStorage $requestIdStorage
     ) {
-        $this->security = $security;
-        $this->requestIdStorage = $requestIdStorage;
     }
 
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        $record['extra']['requestId'] = $this->requestIdStorage->getRequestId();
-        $record['extra']['username'] = $this->security->getUser() !== null
+        $username = $this->security->getUser() !== null
             ? $this->security->getUser()->getUserIdentifier()
             : 'guest';
 
-        return $record;
+        $extra = $record->extra;
+        $extra['requestId'] = $this->requestIdStorage->getRequestId();
+        $extra['username'] = $username;
+
+        return $record->with(extra: $extra);
     }
 }

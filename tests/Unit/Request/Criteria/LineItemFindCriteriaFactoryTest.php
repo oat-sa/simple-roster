@@ -27,26 +27,23 @@ use InvalidArgumentException;
 use OAT\SimpleRoster\Request\Criteria\LineItemFindCriteriaFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LineItemFindCriteriaFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider provideInvalidTimeStamps
-     */
-    public function testShouldThrowInvalidForInvalidTimeStamps(string $timeStamp, string $field): void
+    #[DataProvider('provideInvalidTimeStamps')]
+    public function testShouldThrowInvalidForInvalidTimeStamps(string $timestamp, string $field): void
     {
         $subject = new LineItemFindCriteriaFactory();
-        $request = new Request([$field => $timeStamp]);
+        $request = new Request([$field => $timestamp]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Invalid timestamp for %s: %s', $field, $timeStamp));
+        $this->expectExceptionMessage(sprintf('Invalid timestamp for %s: %s', $field, $timestamp));
 
         $subject->create($request);
     }
 
-    /**
-     * @dataProvider provideValidParameters
-     */
+    #[DataProvider('provideValidParameters')]
     public function testCreate(array $parameters, array $expectations): void
     {
         $subject = new LineItemFindCriteriaFactory();
@@ -62,7 +59,7 @@ class LineItemFindCriteriaFactoryTest extends TestCase
         self::assertSame($expectations['endAt'], $findLineItemCriteria->getLineItemEndAt()->getTimestamp());
     }
 
-    public function provideInvalidTimeStamps(): array
+    public static function provideInvalidTimeStamps(): array
     {
         return [
             'startTimeStampIsZero' => [
@@ -92,7 +89,7 @@ class LineItemFindCriteriaFactoryTest extends TestCase
         ];
     }
 
-    public function provideValidParameters(): array
+    public static function provideValidParameters(): array
     {
         $timeStamp = (new DateTimeImmutable())->getTimestamp();
 

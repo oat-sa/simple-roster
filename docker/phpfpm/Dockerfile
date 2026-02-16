@@ -1,13 +1,13 @@
-FROM php:8.1-fpm
+FROM php:8.4-fpm
 
 ENV SYMFONY_DEPRECATIONS_HELPER=disabled
 ENV XDEBUG_MODE=off
 
 RUN apt-get update && apt-get install -y libsqlite3-dev libsodium-dev \
-    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzip-dev libzstd-dev liblz4-dev bash
+    	zlib1g-dev libicu-dev g++ libzip-dev libpq-dev libzstd-dev liblz4-dev bash
 
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && yes | pecl install igbinary apcu xdebug-3.1.6 msgpack redis \
+    && yes | pecl install igbinary apcu xdebug msgpack redis \
     && docker-php-ext-install pdo \
     && docker-php-ext-install intl \
     && docker-php-ext-install mysqli \

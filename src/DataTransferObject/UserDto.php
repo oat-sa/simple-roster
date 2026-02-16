@@ -30,7 +30,7 @@ class UserDto
     private string $password;
     private ?string $groupId;
 
-    public function __construct(string $username, string $password, string $groupId = null)
+    public function __construct(string $username, string $password, ?string $groupId = null)
     {
         if (empty($username)) {
             throw new InvalidArgumentException('Username cannot be empty');

@@ -26,22 +26,22 @@ use JsonException;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
 use OAT\SimpleRoster\Http\Exception\RequestEntityTooLargeHttpException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class BulkOperationCollectionParamConverter implements ParamConverterInterface
+class BulkOperationCollectionParamConverter implements ValueResolverInterface
 {
     public const BULK_OPERATIONS_LIMIT = 1000;
 
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $class = $configuration->getClass();
-        $param = $configuration->getName();
+        if ($argument->getType() !== BulkOperationCollection::class) {
+            return [];
+        }
 
-        /** @var BulkOperationCollection $collection */
-        $collection = new $class();
+        $collection = new BulkOperationCollection();
 
         foreach ($this->extractOperationsFromRequest($request) as $operation) {
             $bulkOperation = new BulkOperation(
@@ -53,14 +53,7 @@ class BulkOperationCollectionParamConverter implements ParamConverterInterface
             $collection->add($bulkOperation);
         }
 
-        $request->attributes->set($param, $collection);
-
-        return true;
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return BulkOperationCollection::class === $configuration->getClass();
+        return [$collection];
     }
 
     /**

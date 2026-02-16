@@ -18,10 +18,12 @@
  *  Copyright (c) 2022 (original work) Open Assessment Technologies S.A.
  */
 
+declare(strict_types=1);
+
 namespace OAT\SimpleRoster\Tests\Unit\Service\AwsS3;
 
 use League\Flysystem\Filesystem;
-use League\Flysystem\Memory\MemoryAdapter;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use PHPUnit\Framework\TestCase;
 
@@ -30,47 +32,49 @@ class FolderSyncServiceTest extends TestCase
     public function testSync(): void
     {
         $service = new FolderSyncService(
-            $source = new Filesystem(new MemoryAdapter()),
-            $dest = new Filesystem(new MemoryAdapter())
+            $source = new Filesystem(new InMemoryFilesystemAdapter()),
+            $dest   = new Filesystem(new InMemoryFilesystemAdapter())
         );
 
         $dir = 'some_dir';
 
         $path1 = $this->path($dir, 'path/one.txt');
-        $source->put($path1, $content1 = 'some_data1');
+        $source->write($path1, $content1 = 'some_data1');
+
         $path2 = $this->path($dir, 'path/two/file.txt');
-        $source->put($path2, $content2 = 'some_data2');
+        $source->write($path2, $content2 = 'some_data2');
 
         $service->sync($dir);
 
-        $this->assertTrue($dest->has($path1));
-        $this->assertTrue($dest->has($path2));
-        $this->assertEquals($content1, $dest->read($path1));
-        $this->assertEquals($content2, $dest->read($path2));
+        $this->assertTrue($dest->fileExists($path1));
+        $this->assertTrue($dest->fileExists($path2));
+        $this->assertSame($content1, $dest->read($path1));
+        $this->assertSame($content2, $dest->read($path2));
     }
 
     public function testOverrideForExistedFile(): void
     {
         $service = new FolderSyncService(
-            $source = new Filesystem(new MemoryAdapter()),
-            $dest = new Filesystem(new MemoryAdapter())
+            $source = new Filesystem(new InMemoryFilesystemAdapter()),
+            $dest   = new Filesystem(new InMemoryFilesystemAdapter())
         );
 
         $dir = 'some_dir';
 
         $path1 = $this->path($dir, 'path/one.txt');
-        $source->put($path1, $content1 = 'some_data1');
-        $path2 = $this->path($dir, 'path/two/file.txt');
-        $source->put($path2, $content2 = 'some_data2');
+        $source->write($path1, $content1 = 'some_data1');
 
-        $dest->put($path1, 'some_old_data1');
+        $path2 = $this->path($dir, 'path/two/file.txt');
+        $source->write($path2, $content2 = 'some_data2');
+
+        $dest->write($path1, 'some_old_data1');
 
         $service->sync($dir);
 
-        $this->assertTrue($dest->has($path1));
-        $this->assertTrue($dest->has($path2));
-        $this->assertEquals($content1, $dest->read($path1));
-        $this->assertEquals($content2, $dest->read($path2));
+        $this->assertTrue($dest->fileExists($path1));
+        $this->assertTrue($dest->fileExists($path2));
+        $this->assertSame($content1, $dest->read($path1));
+        $this->assertSame($content2, $dest->read($path2));
     }
 
     protected function path(string $root, string $path): string

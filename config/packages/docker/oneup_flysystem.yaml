@@ -3,7 +3,7 @@ oneup_flysystem:
     adapters:
         user_files_adapter_local:
             local:
-                directory: '%kernel.project_dir%/var/user-files'
+                location: '%kernel.project_dir%/var/user-files'
         user_files_adapter_s3: 
             awss3v3:
                 client: Aws\S3\S3Client

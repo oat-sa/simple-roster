@@ -24,20 +24,20 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Cache;
 
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Command\Cache\LineItemCacheWarmerCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LineItemCacheWarmerCommandTest extends KernelTestCase
+class LineItemCacheWarmerCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -145,7 +145,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
                     'cacheTtl' => '3,600',
                 ],
             ],
-            Logger::INFO
+            Level::Info
         );
 
         $this->assertHasLogRecord(
@@ -156,7 +156,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
                     'cacheTtl' => '3,600',
                 ],
             ],
-            Logger::INFO
+            Level::Info
         );
 
         $this->assertHasLogRecord(
@@ -167,7 +167,7 @@ class LineItemCacheWarmerCommandTest extends KernelTestCase
                     'cacheTtl' => '3,600',
                 ],
             ],
-            Logger::INFO
+            Level::Info
         );
     }
 }

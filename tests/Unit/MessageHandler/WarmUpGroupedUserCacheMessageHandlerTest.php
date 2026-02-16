@@ -35,29 +35,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
 {
     private WarmUpGroupedUserCacheMessageHandler $subject;
-
-    /** @var EntityManagerInterface|MockObject */
-    private $entityManager;
-
-    /** @var UserRepository|MockObject */
-    private $userRepository;
-
-    /** @var UserCacheIdGenerator|MockObject */
-    private $cacheIdGenerator;
-
-    /** @var CacheItemPoolInterface|MockObject */
-    private $resultCacheImplementation;
-
-    /** @var LoggerInterface|MockObject */
-    private $messengerLogger;
-
-    /** @var LoggerInterface|MockObject */
-    private $cacheWarmupLogger;
+    private EntityManagerInterface&MockObject $entityManager;
+    private UserRepository&MockObject $userRepository;
+    private UserCacheIdGenerator&MockObject $cacheIdGenerator;
+    private CacheItemPoolInterface&MockObject $resultCacheImplementation;
+    private LoggerInterface&MockObject $messengerLogger;
+    private LoggerInterface&MockObject $cacheWarmupLogger;
 
     protected function setUp(): void
     {
@@ -90,9 +80,15 @@ class WarmUpGroupedUserCacheMessageHandlerTest extends TestCase
         );
     }
 
-    public function testItIsAMessageHandler(): void
+    public function testItIsInvokableAndTaggedAsMessageHandler(): void
     {
-        self::assertInstanceOf(MessageHandlerInterface::class, $this->subject);
+        self::assertTrue(is_callable($this->subject), 'Handler should be callable (__invoke).');
+
+        $ref = new ReflectionClass($this->subject);
+        self::assertTrue($ref->hasMethod('__invoke'));
+
+        $attrs = $ref->getAttributes(AsMessageHandler::class);
+        self::assertNotEmpty($attrs, 'Handler should have #[AsMessageHandler] attribute.');
     }
 
     public function testItThrowsExceptionIfResultCacheIsNotConfigured(): void

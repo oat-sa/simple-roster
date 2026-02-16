@@ -22,20 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\Validator\LineItem;
 
-use ArrayIterator;
 use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UpdateLineItemValidatorTest extends TestCase
 {
-    /** @var MockObject|ValidatorInterface */
-    private $validator;
-
+    private ValidatorInterface|MockObject $validator;
     private UpdateLineItemValidator $subject;
 
     protected function setUp(): void
@@ -54,9 +52,7 @@ class UpdateLineItemValidatorTest extends TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
-            ->willReturn(
-                new ArrayIterator()
-            );
+            ->willReturn(new ConstraintViolationList());
 
         $this->subject->validate($request);
     }
@@ -82,13 +78,7 @@ class UpdateLineItemValidatorTest extends TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
-            ->willReturn(
-                new ArrayIterator(
-                    [
-                        $error
-                    ]
-                )
-            );
+            ->willReturn(new ConstraintViolationList([$error]));
 
         $this->subject->validate($request);
     }

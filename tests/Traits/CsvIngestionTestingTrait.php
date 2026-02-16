@@ -43,10 +43,10 @@ trait CsvIngestionTestingTrait
             /** @var StorageRegistry $storageRegistry */
             $storageRegistry = self::getContainer()->get(StorageRegistry::class);
 
-            $csv = Writer::createFromString();
+            $csv = Writer::fromString();
             $csv->insertAll($csvContent);
 
-            $storageRegistry->getFilesystem($storageId)->write($relativePath, $csv->getContent());
+            $storageRegistry->getFilesystem($storageId)->write($relativePath, $csv->toString());
         } catch (Throwable $exception) {
             throw new LogicException(sprintf('Cannot write csv file: %s', $exception->getMessage()));
         }

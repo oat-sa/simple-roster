@@ -25,6 +25,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Lti\Extractor;
 use LogicException;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LoginHintExtractorTest extends TestCase
 {
@@ -37,9 +38,7 @@ class LoginHintExtractorTest extends TestCase
         $this->subject = new LoginHintExtractor();
     }
 
-    /**
-     * @dataProvider provideValidLoginHints
-     */
+    #[DataProvider('provideValidLoginHints')]
     public function testItCanExtractLoginHint(
         string $loginHint,
         string $expectedUsername,
@@ -51,9 +50,7 @@ class LoginHintExtractorTest extends TestCase
         self::assertSame($expectedAssignmentId, $loginHintDto->getAssignmentId());
     }
 
-    /**
-     * @dataProvider provideInvalidLoginHints
-     */
+    #[DataProvider('provideInvalidLoginHints')]
     public function testShouldThrowLogicExceptionIfLoginHintIsMalformed(string $loginHint, string $message): void
     {
         $this->expectException(LogicException::class);
@@ -62,7 +59,7 @@ class LoginHintExtractorTest extends TestCase
         $this->subject->extract($loginHint);
     }
 
-    public function provideValidLoginHints(): array
+    public static function provideValidLoginHints(): array
     {
         return [
             'withAlphanumericUsername' => [
@@ -78,7 +75,7 @@ class LoginHintExtractorTest extends TestCase
         ];
     }
 
-    public function provideInvalidLoginHints(): array
+    public static function provideInvalidLoginHints(): array
     {
         return [
             'withoutSeparators' => [
