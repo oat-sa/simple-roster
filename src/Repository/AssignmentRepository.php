@@ -84,8 +84,8 @@ class AssignmentRepository extends AbstractRepository
     public function findByStateAndUpdatedAtPaged(
         string $state,
         DateTime $updatedAt,
-        int $offset = null,
-        int $limit = null
+        ?int $offset = null,
+        ?int $limit = null
     ): Paginator {
         $queryBuilder = $this
             ->createQueryBuilder('a')

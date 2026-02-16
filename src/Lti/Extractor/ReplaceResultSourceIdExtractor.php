@@ -41,9 +41,22 @@ class ReplaceResultSourceIdExtractor
      */
     public function extractSourceId(string $xmlContent): int
     {
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (Throwable $exception) {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+            throw new InvalidLtiReplaceResultBodyException();
+        }
+
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!empty($errors)) {
             throw new InvalidLtiReplaceResultBodyException();
         }
 
@@ -54,10 +67,10 @@ class ReplaceResultSourceIdExtractor
             'x:resultRecord/x:sourcedGUID/x:sourcedId/text()'
         );
 
-        if (false === $sourceIdNodes || count($sourceIdNodes) !== 1) {
+        if ($sourceIdNodes === false || count($sourceIdNodes) !== 1) {
             throw new InvalidLtiReplaceResultBodyException();
         }
 
-        return (int)$sourceIdNodes[0];
+        return (int) $sourceIdNodes[0];
     }
 }

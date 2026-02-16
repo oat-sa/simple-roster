@@ -24,10 +24,10 @@ namespace OAT\SimpleRoster\Tests\Integration\Entity;
 
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class UserTest extends KernelTestCase
+class UserTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

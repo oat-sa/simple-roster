@@ -31,11 +31,10 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Lti\Builder\Lti1p3MessageBuilder;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use ReflectionClass;
 
-class Lti1p3MessageBuilderTest extends KernelTestCase
+class Lti1p3MessageBuilderTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

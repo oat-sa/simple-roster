@@ -24,27 +24,30 @@ namespace OAT\SimpleRoster\Tests\Traits;
 
 use LogicException;
 use Monolog\Handler\TestHandler;
+use Monolog\Level;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\Attributes\After;
 
 trait LoggerTestingTrait
 {
     private TestHandler $handler;
-
-    protected function setUp(): void
-    {
-        $this->setUpTestLogHandler();
-    }
+    private array $registeredLoggers = [];
 
     protected function setUpTestLogHandler(string ...$channels): void
     {
-        static::ensureKernelTestCase();
+        if (!self::getContainer()) {
+            self::bootKernel();
+        }
 
-        /** @var Logger $logger */
-        $logger = self::getContainer()->get(LoggerInterface::class);
+        /** @var Logger $mainLogger */
+        $mainLogger = self::getContainer()->get(LoggerInterface::class);
         $this->handler = new TestHandler();
 
-        $logger->pushHandler($this->handler);
+        if ($mainLogger instanceof Logger) {
+            $mainLogger->pushHandler($this->handler);
+            $this->registeredLoggers[] = $mainLogger;
+        }
 
         foreach ($channels as $channel) {
             $logger = self::getContainer()->get(sprintf('monolog.logger.%s', $channel));
@@ -54,6 +57,7 @@ trait LoggerTestingTrait
             }
 
             $logger->pushHandler($this->handler);
+            $this->registeredLoggers[] = $logger;
         }
     }
 
@@ -62,7 +66,7 @@ trait LoggerTestingTrait
         return $this->handler->getRecords();
     }
 
-    public function assertHasLogRecord(array $record, int $level): void
+    public function assertHasLogRecord(array $record, Level $level): void
     {
         $record = [
             'message' => (string)$record['message'],
@@ -73,26 +77,35 @@ trait LoggerTestingTrait
             $this->handler->hasRecord($record, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
-                Logger::getLevelName($level),
+                $level->name,
                 json_encode($record, JSON_THROW_ON_ERROR, 512)
             )
         );
     }
 
-    public function assertHasLogRecordWithMessage(string $message, int $level): void
+    public function assertHasLogRecordWithMessage(string $message, Level $level): void
     {
         self::assertTrue(
             $this->handler->hasRecordThatContains($message, $level),
             sprintf(
                 'Failed asserting that Logger contains record: [%s] %s',
-                Logger::getLevelName($level),
+                $level->name,
                 $message
             )
         );
     }
 
-    public function assertHasRecordThatPasses(callable $callable, int $level): void
+    public function assertHasRecordThatPasses(callable $callable, Level $level): void
     {
         self::assertTrue($this->handler->hasRecordThatPasses($callable, $level));
+    }
+
+    #[After]
+    protected function tearDownLoggerTrait(): void
+    {
+        foreach ($this->registeredLoggers as $logger) {
+            $logger->popHandler();
+        }
+        $this->registeredLoggers = [];
     }
 }

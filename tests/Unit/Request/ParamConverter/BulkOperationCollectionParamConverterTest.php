@@ -22,12 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
+use OAT\SimpleRoster\Bulk\Operation\BulkOperation;
 use OAT\SimpleRoster\Bulk\Operation\BulkOperationCollection;
+use OAT\SimpleRoster\Http\Exception\RequestEntityTooLargeHttpException;
 use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
 use PHPUnit\Framework\TestCase;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class BulkOperationCollectionParamConverterTest extends TestCase
 {
@@ -40,33 +42,21 @@ class BulkOperationCollectionParamConverterTest extends TestCase
         $this->subject = new BulkOperationCollectionParamConverter();
     }
 
-    public function testItIsAParamConverter(): void
+    public function testItReturnsEmptyForUnsupportedClass(): void
     {
-        self::assertInstanceOf(ParamConverterInterface::class, $this->subject);
+        $argument = new ArgumentMetadata('wrong', \stdClass::class, false, false, null);
+
+        $result = $this->subject->resolve(new Request(), $argument);
+
+        self::assertEmpty(iterator_to_array($result, false));
     }
 
-    public function testItSupportsBulkOperationCollection(): void
+    public function testItThrowsBadRequestForInvalidJson(): void
     {
-        $paramConverter = new ParamConverter([]);
-        $paramConverter->setClass(BulkOperationCollection::class);
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Invalid JSON request body received.');
 
-        self::assertTrue($this->subject->supports($paramConverter));
-    }
-
-    public function testItSetsBulkOperationAsRequestAttribute(): void
-    {
-        $paramConverter = new ParamConverter([]);
-        $paramConverter->setClass(BulkOperationCollection::class);
-
-        $expectedParameterName = 'bulkCollection';
-
-        $paramConverter->setName($expectedParameterName);
-
-        /** @var string $requestBodyContent */
-        $requestBodyContent = json_encode([
-            ['identifier' => 'user1'],
-            ['identifier' => 'user2'],
-        ], JSON_THROW_ON_ERROR, 512);
+        $argument = new ArgumentMetadata('bulkCollection', BulkOperationCollection::class, false, false, null);
 
         $request = Request::create(
             '/test',
@@ -75,18 +65,121 @@ class BulkOperationCollectionParamConverterTest extends TestCase
             [],
             [],
             [],
+            '{invalid-json'
+        );
+
+        iterator_to_array($this->subject->resolve($request, $argument));
+    }
+
+    public function testItThrowsBadRequestForEmptyBody(): void
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Empty request body received.');
+
+        $argument = new ArgumentMetadata('bulkCollection', BulkOperationCollection::class, false, false, null);
+
+        $request = Request::create(
+            '/test',
+            Request::METHOD_POST,
+            [],
+            [],
+            [],
+            [],
+            '[]'
+        );
+
+        iterator_to_array($this->subject->resolve($request, $argument), false);
+    }
+
+    public function testItThrowsRequestEntityTooLargeWhenLimitExceeded(): void
+    {
+        $this->expectException(RequestEntityTooLargeHttpException::class);
+        $this->expectExceptionMessage('Bulk operation limit has been exceeded');
+
+        $argument = new ArgumentMetadata('bulkCollection', BulkOperationCollection::class, false, false, null);
+
+        $ops = [];
+        for ($i = 0; $i < BulkOperationCollectionParamConverter::BULK_OPERATIONS_LIMIT + 1; $i++) {
+            $ops[] = ['identifier' => 'user' . $i];
+        }
+
+        $request = Request::create(
+            '/test',
+            'POST',
+            [],
+            [],
+            [],
+            [],
+            json_encode($ops, JSON_THROW_ON_ERROR)
+        );
+
+        iterator_to_array($this->subject->resolve($request, $argument));
+    }
+
+    public function testItResolvesBulkOperationCollectionForPostAsCreate(): void
+    {
+        $argument = new ArgumentMetadata('bulkCollection', BulkOperationCollection::class, false, false, null);
+
+        $requestBodyContent = json_encode([
+            ['identifier' => 'user1'],
+            ['identifier' => 'user2', 'attributes' => ['k' => 'v']],
+        ], JSON_THROW_ON_ERROR);
+
+        $request = Request::create(
+            '/test',
+            Request::METHOD_POST,
+            [],
+            [],
+            [],
+            [],
             $requestBodyContent
         );
 
-        $this->subject->apply($request, $paramConverter);
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
 
-        self::assertTrue($request->attributes->has($expectedParameterName));
+        self::assertCount(1, $result);
+        self::assertInstanceOf(BulkOperationCollection::class, $result[0]);
 
-        /** @var BulkOperationCollection $bulkOperationCollection */
-        $bulkOperationCollection = $request->attributes->get($expectedParameterName);
+        /** @var BulkOperationCollection $collection */
+        $collection = $result[0];
 
-        self::assertInstanceOf(BulkOperationCollection::class, $bulkOperationCollection);
+        self::assertCount(2, $collection);
 
-        self::assertCount(2, $bulkOperationCollection);
+        $items = iterator_to_array($collection, false);
+
+        self::assertSame('user1', $items[0]->getIdentifier());
+        self::assertSame(BulkOperation::TYPE_CREATE, $items[0]->getType());
+        self::assertSame([], $items[0]->getAttributes());
+
+        self::assertSame('user2', $items[1]->getIdentifier());
+        self::assertSame(BulkOperation::TYPE_CREATE, $items[1]->getType());
+        self::assertSame(['k' => 'v'], $items[1]->getAttributes());
+    }
+
+    public function testItResolvesBulkOperationCollectionForPatchAsUpdate(): void
+    {
+        $argument = new ArgumentMetadata('bulkCollection', BulkOperationCollection::class, false, false, null);
+
+        $requestBodyContent = json_encode([
+            ['identifier' => 'user1'],
+        ], JSON_THROW_ON_ERROR);
+
+        $request = Request::create(
+            '/test',
+            Request::METHOD_PATCH,
+            [],
+            [],
+            [],
+            [],
+            $requestBodyContent
+        );
+
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
+
+        /** @var BulkOperationCollection $collection */
+        $collection = $result[0];
+        $items = iterator_to_array($collection, false);
+
+        self::assertSame(BulkOperation::TYPE_UPDATE, $items[0]->getType());
     }
 }

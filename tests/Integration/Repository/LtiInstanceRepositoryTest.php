@@ -25,12 +25,12 @@ namespace OAT\SimpleRoster\Tests\Integration\Repository;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class LtiInstanceRepositoryTest extends KernelTestCase
+class LtiInstanceRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

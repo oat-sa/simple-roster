@@ -24,29 +24,25 @@ namespace OAT\SimpleRoster\Request\ParamConverter;
 
 use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
-use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Symfony\Component\HttpFoundation\Request;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class JwtTokenParamConverter implements ParamConverterInterface
+class JwtTokenParamConverter implements ValueResolverInterface
 {
-    private JwtTokenVerifier $tokenVerifier;
-
-    private JwtConfiguration $jwtConfig;
-
     public function __construct(
-        JwtTokenVerifier $tokenVerifier,
-        JwtConfiguration $jwtConfig
+        private readonly JwtTokenVerifier $tokenVerifier,
+        private readonly JwtConfiguration $jwtConfig,
     ) {
-        $this->tokenVerifier = $tokenVerifier;
-        $this->jwtConfig = $jwtConfig;
     }
-
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if ($argument->getType() !== Plain::class) {
+            return [];
+        }
+
         $decodedRequestBody = json_decode($request->getContent(), true);
         if (!isset($decodedRequestBody['refreshToken'])) {
             throw new BadRequestHttpException("Missing 'refreshToken' in request body.");
@@ -59,13 +55,6 @@ class JwtTokenParamConverter implements ParamConverterInterface
             throw new BadRequestHttpException('Invalid token.');
         }
 
-        $request->attributes->set($configuration->getName(), $refreshToken);
-
-        return true;
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return Plain::class === $configuration->getClass();
+        return [$refreshToken];
     }
 }

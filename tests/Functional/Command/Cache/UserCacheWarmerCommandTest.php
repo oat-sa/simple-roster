@@ -29,16 +29,17 @@ use OAT\SimpleRoster\Command\Cache\UserCacheWarmerCommand;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-class UserCacheWarmerCommandTest extends KernelTestCase
+class UserCacheWarmerCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -72,9 +73,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         $this->setUpTestLogHandler('cache_warmup');
     }
 
-    /**
-     * @dataProvider provideInvalidParameters
-     */
+    #[DataProvider('provideInvalidParameters')]
     public function testItThrowsExceptionForIfInvalidParametersReceived(array $input, string $expectedOutput): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -309,7 +308,7 @@ class UserCacheWarmerCommandTest extends KernelTestCase
         );
     }
 
-    public function provideInvalidParameters(): array
+    public static function provideInvalidParameters(): array
     {
         return [
             'invalidBatchOption' => [

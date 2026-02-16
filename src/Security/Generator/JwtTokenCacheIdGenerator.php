@@ -26,7 +26,7 @@ use Lcobucci\JWT\Token\Plain;
 
 class JwtTokenCacheIdGenerator
 {
-    public function generate(Plain $token, string $subject = null): string
+    public function generate(Plain $token, ?string $subject = null): string
     {
         $subjectClaim = $subject ?? $token->claims()->get('sub');
 

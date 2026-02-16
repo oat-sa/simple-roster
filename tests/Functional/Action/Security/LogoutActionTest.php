@@ -22,20 +22,20 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Security;
 
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LogoutActionTest extends WebTestCase
+class LogoutActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
@@ -134,6 +134,6 @@ class LogoutActionTest extends WebTestCase
             'context' => [
                 'cacheId' => $cacheIdGenerator->generate($refreshToken),
             ],
-        ], Logger::INFO);
+        ], Level::Info);
     }
 }

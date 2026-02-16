@@ -27,15 +27,16 @@ use OAT\SimpleRoster\Command\Ingester\LineItemIngesterCommand;
 use OAT\SimpleRoster\Command\Ingester\UserIngesterCommand;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class AssignmentIngesterCommandTest extends KernelTestCase
+class AssignmentIngesterCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use CsvIngestionTestingTrait;
@@ -184,9 +185,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         }
     }
 
-    /**
-     * @dataProvider provideInvalidSourceFiles
-     */
+    #[DataProvider('provideInvalidSourceFiles')]
     public function testSourceFileValidation(string $filename, array $csvContent, string $expectedOutput): void
     {
         $this->prepareLineItemIngestionContext();
@@ -269,7 +268,7 @@ class AssignmentIngesterCommandTest extends KernelTestCase
         );
     }
 
-    public function provideInvalidSourceFiles(): array
+    public static function provideInvalidSourceFiles(): array
     {
         return [
             'usernameColumnIsMissing' => [

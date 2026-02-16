@@ -43,10 +43,7 @@ class BulkOperationCollection implements IteratorAggregate, Countable
         return count($this->operations);
     }
 
-    /**
-     * @return ArrayIterator|BulkOperation[]
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new ArrayIterator($this->operations);
     }

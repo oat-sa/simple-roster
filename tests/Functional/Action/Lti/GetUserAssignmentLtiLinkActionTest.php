@@ -24,22 +24,23 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
 use Carbon\Carbon;
 use DateInterval;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Generator\NonceGenerator;
 use OAT\SimpleRoster\Lti\LoadBalancer\LtiInstanceLoadBalancerFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetUserAssignmentLtiLinkActionTest extends WebTestCase
+class GetUserAssignmentLtiLinkActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;
@@ -456,8 +457,6 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
         $this->kernelBrowser->insulate(true);
         $authenticationResponse = $this->logInAs($user, $this->kernelBrowser);
         $this->kernelBrowser->insulate(false);
-        //This trick with insulation switchOn/switchOff above is needed to have
-        //log test handler not missing between requests
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
@@ -474,19 +473,22 @@ class GetUserAssignmentLtiLinkActionTest extends WebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame($this->getLogRecords()[0]['context']['lineItem'], $assignment->getLineItem());
+        $records = $this->getLogRecords();
+        $ltiLog = $records[1];
+
+        self::assertSame($assignment->getLineItem()->getId(), $ltiLog->context['lineItem']->getId());
 
         $this->assertHasRecordThatPasses(
-            static function (array $record) use ($assignment, $ltiRequestInResponse) {
-                /** @var LtiRequest $ltiRequest */
-                $ltiRequest = $record['context']['ltiRequest'];
+            static function (LogRecord $record) use ($assignment, $ltiRequestInResponse) {
+                $ltiRequest = $record->context['ltiRequest'] ?? null;
+                $lineItem = $record->context['lineItem'] ?? null;
 
                 return
-                    $record['message'] === "LTI request was successfully generated for assignment with id='1'"
-                    && $ltiRequest->jsonSerialize() === $ltiRequestInResponse
-                    && $record['context']['lineItem'] === $assignment->getLineItem();
+                    $record->message === "LTI request was successfully generated for assignment with id='1'"
+                    && $ltiRequest?->jsonSerialize() === $ltiRequestInResponse
+                    && $lineItem?->getId() === $assignment->getLineItem()->getId();
             },
-            Logger::INFO
+            Level::Info
         );
 
         Carbon::setTestNow();

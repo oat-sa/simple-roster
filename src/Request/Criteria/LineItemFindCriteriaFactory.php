@@ -40,16 +40,22 @@ class LineItemFindCriteriaFactory
             $findLineItemCriteria->addLineItemIds((int)$request->query->get('id'));
         }
 
-        if ($request->query->get('slug') !== null) {
-            $findLineItemCriteria->addLineItemSlugs(...(array)$request->query->get('slug'));
+        $slugs = $request->query->all()['slug'] ?? $request->query->get('slug');
+        if ($slugs !== null) {
+            $slugs = is_array($slugs) ? $slugs : [$slugs];
+            $findLineItemCriteria->addLineItemSlugs(...$slugs);
         }
 
-        if ($request->query->get('label') !== null) {
-            $findLineItemCriteria->addLineItemLabels(...(array)$request->query->get('label'));
+        $labels = $request->query->all()['label'] ?? $request->query->get('label');
+        if ($labels !== null) {
+            $labels = is_array($labels) ? $labels : [$labels];
+            $findLineItemCriteria->addLineItemLabels(...$labels);
         }
 
-        if ($request->query->get('uri') !== null) {
-            $findLineItemCriteria->addLineItemUris(...(array)$request->query->get('uri'));
+        $uris = $request->query->all()['uri'] ?? $request->query->get('uri');
+        if ($uris !== null) {
+            $uris = is_array($uris) ? $uris : [$uris];
+            $findLineItemCriteria->addLineItemUris(...$uris);
         }
 
         $this->applyDateFilter($request, $findLineItemCriteria, 'startAt', 'addLineItemStartAt');

@@ -24,18 +24,17 @@ namespace OAT\SimpleRoster\Tests\Unit\Security\Lti;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\Registration;
-use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use OAT\SimpleRoster\DataTransferObject\LoginHintDto;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Lti\Extractor\LoginHintExtractor;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Lti\OidcUserAuthenticator;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class OidcUserAuthenticatorTest extends KernelTestCase
+class OidcUserAuthenticatorTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

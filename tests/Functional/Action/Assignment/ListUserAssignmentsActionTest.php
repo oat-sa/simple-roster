@@ -27,14 +27,14 @@ use DateTimeInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\UserAuthenticatorTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListUserAssignmentsActionTest extends WebTestCase
+class ListUserAssignmentsActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use UserAuthenticatorTrait;

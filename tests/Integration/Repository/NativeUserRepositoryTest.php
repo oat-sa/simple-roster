@@ -27,10 +27,10 @@ use OAT\SimpleRoster\DataTransferObject\UserDtoCollection;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class NativeUserRepositoryTest extends KernelTestCase
+class NativeUserRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

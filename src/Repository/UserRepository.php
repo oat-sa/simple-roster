@@ -100,7 +100,7 @@ class UserRepository extends AbstractRepository
     public function findAllUsernamesPaged(
         int $limit,
         ?int $lastUserId,
-        FindUserCriteria $criteria = null
+        ?FindUserCriteria $criteria = null
     ): UsernameResultSet {
         if ($limit < 1) {
             throw new InvalidArgumentException("Invalid 'limit' parameter received.");
@@ -140,7 +140,7 @@ class UserRepository extends AbstractRepository
         );
     }
 
-    public function countByCriteria(FindUserCriteria $criteria = null): int
+    public function countByCriteria(?FindUserCriteria $criteria = null): int
     {
         if (!$criteria) {
             $criteria = new FindUserCriteria();

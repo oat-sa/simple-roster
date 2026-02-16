@@ -29,12 +29,13 @@ use OAT\SimpleRoster\Exception\InvalidUsernameException;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindUserCriteria;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class UserRepositoryTest extends KernelTestCase
+class UserRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 
@@ -116,9 +117,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->subject->findAllUsernamesPaged(0, null);
     }
 
-    /**
-     * @dataProvider provideLimits
-     */
+    #[DataProvider('provideLimits')]
     public function testItCanFindAllUsernamesPaged(int $limit): void
     {
         $lastUserId = null;
@@ -160,7 +159,7 @@ class UserRepositoryTest extends KernelTestCase
         self::assertSame(50, $this->subject->countByCriteria($criteria));
     }
 
-    public function provideLimits(): array
+    public static function provideLimits(): array
     {
         return [
             'limit_1' => [1],

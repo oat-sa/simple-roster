@@ -25,15 +25,16 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\CreateEntity;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\FileRemovalTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BulkCreateUserActionTest extends WebTestCase
+class BulkCreateUserActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -77,10 +78,8 @@ class BulkCreateUserActionTest extends WebTestCase
         self::assertSame('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
-    /**
-     * @dataProvider provideValidBody
-     */
-    public function testItCreateBulkUserWithCorrectData(string $body, array $response): void
+    #[DataProvider('provideValidBody')]
+    public function testItCreateBulkUserWithCorrectData(string $request, array $response): void
     {
         $container = self::getContainer();
         $lineItemRepository = $this->getMockBuilder(LineItemRepository::class)
@@ -104,7 +103,7 @@ class BulkCreateUserActionTest extends WebTestCase
             [],
             [],
             [],
-            $body
+            $request
         );
         $content = $this->kernelBrowser->getResponse()->getContent();
 
@@ -114,10 +113,8 @@ class BulkCreateUserActionTest extends WebTestCase
         );
     }
 
-    /**
-     * @dataProvider provideNonExistingSlugBody
-     */
-    public function testItThrowErrorForNonExistSlugData(string $body, string $message): void
+    #[DataProvider('provideNonExistingSlugBody')]
+    public function testItThrowErrorForNonExistSlugData(string $request, string $message): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -125,7 +122,7 @@ class BulkCreateUserActionTest extends WebTestCase
             [],
             [],
             [],
-            $body
+            $request
         );
         $decodedResponse = json_decode(
             $this->kernelBrowser->getResponse()->getContent(),
@@ -140,10 +137,8 @@ class BulkCreateUserActionTest extends WebTestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidInformedFieldsBody
-     */
-    public function testItShouldValidateCreateBulkUserInformedFields(string $body, string $message): void
+    #[DataProvider('provideInvalidInformedFieldsBody')]
+    public function testItShouldValidateCreateBulkUserInformedFields(string $request, string $message): void
     {
         $this->kernelBrowser->request(
             Request::METHOD_POST,
@@ -151,7 +146,7 @@ class BulkCreateUserActionTest extends WebTestCase
             [],
             [],
             [],
-            $body
+            $request
         );
 
         $decodedResponse = json_decode($this->kernelBrowser->getResponse()->getContent(), true);
@@ -161,7 +156,7 @@ class BulkCreateUserActionTest extends WebTestCase
         );
     }
 
-    public function provideValidBody(): array
+    public static function provideValidBody(): array
     {
         return [
             'withAllFields' => [
@@ -179,7 +174,7 @@ class BulkCreateUserActionTest extends WebTestCase
         ];
     }
 
-    public function provideNonExistingSlugBody(): array
+    public static function provideNonExistingSlugBody(): array
     {
         return [
             'withoutExistingSlug' => [
@@ -194,7 +189,7 @@ class BulkCreateUserActionTest extends WebTestCase
         ];
     }
 
-    public function provideInvalidInformedFieldsBody(): array
+    public static function provideInvalidInformedFieldsBody(): array
     {
         return [
             'emptyBody' => [
