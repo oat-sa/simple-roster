@@ -1,6 +1,6 @@
 services:
     simple-roster-nginx:
-        container_name: ${SIMPLE_ROSTER_NGINX_CONTAINER_NAME:-simple-roster-nginx}
+        container_name: simple-roster-nginx${CONTAINER_SUFFIX}
         image: nginx:stable
         networks:
             - simple-roster
