@@ -12,7 +12,6 @@ services:
         working_dir: /etc/nginx/conf.d
         labels:
             - "traefik.backend=simple-roster-nginx"
-            - "traefik.frontend.rule=Host:simple-roster.docker.localhost"
             - "traefik.http.routers.simple-roster-nginx.rule=Host(`${SR_HOST:-simple-roster.docker.localhost}`)"
             - "traefik.docker.network=oat-docker"
             - "traefik.port=80"
