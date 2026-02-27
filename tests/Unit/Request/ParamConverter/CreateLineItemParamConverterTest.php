@@ -22,28 +22,21 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\ParamConverter;
 
-use DateTimeInterface;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Request\ParamConverter\CreateLineItemParamConverter;
 use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CreateLineItemParamConverterTest extends TestCase
 {
     private CreateLineItemParamConverter $subject;
-
-    /** @var MockObject|CreateLineItemValidator */
-    private $createLineItemValidator;
-
-    /** @var MockObject|LoggerInterface */
-    private $logger;
+    private MockObject&CreateLineItemValidator $createLineItemValidator;
+    private MockObject&LoggerInterface $logger;
 
     protected function setUp(): void
     {
@@ -52,80 +45,106 @@ class CreateLineItemParamConverterTest extends TestCase
         $this->createLineItemValidator = $this->createMock(CreateLineItemValidator::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->subject = new CreateLineItemParamConverter($this->createLineItemValidator, $this->logger);
+        $this->subject = new CreateLineItemParamConverter(
+            $this->createLineItemValidator,
+            $this->logger
+        );
     }
 
-    public function testItIsAParamConverter(): void
+    public function testItReturnsEmptyForNonLineItemArgument(): void
     {
-        self::assertInstanceOf(ParamConverterInterface::class, $this->subject);
+        $wrongArgument = new ArgumentMetadata('anything', \stdClass::class, false, false, null);
+
+        $result = $this->subject->resolve(new Request(), $wrongArgument);
+
+        self::assertEmpty(iterator_to_array($result, false));
+        $this->createLineItemValidator->expects(self::never())->method('validate');
     }
 
-    public function testItSupportsLineItem(): void
+    public function testItResolvesLineItemAndValidates(): void
     {
-        $paramConverter = new ParamConverter([]);
-        $paramConverter->setClass(LineItem::class);
+        $argument = new ArgumentMetadata('lineItem', LineItem::class, false, false, null);
 
-        self::assertTrue($this->subject->supports($paramConverter));
+        $payload = ['uri' => 'test-uri', 'slug' => 'test-slug'];
+        $request = $this->createJsonRequest($payload);
+
+        $this->createLineItemValidator
+            ->expects(self::once())
+            ->method('validate')
+            ->with($request);
+
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
+
+        self::assertCount(1, $result);
+        self::assertInstanceOf(LineItem::class, $result[0]);
     }
 
-    public function testItThrowsExceptionCaseValidationFail(): void
+    public function testItThrowsExceptionWhenValidationFails(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request = $this->createMock(Request::class);
+        $argument = new ArgumentMetadata('lineItem', LineItem::class, false, false, null);
+        $request = $this->createJsonRequest(['uri' => 'x', 'slug' => 'y']);
 
-        $this->createLineItemValidator->expects(self::once())
+        $this->createLineItemValidator
+            ->expects(self::once())
             ->method('validate')
             ->with($request)
-            ->willThrowException(new BadRequestHttpException());
+            ->willThrowException(new BadRequestHttpException('validation failed'));
 
-        $this->subject->apply($request, $this->createMock(ParamConverter::class));
+        iterator_to_array($this->subject->resolve($request, $argument), false);
     }
 
     public function testItConvertsParametersSuccessfully(): void
     {
-        $request = $this->createMock(Request::class);
+        $argument = new ArgumentMetadata('lineItem', LineItem::class, false, false, null);
 
-        $payload = json_encode([
+        $payload = [
             'slug' => 'my-slug',
             'uri' => 'my-uri',
-            'label' => 'my-slug',
-            'isActive' => true,
             'startDateTime' => '2021-01-01T00:00:00+0000',
             'endDateTime' => '2021-01-31T00:00:00+0000',
-            'maxAttempts' => 0,
-        ]);
+        ];
+        $request = $this->createJsonRequest($payload);
 
-        $request->expects(self::once())
-            ->method('getContent')
-            ->willReturn($payload);
-
-        $request->attributes = new ParameterBag();
-
-        $this->createLineItemValidator->expects(self::once())
+        $this->createLineItemValidator
+            ->expects(self::once())
             ->method('validate')
             ->with($request);
 
-        $configuration = $this->createMock(ParamConverter::class);
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
 
-        $configuration->expects(self::once())
-            ->method('getName')
-            ->willReturn('collection');
-
-        self::assertTrue($this->subject->apply($request, $configuration));
-
-        self::assertInstanceOf(LineItem::class, $request->attributes->get('collection'));
+        self::assertCount(1, $result);
 
         /** @var LineItem $lineItem */
-        $lineItem = $request->attributes->get('collection');
+        $lineItem = $result[0];
 
         self::assertInstanceOf(LineItem::class, $lineItem);
         self::assertSame('my-uri', $lineItem->getUri());
-        self::assertSame('my-slug', $lineItem->getLabel());
         self::assertSame('my-slug', $lineItem->getSlug());
-        self::assertTrue($lineItem->isActive());
-        self::assertSame(0, $lineItem->getMaxAttempts());
-        self::assertSame('2021-01-01T00:00:00+00:00', $lineItem->getStartAt()->format(DateTimeInterface::ATOM));
-        self::assertSame('2021-01-31T00:00:00+00:00', $lineItem->getEndAt()->format(DateTimeInterface::ATOM));
+
+        self::assertNotNull($lineItem->getStartAt());
+        self::assertSame('2021-01-01T00:00:00+00:00', $lineItem->getStartAt()->format(\DateTimeInterface::ATOM));
+
+        /** @var \DateTimeInterface|null $endAt */
+        $endAt = $lineItem->getEndAt();
+        self::assertNotNull($endAt);
+        self::assertSame('2021-01-31T00:00:00+00:00', $endAt->format(\DateTimeInterface::ATOM));
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function createJsonRequest(array $payload): Request
+    {
+        return new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($payload, JSON_THROW_ON_ERROR)
+        );
     }
 }

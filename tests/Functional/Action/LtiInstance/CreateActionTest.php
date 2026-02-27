@@ -24,10 +24,11 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CreateActionTest extends AbstractLtiInstanceTest
+class CreateActionTest extends AbstractLtiInstanceTestCase
 {
     protected string $url = '/api/v1/lti-instances';
     protected string $method = Request::METHOD_POST;
@@ -49,9 +50,7 @@ class CreateActionTest extends AbstractLtiInstanceTest
         );
     }
 
-    /**
-     * @dataProvider provideInvalidRequests
-     */
+    #[DataProvider('provideInvalidRequests')]
     public function testValidation(array $body): void
     {
         $this->kernelBrowser->request(
@@ -168,7 +167,7 @@ class CreateActionTest extends AbstractLtiInstanceTest
         );
     }
 
-    public function provideInvalidRequests(): array
+    public static function provideInvalidRequests(): array
     {
         return [
             'no_lti_secret' => [

@@ -40,14 +40,14 @@ class CsvWriter
     {
         if (!$this->filesystem->exists($path)) {
             $this->filesystem->mkdir(dirname($path));
-            $csv = Writer::createFromPath($path, self::DEFAULT_CSV_CREATE_MODE);
+            $csv = Writer::from($path, self::DEFAULT_CSV_CREATE_MODE);
             $csv->insertOne($head);
             $csv->insertAll($data);
 
             return;
         }
 
-        $csv = Writer::createFromPath($path, 'a+');
+        $csv = Writer::from($path, 'a+');
         $csv->insertAll($data);
     }
 }

@@ -27,7 +27,7 @@ use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeleteActionTest extends AbstractLtiInstanceTest
+class DeleteActionTest extends AbstractLtiInstanceTestCase
 {
     protected string $url = '/api/v1/lti-instances';
     protected string $method = Request::METHOD_DELETE;

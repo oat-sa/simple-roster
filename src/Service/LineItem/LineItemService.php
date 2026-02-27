@@ -40,7 +40,7 @@ class LineItemService
     public function listLineItems(
         FindLineItemCriteria $findLineItemCriteria,
         int $limit,
-        int $cursor = null
+        ?int $cursor = null
     ): ListLineItemResponse {
         $lineItemResultSet = $this->lineItemRepository->findLineItemsByCriteria(
             $findLineItemCriteria,

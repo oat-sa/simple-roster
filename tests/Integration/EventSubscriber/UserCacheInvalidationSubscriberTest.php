@@ -29,7 +29,8 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use JsonException;
 use LogicException;
-use Monolog\Logger;
+use Monolog\Level;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage;
@@ -38,14 +39,13 @@ use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class UserCacheInvalidationSubscriberTest extends KernelTestCase
+class UserCacheInvalidationSubscriberTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -160,11 +160,11 @@ class UserCacheInvalidationSubscriberTest extends KernelTestCase
             'context' => [
                 'cacheKey' => $cacheId,
             ],
-        ], Logger::INFO);
+        ], Level::Info);
 
         $this->assertHasLogRecord([
             'message' => sprintf("Cache warmup event was successfully dispatched for users '%s'", $username),
             'context' => [],
-        ], Logger::INFO);
+        ], Level::Info);
     }
 }

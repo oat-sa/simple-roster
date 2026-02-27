@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\HealthCheck;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HealthCheckActionTest extends WebTestCase
+class HealthCheckActionTest extends AppWebTestCase
 {
     public function testItReturns200WhenApplicationInHealthy(): void
     {

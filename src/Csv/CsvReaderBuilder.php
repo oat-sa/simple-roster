@@ -65,7 +65,7 @@ class CsvReaderBuilder
             throw new StreamResourceNotFoundException(sprintf("Resource not found: '%s'", $relativePath));
         }
 
-        $reader = Reader::createFromStream($stream);
+        $reader = Reader::from($stream);
 
         return $reader
             ->setHeaderOffset($this->headerOffset)

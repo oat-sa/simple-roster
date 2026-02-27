@@ -22,3 +22,8 @@
 ###< symfony/phpunit-bridge ###
 
 config/secrets/
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

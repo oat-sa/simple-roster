@@ -24,13 +24,12 @@ namespace OAT\SimpleRoster\Tests\Unit\Repository\Criteria;
 
 use InvalidArgumentException;
 use OAT\SimpleRoster\Repository\Criteria\EuclideanDivisionCriterion;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class EuclideanDivisionCriterionTest extends TestCase
 {
-    /**
-     * @dataProvider provideInvalidModuloRemainderPairs
-     */
+    #[DataProvider('provideInvalidModuloRemainderPairs')]
     public function testItValidatesModuloAndRemainder(int $modulo, int $remainder, string $exceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -39,7 +38,7 @@ class EuclideanDivisionCriterionTest extends TestCase
         new EuclideanDivisionCriterion($modulo, $remainder);
     }
 
-    public function provideInvalidModuloRemainderPairs(): array
+    public static function provideInvalidModuloRemainderPairs(): array
     {
         return [
             'tooLowModulo' => [

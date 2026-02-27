@@ -33,10 +33,11 @@ use OAT\SimpleRoster\Repository\UserRepository;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Throwable;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class WarmUpGroupedUserCacheMessageHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class WarmUpGroupedUserCacheMessageHandler
 {
     private EntityManagerInterface $entityManager;
     private UserRepository $userRepository;

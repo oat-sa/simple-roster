@@ -28,12 +28,12 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class LineItemRepositoryTest extends KernelTestCase
+class LineItemRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

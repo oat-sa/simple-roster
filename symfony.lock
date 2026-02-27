@@ -38,18 +38,6 @@
     "dnoegel/php-xdg-base-dir": {
         "version": "v0.1.1"
     },
-    "doctrine/annotations": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.0",
-            "ref": "a2759dd6123694c8d901d0ec80006e044c2e6457"
-        },
-        "files": [
-            "config/routes/annotations.yaml"
-        ]
-    },
     "doctrine/cache": {
         "version": "v1.8.0"
     },
@@ -302,12 +290,12 @@
         "version": "3.5.1"
     },
     "oneup/flysystem-bundle": {
-        "version": "3.7",
+        "version": "4.14",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "main",
-            "version": "3.0",
-            "ref": "e6c6440b279273a468e1f570b0fc1d4ff54ad69e"
+            "version": "4.0",
+            "ref": "3ae1b83985e89138f5443bbc2d9b8c074b497d49"
         },
         "files": [
             "config/packages/oneup_flysystem.yaml"
@@ -356,17 +344,18 @@
         "version": "0.11.1"
     },
     "phpunit/phpunit": {
-        "version": "9.6",
+        "version": "11.5",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "9.6",
-            "ref": "6a9341aa97d441627f8bd424ae85dc04c944f8b4"
+            "version": "11.1",
+            "ref": "1117deb12541f35793eec9fff7494d7aa12283fc"
         },
         "files": [
             ".env.test",
             "phpunit.xml.dist",
-            "tests/bootstrap.php"
+            "tests/bootstrap.php",
+            "bin/phpunit"
         ]
     },
     "psalm/plugin-phpunit": {

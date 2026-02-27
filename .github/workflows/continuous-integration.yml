@@ -16,8 +16,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl, redis
+          php-version: '8.4'
+          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
           tools: composer, phpcs
           coverage: xdebug
         env:
@@ -60,4 +60,4 @@ jobs:
         run: ./bin/console doctrine:schema:update --force --env=test
 
       - name: Run phpunit tests
-        run: php -d xdebug.mode=coverage -d memory_limit=1G ./bin/phpunit --coverage-clover coverage.xml
+        run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml

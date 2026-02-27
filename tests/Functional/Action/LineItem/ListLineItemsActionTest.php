@@ -22,16 +22,16 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\LineItem;
 
-use Carbon\Carbon;
 use DateTimeImmutable;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListLineItemsActionTest extends WebTestCase
+class ListLineItemsActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -71,9 +71,7 @@ class ListLineItemsActionTest extends WebTestCase
         self::assertSame('API key authentication failure.', $decodedResponse['error']['message']);
     }
 
-    /**
-     * @dataProvider provideInvalidParameters
-     */
+    #[DataProvider('provideInvalidParameters')]
     public function testItThrowsInvalidArgumentExceptionForInvalidParameters(
         string $field,
         string $value,
@@ -102,9 +100,7 @@ class ListLineItemsActionTest extends WebTestCase
         self::assertSame($message, $decodedResponse['error']['message']);
     }
 
-    /**
-     * @dataProvider provideValidParameters
-     */
+    #[DataProvider('provideValidParameters')]
     public function testItReturnsValidResponseForMultipleParameters(
         array $parameters,
         int $expectedSize,
@@ -132,7 +128,7 @@ class ListLineItemsActionTest extends WebTestCase
         self::assertSame($nextCursor, $decodedResponse['metadata']['pagination']['nextCursor']);
     }
 
-    public function provideInvalidParameters(): array
+    public static function provideInvalidParameters(): array
     {
         return [
             'startTimeStampIsZero' => [
@@ -176,7 +172,7 @@ class ListLineItemsActionTest extends WebTestCase
     /**
      * * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function provideValidParameters(): array
+    public static function provideValidParameters(): array
     {
         return [
             'noParameters' => [
@@ -238,7 +234,7 @@ class ListLineItemsActionTest extends WebTestCase
                 'parameters' => [
                     'uri' => 'https://test.taocloud.fr/__n/30',
                 ],
-                'size' => 1,
+                'expectedSize' => 1,
                 'nextCursor' => null
             ],
             'filterMultipleUris' => [
@@ -250,7 +246,7 @@ class ListLineItemsActionTest extends WebTestCase
                         'https://test.taocloud.fr/__n/1000'
                     ],
                 ],
-                'size' => 3,
+                'expectedSize' => 3,
                 'nextCursor' => null
             ],
             'filterStartAt' => [

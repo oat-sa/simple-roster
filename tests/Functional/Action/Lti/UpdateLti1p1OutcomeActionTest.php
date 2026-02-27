@@ -22,22 +22,23 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Lti;
 
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\LtiInstance;
 use OAT\SimpleRoster\Repository\LtiInstanceRepository;
 use OAT\SimpleRoster\Security\OAuth\OAuthContext;
 use OAT\SimpleRoster\Security\OAuth\OAuthSigner;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLti1p1OutcomeActionTest extends WebTestCase
+class UpdateLti1p1OutcomeActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use XmlTestingTrait;
@@ -65,7 +66,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $this->assertHasLogRecordWithMessage(
             "Invalid OAuth consumer key received, LTI instance with LTI key = '' cannot be found.",
-            Logger::ERROR
+            Level::Error
         );
     }
 
@@ -95,7 +96,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
 
-        $this->assertHasLogRecordWithMessage('Failed OAuth signature validation.', Logger::ERROR);
+        $this->assertHasLogRecordWithMessage('Failed OAuth signature validation.', Level::Error);
     }
 
     public function testItReturns200IfTheAuthenticationWorksAndAssignmentExists(): void
@@ -112,7 +113,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
 
         $uidGenerator
             ->method('uuid4')
-            ->willReturn($messageIdentifier);
+            ->willReturn(Uuid::fromString($messageIdentifier));
 
         $queryParameters = http_build_query([
             'oauth_body_hash' => 'bodyHash',
@@ -148,7 +149,7 @@ class UpdateLti1p1OutcomeActionTest extends WebTestCase
             'context' => [
                 'ltiInstance' => $ltiInstance,
             ],
-        ], Logger::INFO);
+        ], Level::Info);
     }
 
     public function testItReturns400IfTheAuthenticationWorksButTheXmlIsInvalid(): void

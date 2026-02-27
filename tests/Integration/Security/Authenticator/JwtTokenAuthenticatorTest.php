@@ -23,19 +23,23 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Security\Authenticator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Token;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Authenticator\JwtTokenAuthenticator;
 use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
 use OAT\SimpleRoster\Security\Provider\UserProvider;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
-class JwtTokenAuthenticatorTest extends KernelTestCase
+class JwtTokenAuthenticatorTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 
@@ -75,10 +79,7 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         self::assertTrue($this->subject->supports($request));
     }
 
-
-    /**
-     * @dataProvider provideUnsupportedAuthorizationHeaderPayload
-     */
+    #[DataProvider('provideUnsupportedAuthorizationHeaderPayload')]
     public function testItDoesNotSupportRequestWithAuthorizationHeaderButNoBearerPayloadPrefix(
         string $authorizationHeaderPayload
     ): void {
@@ -94,7 +95,32 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
         self::assertFalse($this->subject->supports($request));
     }
 
-    public function testItCanReturnCredentialsFromRequest(): void
+    public function testItCanAuthenticateRequestWithBearerToken(): void
+    {
+        $token = $this->tokenGenerator->create(
+            (new User())->setUsername('user1'),
+            Request::create('/test'),
+            'accessToken',
+            3600
+        );
+
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()]
+        );
+
+        $passport = $this->subject->authenticate($request);
+
+        self::assertInstanceOf(Passport::class, $passport);
+        $userBadge = $passport->getBadge(UserBadge::class);
+        self::assertSame('user1', $userBadge->getUserIdentifier());
+    }
+
+    public function testItThrowsAuthenticationExceptionIfTokenCannotBeParsed(): void
     {
         $request = Request::create(
             '/test',
@@ -102,63 +128,94 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             [],
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer expectedCredentials']
+            ['HTTP_AUTHORIZATION' => 'Bearer invalidToken']
         );
 
-        self::assertSame('expectedCredentials', $this->subject->getCredentials($request));
-    }
-
-    public function testItThrowsAuthenticationExceptionIfTokenCannotBeParsed(): void
-    {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser('invalidToken', $this->userProvider);
+        $this->subject->authenticate($request);
+    }
+
+    public function testOnAuthenticationFailureReturnsCorrectResponse(): void
+    {
+        $exception = new CustomUserMessageAuthenticationException('Invalid token.');
+
+        $response = $this->subject->onAuthenticationFailure(
+            Request::create('/test'),
+            $exception
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+
+        $decodedContent = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Invalid token.', $decodedContent);
     }
 
     public function testItThrowsAuthenticationExceptionIfTokenIsNotValid(): void
     {
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer aaa.bbb.ccc']
+        );
+
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser($this->createMock(Token::class), $this->userProvider);
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfAudClaimIsNotPresent(): void
     {
         $jwtConfigInitialize = $this->jwtConfig->initialise();
-        $builder = $jwtConfigInitialize->builder();
-        $token = $builder->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
+        $token = $jwtConfigInitialize->builder()
+            ->relatedTo('accessToken')
+            ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
+
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()]
+        );
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
 
-        $this->subject->getUser($token->toString(), $this->userProvider);
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfSubjectIsNotAccessToken(): void
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Invalid token.');
-        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
-
         $jwtConfigInitialize = $this->jwtConfig->initialise();
         $token = $jwtConfigInitialize->builder()
             ->permittedFor('testAudience')
             ->getToken($jwtConfigInitialize->signer(), $jwtConfigInitialize->signingKey());
 
-        $this->subject->getUser($token->toString(), $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()]
+        );
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid token.');
+
+        $this->subject->authenticate($request);
     }
 
     public function testItThrowsAuthenticationExceptionIfTokenIsExpired(): void
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Expired token.');
-        $this->expectExceptionCode(Response::HTTP_FORBIDDEN);
-
         $expiredToken = $this->tokenGenerator->create(
             (new User())->setUsername('testUser'),
             Request::create('/test'),
@@ -168,16 +225,37 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
 
         Carbon::setTestNow('+2 hours');
 
-        $this->subject->getUser($expiredToken->toString(), $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $expiredToken->toString()]
+        );
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Expired token.');
+
+        $this->subject->authenticate($request);
 
         Carbon::setTestNow();
     }
 
+    public function testItReturnsForbiddenStatusOnAuthenticationFailure(): void
+    {
+        $exception = new CustomUserMessageAuthenticationException('Expired token.');
+        $response = $this->subject->onAuthenticationFailure(Request::create('/test'), $exception);
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+
+        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Expired token.', $content);
+    }
+
     public function testItThrowsExceptionIfUserCannotBeFound(): void
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage("Username 'testUser' does not exist");
-
         $token = $this->tokenGenerator->create(
             (new User())->setUsername('testUser'),
             Request::create('/test'),
@@ -185,7 +263,19 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
-        $this->subject->getUser($token->toString(), $this->userProvider);
+        $request = Request::create('/test', 'GET', [], [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()
+        ]);
+
+        $passport = $this->subject->authenticate($request);
+
+        $userBadge = $passport->getBadge(UserBadge::class);
+        $userBadge->setUserLoader(fn() => $this->userProvider->loadUserByIdentifier('testUser'));
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage("Username 'testUser' does not exist");
+
+        $passport->getUser();
     }
 
     public function testItCanSuccessfullyReturnUser(): void
@@ -199,25 +289,65 @@ class JwtTokenAuthenticatorTest extends KernelTestCase
             3600
         );
 
-        $user = $this->subject->getUser($token->toString(), $this->userProvider);
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()]
+        );
 
-        self::assertSame('user1', $user->getUsername());
+        $passport = $this->subject->authenticate($request);
+
+        self::assertInstanceOf(Passport::class, $passport);
+
+        /** @var UserBadge $userBadge */
+        $userBadge = $passport->getBadge(UserBadge::class);
+        self::assertInstanceOf(UserBadge::class, $userBadge);
+        self::assertTrue($passport->hasBadge(UserBadge::class));
+        self::assertSame('user1', $userBadge->getUserIdentifier());
     }
 
-    public function testItBubblesUpExceptionOnAuthenticationFailure(): void
+    public function testItReturnsJsonResponseOnAuthenticationFailure(): void
     {
-        $expectedException = new AuthenticationException('Expected exception');
-        $this->expectExceptionObject($expectedException);
+        $message = 'Expected exception message';
+        $exception = new AuthenticationException($message);
+        $request = Request::create('/test');
 
-        $this->subject->onAuthenticationFailure(Request::create('/test'), $expectedException);
+        $response = $this->subject->onAuthenticationFailure($request, $exception);
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+
+        $decodedResponse = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame($message, $decodedResponse);
     }
 
     public function testItDoesNotSupportRememberMe(): void
     {
-        self::assertFalse($this->subject->supportsRememberMe());
+        $token = $this->tokenGenerator->create(
+            (new User())->setUsername('user1'),
+            Request::create('/test'),
+            'accessToken',
+            3600
+        );
+
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $token->toString()]
+        );
+
+        $passport = $this->subject->authenticate($request);
+
+        self::assertFalse($passport->hasBadge(RememberMeBadge::class));
     }
 
-    public function provideUnsupportedAuthorizationHeaderPayload(): array
+    public static function provideUnsupportedAuthorizationHeaderPayload(): array
     {
         return [
             'nonBearer' => ['nonBearer Something'],

@@ -23,19 +23,20 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\WebHook;
 
 use JsonException;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Exception\DoctrineResultCacheImplementationNotFoundException;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLineItemsWebhookActionTest extends WebTestCase
+class UpdateLineItemsWebhookActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -97,10 +98,9 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     }
 
     /**
-     * @dataProvider provideWrongRequestBodies
-     *
      * @throws JsonException
      */
+    #[DataProvider('provideWrongRequestBodies')]
     public function testItThrowsBadRequestIfRequestIsInvalid(
         string $requestBody,
         string $expectedMessage
@@ -168,7 +168,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'uri' => 'https://docker.localhost/ontologies/tao.rdf#FFF'
                 ],
             ],
-            Logger::INFO
+            Level::Info
         );
 
         $this->assertHasLogRecord(
@@ -179,7 +179,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
                     'newUri' => 'https://docker.localhost/ontologies/tao.rdf#RightOne',
                 ],
             ],
-            Logger::INFO
+            Level::Info
         );
 
         self::assertSame('https://docker.localhost/ontologies/tao.rdf#RightOne', $lineItem->getUri());
@@ -252,7 +252,7 @@ class UpdateLineItemsWebhookActionTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function provideWrongRequestBodies(): array
+    public static function provideWrongRequestBodies(): array
     {
         $missingRemoteDeliveryId = 'Invalid Request Body: '
             . '[events][0][eventData][remoteDeliveryId] -> This field is missing.';

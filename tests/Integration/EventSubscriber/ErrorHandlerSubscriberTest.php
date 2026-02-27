@@ -24,15 +24,15 @@ namespace OAT\SimpleRoster\Tests\Integration\EventSubscriber;
 
 use OAT\SimpleRoster\EventSubscriber\ErrorHandlerSubscriber;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ErrorHandlerSubscriberTest extends KernelTestCase
+class ErrorHandlerSubscriberTest extends AppKernelTestCase
 {
     private ErrorHandlerSubscriber $subject;
     private SerializerResponder $responder;
@@ -84,7 +84,7 @@ class ErrorHandlerSubscriberTest extends KernelTestCase
         $exceptionEvent = new ExceptionEvent(
             static::$kernel,
             $requestMock,
-            HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST,
             $throwable
         );
 
