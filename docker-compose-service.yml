@@ -2,6 +2,8 @@ services:
     simple-roster-nginx:
         container_name: simple-roster-nginx${CONTAINER_SUFFIX}
         image: nginx:stable
+        depends_on:
+            - simple-roster-phpfpm
         networks:
             - simple-roster
             - depp-delivery

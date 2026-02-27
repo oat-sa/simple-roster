@@ -5,7 +5,7 @@ include:
 
 services:
     simple-roster-phpfpm:
-        container_name: simple-roster-phpfpm
+        container_name: simple-roster-phpfpm${CONTAINER_SUFFIX}
         env_file:
             - .env.docker
         build:
