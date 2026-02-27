@@ -33,6 +33,19 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
       - run: git fetch --tags --unshallow
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
+          tools: composer, phpcs
+          coverage: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Debug PHP version
+        run: php -v
+
       - name: Check commit
         if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
         uses: oat-sa/conventional-commit-action@v0
