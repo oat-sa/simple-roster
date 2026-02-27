@@ -22,6 +22,16 @@ services:
         alias: Ramsey\Uuid\UuidFactoryInterface
         public: true
 
+    test.file_storage:
+        class: OAT\SimpleRoster\Service\Upload\S3FileStorage
+        arguments:
+            - '@oneup_flysystem.rostering_files_s3_filesystem_filesystem'
+        public: true
+
+    OAT\SimpleRoster\Service\Upload\FileStorageInterface:
+        alias: test.file_storage
+        public: true
+
     app.jwt_cache.adapter:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
 

@@ -50,6 +50,10 @@ parameters:
     app.aws.endpoint: '%env(string:AWS_ENDPOINT)%'
     app.aws.path_style: '%env(bool:AWS_PATH_STYLE)%'
     app.recreate_users: '%env(bool:RECREATE_QA_USERS)%'
+    app.storage.pending_folder_name: '%env(string:S3_STORAGE_PENDING_FOLDER_NAME)%'
+    app.storage.failed_folder_name: '%env(string:S3_STORAGE_FAILED_FOLDER_NAME)%'
+    app.storage.processed_folder_name: '%env(string:S3_STORAGE_PROCESSED_FOLDER_NAME)%'
+    app.upload.max_size: '%env(int:ALLOWED_UPLOADED_FILE_MAX_SIZE)%'
 
 services:
     # default configuration for services in *this* file
@@ -78,6 +82,10 @@ services:
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
             $generatedUsersFilePath: '%app.generated_users_file_path%'
             $projectDir: '%kernel.project_dir%'
+            $s3PendingFolderName: '%app.storage.pending_folder_name%'
+            $s3FailedFolderName: '%app.storage.failed_folder_name%'
+            $s3ProcessedFolderName: '%app.storage.processed_folder_name%'
+            $allowedUploadedFileMaxSize: '%app.upload.max_size%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -112,6 +120,11 @@ services:
     OAT\SimpleRoster\Action\:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
+
+    OAT\SimpleRoster\Service\Upload\FileStorageInterface:
+        class: OAT\SimpleRoster\Service\Upload\S3FileStorage
+        arguments:
+            $filesystem: '@oneup_flysystem.rostering_files_s3_filesystem_filesystem'
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:

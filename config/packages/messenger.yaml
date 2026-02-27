@@ -3,6 +3,8 @@ framework:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             cache-warmup: 'sync://'
+            rostering-file-uploaded: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_TRANSPORT_DSN)%'
 
         routing:
             'OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage': cache-warmup
+            'OAT\SimpleRoster\Message\RosteringFileUploadedMessage': rostering-file-uploaded

@@ -541,6 +541,34 @@ paths:
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
 
+    /v1/upload:
+        post:
+            security:
+                -   bearerAuth: []
+            summary: Upload a file
+            tags:
+                - FileUpload
+            operationId: uploadFile
+            requestBody:
+                description: The file to upload
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            $ref: '#/components/schemas/UploadRequest'
+            responses:
+                200:
+                    $ref: '#/components/responses/UploadResponse'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                403:
+                    $ref: '#/components/responses/AccessDeniedResponse'
+                404:
+                    $ref: '#/components/responses/NotFoundResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
 components:
     securitySchemes:
         apiKeyAuth:
@@ -901,6 +929,13 @@ components:
                     type: string
                     description: Group prefix to be used if load balancing configured to userGroupId
                     example: TestCollege
+        UploadRequest:
+            type: object
+            properties:
+                file:
+                    type: string
+                    format: binary
+                    description: The file to be uploaded.
         Error:
             type: object
             properties:
@@ -974,6 +1009,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Error'
+        NotFoundResponse:
+            description: Not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
         MethodNotAllowedResponse:
             description: Method not allowed
             content:
@@ -1029,3 +1070,16 @@ components:
                             type: array
                             description: Names of non existing line item slugs
                             example: LQA
+        UploadResponse:
+            description: File uploaded successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+                                description: Success message.
+                            referenceId:
+                                type: string
+                                description: Reference ID of the uploaded file.

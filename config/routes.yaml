@@ -64,6 +64,11 @@ bulkCreateUsers:
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\CreateEntity\BulkCreateUsersAction }
 
+uploadFile:
+  path: '%app.route_prefix%/v1/upload'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\Upload\UploadFileAction }
+
 listLtiInstances:
   path: '%app.route_prefix%/v1/lti-instances'
   methods: GET

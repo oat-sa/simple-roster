@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unrelease
+### Added
+- Added file upload endpoint with validation, forwarding, and messenger notification
+
 ### Fixed
 - Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
 - Updated Symfony to 7.4.5 and PHP to 8.4, including all dependencies
