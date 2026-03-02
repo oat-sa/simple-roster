@@ -41,3 +41,5 @@ RUN curl -ksS https://getcomposer.org/installer | php -- --install-dir=/usr/loca
 
 RUN BLACKFIRE_INSTALL_METHOD=raw bash -c "$(curl -L https://installer.blackfire.io/installer.sh)" \
     && blackfire php:install
+
+COPY --chmod=755 build.sh /tmp/build.sh
