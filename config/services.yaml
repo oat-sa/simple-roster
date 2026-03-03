@@ -130,7 +130,7 @@ services:
     OAT\SimpleRoster\Service\Upload\FileStorageInterface:
         class: OAT\SimpleRoster\Service\Upload\S3FileStorage
         arguments:
-            $filesystem: '@oneup_flysystem.rostering_files_s3_filesystem_filesystem'
+            $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:
