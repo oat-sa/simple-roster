@@ -11,9 +11,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileValidatorTest extends TestCase
 {
+    private const CSV_DELIMITER = ',';
+    private const CSV_ENCLOSURE = '"';
+    private const CSV_ESCAPE = '\\';
+
     public function testItRejectsDisallowedExtension(): void
     {
-        $validator = new UploadedFileValidator(1024);
+        $validator = $this->createValidator(1024);
         $file = $this->createUploadedFile('test.xlsx', 'content');
 
         $this->expectException(UploadedFileValidationException::class);
@@ -24,7 +28,7 @@ class UploadedFileValidatorTest extends TestCase
 
     public function testItRejectsTooLargeFile(): void
     {
-        $validator = new UploadedFileValidator(3);
+        $validator = $this->createValidator(3);
         $file = $this->createUploadedFile('test.csv', '1234');
 
         $this->expectException(UploadedFileValidationException::class);
@@ -35,7 +39,7 @@ class UploadedFileValidatorTest extends TestCase
 
     public function testItAcceptsValidFile(): void
     {
-        $validator = new UploadedFileValidator(1024);
+        $validator = $this->createValidator(1024);
         $file = $this->createUploadedFile('test.csv', 'ok');
 
         $validator->validate($file);
@@ -45,13 +49,33 @@ class UploadedFileValidatorTest extends TestCase
 
     public function testItRejectsInvalidCsvStructure(): void
     {
-        $validator = new UploadedFileValidator(1024);
+        $validator = $this->createValidator(1024);
         $file = $this->createUploadedFile('test.csv', "col1,col2\nvalue1,value2,value3");
 
         $this->expectException(UploadedFileValidationException::class);
         $this->expectExceptionMessage('Invalid CSV structure detected at row "2". Expected "2" columns, got "3".');
 
         $validator->validate($file);
+    }
+
+    public function testItAcceptsCsvWithConfiguredDelimiter(): void
+    {
+        $validator = new UploadedFileValidator(1024, ';', self::CSV_ENCLOSURE, self::CSV_ESCAPE);
+        $file = $this->createUploadedFile('test.csv', "col1;col2\nvalue1;value2");
+
+        $validator->validate($file);
+
+        $this->assertTrue(true);
+    }
+
+    private function createValidator(int $maxSize): UploadedFileValidator
+    {
+        return new UploadedFileValidator(
+            $maxSize,
+            self::CSV_DELIMITER,
+            self::CSV_ENCLOSURE,
+            self::CSV_ESCAPE
+        );
     }
 
     private function createUploadedFile(string $originalName, string $content): UploadedFile

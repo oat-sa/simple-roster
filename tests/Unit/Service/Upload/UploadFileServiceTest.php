@@ -15,9 +15,18 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class UploadFileServiceTest extends TestCase
 {
+    private const CSV_DELIMITER = ',';
+    private const CSV_ENCLOSURE = '"';
+    private const CSV_ESCAPE = '\\';
+
     public function testItStoresFileAndDispatchesMessage(): void
     {
-        $validator = new UploadedFileValidator(1024);
+        $validator = new UploadedFileValidator(
+            1024,
+            self::CSV_DELIMITER,
+            self::CSV_ENCLOSURE,
+            self::CSV_ESCAPE
+        );
 
         $storage = $this->createMock(FileStorageInterface::class);
         $bus = $this->createMock(MessageBusInterface::class);

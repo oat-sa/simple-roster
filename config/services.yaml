@@ -54,6 +54,9 @@ parameters:
     app.storage.failed_folder_name: '%env(string:S3_STORAGE_FAILED_FOLDER_NAME)%'
     app.storage.processed_folder_name: '%env(string:S3_STORAGE_PROCESSED_FOLDER_NAME)%'
     app.upload.max_size: '%env(int:ALLOWED_UPLOADED_FILE_MAX_SIZE)%'
+    app.upload.csv.delimiter: ','
+    app.upload.csv.enclosure: '"'
+    app.upload.csv.escape: "\\"
 
 services:
     # default configuration for services in *this* file
@@ -86,6 +89,9 @@ services:
             $s3FailedFolderName: '%app.storage.failed_folder_name%'
             $s3ProcessedFolderName: '%app.storage.processed_folder_name%'
             $allowedUploadedFileMaxSize: '%app.upload.max_size%'
+            $uploadedFileCsvDelimiter: '%app.upload.csv.delimiter%'
+            $uploadedFileCsvEnclosure: '%app.upload.csv.enclosure%'
+            $uploadedFileCsvEscape: '%app.upload.csv.escape%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:

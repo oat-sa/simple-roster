@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Upload;
 
+use League\Csv\Reader;
+use League\Csv\SyntaxError;
 use OAT\SimpleRoster\Service\Upload\Exception\UploadedFileValidationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
 
 class UploadedFileValidator
 {
     private const ALLOWED_FILE_EXTENSION = 'csv';
 
     public function __construct(
-        private readonly int $allowedUploadedFileMaxSize
+        private readonly int $allowedUploadedFileMaxSize,
+        private readonly string $uploadedFileCsvDelimiter,
+        private readonly string $uploadedFileCsvEnclosure,
+        private readonly string $uploadedFileCsvEscape
     ) {
     }
 
@@ -55,19 +61,23 @@ class UploadedFileValidator
 
     private function validateCsvStructure(UploadedFile $file): void
     {
-        $handle = fopen($file->getPathname(), 'rb');
-        if ($handle === false) {
-            throw new UploadedFileValidationException('Unable to read uploaded CSV file.');
+        try {
+            $csv = Reader::from($file->getPathname(), 'r')
+                ->setDelimiter($this->uploadedFileCsvDelimiter)
+                ->setEnclosure($this->uploadedFileCsvEnclosure)
+                ->setEscape($this->uploadedFileCsvEscape);
+        } catch (Throwable $exception) {
+            throw new UploadedFileValidationException('Unable to read uploaded CSV file.', 0, $exception);
         }
 
         $expectedColumns = null;
         $rowNumber = 0;
 
         try {
-            while (($row = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
+            foreach ($csv->getRecords() as $row) {
                 ++$rowNumber;
 
-                if ($row === [null]) {
+                if ($this->isEmptyCsvRow($row)) {
                     continue;
                 }
 
@@ -89,16 +99,27 @@ class UploadedFileValidator
                     );
                 }
             }
-
-            if (!feof($handle)) {
-                throw new UploadedFileValidationException('Uploaded file cannot be parsed as valid CSV.');
-            }
-
-            if ($expectedColumns === null) {
-                throw new UploadedFileValidationException('Uploaded CSV file is empty.');
-            }
-        } finally {
-            fclose($handle);
+        } catch (SyntaxError $exception) {
+            throw new UploadedFileValidationException('Uploaded file cannot be parsed as valid CSV.', 0, $exception);
         }
+
+        if ($expectedColumns === null) {
+            throw new UploadedFileValidationException('Uploaded CSV file is empty.');
+        }
+    }
+
+    /**
+     * @param array<int, mixed> $row
+     */
+    private function isEmptyCsvRow(array $row): bool
+    {
+        if ($row === [] || $row === [null]) {
+            return true;
+        }
+
+        return array_filter(
+            $row,
+            static fn ($value): bool => is_string($value) ? trim($value) !== '' : $value !== null
+        ) === [];
     }
 }
