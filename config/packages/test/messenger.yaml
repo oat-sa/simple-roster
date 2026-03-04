@@ -3,3 +3,4 @@ framework:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             cache-warmup: 'in-memory://'
+            rostering-file-uploaded: 'in-memory://'

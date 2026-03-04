@@ -119,14 +119,15 @@ class UploadFileActionTest extends AppWebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame('File uploaded', $decodedResponse['message']);
-        self::assertMatchesRegularExpression('#^[0-9a-f-]{36}$#', $decodedResponse['referenceId']);
+        self::assertArrayHasKey('result', $decodedResponse);
+        self::assertSame('File uploaded', $decodedResponse['result']['message']);
+        self::assertMatchesRegularExpression('#^[0-9a-f-]{36}$#', $decodedResponse['result']['referenceId']);
 
         self::assertSame(
-            'pending/' . $decodedResponse['referenceId'] . '.csv',
+            'pending/' . $decodedResponse['result']['referenceId'] . '.csv',
             $captured['key']
         );
-        self::assertSame($decodedResponse['referenceId'], $captured['metadata']['referenceId'] ?? null);
+        self::assertSame($decodedResponse['result']['referenceId'], $captured['metadata']['referenceId'] ?? null);
     }
 
     public function testItReturns400WhenUploadedFileExtensionIsInvalid(): void

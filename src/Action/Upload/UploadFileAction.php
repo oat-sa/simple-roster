@@ -53,6 +53,6 @@ class UploadFileAction
             throw new BadRequestHttpException($exception->getMessage(), $exception);
         }
 
-        return $this->responder->createJsonResponse($result, Response::HTTP_OK);
+        return $this->responder->createJsonResponse(['result' => $result], Response::HTTP_OK);
     }
 }

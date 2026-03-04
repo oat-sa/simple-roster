@@ -1077,9 +1077,12 @@ components:
                     schema:
                         type: object
                         properties:
-                            message:
-                                type: string
-                                description: Success message.
-                            referenceId:
-                                type: string
-                                description: Reference ID of the uploaded file.
+                            result:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: Success message.
+                                    referenceId:
+                                        type: string
+                                        description: Reference ID of the uploaded file.

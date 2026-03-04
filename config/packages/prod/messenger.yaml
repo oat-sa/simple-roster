@@ -1,0 +1,4 @@
+framework:
+    messenger:
+        transports:
+            rostering-file-uploaded: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_TRANSPORT_DSN)%'
