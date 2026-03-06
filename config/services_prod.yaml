@@ -1,0 +1,5 @@
+services:
+    Aws\S3\S3Client:
+        arguments:
+            - version: '%app.aws.version%'
+              region: '%app.aws.region%'
