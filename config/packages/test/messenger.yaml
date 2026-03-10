@@ -5,4 +5,4 @@ framework:
             cache-warmup: 'in-memory://'
             rostering-file-uploaded:
                 dsn: 'in-memory://'
-                serializer: messenger.transport.symfony_serializer
+                serializer: OAT\SimpleRoster\Messenger\Serializer\RosteringFileUploadedSerializer
