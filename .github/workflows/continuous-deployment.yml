@@ -79,4 +79,4 @@ jobs:
           key: ${{ secrets.ENV_QA_CD_SSH_PRIVATE }}
           script: |
             cd /home/ubuntu/pp-stack
-            ./docker/scripts/redeploy.sh
+            ./docker/scripts/redeploy.sh -e sr
