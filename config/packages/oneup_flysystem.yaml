@@ -10,6 +10,8 @@ oneup_flysystem:
                 bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
                 prefix: '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_PREFIX)%'
         rostering_files_adapter:
+            local:
+                location: '%kernel.project_dir%/var/rostering-files'
             awss3v3:
                 client: Aws\S3\S3Client
                 bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
