@@ -11,59 +11,56 @@ on:
 jobs:
   setup:
     name: Setup environment
-    runs-on: ubuntu-25.04
+    runs-on: ubuntu-24.04
     steps:
-      # - name: Setup PHP
-      #   uses: shivammathur/setup-php@v2
-      #   with:
-      #     php-version: '8.4'
-      #     extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
-      #     tools: composer, phpcs
-      #     coverage: xdebug
-      #   env:
-      #     COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
+          tools: composer, phpcs
+          coverage: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Debug PHP version
         run: php -v
 
-  # build:
-  #   name: Build/test environment
-  #   runs-on: ubuntu-22.04
-  #   needs: setup
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         token: ${{ secrets.GH_TOKEN }}
-  #     - run: git fetch --tags --unshallow
+  build:
+    name: Build/test environment
+    runs-on: ubuntu-24.04
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - run: git fetch --tags --unshallow
 
-  #     - name: Debug PHP version
-  #       run: php -v
+      - name: Check commit
+        if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
+        uses: oat-sa/conventional-commit-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Check commit
-  #       if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
-  #       uses: oat-sa/conventional-commit-action@v0
-  #       with:
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-  #     - name: Get Composer Cache Directory
-  #       id: composer-cache
-  #       run: |
-  #         echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-  #     - uses: actions/cache@v4
-  #       with:
-  #         path: ${{ steps.composer-cache.outputs.dir }}
-  #         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-composer-
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN }}"}}'
+        run: composer install -n --ignore-platform-reqs
 
-  #     - name: Install Composer dependencies
-  #       env:
-  #         COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN }}"}}'
-  #       run: composer install -n --ignore-platform-reqs
+      - name: Setup database
+        run: ./bin/console doctrine:schema:update --force --env=test
 
-  #     - name: Setup database
-  #       run: ./bin/console doctrine:schema:update --force --env=test
-
-  #     - name: Run phpunit tests
-  #       run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml
+      - name: Run phpunit tests
+        run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml
