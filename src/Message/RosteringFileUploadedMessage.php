@@ -7,8 +7,7 @@ namespace OAT\SimpleRoster\Message;
 class RosteringFileUploadedMessage
 {
     public function __construct(
-        public readonly string $referenceId,
-        public readonly string $pendingKey
+        public readonly string $referenceId
     ) {
     }
 }

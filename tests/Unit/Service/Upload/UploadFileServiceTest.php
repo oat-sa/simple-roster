@@ -23,6 +23,7 @@ class UploadFileServiceTest extends TestCase
     {
         $validator = new UploadedFileValidator(
             1024,
+            100,
             self::CSV_DELIMITER,
             self::CSV_ENCLOSURE,
             self::CSV_ESCAPE
@@ -44,14 +45,13 @@ class UploadFileServiceTest extends TestCase
                 $this->callback(static function (array $metadata): bool {
                     return isset($metadata['referenceId']) && is_string($metadata['referenceId']) && $metadata['referenceId'] !== '';
                 })
-            )
-            ->willReturn('File uploaded');
+            );
 
         $bus
             ->expects($this->once())
             ->method('dispatch')
             ->with($this->isInstanceOf(RosteringFileUploadedMessage::class))
-            ->willReturn(new Envelope(new RosteringFileUploadedMessage('ref', 'pending/ref.csv')));
+            ->willReturn(new Envelope(new RosteringFileUploadedMessage('ref')));
 
         $result = $service->upload($file);
 

@@ -1,4 +1,6 @@
 framework:
     messenger:
         transports:
-            rostering-file-uploaded: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_TRANSPORT_DSN)%'
+            rostering-file-uploaded:
+                dsn: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_TRANSPORT_DSN)%'
+                serializer: messenger.transport.symfony_serializer

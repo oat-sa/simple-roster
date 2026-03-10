@@ -87,11 +87,9 @@ class UploadFileActionTest extends AppWebTestCase
 
         $storage
             ->method('store')
-            ->willReturnCallback(static function (UploadedFile $file, string $pendingKey, array $metadata) use (&$captured): string {
-                $captured['key'] = $pendingKey;
+            ->willReturnCallback(static function (UploadedFile $file, string $storageKey, array $metadata) use (&$captured): void {
+                $captured['key'] = $storageKey;
                 $captured['metadata'] = $metadata;
-
-                return 'File uploaded';
             });
 
         self::getContainer()->set('test.file_storage', $storage);

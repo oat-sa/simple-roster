@@ -3,7 +3,9 @@ framework:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             cache-warmup: 'sync://'
-            rostering-file-uploaded: 'in-memory://'
+            rostering-file-uploaded:
+                dsn: 'in-memory://'
+                serializer: messenger.transport.symfony_serializer
 
         routing:
             'OAT\SimpleRoster\Message\WarmUpGroupedUserCacheMessage': cache-warmup

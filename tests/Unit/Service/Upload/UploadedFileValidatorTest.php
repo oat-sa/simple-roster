@@ -60,7 +60,7 @@ class UploadedFileValidatorTest extends TestCase
 
     public function testItAcceptsCsvWithConfiguredDelimiter(): void
     {
-        $validator = new UploadedFileValidator(1024, ';', self::CSV_ENCLOSURE, self::CSV_ESCAPE);
+        $validator = new UploadedFileValidator(1024, 100, ';', self::CSV_ENCLOSURE, self::CSV_ESCAPE);
         $file = $this->createUploadedFile('test.csv', "col1;col2\nvalue1;value2");
 
         $validator->validate($file);
@@ -68,10 +68,32 @@ class UploadedFileValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    private function createValidator(int $maxSize): UploadedFileValidator
+    public function testItRejectsTooManyRecords(): void
+    {
+        $validator = $this->createValidator(1024, 2);
+        $file = $this->createUploadedFile('test.csv', "col1,col2\na,b\nc,d\ne,f");
+
+        $this->expectException(UploadedFileValidationException::class);
+        $this->expectExceptionMessage('File records count "3" exceeds maximum allowed records of "2".');
+
+        $validator->validate($file);
+    }
+
+    public function testItAcceptsWhenRecordsCountEqualsConfiguredLimit(): void
+    {
+        $validator = $this->createValidator(1024, 2);
+        $file = $this->createUploadedFile('test.csv', "col1,col2\na,b\nc,d");
+
+        $validator->validate($file);
+
+        $this->assertTrue(true);
+    }
+
+    private function createValidator(int $maxSize, int $maxRecords = 100): UploadedFileValidator
     {
         return new UploadedFileValidator(
             $maxSize,
+            $maxRecords,
             self::CSV_DELIMITER,
             self::CSV_ENCLOSURE,
             self::CSV_ESCAPE

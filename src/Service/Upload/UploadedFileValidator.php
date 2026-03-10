@@ -16,6 +16,7 @@ class UploadedFileValidator
 
     public function __construct(
         private readonly int $allowedUploadedFileMaxSize,
+        private readonly int $allowedUploadedFileMaxRecords,
         private readonly string $uploadedFileCsvDelimiter,
         private readonly string $uploadedFileCsvEnclosure,
         private readonly string $uploadedFileCsvEscape
@@ -72,6 +73,7 @@ class UploadedFileValidator
 
         $expectedColumns = null;
         $rowNumber = 0;
+        $recordCount = 0;
 
         try {
             foreach ($csv->getRecords() as $row) {
@@ -86,6 +88,17 @@ class UploadedFileValidator
                 if ($expectedColumns === null) {
                     $expectedColumns = $columnsCount;
                     continue;
+                }
+
+                ++$recordCount;
+                if ($recordCount > $this->allowedUploadedFileMaxRecords) {
+                    throw new UploadedFileValidationException(
+                        sprintf(
+                            'File records count "%d" exceeds maximum allowed records of "%d".',
+                            $recordCount,
+                            $this->allowedUploadedFileMaxRecords
+                        )
+                    );
                 }
 
                 if ($columnsCount !== $expectedColumns) {

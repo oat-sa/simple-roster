@@ -17,7 +17,7 @@ class S3FileStorage implements FileStorageInterface
     ) {
     }
 
-    public function store(UploadedFile $file, string $key, array $metadata = []): string
+    public function store(UploadedFile $file, string $key, array $metadata = []): void
     {
         $stream = @fopen($file->getPathname(), 'rb');
         if ($stream === false) {
@@ -43,8 +43,6 @@ class S3FileStorage implements FileStorageInterface
                 fclose($stream);
             }
         }
-
-        return sprintf('File uploaded to %s', $key);
     }
 
     public function move(string $sourceKey, string $targetKey, array $metadata = []): string

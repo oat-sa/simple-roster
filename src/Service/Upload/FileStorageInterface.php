@@ -11,7 +11,7 @@ interface FileStorageInterface
     /**
      * @param array<string, string> $metadata
      */
-    public function store(UploadedFile $file, string $key, array $metadata = []): string;
+    public function store(UploadedFile $file, string $key, array $metadata = []): void;
 
     /**
      * @param array<string, string> $metadata

@@ -11,6 +11,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class UploadFileService
 {
+    private const UPLOAD_SUCCESS_MESSAGE = 'File uploaded';
+
     public function __construct(
         private readonly UploadedFileValidator $validator,
         private readonly FileStorageInterface $fileStorage,
@@ -27,33 +29,27 @@ class UploadFileService
         $this->validator->validate($file);
 
         $referenceId = Uuid::uuid4()->toString();
-        $extension = strtolower(trim($file->getClientOriginalExtension()));
+        $storageKey = $this->buildStorageKey($referenceId);
 
-        $pendingKey = $this->buildPendingKey($referenceId, $extension);
-
-        $message = $this->fileStorage->store(
+        $this->fileStorage->store(
             $file,
-            $pendingKey,
+            $storageKey,
             ['referenceId' => $referenceId]
         );
 
-        $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId, $pendingKey));
+        $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId));
 
         return [
-            'message' => $message,
+            'message' => self::UPLOAD_SUCCESS_MESSAGE,
             'referenceId' => $referenceId,
         ];
     }
 
-    private function buildPendingKey(string $referenceId, string $extension): string
+    private function buildStorageKey(string $referenceId): string
     {
         $folder = trim($this->s3PendingFolderName, '/');
-        $fileName = $referenceId . '.' . ltrim($extension, '.');
+        $fileName = $referenceId . '.csv';
 
-        if ($folder === '') {
-            return $fileName;
-        }
-
-        return $folder . '/' . $fileName;
+        return $folder ? $folder . '/' . $fileName : $fileName;
     }
 }
