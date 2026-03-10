@@ -23,6 +23,9 @@ jobs:
         env:
           COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
 
+      - name: Debug PHP version
+        run: php -v
+
   build:
     name: Build/test environment
     runs-on: ubuntu-22.04
@@ -32,6 +35,9 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
       - run: git fetch --tags --unshallow
+
+      - name: Debug PHP version
+        run: php -v
 
       - name: Check commit
         if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
