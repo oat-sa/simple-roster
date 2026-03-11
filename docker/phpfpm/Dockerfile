@@ -39,5 +39,11 @@ RUN { \
 
 RUN curl -ksS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
 
+RUN mkdir -p config/secrets/docker \
+    && openssl genpkey -aes-256-cbc -algorithm RSA -pass pass:devpassphrase -out config/secrets/docker/jwt_private.pem \
+    && openssl pkey -in config/secrets/docker/jwt_private.pem -passin pass:devpassphrase -out config/secrets/docker/jwt_public.pem -pubout
+
 RUN BLACKFIRE_INSTALL_METHOD=raw bash -c "$(curl -L https://installer.blackfire.io/installer.sh)" \
     && blackfire php:install
+
+COPY --chmod=755 build.sh /tmp/build.sh
