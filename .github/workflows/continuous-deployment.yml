@@ -5,11 +5,13 @@ name: Simple Roster - Continuous Deployment
 
 on:
   pull_request:
-    branches: [ master, develop, feat/*, feature/*, fix/*, integration/* ]
-    types: [synchronize, opened, reopened]
+    branches:
+      - develop
+    types: [closed]
 
 jobs:
   setup:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release-') != true
     name: Setup environment
     runs-on: ubuntu-24.04
     steps:
@@ -27,6 +29,7 @@ jobs:
         run: php -v
 
   build:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release-') != true
     name: Build/test environment
     runs-on: ubuntu-24.04
     needs: setup
@@ -69,6 +72,7 @@ jobs:
         run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml
 
   deployment:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release-') != true
     name: Deployment for QA
     needs: [build, setup]
     runs-on: ubuntu-24.04
