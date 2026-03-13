@@ -1,7 +1,8 @@
-# Make a repository release after merging to develop branch
+# Deployment workflow for Simple Roster for the LSI QA
 
 name: Simple Roster - Continuous Deployment
-# This workflow is triggered on pull request open/reopen events across multiple branches
+# This workflow is triggered on pull request closed events on develop branch,
+# but only if the pull request was merged and does not start with 'release-'.
 
 on:
   pull_request:
