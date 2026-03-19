@@ -28,14 +28,35 @@ class RosteringFileUploadedSerializerTest extends TestCase
         );
     }
 
-    public function testDecodeThrowsBecauseSerializerIsWriteOnly(): void
+    public function testDecode(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $decoded = $serializer->decode(['body' => '{"referenceId":"ref-456"}']);
+
+        self::assertInstanceOf(Envelope::class, $decoded);
+        self::assertInstanceOf(RosteringFileUploadedMessage::class, $decoded->getMessage());
+        self::assertSame('ref-456', $decoded->getMessage()->referenceId);
+    }
+
+    public function testDecodeThrowsForBadJson(): void
     {
         $serializer = new RosteringFileUploadedSerializer();
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Transport & serializer not meant for receiving messages');
+        $this->expectExceptionMessage('json_decode error: Syntax error');
 
-        $serializer->decode(['body' => '{}']);
+        $serializer->decode(['body' => '{bad json}']);
+    }
+
+    public function testDecodeThrowsWhenReferenceIdIsMissing(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Reference ID missing.');
+
+        $serializer->decode(['body' => '{"status":"ok"}']);
     }
 
     public function testEncodeThrowsForUnsupportedMessageType(): void

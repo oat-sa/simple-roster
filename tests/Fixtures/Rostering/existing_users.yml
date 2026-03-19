@@ -1,0 +1,10 @@
+OAT\SimpleRoster\Entity\User:
+    existing_user:
+        username: 'existing_user'
+        plainPassword: 'OldPassword1'
+        groupId: 'OLD_SCHOOL'
+
+    existing_group_user:
+        username: 'existing_group_user'
+        plainPassword: 'OldPassword2'
+        groupId: 'OLD_GROUP'

@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
@@ -199,5 +200,84 @@ class UserRepository extends AbstractRepository
                 ->setParameter('modulo', $criteria->getEuclideanDivisionCriterion()->getModulo())
                 ->setParameter('remainder', $criteria->getEuclideanDivisionCriterion()->getRemainder());
         }
+    }
+
+    public function findIdByUsername(string $username): ?int
+    {
+        $result = $this->getConnection()->fetchOne(
+            'SELECT id FROM users WHERE username = :username',
+            ['username' => $username]
+        );
+
+        if (false === $result || null === $result) {
+            return null;
+        }
+
+        return (int)$result;
+    }
+
+    /**
+     * @param array{password?: string, groupId?: string} $fieldsToUpdate
+     */
+    public function updateForRostering(string $username, array $fieldsToUpdate): void
+    {
+        if ($fieldsToUpdate === []) {
+            return;
+        }
+
+        $setFields = [];
+        $params = ['username' => $username];
+
+        if (array_key_exists('password', $fieldsToUpdate)) {
+            $setFields[] = 'password = :password';
+            $params['password'] = $fieldsToUpdate['password'];
+        }
+
+        if (array_key_exists('groupId', $fieldsToUpdate)) {
+            $setFields[] = 'group_id = :groupId';
+            $params['groupId'] = $fieldsToUpdate['groupId'];
+        }
+
+        if ($setFields === []) {
+            return;
+        }
+
+        $this->getConnection()->executeStatement(
+            sprintf('UPDATE users SET %s WHERE username = :username', implode(', ', $setFields)),
+            $params
+        );
+    }
+
+    public function insertForRostering(string $username, string $passwordHash, string $organizationId): int
+    {
+        $userId = $this->getConnection()->fetchOne(
+            'INSERT INTO users (username, password, roles, group_id) '
+            . 'VALUES (:username, :password, :roles, :groupId) RETURNING id',
+            [
+                'username' => $username,
+                'password' => $passwordHash,
+                'roles' => '[]',
+                'groupId' => $organizationId,
+            ]
+        );
+
+        if (false === $userId || null === $userId) {
+            return 0;
+        }
+
+        return (int)$userId;
+    }
+
+    public function deleteById(int $userId): void
+    {
+        $this->getConnection()->executeStatement(
+            'DELETE FROM users WHERE id = :userId',
+            ['userId' => $userId]
+        );
+    }
+
+    private function getConnection(): DbalConnection
+    {
+        return $this->getEntityManager()->getConnection();
     }
 }

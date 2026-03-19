@@ -1,0 +1,446 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OAT\SimpleRoster\Service\Rostering;
+
+use Doctrine\DBAL\Connection;
+use League\Csv\Reader;
+use League\Csv\Statement;
+use League\Csv\Writer;
+use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserRow;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
+use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Throwable;
+
+class RosteringFileProcessor
+{
+    private const RESULT_STATUS = 'status';
+    private const RESULT_ERROR_TYPE = 'errorType';
+    private const RESULT_ERROR_CODE = 'errorCode';
+    private const RESULT_ERROR_MESSAGE = 'errorMessage';
+
+    private const ROW_STATUS_PROCESSED = 'processed';
+    private const ROW_STATUS_VALIDATION_FAILED = '400';
+    private const ROW_STATUS_INTERNAL_ERROR = '500';
+
+    private const ERROR_TYPE = 'error';
+    private const ERROR_CODE_VALIDATION = 'validation.fieldError';
+    private const ERROR_CODE_INTERNAL = 'csv.import.internalError';
+
+    private const MAX_REFERENCE_ID_LENGTH = 255;
+
+    private const ASSIGNMENT_STATE_READY = 'ready';
+    private const INPUT_FILE_NAME = 'input.csv';
+    private const OUTPUT_FILE_NAME = 'sr-output.csv';
+
+    /**
+     * @var array<string, int|null>
+     */
+    private array $lineItemIdsBySessionName = [];
+
+    public function __construct(
+        private readonly FileStorageInterface $fileStorage,
+        private readonly Connection $connection,
+        private readonly UserRepository $userRepository,
+        private readonly LineItemRepository $lineItemRepository,
+        private readonly AssignmentRepository $assignmentRepository,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly LoggerInterface $logger,
+        private readonly RosteringUserRowValidator $rowValidator
+    ) {
+    }
+
+    public function process(string $referenceId): void
+    {
+        $referenceId = trim($referenceId);
+        $this->validateReferenceId($referenceId);
+
+        $inputFileKey = $this->buildStorageKey($referenceId, self::INPUT_FILE_NAME);
+        $outputFileKey = $this->buildStorageKey($referenceId, self::OUTPUT_FILE_NAME);
+        $inputStream = $this->fileStorage->read($inputFileKey);
+        $resultStream = fopen('php://temp', 'rb+');
+
+        if (false === $resultStream) {
+            throw new RuntimeException('Unable to create temporary stream for rostering result file.');
+        }
+
+        $totalRows = 0;
+        $failedRows = 0;
+        $importableRows = 0;
+
+        try {
+            $reader = Reader::from($inputStream);
+            $reader->setHeaderOffset(0);
+            $header = $reader->getHeader();
+            $rows = (new Statement())->process($reader)->getRecords();
+
+            $resultHeader = $this->buildResultHeader($header);
+            $writer = Writer::from($resultStream);
+            $writer->insertOne($resultHeader);
+
+            foreach ($rows as $row) {
+                $wasImportable = false;
+                $resultRow = $this->processRow($row, $wasImportable);
+                if (null === $resultRow) {
+                    continue;
+                }
+
+                ++$totalRows;
+
+                if ($wasImportable) {
+                    ++$importableRows;
+                }
+
+                if ($resultRow[self::RESULT_STATUS] !== self::ROW_STATUS_PROCESSED) {
+                    ++$failedRows;
+                }
+
+                $writer->insertOne($this->toCsvLine($resultHeader, $resultRow));
+            }
+
+            if ($importableRows === 0) {
+                $this->logger->info(
+                    sprintf("Rostering file '%s' skipped because no importable user rows were found.", $referenceId),
+                    [
+                        'referenceId' => $referenceId,
+                        'inputFileKey' => $inputFileKey,
+                        'totalRows' => $totalRows,
+                    ]
+                );
+
+                return;
+            }
+
+            rewind($resultStream);
+            $this->fileStorage->store($resultStream, $outputFileKey);
+        } catch (Throwable $exception) {
+            throw new RuntimeException(
+                sprintf('Unable to process rostering file "%s".', $inputFileKey),
+                0,
+                $exception
+            );
+        } finally {
+            if (is_resource($inputStream)) {
+                fclose($inputStream);
+            }
+
+            if (is_resource($resultStream)) {
+                fclose($resultStream);
+            }
+        }
+
+        $this->logger->info(
+            sprintf("Rostering file '%s' processed.", $referenceId),
+            [
+                'referenceId' => $referenceId,
+                'inputFileKey' => $inputFileKey,
+                'outputFileKey' => $outputFileKey,
+                'totalRows' => $totalRows,
+                'importableRows' => $importableRows,
+                'failedRows' => $failedRows,
+            ]
+        );
+    }
+
+    /**
+     * @param array<string> $header
+     *
+     * @return array<string>
+     */
+    private function buildResultHeader(array $header): array
+    {
+        return array_values(
+            array_unique(
+                array_merge(
+                    $header,
+                    [
+                        self::RESULT_STATUS,
+                        self::RESULT_ERROR_TYPE,
+                        self::RESULT_ERROR_CODE,
+                        self::RESULT_ERROR_MESSAGE,
+                    ]
+                )
+            )
+        );
+    }
+
+    /**
+     * @param array<string, string|null> $row
+     *
+     * @return array<string, string>|null
+     */
+    private function processRow(array $row, bool &$wasImportable): ?array
+    {
+        $normalizedRow = $this->normalizeRow($row);
+
+        if ($this->isRowEmpty($normalizedRow)) {
+            $wasImportable = false;
+
+            return null;
+        }
+
+        $resultRow = $normalizedRow;
+        $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_PROCESSED;
+        $resultRow[self::RESULT_ERROR_TYPE] = '';
+        $resultRow[self::RESULT_ERROR_CODE] = '';
+        $resultRow[self::RESULT_ERROR_MESSAGE] = '';
+
+        $rosteringRow = RosteringUserRow::fromNormalizedRow($normalizedRow);
+        if (!$rosteringRow->isImportable()) {
+            $wasImportable = false;
+            return $resultRow;
+        }
+
+        $wasImportable = true;
+
+        try {
+            $this->runInTransaction(function () use ($rosteringRow): void {
+                $this->upsertUser($rosteringRow);
+            });
+        } catch (RosteringValidationException $exception) {
+            $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_VALIDATION_FAILED;
+            $resultRow[self::RESULT_ERROR_TYPE] = self::ERROR_TYPE;
+            $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_VALIDATION;
+            $resultRow[self::RESULT_ERROR_MESSAGE] = $exception->getMessage();
+        } catch (Throwable $exception) {
+            $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_INTERNAL_ERROR;
+            $resultRow[self::RESULT_ERROR_TYPE] = self::ERROR_TYPE;
+            $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_INTERNAL;
+            $resultRow[self::RESULT_ERROR_MESSAGE] = $exception->getMessage();
+
+            $this->logger->error(
+                sprintf('Unexpected error while importing rostering row: %s', $exception->getMessage()),
+                ['trace' => $exception->getTraceAsString()]
+            );
+        }
+
+        return $resultRow;
+    }
+
+    private function upsertUser(RosteringUserRow $rosteringRow): void
+    {
+        $username = $rosteringRow->getUserUsername() ?? '';
+        $password = $rosteringRow->getUserPassword() ?? '';
+        $organizationId = $rosteringRow->getUserOrganizationId() ?? '';
+        $sessionName = $rosteringRow->getSessionName() ?? '';
+
+        $this->rowValidator->validateUsername($username);
+        $isUserActive = $this->rowValidator->parseUserActive($rosteringRow->getUserActive());
+        $userId = $this->userRepository->findIdByUsername($username);
+
+        if ($isUserActive === false) {
+            if (null === $userId) {
+                return;
+            }
+
+            $this->assignmentRepository->deleteByUserId($userId);
+            $this->userRepository->deleteById($userId);
+
+            return;
+        }
+
+        $hasPassword = '' !== $password;
+        $hasOrganizationId = '' !== $organizationId;
+        $hasSessionName = '' !== $sessionName;
+
+        if ($hasOrganizationId) {
+            $this->rowValidator->validateOrganizationId($organizationId);
+        }
+
+        if ($hasSessionName) {
+            $this->rowValidator->validateSessionName($sessionName);
+        }
+
+        if (null !== $userId) {
+            $fieldsToUpdate = [];
+
+            if ($hasPassword) {
+                $fieldsToUpdate['password'] = $this->hashUserPassword($username, $password);
+            }
+
+            if ($hasOrganizationId) {
+                $fieldsToUpdate['groupId'] = $organizationId;
+            }
+
+            $this->userRepository->updateForRostering($username, $fieldsToUpdate);
+
+            if ($hasSessionName) {
+                $this->replaceUserAssignment($userId, $sessionName);
+            }
+
+            return;
+        }
+
+        if (!$hasPassword) {
+            throw new RosteringValidationException(
+                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_USER_PASSWORD)
+            );
+        }
+
+        if (!$hasOrganizationId) {
+            throw new RosteringValidationException(
+                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_USER_ORGANIZATION_ID)
+            );
+        }
+
+        if (!$hasSessionName) {
+            throw new RosteringValidationException(
+                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_SESSION_NAME)
+            );
+        }
+
+        $createdUserId = $this->createUser($username, $password, $organizationId);
+        $this->replaceUserAssignment($createdUserId, $sessionName);
+    }
+
+    private function createUser(string $username, string $password, string $organizationId): int
+    {
+        $passwordHash = $this->hashUserPassword($username, $password);
+
+        $userId = $this->userRepository->insertForRostering($username, $passwordHash, $organizationId);
+        if (0 === $userId) {
+            throw new RuntimeException(sprintf('Unable to create user "%s".', $username));
+        }
+
+        return $userId;
+    }
+
+    private function hashUserPassword(string $username, string $plainPassword): string
+    {
+        $user = (new User())->setUsername($username);
+
+        return $this->passwordHasher->hashPassword($user, $plainPassword);
+    }
+
+    /**
+     * @param array<string, string> $row
+     */
+    private function isRowEmpty(array $row): bool
+    {
+        foreach ($row as $value) {
+            if ('' !== $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string, string|null> $row
+     *
+     * @return array<string, string>
+     */
+    private function normalizeRow(array $row): array
+    {
+        $normalizedRow = [];
+
+        foreach ($row as $column => $value) {
+            if ($value === null) {
+                $normalizedRow[$column] = '';
+                continue;
+            }
+
+            $normalizedRow[$column] = is_string($value) ? trim($value) : (string)$value;
+        }
+
+        return $normalizedRow;
+    }
+
+    private function replaceUserAssignment(int $userId, string $sessionName): void
+    {
+        $lineItemId = $this->findLineItemIdBySessionName($sessionName);
+        if (null === $lineItemId) {
+            throw new RosteringValidationException(
+                sprintf('Line item "%s" does not exist for field "%s".', $sessionName, RosteringUserRow::FIELD_SESSION_NAME)
+            );
+        }
+
+        $this->assignmentRepository->replaceForRostering(
+            $userId,
+            $lineItemId,
+            self::ASSIGNMENT_STATE_READY
+        );
+    }
+
+    private function findLineItemIdBySessionName(string $sessionName): ?int
+    {
+        if (array_key_exists($sessionName, $this->lineItemIdsBySessionName)) {
+            return $this->lineItemIdsBySessionName[$sessionName];
+        }
+
+        $lineItemId = $this->lineItemRepository->findIdBySlug($sessionName);
+        if (null === $lineItemId) {
+            $this->lineItemIdsBySessionName[$sessionName] = null;
+
+            return null;
+        }
+
+        $this->lineItemIdsBySessionName[$sessionName] = $lineItemId;
+
+        return $lineItemId;
+    }
+
+    private function runInTransaction(callable $operation): void
+    {
+        $this->connection->beginTransaction();
+
+        try {
+            $operation();
+            $this->connection->commit();
+        } catch (Throwable $exception) {
+            if ($this->connection->isTransactionActive()) {
+                $this->connection->rollBack();
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function validateReferenceId(string $referenceId): void
+    {
+        if ($referenceId === '') {
+            throw new RosteringValidationException('Reference ID cannot be empty.');
+        }
+
+        if (strlen($referenceId) > self::MAX_REFERENCE_ID_LENGTH) {
+            throw new RosteringValidationException(
+                sprintf('Reference ID exceeds max length (%d).', self::MAX_REFERENCE_ID_LENGTH)
+            );
+        }
+
+        if (preg_match('/^[A-Za-z0-9._-]+$/', $referenceId) !== 1 || str_contains($referenceId, '..')) {
+            throw new RosteringValidationException('Reference ID contains unsupported characters.');
+        }
+    }
+
+    private function buildStorageKey(string $referenceId, string $fileName): string
+    {
+        return sprintf('%s/%s', $referenceId, $fileName);
+    }
+
+    /**
+     * @param array<string> $header
+     * @param array<string, string> $row
+     *
+     * @return array<string>
+     */
+    private function toCsvLine(array $header, array $row): array
+    {
+        $line = [];
+
+        foreach ($header as $column) {
+            $line[] = $row[$column] ?? '';
+        }
+
+        return $line;
+    }
+}
