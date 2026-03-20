@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
     env(RECREATE_QA_USERS): 'false'
     env(GENERATED_USERS_GROUP): 'TestGroup'
     env(GENERATED_USERS_BATCH_SIZE): '100'
@@ -139,6 +140,13 @@ services:
         class: OAT\SimpleRoster\Service\Rostering\OperationalFileStorage
         arguments:
             $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
+
+    OAT\SimpleRoster\Service\Rostering\RosteringImportStatusService:
+        arguments:
+            $bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
+            $prefix: '%env(FILESYSTEM_ROSTERING_FILES_ADAPTER_S3_PREFIX)%'
+            $kernelEnvironment: '%kernel.environment%'
+            $signedUrlTtl: '%env(ROSTERING_SIGNED_URL_TTL)%'
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:

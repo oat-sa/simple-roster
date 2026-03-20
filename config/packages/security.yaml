@@ -26,7 +26,7 @@ security:
             security: false
 
         api_key:
-            pattern: '^%app.route_prefix%/v1/(bulk|line-items|upload)'
+            pattern: '^%app.route_prefix%/v1/(bulk|line-items|upload|status)'
             provider: app_user_provider
             custom_authenticators:
                 - OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator

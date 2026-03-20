@@ -69,6 +69,11 @@ uploadFile:
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\Upload\UploadFileAction }
 
+getRosteringImportStatus:
+  path: '%app.route_prefix%/v1/status/{referenceId}'
+  methods: GET
+  defaults: { _controller: OAT\SimpleRoster\Action\RosteringImport\GetRosteringImportStatusAction }
+
 listLtiInstances:
   path: '%app.route_prefix%/v1/lti-instances'
   methods: GET

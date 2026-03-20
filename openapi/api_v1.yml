@@ -569,6 +569,35 @@ paths:
                     $ref: '#/components/responses/NotFoundResponse'
                 500:
                     $ref: '#/components/responses/InternalServerErrorResponse'
+
+    /v1/status/{referenceId}:
+        get:
+            security:
+                -   bearerAuth: []
+            summary: Get uploaded file processing status
+            tags:
+                - FileUpload
+            operationId: getUploadStatus
+            parameters:
+                -   in: path
+                    name: referenceId
+                    required: true
+                    schema:
+                        type: string
+                    description: Reference ID returned by the upload endpoint.
+            responses:
+                200:
+                    $ref: '#/components/responses/UploadStatusResponse'
+                400:
+                    $ref: '#/components/responses/BadRequestResponse'
+                401:
+                    $ref: '#/components/responses/UnauthorizedResponse'
+                403:
+                    $ref: '#/components/responses/AccessDeniedResponse'
+                404:
+                    $ref: '#/components/responses/NotFoundResponse'
+                500:
+                    $ref: '#/components/responses/InternalServerErrorResponse'
 components:
     securitySchemes:
         apiKeyAuth:
@@ -1088,3 +1117,36 @@ components:
                                     referenceId:
                                         type: string
                                         description: Reference ID of the uploaded file.
+        UploadStatusResponse:
+            description: Upload status response
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            result:
+                                type: object
+                                properties:
+                                    referenceId:
+                                        type: string
+                                        description: Reference ID of the uploaded file.
+                                    status:
+                                        type: string
+                                        description: Processing status.
+                                        enum:
+                                            - pending
+                                            - processing
+                                            - processed
+                                            - failed
+                                    fileLine:
+                                        type: integer
+                                        description: Number of processed CSV lines.
+                                    messages:
+                                        type: array
+                                        items:
+                                            type: string
+                                        description: Import messages, usually errors.
+                                    resultFileUrl:
+                                        type: string
+                                        nullable: true
+                                        description: Signed URL to the result file (prod only).

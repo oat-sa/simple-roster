@@ -23,6 +23,28 @@ class OperationalFileStorageTest extends TestCase
         $this->subject = new OperationalFileStorage($this->filesystem);
     }
 
+    public function testExistsReturnsTrueWhenFileIsPresent(): void
+    {
+        $this->filesystem
+            ->expects(self::once())
+            ->method('fileExists')
+            ->with('processing/ref.csv')
+            ->willReturn(true);
+
+        self::assertTrue($this->subject->exists('processing/ref.csv'));
+    }
+
+    public function testExistsReturnsFalseWhenStorageThrows(): void
+    {
+        $this->filesystem
+            ->expects(self::once())
+            ->method('fileExists')
+            ->with('processing/ref.csv')
+            ->willThrowException(new RuntimeException('cannot check'));
+
+        self::assertFalse($this->subject->exists('processing/ref.csv'));
+    }
+
     public function testReadReturnsStream(): void
     {
         $stream = fopen('php://temp', 'rb+');
