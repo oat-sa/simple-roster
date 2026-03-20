@@ -11,8 +11,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RosteringImportReferenceIdValidator
 {
-    private const MAX_REFERENCE_ID_LENGTH = 36;
-
     public function __construct(private readonly ValidatorInterface $validator)
     {
     }
@@ -24,14 +22,7 @@ class RosteringImportReferenceIdValidator
             $trimmedReferenceId,
             [
                 new Assert\NotBlank(message: 'Reference ID cannot be empty.'),
-                new Assert\Length(
-                    max: self::MAX_REFERENCE_ID_LENGTH,
-                    maxMessage: sprintf('Reference ID exceeds max length (%d).', self::MAX_REFERENCE_ID_LENGTH)
-                ),
-                new Assert\Regex(
-                    pattern: '/^(?!.*\.\.)[A-Za-z0-9._-]+$/',
-                    message: 'Reference ID contains unsupported characters.'
-                ),
+                new Assert\Uuid(message: 'Reference ID must be a valid UUID.'),
             ]
         );
 

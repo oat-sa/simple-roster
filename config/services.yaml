@@ -141,12 +141,8 @@ services:
         arguments:
             $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
 
-    OAT\SimpleRoster\Service\Rostering\RosteringImportStatusService:
-        arguments:
-            $bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
-            $prefix: '%env(FILESYSTEM_ROSTERING_FILES_ADAPTER_S3_PREFIX)%'
-            $kernelEnvironment: '%kernel.environment%'
-            $signedUrlTtl: '%env(ROSTERING_SIGNED_URL_TTL)%'
+    OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:

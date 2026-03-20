@@ -15,9 +15,9 @@ class RosteringImportReferenceIdValidatorTest extends TestCase
     {
         $subject = new RosteringImportReferenceIdValidator(Validation::createValidator());
 
-        $result = $subject->validate(' 11111111-1111-1111-1111-111111111111 ');
+        $result = $subject->validate(' 76091d1a-3ef5-438d-a88f-8df73bb5f919 ');
 
-        self::assertSame('11111111-1111-1111-1111-111111111111', $result);
+        self::assertSame('76091d1a-3ef5-438d-a88f-8df73bb5f919', $result);
     }
 
     public function testItRejectsEmptyReferenceId(): void
@@ -30,12 +30,12 @@ class RosteringImportReferenceIdValidatorTest extends TestCase
         $subject->validate('   ');
     }
 
-    public function testItRejectsReferenceIdWithUnsupportedCharacters(): void
+    public function testItRejectsNonUuidReferenceId(): void
     {
         $subject = new RosteringImportReferenceIdValidator(Validation::createValidator());
 
         $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('Reference ID contains unsupported characters.');
+        $this->expectExceptionMessage('Reference ID must be a valid UUID.');
 
         $subject->validate('ref..invalid');
     }

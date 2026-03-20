@@ -33,7 +33,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_GET,
-            '/api/v1/status/ref-unauthorized',
+            '/api/v1/status/76091d1a-3ef5-438d-a88f-8df73bb5f919',
             [],
             [],
             ['HTTP_AUTHORIZATION' => 'Bearer invalid']
@@ -44,7 +44,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 
     public function testItReturnsNotFoundWhenReferenceDoesNotExist(): void
     {
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/status/ref-not-found');
+        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/status/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
     }
@@ -58,7 +58,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 
     public function testItReturnsPendingWhenInputFileExistsAndImportRowIsMissing(): void
     {
-        $referenceId = '11111111-1111-1111-1111-111111111111';
+        $referenceId = '11111111-1111-4111-8111-111111111111';
         $this->storeInputFile($referenceId);
 
         $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
@@ -81,7 +81,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 
     public function testItReturnsProcessingStatusFromImportRow(): void
     {
-        $referenceId = '22222222-2222-2222-2222-222222222222';
+        $referenceId = '22222222-2222-4222-8222-222222222222';
         $this->createImportRow($referenceId, RosteringImport::STATUS_PROCESSING, null, null, null, null);
 
         $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
@@ -104,7 +104,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 
     public function testItReturnsFailedStatusWithErrorMessage(): void
     {
-        $referenceId = '33333333-3333-3333-3333-333333333333';
+        $referenceId = '33333333-3333-4333-8333-333333333333';
         $this->createImportRow($referenceId, RosteringImport::STATUS_FAILED, 'Global import error', 100, 90, 10);
 
         $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
