@@ -78,8 +78,12 @@ class RosteringResultFileMerger
      * @param resource $ppStream
      * @param resource $mergedStream
      */
-    private function mergeStreams($srStream, $ppStream, $mergedStream): void
+    private function mergeStreams(mixed $srStream, mixed $ppStream, mixed $mergedStream): void
     {
+        if (!is_resource($srStream) || !is_resource($ppStream) || !is_resource($mergedStream)) {
+            throw new RosteringStatusException('Unable to merge output files: invalid stream resource.');
+        }
+
         $srReader = Reader::from($srStream);
         $srReader->setHeaderOffset(0);
         $ppReader = Reader::from($ppStream);

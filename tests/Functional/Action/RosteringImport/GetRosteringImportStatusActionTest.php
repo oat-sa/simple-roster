@@ -19,6 +19,11 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
 
+    private const STATUS_ENDPOINT_PREFIX = '/api/v1/status/';
+    private const AUTH_TEST_REFERENCE_ID = '76091d1a-3ef5-438d-a88f-8df73bb5f919';
+    private const NOT_FOUND_REFERENCE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    private const INVALID_REFERENCE_ID = 'ref..invalid';
+
     private KernelBrowser $kernelBrowser;
     private FileStorageInterface $fileStorage;
 
@@ -35,7 +40,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
     {
         $this->kernelBrowser->request(
             Request::METHOD_GET,
-            '/api/v1/status/76091d1a-3ef5-438d-a88f-8df73bb5f919',
+            self::STATUS_ENDPOINT_PREFIX . self::AUTH_TEST_REFERENCE_ID,
             [],
             [],
             ['HTTP_AUTHORIZATION' => 'Bearer invalid']
@@ -46,14 +51,14 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
 
     public function testItReturnsNotFoundWhenReferenceDoesNotExist(): void
     {
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/status/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+        $this->kernelBrowser->request(Request::METHOD_GET, self::STATUS_ENDPOINT_PREFIX . self::NOT_FOUND_REFERENCE_ID);
 
         self::assertSame(Response::HTTP_NOT_FOUND, $this->kernelBrowser->getResponse()->getStatusCode());
     }
 
     public function testItReturnsBadRequestForInvalidReferenceId(): void
     {
-        $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/status/ref..invalid');
+        $this->kernelBrowser->request(Request::METHOD_GET, self::STATUS_ENDPOINT_PREFIX . self::INVALID_REFERENCE_ID);
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
     }
@@ -64,13 +69,13 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         $statusService
             ->expects(self::once())
             ->method('getStatus')
-            ->with('76091d1a-3ef5-438d-a88f-8df73bb5f919')
+            ->with(self::AUTH_TEST_REFERENCE_ID)
             ->willThrowException(new RosteringStatusException('Unable to merge worker output files.'));
         self::getContainer()->set(RosteringImportStatusService::class, $statusService);
 
         $this->kernelBrowser->request(
             Request::METHOD_GET,
-            '/api/v1/status/76091d1a-3ef5-438d-a88f-8df73bb5f919'
+            self::STATUS_ENDPOINT_PREFIX . self::AUTH_TEST_REFERENCE_ID
         );
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
@@ -88,7 +93,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         $referenceId = '11111111-1111-4111-8111-111111111111';
         $this->storeInputFile($referenceId);
 
-        $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
+        $this->kernelBrowser->request(Request::METHOD_GET, self::STATUS_ENDPOINT_PREFIX . $referenceId);
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -111,7 +116,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         $referenceId = '22222222-2222-4222-8222-222222222222';
         $this->createImportRow($referenceId, RosteringImport::STATUS_PROCESSING, null, null, null, null);
 
-        $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
+        $this->kernelBrowser->request(Request::METHOD_GET, self::STATUS_ENDPOINT_PREFIX . $referenceId);
 
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
@@ -134,8 +139,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         $referenceId = '33333333-3333-4333-8333-333333333333';
         $this->createImportRow($referenceId, RosteringImport::STATUS_FAILED, 'Global import error', 100, 90, 10);
 
-        $this->kernelBrowser->request(Request::METHOD_GET, sprintf('/api/v1/status/%s', $referenceId));
-
+        $this->kernelBrowser->request(Request::METHOD_GET, self::STATUS_ENDPOINT_PREFIX . $referenceId);
         self::assertSame(Response::HTTP_OK, $this->kernelBrowser->getResponse()->getStatusCode());
 
         $decodedResponse = json_decode(
