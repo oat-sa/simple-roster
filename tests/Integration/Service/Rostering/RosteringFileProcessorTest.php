@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Service\Rostering;
 
 use League\Csv\Reader;
+use LogicException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
+use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
+use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RosteringFileProcessorTest extends AppKernelTestCase
@@ -20,6 +24,9 @@ class RosteringFileProcessorTest extends AppKernelTestCase
     private RosteringFileProcessor $subject;
     private FileStorageInterface $fileStorage;
     private UserPasswordHasherInterface $passwordHasher;
+    private UserRepository $userRepository;
+    private UserCacheIdGenerator $userCacheIdGenerator;
+    private CacheItemPoolInterface $resultCache;
 
     protected function setUp(): void
     {
@@ -33,7 +40,16 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         $container = self::getContainer();
         $this->fileStorage = $container->get(FileStorageInterface::class);
         $this->passwordHasher = $container->get('security.user_password_hasher');
+        $this->userRepository = $container->get(UserRepository::class);
+        $this->userCacheIdGenerator = $container->get(UserCacheIdGenerator::class);
         $this->subject = $container->get(RosteringFileProcessor::class);
+
+        $resultCacheImplementation = $this->getEntityManager()->getConfiguration()->getResultCache();
+        if (!$resultCacheImplementation instanceof CacheItemPoolInterface) {
+            throw new LogicException('Doctrine result cache is not configured.');
+        }
+
+        $this->resultCache = $resultCacheImplementation;
     }
 
     public function testProcessImportsUsersAndWritesResultFile(): void
@@ -269,6 +285,35 @@ CSV;
         self::assertSame('', $rowsByMarker['existing_password_updated']['errorCode']);
         self::assertSame('400', $rowsByMarker['missing_user_rejected']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['missing_user_rejected']['errorCode']);
+    }
+
+    public function testProcessInvalidatesUserCacheForChangedRows(): void
+    {
+        $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
+        $currentLineItemSlug = $availableLineItemSlugs[0];
+        $updatedLineItemSlug = $availableLineItemSlugs[1] ?? $availableLineItemSlugs[0];
+        $username = 'existing_user';
+        $cacheKey = $this->userCacheIdGenerator->generate($username);
+
+        $this->insertAssignment($username, $currentLineItemSlug);
+
+        // Prime cache for this user before rostering update.
+        $this->userRepository->findByUsernameWithAssignments($username);
+        self::assertTrue($this->resultCache->hasItem($cacheKey));
+
+        $csv = sprintf(
+            <<<'CSV'
+user_username,session_name,marker
+existing_user,%s,cache_invalidated
+CSV,
+            $updatedLineItemSlug
+        );
+
+        $this->storeProcessingFile('ref-cache-invalidated', $csv);
+
+        $this->subject->process('ref-cache-invalidated');
+
+        self::assertFalse($this->resultCache->hasItem($cacheKey));
     }
 
     private function storeProcessingFile(string $referenceId, string $csv): void
