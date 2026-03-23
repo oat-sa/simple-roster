@@ -7,6 +7,8 @@ namespace OAT\SimpleRoster\Tests\Functional\Action\RosteringImport;
 use DateTimeImmutable;
 use OAT\SimpleRoster\Entity\RosteringImport;
 use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringStatusException;
+use OAT\SimpleRoster\Service\Rostering\RosteringImportStatusService;
 use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -54,6 +56,31 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         $this->kernelBrowser->request(Request::METHOD_GET, '/api/v1/status/ref..invalid');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+    }
+
+    public function testItReturnsBadRequestWhenStatusResolutionFails(): void
+    {
+        $statusService = $this->createMock(RosteringImportStatusService::class);
+        $statusService
+            ->expects(self::once())
+            ->method('getStatus')
+            ->with('76091d1a-3ef5-438d-a88f-8df73bb5f919')
+            ->willThrowException(new RosteringStatusException('Unable to merge worker output files.'));
+        self::getContainer()->set(RosteringImportStatusService::class, $statusService);
+
+        $this->kernelBrowser->request(
+            Request::METHOD_GET,
+            '/api/v1/status/76091d1a-3ef5-438d-a88f-8df73bb5f919'
+        );
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $this->kernelBrowser->getResponse()->getStatusCode());
+        $decodedResponse = json_decode(
+            (string) $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+        self::assertSame('Unable to resolve rostering import status.', $decodedResponse['error']['message']);
     }
 
     public function testItReturnsPendingWhenInputFileExistsAndImportRowIsMissing(): void

@@ -37,7 +37,7 @@ class RosteringImportRepository extends AbstractRepository
     public function markProcessed(string $referenceId, int $totalRows, int $failedRows): void
     {
         $import = $this->getOrCreate($referenceId);
-        $processedRows = max(0, $totalRows - $failedRows);
+        $processedRows = $totalRows - $failedRows;
 
         if (0 === $import->getAttempts()) {
             $import->setAttempts(1);
@@ -61,7 +61,7 @@ class RosteringImportRepository extends AbstractRepository
     public function markFailed(string $referenceId, string $errorMessage, int $totalRows, int $failedRows): void
     {
         $import = $this->getOrCreate($referenceId);
-        $processedRows = max(0, $totalRows - $failedRows);
+        $processedRows = $totalRows - $failedRows;
         $normalizedErrorMessage = trim($errorMessage);
 
         if ($normalizedErrorMessage === '') {

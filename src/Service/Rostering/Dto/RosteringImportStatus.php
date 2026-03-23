@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Rostering\Dto;
 
+use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\RosteringImport;
 
 class RosteringImportStatus
 {
+    private const STATUS_PROCESSED = 'processed';
+
     public function __construct(
         private readonly string $referenceId,
         private readonly string $status,
@@ -20,6 +23,55 @@ class RosteringImportStatus
     public static function pending(string $referenceId): self
     {
         return new self($referenceId, 'pending', 0, [], null);
+    }
+
+    /**
+     * @param array<string, mixed> $result
+     */
+    public static function fromApiResult(array $result): self
+    {
+        if (!isset($result['referenceId']) || !is_string($result['referenceId']) || trim($result['referenceId']) === '') {
+            throw new InvalidArgumentException('Invalid "referenceId" in Principal Portal status payload.');
+        }
+        $referenceId = trim($result['referenceId']);
+
+        if (!isset($result['status']) || !is_string($result['status']) || trim($result['status']) === '') {
+            throw new InvalidArgumentException('Invalid "status" in Principal Portal status payload.');
+        }
+        $status = trim($result['status']);
+
+        if (!array_key_exists('fileLine', $result) || (!is_int($result['fileLine']) && !is_numeric($result['fileLine']))) {
+            throw new InvalidArgumentException('Invalid "fileLine" in Principal Portal status payload.');
+        }
+        $fileLine = max(0, (int) $result['fileLine']);
+
+        if (!array_key_exists('messages', $result) || !is_array($result['messages'])) {
+            throw new InvalidArgumentException('Invalid "messages" in Principal Portal status payload.');
+        }
+        $messages = [];
+        foreach ($result['messages'] as $message) {
+            if (!is_string($message)) {
+                throw new InvalidArgumentException('Invalid "messages" in Principal Portal status payload.');
+            }
+
+            $messages[] = trim($message);
+        }
+
+        if (!array_key_exists('resultFileUrl', $result)) {
+            throw new InvalidArgumentException('Invalid "resultFileUrl" in Principal Portal status payload.');
+        }
+
+        $resultFileUrl = null;
+        if ($result['resultFileUrl'] !== null) {
+            if (!is_string($result['resultFileUrl'])) {
+                throw new InvalidArgumentException('Invalid "resultFileUrl" in Principal Portal status payload.');
+            }
+
+            $trimmedUrl = trim($result['resultFileUrl']);
+            $resultFileUrl = $trimmedUrl === '' ? null : $trimmedUrl;
+        }
+
+        return new self($referenceId, $status, $fileLine, $messages, $resultFileUrl);
     }
 
     public static function fromImport(RosteringImport $import, ?string $resultFileUrl): self
@@ -65,6 +117,22 @@ class RosteringImportStatus
     public function getResultFileUrl(): ?string
     {
         return $this->resultFileUrl;
+    }
+
+    public function isProcessed(): bool
+    {
+        return $this->status === self::STATUS_PROCESSED;
+    }
+
+    public function withResultFileUrl(?string $resultFileUrl): self
+    {
+        return new self(
+            $this->referenceId,
+            $this->status,
+            $this->fileLine,
+            $this->messages,
+            $resultFileUrl
+        );
     }
 
     /**

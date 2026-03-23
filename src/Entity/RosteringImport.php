@@ -52,6 +52,11 @@ class RosteringImport implements EntityInterface
         return $this;
     }
 
+    public function isProcessed(): bool
+    {
+        return $this->getStatus() === self::STATUS_PROCESSED;
+    }
+
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;

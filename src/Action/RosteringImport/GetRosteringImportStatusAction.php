@@ -6,9 +6,11 @@ namespace OAT\SimpleRoster\Action\RosteringImport;
 
 use OAT\SimpleRoster\Request\Validator\RosteringImport\RosteringImportReferenceIdValidator;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringStatusException;
 use OAT\SimpleRoster\Service\Rostering\RosteringImportStatusService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GetRosteringImportStatusAction
@@ -24,7 +26,12 @@ class GetRosteringImportStatusAction
     {
         $validatedReferenceId = $this->referenceIdValidator->validate($referenceId);
 
-        $status = $this->statusService->getStatus($validatedReferenceId);
+        try {
+            $status = $this->statusService->getStatus($validatedReferenceId);
+        } catch (RosteringStatusException $exception) {
+            throw new BadRequestHttpException('Unable to resolve rostering import status.', $exception);
+        }
+
         if ($status === null) {
             throw new NotFoundHttpException(
                 sprintf('Status for referenceId "%s" was not found.', $validatedReferenceId)
