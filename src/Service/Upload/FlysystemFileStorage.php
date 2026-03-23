@@ -10,7 +10,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Throwable;
 
-class S3FileStorage implements FileStorageInterface
+class FlysystemFileStorage implements FileStorageInterface
 {
     public function __construct(
         private readonly FilesystemOperator $filesystem
@@ -43,26 +43,5 @@ class S3FileStorage implements FileStorageInterface
                 fclose($stream);
             }
         }
-    }
-
-    public function move(string $sourceKey, string $targetKey, array $metadata = []): string
-    {
-        $config = [];
-        if ($metadata !== []) {
-            $config['MetadataDirective'] = 'REPLACE';
-            $config['Metadata'] = $metadata;
-        }
-
-        try {
-            $this->filesystem->move($sourceKey, $targetKey, $config);
-        } catch (FilesystemException|Throwable $exception) {
-            throw new RuntimeException(
-                sprintf('Unable to move file from "%s" to "%s".', $sourceKey, $targetKey),
-                0,
-                $exception
-            );
-        }
-
-        return sprintf('File moved to %s', $targetKey);
     }
 }

@@ -931,6 +931,8 @@ components:
                     example: TestCollege
         UploadRequest:
             type: object
+            required:
+                - file
             properties:
                 file:
                     type: string

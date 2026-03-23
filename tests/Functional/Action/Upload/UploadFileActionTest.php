@@ -21,7 +21,6 @@ class UploadFileActionTest extends AppWebTestCase
 
     private KernelBrowser $kernelBrowser;
 
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -65,7 +64,7 @@ class UploadFileActionTest extends AppWebTestCase
         self::assertSame(
             Response::HTTP_BAD_REQUEST,
             $this->kernelBrowser->getResponse()->getStatusCode(),
-            (string) $this->kernelBrowser->getResponse()->getContent()
+            (string)$this->kernelBrowser->getResponse()->getContent()
         );
 
         $decodedResponse = json_decode(
@@ -107,7 +106,7 @@ class UploadFileActionTest extends AppWebTestCase
         self::assertSame(
             Response::HTTP_OK,
             $this->kernelBrowser->getResponse()->getStatusCode(),
-            (string) $this->kernelBrowser->getResponse()->getContent()
+            (string)$this->kernelBrowser->getResponse()->getContent()
         );
 
         $decodedResponse = json_decode(
@@ -122,7 +121,7 @@ class UploadFileActionTest extends AppWebTestCase
         self::assertMatchesRegularExpression('#^[0-9a-f-]{36}$#', $decodedResponse['result']['referenceId']);
 
         self::assertSame(
-            'pending/' . $decodedResponse['result']['referenceId'] . '.csv',
+            $decodedResponse['result']['referenceId'] . '/input.csv',
             $captured['key']
         );
         self::assertSame($decodedResponse['result']['referenceId'], $captured['metadata']['referenceId'] ?? null);
@@ -142,7 +141,7 @@ class UploadFileActionTest extends AppWebTestCase
         self::assertSame(
             Response::HTTP_BAD_REQUEST,
             $this->kernelBrowser->getResponse()->getStatusCode(),
-            (string) $this->kernelBrowser->getResponse()->getContent()
+            (string)$this->kernelBrowser->getResponse()->getContent()
         );
 
         $decodedResponse = json_decode(

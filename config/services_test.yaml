@@ -23,7 +23,7 @@ services:
         public: true
 
     test.file_storage:
-        class: OAT\SimpleRoster\Service\Upload\S3FileStorage
+        class: OAT\SimpleRoster\Service\Upload\FlysystemFileStorage
         arguments:
             - '@oneup_flysystem.rostering_files_filesystem_filesystem'
         public: true

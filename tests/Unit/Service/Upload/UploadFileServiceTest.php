@@ -32,7 +32,7 @@ class UploadFileServiceTest extends TestCase
         $storage = $this->createMock(FileStorageInterface::class);
         $bus = $this->createMock(MessageBusInterface::class);
 
-        $service = new UploadFileService($validator, $storage, $bus, 'pending');
+        $service = new UploadFileService($validator, $storage, $bus);
 
         $file = $this->createUploadedFile('test.csv', 'a,b');
 
@@ -41,7 +41,7 @@ class UploadFileServiceTest extends TestCase
             ->method('store')
             ->with(
                 $this->identicalTo($file),
-                $this->matchesRegularExpression('#^pending/[0-9a-f-]{36}\.csv$#'),
+                $this->matchesRegularExpression('#^[0-9a-f-]{36}/input\.csv$#'),
                 $this->callback(static function (array $metadata): bool {
                     return isset($metadata['referenceId']) && is_string($metadata['referenceId']) && $metadata['referenceId'] !== '';
                 })
@@ -50,8 +50,13 @@ class UploadFileServiceTest extends TestCase
         $bus
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(RosteringFileUploadedMessage::class))
-            ->willReturn(new Envelope(new RosteringFileUploadedMessage('ref')));
+            ->willReturnCallback(
+                function (object $message): Envelope {
+                    self::assertInstanceOf(RosteringFileUploadedMessage::class, $message);
+
+                    return new Envelope(new RosteringFileUploadedMessage('ref'));
+                }
+            );
 
         $result = $service->upload($file);
 

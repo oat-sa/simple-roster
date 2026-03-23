@@ -16,8 +16,7 @@ class UploadFileService
     public function __construct(
         private readonly UploadedFileValidator $validator,
         private readonly FileStorageInterface $fileStorage,
-        private readonly MessageBusInterface $messageBus,
-        private readonly string $s3PendingFolderName
+        private readonly MessageBusInterface $messageBus
     ) {
     }
 
@@ -47,9 +46,6 @@ class UploadFileService
 
     private function buildStorageKey(string $referenceId): string
     {
-        $folder = trim($this->s3PendingFolderName, '/');
-        $fileName = $referenceId . '.csv';
-
-        return $folder ? $folder . '/' . $fileName : $fileName;
+        return sprintf('%s/input.csv', $referenceId);
     }
 }
