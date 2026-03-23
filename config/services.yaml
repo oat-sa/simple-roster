@@ -142,11 +142,6 @@ services:
         arguments:
             $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
 
-    OAT\SimpleRoster\Service\Rostering\FileStorageInterface:
-        class: OAT\SimpleRoster\Service\Rostering\OperationalFileStorage
-        arguments:
-            $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
-
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
 
