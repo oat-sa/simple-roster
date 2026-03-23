@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Rostering\Validation;
 
-use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserRow;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 
 final class RosteringUserRowValidator
 {
+    public const FIELD_USER_USERNAME = 'user_username';
+    public const FIELD_USER_PASSWORD = 'user_password';
+    public const FIELD_USER_ORGANIZATION_ID = 'user_organizationId';
+    public const FIELD_SESSION_NAME = 'session_name';
+    public const FIELD_USER_ACTIVE = 'user_active';
+    public const FIELD_USER_LANGUAGE = 'user_language';
+
     private const MAX_USER_USERNAME_LENGTH = 255;
     private const MAX_USER_ORGANIZATION_ID_LENGTH = 255;
     private const MAX_SESSION_NAME_LENGTH = 255;
@@ -17,13 +23,13 @@ final class RosteringUserRowValidator
     {
         if ($username === '') {
             throw new RosteringValidationException(
-                sprintf('Field "%s" is required.', RosteringUserRow::FIELD_USER_USERNAME)
+                sprintf('Field "%s" is required.', self::FIELD_USER_USERNAME)
             );
         }
 
         if (preg_match('/\s/', $username) === 1) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" cannot contain whitespaces.', RosteringUserRow::FIELD_USER_USERNAME)
+                sprintf('Field "%s" cannot contain whitespaces.', self::FIELD_USER_USERNAME)
             );
         }
 
@@ -31,7 +37,7 @@ final class RosteringUserRowValidator
             throw new RosteringValidationException(
                 sprintf(
                     'Field "%s" exceeds max length (%d).',
-                    RosteringUserRow::FIELD_USER_USERNAME,
+                    self::FIELD_USER_USERNAME,
                     self::MAX_USER_USERNAME_LENGTH
                 )
             );
@@ -42,7 +48,7 @@ final class RosteringUserRowValidator
     {
         if (preg_match('/\s/', $organizationId) === 1) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" cannot contain whitespaces.', RosteringUserRow::FIELD_USER_ORGANIZATION_ID)
+                sprintf('Field "%s" cannot contain whitespaces.', self::FIELD_USER_ORGANIZATION_ID)
             );
         }
 
@@ -50,7 +56,7 @@ final class RosteringUserRowValidator
             throw new RosteringValidationException(
                 sprintf(
                     'Field "%s" exceeds max length (%d).',
-                    RosteringUserRow::FIELD_USER_ORGANIZATION_ID,
+                    self::FIELD_USER_ORGANIZATION_ID,
                     self::MAX_USER_ORGANIZATION_ID_LENGTH
                 )
             );
@@ -61,7 +67,7 @@ final class RosteringUserRowValidator
     {
         if (preg_match('/\s/', $sessionName) === 1) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" cannot contain whitespaces.', RosteringUserRow::FIELD_SESSION_NAME)
+                sprintf('Field "%s" cannot contain whitespaces.', self::FIELD_SESSION_NAME)
             );
         }
 
@@ -69,7 +75,7 @@ final class RosteringUserRowValidator
             throw new RosteringValidationException(
                 sprintf(
                     'Field "%s" exceeds max length (%d).',
-                    RosteringUserRow::FIELD_SESSION_NAME,
+                    self::FIELD_SESSION_NAME,
                     self::MAX_SESSION_NAME_LENGTH
                 )
             );
@@ -95,7 +101,7 @@ final class RosteringUserRowValidator
         throw new RosteringValidationException(
             sprintf(
                 'Field "%s" must be one of: true, false, 1, 0.',
-                RosteringUserRow::FIELD_USER_ACTIVE
+                self::FIELD_USER_ACTIVE
             )
         );
     }

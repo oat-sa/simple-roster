@@ -8,12 +8,14 @@ use Doctrine\DBAL\Connection;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Csv\Writer;
+use InvalidArgumentException;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\RosteringImportRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
-use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserRow;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDto;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDtoFactory;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
 use Psr\Log\LoggerInterface;
@@ -54,7 +56,8 @@ class RosteringFileProcessor
         private readonly RosteringFileKeyResolver $fileKeyResolver,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
-        private readonly RosteringUserRowValidator $rowValidator
+        private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
+        private readonly UserCacheInvalidator $userCacheInvalidator
     ) {
     }
 
@@ -203,24 +206,25 @@ class RosteringFileProcessor
         $resultRow[self::RESULT_ERROR_CODE] = '';
         $resultRow[self::RESULT_ERROR_MESSAGE] = '';
 
-        $rosteringRow = RosteringUserRow::fromNormalizedRow($normalizedRow);
-        if (!$rosteringRow->isImportable()) {
-            $wasImportable = false;
-            return $resultRow;
-        }
-
-        $wasImportable = true;
-
         try {
-            $this->runInTransaction(function () use ($rosteringRow): void {
-                $this->upsertUser($rosteringRow);
+            $entryDto = $this->entryDtoFactory->fromArray($normalizedRow);
+
+            $wasImportable = $entryDto->isImportable();
+            if (!$wasImportable) {
+                return $resultRow;
+            }
+
+            $this->runInTransaction(function () use ($entryDto): void {
+                $this->upsertUser($entryDto);
             });
         } catch (RosteringValidationException $exception) {
+            $wasImportable = true;
             $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_VALIDATION_FAILED;
             $resultRow[self::RESULT_ERROR_TYPE] = self::ERROR_TYPE;
             $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_VALIDATION;
             $resultRow[self::RESULT_ERROR_MESSAGE] = $exception->getMessage();
         } catch (Throwable $exception) {
+            $wasImportable = true;
             $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_INTERNAL_ERROR;
             $resultRow[self::RESULT_ERROR_TYPE] = self::ERROR_TYPE;
             $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_INTERNAL;
@@ -235,15 +239,20 @@ class RosteringFileProcessor
         return $resultRow;
     }
 
-    private function upsertUser(RosteringUserRow $rosteringRow): void
+    private function upsertUser(RosteringUserEntryDto $entryDto): void
     {
-        $username = $rosteringRow->getUserUsername() ?? '';
-        $password = $rosteringRow->getUserPassword() ?? '';
-        $organizationId = $rosteringRow->getUserOrganizationId() ?? '';
-        $sessionName = $rosteringRow->getSessionName() ?? '';
+        $username = $entryDto->getUserUsername();
+        if (null === $username) {
+            throw new InvalidArgumentException(
+                sprintf('Expected validated %s with non-empty username.', RosteringUserEntryDto::class)
+            );
+        }
 
-        $this->rowValidator->validateUsername($username);
-        $isUserActive = $this->rowValidator->parseUserActive($rosteringRow->getUserActive());
+        $password = $entryDto->getUserPassword() ?? '';
+        $organizationId = $entryDto->getUserOrganizationId() ?? '';
+        $sessionName = $entryDto->getSessionName() ?? '';
+
+        $isUserActive = $entryDto->getUserActive();
         $userId = $this->userRepository->findIdByUsername($username);
 
         if ($isUserActive === false) {
@@ -253,6 +262,7 @@ class RosteringFileProcessor
 
             $this->assignmentRepository->deleteByUserId($userId);
             $this->userRepository->deleteById($userId);
+            $this->invalidateUserCache($username, true);
 
             return;
         }
@@ -261,15 +271,9 @@ class RosteringFileProcessor
         $hasOrganizationId = '' !== $organizationId;
         $hasSessionName = '' !== $sessionName;
 
-        if ($hasOrganizationId) {
-            $this->rowValidator->validateOrganizationId($organizationId);
-        }
-
-        if ($hasSessionName) {
-            $this->rowValidator->validateSessionName($sessionName);
-        }
-
         if (null !== $userId) {
+            $hasUserChanged = false;
+            $hasAssignmentChanged = false;
             $fieldsToUpdate = [];
 
             if ($hasPassword) {
@@ -281,9 +285,15 @@ class RosteringFileProcessor
             }
 
             $this->userRepository->updateForRostering($username, $fieldsToUpdate);
+            $hasUserChanged = $fieldsToUpdate !== [];
 
             if ($hasSessionName) {
                 $this->replaceUserAssignment($userId, $sessionName);
+                $hasAssignmentChanged = true;
+            }
+
+            if ($hasUserChanged || $hasAssignmentChanged) {
+                $this->invalidateUserCache($username, $hasAssignmentChanged);
             }
 
             return;
@@ -291,24 +301,25 @@ class RosteringFileProcessor
 
         if (!$hasPassword) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_USER_PASSWORD)
+                sprintf('Field "%s" is required for new user.', RosteringUserRowValidator::FIELD_USER_PASSWORD)
             );
         }
 
         if (!$hasOrganizationId) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_USER_ORGANIZATION_ID)
+                sprintf('Field "%s" is required for new user.', RosteringUserRowValidator::FIELD_USER_ORGANIZATION_ID)
             );
         }
 
         if (!$hasSessionName) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" is required for new user.', RosteringUserRow::FIELD_SESSION_NAME)
+                sprintf('Field "%s" is required for new user.', RosteringUserRowValidator::FIELD_SESSION_NAME)
             );
         }
 
         $createdUserId = $this->createUser($username, $password, $organizationId);
         $this->replaceUserAssignment($createdUserId, $sessionName);
+        $this->invalidateUserCache($username, true);
     }
 
     private function createUser(string $username, string $password, string $organizationId): int
@@ -328,6 +339,17 @@ class RosteringFileProcessor
         $user = (new User())->setUsername($username);
 
         return $this->passwordHasher->hashPassword($user, $plainPassword);
+    }
+
+    private function invalidateUserCache(string $username, bool $hasAssignmentChanged): void
+    {
+        if ($hasAssignmentChanged) {
+            $this->userCacheInvalidator->invalidateAfterAssignmentChange($username);
+
+            return;
+        }
+
+        $this->userCacheInvalidator->invalidateAfterUserChange($username);
     }
 
     /**
@@ -370,7 +392,11 @@ class RosteringFileProcessor
         $lineItemId = $this->findLineItemIdBySessionName($sessionName);
         if (null === $lineItemId) {
             throw new RosteringValidationException(
-                sprintf('Line item "%s" does not exist for field "%s".', $sessionName, RosteringUserRow::FIELD_SESSION_NAME)
+                sprintf(
+                    'Line item "%s" does not exist for field "%s".',
+                    $sessionName,
+                    RosteringUserRowValidator::FIELD_SESSION_NAME
+                )
             );
         }
 
