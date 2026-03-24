@@ -37,7 +37,7 @@ jobs:
       - run: git fetch --tags --unshallow
 
       - name: Check commit
-        if: ${{ github.base_ref != 'develop' && github.base_ref != 'master' }}
+        if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
         uses: oat-sa/conventional-commit-action@v0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
