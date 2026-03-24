@@ -11,28 +11,8 @@ on:
 jobs:
   setup:
     name: Setup environment
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
-          tools: composer, phpcs
-          coverage: xdebug
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  build:
-    name: Build/test environment
-    runs-on: ubuntu-22.04
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-      - run: git fetch --tags --unshallow
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -46,6 +26,16 @@ jobs:
       - name: Debug PHP version
         run: php -v
 
+  build:
+    name: Build/test environment
+    runs-on: ubuntu-24.04
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - run: git fetch --tags --unshallow
+
       - name: Check commit
         if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
         uses: oat-sa/conventional-commit-action@v0
@@ -55,7 +45,7 @@ jobs:
       - name: Get Composer Cache Directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
       - uses: actions/cache@v4
         with:
