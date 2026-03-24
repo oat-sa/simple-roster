@@ -28,12 +28,7 @@ class RosteringImportStatusService
     public function getStatus(string $referenceId): ?RosteringImportStatus
     {
         if (!$this->principalPortalEnabled) {
-            $localStatus = $this->resolveLocalStatus($referenceId, true);
-            if ($localStatus === null) {
-                return null;
-            }
-
-            return $localStatus;
+            return $this->resolveLocalStatus($referenceId, true);
         }
 
         $localStatus = $this->resolveLocalStatus($referenceId, false);

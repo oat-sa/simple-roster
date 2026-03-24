@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service\Rostering;
 
+use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use OAT\SimpleRoster\Service\Rostering\OperationalFileStorage;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,15 +35,19 @@ class OperationalFileStorageTest extends TestCase
         self::assertTrue($this->subject->exists('processing/ref.csv'));
     }
 
-    public function testExistsReturnsFalseWhenStorageThrows(): void
+    public function testExistsThrowsWhenStorageThrows(): void
     {
         $this->filesystem
             ->expects(self::once())
             ->method('fileExists')
             ->with('processing/ref.csv')
-            ->willThrowException(new RuntimeException('cannot check'));
+            ->willThrowException(new class('cannot check') extends RuntimeException implements FilesystemException {
+            });
 
-        self::assertFalse($this->subject->exists('processing/ref.csv'));
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to check file existence for storage key "processing/ref.csv".');
+
+        $this->subject->exists('processing/ref.csv');
     }
 
     public function testReadReturnsStream(): void

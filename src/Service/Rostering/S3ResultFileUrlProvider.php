@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Rostering;
 
 use Aws\S3\S3Client;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
@@ -15,7 +16,8 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
         private readonly S3Client $s3Client,
         private readonly string $bucket,
         private readonly string $prefix,
-        private readonly string $signedUrlTtl
+        private readonly string $signedUrlTtl,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -43,6 +45,16 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
 
             return (string) $request->getUri();
         } catch (Throwable $exception) {
+            $this->logger->warning(
+                sprintf('Unable to generate signed result file URL for file key "%s".', $fileKey),
+                [
+                    'fileKey' => $fileKey,
+                    'objectKey' => $objectKey,
+                    'bucket' => $this->bucket,
+                    'exception' => $exception,
+                ]
+            );
+
             return null;
         }
     }

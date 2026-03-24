@@ -9,7 +9,7 @@ use OAT\SimpleRoster\Entity\RosteringImport;
 
 class RosteringImportStatus
 {
-    private const STATUS_PROCESSED = 'processed';
+    private const string STATUS_PROCESSED = 'processed';
 
     public function __construct(
         private readonly string $referenceId,
