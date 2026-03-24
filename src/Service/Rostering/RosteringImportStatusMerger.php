@@ -21,8 +21,7 @@ class RosteringImportStatusMerger
             $srStatus->getReferenceId(),
             $this->mergeStatus($srStatus->getStatus(), $ppStatus->getStatus()),
             max($srStatus->getFileLine(), $ppStatus->getFileLine()),
-            $this->mergeMessages($srStatus->getMessages(), $ppStatus->getMessages()),
-            null
+            $this->mergeMessages($srStatus->getMessages(), $ppStatus->getMessages())
         );
     }
 

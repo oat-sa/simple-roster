@@ -37,10 +37,8 @@ class RosteringImportStatusServiceTest extends TestCase
             ->willReturn($import);
 
         $resultFileUrlProvider
-            ->expects(self::once())
-            ->method('generate')
-            ->with($resolver->outputFileKey('ref-1'))
-            ->willReturn('http://local-output');
+            ->expects(self::never())
+            ->method('generate');
 
         $principalPortalStatusClient
             ->expects(self::never())
@@ -61,10 +59,9 @@ class RosteringImportStatusServiceTest extends TestCase
 
         self::assertInstanceOf(RosteringImportStatus::class, $status);
         self::assertSame('processed', $status->getStatus());
-        self::assertSame('http://local-output', $status->getResultFileUrl());
     }
 
-    public function testItReturnsMergedStatusAndMergedOutputFileUrlWhenIntegrationIsEnabled(): void
+    public function testItReturnsMergedStatusWhenIntegrationIsEnabled(): void
     {
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
@@ -82,27 +79,23 @@ class RosteringImportStatusServiceTest extends TestCase
             ->willReturn($import);
 
         $resultFileUrlProvider
-            ->expects(self::once())
-            ->method('generate')
-            ->with($resolver->mergedOutputFileKey('ref-2'))
-            ->willReturn('http://merged-output');
+            ->expects(self::never())
+            ->method('generate');
 
         $principalPortalStatusClient
             ->expects(self::once())
             ->method('fetchStatus')
             ->with('ref-2')
-            ->willReturn(new RosteringImportStatus('ref-2', 'processed', 3, [], null));
+            ->willReturn(new RosteringImportStatus('ref-2', 'processed', 3, []));
 
         $statusMerger
             ->expects(self::once())
             ->method('merge')
-            ->willReturn(new RosteringImportStatus('ref-2', 'processed', 5, [], null));
+            ->willReturn(new RosteringImportStatus('ref-2', 'processed', 5, []));
 
         $resultFileMerger
-            ->expects(self::once())
-            ->method('getOrCreateMergedOutputFileKey')
-            ->with('ref-2')
-            ->willReturn($resolver->mergedOutputFileKey('ref-2'));
+            ->expects(self::never())
+            ->method('getOrCreateMergedOutputFileKey');
 
         $subject = $this->createSubject(
             $repository,
@@ -119,7 +112,99 @@ class RosteringImportStatusServiceTest extends TestCase
 
         self::assertInstanceOf(RosteringImportStatus::class, $status);
         self::assertSame('processed', $status->getStatus());
-        self::assertSame('http://merged-output', $status->getResultFileUrl());
+    }
+
+    public function testItReturnsLocalDownloadUrlWhenProcessedAndIntegrationIsDisabled(): void
+    {
+        $repository = $this->createMock(RosteringImportRepository::class);
+        $fileStorage = $this->createMock(FileStorageInterface::class);
+        $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
+        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
+        $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
+        $resolver = new RosteringFileKeyResolver();
+
+        $repository
+            ->expects(self::once())
+            ->method('findOneBy')
+            ->with(['referenceId' => 'ref-3'])
+            ->willReturn($this->createProcessedImport('ref-3'));
+
+        $resultFileUrlProvider
+            ->expects(self::once())
+            ->method('generate')
+            ->with($resolver->outputFileKey('ref-3'))
+            ->willReturn('http://local-output');
+
+        $principalPortalStatusClient
+            ->expects(self::never())
+            ->method('fetchStatus');
+
+        $subject = $this->createSubject(
+            $repository,
+            $fileStorage,
+            $resolver,
+            $resultFileUrlProvider,
+            $principalPortalStatusClient,
+            $statusMerger,
+            $resultFileMerger,
+            false
+        );
+
+        self::assertSame('http://local-output', $subject->getDownloadUrl('ref-3'));
+    }
+
+    public function testItReturnsMergedDownloadUrlWhenProcessedAndIntegrationIsEnabled(): void
+    {
+        $repository = $this->createMock(RosteringImportRepository::class);
+        $fileStorage = $this->createMock(FileStorageInterface::class);
+        $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
+        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
+        $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
+        $resolver = new RosteringFileKeyResolver();
+
+        $repository
+            ->expects(self::once())
+            ->method('findOneBy')
+            ->with(['referenceId' => 'ref-4'])
+            ->willReturn($this->createProcessedImport('ref-4'));
+
+        $principalPortalStatusClient
+            ->expects(self::once())
+            ->method('fetchStatus')
+            ->with('ref-4')
+            ->willReturn(new RosteringImportStatus('ref-4', 'processed', 3, []));
+
+        $statusMerger
+            ->expects(self::once())
+            ->method('merge')
+            ->willReturn(new RosteringImportStatus('ref-4', 'processed', 5, []));
+
+        $resultFileMerger
+            ->expects(self::once())
+            ->method('getOrCreateMergedOutputFileKey')
+            ->with('ref-4')
+            ->willReturn($resolver->mergedOutputFileKey('ref-4'));
+
+        $resultFileUrlProvider
+            ->expects(self::once())
+            ->method('generate')
+            ->with($resolver->mergedOutputFileKey('ref-4'))
+            ->willReturn('http://merged-output');
+
+        $subject = $this->createSubject(
+            $repository,
+            $fileStorage,
+            $resolver,
+            $resultFileUrlProvider,
+            $principalPortalStatusClient,
+            $statusMerger,
+            $resultFileMerger,
+            true
+        );
+
+        self::assertSame('http://merged-output', $subject->getDownloadUrl('ref-4'));
     }
 
     private function createProcessedImport(string $referenceId): RosteringImport

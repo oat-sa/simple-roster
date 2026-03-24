@@ -50,7 +50,7 @@ class PrincipalPortalStatusHttpClient implements PrincipalPortalStatusClientInte
                 throw new RosteringStatusException('Invalid Principal Portal status payload.');
             }
 
-            return RosteringImportStatus::fromApiResult($decodedBody['result']);
+            return RosteringImportStatus::fromApiResult($decodedBody['result'], $referenceId);
         } catch (Throwable $exception) {
             if ($exception instanceof RosteringStatusException) {
                 throw $exception;

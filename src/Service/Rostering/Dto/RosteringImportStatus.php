@@ -15,26 +15,20 @@ class RosteringImportStatus
         private readonly string $referenceId,
         private readonly string $status,
         private readonly int $fileLine,
-        private readonly array $messages,
-        private readonly ?string $resultFileUrl
+        private readonly array $messages
     ) {
     }
 
     public static function pending(string $referenceId): self
     {
-        return new self($referenceId, 'pending', 0, [], null);
+        return new self($referenceId, 'pending', 0, []);
     }
 
     /**
      * @param array<string, mixed> $result
      */
-    public static function fromApiResult(array $result): self
+    public static function fromApiResult(array $result, string $referenceId): self
     {
-        if (!isset($result['referenceId']) || !is_string($result['referenceId']) || trim($result['referenceId']) === '') {
-            throw new InvalidArgumentException('Invalid "referenceId" in Principal Portal status payload.');
-        }
-        $referenceId = trim($result['referenceId']);
-
         if (!isset($result['status']) || !is_string($result['status']) || trim($result['status']) === '') {
             throw new InvalidArgumentException('Invalid "status" in Principal Portal status payload.');
         }
@@ -57,24 +51,10 @@ class RosteringImportStatus
             $messages[] = trim($message);
         }
 
-        if (!array_key_exists('resultFileUrl', $result)) {
-            throw new InvalidArgumentException('Invalid "resultFileUrl" in Principal Portal status payload.');
-        }
-
-        $resultFileUrl = null;
-        if ($result['resultFileUrl'] !== null) {
-            if (!is_string($result['resultFileUrl'])) {
-                throw new InvalidArgumentException('Invalid "resultFileUrl" in Principal Portal status payload.');
-            }
-
-            $trimmedUrl = trim($result['resultFileUrl']);
-            $resultFileUrl = $trimmedUrl === '' ? null : $trimmedUrl;
-        }
-
-        return new self($referenceId, $status, $fileLine, $messages, $resultFileUrl);
+        return new self($referenceId, $status, $fileLine, $messages);
     }
 
-    public static function fromImport(RosteringImport $import, ?string $resultFileUrl): self
+    public static function fromImport(RosteringImport $import): self
     {
         $messages = [];
         $errorMessage = $import->getErrorMessage();
@@ -86,8 +66,7 @@ class RosteringImportStatus
             $import->getReferenceId(),
             $import->getStatus(),
             $import->getTotalRows() ?? 0,
-            $messages,
-            $resultFileUrl
+            $messages
         );
     }
 
@@ -114,38 +93,20 @@ class RosteringImportStatus
         return $this->messages;
     }
 
-    public function getResultFileUrl(): ?string
-    {
-        return $this->resultFileUrl;
-    }
-
     public function isProcessed(): bool
     {
         return $this->status === self::STATUS_PROCESSED;
     }
 
-    public function withResultFileUrl(?string $resultFileUrl): self
-    {
-        return new self(
-            $this->referenceId,
-            $this->status,
-            $this->fileLine,
-            $this->messages,
-            $resultFileUrl
-        );
-    }
-
     /**
-     * @return array{referenceId: string, status: string, fileLine: int, messages: array<int, string>, resultFileUrl: ?string}
+     * @return array{status: string, fileLine: int, messages: array<int, string>}
      */
     public function toArray(): array
     {
         return [
-            'referenceId' => $this->referenceId,
             'status' => $this->status,
             'fileLine' => $this->fileLine,
             'messages' => $this->messages,
-            'resultFileUrl' => $this->resultFileUrl,
         ];
     }
 }
