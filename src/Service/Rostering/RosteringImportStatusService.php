@@ -63,6 +63,11 @@ class RosteringImportStatusService
             return $this->resultFileUrlProvider->generate($this->fileKeyResolver->outputFileKey($referenceId));
         }
 
+        $ppOutputFileKey = $this->fileKeyResolver->principalPortalOutputFileKey($referenceId);
+        if (!$this->fileStorage->exists($ppOutputFileKey)) {
+            return null;
+        }
+
         $mergedOutputFileKey = $this->resultFileMerger->getOrCreateMergedOutputFileKey($referenceId);
 
         return $this->resultFileUrlProvider->generate($mergedOutputFileKey);
