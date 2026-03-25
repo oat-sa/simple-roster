@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Messenger\Serializer;
 
+use JsonException;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
@@ -23,12 +24,17 @@ class RosteringFileUploadedSerializer implements SerializerInterface
             throw new RuntimeException('Unsupported message type for RosteringFileUploadedSerializer.');
         }
 
-        $body = json_encode([
-            'referenceId' => $message->referenceId,
-        ]);
-
-        if ($body === false) {
-            throw new RuntimeException(sprintf('json_encode error: %s', json_last_error_msg()));
+        try {
+            $body = json_encode(
+                ['referenceId' => $message->referenceId],
+                JSON_THROW_ON_ERROR
+            );
+        } catch (JsonException $exception) {
+            throw new RuntimeException(
+                sprintf('Unable to encode rostering uploaded message: %s', $exception->getMessage()),
+                0,
+                $exception
+            );
         }
 
         return [

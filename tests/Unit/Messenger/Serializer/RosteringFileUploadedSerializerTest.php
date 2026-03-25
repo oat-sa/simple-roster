@@ -47,4 +47,14 @@ class RosteringFileUploadedSerializerTest extends TestCase
 
         $serializer->encode(new Envelope(new stdClass()));
     }
+
+    public function testEncodeThrowsWhenJsonEncodingFails(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to encode rostering uploaded message:');
+
+        $serializer->encode(new Envelope(new RosteringFileUploadedMessage("\xB1\x31")));
+    }
 }
