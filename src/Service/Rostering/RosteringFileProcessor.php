@@ -59,13 +59,14 @@ class RosteringFileProcessor
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
-        private readonly UserCacheInvalidator $userCacheInvalidator
+        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer
     ) {
     }
 
     public function process(string $referenceId): void
     {
         $this->lineItemIdsBySessionName = [];
+        $this->userCacheSynchronizer->reset();
 
         $referenceId = trim($referenceId);
         $this->validateReferenceId($referenceId);
@@ -143,6 +144,8 @@ class RosteringFileProcessor
                 fclose($resultStream);
             }
         }
+
+        $this->userCacheSynchronizer->synchronize();
 
         $this->logger->info(
             sprintf("Rostering file '%s' processed.", $referenceId),
@@ -256,7 +259,7 @@ class RosteringFileProcessor
 
             $this->assignmentRepository->deleteByUserId($userId);
             $this->userRepository->deleteById($userId);
-            $this->invalidateUserCache($username, true);
+            $this->userCacheSynchronizer->markForInvalidationOnly($username);
 
             return;
         }
@@ -287,7 +290,7 @@ class RosteringFileProcessor
             }
 
             if ($hasUserChanged || $hasAssignmentChanged) {
-                $this->invalidateUserCache($username, $hasAssignmentChanged);
+                $this->userCacheSynchronizer->markForWarmup($username);
             }
 
             return;
@@ -313,7 +316,7 @@ class RosteringFileProcessor
 
         $createdUserId = $this->createUser($username, $password, $organizationId);
         $this->replaceUserAssignment($createdUserId, $sessionName);
-        $this->invalidateUserCache($username, true);
+        $this->userCacheSynchronizer->markForWarmup($username);
     }
 
     private function createUser(string $username, string $password, string $organizationId): int
@@ -333,17 +336,6 @@ class RosteringFileProcessor
         $user = (new User())->setUsername($username);
 
         return $this->passwordHasher->hashPassword($user, $plainPassword);
-    }
-
-    private function invalidateUserCache(string $username, bool $hasAssignmentChanged): void
-    {
-        if ($hasAssignmentChanged) {
-            $this->userCacheInvalidator->invalidateAfterAssignmentChange($username);
-
-            return;
-        }
-
-        $this->userCacheInvalidator->invalidateAfterUserChange($username);
     }
 
     /**

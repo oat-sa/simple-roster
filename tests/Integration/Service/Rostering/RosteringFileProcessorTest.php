@@ -287,7 +287,7 @@ CSV;
         self::assertSame('validation.fieldError', $rowsByMarker['missing_user_rejected']['errorCode']);
     }
 
-    public function testProcessInvalidatesUserCacheForChangedRows(): void
+    public function testProcessWarmsUpUserCacheForChangedRows(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
         $currentLineItemSlug = $availableLineItemSlugs[0];
@@ -314,6 +314,10 @@ CSV,
         $this->subject->process('ref-cache-invalidated');
 
         self::assertFalse($this->resultCache->hasItem($cacheKey));
+
+        $this->getEntityManager()->clear();
+        $reloadedUser = $this->userRepository->findByUsernameWithAssignments($username);
+        self::assertSame($updatedLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
     }
 
     private function storeProcessingFile(string $referenceId, string $csv): void
