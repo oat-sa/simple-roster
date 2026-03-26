@@ -104,11 +104,11 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame($referenceId, $decodedResponse['result']['referenceId']);
         self::assertSame('pending', $decodedResponse['result']['status']);
         self::assertSame(0, $decodedResponse['result']['fileLine']);
         self::assertSame([], $decodedResponse['result']['messages']);
-        self::assertNull($decodedResponse['result']['resultFileUrl']);
+        self::assertArrayNotHasKey('referenceId', $decodedResponse['result']);
+        self::assertArrayNotHasKey('resultFileUrl', $decodedResponse['result']);
     }
 
     public function testItReturnsProcessingStatusFromImportRow(): void
@@ -127,11 +127,11 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
             JSON_THROW_ON_ERROR
         );
 
-        self::assertSame($referenceId, $decodedResponse['result']['referenceId']);
         self::assertSame('processing', $decodedResponse['result']['status']);
         self::assertSame(0, $decodedResponse['result']['fileLine']);
         self::assertSame([], $decodedResponse['result']['messages']);
-        self::assertNull($decodedResponse['result']['resultFileUrl']);
+        self::assertArrayNotHasKey('referenceId', $decodedResponse['result']);
+        self::assertArrayNotHasKey('resultFileUrl', $decodedResponse['result']);
     }
 
     public function testItReturnsFailedStatusWithErrorMessage(): void
@@ -152,7 +152,8 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
         self::assertSame('failed', $decodedResponse['result']['status']);
         self::assertSame(100, $decodedResponse['result']['fileLine']);
         self::assertSame(['Global import error'], $decodedResponse['result']['messages']);
-        self::assertNull($decodedResponse['result']['resultFileUrl']);
+        self::assertArrayNotHasKey('referenceId', $decodedResponse['result']);
+        self::assertArrayNotHasKey('resultFileUrl', $decodedResponse['result']);
     }
 
     private function storeInputFile(string $referenceId): void

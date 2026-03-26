@@ -45,7 +45,7 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
 
             return (string) $request->getUri();
         } catch (Throwable $exception) {
-            $this->logger->warning(
+            $this->logger->error(
                 sprintf('Unable to generate signed result file URL for file key "%s".', $fileKey),
                 [
                     'fileKey' => $fileKey,

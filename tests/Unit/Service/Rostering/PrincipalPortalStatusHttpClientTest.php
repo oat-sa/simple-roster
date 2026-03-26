@@ -37,7 +37,7 @@ class PrincipalPortalStatusHttpClientTest extends TestCase
             self::assertSame(sprintf('Bearer %s', $appApiKey), $authorizationHeader);
 
             return new MockResponse(
-                '{"result":{"referenceId":"ref-1","status":"processed","fileLine":12,"messages":[],"resultFileUrl":"http://file"}}',
+                '{"result":{"status":"processed","fileLine":12,"messages":[]}}',
                 ['http_code' => 200]
             );
         });

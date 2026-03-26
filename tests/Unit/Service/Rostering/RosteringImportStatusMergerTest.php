@@ -15,8 +15,8 @@ class RosteringImportStatusMergerTest extends TestCase
         $subject = new RosteringImportStatusMerger();
 
         $merged = $subject->merge(
-            new RosteringImportStatus('ref-1', 'processed', 8, [], null),
-            new RosteringImportStatus('ref-1', 'processed', 10, [], null)
+            new RosteringImportStatus('ref-1', 'processed', 8, []),
+            new RosteringImportStatus('ref-1', 'processed', 10, [])
         );
 
         self::assertSame('processed', $merged->getStatus());
@@ -28,8 +28,8 @@ class RosteringImportStatusMergerTest extends TestCase
         $subject = new RosteringImportStatusMerger();
 
         $merged = $subject->merge(
-            new RosteringImportStatus('ref-1', 'processing', 4, [], null),
-            new RosteringImportStatus('ref-1', 'processing', 9, [], null)
+            new RosteringImportStatus('ref-1', 'processing', 4, []),
+            new RosteringImportStatus('ref-1', 'processing', 9, [])
         );
 
         self::assertSame('processing', $merged->getStatus());
@@ -41,8 +41,8 @@ class RosteringImportStatusMergerTest extends TestCase
         $subject = new RosteringImportStatusMerger();
 
         $merged = $subject->merge(
-            new RosteringImportStatus('ref-1', 'processing', 7, ['SR processing'], null),
-            new RosteringImportStatus('ref-1', 'pending', 10, ['PP pending'], null)
+            new RosteringImportStatus('ref-1', 'processing', 7, ['SR processing']),
+            new RosteringImportStatus('ref-1', 'pending', 10, ['PP pending'])
         );
 
         self::assertSame('pending', $merged->getStatus());
@@ -55,8 +55,8 @@ class RosteringImportStatusMergerTest extends TestCase
         $subject = new RosteringImportStatusMerger();
 
         $merged = $subject->merge(
-            new RosteringImportStatus('ref-1', 'processed', 5, [], null),
-            new RosteringImportStatus('ref-1', 'failed', 5, ['Import failed in PP'], null)
+            new RosteringImportStatus('ref-1', 'processed', 5, []),
+            new RosteringImportStatus('ref-1', 'failed', 5, ['Import failed in PP'])
         );
 
         self::assertSame('failed', $merged->getStatus());

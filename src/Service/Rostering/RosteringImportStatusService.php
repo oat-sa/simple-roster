@@ -28,24 +28,17 @@ class RosteringImportStatusService
     public function getStatus(string $referenceId): ?RosteringImportStatus
     {
         if (!$this->principalPortalEnabled) {
-            return $this->resolveLocalStatus($referenceId, true);
+            return $this->resolveLocalStatus($referenceId);
         }
 
-        $localStatus = $this->resolveLocalStatus($referenceId, false);
+        $localStatus = $this->resolveLocalStatus($referenceId);
         if ($localStatus === null) {
             return null;
         }
 
         try {
             $principalPortalStatus = $this->principalPortalStatusClient->fetchStatus($referenceId);
-            $mergedStatus = $this->statusMerger->merge($localStatus, $principalPortalStatus);
-            if (!$mergedStatus->isProcessed()) {
-                return $mergedStatus;
-            }
-
-            $mergedOutputFileKey = $this->resultFileMerger->getOrCreateMergedOutputFileKey($referenceId);
-
-            return $mergedStatus->withResultFileUrl($this->resultFileUrlProvider->generate($mergedOutputFileKey));
+            return $this->statusMerger->merge($localStatus, $principalPortalStatus);
         } catch (RosteringStatusException $exception) {
             $this->logger->error(
                 sprintf('Unable to resolve merged rostering status for referenceId "%s".', $referenceId),
@@ -59,7 +52,28 @@ class RosteringImportStatusService
         }
     }
 
-    private function resolveLocalStatus(string $referenceId, bool $withResultFileUrl): ?RosteringImportStatus
+    public function getDownloadUrl(string $referenceId): ?string
+    {
+        $status = $this->getStatus($referenceId);
+        if ($status === null || !$status->isProcessed()) {
+            return null;
+        }
+
+        if (!$this->principalPortalEnabled) {
+            return $this->resultFileUrlProvider->generate($this->fileKeyResolver->outputFileKey($referenceId));
+        }
+
+        $ppOutputFileKey = $this->fileKeyResolver->principalPortalOutputFileKey($referenceId);
+        if (!$this->fileStorage->exists($ppOutputFileKey)) {
+            return null;
+        }
+
+        $mergedOutputFileKey = $this->resultFileMerger->getOrCreateMergedOutputFileKey($referenceId);
+
+        return $this->resultFileUrlProvider->generate($mergedOutputFileKey);
+    }
+
+    private function resolveLocalStatus(string $referenceId): ?RosteringImportStatus
     {
         $import = $this->rosteringImportRepository->findOneBy(['referenceId' => $referenceId]);
         if (!$import instanceof RosteringImport) {
@@ -70,10 +84,6 @@ class RosteringImportStatusService
             return null;
         }
 
-        $resultFileUrl = $withResultFileUrl && $import->isProcessed()
-            ? $this->resultFileUrlProvider->generate($this->fileKeyResolver->outputFileKey($referenceId))
-            : null;
-
-        return RosteringImportStatus::fromImport($import, $resultFileUrl);
+        return RosteringImportStatus::fromImport($import);
     }
 }
