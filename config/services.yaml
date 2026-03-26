@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
+    env(ROSTERING_PRINCIPALS_PORTAL_ENABLED): 'false'
+    env(ROSTERING_PRINCIPALS_PORTAL_BASE_URL): ''
     env(RECREATE_QA_USERS): 'false'
     env(GENERATED_USERS_GROUP): 'TestGroup'
     env(GENERATED_USERS_BATCH_SIZE): '100'
@@ -57,6 +60,8 @@ parameters:
     app.upload.csv.delimiter: ','
     app.upload.csv.enclosure: '"'
     app.upload.csv.escape: "\\"
+    app.rostering.principals_portal.enabled: '%env(bool:ROSTERING_PRINCIPALS_PORTAL_ENABLED)%'
+    app.rostering.principals_portal.base_url: '%env(string:ROSTERING_PRINCIPALS_PORTAL_BASE_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -90,6 +95,8 @@ services:
             $uploadedFileCsvDelimiter: '%app.upload.csv.delimiter%'
             $uploadedFileCsvEnclosure: '%app.upload.csv.enclosure%'
             $uploadedFileCsvEscape: '%app.upload.csv.escape%'
+            $principalPortalEnabled: '%app.rostering.principals_portal.enabled%'
+            $principalPortalBaseUrl: '%app.rostering.principals_portal.base_url%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -134,6 +141,12 @@ services:
         class: OAT\SimpleRoster\Service\Rostering\OperationalFileStorage
         arguments:
             $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
+
+    OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
+
+    OAT\SimpleRoster\Service\Rostering\PrincipalPortalStatusClientInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\PrincipalPortalStatusHttpClient
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:

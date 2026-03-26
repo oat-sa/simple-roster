@@ -6,6 +6,8 @@ namespace OAT\SimpleRoster\Service\Rostering;
 
 interface FileStorageInterface
 {
+    public function exists(string $key): bool;
+
     /**
      * @return resource
      */

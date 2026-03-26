@@ -16,6 +16,19 @@ class OperationalFileStorage implements FileStorageInterface
     ) {
     }
 
+    public function exists(string $key): bool
+    {
+        try {
+            return $this->filesystem->fileExists($key);
+        } catch (FilesystemException $exception) {
+            throw new RuntimeException(
+                sprintf('Unable to check file existence for storage key "%s".', $key),
+                0,
+                $exception
+            );
+        }
+    }
+
     public function read(string $key)
     {
         try {

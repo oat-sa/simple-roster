@@ -13,6 +13,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Repository\RosteringImportRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDto;
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDtoFactory;
@@ -42,9 +43,6 @@ class RosteringFileProcessor
     private const MAX_REFERENCE_ID_LENGTH = 255;
 
     private const ASSIGNMENT_STATE_READY = 'ready';
-    private const INPUT_FILE_NAME = 'input.csv';
-    private const OUTPUT_FILE_NAME = 'sr-output.csv';
-
     /**
      * @var array<string, int>
      */
@@ -56,6 +54,8 @@ class RosteringFileProcessor
         private readonly UserRepository $userRepository,
         private readonly LineItemRepository $lineItemRepository,
         private readonly AssignmentRepository $assignmentRepository,
+        private readonly RosteringImportRepository $rosteringImportRepository,
+        private readonly RosteringFileKeyResolver $fileKeyResolver,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
@@ -71,20 +71,25 @@ class RosteringFileProcessor
         $referenceId = trim($referenceId);
         $this->validateReferenceId($referenceId);
 
-        $inputFileKey = $this->buildStorageKey($referenceId, self::INPUT_FILE_NAME);
-        $outputFileKey = $this->buildStorageKey($referenceId, self::OUTPUT_FILE_NAME);
-        $inputStream = $this->fileStorage->read($inputFileKey);
-        $resultStream = fopen('php://temp', 'rb+');
-
-        if (false === $resultStream) {
-            throw new RuntimeException('Unable to create temporary stream for rostering result file.');
-        }
+        $inputFileKey = $this->fileKeyResolver->inputFileKey($referenceId);
+        $outputFileKey = $this->fileKeyResolver->outputFileKey($referenceId);
+        $inputStream = null;
+        $resultStream = null;
 
         $totalRows = 0;
         $failedRows = 0;
         $importableRows = 0;
 
+        $this->rosteringImportRepository->markProcessing($referenceId);
+
         try {
+            $inputStream = $this->fileStorage->read($inputFileKey);
+            $resultStream = fopen('php://temp', 'rb+');
+
+            if (false === $resultStream) {
+                throw new RuntimeException('Unable to create temporary stream for rostering result file.');
+            }
+
             $reader = Reader::from($inputStream);
             $reader->setHeaderOffset(0);
             $header = $reader->getHeader();
@@ -124,12 +129,17 @@ class RosteringFileProcessor
                     ]
                 );
 
+                $this->rosteringImportRepository->markProcessed($referenceId, $totalRows, $failedRows);
+
                 return;
             }
 
             rewind($resultStream);
             $this->fileStorage->store($resultStream, $outputFileKey);
+            $this->rosteringImportRepository->markProcessed($referenceId, $totalRows, $failedRows);
         } catch (Throwable $exception) {
+            $this->markImportFailure($referenceId, $exception, $totalRows, $failedRows);
+
             throw new RuntimeException(
                 sprintf('Unable to process rostering file "%s".', $inputFileKey),
                 0,
@@ -443,11 +453,6 @@ class RosteringFileProcessor
         }
     }
 
-    private function buildStorageKey(string $referenceId, string $fileName): string
-    {
-        return sprintf('%s/%s', $referenceId, $fileName);
-    }
-
     /**
      * @param array<string> $header
      * @param array<string, string> $row
@@ -463,5 +468,25 @@ class RosteringFileProcessor
         }
 
         return $line;
+    }
+
+    private function markImportFailure(
+        string $referenceId,
+        Throwable $exception,
+        int $totalRows,
+        int $failedRows
+    ): void {
+        try {
+            $this->rosteringImportRepository->markFailed($referenceId, $exception->getMessage(), $totalRows, $failedRows);
+        } catch (Throwable $trackingException) {
+            $this->logger->error(
+                sprintf('Unable to persist failed status for rostering import "%s".', $referenceId),
+                [
+                    'referenceId' => $referenceId,
+                    'trackingError' => $trackingException->getMessage(),
+                    'trackingTrace' => $trackingException->getTraceAsString(),
+                ]
+            );
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace OAT\SimpleRoster\Tests\Integration\Service\Rostering;
 use League\Csv\Reader;
 use LogicException;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Entity\RosteringImport;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\UserRepository;
@@ -194,6 +195,21 @@ CSV,
 
         self::assertSame('400', $rowsByMarker['bad_session_name']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['bad_session_name']['errorCode']);
+
+        /** @var RosteringImport|null $import */
+        $import = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'ref-import']);
+        self::assertInstanceOf(RosteringImport::class, $import);
+        self::assertSame(RosteringImport::STATUS_PROCESSED, $import->getStatus());
+        self::assertSame(count($records), $import->getTotalRows());
+        self::assertSame(
+            count(array_filter($records, static fn (array $record): bool => $record['status'] !== 'processed')),
+            $import->getFailedRows()
+        );
+        self::assertSame($import->getTotalRows() - $import->getFailedRows(), $import->getProcessedRows());
+        self::assertSame(1, $import->getAttempts());
+        self::assertNull($import->getErrorMessage());
+        self::assertNotNull($import->getStartedAt());
+        self::assertNotNull($import->getFinishedAt());
     }
 
     public function testProcessSkipsFileWithoutImportableRows(): void
@@ -211,6 +227,16 @@ CSV;
 
         $after = $this->readProcessingFileContent('ref-no-import');
         self::assertSame($before, $after);
+
+        /** @var RosteringImport|null $import */
+        $import = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'ref-no-import']);
+        self::assertInstanceOf(RosteringImport::class, $import);
+        self::assertSame(RosteringImport::STATUS_PROCESSED, $import->getStatus());
+        self::assertSame(2, $import->getTotalRows());
+        self::assertSame(2, $import->getProcessedRows());
+        self::assertSame(0, $import->getFailedRows());
+        self::assertSame(1, $import->getAttempts());
+        self::assertNull($import->getErrorMessage());
     }
 
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void
@@ -285,6 +311,28 @@ CSV;
         self::assertSame('', $rowsByMarker['existing_password_updated']['errorCode']);
         self::assertSame('400', $rowsByMarker['missing_user_rejected']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['missing_user_rejected']['errorCode']);
+    }
+
+    public function testProcessMarksImportAsFailedWhenInputCannotBeRead(): void
+    {
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Unable to process rostering file');
+
+        try {
+            $this->subject->process('missing-file');
+        } finally {
+            /** @var RosteringImport|null $import */
+            $import = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'missing-file']);
+            self::assertInstanceOf(RosteringImport::class, $import);
+            self::assertSame(RosteringImport::STATUS_FAILED, $import->getStatus());
+            self::assertSame(0, $import->getTotalRows());
+            self::assertSame(0, $import->getProcessedRows());
+            self::assertSame(0, $import->getFailedRows());
+            self::assertSame(1, $import->getAttempts());
+            self::assertNotNull($import->getErrorMessage());
+            self::assertNotNull($import->getStartedAt());
+            self::assertNotNull($import->getFinishedAt());
+        }
     }
 
     public function testProcessWarmsUpUserCacheForChangedRows(): void
