@@ -24,23 +24,7 @@ final class UserCacheInvalidator
     /**
      * @throws CacheInvalidArgumentException
      */
-    public function invalidateAfterUserChange(string $username): void
-    {
-        $this->invalidate($username, 'user');
-    }
-
-    /**
-     * @throws CacheInvalidArgumentException
-     */
-    public function invalidateAfterAssignmentChange(string $username): void
-    {
-        $this->invalidate($username, 'assignment');
-    }
-
-    /**
-     * @throws CacheInvalidArgumentException
-     */
-    private function invalidate(string $username, string $trigger): void
+    public function invalidate(string $username): void
     {
         if ($username === '') {
             throw new InvalidArgumentException('Username cannot be empty when invalidating user cache.');
@@ -58,15 +42,12 @@ final class UserCacheInvalidator
 
         $this->logger->info(
             sprintf(
-                "Rostering cache for user '%s' was successfully invalidated after %s change.",
-                $username,
-                $trigger
+                "User cache for user '%s' was successfully invalidated.",
+                $username
             ),
             [
                 'cacheKey' => $cacheKey,
-                'trigger' => $trigger,
             ]
         );
     }
 }
-

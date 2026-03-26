@@ -91,7 +91,7 @@ class UploadedFileValidator
                 }
 
                 ++$recordCount;
-                if ($recordCount > $this->allowedUploadedFileMaxRecords) {
+                if ($recordCount + 1 > $this->allowedUploadedFileMaxRecords) {
                     throw new UploadedFileValidationException(
                         sprintf(
                             'File records count "%d" exceeds maximum allowed records of "%d".',

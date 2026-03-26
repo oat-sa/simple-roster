@@ -9,6 +9,7 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Csv\Writer;
 use InvalidArgumentException;
+use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -37,12 +38,13 @@ class RosteringFileProcessor
     private const ERROR_TYPE = 'error';
     private const ERROR_CODE_VALIDATION = 'validation.fieldError';
     private const ERROR_CODE_INTERNAL = 'csv.import.internalError';
+    private const ERROR_MESSAGE_INTERNAL = 'Internal error while processing row.';
 
     private const MAX_REFERENCE_ID_LENGTH = 255;
 
     private const ASSIGNMENT_STATE_READY = 'ready';
     /**
-     * @var array<string, int|null>
+     * @var array<string, int>
      */
     private array $lineItemIdsBySessionName = [];
 
@@ -57,12 +59,15 @@ class RosteringFileProcessor
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
-        private readonly UserCacheInvalidator $userCacheInvalidator
+        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer
     ) {
     }
 
     public function process(string $referenceId): void
     {
+        $this->lineItemIdsBySessionName = [];
+        $this->userCacheSynchronizer->reset();
+
         $referenceId = trim($referenceId);
         $this->validateReferenceId($referenceId);
 
@@ -150,6 +155,8 @@ class RosteringFileProcessor
             }
         }
 
+        $this->userCacheSynchronizer->synchronize();
+
         $this->logger->info(
             sprintf("Rostering file '%s' processed.", $referenceId),
             [
@@ -228,11 +235,11 @@ class RosteringFileProcessor
             $resultRow[self::RESULT_STATUS] = self::ROW_STATUS_INTERNAL_ERROR;
             $resultRow[self::RESULT_ERROR_TYPE] = self::ERROR_TYPE;
             $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_INTERNAL;
-            $resultRow[self::RESULT_ERROR_MESSAGE] = $exception->getMessage();
+            $resultRow[self::RESULT_ERROR_MESSAGE] = self::ERROR_MESSAGE_INTERNAL;
 
-            $this->logger->error(
-                sprintf('Unexpected error while importing rostering row: %s', $exception->getMessage()),
-                ['trace' => $exception->getTraceAsString()]
+            $this->logger->warning(
+                'Unexpected error while importing rostering row.',
+                ['exception' => $exception]
             );
         }
 
@@ -262,7 +269,7 @@ class RosteringFileProcessor
 
             $this->assignmentRepository->deleteByUserId($userId);
             $this->userRepository->deleteById($userId);
-            $this->invalidateUserCache($username, true);
+            $this->userCacheSynchronizer->markForInvalidationOnly($username);
 
             return;
         }
@@ -293,7 +300,7 @@ class RosteringFileProcessor
             }
 
             if ($hasUserChanged || $hasAssignmentChanged) {
-                $this->invalidateUserCache($username, $hasAssignmentChanged);
+                $this->userCacheSynchronizer->markForWarmup($username);
             }
 
             return;
@@ -319,7 +326,7 @@ class RosteringFileProcessor
 
         $createdUserId = $this->createUser($username, $password, $organizationId);
         $this->replaceUserAssignment($createdUserId, $sessionName);
-        $this->invalidateUserCache($username, true);
+        $this->userCacheSynchronizer->markForWarmup($username);
     }
 
     private function createUser(string $username, string $password, string $organizationId): int
@@ -339,17 +346,6 @@ class RosteringFileProcessor
         $user = (new User())->setUsername($username);
 
         return $this->passwordHasher->hashPassword($user, $plainPassword);
-    }
-
-    private function invalidateUserCache(string $username, bool $hasAssignmentChanged): void
-    {
-        if ($hasAssignmentChanged) {
-            $this->userCacheInvalidator->invalidateAfterAssignmentChange($username);
-
-            return;
-        }
-
-        $this->userCacheInvalidator->invalidateAfterUserChange($username);
     }
 
     /**
@@ -409,17 +405,16 @@ class RosteringFileProcessor
 
     private function findLineItemIdBySessionName(string $sessionName): ?int
     {
-        if (array_key_exists($sessionName, $this->lineItemIdsBySessionName)) {
+        if (isset($this->lineItemIdsBySessionName[$sessionName])) {
             return $this->lineItemIdsBySessionName[$sessionName];
         }
 
-        $lineItemId = $this->lineItemRepository->findIdBySlug($sessionName);
-        if (null === $lineItemId) {
-            $this->lineItemIdsBySessionName[$sessionName] = null;
-
+        $lineItem = $this->lineItemRepository->findOneBy(['slug' => $sessionName]);
+        if (!$lineItem instanceof LineItem) {
             return null;
         }
 
+        $lineItemId = (int)$lineItem->getId();
         $this->lineItemIdsBySessionName[$sessionName] = $lineItemId;
 
         return $lineItemId;

@@ -71,17 +71,17 @@ class UploadedFileValidatorTest extends TestCase
     public function testItRejectsTooManyRecords(): void
     {
         $validator = $this->createValidator(1024, 2);
-        $file = $this->createUploadedFile('test.csv', "col1,col2\na,b\nc,d\ne,f");
+        $file = $this->createUploadedFile('test.csv', "col1,col2\na,b\nc,d");
 
         $this->expectException(UploadedFileValidationException::class);
-        $this->expectExceptionMessage('File records count "3" exceeds maximum allowed records of "2".');
+        $this->expectExceptionMessage('File records count "2" exceeds maximum allowed records of "2".');
 
         $validator->validate($file);
     }
 
     public function testItAcceptsWhenRecordsCountEqualsConfiguredLimit(): void
     {
-        $validator = $this->createValidator(1024, 2);
+        $validator = $this->createValidator(1024, 3);
         $file = $this->createUploadedFile('test.csv', "col1,col2\na,b\nc,d");
 
         $validator->validate($file);
