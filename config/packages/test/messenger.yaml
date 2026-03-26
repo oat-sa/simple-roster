@@ -3,6 +3,9 @@ framework:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             cache-warmup: 'in-memory://'
-            rostering-file-uploaded:
+            rostering-file-uploaded-pp:
+                dsn: 'in-memory://'
+                serializer: OAT\SimpleRoster\Messenger\Serializer\RosteringFileUploadedSerializer
+            rostering-file-uploaded-sr:
                 dsn: 'in-memory://'
                 serializer: OAT\SimpleRoster\Messenger\Serializer\RosteringFileUploadedSerializer

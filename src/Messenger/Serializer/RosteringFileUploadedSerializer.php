@@ -14,7 +14,24 @@ class RosteringFileUploadedSerializer implements SerializerInterface
 {
     public function decode(array $encodedEnvelope): Envelope
     {
-        throw new RuntimeException('Transport & serializer not meant for receiving messages');
+        $body = (string) ($encodedEnvelope['body'] ?? '');
+
+        try {
+            $payload = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new RuntimeException(sprintf('json_decode error: %s', $exception->getMessage()), 0, $exception);
+        }
+
+        if (!is_array($payload) || !isset($payload['referenceId']) || !is_string($payload['referenceId'])) {
+            throw new RuntimeException('Reference ID missing.');
+        }
+
+        $referenceId = trim($payload['referenceId']);
+        if ('' === $referenceId) {
+            throw new RuntimeException('Reference ID missing.');
+        }
+
+        return new Envelope(new RosteringFileUploadedMessage($referenceId));
     }
 
     public function encode(Envelope $envelope): array
@@ -26,15 +43,13 @@ class RosteringFileUploadedSerializer implements SerializerInterface
 
         try {
             $body = json_encode(
-                ['referenceId' => $message->referenceId],
+                [
+                    'referenceId' => $message->referenceId,
+                ],
                 JSON_THROW_ON_ERROR
             );
         } catch (JsonException $exception) {
-            throw new RuntimeException(
-                sprintf('Unable to encode rostering uploaded message: %s', $exception->getMessage()),
-                0,
-                $exception
-            );
+            throw new RuntimeException(sprintf('json_encode error: %s', $exception->getMessage()), 0, $exception);
         }
 
         return [
