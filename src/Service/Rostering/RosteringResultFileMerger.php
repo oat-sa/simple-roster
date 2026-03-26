@@ -29,11 +29,11 @@ class RosteringResultFileMerger
         }
 
         $srOutputFileKey = $this->fileKeyResolver->outputFileKey($referenceId);
-        $ppOutputFileKey = $this->fileKeyResolver->principalPortalOutputFileKey($referenceId);
+        $externalReportingSystemOutputFileKey = $this->fileKeyResolver->externalReportingSystemOutputFileKey($referenceId);
 
         if (
             !$this->fileStorage->exists($srOutputFileKey)
-            || !$this->fileStorage->exists($ppOutputFileKey)
+            || !$this->fileStorage->exists($externalReportingSystemOutputFileKey)
         ) {
             throw new RosteringStatusException(
                 sprintf('Unable to merge output files for "%s": required worker output files are missing.', $referenceId)
@@ -41,19 +41,19 @@ class RosteringResultFileMerger
         }
 
         $srStream = null;
-        $ppStream = null;
+        $externalReportingSystemStream = null;
         $mergedStream = null;
 
         try {
             $srStream = $this->fileStorage->read($srOutputFileKey);
-            $ppStream = $this->fileStorage->read($ppOutputFileKey);
+            $externalReportingSystemStream = $this->fileStorage->read($externalReportingSystemOutputFileKey);
             $mergedStream = fopen('php://temp', 'rb+');
 
             if ($mergedStream === false) {
                 throw new RosteringStatusException('Unable to create temporary stream for merged rostering output file.');
             }
 
-            $this->mergeStreams($srStream, $ppStream, $mergedStream);
+            $this->mergeStreams($srStream, $externalReportingSystemStream, $mergedStream);
             rewind($mergedStream);
             $this->fileStorage->store($mergedStream, $mergedOutputFileKey);
 
@@ -63,8 +63,8 @@ class RosteringResultFileMerger
                 fclose($srStream);
             }
 
-            if (is_resource($ppStream)) {
-                fclose($ppStream);
+            if (is_resource($externalReportingSystemStream)) {
+                fclose($externalReportingSystemStream);
             }
 
             if (is_resource($mergedStream)) {
@@ -75,46 +75,50 @@ class RosteringResultFileMerger
 
     /**
      * @param resource $srStream
-     * @param resource $ppStream
+     * @param resource $externalReportingSystemStream
      * @param resource $mergedStream
      */
-    private function mergeStreams(mixed $srStream, mixed $ppStream, mixed $mergedStream): void
+    private function mergeStreams(mixed $srStream, mixed $externalReportingSystemStream, mixed $mergedStream): void
     {
-        if (!is_resource($srStream) || !is_resource($ppStream) || !is_resource($mergedStream)) {
+        if (!is_resource($srStream) || !is_resource($externalReportingSystemStream) || !is_resource($mergedStream)) {
             throw new RosteringStatusException('Unable to merge output files: invalid stream resource.');
         }
 
         $srReader = Reader::from($srStream);
         $srReader->setHeaderOffset(0);
-        $ppReader = Reader::from($ppStream);
-        $ppReader->setHeaderOffset(0);
+        $externalReportingSystemReader = Reader::from($externalReportingSystemStream);
+        $externalReportingSystemReader->setHeaderOffset(0);
 
         $header = $srReader->getHeader();
-        if ($ppReader->getHeader() !== $header) {
-            throw new RosteringStatusException('Unable to merge output files: headers mismatch between SR and PP.');
+        if ($externalReportingSystemReader->getHeader() !== $header) {
+            throw new RosteringStatusException(
+                'Unable to merge output files: headers mismatch between SR and external reporting system.'
+            );
         }
 
         $writer = Writer::from($mergedStream);
         $writer->insertOne($header);
 
         $srRows = new IteratorIterator((new Statement())->process($srReader)->getRecords());
-        $ppRows = new IteratorIterator((new Statement())->process($ppReader)->getRecords());
+        $externalReportingSystemRows = new IteratorIterator((new Statement())->process($externalReportingSystemReader)->getRecords());
         $srRows->rewind();
-        $ppRows->rewind();
+        $externalReportingSystemRows->rewind();
 
-        while ($srRows->valid() || $ppRows->valid()) {
+        while ($srRows->valid() || $externalReportingSystemRows->valid()) {
             $srRow = $srRows->valid() ? $this->normalizeRow($srRows->current(), $header) : null;
-            $ppRow = $ppRows->valid() ? $this->normalizeRow($ppRows->current(), $header) : null;
+            $externalReportingSystemRow = $externalReportingSystemRows->valid()
+                ? $this->normalizeRow($externalReportingSystemRows->current(), $header)
+                : null;
 
             if ($srRow !== null && $this->isRowEmpty($srRow)) {
                 $srRow = null;
             }
 
-            if ($ppRow !== null && $this->isRowEmpty($ppRow)) {
-                $ppRow = null;
+            if ($externalReportingSystemRow !== null && $this->isRowEmpty($externalReportingSystemRow)) {
+                $externalReportingSystemRow = null;
             }
 
-            foreach ($this->mergeRows($srRow, $ppRow) as $row) {
+            foreach ($this->mergeRows($srRow, $externalReportingSystemRow) as $row) {
                 $writer->insertOne($this->toCsvLine($header, $row));
             }
 
@@ -122,52 +126,52 @@ class RosteringResultFileMerger
                 $srRows->next();
             }
 
-            if ($ppRows->valid()) {
-                $ppRows->next();
+            if ($externalReportingSystemRows->valid()) {
+                $externalReportingSystemRows->next();
             }
         }
     }
 
     /**
      * @param array<string, string>|null $srRow
-     * @param array<string, string>|null $ppRow
+     * @param array<string, string>|null $externalReportingSystemRow
      *
      * @return array<int, array<string, string>>
      */
-    private function mergeRows(?array $srRow, ?array $ppRow): array
+    private function mergeRows(?array $srRow, ?array $externalReportingSystemRow): array
     {
-        if ($srRow === null && $ppRow === null) {
+        if ($srRow === null && $externalReportingSystemRow === null) {
             return [];
         }
 
         if ($srRow === null) {
-            if ($ppRow === null) {
+            if ($externalReportingSystemRow === null) {
                 return [];
             }
 
-            return [$ppRow];
+            return [$externalReportingSystemRow];
         }
 
-        if ($ppRow === null) {
+        if ($externalReportingSystemRow === null) {
             return [$srRow];
         }
 
         $srHasError = $this->rowHasError($srRow);
-        $ppHasError = $this->rowHasError($ppRow);
+        $externalReportingSystemHasError = $this->rowHasError($externalReportingSystemRow);
 
-        if (!$srHasError && !$ppHasError) {
+        if (!$srHasError && !$externalReportingSystemHasError) {
             return [$srRow];
         }
 
-        if ($srHasError && !$ppHasError) {
+        if ($srHasError && !$externalReportingSystemHasError) {
             return [$srRow];
         }
 
-        if (!$srHasError && $ppHasError) {
-            return [$ppRow];
+        if (!$srHasError && $externalReportingSystemHasError) {
+            return [$externalReportingSystemRow];
         }
 
-        return [$srRow, $ppRow];
+        return [$srRow, $externalReportingSystemRow];
     }
 
     /**

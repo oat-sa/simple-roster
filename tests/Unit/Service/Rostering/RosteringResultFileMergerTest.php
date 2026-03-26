@@ -50,7 +50,7 @@ class RosteringResultFileMergerTest extends TestCase
         $referenceId = 'ref-headers';
 
         $storage->write($resolver->outputFileKey($referenceId), "id,status,errorType,errorCode,errorMessage\nu1,processed,,,\n");
-        $storage->write($resolver->principalPortalOutputFileKey($referenceId), "id,status,errorType,errorCode\nu1,processed,,\n");
+        $storage->write($resolver->externalReportingSystemOutputFileKey($referenceId), "id,status,errorType,errorCode\nu1,processed,,\n");
 
         $subject = new RosteringResultFileMerger($storage, $resolver);
 
@@ -79,7 +79,7 @@ class RosteringResultFileMergerTest extends TestCase
         );
 
         $storage->write(
-            $resolver->principalPortalOutputFileKey($referenceId),
+            $resolver->externalReportingSystemOutputFileKey($referenceId),
             implode(
                 "\n",
                 [
@@ -87,7 +87,7 @@ class RosteringResultFileMergerTest extends TestCase
                     'u1,processed,,,',
                     'u2,processed,,,',
                     ',,,,',
-                    'u3,500,error,csv.import.internalError,PP error',
+                    'u3,500,error,csv.import.internalError,External Reporting System error',
                 ]
             ) . "\n"
         );

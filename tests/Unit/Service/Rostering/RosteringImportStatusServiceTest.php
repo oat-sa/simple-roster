@@ -8,7 +8,7 @@ use OAT\SimpleRoster\Entity\RosteringImport;
 use OAT\SimpleRoster\Repository\RosteringImportRepository;
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringImportStatus;
 use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
-use OAT\SimpleRoster\Service\Rostering\PrincipalPortalStatusClientInterface;
+use OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface;
 use OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Rostering\RosteringImportStatusMerger;
@@ -19,12 +19,12 @@ use Psr\Log\NullLogger;
 
 class RosteringImportStatusServiceTest extends TestCase
 {
-    public function testItReturnsLocalStatusWhenPrincipalPortalIntegrationIsDisabled(): void
+    public function testItReturnsLocalStatusWhenExternalReportingSystemIntegrationIsDisabled(): void
     {
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
         $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
-        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $externalReportingStatusClient = $this->createMock(ExternalReportingStatusClientInterface::class);
         $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
         $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
         $resolver = new RosteringFileKeyResolver();
@@ -40,7 +40,7 @@ class RosteringImportStatusServiceTest extends TestCase
             ->expects(self::never())
             ->method('generate');
 
-        $principalPortalStatusClient
+        $externalReportingStatusClient
             ->expects(self::never())
             ->method('fetchStatus');
 
@@ -49,7 +49,7 @@ class RosteringImportStatusServiceTest extends TestCase
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
             false
@@ -66,7 +66,7 @@ class RosteringImportStatusServiceTest extends TestCase
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
         $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
-        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $externalReportingStatusClient = $this->createMock(ExternalReportingStatusClientInterface::class);
         $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
         $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
         $resolver = new RosteringFileKeyResolver();
@@ -82,7 +82,7 @@ class RosteringImportStatusServiceTest extends TestCase
             ->expects(self::never())
             ->method('generate');
 
-        $principalPortalStatusClient
+        $externalReportingStatusClient
             ->expects(self::once())
             ->method('fetchStatus')
             ->with('ref-2')
@@ -102,7 +102,7 @@ class RosteringImportStatusServiceTest extends TestCase
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
             true
@@ -119,7 +119,7 @@ class RosteringImportStatusServiceTest extends TestCase
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
         $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
-        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $externalReportingStatusClient = $this->createMock(ExternalReportingStatusClientInterface::class);
         $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
         $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
         $resolver = new RosteringFileKeyResolver();
@@ -136,7 +136,7 @@ class RosteringImportStatusServiceTest extends TestCase
             ->with($resolver->outputFileKey('ref-3'))
             ->willReturn('http://local-output');
 
-        $principalPortalStatusClient
+        $externalReportingStatusClient
             ->expects(self::never())
             ->method('fetchStatus');
 
@@ -145,7 +145,7 @@ class RosteringImportStatusServiceTest extends TestCase
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
             false
@@ -159,7 +159,7 @@ class RosteringImportStatusServiceTest extends TestCase
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
         $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
-        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $externalReportingStatusClient = $this->createMock(ExternalReportingStatusClientInterface::class);
         $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
         $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
         $resolver = new RosteringFileKeyResolver();
@@ -170,7 +170,7 @@ class RosteringImportStatusServiceTest extends TestCase
             ->with(['referenceId' => 'ref-4'])
             ->willReturn($this->createProcessedImport('ref-4'));
 
-        $principalPortalStatusClient
+        $externalReportingStatusClient
             ->expects(self::once())
             ->method('fetchStatus')
             ->with('ref-4')
@@ -182,12 +182,10 @@ class RosteringImportStatusServiceTest extends TestCase
             ->willReturn(new RosteringImportStatus('ref-4', 'processed', 5, []));
 
         $fileStorage
-            ->expects(self::exactly(2))
+            ->expects(self::once())
             ->method('exists')
-            ->willReturnMap([
-                [$resolver->outputFileKey('ref-4'), true],
-                [$resolver->principalPortalOutputFileKey('ref-4'), true],
-            ]);
+            ->with($resolver->externalReportingSystemOutputFileKey('ref-4'))
+            ->willReturn(true);
 
         $resultFileMerger
             ->expects(self::once())
@@ -206,7 +204,7 @@ class RosteringImportStatusServiceTest extends TestCase
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
             true
@@ -215,12 +213,12 @@ class RosteringImportStatusServiceTest extends TestCase
         self::assertSame('http://merged-output', $subject->getDownloadUrl('ref-4'));
     }
 
-    public function testItReturnsNullWhenPrincipalPortalOutputIsNotReady(): void
+    public function testItReturnsNullWhenExternalReportingSystemOutputIsNotReady(): void
     {
         $repository = $this->createMock(RosteringImportRepository::class);
         $fileStorage = $this->createMock(FileStorageInterface::class);
         $resultFileUrlProvider = $this->createMock(ResultFileUrlProviderInterface::class);
-        $principalPortalStatusClient = $this->createMock(PrincipalPortalStatusClientInterface::class);
+        $externalReportingStatusClient = $this->createMock(ExternalReportingStatusClientInterface::class);
         $statusMerger = $this->createMock(RosteringImportStatusMerger::class);
         $resultFileMerger = $this->createMock(RosteringResultFileMerger::class);
         $resolver = new RosteringFileKeyResolver();
@@ -231,7 +229,7 @@ class RosteringImportStatusServiceTest extends TestCase
             ->with(['referenceId' => 'ref-5'])
             ->willReturn($this->createProcessedImport('ref-5'));
 
-        $principalPortalStatusClient
+        $externalReportingStatusClient
             ->expects(self::once())
             ->method('fetchStatus')
             ->with('ref-5')
@@ -245,7 +243,7 @@ class RosteringImportStatusServiceTest extends TestCase
         $fileStorage
             ->expects(self::once())
             ->method('exists')
-            ->with($resolver->outputFileKey('ref-5'))
+            ->with($resolver->externalReportingSystemOutputFileKey('ref-5'))
             ->willReturn(false);
 
         $resultFileMerger
@@ -261,7 +259,7 @@ class RosteringImportStatusServiceTest extends TestCase
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
             true
@@ -286,20 +284,20 @@ class RosteringImportStatusServiceTest extends TestCase
         FileStorageInterface $fileStorage,
         RosteringFileKeyResolver $resolver,
         ResultFileUrlProviderInterface $resultFileUrlProvider,
-        PrincipalPortalStatusClientInterface $principalPortalStatusClient,
+        ExternalReportingStatusClientInterface $externalReportingStatusClient,
         RosteringImportStatusMerger $statusMerger,
         RosteringResultFileMerger $resultFileMerger,
-        bool $principalPortalEnabled
+        bool $externalReportingSystemEnabled
     ): RosteringImportStatusService {
         return new RosteringImportStatusService(
             $repository,
             $fileStorage,
             $resolver,
             $resultFileUrlProvider,
-            $principalPortalStatusClient,
+            $externalReportingStatusClient,
             $statusMerger,
             $resultFileMerger,
-            $principalPortalEnabled,
+            $externalReportingSystemEnabled,
             new NullLogger()
         );
     }

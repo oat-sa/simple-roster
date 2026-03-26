@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Service\Rostering;
 
-use OAT\SimpleRoster\Service\Rostering\PrincipalPortalStatusHttpClient;
+use OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringStatusException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
-class PrincipalPortalStatusHttpClientTest extends TestCase
+class ExternalReportingStatusHttpClientTest extends TestCase
 {
     public function testItReadsSuccessfulResponse(): void
     {
         $appApiKey = $this->appApiKey();
-        $baseUrl = $this->principalPortalBaseUrl();
+        $baseUrl = $this->externalReportingSystemBaseUrl();
 
         $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use ($appApiKey, $baseUrl): MockResponse {
             self::assertSame('GET', $method);
@@ -42,7 +42,7 @@ class PrincipalPortalStatusHttpClientTest extends TestCase
             );
         });
 
-        $subject = new PrincipalPortalStatusHttpClient(
+        $subject = new ExternalReportingStatusHttpClient(
             $httpClient,
             $appApiKey,
             $baseUrl
@@ -61,10 +61,10 @@ class PrincipalPortalStatusHttpClientTest extends TestCase
             new MockResponse('{"error":{"message":"not found"}}', ['http_code' => 404]),
         ]);
 
-        $subject = new PrincipalPortalStatusHttpClient(
+        $subject = new ExternalReportingStatusHttpClient(
             $httpClient,
             $this->appApiKey(),
-            $this->principalPortalBaseUrl()
+            $this->externalReportingSystemBaseUrl()
         );
 
         $this->expectException(RosteringStatusException::class);
@@ -77,10 +77,10 @@ class PrincipalPortalStatusHttpClientTest extends TestCase
             new MockResponse('{"result":"invalid"}', ['http_code' => 200]),
         ]);
 
-        $subject = new PrincipalPortalStatusHttpClient(
+        $subject = new ExternalReportingStatusHttpClient(
             $httpClient,
             $this->appApiKey(),
-            $this->principalPortalBaseUrl()
+            $this->externalReportingSystemBaseUrl()
         );
 
         $this->expectException(RosteringStatusException::class);
@@ -96,9 +96,9 @@ class PrincipalPortalStatusHttpClientTest extends TestCase
         return $apiKey;
     }
 
-    private function principalPortalBaseUrl(): string
+    private function externalReportingSystemBaseUrl(): string
     {
-        $baseUrl = $_ENV['ROSTERING_PRINCIPALS_PORTAL_BASE_URL'] ?? '';
+        $baseUrl = $_ENV['ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL'] ?? '';
         self::assertIsString($baseUrl);
         self::assertNotSame('', $baseUrl);
 

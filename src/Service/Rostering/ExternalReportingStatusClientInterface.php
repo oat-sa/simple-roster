@@ -6,7 +6,7 @@ namespace OAT\SimpleRoster\Service\Rostering;
 
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringImportStatus;
 
-interface PrincipalPortalStatusClientInterface
+interface ExternalReportingStatusClientInterface
 {
     public function fetchStatus(string $referenceId): RosteringImportStatus;
 }

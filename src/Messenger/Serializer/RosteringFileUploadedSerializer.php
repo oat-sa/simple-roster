@@ -49,7 +49,11 @@ class RosteringFileUploadedSerializer implements SerializerInterface
                 JSON_THROW_ON_ERROR
             );
         } catch (JsonException $exception) {
-            throw new RuntimeException(sprintf('json_encode error: %s', $exception->getMessage()), 0, $exception);
+            throw new RuntimeException(
+                sprintf('Unable to encode rostering uploaded message: %s', $exception->getMessage()),
+                0,
+                $exception
+            );
         }
 
         return [

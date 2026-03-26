@@ -17,17 +17,17 @@ class RosteringImportStatusService
         private readonly FileStorageInterface $fileStorage,
         private readonly RosteringFileKeyResolver $fileKeyResolver,
         private readonly ResultFileUrlProviderInterface $resultFileUrlProvider,
-        private readonly PrincipalPortalStatusClientInterface $principalPortalStatusClient,
+        private readonly ExternalReportingStatusClientInterface $externalReportingStatusClient,
         private readonly RosteringImportStatusMerger $statusMerger,
         private readonly RosteringResultFileMerger $resultFileMerger,
-        private readonly bool $principalPortalEnabled,
+        private readonly bool $externalReportingSystemEnabled,
         private readonly LoggerInterface $logger
     ) {
     }
 
     public function getStatus(string $referenceId): ?RosteringImportStatus
     {
-        if (!$this->principalPortalEnabled) {
+        if (!$this->externalReportingSystemEnabled) {
             return $this->resolveLocalStatus($referenceId);
         }
 
@@ -37,8 +37,8 @@ class RosteringImportStatusService
         }
 
         try {
-            $principalPortalStatus = $this->principalPortalStatusClient->fetchStatus($referenceId);
-            return $this->statusMerger->merge($localStatus, $principalPortalStatus);
+            $externalReportingSystemStatus = $this->externalReportingStatusClient->fetchStatus($referenceId);
+            return $this->statusMerger->merge($localStatus, $externalReportingSystemStatus);
         } catch (RosteringStatusException $exception) {
             $this->logger->error(
                 sprintf('Unable to resolve merged rostering status for referenceId "%s".', $referenceId),
@@ -59,12 +59,12 @@ class RosteringImportStatusService
             return null;
         }
 
-        if (!$this->principalPortalEnabled) {
+        if (!$this->externalReportingSystemEnabled) {
             return $this->resultFileUrlProvider->generate($this->fileKeyResolver->outputFileKey($referenceId));
         }
 
-        $ppOutputFileKey = $this->fileKeyResolver->principalPortalOutputFileKey($referenceId);
-        if (!$this->fileStorage->exists($ppOutputFileKey)) {
+        $externalReportingSystemOutputFileKey = $this->fileKeyResolver->externalReportingSystemOutputFileKey($referenceId);
+        if (!$this->fileStorage->exists($externalReportingSystemOutputFileKey)) {
             return null;
         }
 

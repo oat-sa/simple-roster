@@ -30,22 +30,22 @@ class RosteringImportStatus
     public static function fromApiResult(array $result, string $referenceId): self
     {
         if (!isset($result['status']) || !is_string($result['status']) || trim($result['status']) === '') {
-            throw new InvalidArgumentException('Invalid "status" in Principal Portal status payload.');
+            throw new InvalidArgumentException('Invalid "status" in external reporting system status payload.');
         }
         $status = trim($result['status']);
 
         if (!array_key_exists('fileLine', $result) || (!is_int($result['fileLine']) && !is_numeric($result['fileLine']))) {
-            throw new InvalidArgumentException('Invalid "fileLine" in Principal Portal status payload.');
+            throw new InvalidArgumentException('Invalid "fileLine" in external reporting system status payload.');
         }
         $fileLine = max(0, (int) $result['fileLine']);
 
         if (!array_key_exists('messages', $result) || !is_array($result['messages'])) {
-            throw new InvalidArgumentException('Invalid "messages" in Principal Portal status payload.');
+            throw new InvalidArgumentException('Invalid "messages" in external reporting system status payload.');
         }
         $messages = [];
         foreach ($result['messages'] as $message) {
             if (!is_string($message)) {
-                throw new InvalidArgumentException('Invalid "messages" in Principal Portal status payload.');
+                throw new InvalidArgumentException('Invalid "messages" in external reporting system status payload.');
             }
 
             $messages[] = trim($message);
