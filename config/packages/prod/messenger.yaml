@@ -1,0 +1,9 @@
+framework:
+    messenger:
+        transports:
+            rostering-file-uploaded-external-reporting-system:
+                dsn: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_EXTERNAL_REPORTING_SYSTEM_TRANSPORT_DSN)%'
+                serializer: OAT\SimpleRoster\Messenger\Serializer\RosteringFileUploadedSerializer
+            rostering-file-uploaded-sr:
+                dsn: '%env(MESSENGER_ROSTERING_FILE_UPLOADED_SR_TRANSPORT_DSN)%'
+                serializer: OAT\SimpleRoster\Messenger\Serializer\RosteringFileUploadedSerializer

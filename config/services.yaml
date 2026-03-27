@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
+    env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED): 'false'
+    env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL): ''
     env(RECREATE_QA_USERS): 'false'
     env(GENERATED_USERS_GROUP): 'TestGroup'
     env(GENERATED_USERS_BATCH_SIZE): '100'
@@ -13,6 +16,8 @@ parameters:
     env(FEATURE_GENERATED_USERS_S3_FOLDER_SYNC_ON_LINEITEM_UPDATED_ENABLED): 'false'
     env(AWS_ENDPOINT): 'null'
     env(AWS_PATH_STYLE): 'false'
+    env(ALLOWED_UPLOADED_FILE_MAX_SIZE): '5242880'
+    env(ALLOWED_UPLOADED_FILE_MAX_RECORDS): '10000'
 
     locale: 'en'
     app.api_key: '%env(resolve:APP_API_KEY)%'
@@ -50,6 +55,13 @@ parameters:
     app.aws.endpoint: '%env(string:AWS_ENDPOINT)%'
     app.aws.path_style: '%env(bool:AWS_PATH_STYLE)%'
     app.recreate_users: '%env(bool:RECREATE_QA_USERS)%'
+    app.upload.max_size: '%env(int:ALLOWED_UPLOADED_FILE_MAX_SIZE)%'
+    app.upload.max_records: '%env(int:ALLOWED_UPLOADED_FILE_MAX_RECORDS)%'
+    app.upload.csv.delimiter: ','
+    app.upload.csv.enclosure: '"'
+    app.upload.csv.escape: "\\"
+    app.rostering.external_reporting_system.enabled: '%env(bool:ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED)%'
+    app.rostering.external_reporting_system.base_url: '%env(string:ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -78,6 +90,13 @@ services:
             $lineItemCacheTtl: '%app.cache.ttl.get_line_item_by_id%'
             $generatedUsersFilePath: '%app.generated_users_file_path%'
             $projectDir: '%kernel.project_dir%'
+            $allowedUploadedFileMaxSize: '%app.upload.max_size%'
+            $allowedUploadedFileMaxRecords: '%app.upload.max_records%'
+            $uploadedFileCsvDelimiter: '%app.upload.csv.delimiter%'
+            $uploadedFileCsvEnclosure: '%app.upload.csv.enclosure%'
+            $uploadedFileCsvEscape: '%app.upload.csv.escape%'
+            $externalReportingSystemEnabled: '%app.rostering.external_reporting_system.enabled%'
+            $externalReportingSystemBaseUrl: '%app.rostering.external_reporting_system.base_url%'
 
     _instanceof:
         OAT\SimpleRoster\EventListener\Doctrine\EntityListenerInterface:
@@ -112,6 +131,22 @@ services:
     OAT\SimpleRoster\Action\:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
+
+    OAT\SimpleRoster\Service\Upload\FileStorageInterface:
+        class: OAT\SimpleRoster\Service\Upload\FlysystemFileStorage
+        arguments:
+            $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
+
+    OAT\SimpleRoster\Service\Rostering\FileStorageInterface:
+        class: OAT\SimpleRoster\Service\Rostering\OperationalFileStorage
+        arguments:
+            $filesystem: '@oneup_flysystem.rostering_files_filesystem_filesystem'
+
+    OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
+
+    OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient
 
     OAT\SimpleRoster\EventSubscriber\UserCacheInvalidationSubscriber:
       tags:

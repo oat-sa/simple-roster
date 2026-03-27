@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Repository;
 
+use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
@@ -172,6 +173,20 @@ class LineItemRepository extends AbstractRepository
         }
     }
 
+    public function findIdBySlug(string $slug): ?int
+    {
+        $result = $this->getConnection()->fetchOne(
+            'SELECT id FROM line_items WHERE slug = :slug',
+            ['slug' => $slug]
+        );
+
+        if (false === $result || null === $result) {
+            return null;
+        }
+
+        return (int)$result;
+    }
+
     /**
      * @codeCoverageIgnore
      *
@@ -194,5 +209,10 @@ SQL;
             ->executeQuery(['lineItemId' => $lineItem->getId()]);
 
         return !empty($result->fetchAllAssociative());
+    }
+
+    private function getConnection(): DbalConnection
+    {
+        return $this->getEntityManager()->getConnection();
     }
 }

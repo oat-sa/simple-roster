@@ -1,0 +1,32 @@
+OAT\SimpleRoster\Entity\LineItem:
+    rostering_line_item_1:
+        label: 'Rostering line item 1'
+        uri: 'https://rostering.test/line-item-1'
+        slug: 'rostering-line-item-1'
+        maxAttempts: 1
+    rostering_line_item_2:
+        label: 'Rostering line item 2'
+        uri: 'https://rostering.test/line-item-2'
+        slug: 'rostering-line-item-2'
+        maxAttempts: 1
+
+OAT\SimpleRoster\Entity\User:
+    existing_user:
+        username: 'existing_user'
+        plainPassword: 'OldPassword1'
+        groupId: 'OLD_SCHOOL'
+
+    existing_group_user:
+        username: 'existing_group_user'
+        plainPassword: 'OldPassword2'
+        groupId: 'OLD_GROUP'
+
+    inactive_existing_user:
+        username: 'inactive_existing_user'
+        plainPassword: 'OldPassword3'
+        groupId: 'OLD_INACTIVE_GROUP'
+
+    inactive_existing_user_without_assignment:
+        username: 'inactive_existing_user_without_assignment'
+        plainPassword: 'OldPassword4'
+        groupId: 'OLD_INACTIVE_GROUP_2'
