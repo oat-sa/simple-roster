@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Upload;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
+use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -16,6 +17,7 @@ class UploadFileService
     public function __construct(
         private readonly UploadedFileValidator $validator,
         private readonly FileStorageInterface $fileStorage,
+        private readonly RosteringFileKeyResolver $fileKeyResolver,
         private readonly MessageBusInterface $messageBus
     ) {
     }
@@ -28,7 +30,7 @@ class UploadFileService
         $this->validator->validate($file);
 
         $referenceId = Uuid::uuid4()->toString();
-        $storageKey = $this->buildStorageKey($referenceId);
+        $storageKey = $this->fileKeyResolver->inputFileKey($referenceId);
 
         $this->fileStorage->store(
             $file,
@@ -42,10 +44,5 @@ class UploadFileService
             'message' => self::UPLOAD_SUCCESS_MESSAGE,
             'referenceId' => $referenceId,
         ];
-    }
-
-    private function buildStorageKey(string $referenceId): string
-    {
-        return sprintf('%s/input.csv', $referenceId);
     }
 }

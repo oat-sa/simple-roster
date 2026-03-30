@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Unit\Service\Upload;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
+use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Upload\FileStorageInterface;
 use OAT\SimpleRoster\Service\Upload\UploadedFileValidator;
 use OAT\SimpleRoster\Service\Upload\UploadFileService;
@@ -30,9 +31,10 @@ class UploadFileServiceTest extends TestCase
         );
 
         $storage = $this->createMock(FileStorageInterface::class);
+        $resolver = new RosteringFileKeyResolver();
         $bus = $this->createMock(MessageBusInterface::class);
 
-        $service = new UploadFileService($validator, $storage, $bus);
+        $service = new UploadFileService($validator, $storage, $resolver, $bus);
 
         $file = $this->createUploadedFile('test.csv', 'a,b');
 
