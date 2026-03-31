@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Functional\Action\Upload;
 
+use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Upload\FileStorageInterface;
 use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -79,6 +80,8 @@ class UploadFileActionTest extends AppWebTestCase
 
     public function testItUploadsFileAndReturnsReferenceId(): void
     {
+        $keyResolver = new RosteringFileKeyResolver();
+
         /** @var FileStorageInterface&MockObject $storage */
         $storage = $this->createMock(FileStorageInterface::class);
 
@@ -120,10 +123,7 @@ class UploadFileActionTest extends AppWebTestCase
         self::assertSame('File uploaded', $decodedResponse['result']['message']);
         self::assertMatchesRegularExpression('#^[0-9a-f-]{36}$#', $decodedResponse['result']['referenceId']);
 
-        self::assertSame(
-            $decodedResponse['result']['referenceId'] . '/input.csv',
-            $captured['key']
-        );
+        self::assertSame($keyResolver->inputFileKey($decodedResponse['result']['referenceId']), $captured['key']);
         self::assertSame($decodedResponse['result']['referenceId'], $captured['metadata']['referenceId'] ?? null);
     }
 
