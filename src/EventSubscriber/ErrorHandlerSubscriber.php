@@ -23,21 +23,17 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\EventSubscriber;
 
 use OAT\SimpleRoster\Responder\SerializerResponder;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlerSubscriber implements EventSubscriberInterface
 {
     private SerializerResponder $responder;
-    private LoggerInterface $logger;
 
-    public function __construct(SerializerResponder $responder, LoggerInterface $logger)
+    public function __construct(SerializerResponder $responder)
     {
         $this->responder = $responder;
-        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents(): array
@@ -53,24 +49,8 @@ class ErrorHandlerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $exception = $event->getThrowable();
-        $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
-        if ($statusCode >= 500) {
-            $request = $event->getRequest();
-
-            $this->logger->error(
-                'Unhandled API exception.',
-                [
-                    'statusCode' => $statusCode,
-                    'method' => $request->getMethod(),
-                    'path' => $request->getPathInfo(),
-                    'exception' => $exception,
-                ]
-            );
-        }
-
         $event->setResponse(
-            $this->responder->createErrorJsonResponse($exception)
+            $this->responder->createErrorJsonResponse($event->getThrowable())
         );
     }
 }
