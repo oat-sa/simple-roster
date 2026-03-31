@@ -9,6 +9,10 @@ services:
 
     OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider:
         arguments:
+            $fileStorage: '@OAT\SimpleRoster\Service\Rostering\FileStorageInterface'
+            $fileKeyResolver: '@OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver'
+            $s3Client: '@Aws\S3\S3Client'
             $bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
             $prefix: '%env(FILESYSTEM_ROSTERING_FILES_ADAPTER_S3_PREFIX)%'
             $signedUrlTtl: '%env(ROSTERING_SIGNED_URL_TTL)%'
+            $logger: '@logger'
