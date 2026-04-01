@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RosteringFileUploadedSerializerTest extends TestCase
 {
@@ -21,7 +23,8 @@ class RosteringFileUploadedSerializerTest extends TestCase
 
         self::assertArrayHasKey('body', $encoded);
         self::assertArrayHasKey('headers', $encoded);
-        self::assertSame([], $encoded['headers']);
+        self::assertIsArray($encoded['headers']);
+        self::assertSame(RosteringFileUploadedMessage::class, $encoded['headers']['type'] ?? null);
         self::assertSame(
             ['referenceId' => 'ref-123'],
             json_decode($encoded['body'], true, 512, JSON_THROW_ON_ERROR)
@@ -37,6 +40,47 @@ class RosteringFileUploadedSerializerTest extends TestCase
         self::assertInstanceOf(Envelope::class, $decoded);
         self::assertInstanceOf(RosteringFileUploadedMessage::class, $decoded->getMessage());
         self::assertSame('ref-456', $decoded->getMessage()->referenceId);
+    }
+
+    public function testDecodeSnsWrappedPayload(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $decoded = $serializer->decode(['body' => '{"Message":"{\"referenceId\":\"ref-789\"}"}']);
+
+        self::assertInstanceOf(Envelope::class, $decoded);
+        self::assertInstanceOf(RosteringFileUploadedMessage::class, $decoded->getMessage());
+        self::assertSame('ref-789', $decoded->getMessage()->referenceId);
+    }
+
+    public function testItKeepsRedeliveryStampBetweenEncodeAndDecode(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $envelope = (new Envelope(new RosteringFileUploadedMessage('ref-123')))
+            ->with(new RedeliveryStamp(2));
+
+        $decoded = $serializer->decode($serializer->encode($envelope));
+
+        $stamp = $decoded->last(RedeliveryStamp::class);
+        self::assertInstanceOf(RedeliveryStamp::class, $stamp);
+        self::assertSame(2, $stamp->getRetryCount());
+    }
+
+    public function testItKeepsRetryStampAndDropsErrorDetailsStamp(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $envelope = (new Envelope(new RosteringFileUploadedMessage('ref-123')))
+            ->with(new RedeliveryStamp(2))
+            ->with(ErrorDetailsStamp::create(new RuntimeException('test')));
+
+        $decoded = $serializer->decode($serializer->encode($envelope));
+
+        $retryStamp = $decoded->last(RedeliveryStamp::class);
+        self::assertInstanceOf(RedeliveryStamp::class, $retryStamp);
+        self::assertSame(2, $retryStamp->getRetryCount());
+        self::assertNull($decoded->last(ErrorDetailsStamp::class));
     }
 
     public function testDecodeThrowsForBadJson(): void

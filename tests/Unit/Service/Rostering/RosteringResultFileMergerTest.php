@@ -9,6 +9,7 @@ use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringStatusException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Rostering\RosteringResultFileMerger;
+use OAT\SimpleRoster\Service\Rostering\SeekableStreamFactory;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -22,7 +23,7 @@ class RosteringResultFileMergerTest extends TestCase
         $mergedKey = $resolver->mergedOutputFileKey($referenceId);
         $storage->write($mergedKey, "id,status,errorType,errorCode,errorMessage\nu1,processed,,,\n");
 
-        $subject = new RosteringResultFileMerger($storage, $resolver);
+        $subject = new RosteringResultFileMerger($storage, $resolver, new SeekableStreamFactory());
 
         self::assertSame($mergedKey, $subject->getOrCreateMergedOutputFileKey($referenceId));
     }
@@ -37,7 +38,7 @@ class RosteringResultFileMergerTest extends TestCase
             "id,status,errorType,errorCode,errorMessage\nu1,processed,,,\n"
         );
 
-        $subject = new RosteringResultFileMerger($storage, $resolver);
+        $subject = new RosteringResultFileMerger($storage, $resolver, new SeekableStreamFactory());
 
         $this->expectException(RosteringStatusException::class);
         $subject->getOrCreateMergedOutputFileKey($referenceId);
@@ -52,7 +53,7 @@ class RosteringResultFileMergerTest extends TestCase
         $storage->write($resolver->outputFileKey($referenceId), "id,status,errorType,errorCode,errorMessage\nu1,processed,,,\n");
         $storage->write($resolver->externalReportingSystemOutputFileKey($referenceId), "id,status,errorType,errorCode\nu1,processed,,\n");
 
-        $subject = new RosteringResultFileMerger($storage, $resolver);
+        $subject = new RosteringResultFileMerger($storage, $resolver, new SeekableStreamFactory());
 
         $this->expectException(RosteringStatusException::class);
         $subject->getOrCreateMergedOutputFileKey($referenceId);
@@ -92,7 +93,7 @@ class RosteringResultFileMergerTest extends TestCase
             ) . "\n"
         );
 
-        $subject = new RosteringResultFileMerger($storage, $resolver);
+        $subject = new RosteringResultFileMerger($storage, $resolver, new SeekableStreamFactory());
         $mergedKey = $subject->getOrCreateMergedOutputFileKey($referenceId);
 
         self::assertSame($resolver->mergedOutputFileKey($referenceId), $mergedKey);

@@ -6,17 +6,45 @@ namespace OAT\SimpleRoster\MessageHandler;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Throwable;
 
 #[AsMessageHandler(fromTransport: 'rostering-file-uploaded-sr')]
 class RosteringFileUploadedMessageHandler
 {
-    public function __construct(private readonly RosteringFileProcessor $rosteringFileProcessor)
-    {
+    public function __construct(
+        private readonly RosteringFileProcessor $rosteringFileProcessor,
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public function __invoke(RosteringFileUploadedMessage $message): void
     {
-        $this->rosteringFileProcessor->process($message->referenceId);
+        try {
+            $this->rosteringFileProcessor->process($message->referenceId);
+        } catch (UnrecoverableExceptionInterface $exception) {
+            $this->logger->warning(
+                $exception->getMessage(),
+                [
+                    'messageClass' => RosteringFileUploadedMessage::class,
+                    'referenceId' => $message->referenceId,
+                ]
+            );
+
+            return;
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                $exception->getMessage(),
+                [
+                    'messageClass' => RosteringFileUploadedMessage::class,
+                    'referenceId' => $message->referenceId,
+                    'trace' => $exception->getTraceAsString(),
+                ]
+            );
+
+            throw $exception;
+        }
     }
 }

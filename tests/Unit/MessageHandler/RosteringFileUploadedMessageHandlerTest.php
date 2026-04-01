@@ -7,15 +7,18 @@ namespace OAT\SimpleRoster\Tests\Unit\MessageHandler;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\MessageHandler\RosteringFileUploadedMessageHandler;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 
 class RosteringFileUploadedMessageHandlerTest extends TestCase
 {
     private RosteringFileProcessor&MockObject $rosteringFileProcessor;
+    private LoggerInterface&MockObject $logger;
     private RosteringFileUploadedMessageHandler $subject;
 
     protected function setUp(): void
@@ -23,8 +26,9 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
         parent::setUp();
 
         $this->rosteringFileProcessor = $this->createMock(RosteringFileProcessor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->subject = new RosteringFileUploadedMessageHandler($this->rosteringFileProcessor);
+        $this->subject = new RosteringFileUploadedMessageHandler($this->rosteringFileProcessor, $this->logger);
     }
 
     public function testItIsInvokableAndTaggedAsMessageHandler(): void
@@ -56,9 +60,28 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
             ->with('ref-500')
             ->willThrowException(new RuntimeException('Processor failed.'));
 
+        $this->logger
+            ->expects(self::once())
+            ->method('error');
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Processor failed.');
 
         $this->subject->__invoke(new RosteringFileUploadedMessage('ref-500'));
+    }
+
+    public function testItDoesNotBubbleUpUnrecoverableExceptionFromProcessor(): void
+    {
+        $this->rosteringFileProcessor
+            ->expects(self::once())
+            ->method('process')
+            ->with('ref-invalid')
+            ->willThrowException(new UnrecoverableMessageHandlingException('Reference ID missing.'));
+
+        $this->logger
+            ->expects(self::once())
+            ->method('warning');
+
+        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-invalid'));
     }
 }

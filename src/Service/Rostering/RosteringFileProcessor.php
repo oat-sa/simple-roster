@@ -21,6 +21,8 @@ use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Throwable;
 
@@ -59,7 +61,8 @@ class RosteringFileProcessor
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
-        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer
+        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer,
+        private readonly SeekableStreamFactory $seekableStreamFactory
     ) {
     }
 
@@ -74,6 +77,7 @@ class RosteringFileProcessor
         $inputFileKey = $this->fileKeyResolver->inputFileKey($referenceId);
         $outputFileKey = $this->fileKeyResolver->outputFileKey($referenceId);
         $inputStream = null;
+        $inputCsvStream = null;
         $resultStream = null;
 
         $totalRows = 0;
@@ -90,7 +94,9 @@ class RosteringFileProcessor
                 throw new RuntimeException('Unable to create temporary stream for rostering result file.');
             }
 
-            $reader = Reader::from($inputStream);
+            $inputCsvStream = $this->seekableStreamFactory->create($inputStream, 'rostering input file');
+
+            $reader = Reader::from($inputCsvStream);
             $reader->setHeaderOffset(0);
             $header = $reader->getHeader();
             $rows = (new Statement())->process($reader)->getRecords();
@@ -121,17 +127,17 @@ class RosteringFileProcessor
 
             if ($importableRows === 0) {
                 $this->logger->info(
-                    sprintf("Rostering file '%s' skipped because no importable user rows were found.", $referenceId),
+                    sprintf(
+                        "Rostering file '%s' has no importable SR rows; writing pass-through result output.",
+                        $referenceId
+                    ),
                     [
                         'referenceId' => $referenceId,
                         'inputFileKey' => $inputFileKey,
+                        'outputFileKey' => $outputFileKey,
                         'totalRows' => $totalRows,
                     ]
                 );
-
-                $this->rosteringImportRepository->markProcessed($referenceId, $totalRows, $failedRows);
-
-                return;
             }
 
             rewind($resultStream);
@@ -139,6 +145,10 @@ class RosteringFileProcessor
             $this->rosteringImportRepository->markProcessed($referenceId, $totalRows, $failedRows);
         } catch (Throwable $exception) {
             $this->markImportFailure($referenceId, $exception, $totalRows, $failedRows);
+
+            if ($exception instanceof UnrecoverableExceptionInterface) {
+                throw $exception;
+            }
 
             throw new RuntimeException(
                 sprintf('Unable to process rostering file "%s".', $inputFileKey),
@@ -148,6 +158,10 @@ class RosteringFileProcessor
         } finally {
             if (is_resource($inputStream)) {
                 fclose($inputStream);
+            }
+
+            if (is_resource($inputCsvStream)) {
+                fclose($inputCsvStream);
             }
 
             if (is_resource($resultStream)) {
@@ -439,17 +453,17 @@ class RosteringFileProcessor
     private function validateReferenceId(string $referenceId): void
     {
         if ($referenceId === '') {
-            throw new RosteringValidationException('Reference ID cannot be empty.');
+            throw new UnrecoverableMessageHandlingException('Reference ID cannot be empty.');
         }
 
         if (strlen($referenceId) > self::MAX_REFERENCE_ID_LENGTH) {
-            throw new RosteringValidationException(
+            throw new UnrecoverableMessageHandlingException(
                 sprintf('Reference ID exceeds max length (%d).', self::MAX_REFERENCE_ID_LENGTH)
             );
         }
 
         if (preg_match('/^[A-Za-z0-9._-]+$/', $referenceId) !== 1 || str_contains($referenceId, '..')) {
-            throw new RosteringValidationException('Reference ID contains unsupported characters.');
+            throw new UnrecoverableMessageHandlingException('Reference ID contains unsupported characters.');
         }
     }
 
@@ -489,4 +503,5 @@ class RosteringFileProcessor
             );
         }
     }
+
 }
