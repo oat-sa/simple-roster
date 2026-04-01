@@ -67,25 +67,15 @@ class RosteringResultFileMerger
 
             return $mergedOutputFileKey;
         } finally {
-            if (is_resource($srStream)) {
-                fclose($srStream);
-            }
-
-            if (is_resource($externalReportingSystemStream)) {
-                fclose($externalReportingSystemStream);
-            }
-
-            if (is_resource($seekableSrStream)) {
-                fclose($seekableSrStream);
-            }
-
-            if (is_resource($seekableExternalReportingSystemStream)) {
-                fclose($seekableExternalReportingSystemStream);
-            }
-
-            if (is_resource($mergedStream)) {
-                fclose($mergedStream);
-            }
+            $this->closeResources(
+                [
+                    $seekableSrStream,
+                    $seekableExternalReportingSystemStream,
+                    $srStream,
+                    $externalReportingSystemStream,
+                    $mergedStream,
+                ]
+            );
         }
     }
 
@@ -245,12 +235,34 @@ class RosteringResultFileMerger
         return $line;
     }
 
-    private function createSeekableStreamOrFail(mixed $stream, string $context)
+    private function createSeekableStreamOrFail(mixed $stream, string $context): mixed
     {
         try {
             return $this->seekableStreamFactory->create($stream, $context);
         } catch (\RuntimeException $exception) {
             throw new RosteringStatusException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * @param array<mixed> $streams
+     */
+    private function closeResources(array $streams): void
+    {
+        $closedResourceIds = [];
+
+        foreach ($streams as $stream) {
+            if (!is_resource($stream)) {
+                continue;
+            }
+
+            $resourceId = get_resource_id($stream);
+            if (isset($closedResourceIds[$resourceId])) {
+                continue;
+            }
+
+            fclose($stream);
+            $closedResourceIds[$resourceId] = true;
         }
     }
 }

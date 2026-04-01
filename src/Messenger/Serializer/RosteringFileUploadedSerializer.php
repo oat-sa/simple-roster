@@ -8,7 +8,7 @@ use JsonException;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer as TransportSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -66,12 +66,12 @@ class RosteringFileUploadedSerializer implements SerializerInterface
         }
 
         if (!isset($payload['referenceId']) || !is_string($payload['referenceId'])) {
-            throw new UnrecoverableMessageHandlingException('Reference ID missing.');
+            throw new MessageDecodingFailedException('Reference ID missing.');
         }
 
         $referenceId = trim($payload['referenceId']);
         if ('' === $referenceId) {
-            throw new UnrecoverableMessageHandlingException('Reference ID missing.');
+            throw new MessageDecodingFailedException('Reference ID missing.');
         }
 
         return $referenceId;
@@ -85,7 +85,7 @@ class RosteringFileUploadedSerializer implements SerializerInterface
         try {
             $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new UnrecoverableMessageHandlingException(
+            throw new MessageDecodingFailedException(
                 sprintf('json_decode error: %s', $exception->getMessage()),
                 0,
                 $exception
@@ -93,7 +93,7 @@ class RosteringFileUploadedSerializer implements SerializerInterface
         }
 
         if (!is_array($decoded)) {
-            throw new UnrecoverableMessageHandlingException('Decoded payload must be a JSON object.');
+            throw new MessageDecodingFailedException('Decoded payload must be a JSON object.');
         }
 
         return $decoded;

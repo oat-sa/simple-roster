@@ -6,6 +6,7 @@ namespace OAT\SimpleRoster\Tests\Unit\MessageHandler;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\MessageHandler\RosteringFileUploadedMessageHandler;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,17 +71,20 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
         $this->subject->__invoke(new RosteringFileUploadedMessage('ref-500'));
     }
 
-    public function testItDoesNotBubbleUpUnrecoverableExceptionFromProcessor(): void
+    public function testItConvertsValidationExceptionToUnrecoverableMessageHandlingException(): void
     {
         $this->rosteringFileProcessor
             ->expects(self::once())
             ->method('process')
             ->with('ref-invalid')
-            ->willThrowException(new UnrecoverableMessageHandlingException('Reference ID missing.'));
+            ->willThrowException(new RosteringValidationException('Reference ID missing.'));
 
         $this->logger
             ->expects(self::once())
             ->method('warning');
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+        $this->expectExceptionMessage('Reference ID missing.');
 
         $this->subject->__invoke(new RosteringFileUploadedMessage('ref-invalid'));
     }

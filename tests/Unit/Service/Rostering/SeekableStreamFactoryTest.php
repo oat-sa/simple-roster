@@ -25,6 +25,22 @@ class SeekableStreamFactoryTest extends TestCase
         fclose($seekableStream);
     }
 
+    public function testItReturnsSameStreamWhenInputIsAlreadySeekable(): void
+    {
+        $sourceStream = fopen('php://temp', 'rb+');
+        self::assertIsResource($sourceStream);
+        fwrite($sourceStream, "a,b\n1,2\n");
+        rewind($sourceStream);
+
+        $subject = new SeekableStreamFactory();
+        $seekableStream = $subject->create($sourceStream, 'test stream');
+
+        self::assertSame($sourceStream, $seekableStream);
+        self::assertSame("a,b\n1,2\n", stream_get_contents($seekableStream));
+
+        fclose($sourceStream);
+    }
+
     public function testItThrowsWhenSourceIsNotAResource(): void
     {
         $subject = new SeekableStreamFactory();
@@ -38,7 +54,7 @@ class SeekableStreamFactoryTest extends TestCase
     /**
      * @return resource
      */
-    private function createNonSeekableReadStream(string $content)
+    private function createNonSeekableReadStream(string $content): mixed
     {
         $streams = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         if ($streams === false) {
@@ -52,4 +68,3 @@ class SeekableStreamFactoryTest extends TestCase
         return $readStream;
     }
 }
-

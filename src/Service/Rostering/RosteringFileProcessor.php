@@ -21,8 +21,6 @@ use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Throwable;
 
@@ -146,7 +144,7 @@ class RosteringFileProcessor
         } catch (Throwable $exception) {
             $this->markImportFailure($referenceId, $exception, $totalRows, $failedRows);
 
-            if ($exception instanceof UnrecoverableExceptionInterface) {
+            if ($exception instanceof RosteringValidationException) {
                 throw $exception;
             }
 
@@ -156,17 +154,11 @@ class RosteringFileProcessor
                 $exception
             );
         } finally {
-            if (is_resource($inputStream)) {
-                fclose($inputStream);
-            }
-
-            if (is_resource($inputCsvStream)) {
-                fclose($inputCsvStream);
-            }
-
-            if (is_resource($resultStream)) {
-                fclose($resultStream);
-            }
+            $this->closeResources([
+                $inputCsvStream,
+                $inputStream,
+                $resultStream,
+            ]);
         }
 
         $this->userCacheSynchronizer->synchronize();
@@ -453,17 +445,17 @@ class RosteringFileProcessor
     private function validateReferenceId(string $referenceId): void
     {
         if ($referenceId === '') {
-            throw new UnrecoverableMessageHandlingException('Reference ID cannot be empty.');
+            throw new RosteringValidationException('Reference ID cannot be empty.');
         }
 
         if (strlen($referenceId) > self::MAX_REFERENCE_ID_LENGTH) {
-            throw new UnrecoverableMessageHandlingException(
+            throw new RosteringValidationException(
                 sprintf('Reference ID exceeds max length (%d).', self::MAX_REFERENCE_ID_LENGTH)
             );
         }
 
         if (preg_match('/^[A-Za-z0-9._-]+$/', $referenceId) !== 1 || str_contains($referenceId, '..')) {
-            throw new UnrecoverableMessageHandlingException('Reference ID contains unsupported characters.');
+            throw new RosteringValidationException('Reference ID contains unsupported characters.');
         }
     }
 
@@ -482,6 +474,28 @@ class RosteringFileProcessor
         }
 
         return $line;
+    }
+
+    /**
+     * @param array<mixed> $streams
+     */
+    private function closeResources(array $streams): void
+    {
+        $closedResourceIds = [];
+
+        foreach ($streams as $stream) {
+            if (!is_resource($stream)) {
+                continue;
+            }
+
+            $resourceId = get_resource_id($stream);
+            if (isset($closedResourceIds[$resourceId])) {
+                continue;
+            }
+
+            fclose($stream);
+            $closedResourceIds[$resourceId] = true;
+        }
     }
 
     private function markImportFailure(

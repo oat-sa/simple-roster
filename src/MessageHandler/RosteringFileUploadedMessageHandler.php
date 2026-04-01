@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\MessageHandler;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Throwable;
 
 #[AsMessageHandler(fromTransport: 'rostering-file-uploaded-sr')]
@@ -24,7 +25,7 @@ class RosteringFileUploadedMessageHandler
     {
         try {
             $this->rosteringFileProcessor->process($message->referenceId);
-        } catch (UnrecoverableExceptionInterface $exception) {
+        } catch (RosteringValidationException $exception) {
             $this->logger->warning(
                 $exception->getMessage(),
                 [
@@ -33,7 +34,7 @@ class RosteringFileUploadedMessageHandler
                 ]
             );
 
-            return;
+            throw new UnrecoverableMessageHandlingException($exception->getMessage(), 0, $exception);
         } catch (Throwable $exception) {
             $this->logger->error(
                 $exception->getMessage(),

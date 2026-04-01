@@ -21,14 +21,16 @@ final class SeekableStreamFactory
             );
         }
 
-        $seekableStream = fopen('php://temp', 'rb+');
-        if (false === $seekableStream) {
-            throw new RuntimeException(sprintf('Unable to create seekable stream for %s.', $context));
-        }
-
         $meta = stream_get_meta_data($stream);
         if (($meta['seekable'] ?? false) === true) {
             rewind($stream);
+
+            return $stream;
+        }
+
+        $seekableStream = fopen('php://temp', 'rb+');
+        if (false === $seekableStream) {
+            throw new RuntimeException(sprintf('Unable to create seekable stream for %s.', $context));
         }
 
         if (false === stream_copy_to_stream($stream, $seekableStream)) {
@@ -41,4 +43,3 @@ final class SeekableStreamFactory
         return $seekableStream;
     }
 }
-

@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
@@ -87,7 +88,7 @@ class RosteringFileUploadedSerializerTest extends TestCase
     {
         $serializer = new RosteringFileUploadedSerializer();
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage('json_decode error: Syntax error');
 
         $serializer->decode(['body' => '{bad json}']);
@@ -97,7 +98,7 @@ class RosteringFileUploadedSerializerTest extends TestCase
     {
         $serializer = new RosteringFileUploadedSerializer();
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage('Reference ID missing.');
 
         $serializer->decode(['body' => '{"status":"ok"}']);
