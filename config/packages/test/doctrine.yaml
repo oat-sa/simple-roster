@@ -2,3 +2,9 @@ doctrine:
     dbal:
         driver: 'pdo_sqlite'
         url: 'sqlite:///%kernel.project_dir%/var/test.db3'
+    orm:
+        mappings:
+            OAT\SimpleRoster:
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine_sqlite'
+                prefix: OAT\SimpleRoster\Entity

@@ -24,9 +24,6 @@
         <id name="id" type="integer" column="id">
             <generator strategy="SEQUENCE"/>
             <sequence-generator sequence-name="users_id_seq" allocation-size="1" initial-value="1"/>
-            <options>
-                <option name="default">nextval('users_id_seq'::regclass)</option>
-            </options>
         </id>
         <field name="username" column="username" length="255" unique="true"/>
         <field name="password" column="password" length="255"/>

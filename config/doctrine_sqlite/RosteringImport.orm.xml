@@ -24,9 +24,6 @@
         <id name="id" type="integer" column="id">
             <generator strategy="SEQUENCE"/>
             <sequence-generator sequence-name="rostering_import_id_seq" allocation-size="1" initial-value="1"/>
-            <options>
-                <option name="default">nextval('rostering_import_id_seq'::regclass)</option>
-            </options>
         </id>
         <field name="referenceId" column="reference_id" length="36" unique="true"/>
         <field name="status" column="status" length="32"/>

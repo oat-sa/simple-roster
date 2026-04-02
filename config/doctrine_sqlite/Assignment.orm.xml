@@ -24,9 +24,6 @@
         <id name="id" type="integer" column="id">
             <generator strategy="SEQUENCE"/>
             <sequence-generator sequence-name="assignments_id_seq" allocation-size="1" initial-value="1"/>
-            <options>
-                <option name="default">nextval('assignments_id_seq'::regclass)</option>
-            </options>
         </id>
         <field name="state" column="state" length="255" precision="0" scale="0"/>
         <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
