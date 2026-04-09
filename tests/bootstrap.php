@@ -24,4 +24,6 @@ use Symfony\Component\Dotenv\Dotenv;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-(new Dotenv())->bootEnv(dirname(__DIR__) . '/.env.test');
+if (file_exists(dirname(__DIR__) . '/.env.test')) {
+    (new Dotenv())->overload(dirname(__DIR__) . '/.env.test');
+}

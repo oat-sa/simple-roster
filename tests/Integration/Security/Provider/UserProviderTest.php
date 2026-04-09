@@ -25,16 +25,16 @@ namespace OAT\SimpleRoster\Tests\Integration\Security\Provider;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Security\Provider\UserProvider;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserProviderTest extends KernelTestCase
+class UserProviderTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 
@@ -59,9 +59,9 @@ class UserProviderTest extends KernelTestCase
         $this->subject = new UserProvider($userRepository, $this->requestStack);
     }
 
-    public function testItThrowsUsernameNotFoundExceptionWhenLoadingUserWithInvalidUser(): void
+    public function testItThrowsUserNotFoundExceptionWhenLoadingUserWithInvalidUser(): void
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage("Username 'invalid' does not exist");
 
         $this->subject->loadUserByUsername('invalid');
@@ -77,9 +77,9 @@ class UserProviderTest extends KernelTestCase
         $this->subject->refreshUser($this->createNonSupportedUserInterfaceImplementation());
     }
 
-    public function testItThrowsUsernameNotFoundExceptionWhenRefreshingInvalidUser(): void
+    public function testItThrowsUserNotFoundExceptionWhenRefreshingInvalidUser(): void
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage("User 'invalid' could not be reloaded");
 
         $this->prepareRequestStackMock(1, 'route');
@@ -107,22 +107,22 @@ class UserProviderTest extends KernelTestCase
     {
         return new class () implements UserInterface
         {
-            public function getRoles()
+            public function getRoles(): array
             {
                 return [];
             }
 
-            public function getPassword()
+            public function getPassword(): string
             {
                 return 'password';
             }
 
-            public function getSalt()
+            public function getSalt(): string
             {
                 return 'salt';
             }
 
-            public function getUsername()
+            public function getUserIdentifier(): string
             {
                 return 'invalid';
             }
@@ -130,7 +130,7 @@ class UserProviderTest extends KernelTestCase
             /**
              * @return void
              */
-            public function eraseCredentials()
+            public function eraseCredentials(): void
             {
             }
         };

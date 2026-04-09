@@ -24,16 +24,16 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\GarbageCollector;
 
 use Carbon\Carbon;
 use DateTime;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Command\GarbageCollector\AssignmentGarbageCollectorCommand;
 use OAT\SimpleRoster\Entity\Assignment;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class AssignmentGarbageCollectorCommandTest extends KernelTestCase
+class AssignmentGarbageCollectorCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -120,7 +120,7 @@ class AssignmentGarbageCollectorCommandTest extends KernelTestCase
                     'userWithStartedButStuckAssignment_' . $i,
                     $expectedStatusMap[$i]
                 ),
-                Logger::INFO
+                Level::Info
             );
         }
 

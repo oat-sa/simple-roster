@@ -24,15 +24,16 @@ namespace OAT\SimpleRoster\Tests\Functional\Command\Ingester;
 
 use OAT\SimpleRoster\Command\Ingester\LtiInstanceIngesterCommand;
 use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\CsvIngestionTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LtiInstanceIngesterCommandTest extends KernelTestCase
+class LtiInstanceIngesterCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use CsvIngestionTestingTrait;
@@ -130,9 +131,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidSourceFiles
-     */
+    #[DataProvider('provideInvalidSourceFiles')]
     public function testSourceFileValidation(string $filename, array $csvContent, string $expectedOutput): void
     {
         $this->writeCsv($filename, $csvContent);
@@ -152,7 +151,7 @@ class LtiInstanceIngesterCommandTest extends KernelTestCase
         self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay(true));
     }
 
-    public function provideInvalidSourceFiles(): array
+    public static function provideInvalidSourceFiles(): array
     {
         return [
             'labelColumnIsMissing' => [

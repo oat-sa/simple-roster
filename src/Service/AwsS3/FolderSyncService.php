@@ -22,32 +22,24 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\AwsS3;
 
-use League\Flysystem\{
-    FileExistsException,
-    FileNotFoundException,
-    MountManager,
-    Filesystem
-};
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\MountManager;
+use League\Flysystem\StorageAttributes;
+use League\Flysystem\FilesystemException;
 
 class FolderSyncService
 {
     private const FILESYSTEM_SOURCE = 'source';
     private const FILESYSTEM_DEST = 'dest';
 
-    private Filesystem $sourceFS;
-    private Filesystem $destFS;
-
     public function __construct(
-        Filesystem $sourceFS,
-        Filesystem $destFS
+        private readonly FilesystemOperator $sourceFS,
+        private readonly FilesystemOperator $destFS
     ) {
-        $this->sourceFS = $sourceFS;
-        $this->destFS = $destFS;
     }
 
     /**
-     * @throws FileNotFoundException
-     * @throws FileExistsException
+     * @throws FilesystemException
      */
     public function sync(string $dir): void
     {
@@ -57,22 +49,27 @@ class FolderSyncService
         ]);
 
         $contents = $this->sourceFS->listContents($dir, true);
-        foreach ($contents as $item) {
-            if ('file' !== $item['type']) {
+
+        /** @var StorageAttributes $attributes */
+        foreach ($contents as $attributes) {
+            if (!$attributes->isFile()) {
                 continue;
             }
 
-            $from = sprintf('%s://%s', self::FILESYSTEM_SOURCE, $item['path']);
-            $dest = sprintf('%s://%s', self::FILESYSTEM_DEST, $item['path']);
+            $path = $attributes->path();
+            $source = sprintf('%s://%s', self::FILESYSTEM_SOURCE, $path);
+            $dest = sprintf('%s://%s', self::FILESYSTEM_DEST, $path);
 
-            if ($mountManager->has($dest)) {
-                $resource = $mountManager->readStream($from);
-                if ($resource !== false) {
-                    $mountManager->putStream($dest, $resource);
+            if ($mountManager->fileExists($dest)) {
+                $stream = $mountManager->readStream($source);
+                $mountManager->writeStream($dest, $stream);
+
+                if (is_resource($stream)) {
+                    fclose($stream);
                 }
-                continue;
+            } else {
+                $mountManager->copy($source, $dest);
             }
-            $mountManager->copy($from, $dest);
         }
     }
 }

@@ -23,19 +23,19 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\Bulk;
 
 use Carbon\Carbon;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Request\ParamConverter\BulkOperationCollectionParamConverter;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
+class BulkUpdateUsersAssignmentsStateActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -201,7 +201,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         $this->assertHasLogRecordWithMessage(
             "Bulk assignments cancellation error: User with username = 'nonExistingUser1' cannot be found.",
-            Logger::ERROR
+            Level::Error
         );
     }
 
@@ -261,7 +261,7 @@ class BulkUpdateUsersAssignmentsStateActionTest extends WebTestCase
 
         $this->assertHasLogRecordWithMessage(
             "Successful assignment cancellation (assignmentId = '1', username = 'user1').",
-            Logger::INFO
+            Level::Info
         );
     }
 

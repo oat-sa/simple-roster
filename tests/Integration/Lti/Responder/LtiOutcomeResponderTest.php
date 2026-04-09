@@ -23,11 +23,12 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Integration\Lti\Responder;
 
 use OAT\SimpleRoster\Lti\Responder\LtiOutcomeResponder;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class LtiOutcomeResponderTest extends KernelTestCase
+class LtiOutcomeResponderTest extends AppKernelTestCase
 {
     protected function setUp(): void
     {
@@ -42,17 +43,21 @@ class LtiOutcomeResponderTest extends KernelTestCase
         $twig = self::getContainer()->get(Environment::class);
 
         $messageIdentifier = 'e36f227c-2946-11e8-b467-0ed5f89f718b';
+        $uuid = Uuid::fromString($messageIdentifier);
 
         $uuidFactory = $this->createMock(UuidFactoryInterface::class);
         $uuidFactory
             ->method('uuid4')
-            ->willreturn($messageIdentifier);
+            ->willReturn($uuid);
 
         $subject = new LtiOutcomeResponder($twig, $uuidFactory);
 
         $response = $subject->createXmlResponse(1);
 
-        self::assertSame($this->getValidReplaceResultResponseXml($messageIdentifier), $response->getContent());
+        self::assertSame(
+            $this->getValidReplaceResultResponseXml($messageIdentifier),
+            $response->getContent()
+        );
     }
 
     private function getValidReplaceResultResponseXml(string $messageIdentifier): string

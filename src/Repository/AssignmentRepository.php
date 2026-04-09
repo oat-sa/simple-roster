@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Repository;
 
 use DateTime;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -84,8 +85,8 @@ class AssignmentRepository extends AbstractRepository
     public function findByStateAndUpdatedAtPaged(
         string $state,
         DateTime $updatedAt,
-        int $offset = null,
-        int $limit = null
+        ?int $offset = null,
+        ?int $limit = null
     ): Paginator {
         $queryBuilder = $this
             ->createQueryBuilder('a')
@@ -104,5 +105,39 @@ class AssignmentRepository extends AbstractRepository
         }
 
         return new Paginator($queryBuilder->getQuery(), false);
+    }
+
+    public function replaceForRostering(
+        int $userId,
+        int $lineItemId,
+        string $state
+    ): void {
+        $this->getConnection()->executeStatement(
+            'DELETE FROM assignments WHERE user_id = :userId',
+            ['userId' => $userId]
+        );
+
+        $this->getConnection()->executeStatement(
+            'INSERT INTO assignments (user_id, line_item_id, state, attempts_count, updated_at) '
+            . 'VALUES (:userId, :lineItemId, :state, 0, CURRENT_TIMESTAMP)',
+            [
+                'userId' => $userId,
+                'lineItemId' => $lineItemId,
+                'state' => $state,
+            ]
+        );
+    }
+
+    public function deleteByUserId(int $userId): void
+    {
+        $this->getConnection()->executeStatement(
+            'DELETE FROM assignments WHERE user_id = :userId',
+            ['userId' => $userId]
+        );
+    }
+
+    private function getConnection(): DbalConnection
+    {
+        return $this->getEntityManager()->getConnection();
     }
 }

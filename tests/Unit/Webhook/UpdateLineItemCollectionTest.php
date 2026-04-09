@@ -47,13 +47,23 @@ class UpdateLineItemCollectionTest extends TestCase
                 '22',
                 'test',
                 'http://i.o',
-                (new DateTimeImmutable())->setTimestamp(1565602380)
+                (new DateTimeImmutable())->setTimestamp(1565602380),
+                'qti-interactions-delivery1',
+                'qti-interactions-delivery1-label',
+                1665561600,
+                1666094400,
+                2
             ),
             new UpdateLineItemDto(
                 '11',
                 'test',
                 'http://i.o',
-                (new DateTimeImmutable())->setTimestamp(1565602371)
+                (new DateTimeImmutable())->setTimestamp(1565602371),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
             )
         );
 
@@ -68,13 +78,23 @@ class UpdateLineItemCollectionTest extends TestCase
                 '11',
                 'test',
                 'http://i.o',
-                (new DateTimeImmutable())->setTimestamp(1565602380)
+                (new DateTimeImmutable())->setTimestamp(1565602380),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
             ),
             new UpdateLineItemDto(
                 '22',
                 'test',
                 'http://i.o',
-                (new DateTimeImmutable())->setTimestamp(1565602380)
+                (new DateTimeImmutable())->setTimestamp(1565602380),
+                'qti-interactions-delivery1',
+                'qti-interactions-delivery1-label',
+                1665561600,
+                1666094400,
+                2
             )
         );
 
@@ -91,8 +111,28 @@ class UpdateLineItemCollectionTest extends TestCase
     public function testItMaps(): void
     {
         $collection = new UpdateLineItemCollection(
-            new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable()),
-            new UpdateLineItemDto('22', 'test', 'http://i.o', new DateTimeImmutable())
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
+            ),
+            new UpdateLineItemDto(
+                '22',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery1',
+                'qti-interactions-delivery1-label',
+                1665561600,
+                1666094400,
+                2
+            )
         );
 
         $ids = $collection->map(
@@ -110,8 +150,28 @@ class UpdateLineItemCollectionTest extends TestCase
     public function testItFilters(): void
     {
         $collection = new UpdateLineItemCollection(
-            new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable()),
-            new UpdateLineItemDto('22', 'test', 'http://i.o', new DateTimeImmutable())
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
+            ),
+            new UpdateLineItemDto(
+                '22',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery1',
+                'qti-interactions-delivery1-label',
+                1665561600,
+                1666094400,
+                2
+            )
         );
 
         self::assertCount(2, $collection);
@@ -127,8 +187,28 @@ class UpdateLineItemCollectionTest extends TestCase
     public function testItSetStatus(): void
     {
         $collection = new UpdateLineItemCollection(
-            new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable()),
-            new UpdateLineItemDto('22', 'test', 'http://i.o', new DateTimeImmutable())
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
+            ),
+            new UpdateLineItemDto(
+                '22',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery1',
+                'qti-interactions-delivery1-label',
+                1665561600,
+                1666094400,
+                2
+            )
         );
 
         foreach ($collection as $dto) {
@@ -148,7 +228,17 @@ class UpdateLineItemCollectionTest extends TestCase
         self::assertCount(0, $emptyCollection);
 
         $collection = new UpdateLineItemCollection(
-            new UpdateLineItemDto('11', 'test', 'http://i.o', new DateTimeImmutable())
+            new UpdateLineItemDto(
+                '11',
+                'test',
+                'http://i.o',
+                new DateTimeImmutable(),
+                'qti-interactions-delivery',
+                'qti-interactions-delivery-label',
+                1665561600,
+                1666094400,
+                2
+            )
         );
 
         self::assertCount(1, $collection);

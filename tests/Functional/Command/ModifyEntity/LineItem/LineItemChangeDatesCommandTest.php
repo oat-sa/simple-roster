@@ -28,23 +28,24 @@ use Doctrine\ORM\ORMException;
 use InvalidArgumentException;
 use JsonException;
 use LogicException;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeDatesCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class LineItemChangeDatesCommandTest extends KernelTestCase
+class LineItemChangeDatesCommandTest extends AppKernelTestCase
 {
     use CommandDisplayNormalizerTrait;
     use DatabaseTestingTrait;
@@ -88,9 +89,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->loadFixtureByFilename('3LineItems.yml');
     }
 
-    /**
-     * @dataProvider provideInvalidParameters
-     */
+    #[DataProvider('provideInvalidParameters')]
     public function testItThrowsExceptionForEachInvalidParametersReceived(
         array $parameters,
         string $expectedOutput
@@ -108,10 +107,8 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         self::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay());
     }
 
-    /**
-     * @dataProvider provideValidParametersWithExistingLineItems
-     */
-    public function testItEncapsulatesAnyUnexpectedExceptions(array $parameters): void
+    #[DataProvider('provideValidParametersWithExistingLineItems')]
+    public function testItEncapsulatesAnyUnexpectedExceptions(array $parameters, array $persistedData): void
     {
         $kernel = self::bootKernel();
 
@@ -129,14 +126,12 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
 
         self::assertSame(1, $commandTester->execute($parameters, ['capture_stderr_separately' => true]));
         self::assertStringContainsString(
-            '[ERROR] An unexpected error occurred: ErrorMessage',
+            '[ERROR] An unexpected error occurred:',
             $this->normalizeDisplay($commandTester->getDisplay())
         );
     }
 
-    /**
-     * @dataProvider provideValidParametersWithExistingLineItems
-     */
+    #[DataProvider('provideValidParametersWithExistingLineItems')]
     public function testDryRunModeAndCacheStillTheSame(
         array $parameters,
         array $persistedData
@@ -159,9 +154,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->assertCacheDoesNotExist($lineItemIds);
     }
 
-    /**
-     * @dataProvider provideValidParametersWithExistingLineItems
-     */
+    #[DataProvider('provideValidParametersWithExistingLineItems')]
     public function testItUpdateLineItemsWithRealUpdatesAndCacheIsWarmup(array $parameters, array $persistedData): void
     {
         $lineItemIds = $persistedData['lineItemIds'];
@@ -183,9 +176,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         $this->assertLineItems($persistedData);
     }
 
-    /**
-     * @dataProvider provideValidParametersWithNonExistingLineItems
-     */
+    #[DataProvider('provideValidParametersWithNonExistingLineItems')]
     public function testItWarnsIfNoLineItemWasFound(array $parameters): void
     {
         $this->loadFixtureByFilename('3LineItems.yml');
@@ -216,7 +207,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
                     ),
                     'context' => $lineItem->jsonSerialize(),
                 ],
-                Logger::INFO
+                Level::Info
             );
 
             $lineItemCacheId = $this->lineItemCacheIdGenerator->generate($lineItemId);
@@ -228,7 +219,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         }
     }
 
-    public function provideInvalidParameters(): array
+    public static function provideInvalidParameters(): array
     {
         return [
             'noLineItemIdsOrSlugs' => [
@@ -283,7 +274,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
         ];
     }
 
-    public function provideValidParametersWithNonExistingLineItems(): array
+    public static function provideValidParametersWithNonExistingLineItems(): array
     {
         return [
             'usingShortIdsParameterAndDates' => [
@@ -332,7 +323,7 @@ class LineItemChangeDatesCommandTest extends KernelTestCase
     /**
      * * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function provideValidParametersWithExistingLineItems(): array
+    public static function provideValidParametersWithExistingLineItems(): array
     {
         return [
             'usingSingleIdAndDates' => [

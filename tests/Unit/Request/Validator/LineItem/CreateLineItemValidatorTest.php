@@ -22,24 +22,24 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Tests\Unit\Request\Validator\LineItem;
 
-use ArrayIterator;
 use OAT\SimpleRoster\Request\Validator\LineItem\CreateLineItemValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateLineItemValidatorTest extends TestCase
 {
-    /** @var MockObject|ValidatorInterface */
-    private $validator;
-
+    private ValidatorInterface|MockObject $validator;
     private CreateLineItemValidator $subject;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->subject = new CreateLineItemValidator($this->validator);
     }
@@ -54,9 +54,7 @@ class CreateLineItemValidatorTest extends TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
-            ->willReturn(
-                new ArrayIterator()
-            );
+            ->willReturn(new ConstraintViolationList());
 
         $this->subject->validate($request);
     }
@@ -82,7 +80,7 @@ class CreateLineItemValidatorTest extends TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with([])
-            ->willReturn(new ArrayIterator([$error]));
+            ->willReturn(new ConstraintViolationList([$error]));
 
         $this->subject->validate($request);
     }
@@ -91,7 +89,8 @@ class CreateLineItemValidatorTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage(
-            'Invalid JSON request body received. Error: json_decode() expects parameter 1 to be string, null given.'
+            'Invalid JSON request body received. '
+            . 'Error: json_decode(): Argument #1 ($json) must be of type string, null given.'
         );
 
         $request = $this->createMock(Request::class);

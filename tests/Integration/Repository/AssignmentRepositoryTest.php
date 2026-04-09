@@ -27,10 +27,10 @@ use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class AssignmentRepositoryTest extends KernelTestCase
+class AssignmentRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 

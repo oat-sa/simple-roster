@@ -23,12 +23,12 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Tests\Functional\Action\LtiInstance;
 
 use OAT\SimpleRoster\Entity\LtiInstance;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-abstract class AbstractLtiInstanceTest extends WebTestCase
+abstract class AbstractLtiInstanceTestCase extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;

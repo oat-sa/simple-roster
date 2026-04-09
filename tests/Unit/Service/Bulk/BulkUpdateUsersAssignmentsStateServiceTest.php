@@ -31,6 +31,7 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkUpdateUsersAssignmentsStateService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -135,30 +136,29 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
             ->expects(self::once())
             ->method('flush');
 
+        $expectedCalls = [
+            ["Successful assignment cancellation (assignmentId = '', username = 'test').", ['lineItem' => $expectedLineItem]],
+            ["Successful assignment cancellation (assignmentId = '', username = 'test1').", ['lineItem' => $expectedLineItem]],
+            ["Successful assignment cancellation (assignmentId = '', username = 'test2').", ['lineItem' => $expectedLineItem]],
+        ];
+
+        $callIndex = 0;
+
         $this->logger
             ->expects(self::exactly(3))
             ->method('info')
-            ->withConsecutive(
-                [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test1').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-                [
-                    "Successful assignment cancellation (assignmentId = '', username = 'test2').",
-                    ['lineItem' => $expectedLineItem],
-                ],
-            );
+            ->willReturnCallback(function (string $message, array $context) use (&$callIndex, $expectedCalls): void {
+                self::assertSame($expectedCalls[$callIndex][0], $message);
+                self::assertSame($expectedCalls[$callIndex][1], $context);
+                $callIndex++;
+            });
 
         $this->subject->process($bulkOperationCollection);
+
+        self::assertSame(3, $callIndex, 'Expected exactly 3 logger calls.');
     }
 
-    /**
-     * @dataProvider provideUnsupportedAssignmentState
-     */
+    #[DataProvider('provideUnsupportedAssignmentState')]
     public function testItThrowsExceptionIfInvalidStateIsReceivedAsOperationAttribute(string $invalidState): void
     {
         $this->expectException(LogicException::class);
@@ -202,7 +202,7 @@ class BulkUpdateUsersAssignmentsStateServiceTest extends TestCase
         self::assertSame(Assignment::STATE_COMPLETED, $completedAssignment->getState());
     }
 
-    public function provideUnsupportedAssignmentState(): array
+    public static function provideUnsupportedAssignmentState(): array
     {
         return [
             Assignment::STATE_STARTED => [Assignment::STATE_STARTED],

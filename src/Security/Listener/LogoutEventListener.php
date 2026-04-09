@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Security\Listener;
 
-use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;
 use OAT\SimpleRoster\Security\Generator\JwtTokenCacheIdGenerator;
 use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Psr\Cache\CacheItemPoolInterface;
@@ -38,19 +38,22 @@ class LogoutEventListener
     private JwtTokenCacheIdGenerator $tokenCacheIdGenerator;
     private LoggerInterface $logger;
     private SerializerResponder $serializerResponder;
+    private JwtConfiguration $jwtConfig;
 
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,
         CacheItemPoolInterface $jwtTokenCache,
         JwtTokenCacheIdGenerator $tokenCacheIdGenerator,
         LoggerInterface $securityLogger,
-        SerializerResponder $serializerResponder
+        SerializerResponder $serializerResponder,
+        JwtConfiguration $jwtConfig
     ) {
         $this->tokenExtractor = $tokenExtractor;
         $this->tokenCache = $jwtTokenCache;
         $this->tokenCacheIdGenerator = $tokenCacheIdGenerator;
         $this->logger = $securityLogger;
         $this->serializerResponder = $serializerResponder;
+        $this->jwtConfig = $jwtConfig;
     }
 
     public function onSymfonyComponentSecurityHttpEventLogoutEvent(LogoutEvent $event): void
@@ -58,7 +61,7 @@ class LogoutEventListener
         $request = $event->getRequest();
 
         $accessToken = $this->tokenExtractor->extract($request);
-        $parsedToken = (new Parser())->parse($accessToken);
+        $parsedToken = $this->jwtConfig->parseJwtCredentials($accessToken);
 
         $refreshTokenCacheId = $this->tokenCacheIdGenerator->generate($parsedToken, 'refreshToken');
         $cacheItem = $this->tokenCache->getItem($refreshTokenCacheId);
@@ -67,7 +70,7 @@ class LogoutEventListener
             $this->tokenCache->deleteItem($refreshTokenCacheId);
 
             $this->logger->info(
-                sprintf("Refresh token for user '%s' has been invalidated.", $parsedToken->getClaim('aud')),
+                sprintf("Refresh token for user '%s' has been invalidated.", $parsedToken->claims()->get('aud')[0]),
                 [
                     'cacheId' => $refreshTokenCacheId,
                 ]

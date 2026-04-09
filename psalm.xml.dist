@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-        autoloader="bin/.phpunit/phpunit-8.5-0/vendor/autoload.php"
+        autoloader="bin/.phpunit/phpunit-9.5-0/vendor/autoload.php"
         errorLevel="3"
         hideExternalErrors="true"
         useDocblockTypes="false"

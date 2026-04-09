@@ -20,19 +20,19 @@
 
 namespace OAT\SimpleRoster\Tests\Unit\Command\CreateEntity\User;
 
-use League\Flysystem\FileExistsException;
+use League\Flysystem\UnableToWriteFile;
 use OAT\SimpleRoster\Command\CreateEntity\User\BulkUserCreationCommand;
 use OAT\SimpleRoster\DataTransferObject\UserCreationResult;
 use OAT\SimpleRoster\Service\AwsS3\FolderSyncService;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersServiceConsoleProxy;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use InvalidArgumentException;
 
-class BulkUserCreationCommandTest extends KernelTestCase
+class BulkUserCreationCommandTest extends AppKernelTestCase
 {
     public function testBasicWithSlug(): void
     {
@@ -165,7 +165,7 @@ class BulkUserCreationCommandTest extends KernelTestCase
         $folderSyncServiceMock
             ->expects(self::once())
             ->method('sync')
-            ->willThrowException(new FileExistsException('test/path'));
+            ->willThrowException(new UnableToWriteFile('test/path'));
 
         $kernel->getContainer()->set(BulkCreateUsersServiceConsoleProxy::class, $bulkCreateServiceProxyMock);
         $kernel->getContainer()->set(FolderSyncService::class, $folderSyncServiceMock);

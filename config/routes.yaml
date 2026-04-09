@@ -64,6 +64,21 @@ bulkCreateUsers:
   methods: POST
   defaults: { _controller: OAT\SimpleRoster\Action\CreateEntity\BulkCreateUsersAction }
 
+uploadFile:
+  path: '%app.route_prefix%/v1/upload'
+  methods: POST
+  defaults: { _controller: OAT\SimpleRoster\Action\Upload\UploadFileAction }
+
+getRosteringImportStatus:
+  path: '%app.route_prefix%/v1/status/{referenceId}'
+  methods: GET
+  defaults: { _controller: OAT\SimpleRoster\Action\RosteringImport\GetRosteringImportStatusAction }
+
+getRosteringImportDownload:
+  path: '%app.route_prefix%/v1/download/{referenceId}'
+  methods: GET
+  defaults: { _controller: OAT\SimpleRoster\Action\RosteringImport\GetRosteringImportDownloadAction }
+
 listLtiInstances:
   path: '%app.route_prefix%/v1/lti-instances'
   methods: GET

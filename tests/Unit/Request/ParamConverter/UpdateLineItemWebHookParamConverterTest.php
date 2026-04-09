@@ -30,30 +30,22 @@ use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UpdateLineItemWebHookParamConverterTest extends TestCase
 {
     private UpdateLineItemWebHookParamConverter $subject;
-
-    /** @var MockObject|UpdateLineItemValidator */
-    private $updateLineItemValidator;
-
-    /** @var MockObject|LoggerInterface */
-    private $logger;
+    private MockObject&UpdateLineItemValidator $updateLineItemValidator;
+    private MockObject&LoggerInterface $logger;
 
     protected function setUp(): void
     {
-        $this->updateLineItemValidator = $this->createMock(
-            UpdateLineItemValidator::class
-        );
+        parent::setUp();
 
-        $this->logger = $this->createMock(
-            LoggerInterface::class
-        );
+        $this->updateLineItemValidator = $this->createMock(UpdateLineItemValidator::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->subject = new UpdateLineItemWebHookParamConverter(
             $this->updateLineItemValidator,
@@ -63,85 +55,87 @@ class UpdateLineItemWebHookParamConverterTest extends TestCase
 
     public function testItConvertsSuccessful(): void
     {
-        $request = $this->createMock(
-            Request::class
-        );
-
         $eventName = 'oat\\\\taoPublishing\\\\model\\\\publishing\\\\event\\\\RemoteDeliveryCreatedEvent';
 
         $payload = '{
-                    "source":"https://someinstance.taocloud.org/",
-                    "events":[
-                        {
-                            "eventId":"52a3de8dd0f270fd193f9f4bff05232c",
-                            "eventName":"' . $eventName . '",
-                            "triggeredTimestamp":1565602390,
-                            "eventData":{
-                                "alias":"qti-interactions-delivery",
-                                "remoteDeliveryId":"https://tao.instance/ontologies/tao.rdf#kkkkzk"
-                            }
-                        }
-                    ]
-                }';
+            "source":"https://someinstance.taocloud.org/",
+            "events":[
+                {
+                    "eventId":"52a3de8dd0f270fd193f9f4bff05232c",
+                    "eventName":"' . $eventName . '",
+                    "triggeredTimestamp":1565602390,
+                    "eventData":{
+                        "alias":"qti-interactions-delivery",
+                        "remoteDeliveryId":"https://tao.instance/ontologies/tao.rdf#kkkkzk",
+                        "label":"qti-interactions-delivery-label",
+                        "startAt":1665561600,
+                        "endAt":1666094400,
+                        "maxExecutions":9
+                    }
+                }
+            ]
+        }';
 
-        $request->expects(self::once())
-            ->method('getContent')
-            ->willReturn($payload);
+        $decodedPayload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
 
-        $request->attributes = new ParameterBag();
+        $request = Request::create('/test', Request::METHOD_POST, [], [], [], [], $payload);
+        $argument = new ArgumentMetadata('collection', UpdateLineItemCollection::class, false, false, null);
 
-        $this->updateLineItemValidator->expects(self::once())
+        $this->updateLineItemValidator
+            ->expects(self::once())
             ->method('validate')
             ->with($request);
 
-        $configuration = $this->createMock(
-            ParamConverter::class
-        );
-
-        $configuration->expects(self::once())
-            ->method('getName')
-            ->willReturn('collection');
-
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('info')
-            ->with('UpdateLineItems payload.', json_decode($payload, true));
+            ->with('UpdateLineItems payload.', $decodedPayload);
 
-        self::assertTrue($this->subject->apply($request, $configuration));
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
 
-        self::assertInstanceOf(UpdateLineItemCollection::class, $request->attributes->get('collection'));
+        self::assertCount(1, $result);
+        self::assertInstanceOf(UpdateLineItemCollection::class, $result[0]);
+
+        /** @var UpdateLineItemCollection $collection */
+        $collection = $result[0];
 
         /** @var ArrayIterator $iterator */
-        $iterator = $request->attributes->get('collection')->getIterator();
-        $updateLineItemDto = $iterator[0];
+        $iterator = $collection->getIterator();
+        self::assertCount(1, $iterator);
 
-        self::assertInstanceOf(UpdateLineItemDto::class, $updateLineItemDto);
+        $dto = $iterator[0];
+        self::assertInstanceOf(UpdateLineItemDto::class, $dto);
 
-        self::assertSame("52a3de8dd0f270fd193f9f4bff05232c", $updateLineItemDto->getId());
-        self::assertSame(
-            'oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent',
-            $updateLineItemDto->getName()
-        );
-        self::assertSame(1565602390, $updateLineItemDto->getTriggeredTime()->getTimestamp());
-        self::assertSame("qti-interactions-delivery", $updateLineItemDto->getSlug());
-        self::assertSame(
-            "https://tao.instance/ontologies/tao.rdf#kkkkzk",
-            $updateLineItemDto->getLineItemUri()
-        );
+        self::assertSame('52a3de8dd0f270fd193f9f4bff05232c', $dto->getId());
+        self::assertSame('oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent', $dto->getName());
+        self::assertSame(1565602390, $dto->getTriggeredTime()->getTimestamp());
+        self::assertSame('qti-interactions-delivery', $dto->getSlug());
+        self::assertSame('https://tao.instance/ontologies/tao.rdf#kkkkzk', $dto->getLineItemUri());
+    }
+
+    public function testItReturnsEmptyForUnsupportedClass(): void
+    {
+        $request = new Request();
+        $argument = new ArgumentMetadata('wrong', \stdClass::class, false, false, null);
+
+        $result = iterator_to_array($this->subject->resolve($request, $argument), false);
+
+        self::assertEmpty($result);
     }
 
     public function testItThrowsExceptionCaseValidationFail(): void
     {
-        $this->expectException(BadRequestHttpException::class);
+        $request = new Request();
+        $argument = new ArgumentMetadata('collection', UpdateLineItemCollection::class, false, false, null);
 
-        $request = $this->createMock(
-            Request::class
-        );
-
-        $this->updateLineItemValidator->expects(self::once())
+        $this->updateLineItemValidator
+            ->expects(self::once())
             ->method('validate')
             ->with($request)
-            ->willThrowException(new BadRequestHttpException());
+            ->willThrowException(new BadRequestHttpException('Validation failed'));
 
-        $this->subject->apply($request, $this->createMock(ParamConverter::class));
+        $this->expectException(BadRequestHttpException::class);
+
+        iterator_to_array($this->subject->resolve($request, $argument), false);
     }
 }

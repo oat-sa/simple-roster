@@ -27,15 +27,15 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\SimpleRoster\Entity\Assignment;
 use OAT\SimpleRoster\Lti\BasicOutcome\DummyBasicOutcomeMessageIdGenerator;
+use OAT\SimpleRoster\Tests\AppWebTestCase;
 use OAT\SimpleRoster\Tests\Traits\AssignmentStatusTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\Lti1p3SecurityTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\XmlTestingTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLti1p3OutcomeActionTest extends WebTestCase
+class UpdateLti1p3OutcomeActionTest extends AppWebTestCase
 {
     use DatabaseTestingTrait;
     use Lti1p3SecurityTestingTrait;
@@ -54,14 +54,20 @@ class UpdateLti1p3OutcomeActionTest extends WebTestCase
         $this->loadFixtureByFilename('userWithReadyAssignment.yml');
 
         /** @phpstan-ignore-next-line */
-        $this->registration = static::$container
+        $this->registration = self::getContainer()
             ->get(RegistrationRepositoryInterface::class)
             ->find('testRegistration');
     }
 
     public function testItReturns401IfNotAuthenticated(): void
     {
-        $this->kernelBrowser->request('POST', '/api/v1/lti1p3/outcome');
+        $this->kernelBrowser->request(
+            'POST',
+            '/api/v1/lti1p3/outcome',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/vnd.ims.lti.v1.outcome+xml']
+        );
 
         self::assertSame(Response::HTTP_UNAUTHORIZED, $this->kernelBrowser->getResponse()->getStatusCode());
     }

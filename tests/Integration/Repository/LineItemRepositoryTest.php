@@ -28,13 +28,12 @@ use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\Criteria\FindLineItemCriteria;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
-use PHPUnit\Framework\Error\Error;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class LineItemRepositoryTest extends KernelTestCase
+class LineItemRepositoryTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 
@@ -61,7 +60,7 @@ class LineItemRepositoryTest extends KernelTestCase
 
         $resultCache = $entityManager->getConfiguration()->getResultCache();
         if ($resultCache === null) {
-            throw new Error('`getResultCache` returned null. Cannot setUp', 0, __FILE__, __LINE__);
+            $this->expectErrorMessage('`getResultCache` returned null. Cannot setUp');
         }
         $this->doctrineResultCacheImplementation = $resultCache;
         $this->subject = self::getContainer()->get(LineItemRepository::class);

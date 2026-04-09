@@ -24,6 +24,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\Bulk;
 
 use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Lti\Service\AssigmentFactoryInterface;
+use OAT\SimpleRoster\Lti\Service\AssignmentCollectionMapper\AssignmentCollectionMapperInterface;
 use OAT\SimpleRoster\Lti\Service\UserGenerator\UserGeneratorStateStorageInterface;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Service\Bulk\BulkCreateUsersService;
@@ -37,6 +38,8 @@ class BulkCreateUsersServiceTest extends TestCase
 {
     /** @var UserGeneratorStateStorageInterface|MockObject */
     private $stateStorage;
+    /** @var AssignmentCollectionMapperInterface|MockObject */
+    private $assignmentMapper;
     /** @var LineItemAssignedIndexResolver|MockObject */
     private $lineItemAssignedIndexResolver;
     /** @var AssigmentFactoryInterface|MockObject */
@@ -51,6 +54,7 @@ class BulkCreateUsersServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->stateStorage = $this->createMock(UserGeneratorStateStorageInterface::class);
+        $this->assignmentMapper = $this->createMock(AssignmentCollectionMapperInterface::class);
         $this->lineItemAssignedIndexResolver = $this->createMock(LineItemAssignedIndexResolver::class);
         $this->assigmentFactory = $this->createMock(AssigmentFactoryInterface::class);
         $this->storage = $this->createMock(StorageInterface::class);
@@ -59,6 +63,7 @@ class BulkCreateUsersServiceTest extends TestCase
 
         $this->bulkCreateUsersService = new BulkCreateUsersService(
             $this->stateStorage,
+            $this->assignmentMapper,
             $this->lineItemAssignedIndexResolver,
             $this->assigmentFactory,
             $this->storage,

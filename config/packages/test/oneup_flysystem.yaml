@@ -3,12 +3,17 @@ oneup_flysystem:
     adapters:
         user_files_adapter_local:
             local:
-                directory: '%kernel.project_dir%/var/user-files'
+                location: '%kernel.project_dir%/var/user-files'
         user_files_adapter_s3:
             memory: ~
+        rostering_files_adapter:
+            local:
+                location: '%kernel.project_dir%/var/rostering-files'
 
     filesystems:
         user_files_local_filesystem:
             adapter: user_files_adapter_local
         user_files_s3_filesystem:
             adapter: user_files_adapter_s3
+        rostering_files_filesystem:
+            adapter: rostering_files_adapter

@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Security\Authenticator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
 use OAT\SimpleRoster\Responder\SerializerResponder;
 use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
@@ -31,12 +30,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Throwable;
 
-class JwtTokenAuthenticator extends AbstractGuardAuthenticator
+class JwtTokenAuthenticator extends AbstractAuthenticator
 {
     private AuthorizationHeaderTokenExtractor $tokenExtractor;
 
@@ -44,20 +45,24 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
 
     private SerializerResponder $responder;
 
+    private JwtConfiguration $jwtConfig;
+
     public function __construct(
         AuthorizationHeaderTokenExtractor $tokenExtractor,
         JwtTokenVerifier $tokenVerifier,
-        SerializerResponder $responder
+        SerializerResponder $responder,
+        JwtConfiguration $jwtConfig
     ) {
         $this->tokenExtractor = $tokenExtractor;
         $this->tokenVerifier = $tokenVerifier;
         $this->responder = $responder;
+        $this->jwtConfig = $jwtConfig;
     }
 
     /**
      * @inheritdoc
      */
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER)
             && $this->tokenExtractor->extract($request) !== '';
@@ -66,43 +71,32 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     /**
      * @inheritdoc
      */
-    public function getCredentials(Request $request): string
+    public function authenticate(Request $request): Passport
     {
-        return $this->tokenExtractor->extract($request);
-    }
+        $credentials = $this->tokenExtractor->extract($request);
 
-    /**
-     * @inheritdoc
-     */
-    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
-    {
         try {
-            $token = (new Parser())->parse($credentials);
+            $token = $this->jwtConfig->parseJwtCredentials($credentials);
         } catch (Throwable $exception) {
-            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
+            throw new CustomUserMessageAuthenticationException('Invalid token.');
         }
 
         if (!$this->tokenVerifier->isValid($token) || !$token->claims()->has('aud')) {
-            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
+            throw new CustomUserMessageAuthenticationException('Invalid token.');
         }
 
         if (!$token->claims()->has('sub') || $token->claims()->get('sub') !== 'accessToken') {
-            throw new AuthenticationException('Invalid token.', Response::HTTP_BAD_REQUEST);
+            throw new CustomUserMessageAuthenticationException('Invalid token.');
         }
 
         if ($token->isExpired(Carbon::now())) {
-            throw new AuthenticationException('Expired token.', Response::HTTP_FORBIDDEN);
+            throw new CustomUserMessageAuthenticationException('Expired token.');
         }
 
-        return $userProvider->loadUserByUsername((string)$token->claims()->get('aud')[0]);
-    }
+        $aud = $token->claims()->get('aud');
+        $userIdentifier = is_array($aud) && isset($aud[0]) ? (string)$aud[0] : (string)$aud;
 
-    /**
-     * @inheritdoc
-     */
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        return true;
+        return new SelfValidatingPassport(new UserBadge($userIdentifier));
     }
 
     /**
@@ -110,7 +104,10 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        throw $exception;
+        return $this->responder->createJsonResponse(
+            $exception->getMessage(),
+            Response::HTTP_FORBIDDEN
+        );
     }
 
     /**
@@ -124,15 +121,7 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator
     /**
      * @inheritdoc
      */
-    public function supportsRememberMe(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return $this->responder->createJsonResponse(
             'Full authentication is required to access this resource.',

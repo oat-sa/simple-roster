@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.0.0 - 2026-04-09
+### Added
+- Added file upload endpoint with validation, forwarding, and messenger notification, endpoints are meant to reflect standard used on NextGen
+
+### Fixed
+- Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
+- Updated Symfony to 7.4.5 and PHP to 8.4, including all dependencies
+- Switched PK generation to explicit PostgreSQL sequences for `users`, `assignments`, and `rostering_import` to keep ID defaults consistent on newly created schemas
+
+## 3.0.0 - 2022-10-30
+### Changed
+- Raised minimum required PHP version from `7.4` to `8.1`.
+- Upgraded lcobucci/jwt library from `3.3` to `4.2.1`
+
 ## 2.6.0 - 2022-07-07
 
 ### Added
@@ -75,7 +89,7 @@
 
 ### Fixed
 - Renamed webhook event name from `RemoteDeliveryPublicationFinished` to `oat\\taoPublishing\\model\\publishing\\event\\RemoteDeliveryCreatedEvent`.
-- Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset. 
+- Fixed [roster:modify-entity:line-item:change-dates](docs/cli/modify-entity-line-item-change-dates-command.md) command to allow proper use of timezone offset.
   We now convert the input date(s) to UTC before persisting it.
 
 ## 2.0.5 - 2021-03-03
@@ -182,7 +196,7 @@
 - Added xml namespace environment variable for ReplaceResultRequest, used by ReplaceResultSourceIdExtractor, to follow [LTI 1.1 specifications](https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-26).
 
 ### Fixed
-- Fixed [security breach](https://symfony.com/blog/cve-2020-15094-prevent-rce-when-calling-untrusted-remote-with-cachinghttpclient) by updating symfony/http-kernel to version 4.4.13. 
+- Fixed [security breach](https://symfony.com/blog/cve-2020-15094-prevent-rce-when-calling-untrusted-remote-with-cachinghttpclient) by updating symfony/http-kernel to version 4.4.13.
 - Fixed issue where attemptCount was always returning same value.
 
 ## 1.6.2 - 2020-09-03
@@ -219,7 +233,7 @@
     - Running PHPUnit code coverage checker
     - Running mutation tests with Infection
     - Running static code analysis with PHPStan
-- Added package dependency security checker into composer. 
+- Added package dependency security checker into composer.
 
 ### Changed
 - Changed password encoding algorithm from hardcoded Argon2i to [automatic](https://symfony.com/blog/new-in-symfony-4-3-native-password-encoder).
@@ -233,7 +247,7 @@
 ### Fixed
 - Reverted temporary PHPUnit fix done in version `1.4.1`.
 - Reverted temporary fix caused by a PHP `7.2.20` bug done in version `1.4.0`.
-- Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default. 
+- Moved Symfony deprecation helper from PHPUnit XML configuration file to `.env` file and updated threshold to not break tests by default.
 - Fixed all static code analysis issues, achieving maximum quality strictness level.
 
 ## 1.4.4 - 2020-04-14

@@ -26,6 +26,7 @@ use OAT\SimpleRoster\EventSubscriber\RequestIdGeneratorSubscriber;
 use OAT\SimpleRoster\Request\RequestIdStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -99,23 +100,20 @@ class RequestIdGeneratorSubscriberTest extends TestCase
     {
         $request = Request::create('/test');
 
+        $uuid = Uuid::fromString('123e4567-e89b-12d3-a456-426614174000');
+
         $this->uuidFactory
             ->expects(self::once())
             ->method('uuid4')
-            ->willReturn('expectedRequestId');
+            ->willReturn($uuid);
 
-        $this->requestEvent
-            ->method('getRequest')
-            ->willReturn($request);
-
-        $this->requestEvent
-            ->method('isMainRequest')
-            ->willReturn(true);
+        $this->requestEvent->method('getRequest')->willReturn($request);
+        $this->requestEvent->method('isMainRequest')->willReturn(true);
 
         $this->subject->onKernelRequest($this->requestEvent);
 
-        self::assertSame('expectedRequestId', $request->attributes->get('requestId'));
-        self::assertSame('expectedRequestId', $this->requestIdStorage->getRequestId());
+        self::assertSame($uuid->toString(), $request->attributes->get('requestId'));
+        self::assertSame($uuid->toString(), $this->requestIdStorage->getRequestId());
     }
 
     public function testItWillNotSetRequestIdOnSubRequests(): void

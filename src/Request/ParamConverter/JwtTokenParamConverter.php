@@ -22,45 +22,39 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Request\ParamConverter;
 
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\SimpleRoster\Security\Verifier\JwtTokenVerifier;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Symfony\Component\HttpFoundation\Request;
+use OAT\SimpleRoster\Security\Authenticator\JwtConfiguration;use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class JwtTokenParamConverter implements ParamConverterInterface
+class JwtTokenParamConverter implements ValueResolverInterface
 {
-    private JwtTokenVerifier $tokenVerifier;
-
-    public function __construct(JwtTokenVerifier $tokenVerifier)
-    {
-        $this->tokenVerifier = $tokenVerifier;
+    public function __construct(
+        private readonly JwtTokenVerifier $tokenVerifier,
+        private readonly JwtConfiguration $jwtConfig,
+    ) {
     }
-
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if ($argument->getType() !== Plain::class) {
+            return [];
+        }
+
         $decodedRequestBody = json_decode($request->getContent(), true);
         if (!isset($decodedRequestBody['refreshToken'])) {
             throw new BadRequestHttpException("Missing 'refreshToken' in request body.");
         }
 
         try {
-            $refreshToken = (new Parser())->parse($decodedRequestBody['refreshToken']);
+            $refreshToken = $this->jwtConfig->parseJwtCredentials($decodedRequestBody['refreshToken']);
             $this->tokenVerifier->isValid($refreshToken);
         } catch (Throwable $exception) {
             throw new BadRequestHttpException('Invalid token.');
         }
 
-        $request->attributes->set($configuration->getName(), $refreshToken);
-
-        return true;
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return Token::class === $configuration->getClass();
+        return [$refreshToken];
     }
 }

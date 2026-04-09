@@ -1,24 +1,11 @@
 version: '3'
 
-services:
-    simple-roster-nginx:
-        container_name: simple-roster-nginx
-        image: nginx:stable
-        networks:
-            - simple-roster
-            - oat-docker
-        volumes:
-            - .:/var/www/html:cached
-            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
-        working_dir: /etc/nginx/conf.d
-        labels:
-            - "traefik.backend=simple-roster-nginx"
-            - "traefik.frontend.rule=Host:simple-roster.docker.localhost"
-            - "traefik.docker.network=oat-docker"
-            - "traefik.port=80"
+include:
+    - docker-compose-service.yml
 
+services:
     simple-roster-phpfpm:
-        container_name: simple-roster-phpfpm
+        container_name: simple-roster-phpfpm${CONTAINER_SUFFIX}
         env_file:
             - .env.docker
         build:
@@ -33,7 +20,32 @@ services:
         volumes:
             - .:/var/www/html:cached
             - $COMPOSER_HOME:/root/.composer
+            - ../docker/volumes/rostering-files:/var/rostering-files
         working_dir: /var/www/html
+
+    simple-roster-worker:
+        depends_on:
+            - simple-roster-phpfpm
+        container_name: simple-roster-worker${CONTAINER_SUFFIX}
+        env_file:
+            - .env.docker
+        build:
+            context: ./docker/phpfpm
+        network_mode: service:simple-roster-phpfpm
+        working_dir: /var/www/html
+        volumes_from:
+            - simple-roster-phpfpm
+        environment:
+            XDEBUG_CONFIG: client_host=${DOCKER_GATEWAY_HOST:-host.docker.internal} start_with_request=trigger
+            XDEBUG_SESSION: PHPSTORM_WRK
+            XDEBUG_MODE: ${XDEBUG_MODE:-off}
+            PHP_IDE_CONFIG: serverName=simple-roster.docker.localhost
+        command: >
+            sh -lc 'php bin/console messenger:setup-transports --no-interaction || true;
+            while true; do
+            php bin/console messenger:consume rostering-file-uploaded-sr --time-limit=3600 --memory-limit=256M --no-interaction -vv;
+            sleep 1;
+            done'
 
     simple-roster-redis:
         container_name: simple-roster-redis
@@ -79,13 +91,14 @@ services:
             #- "4510-4559:4510-4559"
             - "4566:4566"
         environment:
-            - SERVICES=s3
+            - SERVICES=s3,sqs
             - DEBUG=1
         networks:
             - simple-roster
             - oat-docker
         volumes:
             - "./localstack:/tmp/localstack"
+            - "./localstack/init:/etc/localstack/init/ready.d"
             - "/var/run/docker.sock:/var/run/docker.sock"
         labels:
             - "traefik.backend=simple-roster-localstack"
@@ -101,6 +114,8 @@ volumes:
 
 networks:
     simple-roster:
+        driver: bridge
+    depp-delivery:
         driver: bridge
     oat-docker:
         external: true

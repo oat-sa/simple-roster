@@ -1,0 +1,66 @@
+# Make a repository release after merging to develop branch
+
+name: Simple Roster - Continuous Integration
+# This workflow is triggered on pull request open/reopen events across multiple branches
+
+on:
+  pull_request:
+    branches: [ master, develop, feat/*, feature/*, fix/*, integration/* ]
+    types: [synchronize, opened, reopened]
+
+jobs:
+  setup:
+    name: Setup environment
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: apcu, sockets, zip, grpc, redis, protobuf, pdo_sqlite, intl
+          tools: composer, phpcs
+          coverage: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Debug PHP version
+        run: php -v
+
+  build:
+    name: Build/test environment
+    runs-on: ubuntu-24.04
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - run: git fetch --tags --unshallow
+
+      - name: Check commit
+        if: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master' }}
+        uses: oat-sa/conventional-commit-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN }}"}}'
+        run: composer install -n --ignore-platform-reqs
+
+      - name: Setup database
+        run: ./bin/console doctrine:schema:update --force --env=test
+
+      - name: Run phpunit tests
+        run: php -d xdebug.mode=coverage -d memory_limit=1G ./vendor/bin/phpunit --coverage-clover coverage.xml

@@ -25,13 +25,12 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\LineItem;
 use OAT\SimpleRoster\Model\LineItemCollection;
 use OAT\SimpleRoster\ResultSet\LineItemResultSet;
 use OAT\SimpleRoster\Service\LineItem\ListLineItemResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ListLineItemResponseTest extends TestCase
 {
-    /**
-     * @dataProvider provideResultSet
-     */
+    #[DataProvider('provideResultSet')]
     public function testJsonSerialization(LineItemResultSet $lineItemResultSet): void
     {
         $subject = new ListLineItemResponse($lineItemResultSet);
@@ -42,7 +41,7 @@ class ListLineItemResponseTest extends TestCase
         self::assertSame($lineItemResultSet->getLastLineItemId(), $result['metadata']['pagination']['nextCursor']);
     }
 
-    public function provideResultSet(): array
+    public static function provideResultSet(): array
     {
         return [
             'withCursor' => [

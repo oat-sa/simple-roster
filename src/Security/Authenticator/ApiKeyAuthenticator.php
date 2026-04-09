@@ -26,17 +26,20 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
-class ApiKeyAuthenticator extends AbstractGuardAuthenticator
+class ApiKeyAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     public const AUTH_REALM = 'SimpleRoster';
-
+    private const FAILURE_MESSAGE = 'API key authentication failure.';
     private AuthorizationHeaderTokenExtractor $tokenExtractor;
     private string $appApiKey;
 
@@ -49,38 +52,32 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         return $request->headers->has(AuthorizationHeaderTokenExtractor::AUTHORIZATION_HEADER);
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): Passport
     {
-        return [
-            'token' => $this->tokenExtractor->extract($request),
-        ];
+        $token = $this->tokenExtractor->extract($request);
+
+        if (null === $token || '' === trim($token)) {
+            throw new CustomUserMessageAuthenticationException('No API token provided.');
+        }
+
+        if ($token !== $this->appApiKey) {
+            throw new CustomUserMessageAuthenticationException('Invalid API key.');
+        }
+
+        return new SelfValidatingPassport(
+            new UserBadge('api_key', fn () => new User())
+        );
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
-        return new User();
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        return $credentials['token'] === $this->appApiKey;
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }
@@ -88,32 +85,27 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        throw $this->createUnauthorizedHttpException($exception);
+        return $this->createUnauthorizedResponse(self::FAILURE_MESSAGE);
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
-        throw $this->createUnauthorizedHttpException($authException);
+        return $this->createUnauthorizedResponse(self::FAILURE_MESSAGE);
     }
 
-    public function supportsRememberMe(): bool
+    private function createUnauthorizedResponse(string $message): JsonResponse
     {
-        return false;
-    }
-
-    private function createUnauthorizedHttpException(?AuthenticationException $exception): UnauthorizedHttpException
-    {
-        $message = 'API key authentication failure.';
-
-        return new UnauthorizedHttpException(
-            sprintf('Bearer realm="%s", error="invalid_api_key", error_description="%s"', static::AUTH_REALM, $message),
-            $message,
-            $exception
+        $response = new JsonResponse(['error' => ['message' => $message]], Response::HTTP_UNAUTHORIZED);
+        $response->headers->set(
+            'WWW-Authenticate',
+            sprintf('Bearer realm="%s", error="invalid_api_key", error_description="%s"', self::AUTH_REALM, $message)
         );
+
+        return $response;
     }
 }

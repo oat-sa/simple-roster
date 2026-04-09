@@ -30,6 +30,7 @@ use OAT\SimpleRoster\Exception\AssignmentNotProcessableException;
 use OAT\SimpleRoster\Lti\Factory\Lti1p1RequestFactory;
 use OAT\SimpleRoster\Lti\Request\LtiRequest;
 use OAT\SimpleRoster\Lti\Service\GetUserAssignmentLtiRequestService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -49,9 +50,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->subject = new GetUserAssignmentLtiRequestService($this->ltiRequestFactory);
     }
 
-    /**
-     * @dataProvider provideNonSuitableAssignmentStates
-     */
+    #[DataProvider('provideNonSuitableAssignmentStates')]
     public function testItThrowsExceptionIfAssignmentDoesNotHaveSuitableState(string $nonSuitableAssignmentStatus): void
     {
         $this->expectException(AssignmentNotProcessableException::class);
@@ -75,13 +74,11 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->subject->getAssignmentLtiRequest($assignment);
     }
 
-    /**
-     * @dataProvider provideInvalidLineItemAssignmentCombinations
-     */
+    #[DataProvider('provideInvalidLineItemAssignmentCombinations')]
     public function testItThrowsExceptionIfAssignmentHasReachedMaximumAttempts(
         int $maxAttempts,
         int $attemptsCount,
-        string $assignmentStatus
+        string $assignmentState
     ): void {
         $this->expectException(AssignmentNotProcessableException::class);
         $this->expectExceptionMessage("Assignment with id '8' has reached the maximum attempts.");
@@ -97,7 +94,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
 
         $assignment
             ->setLineItem($lineItem)
-            ->setState($assignmentStatus)
+            ->setState($assignmentState)
             ->setAttemptsCount($attemptsCount);
 
         $this->ltiRequestFactory
@@ -107,13 +104,11 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         $this->subject->getAssignmentLtiRequest($assignment);
     }
 
-    /**
-     * @dataProvider provideValidLineItemAssignmentCombinations
-     */
+    #[DataProvider('provideValidLineItemAssignmentCombinations')]
     public function testItReturnsAssignmentLtiRequest(
         int $maxAttempts,
         int $attemptsCount,
-        string $assignmentStatus
+        string $assignmentState
     ): void {
         Carbon::setTestNow(Carbon::createFromDate(2020, 1, 1));
 
@@ -134,7 +129,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
             ->setLineItem($lineItem)
             ->setUser($user)
             ->setAttemptsCount($attemptsCount)
-            ->setState($assignmentStatus);
+            ->setState($assignmentState);
 
         $this->ltiRequestFactory
             ->expects(self::once())
@@ -148,7 +143,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function provideNonSuitableAssignmentStates(): array
+    public static function provideNonSuitableAssignmentStates(): array
     {
         return [
             Assignment::STATE_CANCELLED => [Assignment::STATE_CANCELLED],
@@ -156,7 +151,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         ];
     }
 
-    public function provideInvalidLineItemAssignmentCombinations(): array
+    public static function provideInvalidLineItemAssignmentCombinations(): array
     {
         return [
             'withAllAttemptsTakenAndCompletedStatus' => [
@@ -177,7 +172,7 @@ class GetUserAssignmentLtiRequestServiceTest extends TestCase
         ];
     }
 
-    public function provideValidLineItemAssignmentCombinations(): array
+    public static function provideValidLineItemAssignmentCombinations(): array
     {
         return [
             'withMaxAttemptsSpecifiedAndAvailableAttemptsAndReadyStatus' => [

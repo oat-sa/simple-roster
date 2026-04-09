@@ -27,13 +27,14 @@ use DateTimeImmutable;
 use Lcobucci\JWT\Token\DataSet;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Security\Generator\JwtTokenGenerator;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class JwtTokenGeneratorTest extends KernelTestCase
+class JwtTokenGeneratorTest extends AppKernelTestCase
 {
     /** @var JwtTokenGenerator */
     private $subject;
@@ -56,13 +57,8 @@ class JwtTokenGeneratorTest extends KernelTestCase
 
     public function testItCanCreateTokenWithClaims(): void
     {
-        $expectedUuid = '123456';
-
-        $uuid = $this->createMock(UuidInterface::class);
-        $uuid
-            ->expects(self::once())
-            ->method('toString')
-            ->willReturn($expectedUuid);
+        $expectedUuid = '123e4567-e89b-12d3-a456-426614174000';
+        $uuid = Uuid::fromString($expectedUuid);
 
         $this->testUuidFactory
             ->expects(self::once())

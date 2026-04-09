@@ -24,37 +24,59 @@ namespace OAT\SimpleRoster\Tests\Unit\Security\Authenticator;
 
 use OAT\SimpleRoster\Security\Authenticator\ApiKeyAuthenticator;
 use OAT\SimpleRoster\Security\TokenExtractor\AuthorizationHeaderTokenExtractor;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 
 class ApiKeyAuthenticatorTest extends TestCase
 {
-    public function testItDoesNotSupportRememberMe(): void
+    public function testAuthenticateDoesNotAddRememberMeBadge(): void
+    {
+        $extractor = $this->createMock(AuthorizationHeaderTokenExtractor::class);
+        $extractor
+            ->method('extract')
+            ->willReturn('valid-api-key');
+
+        $subject = new ApiKeyAuthenticator($extractor, 'valid-api-key');
+
+        $request = Request::create(
+            '/test',
+            'GET',
+            [],
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer valid-api-key']
+        );
+
+        $passport = $subject->authenticate($request);
+
+        self::assertFalse(
+            $passport->hasBadge(RememberMeBadge::class),
+            'ApiKeyAuthenticator must not support remember-me'
+        );
+    }
+
+    public function testStartReturnsUnauthorizedResponseOnAuthenticationError(): void
     {
         $subject = new ApiKeyAuthenticator(
             $this->createMock(AuthorizationHeaderTokenExtractor::class),
             'key'
         );
 
-        self::assertFalse($subject->supportsRememberMe());
-    }
-
-    public function testItThrowsExceptionUnauthorizedExceptionOnAuthenticationError(): void
-    {
-        $subject = new ApiKeyAuthenticator(
-            $this->createMock(AuthorizationHeaderTokenExtractor::class),
-            'key'
+        $response = $subject->start(
+            Request::create('/test', 'GET'),
+            new AuthenticationException('whatever')
         );
 
-        /** @var Request|MockObject $request */
-        $request = $this->createMock(Request::class);
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
 
-        $this->expectException(UnauthorizedHttpException::class);
-        $this->expectExceptionMessage('API key authentication failure.');
+        $decoded = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $subject->start($request, new AuthenticationException());
+        self::assertSame('API key authentication failure.', $decoded['error']['message']);
+        self::assertTrue($response->headers->has('WWW-Authenticate'));
+        self::assertStringContainsString('Bearer realm="SimpleRoster"', (string)$response->headers->get('WWW-Authenticate'));
     }
+
 }

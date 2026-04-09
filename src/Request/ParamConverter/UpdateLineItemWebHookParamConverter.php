@@ -27,23 +27,24 @@ use OAT\SimpleRoster\Request\Validator\LineItem\UpdateLineItemValidator;
 use OAT\SimpleRoster\WebHook\UpdateLineItemCollection;
 use OAT\SimpleRoster\WebHook\UpdateLineItemDto;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
+class UpdateLineItemWebHookParamConverter implements ValueResolverInterface
 {
-    private UpdateLineItemValidator $updateLineItemValidator;
-    private LoggerInterface $logger;
-
-    public function __construct(UpdateLineItemValidator $updateLineItemValidator, LoggerInterface $requestLogger)
-    {
-        $this->updateLineItemValidator = $updateLineItemValidator;
-        $this->logger = $requestLogger;
+    public function __construct(
+        private readonly UpdateLineItemValidator $updateLineItemValidator,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if ($argument->getType() !== UpdateLineItemCollection::class) {
+            return [];
+        }
+
         $this->updateLineItemValidator->validate($request);
 
         $responseBody = json_decode($request->getContent(), true);
@@ -58,17 +59,14 @@ class UpdateLineItemWebHookParamConverter implements ParamConverterInterface
                 (string)$event['eventName'],
                 (string)$event['eventData']['remoteDeliveryId'],
                 (new DateTimeImmutable())->setTimestamp($event['triggeredTimestamp']),
-                $event['eventData']['alias'] ?? null
+                $event['eventData']['alias'],
+                $event['eventData']['label'] ?? $event['eventData']['alias'],
+                $event['eventData']['startAt'] ?? null,
+                $event['eventData']['endAt'] ?? null,
+                $event['eventData']['maxExecutions'] ?? 0
             );
         }
 
-        $request->attributes->set($configuration->getName(), new UpdateLineItemCollection(...$events));
-
-        return true;
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return UpdateLineItemCollection::class === $configuration->getClass();
+        return [new UpdateLineItemCollection(...$events)];
     }
 }

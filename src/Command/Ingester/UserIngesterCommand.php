@@ -31,7 +31,7 @@ use OAT\SimpleRoster\Repository\NativeUserRepository;
 use OAT\SimpleRoster\Storage\StorageRegistry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Throwable;
 
 class UserIngesterCommand extends AbstractCsvIngesterCommand
@@ -39,18 +39,18 @@ class UserIngesterCommand extends AbstractCsvIngesterCommand
     public const NAME = 'roster:ingest:user';
 
     private NativeUserRepository $userRepository;
-    private UserPasswordEncoderInterface $passwordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(
         CsvReaderBuilder $csvReaderBuilder,
         StorageRegistry $storageRegistry,
         NativeUserRepository $userRepository,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct($csvReaderBuilder, $storageRegistry);
 
         $this->userRepository = $userRepository;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     protected function getIngesterCommandName(): string
@@ -175,7 +175,7 @@ EOF
     {
         return new UserDto(
             $rawUser['username'],
-            $this->passwordEncoder->encodePassword(new User(), $rawUser['password']),
+            $this->passwordHasher->hashPassword(new User(), $rawUser['password']),
             $rawUser['groupId'] ?? null
         );
     }

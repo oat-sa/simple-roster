@@ -30,7 +30,7 @@ use OAT\SimpleRoster\Request\Validator\BulkCreateUserValidator;
 use OAT\SimpleRoster\Request\Initialize\BulkCreateUserRequestInitialize;
 use OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BulkCreateUsersAction
 {
@@ -57,7 +57,7 @@ class BulkCreateUsersAction
         $this->createUserServiceContext = $createUserServiceContext;
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): JsonResponse
     {
         $this->bulkCreateUserValidator->validate($request);
         $requestPayLoad = $this->bulkCreateUserRequestInitialize->initializeRequestData($request);
@@ -78,6 +78,6 @@ class BulkCreateUsersAction
 
         $this->userFolderSync->sync($folderName);
 
-        return $this->responder->createJsonResponse($response, Response::HTTP_CREATED);
+        return $this->responder->createJsonResponse($response, JsonResponse::HTTP_CREATED);
     }
 }

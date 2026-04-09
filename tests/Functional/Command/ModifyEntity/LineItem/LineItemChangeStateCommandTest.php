@@ -27,23 +27,24 @@ use Doctrine\ORM\EntityNotFoundException;
 use Exception;
 use JsonException;
 use LogicException;
-use Monolog\Logger;
+use Monolog\Level;
 use OAT\SimpleRoster\Command\ModifyEntity\LineItem\LineItemChangeStateCommand;
 use OAT\SimpleRoster\Generator\LineItemCacheIdGenerator;
 use OAT\SimpleRoster\Repository\LineItemRepository;
+use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\CommandDisplayNormalizerTrait;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
 use OAT\SimpleRoster\Tests\Traits\LoggerTestingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class LineItemChangeStateCommandTest extends KernelTestCase
+class LineItemChangeStateCommandTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
     use LoggerTestingTrait;
@@ -87,9 +88,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $this->loadFixtureByFilename('100usersWithAssignments.yml');
     }
 
-    /**
-     * @dataProvider provideValidArguments
-     */
+    #[DataProvider('provideValidArguments')]
     public function testItDeactivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         foreach ($lineItemIds as $lineItemId) {
@@ -98,7 +97,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
 
             $lineItemCache = $this->resultCache->getItem($this->lineItemCacheIdGenerator->generate($lineItemId))->get();
             $cache = current(current($lineItemCache));
-            self::assertSame('1', $cache['is_active_3']);
+            self::assertSame(1, $cache['is_active_3']);
         }
 
         $commandResult = $this->commandTester->execute(
@@ -116,9 +115,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         $this->assertLineItems($lineItemIds, 'deactivate', false);
     }
 
-    /**
-     * @dataProvider provideValidArguments
-     */
+    #[DataProvider('provideValidArguments')]
     public function testItActivatesLineItem(array $lineItemIds, string $queryField, array $queryValue): void
     {
         $this->commandTester->execute(
@@ -167,9 +164,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         self::assertTrue($secondLineItem->isActive());
     }
 
-    /**
-     * @dataProvider provideInvalidArguments
-     */
+    #[DataProvider('provideInvalidArguments')]
     public function testItDisplayErrorForInvalidArguments(array $arguments, string $expectedMessage): void
     {
         $this->expectExceptionMessage($expectedMessage);
@@ -208,43 +203,43 @@ class LineItemChangeStateCommandTest extends KernelTestCase
         self::assertStringContainsString('[ERROR] Database Error', $commandTester->getDisplay());
     }
 
-    public function provideValidArguments(): array
+    public static function provideValidArguments(): array
     {
         return [
             'bySlug' => [
-                'line-item-ids' => [2],
-                'query-field' => 'slug',
-                'query-value' => ['lineItemSlug2'],
+                'lineItemIds' => [2],
+                'queryField' => 'slug',
+                'queryValue' => ['lineItemSlug2'],
             ],
             'byMultipleSlugs' => [
-                'line-item-ids' => [2, 1],
-                'query-field' => 'slug',
-                'query-value' => ['lineItemSlug2', 'lineItemSlug1'],
+                'lineItemIds' => [2, 1],
+                'queryField' => 'slug',
+                'queryValue' => ['lineItemSlug2', 'lineItemSlug1'],
             ],
             'byId' => [
-                'line-item-ids' => [1],
-                'query-field' => 'id',
-                'query-value' => ['1'],
+                'lineItemIds' => [1],
+                'queryField' => 'id',
+                'queryValue' => ['1'],
             ],
             'byMultipleIds' => [
-                'line-item-ids' => [1, 3],
-                'query-field' => 'id',
-                'query-value' => ['1', '3'],
+                'lineItemIds' => [1, 3],
+                'queryField' => 'id',
+                'queryValue' => ['1', '3'],
             ],
             'byUri' => [
-                'line-item-ids' => [1, 2],
-                'query-field' => 'uri',
-                'query-value' => ['http://lineitemuri.com'],
+                'lineItemIds' => [1, 2],
+                'queryField' => 'uri',
+                'queryValue' => ['http://lineitemuri.com'],
             ],
             'byMultipleUris' => [
-                'line-item-ids' => [1, 2, 3],
-                'query-field' => 'uri',
-                'query-value' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
+                'lineItemIds' => [1, 2, 3],
+                'queryField' => 'uri',
+                'queryValue' => ['http://lineitemuri.com', 'http://different-lineitemuri.com'],
             ],
         ];
     }
 
-    public function provideInvalidArguments(): array
+    public static function provideInvalidArguments(): array
     {
         return [
             'invalidToggle' => [
@@ -319,7 +314,7 @@ class LineItemChangeStateCommandTest extends KernelTestCase
                         'uri' => $this->getContextUriByLineItemId($lineItemId),
                     ],
                 ],
-                Logger::INFO
+                Level::Info
             );
 
             $lineItem = $this->lineItemRepository->findOneById($lineItemId);
