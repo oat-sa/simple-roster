@@ -23,7 +23,6 @@
     <entity repository-class="OAT\SimpleRoster\Repository\LineItemRepository" name="OAT\SimpleRoster\Entity\LineItem" table="line_items">
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
-            <sequence-generator sequence-name="line_items_id_seq" allocation-size="1" initial-value="1"/>
         </id>
         <field name="label" column="label" length="255" precision="0" scale="0"/>
         <field name="uri" column="uri" length="255" precision="0" scale="0"/>

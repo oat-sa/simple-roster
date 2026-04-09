@@ -22,8 +22,7 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity repository-class="OAT\SimpleRoster\Repository\RosteringImportRepository" name="OAT\SimpleRoster\Entity\RosteringImport" table="rostering_import">
         <id name="id" type="integer" column="id">
-            <generator strategy="SEQUENCE"/>
-            <sequence-generator sequence-name="rostering_import_id_seq" allocation-size="1" initial-value="1"/>
+            <generator strategy="AUTO"/>
         </id>
         <field name="referenceId" column="reference_id" length="36" unique="true"/>
         <field name="status" column="status" length="32"/>
