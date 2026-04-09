@@ -237,6 +237,13 @@ CSV;
         self::assertSame(0, $import->getFailedRows());
         self::assertSame(1, $import->getAttempts());
         self::assertNull($import->getErrorMessage());
+
+        $records = $this->readResultRecords('ref-no-import');
+        self::assertCount(2, $records);
+        self::assertSame('row_1', $records[0]['marker']);
+        self::assertSame('processed', $records[0]['status']);
+        self::assertSame('row_2', $records[1]['marker']);
+        self::assertSame('processed', $records[1]['status']);
     }
 
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void

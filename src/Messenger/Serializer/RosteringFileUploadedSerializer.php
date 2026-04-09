@@ -8,30 +8,34 @@ use JsonException;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer as TransportSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class RosteringFileUploadedSerializer implements SerializerInterface
 {
+    private SerializerInterface $transportSerializer;
+
+    public function __construct()
+    {
+        $this->transportSerializer = TransportSerializer::create();
+    }
+
     public function decode(array $encodedEnvelope): Envelope
     {
-        $body = (string) ($encodedEnvelope['body'] ?? '');
+        $referenceId = $this->extractReferenceId($encodedEnvelope);
+        $normalizedBody = $this->encodeReferenceId($referenceId);
+        $headers = $this->normalizeHeaders($encodedEnvelope['headers'] ?? []);
 
-        try {
-            $payload = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            throw new RuntimeException(sprintf('json_decode error: %s', $exception->getMessage()), 0, $exception);
-        }
+        $headers['type'] = RosteringFileUploadedMessage::class;
 
-        if (!is_array($payload) || !isset($payload['referenceId']) || !is_string($payload['referenceId'])) {
-            throw new RuntimeException('Reference ID missing.');
-        }
-
-        $referenceId = trim($payload['referenceId']);
-        if ('' === $referenceId) {
-            throw new RuntimeException('Reference ID missing.');
-        }
-
-        return new Envelope(new RosteringFileUploadedMessage($referenceId));
+        return $this->transportSerializer->decode(
+            [
+                'body' => $normalizedBody,
+                'headers' => $headers,
+            ]
+        );
     }
 
     public function encode(Envelope $envelope): array
@@ -41,24 +45,74 @@ class RosteringFileUploadedSerializer implements SerializerInterface
             throw new RuntimeException('Unsupported message type for RosteringFileUploadedSerializer.');
         }
 
+        $body = $this->encodeReferenceId($message->referenceId, 'Unable to encode rostering uploaded message: %s');
+
+        $encoded = $this->transportSerializer->encode($envelope->withoutAll(ErrorDetailsStamp::class));
+        $encoded['body'] = $body;
+
+        return [
+            'body' => $encoded['body'],
+            'headers' => $encoded['headers'],
+        ];
+    }
+
+    private function extractReferenceId(array $encodedEnvelope): string
+    {
+        $body = (string) ($encodedEnvelope['body'] ?? '');
+        $payload = $this->decodeJsonObject($body);
+
+        if (isset($payload['Message']) && is_string($payload['Message'])) {
+            $payload = $this->decodeJsonObject($payload['Message']);
+        }
+
+        if (!isset($payload['referenceId']) || !is_string($payload['referenceId'])) {
+            throw new MessageDecodingFailedException('Reference ID missing.');
+        }
+
+        $referenceId = trim($payload['referenceId']);
+        if ('' === $referenceId) {
+            throw new MessageDecodingFailedException('Reference ID missing.');
+        }
+
+        return $referenceId;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeJsonObject(string $json): array
+    {
         try {
-            $body = json_encode(
-                [
-                    'referenceId' => $message->referenceId,
-                ],
-                JSON_THROW_ON_ERROR
-            );
+            $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new RuntimeException(
-                sprintf('Unable to encode rostering uploaded message: %s', $exception->getMessage()),
+            throw new MessageDecodingFailedException(
+                sprintf('json_decode error: %s', $exception->getMessage()),
                 0,
                 $exception
             );
         }
 
-        return [
-            'body' => $body,
-            'headers' => [],
-        ];
+        if (!is_array($decoded)) {
+            throw new MessageDecodingFailedException('Decoded payload must be a JSON object.');
+        }
+
+        return $decoded;
+    }
+
+    private function encodeReferenceId(string $referenceId, string $errorTemplate = 'json_encode error: %s'): string
+    {
+        try {
+            return json_encode(['referenceId' => $referenceId], JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new RuntimeException(sprintf($errorTemplate, $exception->getMessage()), 0, $exception);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeHeaders(mixed $headers): array
+    {
+        return is_array($headers) ? $headers : [];
     }
 }

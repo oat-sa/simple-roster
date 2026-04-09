@@ -59,7 +59,8 @@ class RosteringFileProcessor
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
-        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer
+        private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer,
+        private readonly SeekableStreamFactory $seekableStreamFactory
     ) {
     }
 
@@ -74,6 +75,7 @@ class RosteringFileProcessor
         $inputFileKey = $this->fileKeyResolver->inputFileKey($referenceId);
         $outputFileKey = $this->fileKeyResolver->outputFileKey($referenceId);
         $inputStream = null;
+        $inputCsvStream = null;
         $resultStream = null;
 
         $totalRows = 0;
@@ -90,7 +92,9 @@ class RosteringFileProcessor
                 throw new RuntimeException('Unable to create temporary stream for rostering result file.');
             }
 
-            $reader = Reader::from($inputStream);
+            $inputCsvStream = $this->seekableStreamFactory->create($inputStream, 'rostering input file');
+
+            $reader = Reader::from($inputCsvStream);
             $reader->setHeaderOffset(0);
             $header = $reader->getHeader();
             $rows = (new Statement())->process($reader)->getRecords();
@@ -121,17 +125,17 @@ class RosteringFileProcessor
 
             if ($importableRows === 0) {
                 $this->logger->info(
-                    sprintf("Rostering file '%s' skipped because no importable user rows were found.", $referenceId),
+                    sprintf(
+                        "Rostering file '%s' has no importable SR rows; writing pass-through result output.",
+                        $referenceId
+                    ),
                     [
                         'referenceId' => $referenceId,
                         'inputFileKey' => $inputFileKey,
+                        'outputFileKey' => $outputFileKey,
                         'totalRows' => $totalRows,
                     ]
                 );
-
-                $this->rosteringImportRepository->markProcessed($referenceId, $totalRows, $failedRows);
-
-                return;
             }
 
             rewind($resultStream);
@@ -140,19 +144,21 @@ class RosteringFileProcessor
         } catch (Throwable $exception) {
             $this->markImportFailure($referenceId, $exception, $totalRows, $failedRows);
 
+            if ($exception instanceof RosteringValidationException) {
+                throw $exception;
+            }
+
             throw new RuntimeException(
                 sprintf('Unable to process rostering file "%s".', $inputFileKey),
                 0,
                 $exception
             );
         } finally {
-            if (is_resource($inputStream)) {
-                fclose($inputStream);
-            }
-
-            if (is_resource($resultStream)) {
-                fclose($resultStream);
-            }
+            $this->closeResources([
+                $inputCsvStream,
+                $inputStream,
+                $resultStream,
+            ]);
         }
 
         $this->userCacheSynchronizer->synchronize();
@@ -470,6 +476,28 @@ class RosteringFileProcessor
         return $line;
     }
 
+    /**
+     * @param array<mixed> $streams
+     */
+    private function closeResources(array $streams): void
+    {
+        $closedResourceIds = [];
+
+        foreach ($streams as $stream) {
+            if (!is_resource($stream)) {
+                continue;
+            }
+
+            $resourceId = get_resource_id($stream);
+            if (isset($closedResourceIds[$resourceId])) {
+                continue;
+            }
+
+            fclose($stream);
+            $closedResourceIds[$resourceId] = true;
+        }
+    }
+
     private function markImportFailure(
         string $referenceId,
         Throwable $exception,
@@ -489,4 +517,5 @@ class RosteringFileProcessor
             );
         }
     }
+
 }

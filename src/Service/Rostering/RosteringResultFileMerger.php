@@ -17,7 +17,8 @@ class RosteringResultFileMerger
 
     public function __construct(
         private readonly FileStorageInterface $fileStorage,
-        private readonly RosteringFileKeyResolver $fileKeyResolver
+        private readonly RosteringFileKeyResolver $fileKeyResolver,
+        private readonly SeekableStreamFactory $seekableStreamFactory
     ) {
     }
 
@@ -42,34 +43,39 @@ class RosteringResultFileMerger
 
         $srStream = null;
         $externalReportingSystemStream = null;
+        $seekableSrStream = null;
+        $seekableExternalReportingSystemStream = null;
         $mergedStream = null;
 
         try {
             $srStream = $this->fileStorage->read($srOutputFileKey);
             $externalReportingSystemStream = $this->fileStorage->read($externalReportingSystemOutputFileKey);
+            $seekableSrStream = $this->createSeekableStreamOrFail($srStream, 'SR output file');
+            $seekableExternalReportingSystemStream = $this->createSeekableStreamOrFail(
+                $externalReportingSystemStream,
+                'external reporting system output file'
+            );
             $mergedStream = fopen('php://temp', 'rb+');
 
             if ($mergedStream === false) {
                 throw new RosteringStatusException('Unable to create temporary stream for merged rostering output file.');
             }
 
-            $this->mergeStreams($srStream, $externalReportingSystemStream, $mergedStream);
+            $this->mergeStreams($seekableSrStream, $seekableExternalReportingSystemStream, $mergedStream);
             rewind($mergedStream);
             $this->fileStorage->store($mergedStream, $mergedOutputFileKey);
 
             return $mergedOutputFileKey;
         } finally {
-            if (is_resource($srStream)) {
-                fclose($srStream);
-            }
-
-            if (is_resource($externalReportingSystemStream)) {
-                fclose($externalReportingSystemStream);
-            }
-
-            if (is_resource($mergedStream)) {
-                fclose($mergedStream);
-            }
+            $this->closeResources(
+                [
+                    $seekableSrStream,
+                    $seekableExternalReportingSystemStream,
+                    $srStream,
+                    $externalReportingSystemStream,
+                    $mergedStream,
+                ]
+            );
         }
     }
 
@@ -227,5 +233,36 @@ class RosteringResultFileMerger
         }
 
         return $line;
+    }
+
+    private function createSeekableStreamOrFail(mixed $stream, string $context): mixed
+    {
+        try {
+            return $this->seekableStreamFactory->create($stream, $context);
+        } catch (\RuntimeException $exception) {
+            throw new RosteringStatusException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * @param array<mixed> $streams
+     */
+    private function closeResources(array $streams): void
+    {
+        $closedResourceIds = [];
+
+        foreach ($streams as $stream) {
+            if (!is_resource($stream)) {
+                continue;
+            }
+
+            $resourceId = get_resource_id($stream);
+            if (isset($closedResourceIds[$resourceId])) {
+                continue;
+            }
+
+            fclose($stream);
+            $closedResourceIds[$resourceId] = true;
+        }
     }
 }
