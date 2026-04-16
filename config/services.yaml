@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
+    env(ROSTERING_S3_PUBLIC_ENDPOINT): ''
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED): 'false'
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL): ''
     env(RECREATE_QA_USERS): 'false'
