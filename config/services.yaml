@@ -146,6 +146,9 @@ services:
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
 
+    OAT\SimpleRoster\Service\Rostering\SignedUrlRewriterInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\NoopSignedUrlRewriter
+
     OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface:
         alias: OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient
 

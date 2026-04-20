@@ -18,7 +18,7 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
         private readonly string $prefix,
         private readonly string $signedUrlTtl,
         private readonly LoggerInterface $logger,
-        private readonly string $publicEndpoint = ''
+        private readonly SignedUrlRewriterInterface $signedUrlRewriter
     ) {
     }
 
@@ -44,7 +44,7 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
             );
             $request = $this->s3Client->createPresignedRequest($command, $this->signedUrlTtl);
 
-            return $this->withPublicEndpoint((string) $request->getUri());
+            return $this->signedUrlRewriter->rewrite((string) $request->getUri());
         } catch (Throwable $exception) {
             $this->logger->error(
                 sprintf('Unable to generate signed result file URL for file key "%s".', $fileKey),
@@ -58,37 +58,5 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
 
             return null;
         }
-    }
-
-    private function withPublicEndpoint(string $signedUrl): string
-    {
-        $publicEndpoint = trim($this->publicEndpoint);
-        if ($publicEndpoint === '') {
-            return $signedUrl;
-        }
-
-        $publicParts = parse_url($publicEndpoint);
-        $signedUrlParts = parse_url($signedUrl);
-        if (
-            $publicParts === false
-            || $signedUrlParts === false
-            || !isset($publicParts['scheme'], $publicParts['host'])
-        ) {
-            return $signedUrl;
-        }
-
-        $host = sprintf(
-            '%s://%s%s',
-            $publicParts['scheme'],
-            $publicParts['host'],
-            isset($publicParts['port']) ? sprintf(':%d', (int) $publicParts['port']) : ''
-        );
-
-        return sprintf(
-            '%s%s%s',
-            $host,
-            $signedUrlParts['path'] ?? '',
-            isset($signedUrlParts['query']) ? sprintf('?%s', $signedUrlParts['query']) : ''
-        );
     }
 }

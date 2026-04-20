@@ -12,6 +12,13 @@ services:
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider
 
+    OAT\SimpleRoster\Service\Rostering\SignedUrlRewriterInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\PublicEndpointSignedUrlRewriter
+
+    OAT\SimpleRoster\Service\Rostering\PublicEndpointSignedUrlRewriter:
+        arguments:
+            $publicEndpoint: '%env(string:ROSTERING_S3_PUBLIC_ENDPOINT)%'
+
     OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider:
         arguments:
             $fileStorage: '@OAT\SimpleRoster\Service\Rostering\FileStorageInterface'
@@ -20,5 +27,5 @@ services:
             $bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
             $prefix: '%env(FILESYSTEM_ROSTERING_FILES_ADAPTER_S3_PREFIX)%'
             $signedUrlTtl: '%env(ROSTERING_SIGNED_URL_TTL)%'
-            $publicEndpoint: '%env(string:ROSTERING_S3_PUBLIC_ENDPOINT)%'
+            $signedUrlRewriter: '@OAT\SimpleRoster\Service\Rostering\SignedUrlRewriterInterface'
             $logger: '@logger'
