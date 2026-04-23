@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use ZipArchive;
 
 class UploadFileActionTest extends AppWebTestCase
 {
@@ -157,6 +158,97 @@ class UploadFileActionTest extends AppWebTestCase
         );
     }
 
+    public function testItUploadsSingleCsvFromZipAndReturnsReferenceId(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            self::markTestSkipped('The zip extension is not installed.');
+        }
+
+        /** @var FileStorageInterface&MockObject $storage */
+        $storage = $this->createMock(FileStorageInterface::class);
+
+        $captured = ['content' => null, 'originalName' => null];
+
+        $storage
+            ->method('store')
+            ->willReturnCallback(static function (UploadedFile $file) use (&$captured): void {
+                $captured['content'] = file_get_contents($file->getPathname());
+                $captured['originalName'] = $file->getClientOriginalName();
+            });
+
+        self::getContainer()->set('test.file_storage', $storage);
+
+        $file = $this->createUploadedZip('test.zip', ['test.csv' => "a,b\nc,d"]);
+
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/upload',
+            [],
+            ['file' => $file]
+        );
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $this->kernelBrowser->getResponse()->getStatusCode(),
+            (string)$this->kernelBrowser->getResponse()->getContent()
+        );
+
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame('File uploaded', $decodedResponse['result']['message']);
+        self::assertMatchesRegularExpression('#^[0-9a-f-]{36}$#', $decodedResponse['result']['referenceId']);
+        self::assertSame("a,b\nc,d", $captured['content']);
+        self::assertSame('test.csv', $captured['originalName']);
+    }
+
+    public function testItReturns400WhenZipContainsSeveralFiles(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            self::markTestSkipped('The zip extension is not installed.');
+        }
+
+        /** @var FileStorageInterface&MockObject $storage */
+        $storage = $this->createMock(FileStorageInterface::class);
+
+        $storage
+            ->expects($this->never())
+            ->method('store');
+
+        self::getContainer()->set('test.file_storage', $storage);
+
+        $file = $this->createUploadedZip('test.zip', [
+            'one.csv' => 'a,b',
+            'two.csv' => 'c,d',
+        ]);
+
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/upload',
+            [],
+            ['file' => $file]
+        );
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode(),
+            (string)$this->kernelBrowser->getResponse()->getContent()
+        );
+
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame('ZIP archive must contain exactly one file.', $decodedResponse['error']['message']);
+    }
+
     private function createUploadedFile(string $originalName, string $content): UploadedFile
     {
         $tmpDir = sys_get_temp_dir();
@@ -164,5 +256,24 @@ class UploadFileActionTest extends AppWebTestCase
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, 'text/csv', null, true);
+    }
+
+    /**
+     * @param array<string, string> $files
+     */
+    private function createUploadedZip(string $originalName, array $files): UploadedFile
+    {
+        $tmpDir = sys_get_temp_dir();
+        $path = $tmpDir . '/' . uniqid('upload_', true) . '_' . $originalName;
+        $zip = new ZipArchive();
+        $zip->open($path, ZipArchive::CREATE);
+
+        foreach ($files as $name => $content) {
+            $zip->addFromString($name, $content);
+        }
+
+        $zip->close();
+
+        return new UploadedFile($path, $originalName, 'application/zip', null, true);
     }
 }

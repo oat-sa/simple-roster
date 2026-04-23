@@ -12,7 +12,7 @@ use Throwable;
 
 class UploadedFileValidator
 {
-    private const ALLOWED_FILE_EXTENSION = 'csv';
+    private const string ALLOWED_FILE_EXTENSION = 'csv';
 
     public function __construct(
         private readonly int $allowedUploadedFileMaxSize,
