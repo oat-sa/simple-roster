@@ -87,7 +87,7 @@ final class ZippedCsvExtractor
                     new UploadedFile($extractedPath, $originalName, null, null, true),
                     true
                 );
-            } catch (UploadedFileValidationException $exception) {
+            } catch (\Throwable $exception) {
                 @unlink($extractedPath);
 
                 throw $exception;
