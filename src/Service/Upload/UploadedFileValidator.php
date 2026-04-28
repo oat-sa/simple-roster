@@ -60,6 +60,11 @@ class UploadedFileValidator
         $this->validateCsvStructure($file);
     }
 
+    public function getAllowedUploadedFileMaxSize(): int
+    {
+        return $this->allowedUploadedFileMaxSize;
+    }
+
     private function validateCsvStructure(UploadedFile $file): void
     {
         try {
