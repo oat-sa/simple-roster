@@ -7,6 +7,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\Upload;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Upload\FileStorageInterface;
+use OAT\SimpleRoster\Service\Upload\Exception\UploadedFileValidationException;
 use OAT\SimpleRoster\Service\Upload\UploadedFileValidator;
 use OAT\SimpleRoster\Service\Upload\UploadFileService;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,9 @@ class UploadFileServiceTest extends TestCase
                 $this->identicalTo($file),
                 $this->matchesRegularExpression('#^[0-9a-f-]{36}/input\.csv$#'),
                 $this->callback(static function (array $metadata): bool {
-                    return isset($metadata['referenceId']) && is_string($metadata['referenceId']) && $metadata['referenceId'] !== '';
+                    return isset($metadata['referenceId'])
+                        && is_string($metadata['referenceId'])
+                        && $metadata['referenceId'] !== '';
                 })
             );
 
@@ -100,7 +103,9 @@ class UploadFileServiceTest extends TestCase
                 }),
                 $this->matchesRegularExpression('#^[0-9a-f-]{36}/input\.csv$#'),
                 $this->callback(static function (array $metadata): bool {
-                    return isset($metadata['referenceId']) && is_string($metadata['referenceId']) && $metadata['referenceId'] !== '';
+                    return isset($metadata['referenceId'])
+                        && is_string($metadata['referenceId'])
+                        && $metadata['referenceId'] !== '';
                 })
             );
 
@@ -149,6 +154,42 @@ class UploadFileServiceTest extends TestCase
             ->method('dispatch');
 
         $this->expectExceptionMessage('ZIP archive must contain exactly one file.');
+
+        $service->upload($file);
+    }
+
+    public function testItRejectsUnreadableZipArchive(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('The zip extension is not installed.');
+        }
+
+        $validator = new UploadedFileValidator(
+            1024,
+            100,
+            self::CSV_DELIMITER,
+            self::CSV_ENCLOSURE,
+            self::CSV_ESCAPE
+        );
+
+        $storage = $this->createMock(FileStorageInterface::class);
+        $resolver = new RosteringFileKeyResolver();
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $service = new UploadFileService($validator, $storage, $resolver, $bus);
+
+        $file = $this->createUploadedFile('broken.zip', 'not a zip archive');
+
+        $storage
+            ->expects($this->never())
+            ->method('store');
+
+        $bus
+            ->expects($this->never())
+            ->method('dispatch');
+
+        $this->expectException(UploadedFileValidationException::class);
+        $this->expectExceptionMessage('Unable to read uploaded ZIP file.');
 
         $service->upload($file);
     }

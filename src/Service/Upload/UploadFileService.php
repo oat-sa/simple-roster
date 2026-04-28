@@ -71,7 +71,7 @@ class UploadFileService
 
         $archive = new ZipArchive();
 
-        if (!$archive->open($file->getPathname())) {
+        if ($archive->open($file->getPathname()) !== true) {
             throw new UploadedFileValidationException('Unable to read uploaded ZIP file.');
         }
 
