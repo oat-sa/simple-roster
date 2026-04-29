@@ -87,10 +87,10 @@ final class ZippedCsvExtractor
                     new UploadedFile($extractedPath, $originalName, null, null, true),
                     true
                 );
-            } catch (\Throwable $exception) {
+            } catch (\Throwable $throwable) {
                 @unlink($extractedPath);
 
-                throw $exception;
+                throw $throwable;
             }
         } finally {
             $archive->close();
