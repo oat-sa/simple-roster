@@ -9,7 +9,6 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Csv\Writer;
 use InvalidArgumentException;
-use OAT\SimpleRoster\Entity\LineItem;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
@@ -81,6 +80,15 @@ class RosteringFileProcessor
         $totalRows = 0;
         $failedRows = 0;
         $importableRows = 0;
+
+        $this->logger->info(
+            sprintf("Starting rostering file processing for '%s'.", $referenceId),
+            [
+                'referenceId' => $referenceId,
+                'inputFileKey' => $inputFileKey,
+                'outputFileKey' => $outputFileKey,
+            ]
+        );
 
         $this->rosteringImportRepository->markProcessing($referenceId);
 
@@ -415,12 +423,11 @@ class RosteringFileProcessor
             return $this->lineItemIdsBySessionName[$sessionName];
         }
 
-        $lineItem = $this->lineItemRepository->findOneBy(['slug' => $sessionName]);
-        if (!$lineItem instanceof LineItem) {
+        $lineItemId = $this->lineItemRepository->findIdBySlug($sessionName);
+        if (null === $lineItemId) {
             return null;
         }
 
-        $lineItemId = (int)$lineItem->getId();
         $this->lineItemIdsBySessionName[$sessionName] = $lineItemId;
 
         return $lineItemId;
