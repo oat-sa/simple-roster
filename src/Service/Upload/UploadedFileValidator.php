@@ -90,12 +90,12 @@ class UploadedFileValidator
                     continue;
                 }
 
-                ++$recordCount;
-                if ($recordCount + 1 > $this->allowedUploadedFileMaxRecords) {
+                $currentRecordCount = $recordCount + 1;
+                if ($currentRecordCount > $this->allowedUploadedFileMaxRecords) {
                     throw new UploadedFileValidationException(
                         sprintf(
                             'File records count "%d" exceeds maximum allowed records of "%d".',
-                            $recordCount,
+                            $currentRecordCount,
                             $this->allowedUploadedFileMaxRecords
                         )
                     );
@@ -111,6 +111,8 @@ class UploadedFileValidator
                         )
                     );
                 }
+
+                ++$recordCount;
             }
         } catch (SyntaxError $exception) {
             throw new UploadedFileValidationException('Uploaded file cannot be parsed as valid CSV.', 0, $exception);
