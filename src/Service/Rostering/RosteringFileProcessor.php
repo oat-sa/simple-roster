@@ -81,6 +81,15 @@ class RosteringFileProcessor
         $failedRows = 0;
         $importableRows = 0;
 
+        $this->logger->info(
+            sprintf("Starting rostering file processing for '%s'.", $referenceId),
+            [
+                'referenceId' => $referenceId,
+                'inputFileKey' => $inputFileKey,
+                'outputFileKey' => $outputFileKey,
+            ]
+        );
+
         $this->rosteringImportRepository->markProcessing($referenceId);
 
         try {
