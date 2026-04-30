@@ -6,8 +6,7 @@
 
 ## 4.0.0 - 2026-04-09
 ### Added
-- Moved configuration files to a single oneup_flysystem.yaml and reverted changes based on different address and s3 prefixes depending on environment
-- Added file upload endpoint with validation, forwarding, and messenger notification
+- Added file upload endpoint with validation, forwarding, and messenger notification, endpoints are meant to reflect standard used on NextGen
 
 ### Fixed
 - Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
