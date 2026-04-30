@@ -13,7 +13,6 @@ services:
         volumes:
             - .:/var/www/html:cached
             - $COMPOSER_HOME:/root/.composer
-            - ../docker/volumes/rostering-files:/var/rostering-files
         working_dir: /var/www/html
 
     simple-roster-worker:
