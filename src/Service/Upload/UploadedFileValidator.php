@@ -12,7 +12,7 @@ use Throwable;
 
 class UploadedFileValidator
 {
-    private const ALLOWED_FILE_EXTENSION = 'csv';
+    private const string ALLOWED_FILE_EXTENSION = 'csv';
 
     public function __construct(
         private readonly int $allowedUploadedFileMaxSize,
@@ -58,6 +58,11 @@ class UploadedFileValidator
         }
 
         $this->validateCsvStructure($file);
+    }
+
+    public function getAllowedUploadedFileMaxSize(): int
+    {
+        return $this->allowedUploadedFileMaxSize;
     }
 
     private function validateCsvStructure(UploadedFile $file): void

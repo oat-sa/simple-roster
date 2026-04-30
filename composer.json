@@ -11,6 +11,7 @@
         "ext-openssl": "*",
         "ext-redis": "*",
         "ext-simplexml": "*",
+        "ext-zip": "*",
         "aws/aws-sdk-php": "^3.81",
         "blackfire/php-sdk": "^1.23",
         "doctrine/dbal": "^3.7",

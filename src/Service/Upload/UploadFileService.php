@@ -12,10 +12,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class UploadFileService
 {
-    private const UPLOAD_SUCCESS_MESSAGE = 'File uploaded';
+    private const string UPLOAD_SUCCESS_MESSAGE = 'File uploaded';
 
     public function __construct(
         private readonly UploadedFileValidator $validator,
+        private readonly ZippedCsvExtractor $zippedCsvExtractor,
         private readonly FileStorageInterface $fileStorage,
         private readonly RosteringFileKeyResolver $fileKeyResolver,
         private readonly MessageBusInterface $messageBus
@@ -27,22 +28,29 @@ class UploadFileService
      */
     public function upload(UploadedFile $file): array
     {
-        $this->validator->validate($file);
+        $preparedFile = $this->zippedCsvExtractor->prepare($file);
+        $fileToProcess = $preparedFile->file();
 
-        $referenceId = Uuid::uuid4()->toString();
-        $storageKey = $this->fileKeyResolver->inputFileKey($referenceId);
+        try {
+            $this->validator->validate($fileToProcess);
 
-        $this->fileStorage->store(
-            $file,
-            $storageKey,
-            ['referenceId' => $referenceId]
-        );
+            $referenceId = Uuid::uuid4()->toString();
+            $storageKey = $this->fileKeyResolver->inputFileKey($referenceId);
 
-        $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId));
+            $this->fileStorage->store(
+                $fileToProcess,
+                $storageKey,
+                ['referenceId' => $referenceId]
+            );
 
-        return [
-            'message' => self::UPLOAD_SUCCESS_MESSAGE,
-            'referenceId' => $referenceId,
-        ];
+            $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId));
+
+            return [
+                'message' => self::UPLOAD_SUCCESS_MESSAGE,
+                'referenceId' => $referenceId,
+            ];
+        } finally {
+            $preparedFile->cleanup();
+        }
     }
 }

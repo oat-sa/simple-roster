@@ -4,6 +4,7 @@
 ### Added
 - Moved configuration files to a single oneup_flysystem.yaml and reverted changes based on different address and s3 prefixes depending on environment
 - Added file upload endpoint with validation, forwarding, and messenger notification
+- Added possibility to upload zipped CSVs
 
 ### Fixed
 - Updated Docker configuration by adding the missing `msgpack` dependency and fixing Traefik labels
