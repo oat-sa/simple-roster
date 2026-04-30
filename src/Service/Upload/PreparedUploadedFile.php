@@ -10,9 +10,8 @@ final readonly class PreparedUploadedFile
 {
     public function __construct(
         private UploadedFile $file,
-        private bool         $isTemporary = false
-    )
-    {
+        private bool $isTemporary = false
+    ) {
     }
 
     public function file(): UploadedFile
