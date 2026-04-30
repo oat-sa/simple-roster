@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0 - 2026-04-30
+### Added
+- Added possibility to upload zipped CSVs
+
 ## 4.0.0 - 2026-04-09
 ### Added
 - Added file upload endpoint with validation, forwarding, and messenger notification, endpoints are meant to reflect standard used on NextGen

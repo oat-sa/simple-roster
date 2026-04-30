@@ -7,6 +7,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\Upload;
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use OAT\SimpleRoster\Service\Upload\FileStorageInterface;
+use OAT\SimpleRoster\Service\Upload\ZippedCsvExtractor;
 use OAT\SimpleRoster\Service\Upload\UploadedFileValidator;
 use OAT\SimpleRoster\Service\Upload\UploadFileService;
 use PHPUnit\Framework\TestCase;
@@ -33,8 +34,9 @@ class UploadFileServiceTest extends TestCase
         $storage = $this->createMock(FileStorageInterface::class);
         $resolver = new RosteringFileKeyResolver();
         $bus = $this->createMock(MessageBusInterface::class);
+        $extractor = new ZippedCsvExtractor($validator);
 
-        $service = new UploadFileService($validator, $storage, $resolver, $bus);
+        $service = new UploadFileService($validator, $extractor, $storage, $resolver, $bus);
 
         $file = $this->createUploadedFile('test.csv', 'a,b');
 
@@ -45,7 +47,9 @@ class UploadFileServiceTest extends TestCase
                 $this->identicalTo($file),
                 $this->matchesRegularExpression('#^[0-9a-f-]{36}/input\.csv$#'),
                 $this->callback(static function (array $metadata): bool {
-                    return isset($metadata['referenceId']) && is_string($metadata['referenceId']) && $metadata['referenceId'] !== '';
+                    return isset($metadata['referenceId'])
+                        && is_string($metadata['referenceId'])
+                        && $metadata['referenceId'] !== '';
                 })
             );
 
