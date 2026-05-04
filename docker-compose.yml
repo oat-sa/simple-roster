@@ -48,7 +48,6 @@ services:
             - "traefik.docker.network=oat-docker"
             - "traefik.port=4566"
 
-
     simple-roster-blackfire:
         container_name: simple-roster-blackfire
         image: blackfire/blackfire
