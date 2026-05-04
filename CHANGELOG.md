@@ -3,6 +3,7 @@
 ## 4.1.0 - 2026-04-30
 ### Added
 - Added possibility to upload zipped CSVs
+- Docker compose updated
 
 ## 4.0.0 - 2026-04-09
 ### Added

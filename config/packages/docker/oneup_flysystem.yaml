@@ -11,7 +11,7 @@ oneup_flysystem:
                 prefix: '%env(FILESYSTEM_USER_FILES_ADAPTER_S3_PREFIX)%'
         rostering_files_adapter:
             local:
-                location: '/var/rostering-files'
+                location: '%kernel.project_dir%/var/rostering-files'
     filesystems:
         user_files_local_filesystem:
             adapter: user_files_adapter_local
