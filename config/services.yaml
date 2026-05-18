@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
+    env(ROSTERING_CLOUDWATCH_NAMESPACE): ''
+    env(ROSTERING_CLOUDWATCH_LOG_GROUP): ''
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED): 'false'
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL): ''
     env(RECREATE_QA_USERS): 'false'
@@ -145,6 +147,13 @@ services:
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
 
+    OAT\SimpleRoster\Command\Rostering\RosteringImportCloudWatchExportCommand:
+        arguments:
+            $defaultNamespace: '%env(string:ROSTERING_CLOUDWATCH_NAMESPACE)%'
+            $projectName: 'sr'
+            $environmentName: '%kernel.environment%'
+            $logGroupName: '%env(string:ROSTERING_CLOUDWATCH_LOG_GROUP)%'
+
     OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface:
         alias: OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient
 
@@ -243,6 +252,20 @@ services:
     Aws\S3\S3Client:
         arguments:
             - version: '%app.aws.version%'
+              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
+              use_path_style_endpoint: '%app.aws.path_style%'
+
+    Aws\CloudWatch\CloudWatchClient:
+        arguments:
+            - version: '2010-08-01'
+              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
+              use_path_style_endpoint: '%app.aws.path_style%'
+
+    Aws\CloudWatchLogs\CloudWatchLogsClient:
+        arguments:
+            - version: '2014-03-28'
               region: '%app.aws.region%'
               endpoint: '%app.aws.endpoint%'
               use_path_style_endpoint: '%app.aws.path_style%'
