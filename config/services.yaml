@@ -153,6 +153,9 @@ services:
             $projectName: 'sr'
             $environmentName: '%kernel.environment%'
             $logGroupName: '%env(string:ROSTERING_CLOUDWATCH_LOG_GROUP)%'
+            $uploadedFileCsvDelimiter: '%app.upload.csv.delimiter%'
+            $uploadedFileCsvEnclosure: '%app.upload.csv.enclosure%'
+            $uploadedFileCsvEscape: '%app.upload.csv.escape%'
 
     OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface:
         alias: OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient
