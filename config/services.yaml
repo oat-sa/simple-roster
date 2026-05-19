@@ -264,14 +264,12 @@ services:
             - version: '2010-08-01'
               region: '%app.aws.region%'
               endpoint: '%app.aws.endpoint%'
-              use_path_style_endpoint: '%app.aws.path_style%'
 
     Aws\CloudWatchLogs\CloudWatchLogsClient:
         arguments:
             - version: '2014-03-28'
               region: '%app.aws.region%'
               endpoint: '%app.aws.endpoint%'
-              use_path_style_endpoint: '%app.aws.path_style%'
 
     OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext:
         arguments:

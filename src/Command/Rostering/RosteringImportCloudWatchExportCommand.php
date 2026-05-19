@@ -27,6 +27,9 @@ class RosteringImportCloudWatchExportCommand extends Command
 {
     public const NAME = 'roster:rostering:metrics:export';
     private const DEFAULT_LOG_STREAM_PREFIX = 'rostering-import';
+    private const MAX_LOG_EVENTS_PER_REQUEST = 10000;
+    private const MAX_LOG_BATCH_BYTES = 921600;
+    private const LOG_EVENT_OVERHEAD_BYTES = 26;
 
     private const OPTION_WINDOW_MINUTES = 'window-minutes';
     private const OPTION_NAMESPACE = 'namespace';
@@ -114,6 +117,8 @@ class RosteringImportCloudWatchExportCommand extends Command
 
             return self::SUCCESS;
         }
+
+        $this->assertLogGroupConfigured($logEvents);
 
         try {
             if ($metricData !== []) {
@@ -291,9 +296,7 @@ class RosteringImportCloudWatchExportCommand extends Command
             return 0;
         }
 
-        if (trim($this->logGroupName) === '') {
-            throw new RuntimeException('CloudWatch log group name is required.');
-        }
+        $this->assertLogGroupConfigured($logEvents);
 
         $logStreamName = $this->createLogStreamName($executedAt);
 
@@ -310,15 +313,72 @@ class RosteringImportCloudWatchExportCommand extends Command
             }
         }
 
-        $this->cloudWatchLogsClient->putLogEvents(
-            [
+        $nextSequenceToken = null;
+        foreach ($this->splitLogEventsIntoBatches($logEvents) as $logEventsBatch) {
+            $request = [
                 'logGroupName' => $this->logGroupName,
                 'logStreamName' => $logStreamName,
-                'logEvents' => $logEvents,
-            ]
-        );
+                'logEvents' => $logEventsBatch,
+            ];
+            if ($nextSequenceToken !== null) {
+                $request['sequenceToken'] = $nextSequenceToken;
+            }
+
+            $result = $this->cloudWatchLogsClient->putLogEvents($request);
+            if ($result->hasKey('nextSequenceToken')) {
+                $nextSequenceToken = $result->get('nextSequenceToken');
+            }
+        }
 
         return count($logEvents);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $logEvents
+     */
+    private function assertLogGroupConfigured(array $logEvents): void
+    {
+        if ($logEvents !== [] && trim($this->logGroupName) === '') {
+            throw new RuntimeException('CloudWatch log group name is required.');
+        }
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $logEvents
+     *
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    private function splitLogEventsIntoBatches(array $logEvents): array
+    {
+        $batches = [];
+        $currentBatch = [];
+        $currentBatchBytes = 0;
+
+        foreach ($logEvents as $logEvent) {
+            $message = (string) ($logEvent['message'] ?? '');
+            $eventBytes = self::LOG_EVENT_OVERHEAD_BYTES + strlen($message);
+            if ($eventBytes > self::MAX_LOG_BATCH_BYTES) {
+                throw new RuntimeException('Single CloudWatch log event exceeds supported batch size.');
+            }
+
+            $wouldExceedBatchLimit = count($currentBatch) >= self::MAX_LOG_EVENTS_PER_REQUEST
+                || ($currentBatchBytes + $eventBytes) > self::MAX_LOG_BATCH_BYTES;
+
+            if ($currentBatch !== [] && $wouldExceedBatchLimit) {
+                $batches[] = $currentBatch;
+                $currentBatch = [];
+                $currentBatchBytes = 0;
+            }
+
+            $currentBatch[] = $logEvent;
+            $currentBatchBytes += $eventBytes;
+        }
+
+        if ($currentBatch !== []) {
+            $batches[] = $currentBatch;
+        }
+
+        return $batches;
     }
 
     private function createLogStreamName(DateTimeImmutable $executedAt): string
