@@ -7,6 +7,7 @@ namespace OAT\SimpleRoster\Repository;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\RosteringImport;
 
@@ -87,6 +88,27 @@ class RosteringImportRepository extends AbstractRepository
         $this->save($import);
     }
 
+    /**
+     * @return RosteringImport[]
+     */
+    public function findInWindow(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $queryBuilder = $this->createQueryBuilder('ri');
+        $expr = $queryBuilder->expr();
+
+        $queryBuilder
+            ->where(
+                $expr->orX(
+                    $this->createDateRangeExpression($expr, 'ri.startedAt'),
+                    $this->createDateRangeExpression($expr, 'ri.finishedAt')
+                )
+            )
+            ->setParameter('from', $from)
+            ->setParameter('to', $to);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     private function getNowUtc(): DateTimeInterface
     {
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
@@ -107,5 +129,14 @@ class RosteringImportRepository extends AbstractRepository
         $entityManager = $this->getEntityManager();
         $entityManager->persist($import);
         $entityManager->flush();
+    }
+
+    private function createDateRangeExpression(Expr $expr, string $fieldName)
+    {
+        return $expr->andX(
+            $expr->isNotNull($fieldName),
+            $expr->gte($fieldName, ':from'),
+            $expr->lt($fieldName, ':to')
+        );
     }
 }

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- [LSI-8055](https://oat-sa.atlassian.net/browse/LSI-8055) Added CloudWatch rostering import metrics/logs export command.
+
 ## 4.1.0 - 2026-04-30
 ### Added
 - Added possibility to upload zipped CSVs
