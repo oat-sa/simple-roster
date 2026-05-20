@@ -95,17 +95,6 @@ class UploadedFileValidator
                     continue;
                 }
 
-                $currentRecordCount = $recordCount + 1;
-                if ($currentRecordCount > $this->allowedUploadedFileMaxRecords) {
-                    throw new UploadedFileValidationException(
-                        sprintf(
-                            'File records count "%d" exceeds maximum allowed records of "%d".',
-                            $currentRecordCount,
-                            $this->allowedUploadedFileMaxRecords
-                        )
-                    );
-                }
-
                 if ($columnsCount !== $expectedColumns) {
                     throw new UploadedFileValidationException(
                         sprintf(
@@ -125,6 +114,16 @@ class UploadedFileValidator
 
         if ($expectedColumns === null) {
             throw new UploadedFileValidationException('Uploaded CSV file is empty.');
+        }
+
+        if ($recordCount > $this->allowedUploadedFileMaxRecords) {
+            throw new UploadedFileValidationException(
+                sprintf(
+                    'File records count "%d" exceeds maximum allowed records of "%d".',
+                    $recordCount,
+                    $this->allowedUploadedFileMaxRecords
+                )
+            );
         }
     }
 

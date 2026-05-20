@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.1 - 2026-05-20
+- [LSI-7253](https://oat-sa.atlassian.net/browse/LSI-7253) Fixed upload validator row-count overflow messaging to report the actual exceeded record count.
+- [LSI-8055](https://oat-sa.atlassian.net/browse/LSI-8055) Added CloudWatch rostering import metrics/logs export command.
+
 ## 4.1.0 - 2026-04-30
 ### Added
 - Added possibility to upload zipped CSVs
