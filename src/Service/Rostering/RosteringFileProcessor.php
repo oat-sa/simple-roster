@@ -243,7 +243,7 @@ class RosteringFileProcessor
             $resultRow[self::RESULT_ERROR_CODE] = self::ERROR_CODE_INTERNAL;
             $resultRow[self::RESULT_ERROR_MESSAGE] = self::ERROR_MESSAGE_INTERNAL;
 
-            $this->logger->warning(
+            $this->logger->error(
                 'Unexpected error while importing rostering row.',
                 ['exception' => $exception]
             );
