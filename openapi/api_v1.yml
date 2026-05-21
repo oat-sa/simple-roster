@@ -995,7 +995,7 @@ components:
                 file:
                     type: string
                     format: binary
-                    description: The file to be uploaded.
+                    description: The CSV file to be uploaded, or a ZIP archive containing exactly one CSV file.
         Error:
             type: object
             properties:

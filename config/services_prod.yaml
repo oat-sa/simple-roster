@@ -4,6 +4,16 @@ services:
             - version: '%app.aws.version%'
               region: '%app.aws.region%'
 
+    Aws\CloudWatch\CloudWatchClient:
+        arguments:
+            - version: '2010-08-01'
+              region: '%app.aws.region%'
+
+    Aws\CloudWatchLogs\CloudWatchLogsClient:
+        arguments:
+            - version: '2014-03-28'
+              region: '%app.aws.region%'
+
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider
 

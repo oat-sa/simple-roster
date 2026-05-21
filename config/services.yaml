@@ -6,6 +6,8 @@
 parameters:
     env(ROSTERING_SIGNED_URL_TTL): '+15 minutes'
     env(ROSTERING_S3_PUBLIC_ENDPOINT): ''
+    env(ROSTERING_CLOUDWATCH_NAMESPACE): ''
+    env(ROSTERING_CLOUDWATCH_LOG_GROUP): ''
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED): 'false'
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL): ''
     env(RECREATE_QA_USERS): 'false'
@@ -149,6 +151,16 @@ services:
     OAT\SimpleRoster\Service\Rostering\SignedUrlRewriterInterface:
         alias: OAT\SimpleRoster\Service\Rostering\NoopSignedUrlRewriter
 
+    OAT\SimpleRoster\Command\Rostering\RosteringImportCloudWatchExportCommand:
+        arguments:
+            $defaultNamespace: '%env(string:ROSTERING_CLOUDWATCH_NAMESPACE)%'
+            $projectName: 'sr'
+            $environmentName: '%kernel.environment%'
+            $logGroupName: '%env(string:ROSTERING_CLOUDWATCH_LOG_GROUP)%'
+            $uploadedFileCsvDelimiter: '%app.upload.csv.delimiter%'
+            $uploadedFileCsvEnclosure: '%app.upload.csv.enclosure%'
+            $uploadedFileCsvEscape: '%app.upload.csv.escape%'
+
     OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusClientInterface:
         alias: OAT\SimpleRoster\Service\Rostering\ExternalReportingStatusHttpClient
 
@@ -250,6 +262,18 @@ services:
               region: '%app.aws.region%'
               endpoint: '%app.aws.endpoint%'
               use_path_style_endpoint: '%app.aws.path_style%'
+
+    Aws\CloudWatch\CloudWatchClient:
+        arguments:
+            - version: '2010-08-01'
+              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
+
+    Aws\CloudWatchLogs\CloudWatchLogsClient:
+        arguments:
+            - version: '2014-03-28'
+              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
 
     OAT\SimpleRoster\Service\Bulk\CreateUserServiceContext:
         arguments:
