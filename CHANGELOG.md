@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Changed
+- [LSI-8076](https://oat-sa.atlassian.net/browse/LSI-8076) Allowed whitespace in rostering organization identifiers and aligned integration test expectations.
+
 ## 4.1.2 - 2026-05-21
 - [LSI-8062](https://oat-sa.atlassian.net/browse/LSI-8055) Changed log severity
 
