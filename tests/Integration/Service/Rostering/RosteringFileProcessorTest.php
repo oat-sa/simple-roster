@@ -178,8 +178,8 @@ CSV,
         self::assertSame('400', $rowsByMarker['bad_username']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['bad_username']['errorCode']);
 
-        self::assertSame('400', $rowsByMarker['bad_org']['status']);
-        self::assertSame('validation.fieldError', $rowsByMarker['bad_org']['errorCode']);
+        self::assertSame('processed', $rowsByMarker['bad_org']['status']);
+        self::assertSame('', $rowsByMarker['bad_org']['errorCode']);
 
         self::assertSame('400', $rowsByMarker['invalid_bool']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['invalid_bool']['errorCode']);

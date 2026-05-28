@@ -46,12 +46,6 @@ final class RosteringUserRowValidator
 
     public function validateOrganizationId(string $organizationId): void
     {
-        if (preg_match('/\s/', $organizationId) === 1) {
-            throw new RosteringValidationException(
-                sprintf('Field "%s" cannot contain whitespaces.', self::FIELD_USER_ORGANIZATION_ID)
-            );
-        }
-
         if (strlen($organizationId) > self::MAX_USER_ORGANIZATION_ID_LENGTH) {
             throw new RosteringValidationException(
                 sprintf(
