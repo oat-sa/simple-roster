@@ -19,7 +19,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
             [
                 RosteringUserRowValidator::FIELD_USER_USERNAME => 'user_1',
                 RosteringUserRowValidator::FIELD_USER_PASSWORD => 'Pass123',
-                RosteringUserRowValidator::FIELD_USER_ORGANIZATION_ID => 'SCHOOL_1',
+                RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID => 'COLLEGE_1',
                 RosteringUserRowValidator::FIELD_SESSION_NAME => 'session-1',
                 RosteringUserRowValidator::FIELD_USER_LANGUAGE => 'en',
                 RosteringUserRowValidator::FIELD_USER_ACTIVE => 'true',
@@ -28,7 +28,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
 
         $this->assertSame('user_1', $entryDto->getUserUsername());
         $this->assertSame('Pass123', $entryDto->getUserPassword());
-        $this->assertSame('SCHOOL_1', $entryDto->getUserOrganizationId());
+        $this->assertSame('COLLEGE_1', $entryDto->getParentOrganizationId());
         $this->assertSame('session-1', $entryDto->getSessionName());
         $this->assertSame('en', $entryDto->getUserLanguage());
         $this->assertTrue($entryDto->getUserActive());
@@ -60,7 +60,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
 
         $subject->fromArray(
             [
-                RosteringUserRowValidator::FIELD_USER_ORGANIZATION_ID => 'SCHOOL_1',
+                RosteringUserRowValidator::FIELD_USER_PASSWORD => 'Pass123',
             ]
         );
     }

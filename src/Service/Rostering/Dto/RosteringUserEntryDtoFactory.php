@@ -19,14 +19,13 @@ final class RosteringUserEntryDtoFactory
     {
         $username = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_USERNAME);
         $password = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_PASSWORD);
-        $organizationId = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_ORGANIZATION_ID);
+        $parentOrganizationId = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID);
         $sessionName = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_SESSION_NAME);
         $userLanguage = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_LANGUAGE);
         $userActiveRaw = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_ACTIVE);
         if (
             null === $username
             && null === $password
-            && null === $organizationId
             && null === $sessionName
             && null === $userLanguage
             && null === $userActiveRaw
@@ -36,8 +35,8 @@ final class RosteringUserEntryDtoFactory
 
         $this->rowValidator->validateUsername($username ?? '');
 
-        if (null !== $organizationId) {
-            $this->rowValidator->validateOrganizationId($organizationId);
+        if (null !== $parentOrganizationId) {
+            $this->rowValidator->validateParentOrganizationId($parentOrganizationId);
         }
 
         if (null !== $sessionName) {
@@ -49,7 +48,7 @@ final class RosteringUserEntryDtoFactory
         return new RosteringUserEntryDto(
             $username,
             $password,
-            $organizationId,
+            $parentOrganizationId,
             $sessionName,
             $userLanguage,
             $isUserActive
