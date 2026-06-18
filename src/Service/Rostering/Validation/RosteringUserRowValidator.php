@@ -10,13 +10,13 @@ final class RosteringUserRowValidator
 {
     public const FIELD_USER_USERNAME = 'user_username';
     public const FIELD_USER_PASSWORD = 'user_password';
-    public const FIELD_USER_ORGANIZATION_ID = 'user_organizationId';
+    public const FIELD_HIERARCHY_PARENT_ORGANIZATION_ID = 'hierarchy_parentOrganizationId';
     public const FIELD_SESSION_NAME = 'session_name';
     public const FIELD_USER_ACTIVE = 'user_active';
     public const FIELD_USER_LANGUAGE = 'user_language';
 
     private const MAX_USER_USERNAME_LENGTH = 255;
-    private const MAX_USER_ORGANIZATION_ID_LENGTH = 255;
+    private const MAX_PARENT_ORGANIZATION_ID_LENGTH = 255;
     private const MAX_SESSION_NAME_LENGTH = 255;
 
     public function validateUsername(string $username): void
@@ -44,14 +44,14 @@ final class RosteringUserRowValidator
         }
     }
 
-    public function validateOrganizationId(string $organizationId): void
+    public function validateParentOrganizationId(string $parentOrganizationId): void
     {
-        if (strlen($organizationId) > self::MAX_USER_ORGANIZATION_ID_LENGTH) {
+        if (strlen($parentOrganizationId) > self::MAX_PARENT_ORGANIZATION_ID_LENGTH) {
             throw new RosteringValidationException(
                 sprintf(
                     'Field "%s" exceeds max length (%d).',
-                    self::FIELD_USER_ORGANIZATION_ID,
-                    self::MAX_USER_ORGANIZATION_ID_LENGTH
+                    self::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID,
+                    self::MAX_PARENT_ORGANIZATION_ID_LENGTH
                 )
             );
         }

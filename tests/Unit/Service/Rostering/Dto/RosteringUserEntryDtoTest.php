@@ -14,7 +14,7 @@ class RosteringUserEntryDtoTest extends TestCase
         $entryDto = new RosteringUserEntryDto(
             'user_1',
             'Pass123',
-            'SCHOOL_1',
+            'COLLEGE_1',
             'session-1',
             'en',
             true
@@ -22,7 +22,7 @@ class RosteringUserEntryDtoTest extends TestCase
 
         $this->assertSame('user_1', $entryDto->getUserUsername());
         $this->assertSame('Pass123', $entryDto->getUserPassword());
-        $this->assertSame('SCHOOL_1', $entryDto->getUserOrganizationId());
+        $this->assertSame('COLLEGE_1', $entryDto->getParentOrganizationId());
         $this->assertSame('session-1', $entryDto->getSessionName());
         $this->assertSame('en', $entryDto->getUserLanguage());
         $this->assertTrue($entryDto->getUserActive());
