@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Fixed
+- [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
+
 ## 4.2.0 - 2026-05-28
 ### Added
 - [LSI-8076](https://oat-sa.atlassian.net/browse/LSI-8076) Allowed whitespace in rostering organization identifiers and aligned integration test expectations.
