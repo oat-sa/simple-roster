@@ -53,6 +53,12 @@ Then install application dependencies:
 docker container exec -it simple-roster-phpfpm composer install
 ```
 
+Setup the DB
+```shell
+docker container exec simple-roster-phpfpm bin/console doctrine:database:create
+docker container exec simple-roster-phpfpm bin/console doctrine:schema:update --force
+```
+
 The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
 In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
 
