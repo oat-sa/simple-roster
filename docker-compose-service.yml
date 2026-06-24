@@ -17,3 +17,5 @@ services:
             - "traefik.http.routers.simple-roster-nginx.rule=Host(`${SR_HOST:-simple-roster.docker.localhost}`)"
             - "traefik.docker.network=oat-docker"
             - "traefik.port=80"
+        ports:
+            - "80:80"
