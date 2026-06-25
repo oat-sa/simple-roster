@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.3.0 - 2026-06-25
 ### Fixed
 - [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
 
