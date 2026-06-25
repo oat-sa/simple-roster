@@ -262,7 +262,7 @@ class RosteringFileProcessor
         }
 
         $password = $entryDto->getUserPassword() ?? '';
-        $organizationId = $entryDto->getUserOrganizationId() ?? '';
+        $parentOrganizationId = $entryDto->getParentOrganizationId() ?? '';
         $sessionName = $entryDto->getSessionName() ?? '';
 
         $isUserActive = $entryDto->getUserActive();
@@ -281,7 +281,7 @@ class RosteringFileProcessor
         }
 
         $hasPassword = '' !== $password;
-        $hasOrganizationId = '' !== $organizationId;
+        $hasParentOrganizationId = '' !== $parentOrganizationId;
         $hasSessionName = '' !== $sessionName;
 
         if (null !== $userId) {
@@ -293,8 +293,8 @@ class RosteringFileProcessor
                 $fieldsToUpdate['password'] = $this->hashUserPassword($username, $password);
             }
 
-            if ($hasOrganizationId) {
-                $fieldsToUpdate['groupId'] = $organizationId;
+            if ($hasParentOrganizationId) {
+                $fieldsToUpdate['groupId'] = $parentOrganizationId;
             }
 
             $this->userRepository->updateForRostering($username, $fieldsToUpdate);
@@ -318,9 +318,12 @@ class RosteringFileProcessor
             );
         }
 
-        if (!$hasOrganizationId) {
+        if (!$hasParentOrganizationId) {
             throw new RosteringValidationException(
-                sprintf('Field "%s" is required for new user.', RosteringUserRowValidator::FIELD_USER_ORGANIZATION_ID)
+                sprintf(
+                    'Field "%s" is required for new user.',
+                    RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
+                )
             );
         }
 
@@ -330,7 +333,7 @@ class RosteringFileProcessor
             );
         }
 
-        $createdUserId = $this->createUser($username, $password, $organizationId);
+        $createdUserId = $this->createUser($username, $password, $parentOrganizationId);
         $this->replaceUserAssignment($createdUserId, $sessionName);
         $this->userCacheSynchronizer->markForWarmup($username);
     }

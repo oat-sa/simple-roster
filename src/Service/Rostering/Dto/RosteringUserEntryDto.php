@@ -9,7 +9,7 @@ final class RosteringUserEntryDto
     public function __construct(
         private readonly ?string $userUsername,
         private readonly ?string $userPassword,
-        private readonly ?string $userOrganizationId,
+        private readonly ?string $parentOrganizationId,
         private readonly ?string $sessionName,
         private readonly ?string $userLanguage,
         private readonly ?bool $userActive
@@ -20,7 +20,7 @@ final class RosteringUserEntryDto
     {
         return $this->userUsername !== null
             || $this->userPassword !== null
-            || $this->userOrganizationId !== null
+            || $this->parentOrganizationId !== null
             || $this->sessionName !== null
             || $this->userLanguage !== null
             || $this->userActive !== null;
@@ -36,9 +36,9 @@ final class RosteringUserEntryDto
         return $this->userPassword;
     }
 
-    public function getUserOrganizationId(): ?string
+    public function getParentOrganizationId(): ?string
     {
-        return $this->userOrganizationId;
+        return $this->parentOrganizationId;
     }
 
     public function getSessionName(): ?string
