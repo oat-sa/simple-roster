@@ -55,7 +55,6 @@ docker container exec -it simple-roster-phpfpm composer install
 
 Setup the DB
 ```shell
-docker container exec simple-roster-phpfpm bin/console doctrine:database:create
 docker container exec simple-roster-phpfpm bin/console doctrine:schema:update --force
 ```
 
@@ -118,7 +117,7 @@ and execute the command again.
 Make sure tests are in passing state and coverage report is generated:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEBUG_MODE=coverage bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --log-junit=var/log/phpunit/coverage/junit.xml"
+docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-xml=var/log/phpunit/coverage/coverage-xml --log-junit=var/log/phpunit/coverage/junit.xml"
 ```
 
 Then run infection and provide the coverage xml files as parameters:
