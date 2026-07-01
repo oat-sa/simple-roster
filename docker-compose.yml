@@ -73,23 +73,9 @@ services:
         volumes:
             - simple-roster-postgres-volume:/var/lib/postgres/data:cached
 
-    simple-roster-blackfire:
-        container_name: simple-roster-blackfire
-        image: blackfire/blackfire
-        networks:
-            - simple-roster
-        ports:
-            - 8707
-        environment:
-            - BLACKFIRE_SERVER_ID
-            - BLACKFIRE_SERVER_TOKEN
-
     simple-roster-localstack:
         container_name: simple-roster-localstack
-        image: localstack/localstack
-        ports:
-            #- "4510-4559:4510-4559"
-            - "4566:4566"
+        image: localstack/localstack:3.0.2
         environment:
             - SERVICES=s3,sqs
             - DEBUG=1
@@ -97,7 +83,7 @@ services:
             - simple-roster
             - oat-docker
         volumes:
-            - "./localstack:/tmp/localstack"
+            - "./localstack:/var/lib/localstack"
             - "./localstack/init:/etc/localstack/init/ready.d"
             - "/var/run/docker.sock:/var/run/docker.sock"
         labels:
