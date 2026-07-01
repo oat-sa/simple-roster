@@ -18,4 +18,4 @@ services:
             - "traefik.docker.network=oat-docker"
             - "traefik.port=80"
         ports:
-            - "80:80"
+            - "${SR_PORT:-8015}:80"

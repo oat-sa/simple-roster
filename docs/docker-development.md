@@ -58,11 +58,7 @@ Setup the DB
 docker container exec simple-roster-phpfpm bin/console doctrine:schema:update --force
 ```
 
-The following section is optional and is applicable only if you are using [OAT Docker Stack](https://github.com/oat-sa/docker-stack).
-In order to install it please follow the installation steps in it's [README](https://github.com/oat-sa/docker-stack#installation) file.
-
-> The application is *NOT* exposed on any port by default. It be automatically available at `https://simple-roster.docker.localhost` DNS host.
-> If your system cannot resolve the domain, you might want to check [this article](https://github.com/oat-sa/docker-stack#how-to-redirect-dockerlocalhost-dns-queries-to-localhost) about how to redirect `.docker.localhost` DNS queries to your localhost.
+> By default, the application exposes port 8015. You can change this using the SR_PORT variable in .env.local. If you use Traefik, the application will be automatically available at http://simple-roster.docker.localhost:<SR_PORT>; otherwise, it will be available at http://localhost:<SR_PORT>.
 
 ## Testing
 
@@ -123,7 +119,7 @@ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && XDEB
 Then run infection and provide the coverage xml files as parameters:
 
 ```shell script
-$ docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc) --skip-initial-tests --coverage=var/log/phpunit/coverage"
+docker container exec -it simple-roster-phpfpm bash -c "source .env.test && vendor/bin/infection --threads=$(nproc) --skip-initial-tests --coverage=var/log/phpunit/coverage"
 ```
 
 **Tip 1:** If you want to run infection against individual files, you can use the [--filter](https://infection.github.io/guide/command-line-options.html#filter) option.
