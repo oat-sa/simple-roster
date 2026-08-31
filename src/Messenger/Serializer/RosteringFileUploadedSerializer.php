@@ -24,8 +24,8 @@ class RosteringFileUploadedSerializer implements SerializerInterface
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        $referenceId = $this->extractReferenceId($encodedEnvelope);
-        $normalizedBody = $this->encodeReferenceId($referenceId);
+        $payload = $this->extractPayload($encodedEnvelope);
+        $normalizedBody = $this->encodePayload($payload);
         $headers = $this->normalizeHeaders($encodedEnvelope['headers'] ?? []);
 
         $headers['type'] = RosteringFileUploadedMessage::class;
@@ -45,7 +45,11 @@ class RosteringFileUploadedSerializer implements SerializerInterface
             throw new RuntimeException('Unsupported message type for RosteringFileUploadedSerializer.');
         }
 
-        $body = $this->encodeReferenceId($message->referenceId, 'Unable to encode rostering uploaded message: %s');
+        $payload = ['referenceId' => $message->referenceId];
+        if (null !== $message->uploadedAt) {
+            $payload['uploadedAt'] = $message->uploadedAt;
+        }
+        $body = $this->encodePayload($payload, 'Unable to encode rostering uploaded message: %s');
 
         $encoded = $this->transportSerializer->encode($envelope->withoutAll(ErrorDetailsStamp::class));
         $encoded['body'] = $body;
@@ -56,7 +60,7 @@ class RosteringFileUploadedSerializer implements SerializerInterface
         ];
     }
 
-    private function extractReferenceId(array $encodedEnvelope): string
+    private function extractPayload(array $encodedEnvelope): array
     {
         $body = (string) ($encodedEnvelope['body'] ?? '');
         $payload = $this->decodeJsonObject($body);
@@ -74,7 +78,12 @@ class RosteringFileUploadedSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Reference ID missing.');
         }
 
-        return $referenceId;
+        return [
+            'referenceId' => $referenceId,
+            'uploadedAt' => isset($payload['uploadedAt']) && is_string($payload['uploadedAt'])
+                ? $payload['uploadedAt']
+                : null,
+        ];
     }
 
     /**
@@ -99,10 +108,10 @@ class RosteringFileUploadedSerializer implements SerializerInterface
         return $decoded;
     }
 
-    private function encodeReferenceId(string $referenceId, string $errorTemplate = 'json_encode error: %s'): string
+    private function encodePayload(array $payload, string $errorTemplate = 'json_encode error: %s'): string
     {
         try {
-            return json_encode(['referenceId' => $referenceId], JSON_THROW_ON_ERROR);
+            return json_encode($payload, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
             throw new RuntimeException(sprintf($errorTemplate, $exception->getMessage()), 0, $exception);
         }

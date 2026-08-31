@@ -64,7 +64,7 @@ class RosteringFileProcessor
     ) {
     }
 
-    public function process(string $referenceId): void
+    public function process(string $referenceId, ?string $uploadedAt = null): void
     {
         $this->lineItemIdsBySessionName = [];
         $this->userCacheSynchronizer->reset();
@@ -82,7 +82,7 @@ class RosteringFileProcessor
         $failedRows = 0;
         $importableRows = 0;
 
-        $this->rosteringImportRepository->markProcessing($referenceId);
+        $this->rosteringImportRepository->markProcessing($referenceId, $uploadedAt);
 
         try {
             $inputStream = $this->fileStorage->read($inputFileKey);

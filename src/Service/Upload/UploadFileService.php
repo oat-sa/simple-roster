@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Service\Upload;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
+use DateTimeImmutable;
+use DateTimeZone;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -42,7 +44,8 @@ class UploadFileService
                 $storageKey,
                 ['referenceId' => $referenceId]
             );
-            $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId));
+            $uploadedAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId, $uploadedAt->format(DATE_ATOM)));
 
             return [
                 'message' => self::UPLOAD_SUCCESS_MESSAGE,

@@ -59,6 +59,8 @@ class UploadFileServiceTest extends TestCase
             ->willReturnCallback(
                 function (object $message): Envelope {
                     self::assertInstanceOf(RosteringFileUploadedMessage::class, $message);
+                    self::assertNotNull($message->uploadedAt);
+                    self::assertNotFalse(\DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $message->uploadedAt));
 
                     return new Envelope(new RosteringFileUploadedMessage('ref'));
                 }

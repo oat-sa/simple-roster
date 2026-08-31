@@ -116,7 +116,8 @@ CSV,
 
         $this->storeProcessingFile('ref-import', $csv);
 
-        $this->subject->process('ref-import');
+        $uploadedAt = '2026-08-31T12:00:00+00:00';
+        $this->subject->process('ref-import', $uploadedAt);
         $this->getEntityManager()->clear();
 
         /** @var User|null $newUser */
@@ -219,6 +220,15 @@ CSV,
         self::assertNull($import->getErrorMessage());
         self::assertNotNull($import->getStartedAt());
         self::assertNotNull($import->getFinishedAt());
+        self::assertSame($uploadedAt, $import->getUploadedAt()?->format(DATE_ATOM));
+
+        $createdAt = $import->getCreatedAt();
+        $this->subject->process('ref-import', '2026-08-31T13:00:00+00:00');
+        $this->getEntityManager()->clear();
+        $retriedImport = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'ref-import']);
+        self::assertInstanceOf(RosteringImport::class, $retriedImport);
+        self::assertSame($uploadedAt, $retriedImport->getUploadedAt()?->format(DATE_ATOM));
+        self::assertSame($createdAt?->format(DATE_ATOM), $retriedImport->getCreatedAt()?->format(DATE_ATOM));
     }
 
     public function testProcessSkipsFileWithoutImportableRows(): void

@@ -24,7 +24,7 @@ class RosteringFileUploadedMessageHandler
     public function __invoke(RosteringFileUploadedMessage $message): void
     {
         try {
-            $this->rosteringFileProcessor->process($message->referenceId);
+            $this->rosteringFileProcessor->process($message->referenceId, $message->uploadedAt);
         } catch (RosteringValidationException $exception) {
             $this->logger->warning(
                 $exception->getMessage(),

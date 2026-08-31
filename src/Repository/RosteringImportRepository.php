@@ -18,9 +18,9 @@ class RosteringImportRepository extends AbstractRepository
         parent::__construct($registry, RosteringImport::class);
     }
 
-    public function markProcessing(string $referenceId): void
+    public function markProcessing(string $referenceId, ?string $uploadedAt = null): void
     {
-        $import = $this->getOrCreate($referenceId);
+        $import = $this->getOrCreate($referenceId, $uploadedAt);
 
         $import
             ->setStatus(RosteringImport::STATUS_PROCESSING)
@@ -114,16 +114,24 @@ class RosteringImportRepository extends AbstractRepository
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
-    private function getOrCreate(string $referenceId): RosteringImport
+    private function getOrCreate(string $referenceId, ?string $uploadedAt = null): RosteringImport
     {
         $import = $this->findOneBy(['referenceId' => $referenceId]);
         if ($import instanceof RosteringImport) {
             return $import;
         }
 
-        return (new RosteringImport())
+        $import = (new RosteringImport())
             ->setReferenceId($referenceId)
             ->setCreatedAt($this->getNowUtc());
+
+        if (null !== $uploadedAt) {
+            $parsedUploadedAt = DateTimeImmutable::createFromFormat('!Y-m-d\\TH:i:sP', $uploadedAt);
+            if ($parsedUploadedAt instanceof DateTimeImmutable && $parsedUploadedAt->format(DATE_ATOM) === $uploadedAt) {
+                $import->setUploadedAt($parsedUploadedAt);
+            }
+        }
+        return $import;
     }
 
     private function save(RosteringImport $import): void

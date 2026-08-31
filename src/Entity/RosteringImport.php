@@ -21,6 +21,7 @@ class RosteringImport implements EntityInterface
     private ?int $processedRows = null;
     private ?int $failedRows = null;
     private ?DateTimeInterface $createdAt = null;
+    private ?DateTimeInterface $uploadedAt = null;
     private ?DateTimeInterface $startedAt = null;
     private ?DateTimeInterface $finishedAt = null;
 
@@ -33,6 +34,14 @@ class RosteringImport implements EntityInterface
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function getUploadedAt(): ?DateTimeInterface { return $this->uploadedAt; }
+
+    public function setUploadedAt(?DateTimeInterface $uploadedAt): self
+    {
+        $this->uploadedAt = $uploadedAt;
         return $this;
     }
 
