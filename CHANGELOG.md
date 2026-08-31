@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+### Added
+- [LSI-8268](https://oat-sa.atlassian.net/browse/LSI-8268) Added `created_at` and `uploaded_at` timestamps to rostering imports, preserving both the import creation time and the original file upload time.
+
 ### Fixed
 - [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
 
