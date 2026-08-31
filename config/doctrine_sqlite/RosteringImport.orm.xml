@@ -35,6 +35,7 @@
         <field name="totalRows" type="integer" column="total_rows" nullable="true"/>
         <field name="processedRows" type="integer" column="processed_rows" nullable="true"/>
         <field name="failedRows" type="integer" column="failed_rows" nullable="true"/>
+        <field name="createdAt" type="datetime" column="created_at" nullable="false"/>
         <field name="startedAt" type="datetime" column="started_at" nullable="true"/>
         <field name="finishedAt" type="datetime" column="finished_at" nullable="true"/>
     </entity>

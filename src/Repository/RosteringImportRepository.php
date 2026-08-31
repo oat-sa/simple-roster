@@ -121,7 +121,9 @@ class RosteringImportRepository extends AbstractRepository
             return $import;
         }
 
-        return (new RosteringImport())->setReferenceId($referenceId);
+        return (new RosteringImport())
+            ->setReferenceId($referenceId)
+            ->setCreatedAt($this->getNowUtc());
     }
 
     private function save(RosteringImport $import): void

@@ -42,7 +42,6 @@ class UploadFileService
                 $storageKey,
                 ['referenceId' => $referenceId]
             );
-
             $this->messageBus->dispatch(new RosteringFileUploadedMessage($referenceId));
 
             return [
