@@ -12,6 +12,7 @@ use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\UserRepository;
 use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
+use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use OAT\SimpleRoster\Tests\AppKernelTestCase;
 use OAT\SimpleRoster\Tests\Traits\DatabaseTestingTrait;
@@ -51,6 +52,34 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
+    }
+
+    public function testProcessFailsWhenUnexpectedDelimiterProducesOneColumn(): void
+    {
+        $this->storeProcessingFile(
+            'ref-unexpected-delimiter',
+            "hierarchy_parentOrganizationId;user_username\nRoot;invalid_user"
+        );
+
+        try {
+            $this->subject->process('ref-unexpected-delimiter');
+            self::fail('Expected invalid CSV structure exception.');
+        } catch (\Throwable $exception) {
+            self::assertInstanceOf(RosteringValidationException::class, $exception);
+            self::assertStringContainsString('only one column was parsed', $exception->getMessage());
+        }
+
+        $this->getEntityManager()->clear();
+        /** @var RosteringImport|null $import */
+        $import = $this->getRepository(RosteringImport::class)->findOneBy([
+            'referenceId' => 'ref-unexpected-delimiter',
+        ]);
+
+        self::assertInstanceOf(RosteringImport::class, $import);
+        self::assertSame(RosteringImport::STATUS_FAILED, $import->getStatus());
+        self::assertSame(0, $import->getTotalRows());
+        self::assertSame(0, $import->getFailedRows());
+        self::assertStringContainsString('only one column was parsed', (string) $import->getErrorMessage());
     }
 
     public function testProcessImportsUsersAndWritesResultFile(): void

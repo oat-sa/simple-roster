@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+### Added 
+- [LSI-8270](https://oat-sa.atlassian.net/browse/LSI-8270) Reject rostering files parsed as a single column, such as files using an unexpected delimiter, instead of reporting them as successfully processed.
+
 ### Fixed
 - [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
 

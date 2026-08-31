@@ -60,7 +60,8 @@ class RosteringFileProcessor
         private readonly LoggerInterface $logger,
         private readonly RosteringUserEntryDtoFactory $entryDtoFactory,
         private readonly RosteringUserCacheSynchronizer $userCacheSynchronizer,
-        private readonly SeekableStreamFactory $seekableStreamFactory
+        private readonly SeekableStreamFactory $seekableStreamFactory,
+        private readonly string $uploadedFileCsvDelimiter
     ) {
     }
 
@@ -94,9 +95,18 @@ class RosteringFileProcessor
 
             $inputCsvStream = $this->seekableStreamFactory->create($inputStream, 'rostering input file');
 
-            $reader = Reader::from($inputCsvStream);
+            $reader = Reader::from($inputCsvStream)
+                ->setDelimiter($this->uploadedFileCsvDelimiter);
             $reader->setHeaderOffset(0);
             $header = $reader->getHeader();
+            if (count($header) < 2) {
+                throw new RosteringValidationException(
+                    sprintf(
+                        'Invalid CSV structure: only one column was parsed. Check that the file uses the expected delimiter "%s".',
+                        $this->uploadedFileCsvDelimiter
+                    )
+                );
+            }
             $rows = (new Statement())->process($reader)->getRecords();
 
             $resultHeader = $this->buildResultHeader($header);
