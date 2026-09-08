@@ -60,7 +60,6 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         $secondaryLineItemSlug = $availableLineItemSlugs[1] ?? $availableLineItemSlugs[0];
 
         $this->insertAssignment('existing_user', $primaryLineItemSlug);
-        $this->insertAssignment('existing_user', $secondaryLineItemSlug);
         $this->insertAssignment('existing_group_user', $primaryLineItemSlug);
         $this->insertAssignment('inactive_existing_user', $primaryLineItemSlug);
 
@@ -253,6 +252,52 @@ CSV;
         self::assertSame('processed', $records[0]['status']);
         self::assertSame('row_2', $records[1]['marker']);
         self::assertSame('processed', $records[1]['status']);
+    }
+
+    public function testProcessPreservesAssignmentWhenSessionDoesNotChange(): void
+    {
+        $username = 'existing_user';
+        $sessionName = $this->fetchAvailableLineItemSlugs()[0];
+        $connection = $this->getEntityManager()->getConnection();
+
+        $this->insertAssignment($username, $sessionName);
+        $connection->executeStatement(
+            'UPDATE assignments SET state = :state, attempts_count = :attemptsCount, updated_at = :updatedAt '
+            . 'WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            [
+                'state' => Assignment::STATE_STARTED,
+                'attemptsCount' => 1,
+                'updatedAt' => '2026-01-02 03:04:05',
+                'username' => $username,
+            ]
+        );
+
+        $assignmentBefore = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+        self::assertIsArray($assignmentBefore);
+
+        $csv = sprintf(
+            <<<'CSV'
+user_username,session_name,marker
+existing_user,%s,unchanged_assignment
+CSV,
+            $sessionName
+        );
+
+        $this->storeProcessingFile('ref-unchanged-assignment', $csv);
+        $this->subject->process('ref-unchanged-assignment');
+
+        $assignmentAfter = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+
+        self::assertSame($assignmentBefore, $assignmentAfter);
+        self::assertSame('processed', $this->readResultRecords('ref-unchanged-assignment')[0]['status']);
     }
 
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void
