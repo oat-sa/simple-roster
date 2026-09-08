@@ -60,7 +60,6 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         $secondaryLineItemSlug = $availableLineItemSlugs[1] ?? $availableLineItemSlugs[0];
 
         $this->insertAssignment('existing_user', $primaryLineItemSlug);
-        $this->insertAssignment('existing_user', $secondaryLineItemSlug);
         $this->insertAssignment('existing_group_user', $primaryLineItemSlug);
         $this->insertAssignment('inactive_existing_user', $primaryLineItemSlug);
 
@@ -138,7 +137,7 @@ CSV,
         self::assertInstanceOf(User::class, $existingUserAfter);
         self::assertNotSame($existingHashBefore, $existingUserAfter->getPassword());
         self::assertTrue($this->passwordHasher->isPasswordValid($existingUserAfter, 'ChangedPass1'));
-        self::assertSame([$secondaryLineItemSlug], $this->fetchAssignmentSlugs('existing_user'));
+        self::assertSame([$primaryLineItemSlug], $this->fetchAssignmentSlugs('existing_user'));
 
         /** @var User|null $existingGroupUserAfter */
         $existingGroupUserAfter = $this->getRepository(User::class)->findOneBy(['username' => 'existing_group_user']);
@@ -255,6 +254,52 @@ CSV;
         self::assertSame('processed', $records[1]['status']);
     }
 
+    public function testProcessDoesNotChangeAssignmentForExistingUser(): void
+    {
+        $username = 'existing_user';
+        [$currentSessionName, $newSessionName] = $this->fetchAvailableLineItemSlugs();
+        $connection = $this->getEntityManager()->getConnection();
+
+        $this->insertAssignment($username, $currentSessionName);
+        $connection->executeStatement(
+            'UPDATE assignments SET state = :state, attempts_count = :attemptsCount, updated_at = :updatedAt '
+            . 'WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            [
+                'state' => Assignment::STATE_STARTED,
+                'attemptsCount' => 1,
+                'updatedAt' => '2026-01-02 03:04:05',
+                'username' => $username,
+            ]
+        );
+
+        $assignmentBefore = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+        self::assertIsArray($assignmentBefore);
+
+        $csv = sprintf(
+            <<<'CSV'
+user_username,session_name,marker
+existing_user,%s,existing_assignment
+CSV,
+            $newSessionName
+        );
+
+        $this->storeProcessingFile('ref-existing-assignment', $csv);
+        $this->subject->process('ref-existing-assignment');
+
+        $assignmentAfter = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+
+        self::assertSame($assignmentBefore, $assignmentAfter);
+        self::assertSame('processed', $this->readResultRecords('ref-existing-assignment')[0]['status']);
+    }
+
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
@@ -351,7 +396,7 @@ CSV;
         }
     }
 
-    public function testProcessWarmsUpUserCacheForChangedRows(): void
+    public function testProcessDoesNotWarmUpUserCacheWhenOnlySessionIsProvidedForExistingUser(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
         $currentLineItemSlug = $availableLineItemSlugs[0];
@@ -377,11 +422,11 @@ CSV,
 
         $this->subject->process('ref-cache-invalidated');
 
-        self::assertFalse($this->resultCache->hasItem($cacheKey));
+        self::assertTrue($this->resultCache->hasItem($cacheKey));
 
         $this->getEntityManager()->clear();
         $reloadedUser = $this->userRepository->findByUsernameWithAssignments($username);
-        self::assertSame($updatedLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
+        self::assertSame($currentLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
     }
 
     private function storeProcessingFile(string $referenceId, string $csv): void
