@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.3.1 - 2026-08-08
 ### Fixed
 - [LSI-8288](https://oat-sa.atlassian.net/browse/LSI-8288) Prevented rostering imports from changing assignments of existing users.
 - [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
