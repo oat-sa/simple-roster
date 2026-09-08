@@ -112,15 +112,6 @@ class AssignmentRepository extends AbstractRepository
         int $lineItemId,
         string $state
     ): void {
-        $currentLineItemId = $this->getConnection()->fetchOne(
-            'SELECT line_item_id FROM assignments WHERE user_id = :userId LIMIT 1',
-            ['userId' => $userId]
-        );
-
-        if (false !== $currentLineItemId && (int)$currentLineItemId === $lineItemId) {
-            return;
-        }
-
         $this->getConnection()->executeStatement(
             'DELETE FROM assignments WHERE user_id = :userId',
             ['userId' => $userId]
