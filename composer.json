@@ -39,7 +39,9 @@
         "symfony/serializer": "^7.4",
         "symfony/twig-bundle": "^7.4",
         "symfony/validator": "^7.4",
-        "symfony/yaml": "^7.4"
+        "symfony/yaml": "^7.4",
+        "twig/twig": "^3.27.0",
+        "mtdowling/jmespath.php": "^2.9.1"
     },
     "replace": {
         "paragonie/random_compat": "2.*",
