@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Added
+- [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners accross lsi team repositories
+
 ## 4.3.1 - 2026-08-08
 ### Fixed
 - [LSI-8288](https://oat-sa.atlassian.net/browse/LSI-8288) Prevented rostering imports from changing assignments of existing users.

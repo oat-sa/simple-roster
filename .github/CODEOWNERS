@@ -1,0 +1,8 @@
+# CODEOWNERS for simple-roster
+#
+# The LSI team and its LSI-DEPP sub-team are the default code owners for the
+# entire repository. GitHub automatically requests a review from these teams
+# on every pull request. Both are listed on the same line so both are
+# requested (for any given path, only the last matching pattern applies).
+
+* @oat-sa/lsi @oat-sa/lsi-depp
