@@ -2,7 +2,7 @@
 
 ## Unreleased
 ### Added
-- [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners accross lsi team repositories
+- [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 
 ## 4.3.1 - 2026-08-08
 ### Fixed
