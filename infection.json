@@ -36,7 +36,7 @@
         }
     },
     "phpUnit": {
-        "customPath": "bin/phpunit"
+        "customPath": "vendor/bin/phpunit"
     },
     "tmpDir": "var/cache/infection"
 }
