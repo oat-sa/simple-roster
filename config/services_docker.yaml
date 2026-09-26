@@ -3,16 +3,11 @@ services:
         arguments:
             - version: '%app.aws.version%'
               region: '%app.aws.region%'
-
-    Aws\CloudWatch\CloudWatchClient:
-        arguments:
-            - version: '2010-08-01'
-              region: '%app.aws.region%'
-
-    Aws\CloudWatchLogs\CloudWatchLogsClient:
-        arguments:
-            - version: '2014-03-28'
-              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
+              use_path_style_endpoint: '%app.aws.path_style%'
+              credentials:
+                  key: '%env(AWS_ACCESS_KEY_ID)%'
+                  secret: '%env(AWS_SECRET_ACCESS_KEY)%'
 
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider
