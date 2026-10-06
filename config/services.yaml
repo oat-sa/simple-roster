@@ -151,7 +151,7 @@ services:
 
     OAT\SimpleRoster\Service\Rostering\Validation\RosteringCompatibilityValidator:
         arguments:
-            $enabled: '%app.rostering.external_reporting_system.compatibility_validation.enabled%'
+            $isCompatibilityValidationEnabled: '%app.rostering.external_reporting_system.compatibility_validation.enabled%'
 
     OAT\SimpleRoster\Command\Rostering\RosteringImportCloudWatchExportCommand:
         arguments:
