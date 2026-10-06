@@ -32,13 +32,7 @@ final class RosteringCompatibilityValidator
             RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
         );
 
-        $this->validateHierarchyFieldsAreProvidedTogether($organizationId, $parentOrganizationId);
-
-        $this->validateOrganizationId($organizationId, self::FIELD_HIERARCHY_ORGANIZATION_ID);
-        $this->validateOrganizationId(
-            $parentOrganizationId,
-            RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
-        );
+        $this->validateHierarchyFields($organizationId, $parentOrganizationId);
 
         $username = $this->fieldValue($values, RosteringUserRowValidator::FIELD_USER_USERNAME);
         if (strlen($username) > self::MAX_USER_USERNAME_LENGTH) {
@@ -72,29 +66,35 @@ final class RosteringCompatibilityValidator
         return false;
     }
 
-    private function validateHierarchyFieldsAreProvidedTogether(
+    private function validateHierarchyFields(
         string $organizationId,
         string $parentOrganizationId
     ): void {
-        if (($organizationId === '') === ($parentOrganizationId === '')) {
-            return;
+        if ($organizationId === '' && $parentOrganizationId === '') {
+            throw new RosteringValidationException(
+                sprintf('Field "%s" is required.', self::FIELD_HIERARCHY_ORGANIZATION_ID)
+            );
         }
 
-        throw new RosteringValidationException(
-            sprintf(
-                'Fields "%s" and "%s" must be provided together.',
-                self::FIELD_HIERARCHY_ORGANIZATION_ID,
-                RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
-            )
+        if ($organizationId === '' || $parentOrganizationId === '') {
+            throw new RosteringValidationException(
+                sprintf(
+                    'Fields "%s" and "%s" must be provided together.',
+                    self::FIELD_HIERARCHY_ORGANIZATION_ID,
+                    RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
+                )
+            );
+        }
+
+        $this->validateOrganizationId($organizationId, self::FIELD_HIERARCHY_ORGANIZATION_ID);
+        $this->validateOrganizationId(
+            $parentOrganizationId,
+            RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID
         );
     }
 
     private function validateOrganizationId(string $organizationId, string $fieldName): void
     {
-        if ($organizationId === '') {
-            throw new RosteringValidationException(sprintf('Field "%s" is required.', $fieldName));
-        }
-
         if (strlen($organizationId) <= self::MAX_ORGANIZATION_ID_LENGTH) {
             return;
         }
