@@ -285,8 +285,6 @@ class RosteringFileProcessor
         $hasSessionName = '' !== $sessionName;
 
         if (null !== $userId) {
-            $hasUserChanged = false;
-            $hasAssignmentChanged = false;
             $fieldsToUpdate = [];
 
             if ($hasPassword) {
@@ -298,14 +296,8 @@ class RosteringFileProcessor
             }
 
             $this->userRepository->updateForRostering($username, $fieldsToUpdate);
-            $hasUserChanged = $fieldsToUpdate !== [];
 
-            if ($hasSessionName) {
-                $this->replaceUserAssignment($userId, $sessionName);
-                $hasAssignmentChanged = true;
-            }
-
-            if ($hasUserChanged || $hasAssignmentChanged) {
+            if ([] !== $fieldsToUpdate) {
                 $this->userCacheSynchronizer->markForWarmup($username);
             }
 

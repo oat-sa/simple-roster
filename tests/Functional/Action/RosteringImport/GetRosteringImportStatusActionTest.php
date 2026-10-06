@@ -182,6 +182,7 @@ class GetRosteringImportStatusActionTest extends AppWebTestCase
             ->setTotalRows($totalRows)
             ->setProcessedRows($processedRows)
             ->setFailedRows($failedRows)
+            ->setCreatedAt(new DateTimeImmutable())
             ->setStartedAt(new DateTimeImmutable())
             ->setFinishedAt(new DateTimeImmutable());
 
