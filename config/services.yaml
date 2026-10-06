@@ -9,6 +9,7 @@ parameters:
     env(ROSTERING_CLOUDWATCH_LOG_GROUP): ''
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED): 'false'
     env(ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL): ''
+    env(ROSTERING_EXTERNAL_VALIDATION_ENABLED): 'false'
     env(RECREATE_QA_USERS): 'false'
     env(GENERATED_USERS_GROUP): 'TestGroup'
     env(GENERATED_USERS_BATCH_SIZE): '100'
@@ -64,6 +65,7 @@ parameters:
     app.upload.csv.escape: "\\"
     app.rostering.external_reporting_system.enabled: '%env(bool:ROSTERING_EXTERNAL_REPORTING_SYSTEM_ENABLED)%'
     app.rostering.external_reporting_system.base_url: '%env(string:ROSTERING_EXTERNAL_REPORTING_SYSTEM_BASE_URL)%'
+    app.rostering.external_reporting_system.compatibility_validation.enabled: '%env(bool:ROSTERING_EXTERNAL_VALIDATION_ENABLED)%'
 
 services:
     # default configuration for services in *this* file
@@ -146,6 +148,10 @@ services:
 
     OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
         alias: OAT\SimpleRoster\Service\Rostering\NullResultFileUrlProvider
+
+    OAT\SimpleRoster\Service\Rostering\Validation\RosteringCompatibilityValidator:
+        arguments:
+            $isCompatibilityValidationEnabled: '%app.rostering.external_reporting_system.compatibility_validation.enabled%'
 
     OAT\SimpleRoster\Command\Rostering\RosteringImportCloudWatchExportCommand:
         arguments:

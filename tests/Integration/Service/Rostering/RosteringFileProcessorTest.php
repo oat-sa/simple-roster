@@ -22,15 +22,20 @@ class RosteringFileProcessorTest extends AppKernelTestCase
 {
     use DatabaseTestingTrait;
 
+    private const EXTERNAL_VALIDATION_ENV = 'ROSTERING_EXTERNAL_VALIDATION_ENABLED';
+
     private RosteringFileProcessor $subject;
     private FileStorageInterface $fileStorage;
     private UserPasswordHasherInterface $passwordHasher;
     private UserRepository $userRepository;
     private UserCacheIdGenerator $userCacheIdGenerator;
     private CacheItemPoolInterface $resultCache;
+    private string $externalValidationEnvValue;
 
     protected function setUp(): void
     {
+        $this->externalValidationEnvValue = $_ENV[self::EXTERNAL_VALIDATION_ENV] ?? 'false';
+
         parent::setUp();
 
         self::bootKernel();
@@ -51,6 +56,15 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         }
 
         $this->resultCache = $resultCacheImplementation;
+    }
+
+    protected function tearDown(): void
+    {
+        try {
+            parent::tearDown();
+        } finally {
+            $this->restoreExternalValidationEnvironment();
+        }
     }
 
     public function testProcessImportsUsersAndWritesResultFile(): void
@@ -374,6 +388,110 @@ CSV;
         self::assertSame('validation.fieldError', $rowsByMarker['missing_user_rejected']['errorCode']);
     }
 
+    public function testProcessAppliesExternalCompatibilityValidationBeforeMutatingUsers(): void
+    {
+        $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
+        $currentSessionName = $availableLineItemSlugs[0];
+        $newSessionName = $availableLineItemSlugs[1] ?? $availableLineItemSlugs[0];
+
+        $this->insertAssignment('existing_user', $currentSessionName);
+
+        /** @var User $existingUserBefore */
+        $existingUserBefore = $this->getRepository(User::class)->findOneBy(['username' => 'existing_user']);
+        self::assertInstanceOf(User::class, $existingUserBefore);
+        $passwordBefore = (string)$existingUserBefore->getPassword();
+        $assignmentsBefore = $this->fetchAssignmentSlugs('existing_user');
+
+        $this->rebootKernelWithExternalCompatibilityValidationEnabled();
+
+        $csvHeader = implode(
+            ',',
+            [
+                'hierarchy_organizationId',
+                'hierarchy_parentOrganizationId',
+                'user_username',
+                'user_password',
+                'user_organizationId',
+                'hierarchy_organizationName',
+                'session_name',
+                'user_active',
+                'principal_username',
+                'marker',
+            ]
+        );
+        $csv = $csvHeader . "\n" . sprintf(
+            <<<'CSV'
+CLASS_1,SCHOOL_1,compatible_user,Password123,,,%s,true,,valid_student
+,,missing_classroom,Password123,,,%s,true,,missing_hierarchy
+,SCHOOL_1,existing_user,ChangedPassword123,,,%s,false,,partial_hierarchy_existing_user
+CLASS_2,,missing_school,Password123,,,%s,true,,missing_school
+CLASS_3,SCHOOL_3,%s,Password123,,,%s,true,,long_username
+SCHOOL_2,Root,,,,,,,principal_1,principal_only
+CSV,
+            $newSessionName,
+            $newSessionName,
+            $newSessionName,
+            $newSessionName,
+            str_repeat('u', 101),
+            $newSessionName
+        );
+
+        $this->storeProcessingFile('ref-compatibility-validation', $csv);
+        $this->subject->process('ref-compatibility-validation');
+        $this->getEntityManager()->clear();
+
+        /** @var User|null $compatibleUser */
+        $compatibleUser = $this->getRepository(User::class)->findOneBy(['username' => 'compatible_user']);
+        self::assertInstanceOf(User::class, $compatibleUser);
+        self::assertSame('SCHOOL_1', $compatibleUser->getGroupId());
+        self::assertSame([$newSessionName], $this->fetchAssignmentSlugs('compatible_user'));
+
+        self::assertNull($this->getRepository(User::class)->findOneBy(['username' => 'missing_classroom']));
+        self::assertNull($this->getRepository(User::class)->findOneBy(['username' => 'missing_school']));
+        self::assertNull($this->getRepository(User::class)->findOneBy(['username' => str_repeat('u', 101)]));
+
+        /** @var User|null $existingUserAfter */
+        $existingUserAfter = $this->getRepository(User::class)->findOneBy(['username' => 'existing_user']);
+        self::assertInstanceOf(User::class, $existingUserAfter);
+        self::assertSame($passwordBefore, (string)$existingUserAfter->getPassword());
+        self::assertSame($assignmentsBefore, $this->fetchAssignmentSlugs('existing_user'));
+
+        $records = $this->readResultRecords('ref-compatibility-validation');
+        $rowsByMarker = [];
+        foreach ($records as $record) {
+            $rowsByMarker[$record['marker']] = $record;
+        }
+
+        self::assertSame('processed', $rowsByMarker['valid_student']['status']);
+        self::assertSame('processed', $rowsByMarker['principal_only']['status']);
+
+        self::assertSame('400', $rowsByMarker['missing_hierarchy']['status']);
+        self::assertSame('error', $rowsByMarker['missing_hierarchy']['errorType']);
+        self::assertSame('validation.fieldError', $rowsByMarker['missing_hierarchy']['errorCode']);
+        self::assertSame(
+            'Field "hierarchy_organizationId" is required.',
+            $rowsByMarker['missing_hierarchy']['errorMessage']
+        );
+
+        self::assertSame('400', $rowsByMarker['partial_hierarchy_existing_user']['status']);
+        self::assertSame(
+            'Fields "hierarchy_organizationId" and "hierarchy_parentOrganizationId" must be provided together.',
+            $rowsByMarker['partial_hierarchy_existing_user']['errorMessage']
+        );
+
+        self::assertSame('400', $rowsByMarker['missing_school']['status']);
+        self::assertSame(
+            'Fields "hierarchy_organizationId" and "hierarchy_parentOrganizationId" must be provided together.',
+            $rowsByMarker['missing_school']['errorMessage']
+        );
+
+        self::assertSame('400', $rowsByMarker['long_username']['status']);
+        self::assertSame(
+            'Field "user_username" exceeds max length (100).',
+            $rowsByMarker['long_username']['errorMessage']
+        );
+    }
+
     public function testProcessMarksImportAsFailedWhenInputCannotBeRead(): void
     {
         self::expectException(\RuntimeException::class);
@@ -437,6 +555,24 @@ CSV,
         rewind($stream);
 
         $this->fileStorage->store($stream, $this->buildInputKey($referenceId));
+    }
+
+    private function rebootKernelWithExternalCompatibilityValidationEnabled(): void
+    {
+        static::ensureKernelShutdown();
+
+        $_ENV[self::EXTERNAL_VALIDATION_ENV] = 'true';
+
+        self::bootKernel();
+
+        $container = self::getContainer();
+        $this->fileStorage = $container->get(FileStorageInterface::class);
+        $this->subject = $container->get(RosteringFileProcessor::class);
+    }
+
+    private function restoreExternalValidationEnvironment(): void
+    {
+        $_ENV[self::EXTERNAL_VALIDATION_ENV] = $this->externalValidationEnvValue;
     }
 
     private function readProcessingFileContent(string $referenceId): string
