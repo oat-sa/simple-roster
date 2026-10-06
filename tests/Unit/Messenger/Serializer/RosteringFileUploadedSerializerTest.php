@@ -43,6 +43,18 @@ class RosteringFileUploadedSerializerTest extends TestCase
         self::assertSame('ref-456', $decoded->getMessage()->referenceId);
     }
 
+    public function testItRoundTripsUploadedAt(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+        $uploadedAt = '2026-08-31T12:00:00+00:00';
+
+        $decoded = $serializer->decode($serializer->encode(
+            new Envelope(new RosteringFileUploadedMessage('ref-123', $uploadedAt))
+        ));
+
+        self::assertSame($uploadedAt, $decoded->getMessage()->uploadedAt);
+    }
+
     public function testDecodeSnsWrappedPayload(): void
     {
         $serializer = new RosteringFileUploadedSerializer();
