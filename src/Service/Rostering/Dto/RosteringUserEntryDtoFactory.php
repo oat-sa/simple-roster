@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace OAT\SimpleRoster\Service\Rostering\Dto;
 
+use OAT\SimpleRoster\Service\Rostering\Validation\RosteringCompatibilityValidator;
 use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
 
 final class RosteringUserEntryDtoFactory
 {
-    public function __construct(private readonly RosteringUserRowValidator $rowValidator)
-    {
+    public function __construct(
+        private readonly RosteringUserRowValidator $rowValidator,
+        private readonly RosteringCompatibilityValidator $compatibilityValidator
+    ) {
     }
 
     /**
@@ -17,6 +20,8 @@ final class RosteringUserEntryDtoFactory
      */
     public function fromArray(array $values): RosteringUserEntryDto
     {
+        $this->compatibilityValidator->validate($values);
+
         $username = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_USERNAME);
         $password = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_USER_PASSWORD);
         $parentOrganizationId = $this->fieldValueOrNull($values, RosteringUserRowValidator::FIELD_HIERARCHY_PARENT_ORGANIZATION_ID);

@@ -6,6 +6,7 @@ namespace OAT\SimpleRoster\Tests\Unit\Service\Rostering\Dto;
 
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDtoFactory;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
+use OAT\SimpleRoster\Service\Rostering\Validation\RosteringCompatibilityValidator;
 use OAT\SimpleRoster\Service\Rostering\Validation\RosteringUserRowValidator;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +14,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
 {
     public function testItMapsKnownColumnsFromNormalizedRowAndParsesUserActive(): void
     {
-        $subject = new RosteringUserEntryDtoFactory(new RosteringUserRowValidator());
+        $subject = $this->createSubject();
 
         $entryDto = $subject->fromArray(
             [
@@ -37,7 +38,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
 
     public function testItTreatsMissingAndEmptyValuesAsNullForNonImportableRows(): void
     {
-        $subject = new RosteringUserEntryDtoFactory(new RosteringUserRowValidator());
+        $subject = $this->createSubject();
 
         $entryDto = $subject->fromArray(
             [
@@ -53,7 +54,7 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
 
     public function testItValidatesImportableRowsDuringCreation(): void
     {
-        $subject = new RosteringUserEntryDtoFactory(new RosteringUserRowValidator());
+        $subject = $this->createSubject();
 
         $this->expectException(RosteringValidationException::class);
         $this->expectExceptionMessage('Field "user_username" is required.');
@@ -62,6 +63,28 @@ class RosteringUserEntryDtoFactoryTest extends TestCase
             [
                 RosteringUserRowValidator::FIELD_USER_PASSWORD => 'Pass123',
             ]
+        );
+    }
+
+    public function testItKeepsTheStandaloneUsernameLimitWhenCompatibilityValidationIsDisabled(): void
+    {
+        $subject = $this->createSubject();
+        $username = str_repeat('u', 101);
+
+        $entryDto = $subject->fromArray(
+            [
+                RosteringUserRowValidator::FIELD_USER_USERNAME => $username,
+            ]
+        );
+
+        $this->assertSame($username, $entryDto->getUserUsername());
+    }
+
+    private function createSubject(): RosteringUserEntryDtoFactory
+    {
+        return new RosteringUserEntryDtoFactory(
+            new RosteringUserRowValidator(),
+            new RosteringCompatibilityValidator(false)
         );
     }
 }
