@@ -40,14 +40,4 @@ class RosteringUserRowValidatorTest extends TestCase
 
         $subject->validateUsername('bad username');
     }
-
-    public function testItRejectsOrganizationIdWithWhitespaces(): void
-    {
-        $subject = new RosteringUserRowValidator();
-
-        $this->expectException(RosteringValidationException::class);
-        $this->expectExceptionMessage('cannot contain whitespaces');
-
-        $subject->validateOrganizationId('BAD ORG');
-    }
 }

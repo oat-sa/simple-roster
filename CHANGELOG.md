@@ -1,6 +1,22 @@
 # Changelog
 
 ## Unreleased
+### Added
+- [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
+
+## 4.3.1 - 2026-08-08
+### Fixed
+- [LSI-8288](https://oat-sa.atlassian.net/browse/LSI-8288) Prevented rostering imports from changing assignments of existing users.
+- [LSI-8100](https://oat-sa.atlassian.net/browse/LSI-8100) Populated SR rostering `groupId` from `hierarchy_parentOrganizationId` instead of `hierarchy_orgnizationId`.
+
+## 4.2.0 - 2026-05-28
+### Added
+- [LSI-8076](https://oat-sa.atlassian.net/browse/LSI-8076) Allowed whitespace in rostering organization identifiers and aligned integration test expectations.
+
+## 4.1.2 - 2026-05-21
+- [LSI-8062](https://oat-sa.atlassian.net/browse/LSI-8055) Changed log severity
+
+## 4.1.1 - 2026-05-20
 - [LSI-7253](https://oat-sa.atlassian.net/browse/LSI-7253) Fixed upload validator row-count overflow messaging to report the actual exceeded record count.
 - [LSI-8055](https://oat-sa.atlassian.net/browse/LSI-8055) Added CloudWatch rostering import metrics/logs export command.
 
