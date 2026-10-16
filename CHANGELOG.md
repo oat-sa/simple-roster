@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Added
+- [LSI-7252](https://oat-sa.atlassian.net/browse/LSI-7252) Switched docker rostering operational storage to LocalStack S3 and added signed URL generation for local access.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 
 ## 4.3.1 - 2026-08-08
@@ -22,9 +23,6 @@
 
 ## 4.1.0 - 2026-04-30
 ### Added
-- Moved configuration files to a single oneup_flysystem.yaml and reverted changes based on different address and s3 prefixes depending on environment
-- Added file upload endpoint with validation, forwarding, and messenger notification
-- Switched docker rostering operational storage to LocalStack S3 and added signed URL generation with optional public endpoint rewriting for local access
 - Added possibility to upload zipped CSVs
 
 ## 4.0.0 - 2026-04-09

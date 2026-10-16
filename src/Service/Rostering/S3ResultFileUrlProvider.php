@@ -17,8 +17,7 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
         private readonly string $bucket,
         private readonly string $prefix,
         private readonly string $signedUrlTtl,
-        private readonly LoggerInterface $logger,
-        private readonly SignedUrlRewriterInterface $signedUrlRewriter
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -44,7 +43,7 @@ class S3ResultFileUrlProvider implements ResultFileUrlProviderInterface
             );
             $request = $this->s3Client->createPresignedRequest($command, $this->signedUrlTtl);
 
-            return $this->signedUrlRewriter->rewrite((string) $request->getUri());
+            return (string) $request->getUri();
         } catch (Throwable $exception) {
             $this->logger->error(
                 sprintf('Unable to generate signed result file URL for file key "%s".', $fileKey),
