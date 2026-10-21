@@ -78,6 +78,14 @@ class RosteringFileUploadedSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Reference ID missing.');
         }
 
+        if (
+            array_key_exists('uploadedAt', $payload)
+            && null !== $payload['uploadedAt']
+            && !is_string($payload['uploadedAt'])
+        ) {
+            throw new MessageDecodingFailedException('Uploaded at must be a string.');
+        }
+
         return [
             'referenceId' => $referenceId,
             'uploadedAt' => isset($payload['uploadedAt']) && is_string($payload['uploadedAt'])

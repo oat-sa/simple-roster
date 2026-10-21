@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\RosteringImport;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 
 class RosteringImportRepository extends AbstractRepository
 {
@@ -18,9 +18,12 @@ class RosteringImportRepository extends AbstractRepository
         parent::__construct($registry, RosteringImport::class);
     }
 
-    public function markProcessing(string $referenceId, ?string $uploadedAt = null): void
+    public function markProcessing(RosteringFileProcessingContext $context): void
     {
-        $import = $this->getOrCreate($referenceId, $uploadedAt);
+        $import = $this->getOrCreate(
+            $context->getReferenceId(),
+            $context->getUploadedAt()
+        );
 
         $import
             ->setStatus(RosteringImport::STATUS_PROCESSING)
@@ -109,12 +112,12 @@ class RosteringImportRepository extends AbstractRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    private function getNowUtc(): DateTimeInterface
+    private function getNowUtc(): DateTimeImmutable
     {
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
-    private function getOrCreate(string $referenceId, ?string $uploadedAt = null): RosteringImport
+    private function getOrCreate(string $referenceId, ?DateTimeImmutable $uploadedAt = null): RosteringImport
     {
         $import = $this->findOneBy(['referenceId' => $referenceId]);
         if ($import instanceof RosteringImport) {
@@ -125,12 +128,8 @@ class RosteringImportRepository extends AbstractRepository
             ->setReferenceId($referenceId)
             ->setCreatedAt($this->getNowUtc());
 
-        if (null !== $uploadedAt) {
-            $parsedUploadedAt = DateTimeImmutable::createFromFormat('!Y-m-d\\TH:i:sP', $uploadedAt);
-            if ($parsedUploadedAt instanceof DateTimeImmutable && $parsedUploadedAt->format(DATE_ATOM) === $uploadedAt) {
-                $import->setUploadedAt($parsedUploadedAt);
-            }
-        }
+        $import->setUploadedAt($uploadedAt);
+
         return $import;
     }
 

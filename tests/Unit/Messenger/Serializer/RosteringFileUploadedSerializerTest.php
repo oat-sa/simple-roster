@@ -116,6 +116,16 @@ class RosteringFileUploadedSerializerTest extends TestCase
         $serializer->decode(['body' => '{"status":"ok"}']);
     }
 
+    public function testDecodeThrowsWhenUploadedAtIsNotAString(): void
+    {
+        $serializer = new RosteringFileUploadedSerializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Uploaded at must be a string.');
+
+        $serializer->decode(['body' => '{"referenceId":"ref-123","uploadedAt":123}']);
+    }
+
     public function testEncodeThrowsForUnsupportedMessageType(): void
     {
         $serializer = new RosteringFileUploadedSerializer();
