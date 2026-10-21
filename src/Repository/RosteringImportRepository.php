@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\Repository;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 use OAT\SimpleRoster\Entity\RosteringImport;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 
 class RosteringImportRepository extends AbstractRepository
 {
@@ -18,9 +18,12 @@ class RosteringImportRepository extends AbstractRepository
         parent::__construct($registry, RosteringImport::class);
     }
 
-    public function markProcessing(string $referenceId): void
+    public function markProcessing(RosteringFileProcessingContext $context): void
     {
-        $import = $this->getOrCreate($referenceId);
+        $import = $this->getOrCreate(
+            $context->getReferenceId(),
+            $context->getUploadedAt()
+        );
 
         $import
             ->setStatus(RosteringImport::STATUS_PROCESSING)
@@ -109,19 +112,25 @@ class RosteringImportRepository extends AbstractRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    private function getNowUtc(): DateTimeInterface
+    private function getNowUtc(): DateTimeImmutable
     {
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
-    private function getOrCreate(string $referenceId): RosteringImport
+    private function getOrCreate(string $referenceId, ?DateTimeImmutable $uploadedAt = null): RosteringImport
     {
         $import = $this->findOneBy(['referenceId' => $referenceId]);
         if ($import instanceof RosteringImport) {
             return $import;
         }
 
-        return (new RosteringImport())->setReferenceId($referenceId);
+        $import = (new RosteringImport())
+            ->setReferenceId($referenceId)
+            ->setCreatedAt($this->getNowUtc());
+
+        $import->setUploadedAt($uploadedAt);
+
+        return $import;
     }
 
     private function save(RosteringImport $import): void

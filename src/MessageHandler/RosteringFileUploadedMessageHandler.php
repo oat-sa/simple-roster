@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OAT\SimpleRoster\MessageHandler;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use Psr\Log\LoggerInterface;
@@ -24,7 +25,9 @@ class RosteringFileUploadedMessageHandler
     public function __invoke(RosteringFileUploadedMessage $message): void
     {
         try {
-            $this->rosteringFileProcessor->process($message->referenceId);
+            $this->rosteringFileProcessor->process(
+                RosteringFileProcessingContext::fromPayload($message->referenceId, $message->uploadedAt)
+            );
         } catch (RosteringValidationException $exception) {
             $this->logger->warning(
                 $exception->getMessage(),

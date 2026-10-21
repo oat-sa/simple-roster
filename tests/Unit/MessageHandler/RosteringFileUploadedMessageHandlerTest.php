@@ -6,6 +6,7 @@ namespace OAT\SimpleRoster\Tests\Unit\MessageHandler;
 
 use OAT\SimpleRoster\Message\RosteringFileUploadedMessage;
 use OAT\SimpleRoster\MessageHandler\RosteringFileUploadedMessageHandler;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use Psr\Log\LoggerInterface;
@@ -45,12 +46,14 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
 
     public function testItProcessesUploadedMessage(): void
     {
+        $uploadedAt = '2026-08-31T12:00:00+00:00';
+
         $this->rosteringFileProcessor
             ->expects(self::once())
             ->method('process')
-            ->with('ref-123');
+            ->with(RosteringFileProcessingContext::fromPayload('ref-123', $uploadedAt));
 
-        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123'));
+        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123', $uploadedAt));
     }
 
     public function testItBubblesUpExceptionFromProcessor(): void
@@ -58,7 +61,7 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
         $this->rosteringFileProcessor
             ->expects(self::once())
             ->method('process')
-            ->with('ref-500')
+            ->with(RosteringFileProcessingContext::fromPayload('ref-500'))
             ->willThrowException(new RuntimeException('Processor failed.'));
 
         $this->logger
@@ -76,7 +79,7 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
         $this->rosteringFileProcessor
             ->expects(self::once())
             ->method('process')
-            ->with('ref-invalid')
+            ->with(RosteringFileProcessingContext::fromPayload('ref-invalid'))
             ->willThrowException(new RosteringValidationException('Reference ID missing.'));
 
         $this->logger
@@ -87,5 +90,21 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
         $this->expectExceptionMessage('Reference ID missing.');
 
         $this->subject->__invoke(new RosteringFileUploadedMessage('ref-invalid'));
+    }
+
+    public function testItRejectsInvalidUploadedAtBeforeProcessing(): void
+    {
+        $this->rosteringFileProcessor
+            ->expects(self::never())
+            ->method('process');
+
+        $this->logger
+            ->expects(self::once())
+            ->method('warning');
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+        $this->expectExceptionMessage('Uploaded at must be a valid DATE_ATOM timestamp.');
+
+        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-invalid-date', 'not-a-date'));
     }
 }

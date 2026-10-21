@@ -15,6 +15,7 @@ use OAT\SimpleRoster\Repository\AssignmentRepository;
 use OAT\SimpleRoster\Repository\LineItemRepository;
 use OAT\SimpleRoster\Repository\RosteringImportRepository;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDto;
 use OAT\SimpleRoster\Service\Rostering\Dto\RosteringUserEntryDtoFactory;
 use OAT\SimpleRoster\Service\Rostering\Exception\RosteringValidationException;
@@ -40,8 +41,6 @@ class RosteringFileProcessor
     private const ERROR_CODE_INTERNAL = 'csv.import.internalError';
     private const ERROR_MESSAGE_INTERNAL = 'Internal error while processing row.';
 
-    private const MAX_REFERENCE_ID_LENGTH = 255;
-
     private const ASSIGNMENT_STATE_READY = 'ready';
     /**
      * @var array<string, int>
@@ -64,13 +63,12 @@ class RosteringFileProcessor
     ) {
     }
 
-    public function process(string $referenceId): void
+    public function process(RosteringFileProcessingContext $context): void
     {
         $this->lineItemIdsBySessionName = [];
         $this->userCacheSynchronizer->reset();
 
-        $referenceId = trim($referenceId);
-        $this->validateReferenceId($referenceId);
+        $referenceId = $context->getReferenceId();
 
         $inputFileKey = $this->fileKeyResolver->inputFileKey($referenceId);
         $outputFileKey = $this->fileKeyResolver->outputFileKey($referenceId);
@@ -82,7 +80,7 @@ class RosteringFileProcessor
         $failedRows = 0;
         $importableRows = 0;
 
-        $this->rosteringImportRepository->markProcessing($referenceId);
+        $this->rosteringImportRepository->markProcessing($context);
 
         try {
             $inputStream = $this->fileStorage->read($inputFileKey);
@@ -434,23 +432,6 @@ class RosteringFileProcessor
             }
 
             throw $exception;
-        }
-    }
-
-    private function validateReferenceId(string $referenceId): void
-    {
-        if ($referenceId === '') {
-            throw new RosteringValidationException('Reference ID cannot be empty.');
-        }
-
-        if (strlen($referenceId) > self::MAX_REFERENCE_ID_LENGTH) {
-            throw new RosteringValidationException(
-                sprintf('Reference ID exceeds max length (%d).', self::MAX_REFERENCE_ID_LENGTH)
-            );
-        }
-
-        if (preg_match('/^[A-Za-z0-9._-]+$/', $referenceId) !== 1 || str_contains($referenceId, '..')) {
-            throw new RosteringValidationException('Reference ID contains unsupported characters.');
         }
     }
 

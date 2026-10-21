@@ -11,6 +11,7 @@ use OAT\SimpleRoster\Entity\RosteringImport;
 use OAT\SimpleRoster\Entity\User;
 use OAT\SimpleRoster\Generator\UserCacheIdGenerator;
 use OAT\SimpleRoster\Repository\UserRepository;
+use OAT\SimpleRoster\Service\Rostering\Dto\RosteringFileProcessingContext;
 use OAT\SimpleRoster\Service\Rostering\FileStorageInterface;
 use OAT\SimpleRoster\Service\Rostering\RosteringFileProcessor;
 use OAT\SimpleRoster\Tests\AppKernelTestCase;
@@ -115,7 +116,8 @@ CSV,
 
         $this->storeProcessingFile('ref-import', $csv);
 
-        $this->subject->process('ref-import');
+        $uploadedAt = '2026-08-31T12:00:00+00:00';
+        $this->process('ref-import', $uploadedAt);
         $this->getEntityManager()->clear();
 
         /** @var User|null $newUser */
@@ -218,6 +220,15 @@ CSV,
         self::assertNull($import->getErrorMessage());
         self::assertNotNull($import->getStartedAt());
         self::assertNotNull($import->getFinishedAt());
+        self::assertSame($uploadedAt, $import->getUploadedAt()?->format(DATE_ATOM));
+
+        $createdAt = $import->getCreatedAt();
+        $this->process('ref-import', '2026-08-31T13:00:00+00:00');
+        $this->getEntityManager()->clear();
+        $retriedImport = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'ref-import']);
+        self::assertInstanceOf(RosteringImport::class, $retriedImport);
+        self::assertSame($uploadedAt, $retriedImport->getUploadedAt()?->format(DATE_ATOM));
+        self::assertSame($createdAt?->format(DATE_ATOM), $retriedImport->getCreatedAt()?->format(DATE_ATOM));
     }
 
     public function testProcessSkipsFileWithoutImportableRows(): void
@@ -231,7 +242,7 @@ CSV;
         $this->storeProcessingFile('ref-no-import', $csv);
         $before = $this->readProcessingFileContent('ref-no-import');
 
-        $this->subject->process('ref-no-import');
+        $this->process('ref-no-import');
 
         $after = $this->readProcessingFileContent('ref-no-import');
         self::assertSame($before, $after);
@@ -288,7 +299,7 @@ CSV,
         );
 
         $this->storeProcessingFile('ref-existing-assignment', $csv);
-        $this->subject->process('ref-existing-assignment');
+        $this->process('ref-existing-assignment');
 
         $assignmentAfter = $connection->fetchAssociative(
             'SELECT id, line_item_id, state, attempts_count, updated_at '
@@ -317,7 +328,7 @@ CSV,
         );
 
         $this->storeProcessingFile('ref-skip-empty-rows', $csv);
-        $this->subject->process('ref-skip-empty-rows');
+        $this->process('ref-skip-empty-rows');
 
         $records = $this->readResultRecords('ref-skip-empty-rows');
         self::assertCount(2, $records);
@@ -350,7 +361,7 @@ CSV;
 
         $this->storeProcessingFile('ref-case-1', $csv);
 
-        $this->subject->process('ref-case-1');
+        $this->process('ref-case-1');
         $this->getEntityManager()->clear();
 
         /** @var User $existingAfter */
@@ -380,7 +391,7 @@ CSV;
         self::expectExceptionMessage('Unable to process rostering file');
 
         try {
-            $this->subject->process('missing-file');
+            $this->process('missing-file');
         } finally {
             /** @var RosteringImport|null $import */
             $import = $this->getRepository(RosteringImport::class)->findOneBy(['referenceId' => 'missing-file']);
@@ -420,13 +431,18 @@ CSV,
 
         $this->storeProcessingFile('ref-cache-invalidated', $csv);
 
-        $this->subject->process('ref-cache-invalidated');
+        $this->process('ref-cache-invalidated');
 
         self::assertTrue($this->resultCache->hasItem($cacheKey));
 
         $this->getEntityManager()->clear();
         $reloadedUser = $this->userRepository->findByUsernameWithAssignments($username);
         self::assertSame($currentLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
+    }
+
+    private function process(string $referenceId, ?string $uploadedAt = null): void
+    {
+        $this->subject->process(RosteringFileProcessingContext::fromPayload($referenceId, $uploadedAt));
     }
 
     private function storeProcessingFile(string $referenceId, string $csv): void

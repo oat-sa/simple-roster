@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Added
+- [LSI-8268](https://oat-sa.atlassian.net/browse/LSI-8268) Added `created_at` and `uploaded_at` timestamps to rostering imports, preserving both the import creation time and the original file upload time.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 
 ## 4.3.1 - 2026-08-08
