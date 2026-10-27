@@ -60,7 +60,6 @@ class RosteringFileProcessorTest extends AppKernelTestCase
         $secondaryLineItemSlug = $availableLineItemSlugs[1] ?? $availableLineItemSlugs[0];
 
         $this->insertAssignment('existing_user', $primaryLineItemSlug);
-        $this->insertAssignment('existing_user', $secondaryLineItemSlug);
         $this->insertAssignment('existing_group_user', $primaryLineItemSlug);
         $this->insertAssignment('inactive_existing_user', $primaryLineItemSlug);
 
@@ -83,24 +82,26 @@ class RosteringFileProcessorTest extends AppKernelTestCase
 
         $csv = sprintf(<<<'CSV'
 hierarchy_parentOrganizationId,user_username,user_password,user_organizationId,session_name,user_active,principal_username,marker
-Root,new_user,NewPass1,SCHOOL_1,%s,true,,new_user
-Root,existing_user,ChangedPass1,,%s,1,,pwd_assignment_update
-Root,existing_group_user,,NEW_GROUP,,true,,org_update
+SCHOOL_1,new_user,NewPass1,IGNORED_CLASS,%s,true,,new_user
+PARENT_SCHOOL,parent_group_user,ParentPass1,CHILD_GROUP,%s,true,,parent_group_user
+,existing_user,ChangedPass1,,%s,1,,pwd_assignment_update
+NEW_GROUP,existing_group_user,,IGNORED_CLASS,,true,,org_update
 SCHOOL_1,,,,,,,class_skip
 Root,,,,,,principal_a,principal_skip
-Root,,MissingPass,SCHOOL_2,%s,true,,missing_username
-Root,bad username,Pass1,SCHOOL_3,%s,true,,bad_username
-Root,bad_org,Pass2,BAD ORG,%s,true,,bad_org
-Root,inactive_user,Pass3,SCHOOL_4,%s,false,,inactive
+SCHOOL_2,,MissingPass,IGNORED_CLASS,%s,true,,missing_username
+SCHOOL_3,bad username,Pass1,IGNORED_CLASS,%s,true,,bad_username
+SCHOOL_4,ignored_user_org,Pass2,BAD ORG,%s,true,,ignored_user_org
+SCHOOL_5,inactive_user,Pass3,IGNORED_CLASS,%s,false,,inactive
 Root,inactive_existing_user,,,,false,,inactive_existing
 Root,inactive_existing_user_without_assignment,,,,false,,inactive_existing_without_assignment
-Root,wrong_bool,Pass4,SCHOOL_5,%s,maybe,,invalid_bool
-Root,missing_user_pwd,,SCHOOL_6,%s,true,,missing_user_pwd
-Root,missing_user_org,Pass5,,%s,true,,missing_user_org
-Root,missing_session_name,Pass6,SCHOOL_6,,true,,missing_session_name
-Root,bad_session_name,Pass7,SCHOOL_7,missing-slug,true,,bad_session_name
-Root,existing_user,,,,true,,noop
+SCHOOL_6,wrong_bool,Pass4,IGNORED_CLASS,%s,maybe,,invalid_bool
+SCHOOL_7,missing_user_pwd,,IGNORED_CLASS,%s,true,,missing_user_pwd
+,missing_parent_org,Pass5,IGNORED_CLASS,%s,true,,missing_parent_org
+SCHOOL_8,missing_session_name,Pass6,IGNORED_CLASS,,true,,missing_session_name
+SCHOOL_9,bad_session_name,Pass7,IGNORED_CLASS,missing-slug,true,,bad_session_name
+,existing_user,,,,true,,noop
 CSV,
+            $primaryLineItemSlug,
             $primaryLineItemSlug,
             $secondaryLineItemSlug,
             $primaryLineItemSlug,
@@ -124,12 +125,19 @@ CSV,
         self::assertTrue($this->passwordHasher->isPasswordValid($newUser, 'NewPass1'));
         self::assertSame([$primaryLineItemSlug], $this->fetchAssignmentSlugs('new_user'));
 
+        /** @var User|null $parentGroupUserAfter */
+        $parentGroupUserAfter = $this->getRepository(User::class)->findOneBy(['username' => 'parent_group_user']);
+        self::assertInstanceOf(User::class, $parentGroupUserAfter);
+        self::assertSame('PARENT_SCHOOL', $parentGroupUserAfter->getGroupId());
+        self::assertTrue($this->passwordHasher->isPasswordValid($parentGroupUserAfter, 'ParentPass1'));
+        self::assertSame([$primaryLineItemSlug], $this->fetchAssignmentSlugs('parent_group_user'));
+
         /** @var User|null $existingUserAfter */
         $existingUserAfter = $this->getRepository(User::class)->findOneBy(['username' => 'existing_user']);
         self::assertInstanceOf(User::class, $existingUserAfter);
         self::assertNotSame($existingHashBefore, $existingUserAfter->getPassword());
         self::assertTrue($this->passwordHasher->isPasswordValid($existingUserAfter, 'ChangedPass1'));
-        self::assertSame([$secondaryLineItemSlug], $this->fetchAssignmentSlugs('existing_user'));
+        self::assertSame([$primaryLineItemSlug], $this->fetchAssignmentSlugs('existing_user'));
 
         /** @var User|null $existingGroupUserAfter */
         $existingGroupUserAfter = $this->getRepository(User::class)->findOneBy(['username' => 'existing_group_user']);
@@ -178,8 +186,8 @@ CSV,
         self::assertSame('400', $rowsByMarker['bad_username']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['bad_username']['errorCode']);
 
-        self::assertSame('400', $rowsByMarker['bad_org']['status']);
-        self::assertSame('validation.fieldError', $rowsByMarker['bad_org']['errorCode']);
+        self::assertSame('processed', $rowsByMarker['ignored_user_org']['status']);
+        self::assertSame('', $rowsByMarker['ignored_user_org']['errorCode']);
 
         self::assertSame('400', $rowsByMarker['invalid_bool']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['invalid_bool']['errorCode']);
@@ -187,8 +195,8 @@ CSV,
         self::assertSame('400', $rowsByMarker['missing_user_pwd']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['missing_user_pwd']['errorCode']);
 
-        self::assertSame('400', $rowsByMarker['missing_user_org']['status']);
-        self::assertSame('validation.fieldError', $rowsByMarker['missing_user_org']['errorCode']);
+        self::assertSame('400', $rowsByMarker['missing_parent_org']['status']);
+        self::assertSame('validation.fieldError', $rowsByMarker['missing_parent_org']['errorCode']);
 
         self::assertSame('400', $rowsByMarker['missing_session_name']['status']);
         self::assertSame('validation.fieldError', $rowsByMarker['missing_session_name']['errorCode']);
@@ -246,6 +254,52 @@ CSV;
         self::assertSame('processed', $records[1]['status']);
     }
 
+    public function testProcessDoesNotChangeAssignmentForExistingUser(): void
+    {
+        $username = 'existing_user';
+        [$currentSessionName, $newSessionName] = $this->fetchAvailableLineItemSlugs();
+        $connection = $this->getEntityManager()->getConnection();
+
+        $this->insertAssignment($username, $currentSessionName);
+        $connection->executeStatement(
+            'UPDATE assignments SET state = :state, attempts_count = :attemptsCount, updated_at = :updatedAt '
+            . 'WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            [
+                'state' => Assignment::STATE_STARTED,
+                'attemptsCount' => 1,
+                'updatedAt' => '2026-01-02 03:04:05',
+                'username' => $username,
+            ]
+        );
+
+        $assignmentBefore = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+        self::assertIsArray($assignmentBefore);
+
+        $csv = sprintf(
+            <<<'CSV'
+user_username,session_name,marker
+existing_user,%s,existing_assignment
+CSV,
+            $newSessionName
+        );
+
+        $this->storeProcessingFile('ref-existing-assignment', $csv);
+        $this->subject->process('ref-existing-assignment');
+
+        $assignmentAfter = $connection->fetchAssociative(
+            'SELECT id, line_item_id, state, attempts_count, updated_at '
+            . 'FROM assignments WHERE user_id = (SELECT id FROM users WHERE username = :username)',
+            ['username' => $username]
+        );
+
+        self::assertSame($assignmentBefore, $assignmentAfter);
+        self::assertSame('processed', $this->readResultRecords('ref-existing-assignment')[0]['status']);
+    }
+
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
@@ -253,7 +307,7 @@ CSV;
 
         $csv = sprintf(<<<'CSV'
 hierarchy_parentOrganizationId,user_username,user_password,user_organizationId,session_name,user_active,principal_username,marker
-Root,empty_row_case_user_1,Password123,SCHOOL_1,%s,true,,row_1
+SCHOOL_1,empty_row_case_user_1,Password123,IGNORED_CLASS,%s,true,,row_1
 
 ,,,,,,,
 Root,empty_row_case_user_2,Password456,SCHOOL_2,%s,true,,row_2
@@ -342,7 +396,7 @@ CSV;
         }
     }
 
-    public function testProcessWarmsUpUserCacheForChangedRows(): void
+    public function testProcessDoesNotWarmUpUserCacheWhenOnlySessionIsProvidedForExistingUser(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
         $currentLineItemSlug = $availableLineItemSlugs[0];
@@ -368,11 +422,11 @@ CSV,
 
         $this->subject->process('ref-cache-invalidated');
 
-        self::assertFalse($this->resultCache->hasItem($cacheKey));
+        self::assertTrue($this->resultCache->hasItem($cacheKey));
 
         $this->getEntityManager()->clear();
         $reloadedUser = $this->userRepository->findByUsernameWithAssignments($username);
-        self::assertSame($updatedLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
+        self::assertSame($currentLineItemSlug, $reloadedUser->getLastAssignment()->getLineItem()->getSlug());
     }
 
     private function storeProcessingFile(string $referenceId, string $csv): void

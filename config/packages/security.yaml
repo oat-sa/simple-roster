@@ -25,6 +25,10 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        api_docs:
+            pattern: '^%app.route_prefix%/v1/docs/openapi\.yaml$'
+            security: false
+
         api_key:
             pattern: '^%app.route_prefix%/v1/(bulk-create-users|bulk|line-items|upload|status|download)(?:$|/)'
             provider: app_user_provider

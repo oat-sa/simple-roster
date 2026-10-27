@@ -12,7 +12,7 @@ use Throwable;
 
 class UploadedFileValidator
 {
-    private const ALLOWED_FILE_EXTENSION = 'csv';
+    private const string ALLOWED_FILE_EXTENSION = 'csv';
 
     public function __construct(
         private readonly int $allowedUploadedFileMaxSize,
@@ -60,6 +60,11 @@ class UploadedFileValidator
         $this->validateCsvStructure($file);
     }
 
+    public function getAllowedUploadedFileMaxSize(): int
+    {
+        return $this->allowedUploadedFileMaxSize;
+    }
+
     private function validateCsvStructure(UploadedFile $file): void
     {
         try {
@@ -90,17 +95,6 @@ class UploadedFileValidator
                     continue;
                 }
 
-                ++$recordCount;
-                if ($recordCount + 1 > $this->allowedUploadedFileMaxRecords) {
-                    throw new UploadedFileValidationException(
-                        sprintf(
-                            'File records count "%d" exceeds maximum allowed records of "%d".',
-                            $recordCount,
-                            $this->allowedUploadedFileMaxRecords
-                        )
-                    );
-                }
-
                 if ($columnsCount !== $expectedColumns) {
                     throw new UploadedFileValidationException(
                         sprintf(
@@ -111,6 +105,8 @@ class UploadedFileValidator
                         )
                     );
                 }
+
+                ++$recordCount;
             }
         } catch (SyntaxError $exception) {
             throw new UploadedFileValidationException('Uploaded file cannot be parsed as valid CSV.', 0, $exception);
@@ -118,6 +114,16 @@ class UploadedFileValidator
 
         if ($expectedColumns === null) {
             throw new UploadedFileValidationException('Uploaded CSV file is empty.');
+        }
+
+        if ($recordCount > $this->allowedUploadedFileMaxRecords) {
+            throw new UploadedFileValidationException(
+                sprintf(
+                    'File records count "%d" exceeds maximum allowed records of "%d".',
+                    $recordCount,
+                    $this->allowedUploadedFileMaxRecords
+                )
+            );
         }
     }
 

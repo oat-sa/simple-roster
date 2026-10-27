@@ -79,6 +79,11 @@ getRosteringImportDownload:
   methods: GET
   defaults: { _controller: OAT\SimpleRoster\Action\RosteringImport\GetRosteringImportDownloadAction }
 
+getOpenApiSpec:
+  path: '%app.route_prefix%/v1/docs/openapi.yaml'
+  methods: GET
+  defaults: { _controller: OAT\SimpleRoster\Action\Documentation\GetOpenApiSpecAction }
+
 listLtiInstances:
   path: '%app.route_prefix%/v1/lti-instances'
   methods: GET
