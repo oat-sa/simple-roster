@@ -5,6 +5,9 @@
 - [LSI-7252](https://oat-sa.atlassian.net/browse/LSI-7252) Switched docker rostering operational storage to LocalStack S3 and added signed URL generation for local access.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 
+### Fixed
+- [LSI-8303](https://oat-sa.atlassian.net/browse/LSI-8303) Prevented duplicate username errors during concurrent Simple Roster imports.
+
 ## 4.3.1 - 2026-08-08
 ### Fixed
 - [LSI-8288](https://oat-sa.atlassian.net/browse/LSI-8288) Prevented rostering imports from changing assignments of existing users.

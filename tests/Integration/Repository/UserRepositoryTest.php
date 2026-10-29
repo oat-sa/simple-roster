@@ -159,6 +159,33 @@ class UserRepositoryTest extends AppKernelTestCase
         self::assertSame(50, $this->subject->countByCriteria($criteria));
     }
 
+    public function testInsertForRosteringIgnoresOnlyDuplicateUsername(): void
+    {
+        $username = 'concurrent_user';
+
+        $createdUserId = $this->subject->insertForRostering(
+            $username,
+            'first-password-hash',
+            'FIRST_GROUP'
+        );
+        $conflictingUserId = $this->subject->insertForRostering(
+            $username,
+            'second-password-hash',
+            'SECOND_GROUP'
+        );
+
+        self::assertIsInt($createdUserId);
+        self::assertGreaterThan(0, $createdUserId);
+        self::assertNull($conflictingUserId);
+        self::assertSame(
+            1,
+            (int)$this->getEntityManager()->getConnection()->fetchOne(
+                'SELECT COUNT(*) FROM users WHERE username = :username',
+                ['username' => $username]
+            )
+        );
+    }
+
     public static function provideLimits(): array
     {
         return [
