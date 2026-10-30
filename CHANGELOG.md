@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Added
+- [LSI-7252](https://oat-sa.atlassian.net/browse/LSI-7252) Switched docker rostering operational storage to LocalStack S3 and added signed URL generation for local access.
 - [LSI-8268](https://oat-sa.atlassian.net/browse/LSI-8268) Added `created_at` and `uploaded_at` timestamps to rostering imports, preserving both the import creation time and the original file upload time.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 

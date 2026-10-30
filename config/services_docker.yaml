@@ -1,0 +1,34 @@
+services:
+    Aws\S3\S3Client:
+        arguments:
+            - version: '%app.aws.version%'
+              region: '%app.aws.region%'
+              endpoint: '%app.aws.endpoint%'
+              use_path_style_endpoint: '%app.aws.path_style%'
+              credentials:
+                  key: '%env(AWS_ACCESS_KEY_ID)%'
+                  secret: '%env(AWS_SECRET_ACCESS_KEY)%'
+
+    app.rostering.s3_presign_client:
+        class: Aws\S3\S3Client
+        arguments:
+            - version: '%app.aws.version%'
+              region: '%app.aws.region%'
+              endpoint: '%env(string:ROSTERING_S3_PUBLIC_ENDPOINT)%'
+              use_path_style_endpoint: '%app.aws.path_style%'
+              credentials:
+                  key: '%env(AWS_ACCESS_KEY_ID)%'
+                  secret: '%env(AWS_SECRET_ACCESS_KEY)%'
+
+    OAT\SimpleRoster\Service\Rostering\ResultFileUrlProviderInterface:
+        alias: OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider
+
+    OAT\SimpleRoster\Service\Rostering\S3ResultFileUrlProvider:
+        arguments:
+            $fileStorage: '@OAT\SimpleRoster\Service\Rostering\FileStorageInterface'
+            $fileKeyResolver: '@OAT\SimpleRoster\Service\Rostering\RosteringFileKeyResolver'
+            $s3Client: '@app.rostering.s3_presign_client'
+            $bucket: '%env(FILESYSTEM_OPERATIONAL_S3_BUCKET)%'
+            $prefix: '%env(FILESYSTEM_ROSTERING_FILES_ADAPTER_S3_PREFIX)%'
+            $signedUrlTtl: '%env(ROSTERING_SIGNED_URL_TTL)%'
+            $logger: '@logger'

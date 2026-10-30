@@ -20,7 +20,6 @@ services:
         volumes:
             - .:/var/www/html:cached
             - $COMPOSER_HOME:/root/.composer
-            - ../docker/volumes/rostering-files:/var/rostering-files
         working_dir: /var/www/html
 
     simple-roster-worker:
@@ -86,18 +85,18 @@ services:
 
     simple-roster-localstack:
         container_name: simple-roster-localstack
-        image: localstack/localstack
+        image: localstack/localstack:3.0.2
         ports:
             #- "4510-4559:4510-4559"
             - "4566:4566"
         environment:
             - SERVICES=s3,sqs
+            - AWS_DEFAULT_REGION=eu-west-1
             - DEBUG=1
         networks:
             - simple-roster
             - oat-docker
         volumes:
-            - "./localstack:/tmp/localstack"
             - "./localstack/init:/etc/localstack/init/ready.d"
             - "/var/run/docker.sock:/var/run/docker.sock"
         labels:

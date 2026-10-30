@@ -53,7 +53,18 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
             ->method('process')
             ->with(RosteringFileProcessingContext::fromPayload('ref-123', $uploadedAt));
 
-        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123', $uploadedAt));
+        $this->logger
+            ->expects(self::once())
+            ->method('info')
+            ->with(
+                'Rostering file processing finished.',
+                [
+                    'messageClass' => RosteringFileUploadedMessage::class,
+                    'referenceId' => 'ref-123',
+                ]
+            );
+
+        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123'));
     }
 
     public function testItBubblesUpExceptionFromProcessor(): void
