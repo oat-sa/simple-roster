@@ -158,6 +158,49 @@ class UploadFileActionTest extends AppWebTestCase
         );
     }
 
+    public function testItReturns400WhenCsvUsesUnexpectedDelimiter(): void
+    {
+        /** @var FileStorageInterface&MockObject $storage */
+        $storage = $this->createMock(FileStorageInterface::class);
+        $storage
+            ->expects($this->never())
+            ->method('store');
+
+        self::getContainer()->set('test.file_storage', $storage);
+
+        $file = $this->createUploadedFile(
+            'input.csv',
+            "user_username;user_password;user_language;user_active;user_organizationId;"
+            . "hierarchy_organizationId;hierarchy_organizationName;hierarchy_parentOrganizationId;session_name\n"
+            . "test-user;test-password;en-US;true;ORG-001;ORG-001;Example Organization;PARENT-001;test-session"
+        );
+
+        $this->kernelBrowser->request(
+            Request::METHOD_POST,
+            '/api/v1/upload',
+            [],
+            ['file' => $file]
+        );
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $this->kernelBrowser->getResponse()->getStatusCode(),
+            (string)$this->kernelBrowser->getResponse()->getContent()
+        );
+
+        $decodedResponse = json_decode(
+            $this->kernelBrowser->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        self::assertSame(
+            'Uploaded CSV file contains only one column. Check that the file uses the expected delimiter ",".',
+            $decodedResponse['error']['message']
+        );
+    }
+
     public function testItUploadsSingleCsvFromZipAndReturnsReferenceId(): void
     {
         if (!class_exists(ZipArchive::class)) {
