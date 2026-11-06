@@ -58,14 +58,14 @@ class UploadedFileValidatorTest extends TestCase
         $validator->validate($file);
     }
 
-    public function testItRejectsProvidedCsvUsingUnexpectedDelimiter(): void
+    public function testItRejectsCsvUsingUnexpectedDelimiter(): void
     {
         $validator = $this->createValidator(1024);
         $file = $this->createUploadedFile(
             'input.csv',
             "user_username;user_password;user_language;user_active;user_organizationId;"
             . "hierarchy_organizationId;hierarchy_organizationName;hierarchy_parentOrganizationId;session_name\n"
-            . "01ZR0752310D501;password;fr-FR;true;2GT;2GT;2GT;0752310D;September26-Delivery"
+            . "test-user;test-password;en-US;true;ORG-001;ORG-001;Example Organization;PARENT-001;test-session"
         );
 
         $this->expectException(UploadedFileValidationException::class);
