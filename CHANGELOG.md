@@ -4,6 +4,7 @@
 ### Added
 - [LSI-7252](https://oat-sa.atlassian.net/browse/LSI-7252) Switched docker rostering operational storage to LocalStack S3 and added signed URL generation for local access.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
+- [LSI-8302](https://oat-sa.atlassian.net/browse/LSI-8302) Align validation with External Rostering System requirements
 
 ### Fixed
 - [LSI-8270](https://oat-sa.atlassian.net/browse/LSI-8270) Reject rostering files parsed as a single column when they use an unexpected delimiter instead of reporting a successful import.
