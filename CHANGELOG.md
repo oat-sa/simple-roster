@@ -6,6 +6,9 @@
 - [LSI-8268](https://oat-sa.atlassian.net/browse/LSI-8268) Added `created_at` and `uploaded_at` timestamps to rostering imports, preserving both the import creation time and the original file upload time.
 - [LSI-8310](https://oat-sa.atlassian.net/browse/LSI-8310) Enforce code owners across lsi team repositories
 
+### Fixed
+- [LSI-8270](https://oat-sa.atlassian.net/browse/LSI-8270) Reject rostering files parsed as a single column when they use an unexpected delimiter instead of reporting a successful import.
+
 ## 4.3.1 - 2026-08-08
 ### Fixed
 - [LSI-8288](https://oat-sa.atlassian.net/browse/LSI-8288) Prevented rostering imports from changing assignments of existing users.

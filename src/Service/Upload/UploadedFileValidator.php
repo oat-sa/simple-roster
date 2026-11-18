@@ -116,6 +116,15 @@ class UploadedFileValidator
             throw new UploadedFileValidationException('Uploaded CSV file is empty.');
         }
 
+        if ($expectedColumns < 2) {
+            throw new UploadedFileValidationException(
+                sprintf(
+                    'Uploaded CSV file contains only one column. Check that the file uses the expected delimiter "%s".',
+                    $this->uploadedFileCsvDelimiter
+                )
+            );
+        }
+
         if ($recordCount > $this->allowedUploadedFileMaxRecords) {
             throw new UploadedFileValidationException(
                 sprintf(

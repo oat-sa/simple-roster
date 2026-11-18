@@ -40,7 +40,7 @@ class UploadedFileValidatorTest extends TestCase
     public function testItAcceptsValidFile(): void
     {
         $validator = $this->createValidator(1024);
-        $file = $this->createUploadedFile('test.csv', 'ok');
+        $file = $this->createUploadedFile('test.csv', 'column1,column2');
 
         $validator->validate($file);
 
@@ -54,6 +54,24 @@ class UploadedFileValidatorTest extends TestCase
 
         $this->expectException(UploadedFileValidationException::class);
         $this->expectExceptionMessage('Invalid CSV structure detected at row "2". Expected "2" columns, got "3".');
+
+        $validator->validate($file);
+    }
+
+    public function testItRejectsCsvUsingUnexpectedDelimiter(): void
+    {
+        $validator = $this->createValidator(1024);
+        $file = $this->createUploadedFile(
+            'input.csv',
+            "user_username;user_password;user_language;user_active;user_organizationId;"
+            . "hierarchy_organizationId;hierarchy_organizationName;hierarchy_parentOrganizationId;session_name\n"
+            . "test-user;test-password;en-US;true;ORG-001;ORG-001;Example Organization;PARENT-001;test-session"
+        );
+
+        $this->expectException(UploadedFileValidationException::class);
+        $this->expectExceptionMessage(
+            'Uploaded CSV file contains only one column. Check that the file uses the expected delimiter ",".'
+        );
 
         $validator->validate($file);
     }
