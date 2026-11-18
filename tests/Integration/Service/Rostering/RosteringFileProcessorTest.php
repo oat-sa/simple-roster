@@ -300,6 +300,67 @@ CSV,
         self::assertSame('processed', $this->readResultRecords('ref-existing-assignment')[0]['status']);
     }
 
+    public function testProcessUpdatesUserWhenInsertLosesUsernameRace(): void
+    {
+        [$concurrentLineItemSlug, $requestedLineItemSlug] = $this->fetchAvailableLineItemSlugs();
+        $connection = $this->getEntityManager()->getConnection();
+        $concurrentLineItemId = (int)$connection->fetchOne(
+            'SELECT id FROM line_items WHERE slug = :slug',
+            ['slug' => $concurrentLineItemSlug]
+        );
+
+        $csv = sprintf(
+            <<<'CSV'
+hierarchy_parentOrganizationId,user_username,user_password,session_name,marker
+SECOND_WORKER_GROUP,concurrent_user,SecondWorkerPassword1,%s,concurrent_username
+CSV,
+            $requestedLineItemSlug
+        );
+        $this->storeProcessingFile('ref-concurrent-username', $csv);
+
+        try {
+            // Simulate another worker creating the user after our SELECT but before our INSERT.
+            $this->createConcurrentUserInsertionTrigger($concurrentLineItemId);
+            $this->subject->process('ref-concurrent-username');
+        } finally {
+            $this->dropConcurrentUserInsertionTrigger();
+        }
+
+        $this->getEntityManager()->clear();
+
+        self::assertSame(
+            1,
+            (int)$connection->fetchOne(
+                'SELECT COUNT(*) FROM users WHERE username = :username',
+                ['username' => 'concurrent_user']
+            )
+        );
+
+        /** @var User|null $concurrentUser */
+        $concurrentUser = $this->getRepository(User::class)->findOneBy(['username' => 'concurrent_user']);
+        self::assertInstanceOf(User::class, $concurrentUser);
+        self::assertSame('SECOND_WORKER_GROUP', $concurrentUser->getGroupId());
+        self::assertTrue($this->passwordHasher->isPasswordValid($concurrentUser, 'SecondWorkerPassword1'));
+        self::assertSame([$concurrentLineItemSlug], $this->fetchAssignmentSlugs('concurrent_user'));
+
+        $records = $this->readResultRecords('ref-concurrent-username');
+        self::assertCount(1, $records);
+        self::assertSame('processed', $records[0]['status']);
+        self::assertSame('', $records[0]['errorType']);
+        self::assertSame('', $records[0]['errorCode']);
+        self::assertSame('', $records[0]['errorMessage']);
+
+        /** @var RosteringImport|null $import */
+        $import = $this->getRepository(RosteringImport::class)->findOneBy(
+            ['referenceId' => 'ref-concurrent-username']
+        );
+        self::assertInstanceOf(RosteringImport::class, $import);
+        self::assertSame(RosteringImport::STATUS_PROCESSED, $import->getStatus());
+        self::assertSame(1, $import->getTotalRows());
+        self::assertSame(1, $import->getProcessedRows());
+        self::assertSame(0, $import->getFailedRows());
+    }
+
     public function testProcessSkipsEmptyRowsAndDoesNotWriteThemToResultCsv(): void
     {
         $availableLineItemSlugs = $this->fetchAvailableLineItemSlugs();
@@ -437,6 +498,34 @@ CSV,
         rewind($stream);
 
         $this->fileStorage->store($stream, $this->buildInputKey($referenceId));
+    }
+
+    private function createConcurrentUserInsertionTrigger(int $lineItemId): void
+    {
+        $this->getEntityManager()->getConnection()->executeStatement(
+            sprintf(
+                <<<'SQL'
+CREATE TRIGGER simulate_concurrent_user_creation_trigger
+BEFORE INSERT ON users
+WHEN NEW.username = 'concurrent_user'
+BEGIN
+    INSERT INTO users (username, password, roles, group_id)
+    VALUES (NEW.username, 'FirstWorkerPasswordHash', '[]', 'FIRST_WORKER_GROUP');
+
+    INSERT INTO assignments (user_id, line_item_id, state, attempts_count, updated_at)
+    VALUES ((SELECT id FROM users WHERE username = NEW.username), %d, 'started', 1, CURRENT_TIMESTAMP);
+END
+SQL,
+                $lineItemId
+            )
+        );
+    }
+
+    private function dropConcurrentUserInsertionTrigger(): void
+    {
+        $this->getEntityManager()->getConnection()->executeStatement(
+            'DROP TRIGGER IF EXISTS simulate_concurrent_user_creation_trigger'
+        );
     }
 
     private function readProcessingFileContent(string $referenceId): string

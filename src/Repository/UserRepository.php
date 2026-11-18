@@ -248,11 +248,12 @@ class UserRepository extends AbstractRepository
         );
     }
 
-    public function insertForRostering(string $username, string $passwordHash, string $organizationId): int
+    public function insertForRostering(string $username, string $passwordHash, string $organizationId): ?int
     {
         $userId = $this->getConnection()->fetchOne(
             'INSERT INTO users (username, password, roles, group_id) '
-            . 'VALUES (:username, :password, :roles, :groupId) RETURNING id',
+            . 'VALUES (:username, :password, :roles, :groupId) '
+            . 'ON CONFLICT (username) DO NOTHING RETURNING id',
             [
                 'username' => $username,
                 'password' => $passwordHash,
@@ -262,7 +263,7 @@ class UserRepository extends AbstractRepository
         );
 
         if (false === $userId || null === $userId) {
-            return 0;
+            return null;
         }
 
         return (int)$userId;

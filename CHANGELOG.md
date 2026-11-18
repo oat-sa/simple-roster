@@ -7,6 +7,7 @@
 
 ### Fixed
 - [LSI-8270](https://oat-sa.atlassian.net/browse/LSI-8270) Reject rostering files parsed as a single column when they use an unexpected delimiter instead of reporting a successful import.
+- [LSI-8303](https://oat-sa.atlassian.net/browse/LSI-8303) Prevented duplicate username errors during concurrent Simple Roster imports.
 
 ## 4.3.1 - 2026-08-08
 ### Fixed

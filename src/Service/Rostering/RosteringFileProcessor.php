@@ -293,21 +293,7 @@ class RosteringFileProcessor
         $hasSessionName = '' !== $sessionName;
 
         if (null !== $userId) {
-            $fieldsToUpdate = [];
-
-            if ($hasPassword) {
-                $fieldsToUpdate['password'] = $this->hashUserPassword($username, $password);
-            }
-
-            if ($hasParentOrganizationId) {
-                $fieldsToUpdate['groupId'] = $parentOrganizationId;
-            }
-
-            $this->userRepository->updateForRostering($username, $fieldsToUpdate);
-
-            if ([] !== $fieldsToUpdate) {
-                $this->userCacheSynchronizer->markForWarmup($username);
-            }
+            $this->updateExistingUser($username, $password, $parentOrganizationId);
 
             return;
         }
@@ -333,21 +319,43 @@ class RosteringFileProcessor
             );
         }
 
-        $createdUserId = $this->createUser($username, $password, $parentOrganizationId);
+        $passwordHash = $this->hashUserPassword($username, $password);
+        $createdUserId = $this->userRepository->insertForRostering(
+            $username,
+            $passwordHash,
+            $parentOrganizationId
+        );
+        if (null === $createdUserId) {
+            $this->updateExistingUser($username, $password, $parentOrganizationId, $passwordHash);
+
+            return;
+        }
+
         $this->replaceUserAssignment($createdUserId, $sessionName);
         $this->userCacheSynchronizer->markForWarmup($username);
     }
 
-    private function createUser(string $username, string $password, string $organizationId): int
-    {
-        $passwordHash = $this->hashUserPassword($username, $password);
+    private function updateExistingUser(
+        string $username,
+        string $password,
+        string $organizationId,
+        ?string $passwordHash = null
+    ): void {
+        $fieldsToUpdate = [];
 
-        $userId = $this->userRepository->insertForRostering($username, $passwordHash, $organizationId);
-        if (0 === $userId) {
-            throw new RuntimeException(sprintf('Unable to create user "%s".', $username));
+        if ('' !== $password) {
+            $fieldsToUpdate['password'] = $passwordHash ?? $this->hashUserPassword($username, $password);
         }
 
-        return $userId;
+        if ('' !== $organizationId) {
+            $fieldsToUpdate['groupId'] = $organizationId;
+        }
+
+        $this->userRepository->updateForRostering($username, $fieldsToUpdate);
+
+        if ([] !== $fieldsToUpdate) {
+            $this->userCacheSynchronizer->markForWarmup($username);
+        }
     }
 
     private function hashUserPassword(string $username, string $plainPassword): string
