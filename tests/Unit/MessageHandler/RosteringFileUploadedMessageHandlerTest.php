@@ -64,7 +64,7 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
                 ]
             );
 
-        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123'));
+        $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123', $uploadedAt));
     }
 
     public function testItBubblesUpExceptionFromProcessor(): void
