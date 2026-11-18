@@ -34,7 +34,7 @@ class UploadFileService
         try {
             $this->validator->validate($fileToProcess);
 
-            $referenceId = Uuid::uuid4()->toString();
+            $referenceId = Uuid::uuid6()->toString();
             $storageKey = $this->fileKeyResolver->inputFileKey($referenceId);
 
             $this->fileStorage->store(

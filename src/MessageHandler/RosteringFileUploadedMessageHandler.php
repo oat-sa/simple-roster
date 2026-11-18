@@ -25,6 +25,14 @@ class RosteringFileUploadedMessageHandler
     {
         try {
             $this->rosteringFileProcessor->process($message->referenceId);
+
+            $this->logger->info(
+                'Rostering file processing finished.',
+                [
+                    'messageClass' => RosteringFileUploadedMessage::class,
+                    'referenceId' => $message->referenceId,
+                ]
+            );
         } catch (RosteringValidationException $exception) {
             $this->logger->warning(
                 $exception->getMessage(),

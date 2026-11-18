@@ -45,6 +45,14 @@ final class RosteringUserCacheSynchronizer
         $usernamesForInvalidation = array_keys($this->users);
         $usernamesForWarmup = array_keys(array_filter($this->users));
 
+        $this->logger->info(
+            'Starting rostering cache synchronization.',
+            [
+                'usersForInvalidationCount' => count($usernamesForInvalidation),
+                'usersForWarmupCount' => count($usernamesForWarmup),
+            ]
+        );
+
         foreach ($usernamesForInvalidation as $username) {
             try {
                 $this->userCacheInvalidator->invalidate($username);
@@ -57,6 +65,14 @@ final class RosteringUserCacheSynchronizer
         }
 
         if ($usernamesForWarmup === []) {
+            $this->logger->info(
+                'Finished rostering cache synchronization.',
+                [
+                    'usersForInvalidationCount' => count($usernamesForInvalidation),
+                    'usersForWarmupCount' => 0,
+                ]
+            );
+
             return;
         }
 
@@ -71,5 +87,13 @@ final class RosteringUserCacheSynchronizer
                 ]
             );
         }
+
+        $this->logger->info(
+            'Finished rostering cache synchronization.',
+            [
+                'usersForInvalidationCount' => count($usernamesForInvalidation),
+                'usersForWarmupCount' => count($usernamesForWarmup),
+            ]
+        );
     }
 }

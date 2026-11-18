@@ -50,6 +50,17 @@ class RosteringFileUploadedMessageHandlerTest extends TestCase
             ->method('process')
             ->with('ref-123');
 
+        $this->logger
+            ->expects(self::once())
+            ->method('info')
+            ->with(
+                'Rostering file processing finished.',
+                [
+                    'messageClass' => RosteringFileUploadedMessage::class,
+                    'referenceId' => 'ref-123',
+                ]
+            );
+
         $this->subject->__invoke(new RosteringFileUploadedMessage('ref-123'));
     }
 
